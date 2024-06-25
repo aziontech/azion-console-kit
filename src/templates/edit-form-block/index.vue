@@ -4,7 +4,7 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { TOAST_LIFE } from '@/utils/constants'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -40,6 +40,7 @@
 
   const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
+  const { scrollToError } = useScrollToError()
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -91,10 +92,6 @@
       detail
     }
 
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
-    }
-
     toast.add(options)
   }
 
@@ -130,25 +127,7 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(errors)
     }
   )
 
@@ -162,9 +141,15 @@
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
       :class="{ 'mt-4': isTabs }"
     >
-      <slot name="form" />
+      <slot
+        name="form"
+        :errors="errors"
+      />
 
-      <slot name="raw-form" />
+      <slot
+        name="raw-form"
+        :errors="errors"
+      />
     </form>
   </div>
 

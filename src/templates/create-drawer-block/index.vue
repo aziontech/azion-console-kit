@@ -7,7 +7,8 @@
   import Sidebar from 'primevue/sidebar'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import { TOAST_LIFE } from '@/utils/constants'
+
+  import { useScrollToError } from '@/composables/useScrollToError'
   defineOptions({
     name: 'create-drawer-block'
   })
@@ -40,12 +41,13 @@
     }
   })
 
+  const { scrollToError } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
 
-  const { resetForm, isSubmitting, handleSubmit } = useForm({
+  const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -88,10 +90,6 @@
       detail: summary
     }
 
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
-    }
-
     toast.add(options)
   }
 
@@ -116,25 +114,7 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(errors)
     }
   )
 
@@ -172,6 +152,7 @@
       >
         <slot
           name="formFields"
+          :errors="errors"
           :disabledFields="isSubmitting"
         />
       </form>

@@ -3,8 +3,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import InputNumber from 'primevue/inputnumber'
-  import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
   import PrimeTag from 'primevue/tag'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -65,8 +65,8 @@
   const { value: browserCacheSettings } = useField('browserCacheSettings')
 
   const { value: name } = useField('name')
-  const { value: address, errorMessage: addressError } = useField('address')
-  const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
+  const { value: address } = useField('address')
+  const { value: hostHeader } = useField('hostHeader')
   const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
@@ -99,24 +99,24 @@
     {
       title: 'HTTP support',
       subtitle: `Use only the HTTP protocol. Choose from the available HTTP ports.`,
-      value: 'http'
+      inputValue: 'http'
     },
     {
       title: 'HTTP and HTTPS support',
       subtitle: `Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports.`,
-      value: 'http,https'
+      inputValue: 'http,https'
     },
     {
       title: 'HTTP/3 support',
       subtitle: `Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443.`,
-      value: 'http3'
+      inputValue: 'http3'
     }
   ]
 
   const policyProtocolRadioOptions = [
-    { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
-    { title: 'Enforce HTTP', value: 'http' },
-    { title: 'Enforce HTTPS', value: 'https' }
+    { title: 'Preserve HTTP/HTTPS', inputValue: 'preserve' },
+    { title: 'Enforce HTTP', inputValue: 'http' },
+    { title: 'Enforce HTTPS', inputValue: 'https' }
   ]
 
   const cacheSettingsRadioOptions = (type) => {
@@ -127,11 +127,11 @@
     const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
 
     return [
-      { title: 'Override cache settings', value: 'override' },
+      { title: 'Override cache settings', inputValue: 'override' },
       {
         title: 'Honor cache policies',
         subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
-        value: 'honor'
+        inputValue: 'honor'
       }
     ]
   }
@@ -248,6 +248,7 @@
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
+              name="httpPort"
               filter
               autoFilterFocus
               optionLabel="name"
@@ -285,6 +286,7 @@
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"
+              name="httpsPort"
               optionLabel="name"
               display="chip"
               :class="{ 'p-invalid': httpsPortError }"
@@ -311,47 +313,33 @@
         v-if="checkIsProtocol.https || checkIsProtocol.http3"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="tls-version"
-            class="text-color text-base font-medium"
-            >Minimum TLS version</label
-          >
-          <Dropdown
-            appendTo="self"
+          <FieldDropdown
+            label="Minimum TLS version"
+            name="minimumTlsVersion"
             :options="TLS_VERSIONS_OPTIONS"
-            v-model="minimumTlsVersion"
             optionLabel="label"
             optionValue="value"
+            :value="minimumTlsVersion"
+            inputId="minimumTlsVersion"
             placeholder="Select a minimum TLS Version"
             :disabled="checkIsProtocol.http"
+            description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
           />
-
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
-            supports.
-          </small>
         </div>
 
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="ciphers-list"
-            class="text-color text-base font-medium"
-            >Cipher suite</label
-          >
-          <Dropdown
-            appendTo="self"
+          <FieldDropdown
+            label="Cipher suite"
+            name="supportedCiphers"
             :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
-            v-model="supportedCiphers"
             optionLabel="label"
             optionValue="value"
+            :value="supportedCiphers"
+            inputId="supportedCiphers"
             placeholder="Select the supported cipher suite"
             :disabled="checkIsProtocol.http"
+            description="Select which cipher suite the application supports. See the list of supported ciphers in the documentation."
           />
-
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Select which cipher suite the application supports. See the list of supported ciphers in
-            the documentation.
-          </small>
         </div>
       </div>
     </template>
@@ -401,49 +389,25 @@
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="address"
-          class="text-color text-base font-medium"
-          >Address *</label
-        >
-        <InputText
-          id="address"
-          v-model="address"
-          :class="{ 'p-invalid': addressError }"
+        <FieldText
+          label="Address *"
+          name="address"
           aria-describedby="address-help"
           placeholder="example.com"
+          :value="address"
+          description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
-        <div class="text-color-secondary text-sm font-normal">
-          Define an origin for the content in FQDN format or an IPv4/IPv6 address.
-        </div>
-        <small
-          v-if="addressError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ addressError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="host-header"
-          class="text-color text-base font-medium"
-          >Host Header *</label
-        >
-        <InputText
-          id="hostHeader"
-          v-model="hostHeader"
-          :class="{ 'p-invalid': hostHeaderError }"
+        <FieldText
+          label="Host Header *"
+          name="hostHeader"
           aria-describedby="hostHeader-help"
           placeholder="${host}"
+          :value="hostHeader"
+          description="Identify a virtualhost sent in the Host header to the origin."
         />
-        <div class="text-color-secondary text-sm font-normal">
-          Identify a virtualhost sent in the Host header to the origin.
-        </div>
-        <small
-          v-if="hostHeaderError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ hostHeaderError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -469,8 +433,9 @@
           <label
             for="maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >Maximum TTL (seconds)</label
           >
+            Maximum TTL (seconds)
+          </label>
 
           <InputNumber
             v-model="browserCacheSettingsMaximumTtl"
@@ -491,8 +456,9 @@
           <label
             for="cdn-maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
           >
+            {{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+          </label>
 
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"

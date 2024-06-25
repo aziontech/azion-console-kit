@@ -117,11 +117,16 @@
   }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'domain name copied')
+    showToast('success', 'Domain copied to clipboard!')
+  }
+
+  const scrollToTop = () => {
+    window.scrollTo(0, 0)
   }
 
   onMounted(async () => {
     try {
+      scrollToTop()
       await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
     } catch (error) {
       toastError(error)

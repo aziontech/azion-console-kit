@@ -8,17 +8,17 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
   import FieldGroupCheckbox from '@/templates/form-fields-inputs/fieldGroupCheckbox'
-  import Dropdown from 'primevue/dropdown'
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
 
-  import TextArea from 'primevue/textarea'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
   const emit = defineEmits(['l2-caching-enabled'])
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
     },
@@ -40,7 +40,7 @@
   ])
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
       return CDN_MAXIMUM_TTL_MIN_VALUE
     }
     return CDN_MAXIMUM_TTL_MAX_VALUE
@@ -60,14 +60,13 @@
   const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
   const { value: isSliceL2CachingEnabled } = useField('isSliceL2CachingEnabled')
   const { value: cacheByQueryString } = useField('cacheByQueryString')
-  const { value: queryStringFields, errorMessage: queryStringFieldsError } =
-    useField('queryStringFields')
+  const { value: queryStringFields } = useField('queryStringFields')
   const { value: l2CachingEnabled } = useField('l2CachingEnabled')
   const { value: l2Region } = useField('l2Region')
   const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
 
   const { value: cacheByCookies } = useField('cacheByCookies')
-  const { value: cookieNames, errorMessage: cookieNamesError } = useField('cookieNames')
+  const { value: cookieNames } = useField('cookieNames')
   const { value: adaptiveDeliveryAction } = useField('adaptiveDeliveryAction')
   const {
     fields: deviceGroup,
@@ -101,10 +100,10 @@
       {
         title: 'Honor cache policies',
         subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
-        value: 'honor',
+        inputValue: 'honor',
         disabled: !isBrowser && l2CachingEnabled.value
       },
-      { title: 'Override cache settings', value: 'override' }
+      { title: 'Override cache settings', inputValue: 'override' }
     ]
   }
 
@@ -128,54 +127,54 @@
   const queryStringRadioOptions = [
     {
       title: 'Content does not vary by Query String (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Query String fields (Allowlist)',
-      value: 'whitelist',
-      disabled: !props.isEnableApplicationAccelerator
+      inputValue: 'whitelist',
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by Query String, except for some fields (Blocklist)',
-      value: 'blacklist',
-      disabled: !props.isEnableApplicationAccelerator
+      inputValue: 'blacklist',
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by all Query String fields',
-      value: 'all'
+      inputValue: 'all'
     }
   ]
 
   const cookieRadioOptions = [
     {
       title: 'Content does not vary by Cookies (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Cookies (Allowlist)',
-      value: 'whitelist',
-      disabled: !props.isEnableApplicationAccelerator
+      inputValue: 'whitelist',
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
-      value: 'blacklist',
-      disabled: !props.isEnableApplicationAccelerator
+      inputValue: 'blacklist',
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by all Cookies',
-      value: 'all',
-      disabled: !props.isEnableApplicationAccelerator
+      inputValue: 'all',
+      disabled: !props.isApplicationAcceleratorEnabled
     }
   ]
 
   const adaptiveDeliveryRadioOptions = [
     {
       title: 'Content does not vary by Device Groups (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Device Groups (Allowlist)',
-      value: 'whitelist'
+      inputValue: 'whitelist'
     }
   ]
 
@@ -188,7 +187,7 @@
       }
     ]
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       options.push(
         {
           title: 'Query String Sort',
@@ -233,7 +232,7 @@
     isSliceL2CachingEnabled.value = false
 
     const hasNotApplicationAcceleratorAndExceedMinimumValue =
-      !props.isEnableApplicationAccelerator &&
+      !props.isApplicationAcceleratorEnabled &&
       cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
 
     if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {
@@ -295,6 +294,11 @@
           :max="31536000"
           :step="1"
           :class="{ 'p-invalid': browserCacheSettingsMaximumTtlError }"
+          :pt="{
+            input: {
+              name: 'browserCacheSettingsMaximumTtl'
+            }
+          }"
         />
         <small
           v-if="browserCacheSettingsMaximumTtlError"
@@ -356,24 +360,18 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
         v-if="props.showTieredCache"
       >
-        <label
-          for="method"
-          class="text-color text-sm font-medium leading-5"
-          >Tiered Cache Region</label
-        >
-        <Dropdown
-          appendTo="self"
-          inputId="originId"
-          v-model="l2Region"
-          :disabled="!l2CachingEnabled"
+        <FieldDropdown
+          label="Tiered Cache Region"
+          name="l2Region"
           :options="TIERED_CACHE_REGION"
           optionLabel="label"
-          option-value="value"
+          optionValue="value"
+          :value="l2Region"
+          inputId="l2Region"
           placeholder="Select an Tiered Cache Region"
+          :disabled="!l2CachingEnabled"
+          description="Choose an Tiered Cache Region suitable for your application."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5"
-          >Choose an Tiered Cache Region suitable for your application.</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -446,23 +444,13 @@
         v-if="showQueryFields"
         class="flex flex-col sm:max-w-lg w-full gap-2"
       >
-        <label
-          for="queryStringFields"
-          class="text-color text-sm font-medium"
-          >Query String Fields *</label
-        >
-        <TextArea
-          id="queryStringFields"
-          v-model="queryStringFields"
-          :class="{ 'p-invalid': queryStringFieldsError }"
-          rows="5"
-          cols="30"
+        <FieldTextArea
+          label="Query String Fields *"
+          name="queryStringFields"
+          :value="queryStringFields"
           placeholder="name"
+          description="Separate query fields using line breaks."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Separate query fields using line breaks.
-        </small>
-        <small class="p-error">{{ queryStringFieldsError }}</small>
       </div>
 
       <FieldGroupSwitch
@@ -482,23 +470,13 @@
         v-if="showCookieNames"
         class="flex flex-col sm:max-w-lg w-full gap-2"
       >
-        <label
-          for="cookieNames"
-          class="text-color text-sm font-medium"
-          >Cookie Names *</label
-        >
-        <TextArea
-          id="cookieNames"
-          v-model="cookieNames"
-          :class="{ 'p-invalid': cookieNamesError }"
-          rows="5"
-          cols="30"
+        <FieldTextArea
+          label="Cookie Names *"
+          name="cookieNames"
+          :value="cookieNames"
           placeholder="cookie_name"
+          description="Separate cookies using line breaks."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Separate cookies using line breaks.
-        </small>
-        <small class="p-error">{{ cookieNamesError }}</small>
       </div>
 
       <FieldGroupRadio

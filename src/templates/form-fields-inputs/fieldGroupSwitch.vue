@@ -33,6 +33,10 @@
     options: {
       type: Array,
       required: true
+    },
+    inputClass: {
+      type: String,
+      default: ''
     }
   })
 
@@ -73,6 +77,7 @@
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
+          :selectorClass="props.inputClass"
         >
           <template #footer>
             <slot
@@ -92,12 +97,6 @@
       v-if="props.helpText"
     >
       {{ props.helpText }}
-    </small>
-    <small
-      v-if="errorMessage"
-      class="p-error text-xs font-normal leading-tight"
-    >
-      {{ errorMessage }}
     </small>
   </div>
 </template>

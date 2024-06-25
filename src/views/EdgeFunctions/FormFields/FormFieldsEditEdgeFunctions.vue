@@ -1,6 +1,7 @@
 <script setup>
   import InputText from 'primevue/inputtext'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -26,7 +27,7 @@
     return previewState.value && language.value !== 'lua'
   })
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
   const { value: code, errorMessage: codeError } = useField('code')
@@ -81,26 +82,13 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <InputText
-              v-model="name"
-              id="name"
-              type="text"
-              :class="{ 'p-invalid': nameError }"
+            <FieldText
+              label="Name *"
+              name="name"
               placeholder="My function"
+              :value="name"
+              description="Give a unique and descriptive name to identify the function."
             />
-            <small
-              v-if="nameError"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ nameError }}</small
-            >
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Give a unique and descriptive name to identify the function.</small
-            >
           </div>
         </template>
       </FormHorizontal>

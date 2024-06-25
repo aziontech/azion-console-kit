@@ -196,7 +196,6 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({ name: 'list-table-block' })
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
@@ -283,10 +282,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

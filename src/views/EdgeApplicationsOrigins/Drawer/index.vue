@@ -8,7 +8,6 @@
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
@@ -40,7 +39,7 @@
       type: Function,
       required: true
     },
-    isLoadBalancer: {
+    isLoadBalancerEnabled: {
       type: Boolean,
       required: true
     }
@@ -62,7 +61,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: !props.isLoadBalancer
+      disabled: !props.isLoadBalancerEnabled
     },
     {
       label: 'Edge Storage',
@@ -220,8 +219,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Origin key copied to clipboard!',
-      life: TOAST_LIFE
+      summary: 'Origin key copied to clipboard!'
     })
   }
 
@@ -273,7 +271,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
     @onError="handleFailedCreateOrigin"
-    :showBarGoBack="true"
+    showBarGoBack
     title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
@@ -294,7 +292,7 @@
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="handleTrackEdit"
-    :showBarGoBack="true"
+    showBarGoBack
     @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >

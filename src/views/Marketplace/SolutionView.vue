@@ -253,10 +253,12 @@
       closable: true,
       severity: 'success',
       summary: feedback,
-      link: {
-        label: 'Go to Edge Functions',
-        callback: () => {
-          router.push({ name: 'list-edge-functions' })
+      action: {
+        link: {
+          label: 'Go to Edge Functions',
+          callback: () => {
+            router.push({ name: 'list-edge-functions' })
+          }
         }
       }
     })

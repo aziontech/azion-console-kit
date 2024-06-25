@@ -32,7 +32,7 @@
       type: Function,
       required: true
     },
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
     },
@@ -55,7 +55,7 @@
     hideApplicationAcceleratorInDescription: {
       type: Boolean
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -206,18 +206,19 @@
     :showBarGoBack="true"
     title="Create Rule"
   >
-    <template #formFields>
+    <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
+        :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
-        :isImageOptimization="props.isImageOptimization"
+        :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        :errors="errors"
       />
     </template>
   </CreateDrawerBlock>
@@ -233,18 +234,19 @@
     @onError="closeDrawerEdit"
     title="Edit Rule"
   >
-    <template #formFields>
+    <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
+        :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
-        :isImageOptimization="props.isImageOptimization"
+        :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        :errors="errors"
       />
     </template>
   </EditDrawerBlock>

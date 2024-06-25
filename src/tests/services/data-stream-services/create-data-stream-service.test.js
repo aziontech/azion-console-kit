@@ -28,7 +28,7 @@ const fixtures = {
   dataStreamCustomTemplateMock: {
     name: 'Data Stream Custom a Template',
     template: 'CUSTOM_TEMPLATE',
-    dataSet: '{"session_id":"$session_id"}',
+    dataSet: '{"session_id":"$session_id",  "event_id":"$event_id"}',
     dataSource: 'http',
     domains: [[], []],
     endpoint: 'qradar',
@@ -95,7 +95,11 @@ describe('DataStreamServices', () => {
       method: 'POST',
       body: {
         name: fixtures.dataStreamCustomTemplateMock.name,
-        template_model: fixtures.dataStreamCustomTemplateMock.dataSet,
+        template_model: JSON.stringify(
+          JSON.parse(fixtures.dataStreamCustomTemplateMock.dataSet),
+          null,
+          '\t'
+        ),
         domain_ids: [],
         all_domains: true,
         endpoint: {
@@ -238,7 +242,8 @@ describe('DataStreamServices', () => {
       endpoint: 'kafka',
       values: {
         kafkaTopic: 'example_topic',
-        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092'
+        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092',
+        useTls: true
       }
     },
     {

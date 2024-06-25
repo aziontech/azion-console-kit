@@ -40,7 +40,6 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const toast = useToast()
 
@@ -82,10 +81,6 @@
       detail
     }
 
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
-    }
-
     toast.add(options)
   }
 
@@ -111,7 +106,11 @@
   }
 
   const showEmailToast = () => {
-    showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+    showToast(
+      'info',
+      'Check your inbox and follow the instructions to verify this new email.',
+      'Confirmation email sent'
+    )
   }
 
   const successSubmit = () => {
@@ -157,7 +156,7 @@
           .required()
           .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
-          .test('requirements', '', (value) => {
+          .test('requirements', 'password does not meet the requirements', (value) => {
             const hasUpperCase = value && /[A-Z]/.test(value)
             const hasLowerCase = value && /[a-z]/.test(value)
             const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)

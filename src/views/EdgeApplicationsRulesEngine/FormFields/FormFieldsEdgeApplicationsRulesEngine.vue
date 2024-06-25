@@ -4,19 +4,20 @@
   import { useField, useFieldArray } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import fieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
-  import AutoComplete from 'primevue/autocomplete'
+
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
     },
@@ -24,7 +25,7 @@
       type: Boolean,
       required: true
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -58,12 +59,15 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
+    },
+    errors: {
+      type: Object
     }
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimization)
-  const checkPhaseIsDefaultValue = ref(true)
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
+  const checkPhaseIsDefaultValue = ref()
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -92,7 +96,7 @@
   })
 
   const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimization) return ''
+    if (props.isImageOptimizationEnabled) return ''
     return ' - Requires Image Processor'
   })
 
@@ -198,7 +202,6 @@
   } = useFieldArray('behaviors')
   const { value: phase } = useField('phase')
   const { value: description } = useField('description')
-  useField('isActive')
 
   const DEFAULT_OPERATOR = {
     variable: '${uri}',
@@ -272,7 +275,7 @@
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
    * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isEnableApplicationAccelerator' prop.
+   * it sets the 'requires' property based on the 'isApplicationAcceleratorEnabled' prop.
    * @param {Array} options - The behavior options to update.
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
@@ -285,7 +288,7 @@
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
+        const requires = conditionsMap[option.value] ?? !props.isApplicationAcceleratorEnabled
 
         return { ...option, requires }
       }
@@ -599,33 +602,29 @@
 
   const phasesRadioOptions = ref([])
 
-  watch(
-    checkPhaseIsDefaultValue,
-    () => {
-      if (!checkPhaseIsDefaultValue.value) {
-        phasesRadioOptions.value = [
-          {
-            title: 'Request Phase',
-            value: 'request',
-            subtitle: 'Configure the requests made to the edge.'
-          },
-          {
-            title: 'Response Phase',
-            value: 'response',
-            subtitle: 'Configure the responses delivered to end-users.'
-          }
-        ]
-      } else {
-        phasesRadioOptions.value = []
-      }
-    },
-    { immediate: true }
-  )
+  const setPhaseRadioOptions = () => {
+    if (!checkPhaseIsDefaultValue.value) {
+      phasesRadioOptions.value = [
+        {
+          title: 'Request Phase',
+          inputValue: 'request',
+          subtitle: 'Configure the requests made to the edge.'
+        },
+        {
+          title: 'Response Phase',
+          inputValue: 'response',
+          subtitle: 'Configure the responses delivered to end-users.'
+        }
+      ]
+    } else {
+      phasesRadioOptions.value = []
+    }
+  }
 
   onMounted(async () => {
     updateBehaviorsOptionsRequires()
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -639,13 +638,15 @@
 
     callOptionsServicesAtEdit()
     await processBehaviorsAtEdit()
+
     checkPhaseIsDefaultValue.value = phase.value === 'default'
+    setPhaseRadioOptions()
   })
 </script>
 
 <template>
   <FormHorizontal
-    :isDrawer="true"
+    isDrawer
     title="General"
     description="Create a rule to handle the conditional execution of behaviors through logical operators."
   >
@@ -732,22 +733,16 @@
           </div>
 
           <div class="flex gap-2 mt-6 mb-8">
-            <div class="p-inputgroup">
-              <div
-                class="p-inputgroup-addon"
-                :class="{
-                  'opacity-20': !props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue
-                }"
-              >
-                <i class="pi pi-dollar"></i>
-              </div>
-              <AutoComplete
+            <div class="w-full">
+              <fieldAutoComplete
                 :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
-                @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue"
-                :completeOnFocus="true"
+                :onComplete="searchVariableOption"
+                icon="pi pi-search"
+                :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
+                completeOnFocus
               />
             </div>
 
@@ -755,27 +750,28 @@
               :options="criteriaOperatorOptions"
               optionLabel="label"
               optionValue="value"
-              inputClass="w-full"
+              class="h-fit"
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
             />
-            <FieldText
-              v-if="
-                criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
-                criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
-              "
-              :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
-              :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
-              inputClass="w-full"
-              :disabled="checkPhaseIsDefaultValue"
-            />
+            <div class="w-full">
+              <FieldText
+                v-if="
+                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
+                "
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
+                :disabled="checkPhaseIsDefaultValue"
+              />
+            </div>
           </div>
         </div>
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -796,11 +792,10 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
-
           <PrimeButton
             v-if="isNotFirstCriteria(criteriaIndex)"
             icon="pi pi-trash"
@@ -810,7 +805,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue">
+      <div v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -861,7 +856,6 @@
               optionValue="value"
               optionDisabled="requires"
               :value="behaviors[behaviorIndex].value.name"
-              inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
             />
           </div>
@@ -874,7 +868,6 @@
                 :options="functionsInstanceOptions"
                 optionLabel="name.text"
                 optionValue="id"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -886,7 +879,6 @@
                 :options="originsOptions"
                 optionLabel="name"
                 optionValue="originId"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -898,7 +890,6 @@
                 :options="cacheSettingsOptions"
                 optionLabel="name"
                 optionValue="id"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -907,21 +898,21 @@
               <div class="flex flex-col w-full">
                 <FieldText
                   placeholder="Captured Array"
-                  inputClass="w-full mb-3"
+                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.captured_array"
                 />
                 <FieldText
                   placeholder="Subject"
-                  inputClass="w-full mb-3"
+                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.subject"
                 />
                 <FieldText
                   placeholder="Regex"
-                  inputClass="w-full"
+                  class="w-full"
                   :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.regex"
@@ -930,7 +921,6 @@
             </template>
             <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
               <FieldText
-                inputClass="w-full"
                 :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"

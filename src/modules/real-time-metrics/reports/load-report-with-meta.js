@@ -75,6 +75,8 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
 
   let resultQuery = resultQueryRaw
 
+  if (!resultQueryRaw) return {}
+
   const dataset = Object.keys(resultQueryRaw)
 
   if (dataset) {

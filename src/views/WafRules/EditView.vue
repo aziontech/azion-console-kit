@@ -9,13 +9,12 @@
     <template #form>
       <FormFieldsWafRules :disabledActive="false"></FormFieldsWafRules>
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+    <template #action-bar="{ onSubmit, onCancel, formValid, loading, values }">
       <ActionBarTemplate
         v-if="showActionBar"
-        @onSubmit="formSubmit(onSubmit, values)"
+        @onSubmit="formSubmit(onSubmit, values, formValid)"
         @onCancel="onCancel"
         :loading="loading"
-        :submitDisabled="!formValid"
       />
     </template>
   </EditFormBlock>
@@ -47,23 +46,23 @@
 
   const validationSchema = yup.object({
     name: yup.string().required(),
-    crossSiteScriptingSensitivity: yup.string(),
-    directoryTraversalSensitivity: yup.string(),
-    evadingTricksSensitivity: yup.string(),
-    fileUploadSensitivity: yup.string(),
-    identifiedAttackSensitivity: yup.string(),
-    remoteFileInclusionSensitivity: yup.string(),
+    sqlInjection: yup.boolean(),
     sqlInjectionSensitivity: yup.string(),
-    unwantedAccessSensitivity: yup.string(),
-    active: yup.boolean(),
-    fileUpload: yup.boolean(),
-    evadingTricks: yup.boolean(),
-    unwantedAccess: yup.boolean(),
-    identifiedAttack: yup.boolean(),
-    crossSiteScripting: yup.boolean(),
-    directoryTraversal: yup.boolean(),
     remoteFileInclusion: yup.boolean(),
-    sqlInjection: yup.boolean()
+    remoteFileInclusionSensitivity: yup.string(),
+    directoryTraversal: yup.boolean(),
+    directoryTraversalSensitivity: yup.string(),
+    crossSiteScripting: yup.boolean(),
+    crossSiteScriptingSensitivity: yup.string(),
+    fileUpload: yup.boolean(),
+    fileUploadSensitivity: yup.string(),
+    evadingTricks: yup.boolean(),
+    evadingTricksSensitivity: yup.string(),
+    unwantedAccess: yup.boolean(),
+    unwantedAccessSensitivity: yup.string(),
+    identifiedAttack: yup.boolean(),
+    identifiedAttackSensitivity: yup.string(),
+    active: yup.boolean()
   })
 
   const wafRuleId = ref(route.params.id)
@@ -76,8 +75,10 @@
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
   }
 
-  const formSubmit = async (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
     await onSubmit()
-    emit('handleWafRulesUpdated', values)
+    if (formValid) {
+      emit('handleWafRulesUpdated', values)
+    }
   }
 </script>

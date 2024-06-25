@@ -41,7 +41,6 @@
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
-  import { TOAST_LIFE } from '@/utils/constants'
   import { useRoute, useRouter } from 'vue-router'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
@@ -87,7 +86,8 @@
         copy: copyDomain
       },
       onClose: () => {
-        router.push({ name: 'list-domains' })
+        router.push({ path: value.urlToEditView })
+        renderToastDomainCreateSuccesfully()
       }
     })
     tracker.product.productCreated({
@@ -116,6 +116,16 @@
     }
   }
 
+  const renderToastDomainCreateSuccesfully = () => {
+    const toastConfig = {
+      closable: true,
+      severity: 'success',
+      summary: 'Succesfully created',
+      detail: 'The domain is now available in the Domain management section.'
+    }
+    toast.add({ ...toastConfig })
+  }
+
   const handleTrackFailedCreation = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -141,10 +151,6 @@
       closable: true,
       severity,
       summary
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

@@ -76,7 +76,7 @@
       is: 'kafka',
       then: (schema) => schema.max(150).required('Kafka Topic is a required field')
     }),
-
+    useTls: yup.boolean(),
     // s3
     host: yup.string().when('endpoint', {
       is: 's3',
@@ -235,12 +235,11 @@
             :listDataStreamDomainsService="props.listDataStreamDomainsService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
           <SamplingDialog
             v-model:visible="displaySamplingDialog"
