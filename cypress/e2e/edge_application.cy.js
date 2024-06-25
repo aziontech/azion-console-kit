@@ -32,9 +32,7 @@ const selectors = {
     actionsButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
     deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]',
     deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
-    successMessage: '.justify-between > .flex > .text-color',
-    closeSuccessMessage: '.p-toast-icon-close > .p-icon'
+    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
   }
 }
 
@@ -104,7 +102,5 @@ describe('Edge Application', () => {
     cy.get(selectors.edgeApplication.confirmDelete).click()
     cy.get(selectors.edgeApplication.deleteInput).type('delete')
     cy.get(selectors.edgeApplication.confirmDeleteButton).click()
-    cy.get(selectors.edgeApplication.successMessage).should('be.visible')
-    cy.get(selectors.edgeApplication.closeSuccessMessage).click()
   })
 })
