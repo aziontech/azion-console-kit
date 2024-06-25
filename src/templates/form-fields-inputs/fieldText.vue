@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { ref, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -31,13 +31,9 @@
     readonly: {
       type: Boolean,
       default: false
-    },
-    inputClass: {
-      type: String,
-      default: ''
     }
   })
-
+  const inputRef = ref(null)
   const name = toRef(props, 'name')
 
   const {
@@ -48,15 +44,21 @@
   } = useField(name, undefined, {
     initialValue: props.value
   })
+
+  defineExpose({
+    inputRef
+  })
 </script>
 
 <template>
   <label
     :for="props.name"
     class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
   >
+    {{ props.label }}
+  </label>
   <InputText
+    ref="inputRef"
     :id="name"
     v-model="inputValue"
     :name="name"
@@ -65,8 +67,8 @@
     type="text"
     :placeholder="props.placeholder"
     @input="handleChange"
+    :class="{ 'p-invalid': errorMessage }"
     @blur="handleBlur"
-    :class="inputClass"
     v-bind="$attrs"
   />
   <small

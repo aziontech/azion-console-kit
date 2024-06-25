@@ -47,7 +47,7 @@
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
 
-  const { resetForm, isSubmitting, handleSubmit } = useForm({
+  const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -152,6 +152,7 @@
       >
         <slot
           name="formFields"
+          :errors="errors"
           :disabledFields="isSubmitting"
         />
       </form>

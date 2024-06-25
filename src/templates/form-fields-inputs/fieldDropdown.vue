@@ -33,7 +33,7 @@
       default: ''
     },
     optionDisabled: {
-      type: String,
+      type: [String, Function],
       default: ''
     },
     options: {
@@ -135,6 +135,7 @@
     :class="{ 'p-invalid': errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
+    class="w-full"
     :pt="{
       filterInput: {
         class: 'w-full'

@@ -8,14 +8,14 @@ const fixtures = {
     origin_id: '12',
     error_responses: [
       {
-        code: 500,
+        code: 'any',
         timeout: 2,
         uri: '/teste/',
         custom_status_code: '503'
       }
     ]
   },
-  parsedCode: '500',
+  parsedCode: 'any',
   parsedCustomCode: 503
 }
 
