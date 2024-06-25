@@ -1,5 +1,5 @@
 /* if you have two environments for the same application */
-//const environment = process.env.VITE_ENVIRONMENT || 'production';
+const environment = process.env.VITE_ENVIRONMENT || 'production';
 //const config = require(`./azion/${environment}/azion.json`)
 
 /* eslint-env node */
@@ -8,6 +8,22 @@
 //  config.domain.domain_name && config.domain.domain_name.trim() !== ''
 //    ? config.domain.domain_name
 //    : 'console.azion.com'
+
+const addStagePrefix = (origin) => {
+  if (environment === 'stage') {
+    return origin?.map(origin => ({
+      ...origin,
+      hostHeader: `stage-${origin.hostHeader}`,
+      addresses: origin.addresses?.map(addr => `stage-${addr}`)
+    }));
+  }
+  return origin;
+};
+
+const addStageSuffixToCookies = (cookieName) => {
+  return environment === 'stage' ? `${cookieName}_stg` : cookieName;
+};
+
 
 const cacheConfig = [
   {
@@ -221,7 +237,7 @@ const backRules = [
 
 const AzionConfig = {
   cache: [...cacheConfig],
-  origin: [
+  origin: addStagePrefix([
     {
       name: 'origin-storage-default',
       type: 'object_storage'
@@ -274,7 +290,7 @@ const AzionConfig = {
     //   hostHeader: 'variables.azion.com',
     //   addresses: ['variables.azion.com']
     // }
-  ],
+  ]),
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
     response: [
@@ -283,15 +299,15 @@ const AzionConfig = {
         description:
           'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
         match: '.*',
-        variable: 'upstream_cookie__azrt',
+        variable: `upstream_cookie_${addStageSuffixToCookies('_azrt')}`,
         behavior: {
           capture: {
             match: '(.*)',
             captured: 'azrt_arr',
-            subject: 'upstream_cookie__azrt'
+            subject: `upstream_cookie_${addStageSuffixToCookies('_azrt')}`
           },
-          setCookie: `_azrt=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
-          filterCookie: '_azrt'
+          setCookie: `${addStageSuffixToCookies('_azrt')}=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          filterCookie: addStageSuffixToCookies('_azrt')
         }
       },
       {
@@ -299,15 +315,15 @@ const AzionConfig = {
         description:
           'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
         match: '.*',
-        variable: 'upstream_cookie_azsid',
+        variable: `upstream_cookie_${addStageSuffixToCookies('azsid')}`,
         behavior: {
           capture: {
             match: '(.*)',
             captured: 'azsid_arr',
-            subject: 'upstream_cookie_azsid'
+            subject: `upstream_cookie_${addStageSuffixToCookies('azsid')}`
           },
-          setCookie: `azsid=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
-          filterCookie: 'azsid'
+          setCookie: `${addStageSuffixToCookies('azsid')}=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          filterCookie: addStageSuffixToCookies('azsid')
         }
       },
       {
@@ -315,15 +331,15 @@ const AzionConfig = {
         description:
           'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
         match: '.*',
-        variable: 'upstream_cookie__azat',
+        variable: `upstream_cookie_${addStageSuffixToCookies('_azat')}`,
         behavior: {
           capture: {
             match: '(.*)',
             captured: 'azat_arr',
-            subject: 'upstream_cookie__azat'
+            subject: `upstream_cookie_${addStageSuffixToCookies('_azat')}`
           },
-          setCookie: `_azat=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
-          filterCookie: '_azat'
+          setCookie: `${addStageSuffixToCookies('_azat')}=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          filterCookie: addStageSuffixToCookies('_azat')
         }
       },
       {
