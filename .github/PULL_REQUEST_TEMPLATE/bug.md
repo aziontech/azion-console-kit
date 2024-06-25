@@ -19,7 +19,6 @@
 - [ ] Tags are added to the PR
 
 #### These changes were tested on the following browsers:
-
 - [ ] Chrome
 - [ ] Edge
 - [ ] Firefox

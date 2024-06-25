@@ -1,11 +1,11 @@
 name: E2E Tests
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  push:
-    branches:
-      - dev
+    pull_request:
+      types: [opened, synchronize, reopened, ready_for_review]
+    push:
+      branches:
+        - dev
 
 jobs:
   run-e2e-tests:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
-        env:
+        env: 
           CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
           CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
           CYPRESS_USERNAME_STAGE: ${{ secrets.CYPRESS_USERNAME_STAGE }}
@@ -31,7 +31,7 @@ jobs:
           build: yarn build
           start: yarn dev
           browser: chrome
-          wait-on: 'http://localhost:5173/'
+          wait-on: "http://localhost:5173/"
           wait-on-timeout: 120
 
       - name: Check E2E Test Coverage

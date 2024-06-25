@@ -7,7 +7,7 @@ const selectors = {
   },
   sidebar: {
     menuToggleButton: '[data-testid="sidebar-block__toggle-button"] > .p-button-icon',
-    variablesMenuItem: '[data-testid="sidebar-block__menu-item__variables"] > .p-menuitem-text'
+    variablesMenuItem: '[data-testid="sidebar-block__menu-item__variables"] > .p-menuitem-text',
   },
   variables: {
     createButton: '[data-testid="create_Variable_button"]',
@@ -44,12 +44,10 @@ describe('Variables spec', () => {
     cy.get(selectors.login.signInButton).click()
 
     // Navegar até a tela de Variáveis
-    cy.get(selectors.sidebar.menuToggleButton).click()
-    cy.get(selectors.sidebar.variablesMenuItem).click()
-    cy.get('.text-\\[var\\(--text-color\\)\\]')
-      .should('be.visible')
-      .should('have.text', 'Variables')
-  })
+    cy.get(selectors.sidebar.menuToggleButton).click();
+    cy.get(selectors.sidebar.variablesMenuItem).click();
+    cy.get('.text-\\[var\\(--text-color\\)\\]').should('be.visible').should('have.text', 'Variables');
+  });
 
   it('Create a variable', () => {
     // Act
@@ -67,11 +65,11 @@ describe('Variables spec', () => {
     cy.get(selectors.variables.tableRowKey).should('be.visible').should('have.text', keyName)
 
     // Cleanup
-    cy.get(selectors.variables.actionsButton).click()
-    cy.get(selectors.variables.deleteButton).click()
-    cy.get(selectors.variables.deleteInput).clear()
-    cy.get(selectors.variables.deleteInput).type('delete')
-    cy.get(selectors.variables.confirmDeleteButton).click()
-    cy.get(selectors.variables.successMessage).should('have.text', 'Variable successfully deleted')
-  })
-})
+    cy.get(selectors.variables.actionsButton).click();
+    cy.get(selectors.variables.deleteButton).click();
+    cy.get(selectors.variables.deleteInput).clear();
+    cy.get(selectors.variables.deleteInput).type('delete');
+    cy.get(selectors.variables.confirmDeleteButton).click();
+    cy.get(selectors.variables.successMessage).should('have.text', 'Variable successfully deleted');
+  });
+});
