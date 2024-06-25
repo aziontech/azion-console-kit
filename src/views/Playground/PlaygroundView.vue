@@ -1,44 +1,70 @@
 <template>
-  <div class="flex flex-col gap-10 max-w-screen-xl mx-auto">
-    <div class="flex gap-4 h-10 mt-10">
+  <div class="grid grid-col-1 p-10">
+    <div class="flex items-center justify-center gap-4">
       <PrimeButton
-        label="Show toast 5s"
-        severity="secondary"
-        @click="showToast(5)"
+        size="small"
+        severity="success"
+        label="Success Toasts"
+        @click="triggerToasts('success')"
       />
       <PrimeButton
-        label="Show toast 10s"
-        severity="secondary"
-        @click="showToast(10)"
+        size="small"
+        severity="warning"
+        label="Warn Toasts"
+        @click="triggerToasts('warn')"
       />
       <PrimeButton
-        label="Show toast 15s"
-        severity="secondary"
-        @click="showToast(15)"
+        size="small"
+        severity="danger"
+        label="Error Toasts"
+        @click="triggerToasts('error')"
+      />
+      <PrimeButton
+        size="small"
+        severity="info"
+        label="Info Toasts"
+        @click="triggerToasts('info')"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import PrimeButton from 'primevue/button'
 
   const toast = useToast()
 
-  const secondsToMilliseconds = (seconds) => {
-    return seconds * 1000
-  }
-
-  const showToast = (life) => {
-    const options = {
-      closable: true,
-      severity: 'success',
-      summary: 'success',
-      detail: `Show toast ${life}s`,
-      life: secondsToMilliseconds(life)
+  const triggerToasts = (type) => {
+    const toastOptions = {
+      severity: type,
+      summary: 'Title (limited to 100 characters)',
+      detail:
+        'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 characters).'
     }
 
-    toast.add(options)
+    const actions = {
+      primary: { callback: () => console.log('Primary Action'), label: 'Primary' },
+      secondary: { callback: () => console.log('Secondary Action'), label: 'Secondary' },
+      link: { callback: () => console.log('Link Action'), label: 'Link' }
+    }
+
+    // only title
+    toast.add({ ...toastOptions, detail: undefined })
+
+    // title and description
+    toast.add(toastOptions)
+
+    // actions
+    toast.add({
+      ...toastOptions,
+      action: { primary: actions.primary, secondary: actions.secondary }
+    })
+
+    // link
+    toast.add({ ...toastOptions, action: { link: actions.link } })
+
+    // with custom life
+    toast.add({ ...toastOptions, life: 0 })
   }
 </script>

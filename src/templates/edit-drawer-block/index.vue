@@ -7,7 +7,6 @@
   import Sidebar from 'primevue/sidebar'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import { TOAST_LIFE } from '@/utils/constants'
   import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
@@ -106,10 +105,6 @@
       detail
     }
 
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
-    }
-
     toast.add(options)
   }
 
@@ -173,7 +168,6 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full' },
-      header: { class: 'flex justify-between text-xl font-medium px-8' },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"

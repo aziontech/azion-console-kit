@@ -13,7 +13,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
@@ -67,7 +67,7 @@
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
   const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
-  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
+  const checkPhaseIsDefaultValue = ref()
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -602,28 +602,24 @@
 
   const phasesRadioOptions = ref([])
 
-  watch(
-    checkPhaseIsDefaultValue,
-    () => {
-      if (!checkPhaseIsDefaultValue.value) {
-        phasesRadioOptions.value = [
-          {
-            title: 'Request Phase',
-            inputValue: 'request',
-            subtitle: 'Configure the requests made to the edge.'
-          },
-          {
-            title: 'Response Phase',
-            inputValue: 'response',
-            subtitle: 'Configure the responses delivered to end-users.'
-          }
-        ]
-      } else {
-        phasesRadioOptions.value = []
-      }
-    },
-    { immediate: true }
-  )
+  const setPhaseRadioOptions = () => {
+    if (!checkPhaseIsDefaultValue.value) {
+      phasesRadioOptions.value = [
+        {
+          title: 'Request Phase',
+          inputValue: 'request',
+          subtitle: 'Configure the requests made to the edge.'
+        },
+        {
+          title: 'Response Phase',
+          inputValue: 'response',
+          subtitle: 'Configure the responses delivered to end-users.'
+        }
+      ]
+    } else {
+      phasesRadioOptions.value = []
+    }
+  }
 
   onMounted(async () => {
     updateBehaviorsOptionsRequires()
@@ -642,7 +638,9 @@
 
     callOptionsServicesAtEdit()
     await processBehaviorsAtEdit()
+
     checkPhaseIsDefaultValue.value = phase.value === 'default'
+    setPhaseRadioOptions()
   })
 </script>
 
