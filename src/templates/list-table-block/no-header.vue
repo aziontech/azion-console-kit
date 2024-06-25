@@ -147,7 +147,7 @@
               data-testid="data-table-actions-column-body"
             >
               <PrimeMenu
-                ref="menu"
+                :ref="assignMenuRef(rowData.id)"
                 id="overlay_menu"
                 v-bind:model="actionOptions(rowData?.status)"
                 :popup="true"
@@ -386,11 +386,11 @@
     router.push(props.createPagePath)
   }
 
-  const menu = ref(null)
+  const menuRef = ref({})
   const toggleActionsMenu = (event, selectedItem) => {
     selectedItemData.value = selectedItem
     selectedId.value = selectedItem.id
-    menu.value.toggle(event)
+    menuRef.value[selectedItem.id].toggle(event)
   }
 
   const editItemSelected = ({ data: item, originalEvent }) => {
@@ -461,7 +461,13 @@
     emit('on-load-data', hasData)
   })
 
-  // to make a filter
+  const assignMenuRef = (id) => {
+    return (document) => {
+      if (document !== null) {
+        menuRef.value[id] = document
+      }
+    }
+  }
 
   watch(selectedItems, (selectedData) => {
     emit('on-select-data', selectedData)

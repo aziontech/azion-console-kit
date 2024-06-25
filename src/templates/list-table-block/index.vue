@@ -137,7 +137,7 @@
             data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
-              :ref="(document) => (menuRef[rowData.id] = document)"
+              :ref="assignMenuRef(rowData.id)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
@@ -426,6 +426,14 @@
 
   const updatedTable = () => {
     loadData({ page: 1 })
+  }
+
+  const assignMenuRef = (id) => {
+    return (document) => {
+      if (document !== null) {
+        menuRef.value[id] = document
+      }
+    }
   }
 
   watch(data, (currentState) => {
