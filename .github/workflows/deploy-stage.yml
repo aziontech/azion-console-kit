@@ -1,9 +1,9 @@
-name: Deploy Console Kit (PRODUCTION)
+name: Deploy Console Kit (STAGE)
 
 on:
   push:
     branches:
-      - main
+      - dev
 env:
   HUSKY: 0
 

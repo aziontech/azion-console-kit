@@ -1,6 +1,6 @@
 export default {
     preset: {
-        name: "react",
+        name: "vue",
         mode: "deliver",
     }
 }
