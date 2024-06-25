@@ -45,6 +45,10 @@
     step: {
       type: Number,
       default: 1
+    },
+    useGrouping: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -76,6 +80,7 @@
     :min="props.min"
     :max="props.max"
     :step="props.step"
+    :useGrouping="props.useGrouping"
     type="number"
     @input="(event) => handleChange(event.value)"
     @blur="handleBlur"
