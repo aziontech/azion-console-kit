@@ -3,6 +3,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/FieldTextIcon'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
 
@@ -196,7 +197,7 @@
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
+        <FieldTextIcon
           label="Private Key Type"
           disabled
           icon="pi pi-lock"
