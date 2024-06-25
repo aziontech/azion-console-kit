@@ -59,9 +59,7 @@
       </div>
     </div>
 
-    <template
-      #footer
-    >
+    <template #footer>
       <PrimeButton
         outlined
         label="Cancel"

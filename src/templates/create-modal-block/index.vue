@@ -324,9 +324,7 @@
             />
           </span>
         </div>
-        <template
-          v-if="isSearching"
-        >
+        <template v-if="isSearching">
           <template v-if="!!filteredTemplates.length">
             <div class="text-sm">
               {{ resultsText }}

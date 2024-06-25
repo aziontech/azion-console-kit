@@ -70,9 +70,7 @@
         :sortField="col?.sortField"
         data-testid="data-table-column"
       >
-        <template
-          #body="{ data: rowData }"
-        >
+        <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
               v-html="rowData[col.field]"
@@ -132,9 +130,7 @@
             </OverlayPanel>
           </div>
         </template>
-        <template
-          #body="{ data: rowData }"
-        >
+        <template #body="{ data: rowData }">
           <div
             class="flex justify-end"
             v-if="showActions"
@@ -159,9 +155,7 @@
           </div>
         </template>
       </Column>
-      <template
-        #empty
-      >
+      <template #empty>
         <slot
           name="noRecordsFound"
           data-testid="data-table-empty-content"
@@ -216,9 +210,7 @@
         :header="col.header"
         data-testid="data-table-skeleton-column"
       >
-        <template
-          #body
-        >
+        <template #body>
           <Skeleton />
         </template>
       </Column>
