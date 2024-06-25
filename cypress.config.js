@@ -11,8 +11,8 @@ export default defineConfig({
     video: true,
     experimentalStudio: true,
     setupNodeEvents(on, config) {
-      codeCoverageTask(on, config);
-      return config;
+      codeCoverageTask(on, config)
+      return config
     }
   },
   env: {
