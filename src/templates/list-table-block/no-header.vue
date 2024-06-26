@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div class="max-w-full cursor-pointer mt-4">
+  <div data-testid="data-table-container">
+    <div
+      class="max-w-full cursor-pointer mt-4"
+      data-testid="data-table-wrapper"
+    >
       <DataTable
         v-if="!isLoading"
         scrollable
@@ -17,16 +20,24 @@
         v-model:selection="selectedItems"
         @rowReorder="onRowReorder"
         :pt="pt"
+        data-testid="data-table"
       >
         <template #header>
           <slot name="header">
-            <div class="flex flex-wrap justify-between gap-2 w-full">
-              <span class="flex flex-row p-input-icon-left max-sm:w-full">
+            <div
+              class="flex flex-wrap justify-between gap-2 w-full"
+              data-testid="data-table-header"
+            >
+              <span
+                class="flex flex-row p-input-icon-left max-sm:w-full"
+                data-testid="data-table-search-container"
+              >
                 <i class="pi pi-search" />
                 <InputText
                   class="w-full md:min-w-[320px]"
                   v-model.trim="filters.global.value"
                   placeholder="Search"
+                  data-testid="data-table-search-input"
                 />
               </span>
               <slot name="addButton">
@@ -36,6 +47,7 @@
                   icon="pi pi-plus"
                   :label="addButtonLabel"
                   v-if="addButtonLabel"
+                  data-testid="data-table-add-button"
                 />
               </slot>
             </div>
@@ -46,12 +58,14 @@
           v-if="reorderableRows"
           rowReorder
           headerStyle="width: 3rem"
+          data-testid="data-table-reorder-column"
         >
           <template #body="slotProps">
             <i
               v-if="isReorderAllEnabled || slotProps.index"
               class="pi pi-bars cursor-move"
               data-pc-section="rowreordericon"
+              data-testid="data-table-reorder-icon"
             ></i>
           </template>
         </Column>
@@ -60,6 +74,7 @@
           v-if="showselectionMode"
           selectionMode="multiple"
           headerStyle="width: 3rem"
+          data-testid="data-table-selection-column"
         ></Column>
 
         <Column
@@ -68,10 +83,14 @@
           :key="col.field"
           :field="col.field"
           :header="col.header"
+          data-testid="data-table-column"
         >
           <template #body="{ data: rowData }">
             <template v-if="col.type !== 'component'">
-              <div v-html="rowData[col.field]" />
+              <div
+                v-html="rowData[col.field]"
+                data-testid="data-table-column-cell"
+              />
             </template>
             <template v-else>
               <component :is="col.component(rowData[col.field])" />
@@ -81,15 +100,20 @@
         <Column
           :frozen="showActions"
           alignFrozen="right"
+          data-testid="data-table-actions-column"
         >
           <template #header>
-            <div class="flex justify-end w-full">
+            <div
+              class="flex justify-end w-full"
+              data-testid="data-table-actions-column-header"
+            >
               <PrimeButton
                 outlined
                 icon="ai ai-column"
                 class="table-button"
                 @click="toggleColumnSelector"
                 v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+                data-testid="data-table-actions-column-hidden-columns-button"
               >
               </PrimeButton>
               <OverlayPanel
@@ -97,6 +121,7 @@
                 :pt="{
                   content: { class: 'p-0' }
                 }"
+                data-testid="data-table-actions-column-hidden-columns-overlay"
               >
                 <Listbox
                   v-model="selectedColumns"
@@ -106,6 +131,7 @@
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
+                  data-testid="data-table-actions-column-hidden-columns-listbox"
                 >
                   <template #optiongroup="slotProps">
                     <p class="p-0 text-sm font-medium">{{ slotProps.option.label }}</p>
@@ -118,12 +144,14 @@
             <div
               class="flex justify-end"
               v-if="showActions"
+              data-testid="data-table-actions-column-body"
             >
               <PrimeMenu
-                ref="menu"
+                :ref="assignMenuRef(rowData.id)"
                 id="overlay_menu"
                 v-bind:model="actionOptions(rowData?.status)"
                 :popup="true"
+                data-testid="data-table-actions-column-menu"
               />
               <PrimeButton
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
@@ -132,13 +160,17 @@
                 outlined
                 @click="(event) => toggleActionsMenu(event, rowData)"
                 class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-actions-button"
               />
             </div>
           </template>
         </Column>
         <template #empty>
           <slot name="noRecordsFound">
-            <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <div
+              class="my-4 flex flex-col gap-3 justify-center items-start"
+              data-testid="data-table-empty-message-container"
+            >
               <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
             </div>
           </slot>
@@ -151,15 +183,20 @@
         :pt="{
           header: { class: '!border-t-0' }
         }"
+        data-testid="data-table-loading-skeleton"
       >
         <template #header>
-          <div class="flex self-start">
+          <div
+            class="flex self-start"
+            data-testid="data-table-loading-skeleton-header"
+          >
             <span class="flex flex-row p-input-icon-left">
               <i class="pi pi-search" />
               <InputText
                 class="h-8 w-full md:min-w-[320px]"
                 v-model="filters.global.value"
                 placeholder="Search"
+                data-testid="data-table-loading-skeleton-search-input"
               />
             </span>
           </div>
@@ -170,6 +207,7 @@
           :key="col.field"
           :field="col.field"
           :header="col.header"
+          data-testid="data-table-loading-skeleton-column"
         >
           <template #body>
             <Skeleton />
@@ -180,6 +218,7 @@
     <DeleteDialog
       :informationForDeletion="informationForDeletion"
       @successfullyDeleted="updatedTable()"
+      data-testid="delete-dialog"
     />
   </div>
 </template>
@@ -347,11 +386,11 @@
     router.push(props.createPagePath)
   }
 
-  const menu = ref(null)
+  const menuRef = ref({})
   const toggleActionsMenu = (event, selectedItem) => {
     selectedItemData.value = selectedItem
     selectedId.value = selectedItem.id
-    menu.value.toggle(event)
+    menuRef.value[selectedItem.id].toggle(event)
   }
 
   const editItemSelected = ({ data: item, originalEvent }) => {
@@ -422,7 +461,13 @@
     emit('on-load-data', hasData)
   })
 
-  // to make a filter
+  const assignMenuRef = (id) => {
+    return (document) => {
+      if (document !== null) {
+        menuRef.value[id] = document
+      }
+    }
+  }
 
   watch(selectedItems, (selectedData) => {
     emit('on-select-data', selectedData)

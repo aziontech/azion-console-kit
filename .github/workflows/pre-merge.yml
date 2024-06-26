@@ -3,9 +3,12 @@ name: Pre-merge
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - dev
   push:
     branches:
       - dev
+  workflow_dispatch:
 
 env:
   HUSKY: 0
