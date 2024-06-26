@@ -20,7 +20,7 @@ describe('Your Settings spec', () => {
     cy.get('#countryCallCode_0').click()
     cy.getByTestId('contact__mobile__input').type('424242424242')
 
-    cy.getByTestId('Save_button').click()
+    cy.getByTestId('form-actions-submit-button').click()
 
     // Assert
     cy.wait('@patchUser')

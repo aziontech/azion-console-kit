@@ -68,7 +68,7 @@ describe('Your Settings spec', () => {
     cy.getByTestId('security__confirm-password__input').type('AAaaa123!!!')
 
     cy.get('.p-inputswitch-slider').click()
-    cy.getByTestId('Save_button').click()
+    cy.getByTestId('form-actions-submit-button').click()
 
     // Assert
     cy.wait('@patchUser').its('request.body').should('deep.equal', payload)
@@ -83,7 +83,7 @@ describe('Your Settings spec', () => {
     // Act
     cy.getByTestId('contact__email__input').type('testuser@cy.com.br')
 
-    cy.getByTestId('Save_button').click()
+    cy.getByTestId('form-actions-submit-button').click()
 
     // Assert
     cy.wait('@patchUser')
