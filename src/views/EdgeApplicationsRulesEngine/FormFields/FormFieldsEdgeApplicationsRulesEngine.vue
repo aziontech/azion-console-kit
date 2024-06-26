@@ -692,7 +692,7 @@
         severity="info"
         data-testid="rule-form-phase-message"
       >
-        Once a rule is created, its phase cannot be changed. To change the phase, it'll be necessary to create a new rule.
+        Once a rule is created, its phase cannot be changed. To change the phase, create a new rule.
       </InlineMessage>
 
       <FieldGroupRadio
