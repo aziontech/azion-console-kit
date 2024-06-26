@@ -34,18 +34,18 @@
   <FormHorizontal
     title="General"
     description="Create a credential to use and authenticate Edge Orchestrator services."
-    data-testid="credentials-form__section__general"
+    data-testid="credentials-create-form__section__general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
-          data-testid="credentials-form__name-field__label"
+          data-testid="credentials-create-form__name-field__label"
           for="name"
           class="text-color text-base font-medium"
           >Name *</label
         >
         <InputText
-          data-testid="credentials-form__name-field__input"
+          data-testid="credentials-create-form__name-field__input"
           v-model="name"
           id="name"
           type="text"
@@ -54,7 +54,7 @@
         />
         <small
           v-if="nameError"
-          data-testid="credentials-form__name-field__error-text"
+          data-testid="credentials-create-form__name-field__error-text"
           class="p-error text-xs font-normal leading-tight"
           >{{ nameError }}</small
         >
@@ -62,13 +62,13 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
-          data-testid="credentials-form__description-field__label"
+          data-testid="credentials-create-form__description-field__label"
           for="description"
           class="text-color text-base font-medium"
           >Description</label
         >
         <PrimeTextarea
-          data-testid="credentials-form__description-field__textarea"
+          data-testid="credentials-create-form__description-field__textarea"
           v-model="description"
           id="description"
           rows="2"
@@ -78,7 +78,7 @@
         />
         <small
           class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="credentials-form__description-field__description"
+          data-testid="credentials-create-form__description-field__description"
         >
           Description and purpose of the credential.
         </small>
@@ -88,12 +88,12 @@
   <FormHorizontal
     title="Token"
     description="Save the credential to generate the token for Edge Orchestrator."
-    data-testid="credentials-form__section__token"
+    data-testid="credentials-create-form__section__token"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <label
-          data-testid="credentials-form__token-field__label"
+          data-testid="credentials-create-form__token-field__label"
           for="personalToken"
           class="text-color text-base font-medium"
         >
@@ -104,7 +104,7 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
             <PrimePassword
-              data-testid="credentials-form__token-field__input"
+              data-testid="credentials-create-form__token-field__input"
               id="personalToken"
               v-model="tokenValue"
               type="text"
@@ -115,7 +115,7 @@
             />
           </span>
           <PrimeButton
-            data-testid="credentials-form__token-field__copy-token-button"
+            data-testid="credentials-create-form__token-field__copy-token-button"
             icon="pi pi-clone"
             outlined
             type="button"
@@ -130,7 +130,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Status"
-    data-testid="credentials-form__section__status"
+    data-testid="credentials-create-form__section__status"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -139,7 +139,7 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
             <InputSwitch
-              data-testid="credentials-form__status-field__switch"
+              data-testid="credentials-create-form__status-field__switch"
               v-model="status"
               :disabled="props.generatedToken"
               id="active"
@@ -147,7 +147,7 @@
             <div class="flex-col gap-1">
               <div
                 class="text-color text-sm font-normal leading-5"
-                data-testid="credentials-form__status-field__label"
+                data-testid="credentials-create-form__status-field__label"
               >
                 Active
               </div>
