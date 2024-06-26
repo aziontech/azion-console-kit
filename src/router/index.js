@@ -81,8 +81,8 @@ const router = createRouter({
   ].concat(errorRoutes)
 })
 
-router.beforeEach(beforeEachRoute)
-router.beforeEach(redirectToManager)
-router.afterEach(afterEachRouteGuard)
+router.beforeEach(beforeEachRoute);
+router.beforeEach(redirectToManager);
+router.afterEach(afterEachRouteGuard);
 
 export default router
