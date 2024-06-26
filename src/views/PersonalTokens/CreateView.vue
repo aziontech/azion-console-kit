@@ -87,7 +87,7 @@
     const toastConfig = {
       closable: true,
       severity: 'success',
-      summary: 'Personal token copied'
+      summary: 'Successfully copied!'
     }
 
     try {
