@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   errorResponseSample: {
-    id: '123',
+    id: 123,
     origin_id: '12',
     error_responses: [
       {
@@ -60,7 +60,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     const [errorResponse] = fixtures.errorResponseSample.error_responses
     expect(result).toEqual({
       id: fixtures.errorResponseSample.id,
-      originId: fixtures.errorResponseSample.origin_id,
+      originId: fixtures.errorResponseSample.origin_id.toString(),
       errorResponses: [
         {
           code: fixtures.parsedCode,
