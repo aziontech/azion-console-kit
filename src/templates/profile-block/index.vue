@@ -4,9 +4,11 @@
     icon="pi pi-user"
     class="transition-all bg-header-avatar cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
+    data-testid="profile-block__avatar"
   />
 
   <Sidebar
+    data-testid="profile-block__sidebar"
     v-model:visible="showProfile"
     header="Bottom Sidebar"
     position="bottom"
@@ -19,6 +21,7 @@
   >
     <!-- Mobile Menu Navigation -->
     <PrimeMenu
+      data-testid="profile-block__sidebar__profile-menu"
       :model="profileMenuItems"
       :pt="{
         root: { class: 'w-full border-none bg-transparent' },
@@ -29,16 +32,29 @@
       <template #start>
         <div class="flex flex-column px-2.5 h-14 justify-center">
           <div class="flex flex-column align gap-1">
-            <span class="text-sm font-medium">{{ user.name }}</span>
+            <span
+              class="text-sm font-medium"
+              data-testid="profile-block__profile-menu__user-name"
+              >{{ user.name }}</span
+            >
             <div class="flex gap-2">
-              <span class="text-xs">ID: {{ user.id }}</span>
-              <span class="text-xs">Client ID: {{ user.client_id }}</span>
+              <span
+                class="text-xs"
+                data-testid="profile-block__profile-menu__user-id"
+                >ID: {{ user.id }}</span
+              >
+              <span
+                class="text-xs"
+                data-testid="profile-block__profile-menu__client-id"
+                >Client ID: {{ user.client_id }}</span
+              >
             </div>
           </div>
         </div>
       </template>
       <template #end>
         <PrimeMenu
+          data-testid="profile-block__sidebar__settings-menu"
           :model="profileMenuSettings"
           :pt="{
             root: { class: 'p-0 w-full border-none bg-transparent' },
@@ -49,15 +65,32 @@
           <template #start>
             <div class="flex flex-row items-center">
               <div class="flex flex-col gap-1 px-2 py-2.5">
-                <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-                <span class="text-xs">{{ user.email }}</span>
+                <span
+                  class="text-sm font-medium leading-none"
+                  data-testid="profile-block__settings-menu__full-name"
+                  >{{ user.full_name }}</span
+                >
+                <span
+                  class="text-xs"
+                  data-testid="profile-block__settings-menu__email"
+                  >{{ user.email }}</span
+                >
               </div>
             </div>
           </template>
         </PrimeMenu>
-        <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-          <span class="text-sm">Theme</span>
+
+        <div
+          class="flex flex-row justify-between items-center align-middle px-2 py-1.5"
+          data-testid="profile-block__settings-menu__theme"
+        >
+          <span
+            class="text-sm"
+            data-testid="profile-block__theme__label"
+            >Theme</span
+          >
           <Dropdown
+            data-testid="profile-block__theme__options"
             appendTo="self"
             :modelValue="selectedTheme"
             @update:modelValue="setSelectedTheme"
@@ -76,20 +109,31 @@
                 v-if="slotProps.value"
                 class="flex gap-2 align-items-center"
               >
-                <i :class="slotProps.value.icon"></i>
-                <div>{{ slotProps.value.name }}</div>
+                <i
+                  :data-testid="`profile-block__theme-value__icon-${slotProps.value.icon}`"
+                  :class="slotProps.value.icon"
+                ></i>
+                <div :data-testid="`profile-block__theme-value__value-${slotProps.value.name}`">
+                  {{ slotProps.value.name }}
+                </div>
               </div>
             </template>
             <template #option="slotProps">
               <div class="flex gap-2 align-items-center">
-                <i :class="slotProps.option.icon"></i>
-                <div>{{ slotProps.option.name }}</div>
+                <i
+                  :data-testid="`profile-block__theme-options__icon-${slotProps.value.icon}`"
+                  :class="slotProps.option.icon"
+                ></i>
+                <div :data-testid="`profile-block__theme-options__option-${slotProps.value.name}`">
+                  {{ slotProps.option.name }}
+                </div>
               </div>
             </template>
           </Dropdown>
         </div>
         <Divider class="surface-border p-1 m-0" />
         <PrimeButton
+          data-testid="profile-block__sidebar__logout-btn"
           class="w-full rounded-md flex content-start text-left"
           :pt="{
             label: {
@@ -109,6 +153,7 @@
   </Sidebar>
 
   <PrimeMenu
+    data-testid="profile-block__mobile-profile-menu"
     style="position: fixed !important; top: 46px"
     :model="profileMenuItems"
     :popup="true"
@@ -121,16 +166,29 @@
     <template #start>
       <div class="flex flex-column px-2.5 py-3 mt-2 h-14 justify-center">
         <div class="flex flex-column align gap-1">
-          <span class="text-sm font-medium">{{ user.name }}</span>
+          <span
+            class="text-sm font-medium"
+            data-testid="profile-block__mobile-profile-menu__user-name"
+            >{{ user.name }}</span
+          >
           <div class="flex gap-2">
-            <span class="text-xs">ID: {{ user.id }}</span>
-            <span class="text-xs">Client ID: {{ user.client_id }}</span>
+            <span
+              class="text-xs"
+              data-testid="profile-block__mobile-profile-menu__user-id"
+              >ID: {{ user.id }}</span
+            >
+            <span
+              class="text-xs"
+              data-testid="profile-block__mobile-profile-menu__client-id"
+              >Client ID: {{ user.client_id }}</span
+            >
           </div>
         </div>
       </div>
     </template>
     <template #end>
       <PrimeMenu
+        data-testid="profile-block__mobile-profile-menu__settings-menu"
         :model="profileMenuSettings"
         :pt="{
           root: { class: 'p-0 w-full border-none bg-transparent' },
@@ -141,15 +199,31 @@
         <template #start>
           <div class="flex flex-row items-center">
             <div class="flex flex-col gap-1 px-2 py-2.5">
-              <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-              <span class="text-xs">{{ user.email }}</span>
+              <span
+                class="text-sm font-medium leading-none"
+                data-testid="profile-block__mobile-settings-menu__full-name"
+                >{{ user.full_name }}</span
+              >
+              <span
+                class="text-xs"
+                data-testid="profile-block__mobile-settings-menu__email"
+                >{{ user.email }}</span
+              >
             </div>
           </div>
         </template>
       </PrimeMenu>
-      <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-        <span class="text-sm">Theme</span>
+      <div
+        class="flex flex-row justify-between items-center align-middle px-2 py-1.5"
+        data-testid="profile-block__mobile-settings-menu__theme"
+      >
+        <span
+          class="text-sm"
+          data-testid="profile-block__mobile-theme__label"
+          >Theme</span
+        >
         <Dropdown
+          data-testid="profile-block__mobile-theme__options"
           appendTo="self"
           :modelValue="selectedTheme"
           @update:modelValue="setSelectedTheme"
@@ -168,20 +242,35 @@
               v-if="slotProps.value"
               class="flex gap-2 align-items-center"
             >
-              <i :class="slotProps.value.icon"></i>
-              <div>{{ slotProps.value.name }}</div>
+              <i
+                :data-testid="`profile-block__mobile-theme-value__icon-${slotProps.value.name}`"
+                :class="slotProps.value.icon"
+              ></i>
+              <div
+                :data-testid="`profile-block__mobile-theme-value__value-${slotProps.value.name}`"
+              >
+                {{ slotProps.value.name }}
+              </div>
             </div>
           </template>
           <template #option="slotProps">
             <div class="flex gap-2 align-items-center">
-              <i :class="slotProps.option.icon"></i>
-              <div>{{ slotProps.option.name }}</div>
+              <i
+                :data-testid="`profile-block__mobile-theme-option__icon-${slotProps.value.name}`"
+                :class="slotProps.option.icon"
+              ></i>
+              <div
+                :data-testid="`profile-block__mobile-theme-option__icon-${slotProps.value.name}`"
+              >
+                {{ slotProps.option.name }}
+              </div>
             </div>
           </template>
         </Dropdown>
       </div>
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
       <PrimeButton
+        data-testid="profile-block__mobile-menu__logout-btn"
         class="w-full rounded-md flex content-start text-left"
         :pt="{
           label: {

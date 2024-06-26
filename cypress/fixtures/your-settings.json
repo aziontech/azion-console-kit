@@ -1,0 +1,20 @@
+{
+  "data": {
+  "id": 1234,
+  "first_name": "Clean User",
+  "last_name": "Cypress",
+  "email": "testuser@cy.com",
+  "country_call_code": "US - 1",
+  "mobile": "1234567890",
+  "timezone": "Etc/GMT-14",
+  "language": "en",
+  "two_factor_enabled": false,
+  "is_account_owner": true,
+  "teams": [
+    {
+      "id": 1234,
+      "name": "Default Team",
+      "is_active": true
+    }
+  ]
+}}

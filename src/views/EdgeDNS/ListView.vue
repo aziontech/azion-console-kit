@@ -3,14 +3,14 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edge DNS"
-        description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
+        description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
             outlined
             icon="pi pi-copy"
             class="max-md:w-full"
-            label="Copy"
+            label="Copy Nameserver Values"
             @click="handleCopyNameServers"
           ></PrimeButton>
         </template>
