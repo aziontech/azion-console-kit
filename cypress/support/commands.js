@@ -20,8 +20,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 
 // Custom command to get an element by data-testid
 Cypress.Commands.add('getByTestId', (selector, ...args) => {
-  return cy.get(`[data-testid=${selector}]`, ...args);
-});
+  return cy.get(`[data-testid="${selector}"]`, ...args)
+})
 
 // Helper function to perform login
 function login(email, password, username) {
