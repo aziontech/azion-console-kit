@@ -72,7 +72,7 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'Successfully authorized'
+            summary: 'Successfully authorized!'
           })
           this.authorizeDialogVisible = false
         }
