@@ -1,40 +1,71 @@
+const selectors = {
+  list: {
+    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
+    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
+    searchInput: '[data-testid="data-table-search-input"]',
+    filteredRow: {
+      nameColumn: '[data-testid="list-table-block__column__name__row"]',
+      statusColum: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+    },
+    actionsMenu: {
+      button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+      deleteAction: '.p-menuitem-content > .p-menuitem-link'
+    },
+    deleteDialog: {
+      confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+      deleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
+      confirmInput: '#confirm-input'
+    }
+  },
+  form: {
+    digitalCertificateName: '[data-testid="digital-certificate__name-field"]',
+    submitButton: '[data-testid="form-actions-submit-button"]',
+    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]'
+  },
+  toast: {
+    createSuccessMessage: ':nth-child(2) > .p-toast-message-content > .flex-column > .text-sm',
+    deleteSuccessMessage: ':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color'
+  }
+}
 describe('Digital Certificates spec', () => {
-  it('Create a new digital certificate', function () {
-    // Arrange
+  beforeEach(() => {
     cy.login()
-    cy.getByTestId('sidebar-block__toggle-button').click()
-    cy.getByTestId('sidebar-block__menu-item__digital-certificates').click()
-    cy.getByTestId('create_Digital Certificate_button').click()
+    cy.openProductThroughSidebar('digital-certificates')
+  })
+
+  it('should create and delete a new digital certificate', function () {
+    // Arrange
+    cy.get(selectors.list.createDigitalCertificateButton).click()
 
     // Act
-    cy.getByTestId('digital_certificate__name_field').clear()
-    cy.getByTestId('digital_certificate__name_field').type('EntityName')
-    cy.getByTestId('form-actions-submit-button').click()
+    cy.get(selectors.form.digitalCertificateName).clear()
+    cy.get(selectors.form.digitalCertificateName).type('EntityName')
+    cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.get(':nth-child(2) > .p-toast-message-content > .flex-column > .text-sm').should(
+    cy.get(selectors.toast.createSuccessMessage).should(
       'have.text',
       'Your digital certificate has been created!'
     )
-    cy.getByTestId('page_title_Edit Digital Certificate').should(
+    cy.get(selectors.form.editPageTitle).should(
       'have.text',
       'Edit Digital Certificate'
     )
-    cy.get(':nth-child(3) > .p-menuitem-link').click()
-    cy.getByTestId('data-table-search-input').clear()
-    cy.getByTestId('data-table-search-input').type('EntityName')
-    cy.getByTestId('list-table-block__column__name__row').should('have.text', 'EntityName')
-    cy.get('[data-testid="list-table-block__column__status__row"] > .p-tag-value').should(
+    cy.get(selectors.list.breadcumbReturnToList).click()
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type('EntityName')
+    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', 'EntityName')
+    cy.get(selectors.list.filteredRow.statusColum).should(
       'have.text',
       'Pending'
     )
 
     // Cleanup
-    cy.get('[data-testid="data-table-actions-column-body-actions-menu-button"]').click()
-    cy.get('.p-menuitem-content > .p-menuitem-link').click()
-    cy.get('#confirm-input').clear()
-    cy.get('#confirm-input').type('delete{enter}')
-    cy.get(':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color').should(
+    cy.get(selectors.list.actionsMenu.button).click()
+    cy.get(selectors.list.actionsMenu.deleteAction).click()
+    cy.get(selectors.list.deleteDialog.confirmInput).clear()
+    cy.get(selectors.list.deleteDialog.confirmInput).type('delete{enter}')
+    cy.get(selectors.toast.deleteSuccessMessage).should(
       'have.text',
       'Digital certificate successfully deleted!'
     )
