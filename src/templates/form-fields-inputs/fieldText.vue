@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, toRef } from 'vue'
+  import { ref, toRef, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -35,6 +35,8 @@
   })
   const inputRef = ref(null)
   const name = toRef(props, 'name')
+  const slots = useSlots()
+  const hasDescriptionSlot = !!slots.description
 
   const {
     value: inputValue,
@@ -53,7 +55,7 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
   >
     {{ props.label }}
   </label>
@@ -78,8 +80,10 @@
   >
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    v-if="props.description || hasDescriptionSlot"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>

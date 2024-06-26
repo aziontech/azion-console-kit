@@ -216,9 +216,12 @@
           placeholder="example@email.com;holder@email.com"
           name="billingEmails"
           :value="billingEmails"
-          description="Billing information will be forwarded to all emails listed in this field. Separate each
-          email address with a semicolon ( ; )."
-        />
+        >
+          <template #description>
+            Billing information will be forwarded to all emails listed in this field. Separate each
+            email address with a semicolon (<code>;</code>).
+          </template>
+        </FieldTextArea>
       </div>
     </template>
   </FormHorizontal>

@@ -84,8 +84,9 @@
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description"
