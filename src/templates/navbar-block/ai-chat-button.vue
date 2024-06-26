@@ -1,48 +1,49 @@
 <template>
   <PrimeButton
     :label="currentLabel"
-    @click="openHelpCenter()"
+    @click="openAiChat()"
     :pt="{
       label: { class: 'text-white' },
       icon: { class: 'text-white' }
     }"
     :class="{
-      'bg-header hover:bg-header-button-hover': !helpCenterIsOpen,
-      'bg-header-button-enabled': helpCenterIsOpen
+      'bg-header hover:bg-header-button-hover': !aiChatIsOpen,
+      'bg-header-button-enabled': aiChatIsOpen
     }"
-    icon="pi pi-question-circle"
+    icon="pi pi-sparkles"
     size="small"
     class="text-white border-header"
-    v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
+    v-tooltip.bottom="{ value: 'Ask Azion', showDelay: 200 }"
   />
 </template>
 
 <script setup>
   import { computed, inject } from 'vue'
-  import { useHelpCenterStore } from '@/stores/help-center'
   import { useAskAzionAiChatStore } from '@/stores/ask-azion-ai-chat'
+  import { useHelpCenterStore } from '@/stores/help-center'
+
   import PrimeButton from 'primevue/button'
 
-  defineOptions({ name: 'navbar-help-block' })
+  defineOptions({ name: 'ai-chat-button' })
 
-  const helpCenterStore = useHelpCenterStore()
   const askAzionAiChatStore = useAskAzionAiChatStore()
+  const helpCenterStore = useHelpCenterStore()
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
 
-  const openHelpCenter = () => {
-    helpCenterStore.toggle()
-    askAzionAiChatStore.close()
+  const openAiChat = () => {
+    askAzionAiChatStore.toggle()
+    helpCenterStore.close()
   }
 
   const currentLabel = computed(() => {
     if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Help'
+      return 'Ask Azion'
     }
     return ''
   })
 
-  const helpCenterIsOpen = computed(() => {
-    return helpCenterStore.isOpen
+  const aiChatIsOpen = computed(() => {
+    return askAzionAiChatStore.isOpen ? 'active-helper' : ''
   })
 </script>
