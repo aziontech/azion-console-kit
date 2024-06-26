@@ -1,3 +1,5 @@
+import generateUniqueName from '../support/utils';
+
 const selectors = {
   login: {
     emailInput: '[data-testid="signin-block__email-input"]',
@@ -33,11 +35,6 @@ const selectors = {
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
   }
 }
-
-const generateUniqueName = (prefix) => {
-  const timestamp = Date.now()
-  return `${prefix}-${timestamp}`
-};
 
 const email = Cypress.env('CYPRESS_EMAIL_STAGE')
 const password = Cypress.env('CYPRESS_PASSWORD_STAGE')
