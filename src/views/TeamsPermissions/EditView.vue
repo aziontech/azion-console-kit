@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edit Team"
-        data-testid="teams-permissions__edit__page-heading"
+        data-testid="teams-permissions__edit-view__page-heading"
       />
     </template>
     <template #content>

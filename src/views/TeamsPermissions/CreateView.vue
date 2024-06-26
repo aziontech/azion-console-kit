@@ -3,7 +3,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Create Team"
-        data-testid="teams-permissions__create__page-heading"
+        data-testid="teams-permissions__create-view__page-heading"
       />
     </template>
     <template #content>
