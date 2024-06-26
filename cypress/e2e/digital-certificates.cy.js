@@ -16,7 +16,10 @@ describe('Digital Certificates spec', () => {
       'have.text',
       'Your digital certificate has been created!'
     )
-    cy.getByTestId('page_title_Edit Digital Certificate').should('have.text', 'Edit Digital Certificate')
+    cy.getByTestId('page_title_Edit Digital Certificate').should(
+      'have.text',
+      'Edit Digital Certificate'
+    )
     cy.get(':nth-child(3) > .p-menuitem-link').click()
     cy.getByTestId('data-table-search-input').clear()
     cy.getByTestId('data-table-search-input').type('EntityName')
@@ -27,8 +30,8 @@ describe('Digital Certificates spec', () => {
     )
 
     // Cleanup
-    cy.get('[data-testid="data-table-actions-column-body-actions-menu-button"]').click();
-    cy.get('.p-menuitem-content > .p-menuitem-link').click();
+    cy.get('[data-testid="data-table-actions-column-body-actions-menu-button"]').click()
+    cy.get('.p-menuitem-content > .p-menuitem-link').click()
     cy.get('#confirm-input').clear()
     cy.get('#confirm-input').type('delete{enter}')
     cy.get(':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color').should(
