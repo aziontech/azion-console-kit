@@ -10,7 +10,7 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ['cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
+      files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
       extends: ['plugin:cypress/recommended']
     }
   ],
