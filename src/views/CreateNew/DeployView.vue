@@ -208,7 +208,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Creation Failed',
+        summary: 'Creation failed',
         detail: failMessage
       })
     } finally {
