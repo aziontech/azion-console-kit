@@ -25,14 +25,14 @@ const selectors = {
     }
   },
   form: {
-    teamName: '[data-testid="teams-permissions__name-field__input"]',
-    teamNameError: '[data-testid="teams-permissions__name-field__error-text"]',
-    teamStatus: '[data-testid="teams-permissions__form-fields__status"]',
+    teamName: '[data-testid="teams-permissions-form__name-field__input"]',
+    teamNameError: '[data-testid="teams-permissions-form__name-field__error-text"]',
+    teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
     allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
     allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
     singlePermissionToTarget: '[aria-label="Move to Target"] > .p-icon > path',
     viewContentDeliverySettingsPermission:
-      '[data-testid="teams-permissions__permissions-field__picklist__item-View Content Delivery Settings"]',
+      '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
 
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',

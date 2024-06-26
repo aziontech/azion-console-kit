@@ -57,7 +57,7 @@
 </script>
 <template>
   <FormHorizontal
-    data-testid="teams-permissions__form-fields__general"
+    data-testid="teams-permissions-form__section__general"
     title="General"
     description="Use permissions to manage and oversee users by defining access levels of client accounts.
 "
@@ -65,13 +65,13 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
-          data-testid="teams-permissions__name-field__label"
+          data-testid="teams-permissions-form__name-field__label"
           for="name"
           class="text-color text-base font-medium"
           >Name *
         </label>
         <InputText
-          data-testid="teams-permissions__name-field__input"
+          data-testid="teams-permissions-form__name-field__input"
           v-model="name"
           type="text"
           id="name"
@@ -79,13 +79,13 @@
         />
         <small
           class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="teams-permissions__name-field__description"
+          data-testid="teams-permissions-form__name-field__description"
         >
           Give a unique and descriptive name to identify the team.
         </small>
         <small
           v-if="errorName"
-          data-testid="teams-permissions__name-field__error-text"
+          data-testid="teams-permissions-form__name-field__error-text"
           class="p-error text-xs font-normal leading-tight"
           >{{ errorName }}</small
         >
@@ -93,7 +93,7 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    data-testid="teams-permissions__form-fields__permissions"
+    data-testid="teams-permissions-form__section__permissions"
     title="Permissions"
     description="Determine the access level of accounts and assign permissions according to their team. Teams can be based on the role and tasks of account users.
 "
@@ -101,13 +101,13 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">
         <label
-          data-testid="teams-permissions__permissions-field__label"
+          data-testid="teams-permissions-form__permissions-field__label"
           for="value"
           class="text-color text-base font-medium"
           >Permissions *
         </label>
         <PickList
-          data-testid="teams-permissions__permissions-field__picklist"
+          data-testid="teams-permissions-form__permissions-field__picklist"
           v-model="permissionsList"
           :pt="{
             sourceList: { class: ['h-80'] },
@@ -125,7 +125,7 @@
               <div>
                 <span
                   class="font-normal"
-                  :data-testid="`teams-permissions__permissions-field__picklist__item-${slotProps.item.name}`"
+                  :data-testid="`teams-permissions-form__permissions-field__picklist__item-${slotProps.item.name}`"
                   >{{ slotProps.item.name }}</span
                 >
               </div>
@@ -134,7 +134,7 @@
         </PickList>
         <small
           class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="teams-permissions__permissions-field__description"
+          data-testid="teams-permissions-form__permissions-field__description"
         >
           Select an item from the list and then use the arrows to move it between the available and
           selected permissions boxes. Use the double-line arrows to move all items or press the
@@ -145,11 +145,11 @@
   </FormHorizontal>
   <FormHorizontal
     title="Status"
-    data-testid="teams-permissions__form-fields__status"
+    data-testid="teams-permissions-form__section__status"
   >
     <template #inputs>
       <FieldSwitchBlock
-        data-testid="teams-permissions__status-field__switch"
+        data-testid="teams-permissions-form__status-field__switch"
         nameField="isActive"
         name="active"
         auto
