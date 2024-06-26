@@ -755,7 +755,8 @@
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
             />
-            <div class="w-full">
+
+            <div class="flex flex-col w-full">
               <FieldText
                 v-if="
                   criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
