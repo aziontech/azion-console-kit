@@ -27,7 +27,7 @@ const selectors = {
     behaviorsDropdown: '[data-testid="rule-form-behaviors-item-name"] > .p-dropdown-trigger',
     behaviors: '#behaviors\\[0\\]\\.name_4',
     ruleTable: '.p-datatable-tbody > tr > :nth-child(2) > div',
-    actionsButton: 'table > tbody > tr:last-child > td.p-frozen-column > div > button',
+    actionsButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
     deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]',
     deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
@@ -94,6 +94,8 @@ describe('Edge Application', () => {
     // Delete the edge application
     cy.visit('/edge-applications')
     cy.get(selectors.edgeApplication.searchInput).clear()
+    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName).should('be.visible').should('have.text', edgeApplicationName)
     cy.get(selectors.edgeApplication.actionsButton).click()
     cy.get(selectors.edgeApplication.deleteButton).click()
     cy.get(selectors.edgeApplication.deleteInput).type('delete')
