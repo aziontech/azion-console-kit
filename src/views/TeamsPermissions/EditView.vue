@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Team"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Team"
+        data-testid="teams-permissions__edit-view__page-heading"
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -11,9 +14,7 @@
         :schema="validationSchema"
       >
         <template #form>
-          <FormFieldsTeamPermissions
-            :listPermissionService="props.listPermissionService"
-          ></FormFieldsTeamPermissions>
+          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate

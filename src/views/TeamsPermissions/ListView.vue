@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Teams Permissions"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Teams Permissions"
+        data-testid="teams-permissions__list-view__page-heading"
+      />
     </template>
     <template #content>
       <ListTableBlock
@@ -19,6 +22,7 @@
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
+        data-testid="teams-permissions__list-view__empty-results-block"
         title="No teams have been created"
         description="Click the button below to create your first team and add permissions."
         createButtonLabel="Team"
