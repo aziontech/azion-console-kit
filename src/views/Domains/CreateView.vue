@@ -120,7 +120,7 @@
     const toastConfig = {
       closable: true,
       severity: 'success',
-      summary: 'Succesfully created',
+      summary: 'Succesfully created!',
       detail: 'The domain is now available in the Domain management section.'
     }
     toast.add({ ...toastConfig })
