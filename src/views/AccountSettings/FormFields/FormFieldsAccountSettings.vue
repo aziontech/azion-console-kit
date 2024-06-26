@@ -7,7 +7,6 @@
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
   import { onMounted, ref, watch, computed } from 'vue'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const props = defineProps({
     listCountriesService: {
@@ -46,10 +45,6 @@
       severity,
       summary,
       closable: true
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     return toast.add(options)

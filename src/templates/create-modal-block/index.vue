@@ -6,7 +6,6 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -137,10 +136,6 @@
       detail
     }
 
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
-    }
-
     toast.add(options)
   }
 
@@ -266,9 +261,18 @@
 </script>
 
 <template>
-  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4">
-    <div class="-ml-2 sm:min-w-[240px]">
-      <ul class="flex flex-col gap-1 md:fixed md:w-60">
+  <div
+    class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4"
+    data-testid="integrations-list-container"
+  >
+    <div
+      class="-ml-2 sm:min-w-[240px]"
+      data-testid="integrations-list-menu"
+    >
+      <ul
+        class="flex flex-col gap-1 md:fixed md:w-60"
+        data-testid="integrations-list-menu-items"
+      >
         <li
           v-for="(menuitem, index) in TABS"
           :key="index"
@@ -283,24 +287,33 @@
             }"
             @click="onTabChange(menuitem)"
             :label="menuitem.label"
+            data-testid="integrations-list-menu-item"
           />
         </li>
       </ul>
     </div>
 
-    <div class="overflow-auto w-full flex flex-col">
+    <div
+      class="overflow-auto w-full flex flex-col"
+      data-testid="integrations-list-content"
+    >
       <LoadingState v-if="isLoading" />
       <div
         class="flex flex-col gap-5 mb-5 w-full"
         v-else
+        data-testid="integrations-list-content-body"
       >
-        <div class="flex flex-col gap-3">
+        <div
+          class="flex flex-col gap-3"
+          data-testid="integrations-list-content-header"
+        >
           <div class="text-base font-medium">
             {{ tabInfo[selectedTab].title }}
           </div>
           <span
             v-if="!tabInfo.githubImport.show"
             class="p-input-icon-left"
+            data-testid="integrations-list-content-search"
           >
             <i class="pi pi-search" />
             <PrimeInputText
@@ -327,6 +340,7 @@
                 class="ml-3 p-0"
                 size="small"
                 @click="resetFilters"
+                data-testid="integrations-list-content-search-results-see-all"
               />
             </div>
           </template>
@@ -336,6 +350,7 @@
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         v-if="tabInfo.recommended.show"
+        data-testid="integrations-list-content-recommended"
       >
         <PrimeButton
           v-for="template in filteredTemplates"
@@ -343,6 +358,7 @@
           @click="redirectToSolution(template, 'recommended')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
+          data-testid="integrations-list-content-recommended-item"
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">
@@ -372,6 +388,7 @@
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.templates.show"
+        data-testid="integrations-list-content-templates"
       >
         <PrimeButton
           v-for="template in filteredTemplates"
@@ -379,6 +396,7 @@
           @click="redirectToSolution(template, 'templates')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
+          data-testid="integrations-list-content-templates-item"
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">
@@ -408,6 +426,7 @@
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.newResource.show"
+        data-testid="integrations-list-content-new-resources"
       >
         <PrimeButton
           v-for="resource in filteredTemplates"
@@ -415,6 +434,7 @@
           @click="redirect(resource.to, resource.label)"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
+          data-testid="integrations-list-content-new-resources-item"
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">
@@ -435,6 +455,7 @@
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="tabInfo.githubImport.show"
+        data-testid="integrations-list-content-github-import"
       >
         <PrimeButton
           v-for="(template, index) in filteredTemplates"
@@ -442,6 +463,7 @@
           @click="redirectGithubImport(template, 'githubImport')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
+          data-testid="integrations-list-content-github-import-item"
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">

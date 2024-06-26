@@ -12,7 +12,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
@@ -63,7 +63,7 @@
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
   const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
-  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
+  const checkPhaseIsDefaultValue = ref()
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -599,28 +599,24 @@
 
   const phasesRadioOptions = ref([])
 
-  watch(
-    checkPhaseIsDefaultValue,
-    () => {
-      if (!checkPhaseIsDefaultValue.value) {
-        phasesRadioOptions.value = [
-          {
-            title: 'Request Phase',
-            inputValue: 'request',
-            subtitle: 'Configure the requests made to the edge.'
-          },
-          {
-            title: 'Response Phase',
-            inputValue: 'response',
-            subtitle: 'Configure the responses delivered to end-users.'
-          }
-        ]
-      } else {
-        phasesRadioOptions.value = []
-      }
-    },
-    { immediate: true }
-  )
+  const setPhaseRadioOptions = () => {
+    if (!checkPhaseIsDefaultValue.value) {
+      phasesRadioOptions.value = [
+        {
+          title: 'Request Phase',
+          inputValue: 'request',
+          subtitle: 'Configure the requests made to the edge.'
+        },
+        {
+          title: 'Response Phase',
+          inputValue: 'response',
+          subtitle: 'Configure the responses delivered to end-users.'
+        }
+      ]
+    } else {
+      phasesRadioOptions.value = []
+    }
+  }
 
   onMounted(async () => {
     updateBehaviorsOptionsRequires()
@@ -639,7 +635,9 @@
 
     callOptionsServicesAtEdit()
     await processBehaviorsAtEdit()
+
     checkPhaseIsDefaultValue.value = phase.value === 'default'
+    setPhaseRadioOptions()
   })
 </script>
 
@@ -648,6 +646,7 @@
     :isDrawer="true"
     title="General"
     description="Create a rule to handle the conditional execution of behaviors through logical operators."
+    data-testid="rule-form-general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -659,6 +658,7 @@
           placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
+          data-testid="rule-form-general-name"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -669,6 +669,7 @@
           name="description"
           :value="description"
           description="Add a short description or comment to the rule."
+          data-testid="rule-form-general-description"
         />
       </div>
     </template>
@@ -679,12 +680,14 @@
     title="Phase"
     description="Select the phase of the execution of the rule."
     v-if="!checkPhaseIsDefaultValue"
+    data-testid="rule-form-phase"
   >
     <template #inputs>
       <InlineMessage
         v-if="isEditDrawer"
         class="p-2"
         severity="info"
+        data-testid="rule-form-phase-message"
       >
         Once a rule is created, its phase cannot be changed. If you want to change the phase, you
         must create a new rule.
@@ -694,6 +697,7 @@
         nameField="phase"
         isCard
         :options="phasesRadioOptions"
+        data-testid="rule-form-phase-radio"
       />
     </template>
   </FormHorizontal>
@@ -702,22 +706,26 @@
     :isDrawer="true"
     title="Criteria"
     description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
+    data-testid="rule-form-criteria"
   >
     <template #inputs>
       <div
         class="flex flex-col"
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
+        data-testid="rule-form-criteria-item"
       >
         <div
           v-for="(item, conditionalIndex) in criteriaItem.value"
           :key="conditionalIndex"
+          data-testid="rule-form-criteria-item-conditional"
         >
           <div class="flex items-center gap-2">
             <Divider
               align="left"
               type="dashed"
               class="capitalize z-0"
+              data-testid="rule-form-criteria-item-conditional-divider"
             >
               {{ item.conditional }}
             </Divider>
@@ -728,6 +736,7 @@
               size="small"
               outlined
               @click="removeConditional(criteriaIndex, conditionalIndex)"
+              data-testid="rule-form-criteria-item-conditional-remove-button"
             />
           </div>
 
@@ -738,6 +747,7 @@
                 :class="{
                   'opacity-20': !props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue
                 }"
+                data-testid="rule-form-criteria-item-conditional-input-group-addon"
               >
                 <i class="pi pi-dollar"></i>
               </div>
@@ -748,6 +758,7 @@
                 @complete="searchVariableOption"
                 :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
+                data-testid="rule-form-criteria-item-conditional-autocomplete"
               />
             </div>
 
@@ -759,6 +770,7 @@
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
+              data-testid="rule-form-criteria-item-conditional-operator"
             />
             <FieldText
               v-if="
@@ -769,6 +781,7 @@
               :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
               inputClass="w-full"
               :disabled="checkPhaseIsDefaultValue"
+              data-testid="rule-form-criteria-item-conditional-input-value"
             />
           </div>
         </div>
@@ -776,6 +789,7 @@
         <div
           class="flex gap-2 mb-8"
           v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
+          data-testid="rule-form-criteria-item-conditional-add-button"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -798,6 +812,7 @@
         <div
           v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
+          data-testid="rule-form-criteria-item-remove-button"
         >
           <Divider type="solid" />
           <PrimeButton
@@ -817,6 +832,7 @@
           outlined
           :disabled="maximumCriteriaReached"
           @click="addNewCriteria"
+          data-testid="rule-form-criteria-add-button"
         />
       </div>
     </template>
@@ -826,17 +842,20 @@
     :isDrawer="true"
     title="Behaviors"
     description="Set the behaviors the rule should perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
+    data-testid="rule-form-behaviors"
   >
     <template #inputs>
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
+        data-testid="rule-form-behaviors-item"
       >
         <div class="flex items-center gap-2">
           <Divider
             align="left"
             type="dashed z-0"
+            data-testid="rule-form-behaviors-item-divider"
           >
             {{ getBehaviorLabel(behaviorItem) }}
           </Divider>
@@ -847,6 +866,7 @@
             size="small"
             outlined
             @click="removeBehavior(behaviorIndex)"
+            data-testid="rule-form-behaviors-item-remove-button"
           />
         </div>
 
@@ -862,6 +882,7 @@
               :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
+              data-testid="rule-form-behaviors-item-name"
             />
           </div>
 
@@ -876,6 +897,7 @@
                 inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
+                data-testid="rule-form-behaviors-item-run-function"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
@@ -888,6 +910,7 @@
                 inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
+                data-testid="rule-form-behaviors-item-set-origin"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
@@ -900,6 +923,7 @@
                 inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
+                data-testid="rule-form-behaviors-item-set-cache-policy"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
@@ -910,6 +934,7 @@
                   :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.captured_array"
+                  data-testid="rule-form-behaviors-item-capture-match-groups-captured-array"
                 />
                 <FieldText
                   placeholder="Subject"
@@ -917,6 +942,7 @@
                   :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.subject"
+                  data-testid="rule-form-behaviors-item-capture-match-groups-subject"
                 />
                 <FieldText
                   placeholder="Regex"
@@ -924,6 +950,7 @@
                   :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.regex"
+                  data-testid="rule-form-behaviors-item-capture-match-groups-regex"
                 />
               </div>
             </template>
@@ -933,6 +960,7 @@
                 :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
+                data-testid="rule-form-behaviors-item-target"
               />
             </template>
           </div>
@@ -947,6 +975,7 @@
           size="small"
           outlined
           @click="addNewBehavior"
+          data-testid="rule-form-behaviors-add-button"
         />
       </div>
     </template>
@@ -955,6 +984,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Status"
+    data-testid="rule-form-status"
   >
     <template #inputs>
       <FieldSwitchBlock
@@ -963,6 +993,7 @@
         auto
         :isCard="false"
         title="Active"
+        data-testid="rule-form-status-switch"
       />
     </template>
   </FormHorizontal>

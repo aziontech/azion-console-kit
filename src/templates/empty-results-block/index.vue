@@ -56,6 +56,7 @@
               class="max-md:w-full w-fit"
               severity="secondary"
               icon="pi pi-plus"
+              :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"
               @click="navigateToCreatePage"
             />

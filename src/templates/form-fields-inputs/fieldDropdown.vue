@@ -122,6 +122,7 @@
     {{ props.label }} {{ labelSufix }}
   </label>
   <Dropdown
+    v-bind="$attrs"
     appendTo="self"
     :id="name"
     :loading="loading"

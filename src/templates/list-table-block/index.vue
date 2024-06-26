@@ -1,5 +1,8 @@
 <template>
-  <div class="max-w-full">
+  <div
+    class="max-w-full"
+    data-testid="data-table-container"
+  >
     <DataTable
       class="overflow-clip rounded-md"
       v-if="!isLoading"
@@ -16,22 +19,34 @@
       :rows="MINIMUN_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       :loading="isLoading"
+      data-testid="data-table"
     >
       <template #header>
-        <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="flex flex-row p-input-icon-left items-center max-sm:w-full">
+        <div
+          class="flex flex-wrap justify-between gap-2 w-full"
+          data-testid="data-table-header"
+        >
+          <span
+            class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+            data-testid="data-table-search"
+          >
             <i class="pi pi-search" />
             <InputText
               class="h-8 w-full md:min-w-[320px]"
               v-model.trim="filters.global.value"
               placeholder="Search"
+              data-testid="data-table-search-input"
             />
           </span>
-          <slot name="addButton">
+          <slot
+            name="addButton"
+            data-testid="data-table-add-button"
+          >
             <PrimeButton
               class="max-sm:w-full"
               @click="navigateToAddPage"
               icon="pi pi-plus"
+              :data-testid="`create_${addButtonLabel}_button`"
               :label="addButtonLabel"
               v-if="addButtonLabel"
             />
@@ -43,6 +58,7 @@
         v-if="reorderableRows"
         rowReorder
         headerStyle="width: 3rem"
+        data-testid="data-table-reorder-column"
       />
 
       <Column
@@ -52,6 +68,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
@@ -73,15 +90,20 @@
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        data-testid="data-table-actions-column"
       >
         <template #header>
-          <div class="flex justify-end w-full">
+          <div
+            class="flex justify-end w-full"
+            data-testid="data-table-actions-column-header"
+          >
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
               v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
             <OverlayPanel
@@ -89,6 +111,7 @@
               :pt="{
                 content: { class: 'p-0' }
               }"
+              data-testid="data-table-actions-column-header-toggle-columns-panel"
             >
               <Listbox
                 v-model="selectedColumns"
@@ -98,6 +121,7 @@
                 optionLabel="header"
                 optionGroupLabel="label"
                 optionGroupChildren="items"
+                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
               >
                 <template #optiongroup="slotProps">
                   <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
@@ -110,12 +134,14 @@
           <div
             class="flex justify-end"
             v-if="showActions"
+            data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
-              :ref="(document) => (menuRef[rowData.id] = document)"
+              :ref="assignMenuRef(rowData.id)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
+              data-testid="data-table-actions-column-body-actions-menu"
             />
             <PrimeButton
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
@@ -124,12 +150,16 @@
               outlined
               @click="(event) => toggleActionsMenu(event, rowData.id)"
               class="cursor-pointer table-button"
+              data-testid="data-table-actions-column-body-actions-menu-button"
             />
           </div>
         </template>
       </Column>
       <template #empty>
-        <slot name="noRecordsFound">
+        <slot
+          name="noRecordsFound"
+          data-testid="data-table-empty-content"
+        >
           <div class="my-4 flex flex-col gap-3 justify-center items-start">
             <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
@@ -143,15 +173,23 @@
       :pt="{
         header: { class: '!border-t-0' }
       }"
+      data-testid="data-table-skeleton"
     >
       <template #header>
-        <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="flex flex-row h-8 p-input-icon-left max-sm:w-full">
+        <div
+          class="flex flex-wrap justify-between gap-2 w-full"
+          data-testid="data-table-skeleton-header"
+        >
+          <span
+            class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
+            data-testid="data-table-skeleton-search"
+          >
             <i class="pi pi-search" />
             <InputText
               class="w-full h-8 md:min-w-[320px]"
               v-model="filters.global.value"
               placeholder="Search"
+              data-testid="data-table-skeleton-search-input"
             />
           </span>
           <PrimeButton
@@ -160,6 +198,7 @@
             icon="pi pi-plus"
             :label="addButtonLabel"
             v-if="addButtonLabel"
+            data-testid="data-table-skeleton-add-button"
           />
         </div>
       </template>
@@ -169,6 +208,7 @@
         :key="col.field"
         :field="col.field"
         :header="col.header"
+        data-testid="data-table-skeleton-column"
       >
         <template #body>
           <Skeleton />
@@ -179,6 +219,7 @@
   <DeleteDialog
     :informationForDeletion="informationForDeletion"
     @successfullyDeleted="updatedTable()"
+    data-testid="delete-dialog"
   />
 </template>
 
@@ -196,7 +237,6 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({ name: 'list-table-block' })
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
@@ -283,10 +323,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)
@@ -390,6 +426,14 @@
 
   const updatedTable = () => {
     loadData({ page: 1 })
+  }
+
+  const assignMenuRef = (id) => {
+    return (document) => {
+      if (document !== null) {
+        menuRef.value[id] = document
+      }
+    }
   }
 
   watch(data, (currentState) => {
