@@ -10,5 +10,5 @@ describe('Credentials', () => {
     cy.get(selectors.menu.credentials).click()
   })
 
-  it('should create a new credential from an empty page', () => {})
+  it('should create a credential from an empty page', () => {})
 })
