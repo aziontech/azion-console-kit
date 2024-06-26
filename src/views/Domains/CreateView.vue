@@ -101,7 +101,7 @@
     const toastConfig = {
       closable: true,
       severity: 'success',
-      summary: 'Domain copied to clipboard!'
+      summary: 'Successfully copied!'
     }
 
     try {
@@ -111,7 +111,7 @@
       toast.add({
         ...toastConfig,
         severity: 'error',
-        detail: 'The Domain could not be copied to clipboard. Please try again.'
+        detail: 'The domain cannot be copied to the clipboard. Try copying it again.'
       })
     }
   }
