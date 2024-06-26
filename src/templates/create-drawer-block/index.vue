@@ -41,7 +41,7 @@
     }
   })
 
-  const { scrollToError } = useScrollToError()
+  const { scrollToErrorInDrawer } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
@@ -114,7 +114,7 @@
       }
     },
     ({ errors }) => {
-      scrollToError(errors)
+      scrollToErrorInDrawer(errors)
     }
   )
 

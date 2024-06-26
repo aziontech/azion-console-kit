@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { toRef, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import TextArea from 'primevue/textarea'
 
@@ -41,7 +41,8 @@
   })
 
   const name = toRef(props, 'name')
-
+  const slots = useSlots()
+  const hasDescriptionSlot = !!slots.description
   const {
     value: inputValue,
     errorMessage,
@@ -81,8 +82,10 @@
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    v-if="props.description || hasDescriptionSlot"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>

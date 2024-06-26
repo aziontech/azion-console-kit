@@ -1,30 +1,41 @@
 export function useScrollToError() {
-  const createStringQuerySelector = (errorKeys) => {
+  const ELEMENT_DRAWER_SELECTOR = '[data-pc-name="sidebar"]'
+  const SCROLL_DELAY_MS = 250
+
+  const createQuerySelectorString = (errorKeys, isInDrawer) => {
+    const prefix = isInDrawer ? `${ELEMENT_DRAWER_SELECTOR} ` : ''
+
     return errorKeys
       .map((key) => {
-        return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
+        const querySelector = key.startsWith('monaco')
+          ? `[name="${key}"] textarea`
+          : `[name="${key}"]`
+        return `${prefix}${querySelector}`
       })
       .join(', ')
   }
 
-  const scrollToError = (errors) => {
+  const scrollToErrorElement = (errors, isInDrawer = false) => {
     const errorKeys = Object.keys(errors)
-    const stringQuerySelector = createStringQuerySelector(errorKeys)
-    const listElements = document.querySelectorAll(stringQuerySelector)
-    if (!listElements.length) return
+    if (!errorKeys.length) return
 
-    const [firstElementError] = listElements
+    const querySelectorString = createQuerySelectorString(errorKeys, isInDrawer)
+    const errorElements = document.querySelectorAll(querySelectorString)
+    if (!errorElements.length) return
 
-    firstElementError.scrollIntoView({
-      block: 'center',
-      behavior: 'smooth'
-    })
+    const [firstErrorElement] = errorElements
+    firstErrorElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
+
     setTimeout(() => {
-      firstElementError.focus({ preventScroll: true })
-      firstElementError.click()
-    }, 250)
+      firstErrorElement.focus({ preventScroll: true })
+      firstErrorElement.click()
+    }, SCROLL_DELAY_MS)
   }
+
+  const scrollToErrorInDrawer = (errors) => scrollToErrorElement(errors, true)
+
   return {
-    scrollToError
+    scrollToError: scrollToErrorElement,
+    scrollToErrorInDrawer
   }
 }

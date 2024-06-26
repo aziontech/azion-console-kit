@@ -54,7 +54,7 @@
     initialValues: props.initialValues
   })
 
-  const { scrollToError } = useScrollToError()
+  const { scrollToErrorInDrawer } = useScrollToError()
   const toast = useToast()
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
@@ -142,7 +142,7 @@
       }
     },
     ({ errors }) => {
-      scrollToError(errors)
+      scrollToErrorInDrawer(errors)
     }
   )
 

@@ -1,7 +1,7 @@
 <script setup>
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
-  import { computed, toRef } from 'vue'
+  import { computed, toRef, useSlots } from 'vue'
 
   const props = defineProps({
     value: {
@@ -65,6 +65,8 @@
   const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
 
   const name = toRef(props, 'name')
+  const slots = useSlots()
+  const hasDescriptionSlot = !!slots.description
 
   const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
@@ -164,8 +166,10 @@
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    v-if="props.description || hasDescriptionSlot"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>
