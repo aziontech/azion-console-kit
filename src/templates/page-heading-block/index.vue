@@ -14,6 +14,7 @@
         v-if="pageTitle || description"
       >
         <div
+          :data-testid="`page_title_${pageTitle}`"
           class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl"
           v-if="pageTitle"
         >

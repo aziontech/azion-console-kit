@@ -41,3 +41,4 @@ cypress.env.*
 .edge
 
 src/views/Playground/PlaygroundView.vue
+/cypress/downloads

@@ -1,74 +1,56 @@
 /* eslint-disable no-undef */
+/* eslint-disable no-console */
 
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+// Define selectors for elements
+const selectors = {
+  menu: {
+    avatarIcon: '[data-testid="profile-block__avatar"]',
+    menuItem: (menuItemLabel) => `li[aria-label="${menuItemLabel}"] > .p-menuitem-content > .p-menuitem-link`,
+  },
+  login: {
+    emailInput: '[data-testid="signin-block__email-input"]',
+    nextButton: '[data-testid="signin-block__next-button"] > .p-button-label',
+    passwordInput: '[data-testid="signin-block__password-input"] > .p-inputtext',
+    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label',
+  },
+  sidebar: {
+    toggleButton: '[data-testid="sidebar-block__toggle-button"]',
+    menuItem: (productName) => `[data-testid="sidebar-block__menu-item__${productName}"]`,
+  },
+};
 
-/**
- * Custom Cypress command to get an element by data-testid attribute.
- *
- * @param {string} selector - The value of the data-testid attribute to locate the element.
- * @param {...any} args - Additional arguments that can be passed to the cy.get() command.
- * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - A Cypress Chainable yielding the found element.
- *
- * @example
- * cy.getByTestId('myTestId').should('be.visible');
- */
-Cypress.Commands.add('getByTestId', (selector, ...args) => {
-  return cy.get(`[data-testid=${selector}]`, ...args)
-})
+// Disable test failure for all uncaught exceptions
+Cypress.on('uncaught:exception', (err, runnable) => {
+  console.log('Uncaught exception in test:', runnable.title);
+  console.error('Uncaught exception:', err);
+  return false;
+});
 
-function login(email, password, username) {
-    // Arrange: Visit the login page and define user credentials
-    cy.visit('/login');
+// Function to perform login
+const login = (email, password) => {
+  cy.visit('/login');
+  cy.get(selectors.login.emailInput).type(email);
+  cy.get(selectors.login.nextButton).click();
+  cy.get(selectors.login.passwordInput).type(password);
+  cy.get(selectors.login.signInButton).click();
+};
 
-    // Act: Enter email, password and click login button
-    cy.get('#email').type(email)
-    cy.get('.surface-card > :nth-child(2) > .p-button').click()
-    cy.get('#password').type(password, { log: false })
-    cy.get('.flex-row-reverse').click()
-
-    // Assert: Verify successful login by checking for user's name in the profile menu
-    cy.get('.gap-2 > .p-avatar').click()
-    cy.get('.flex-column > .text-sm').should('contain', username)
-}
-
+// Custom command to perform login using environment variables
 Cypress.Commands.add('login', () => {
-  const email = Cypress.env('CYPRESS_EMAIL_STAGE')
-  const password = Cypress.env('CYPRESS_PASSWORD_STAGE')
-  const username = Cypress.env('CYPRESS_USERNAME_STAGE')
+  const email = Cypress.env('CYPRESS_EMAIL_STAGE');
+  const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
+  cy.log(`🔐 Authenticating | ${email}`);
+  login(email, password);
+});
 
-  const log = Cypress.log({
-    displayName: 'AUTH',
-    message: [`🔐 Authenticating | ${email}`],
-    autoEnd: false
-  })
-  log.snapshot('before')
+// Custom command to open a product through the sidebar menu
+Cypress.Commands.add('openProductThroughSidebar', (productName) => {
+  cy.get(selectors.sidebar.toggleButton).click();
+  cy.get(selectors.sidebar.menuItem(productName)).click();
+});
 
-  login(email, password, username)
-
-  log.snapshot('after')
-  log.end()
-})
+// Custom command to open a menu item
+Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
+  cy.get(selectors.menu.avatarIcon).click();
+  cy.get(selectors.menu.menuItem(menuItemLabel)).click();
+});

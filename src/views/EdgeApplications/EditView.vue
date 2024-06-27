@@ -8,11 +8,13 @@
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
     :isTabs="true"
+    data-testid="edit-edge-application-form-block"
   >
     <template #form>
       <FormFieldsCreateEdgeApplications
         :handleBlock="handleBlocks"
         :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService"
+        data-testid="edit-edge-application-form-fields"
       />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
@@ -21,6 +23,7 @@
         @onCancel="onCancel"
         :loading="loading"
         :submitDisabled="!formValid"
+        data-testid="edit-edge-application-action-bar"
       />
     </template>
   </EditFormBlock>
