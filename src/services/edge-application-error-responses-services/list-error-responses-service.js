@@ -16,7 +16,7 @@ const adapt = (httpResponse) => {
   const parsedErrorResponses = {
     id: response.id,
     name: response.name,
-    originId: response.origin_id.toString(),
+    originId: response.origin_id?.toString(),
     errorResponses: response.error_responses.map((element) => {
       return {
         code: element.code.toString(),
