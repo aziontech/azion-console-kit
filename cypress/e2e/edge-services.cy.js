@@ -16,7 +16,7 @@ const selectors = {
   },
   form: {
     serviceName: '[data-testid="edge-service-form__name-field"]',
-    nameRequiredLabel: '.p-error',
+    nameRequiredLabel: '[data-testid="edge-service-form__name-field-error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
     pageTitle: '[data-testid="page_title_EntityName"]',
     cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label'
