@@ -7,7 +7,7 @@ import { SignUpTracker, SignInTracker, CreateTracker, ProductTracker } from './t
  */
 
 /**
- * @typedef {'Edge Application'|'Origins'|'Domains', 'Edge Functions'} AzionProductsNames
+ * @typedef {'Edge Application'|'Origins'|'Domains'|'Edge Functions'} AzionProductsNames
  */
 
 export class AnalyticsTrackerAdapter {
@@ -54,6 +54,7 @@ export class AnalyticsTrackerAdapter {
   async track() {
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
+      props.application = 'console-kit'
       const propsWithTraits = { ...props, ...this.#traits }
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })

@@ -8,7 +8,7 @@ const environment = {
     segmentToken: 'EeKBQaSXEBAkaOYc0Z9XrPALzdt5rLpI'
   },
   production: {
-    segmentToken: 'MFfoMuZo6JPehBpfh21zXEjlwOs2zDeP'
+    segmentToken: 'ETgfGs4YWT2MBa1uMCaB6l0tsFjjvd9l'
   }
 }
 
