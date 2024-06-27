@@ -1,62 +1,57 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
 
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
+// Define selectors for elements
+const selectors = {
+  menu: {
+    avatarIcon: '[data-testid="profile-block__avatar"]',
+    menuItem: (menuItemLabel) => `li[aria-label="${menuItemLabel}"] > .p-menuitem-content > .p-menuitem-link`,
+  },
+  login: {
+    emailInput: '[data-testid="signin-block__email-input"]',
+    nextButton: '[data-testid="signin-block__next-button"] > .p-button-label',
+    passwordInput: '[data-testid="signin-block__password-input"] > .p-inputtext',
+    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label',
+  },
+  sidebar: {
+    toggleButton: '[data-testid="sidebar-block__toggle-button"]',
+    menuItem: (productName) => `[data-testid="sidebar-block__menu-item__${productName}"]`,
+  },
+};
+
+const email = Cypress.env('CYPRESS_EMAIL_STAGE');
+const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
 
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
-  console.log('Uncaught exception in test:', runnable.title)
-  console.error('Uncaught exception:', err)
-  return false
-})
+  console.log('Uncaught exception in test:', runnable.title);
+  console.error('Uncaught exception:', err);
+  return false;
+});
 
-// Custom command to get an element by data-testid
-Cypress.Commands.add('getByTestId', (selector, ...args) => {
-  return cy.get(`[data-testid="${selector}"]`, ...args)
-})
+// Function to perform login
+const login = (email, password) => {
+  cy.visit('/login');
+  cy.get(selectors.login.emailInput).type(email);
+  cy.get(selectors.login.nextButton).click();
+  cy.get(selectors.login.passwordInput).type(password);
+  cy.get(selectors.login.signInButton).click();
+};
 
-// Helper function to perform login
-function login(email, password, username) {
-  cy.visit('/login')
-
-  cy.get('#email').type(email)
-  cy.get('.surface-card > :nth-child(2) > .p-button').click()
-  cy.get('#password').type(password, { log: false })
-  cy.get('.flex-row-reverse').click()
-
-  cy.get('.gap-2 > .p-avatar').click()
-  cy.get('.flex-column > .text-sm').should('contain', username)
-}
-
-// Custom command to perform login
+// Custom command to perform login using environment variables
 Cypress.Commands.add('login', () => {
-  const email = Cypress.env('CYPRESS_EMAIL_STAGE')
-  const password = Cypress.env('CYPRESS_PASSWORD_STAGE')
-  const username = Cypress.env('CYPRESS_USERNAME_STAGE')
+  cy.log(`🔐 Authenticating | ${email}`);
+  login(email, password);
+});
 
-  const log = Cypress.log({
-    displayName: 'AUTH',
-    message: [`🔐 Authenticating | ${email}`],
-    autoEnd: false
-  })
-  log.snapshot('before')
-
-  login(email, password, username)
-
-  log.snapshot('after')
-  log.end()
-})
-
-// Open the product through the sidebar menu
+// Custom command to open a product through the sidebar menu
 Cypress.Commands.add('openProductThroughSidebar', (productName) => {
-  cy.get('[data-testid="sidebar-block__toggle-button"]').click()
-  cy.get(`[data-testid="sidebar-block__menu-item__${productName}"]`).click()
-})
+  cy.get(selectors.sidebar.toggleButton).click();
+  cy.get(selectors.sidebar.menuItem(productName)).click();
+});
+
+// Custom command to open a menu item
+Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
+  cy.get(selectors.menu.avatarIcon).click();
+  cy.get(selectors.menu.menuItem(menuItemLabel)).click();
+});
