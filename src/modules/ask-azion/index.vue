@@ -16,6 +16,7 @@
 
     <div class="h-full flex justify-between flex-col">
       <deep-chat
+        :stream="true"
         :initialMessages="initialMessages"
         :chatStyle="deepChatStyles"
         :messageStyles="messageStyles"
@@ -23,7 +24,6 @@
         :textInput="textInputStyles"
         :submitButtonStyles="submitButtonStyles"
         :request="makeRequestConfig()"
-        :stream="true"
         :requestInterceptor="
           (requestDetails) =>
             requestInterceptorService(requestDetails, {
