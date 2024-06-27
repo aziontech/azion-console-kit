@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Team"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Team"
+        data-testid="teams-permissions__create-view__page-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock
@@ -11,9 +14,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsTeamPermissions
-            :listPermissionService="props.listPermissionService"
-          ></FormFieldsTeamPermissions>
+          <FormFieldsTeamPermissions :listPermissionService="props.listPermissionService" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate

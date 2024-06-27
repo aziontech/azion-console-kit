@@ -1,0 +1,6 @@
+builder=webpack
+entry=./main.js
+preset=vue
+mode=deliver
+useNodePolyfills=false
+useOwnWorker=false

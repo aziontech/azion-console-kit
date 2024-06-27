@@ -57,12 +57,14 @@
 </script>
 <template>
   <FormHorizontal
+    data-testid="teams-permissions-form__section__general"
     title="General"
     description="Use permissions to manage and oversee users by defining access levels of client accounts."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="teams-permissions-form__name-field__text"
           label="Name *"
           name="name"
           :value="name"
@@ -72,18 +74,21 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
+    data-testid="teams-permissions-form__section__permissions"
     title="Permissions"
     description="Determine the access level of accounts and assign permissions according to their team. Teams can be based on the role and tasks of account users."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">
         <label
+          data-testid="teams-permissions-form__permissions-field__label"
           for="value"
           class="text-color text-base font-medium"
         >
           Permissions *
         </label>
         <PickList
+          data-testid="teams-permissions-form__permissions-field__picklist"
           v-model="permissionsList"
           :pt="{
             sourceList: { class: ['h-80'] },
@@ -100,12 +105,19 @@
           <template #item="slotProps">
             <div>
               <div>
-                <span class="font-normal">{{ slotProps.item.name }}</span>
+                <span
+                  class="font-normal"
+                  :data-testid="`teams-permissions-form__permissions-field__picklist__item-${slotProps.item.name}`"
+                  >{{ slotProps.item.name }}</span
+                >
               </div>
             </div>
           </template>
         </PickList>
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="teams-permissions-form__permissions-field__description"
+        >
           Select an item from the list and then use the arrows to move it between the available and
           selected permissions boxes. Use the double-line arrows to move all items or press the
           <code>ctrl</code> or <code>command</code> keys to select multiple items.
@@ -119,9 +131,13 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal title="Status">
+  <FormHorizontal
+    title="Status"
+    data-testid="teams-permissions-form__section__status"
+  >
     <template #inputs>
       <FieldSwitchBlock
+        data-testid="teams-permissions-form__status-field__switch"
         nameField="isActive"
         name="active"
         auto

@@ -87,6 +87,7 @@
           name="digitalCertificateName"
           placeholder="My digital certificate"
           :value="digitalCertificateName"
+          data-testid="digital-certificate__name-field"
         />
       </div>
     </template>

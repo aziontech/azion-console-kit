@@ -205,6 +205,7 @@
     @onSuccess="handleCreateRulesEngine"
     :showBarGoBack="true"
     title="Create Rule"
+    data-testid="rules-engine-create-drawer"
   >
     <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
@@ -218,6 +219,7 @@
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        data-testid="rules-engine-create-drawer-form-fields"
         :errors="errors"
       />
     </template>
@@ -233,6 +235,7 @@
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Rule"
+    data-testid="rules-engine-edit-drawer"
   >
     <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
@@ -246,6 +249,7 @@
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        data-testid="rules-engine-edit-drawer-form-fields"
         :errors="errors"
       />
     </template>

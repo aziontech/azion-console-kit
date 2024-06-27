@@ -1,7 +1,10 @@
 <template>
-  <ContentBlock>
+  <ContentBlock data-testid="create-edge-application-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Application"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Edge Application"
+        data-testid="create-edge-application-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock
@@ -10,9 +13,13 @@
         :createService="props.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        data-testid="create-edge-application-form-block"
       >
         <template #form>
-          <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" />
+          <FormFieldsCreateEdgeApplications
+            :handleBlock="handleBlocks"
+            data-testid="create-edge-application-form-fields"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -20,6 +27,7 @@
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
+            data-testid="create-edge-application-action-bar"
           />
         </template>
       </CreateFormBlock>

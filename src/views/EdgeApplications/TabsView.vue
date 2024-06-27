@@ -253,9 +253,12 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
-      <PageHeadingBlock :pageTitle="tabTitle" />
+      <PageHeadingBlock
+        :pageTitle="tabTitle"
+        data-testid="edge-application-details-heading"
+      />
     </template>
     <template #content>
       <TabView
@@ -263,17 +266,20 @@
         @tab-click="({ index = 0 }) => changeTab(index)"
         class="w-full h-full"
         v-if="edgeApplication"
+        data-testid="edge-application-details-tab-view"
       >
         <TabPanel
           v-for="(tab, index) in filteredTabs"
           :key="index"
           :header="tab.header"
+          data-testid="edge-application-details-tab-panel"
         >
           <component
             :is="tab.component"
             v-if="tab.show"
             @updatedApplication="updatedApplication"
             v-bind="tab.props()"
+            data-testid="edge-application-details-tab-panel-component"
           />
         </TabPanel>
       </TabView>
