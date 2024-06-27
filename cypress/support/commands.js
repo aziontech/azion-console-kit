@@ -19,9 +19,6 @@ const selectors = {
   },
 };
 
-const email = Cypress.env('CYPRESS_EMAIL_STAGE');
-const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
-
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
   console.log('Uncaught exception in test:', runnable.title);
@@ -40,6 +37,8 @@ const login = (email, password) => {
 
 // Custom command to perform login using environment variables
 Cypress.Commands.add('login', () => {
+  const email = Cypress.env('CYPRESS_EMAIL_STAGE');
+  const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
   cy.log(`🔐 Authenticating | ${email}`);
   login(email, password);
 });
