@@ -34,7 +34,7 @@
   const { value: language } = useField('language')
   const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile } = useField('mobile')
+  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
@@ -100,7 +100,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="your-settings-form__profile__first-name__field-text"
+          data-testid="profile__first-name__input"
           label="First Name *"
           name="firstName"
           :value="firstName"
@@ -109,7 +109,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="profile__last-name__field-text"
+          data-testid="profile__last-name__input"
           label="Last Name *"
           name="lastName"
           :value="lastName"
@@ -119,7 +119,7 @@
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
-            data-testid="profile__timezone__field-dropdown"
+            data-testid="profile__timezone__options"
             label="Timezone *"
             name="timezone"
             :options="optionsTimezone"
@@ -176,7 +176,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="contact__email__field-text"
+          data-testid="contact__email__input"
           label="Email *"
           name="email"
           :value="email"

@@ -64,7 +64,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="teams-permissions-form__name-field__text"
+          data-testid="teams-permissions-form__name__field-text"
           label="Name *"
           name="name"
           :value="name"

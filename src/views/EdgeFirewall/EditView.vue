@@ -36,7 +36,8 @@
     return props.edgeFirewall
   }
 
-  const formSubmit = async (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
+    if (!formValid) return
     await onSubmit()
     emit('updatedFirewall', values)
   }

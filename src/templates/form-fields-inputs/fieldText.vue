@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, toRef, useSlots } from 'vue'
+  import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -36,7 +36,13 @@
   const inputRef = ref(null)
   const name = toRef(props, 'name')
   const slots = useSlots()
+  const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
+
+  const testIdError = computed(() => {
+    const id = attrs['data-testid']
+    return id ? `${id}__error-message` : 'error-message'
+  })
 
   const {
     value: inputValue,
@@ -75,9 +81,11 @@
   />
   <small
     v-if="errorMessage"
+    :data-testid="testIdError"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description || hasDescriptionSlot"
