@@ -143,6 +143,7 @@
           <FieldNumber
             label="Sampling Percentage (%)"
             name="samplingPercentage"
+            :value="samplingPercentage"
             description="Percentage value received in return of the total data related to all domains."
             :min="0"
             :max="100"
@@ -188,6 +189,7 @@
             label="URL *"
             description="Specific URL that'll receive the collected data."
             name="endpointUrl"
+            :value="endpointUrl"
             placeholder="https://app.domain.com/"
           />
         </div>
@@ -240,6 +242,7 @@
             label="Bootstrap Servers *"
             name="bootstrapServers"
             rows="5"
+            :value="bootstrapServers"
             placeholder="host1:port1,host2:port2,..."
             description="List of hosts and ports in a Kafka cluster. Separate items by comma and no space.."
           />
@@ -249,6 +252,7 @@
           <FieldText
             label="Kafka Topic *"
             name="kafkaTopic"
+            :value="kafkaTopic"
             description="Name of the topic in a Kafka cluster."
             placeholder="analytics.fct.pageviews.0"
           />
@@ -284,6 +288,7 @@
           <FieldText
             label="URL *"
             name="host"
+            :value="host"
             description="Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol."
             placeholder="https://myownhost.s3.us-east-1.myprovider.com"
           />
@@ -293,6 +298,7 @@
           <FieldText
             label="Bucket Name *"
             name="bucket"
+            :value="bucket"
             description="Name of the bucket to which the object will be sent."
             placeholder="mys3bucket"
           />
@@ -302,6 +308,7 @@
           <FieldText
             label="Region *"
             name="region"
+            :value="region"
             description="Region in which your bucket is hosted."
             placeholder="us-east-1"
           />
@@ -418,6 +425,7 @@
           <FieldText
             label="Project ID *"
             name="projectID"
+            :value="projectID"
             description="ID of the project in Google Cloud."
             placeholder="mycustomGBQproject01"
           />
@@ -427,6 +435,7 @@
           <FieldText
             label="Dataset ID *"
             name="datasetID"
+            :value="datasetID"
             description="Name of the dataset created on Google BigQuery. Case sensitive field."
             placeholder="myGBQdataset"
           />
@@ -436,6 +445,7 @@
           <FieldText
             label="Table ID *"
             name="tableID"
+            :value="tableID"
             description="Name of the table on Google BigQuery."
             placeholder="mypagaviewtable01"
           />
@@ -474,6 +484,7 @@
           <FieldText
             label="URL *"
             name="elasticsearchUrl"
+            :value="elasticsearchUrl"
             description="URL address plus the Elasticsearch index that'll receive the collected data."
             placeholder="https://elasticsearch-domain.com/myindex"
           />
@@ -483,6 +494,7 @@
           <FieldTextArea
             label="API Key *"
             name="apiKey"
+            :value="apiKey"
             rows="5"
             placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
             description="API key used for Elasticsearch authorization in base64 encode format."
@@ -499,6 +511,7 @@
           <FieldText
             label="URL *"
             name="splunkUrl"
+            :value="splunkUrl"
             description="URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL."
             placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
           />
@@ -508,7 +521,7 @@
           <FieldTextArea
             label="API Key *"
             name="splunkApiKey"
-            rows="5"
+            :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
             description="HTTP Event Collector Token provided during the Splunk installation."
           />
@@ -524,6 +537,7 @@
           <FieldText
             label="Stream Name *"
             name="streamName"
+            :value="streamName"
             description="Delivery stream name."
             placeholder="MyKDFConnector"
           />
@@ -533,6 +547,7 @@
           <FieldText
             label="Region *"
             name="awsRegion"
+            :value="awsRegion"
             description="Region where the Amazon Kinesis instance is running."
             placeholder="us-east-1"
           />
@@ -600,6 +615,7 @@
           <FieldText
             label="URL *"
             name="datadogUrl"
+            :value="datadogUrl"
             description="URL or URI of the Datadog endpoint."
             placeholder="https://http-intake.logs.datadoghq.com/v1/input"
           />
@@ -609,7 +625,7 @@
           <FieldTextArea
             label="API Key *"
             name="datadogApiKey"
-            rows="5"
+            :value="datadogApiKey"
             placeholder="ij9076f1ujik17a81f938yhru5g713422"
             description="API key generated through the Datadog dashboard."
           />
@@ -625,6 +641,7 @@
           <FieldText
             label="URL *"
             name="QRadarUrl"
+            :value="QRadarUrl"
             description="Specific URL that'll receive the collected data."
             placeholder="http://137.15.824.10:14440"
           />
@@ -640,6 +657,7 @@
           <FieldText
             label="Log Type *"
             name="logType"
+            :value="logType"
             description="Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters."
             placeholder="AzureMonitorTest"
           />
@@ -675,6 +693,7 @@
           <FieldText
             label="Time Generated Field"
             name="generatedField"
+            :value="generatedField"
             description="Specifies how long it’ll take for the log to be available after collection. Uses
             ingestion time if not specified."
             placeholder="myCustomTimeField"
@@ -685,6 +704,7 @@
           <FieldText
             label="Workspace ID *"
             name="workspaceID"
+            :value="workspaceID"
             description="ID of the Workspace."
             placeholder="kik73154-0426-464c-aij3-eg6d24u87c50"
           />
@@ -700,6 +720,7 @@
           <FieldText
             label="Storage Account *"
             name="storageAccount"
+            :value="storageAccount"
             description="Name of the storage account."
             placeholder="mystorageaccount"
           />
@@ -709,6 +730,7 @@
           <FieldText
             label="Container Name *"
             name="containerName"
+            :value="containerName"
             description="Name of the container."
             placeholder="mycontainer"
           />
@@ -718,6 +740,7 @@
           <FieldText
             label="Blob SAS Token *"
             name="blobToken"
+            :value="blobToken"
             description="Token generated by Blob Storage. It should have create, read, write, and list accesses granted."
             placeholder="sp=oiuwdl&st=2022-04-14T18:05:08Z&se=2026-03-02T02:05:08Z&sv=2020-08-04&sr=c&sig=YUi0TBEt7XTlxXex4Jui%2Fc88h6qAgMmCY4XIXeMvxa0%3F"
           />
@@ -735,6 +758,7 @@
         <FieldText
           label="Payload Format *"
           name="payloadFormat"
+          :value="payloadFormat"
           description="The format that payload will be sent. The $dataset variable will be replaced by all logs already with the log line separator applied."
           placeholder="$dataset"
         />
@@ -744,6 +768,7 @@
         <FieldText
           label="Payload Log Line Separator *"
           name="lineSeparator"
+          :value="lineSeparator"
           :description="placeholderLineSeparator"
         />
       </div>
@@ -752,6 +777,7 @@
         <FieldNumber
           label="Payload Max Size"
           name="maxSize"
+          :value="maxSize"
           description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
           placeholder="1000000"
           :useGrouping="false"
@@ -783,15 +809,12 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
 
   import ButtonPrimer from 'primevue/button'
-  // import Dropdown from 'primevue/dropdown'
   import InlineMessage from 'primevue/inlinemessage'
-  // import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
   import PickList from 'primevue/picklist'
   import RadioButton from 'primevue/radiobutton'
-  // import TextArea from 'primevue/textarea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
@@ -852,32 +875,66 @@
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
   const { value: hasSampling } = useField('hasSampling')
-
+  const { value: samplingPercentage } = useField('samplingPercentage')
   // standard
+  const { value: endpointUrl } = useField('endpointUrl')
   const { value: headers } = useField('headers')
   const { value: maxSize } = useField('maxSize')
   const { value: lineSeparator } = useField('lineSeparator')
   const { value: payloadFormat } = useField('payloadFormat')
 
   // kafka
+  const { value: bootstrapServers } = useField('bootstrapServers')
+  const { value: kafkaTopic } = useField('kafkaTopic')
   const { value: useTls, errorMessage: useTlsError } = useField('useTls')
 
+  // QRadar
+  const { value: QRadarUrl } = useField('QRadarUrl')
+
   // s3
+  const { value: host } = useField('host')
+  const { value: bucket } = useField('bucket')
+  const { value: region } = useField('region')
   const { value: accessKey, errorMessage: accessKeyError } = useField('accessKey')
   const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
   const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
   const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
 
   // google big query
+  const { value: projectID } = useField('projectID')
+  const { value: datasetID } = useField('datasetID')
+  const { value: tableID } = useField('tableID')
   const { value: serviceAccountKey, errorMessage: serviceAccountKeyError } =
     useField('serviceAccountKey')
 
+  // elasticsearch
+  const { value: elasticsearchUrl } = useField('elasticsearchUrl')
+  const { value: apiKey } = useField('apiKey')
+
+  // splunk
+  const { value: splunkUrl } = useField('splunkUrl')
+  const { value: splunkApiKey } = useField('splunkApiKey')
+
   // aws_kinesis_firehose
+  const { value: streamName } = useField('streamName')
+  const { value: awsRegion } = useField('awsRegion')
   const { value: awsAccessKey, errorMessage: awsAccessKeyError } = useField('awsAccessKey')
   const { value: awsSecretKey, errorMessage: awsSecretKeyError } = useField('awsSecretKey')
 
   // azure_monitor
   const { value: sharedKey, errorMessage: sharedKeyError } = useField('sharedKey')
+  const { value: logType } = useField('logType')
+  const { value: generatedField } = useField('generatedField')
+  const { value: workspaceID } = useField('workspaceID')
+
+  // datadog
+  const { value: datadogUrl } = useField('datadogUrl')
+  const { value: datadogApiKey } = useField('datadogApiKey')
+
+  // azure_blob_storage
+  const { value: storageAccount } = useField('storageAccount')
+  const { value: containerName } = useField('containerName')
+  const { value: blobToken } = useField('blobToken')
 
   const listTemplates = ref([])
 
