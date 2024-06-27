@@ -246,12 +246,12 @@
 
         ${createSuggestion({
           title: 'Learn how to use our API V4',
-          text: 'I want to know how to use the API or CLI, give me the documentation links'
+          text: 'I want to know how to use the API or CLI'
         })}
 
         ${createSuggestion({
-          title: 'Automate with our CLI',
-          text: 'I want to know how to automate using the CLI'
+          title: 'How to use Azion to pointing my traffic',
+          text: 'I want to know how to point my traffic to Azion'
         })}
       </div>
       `,
