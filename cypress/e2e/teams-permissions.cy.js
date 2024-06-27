@@ -1,8 +1,4 @@
 const selectors = {
-  menu: {
-    teamsPermissionsMenuItem:
-      'li[aria-label="Teams Permissions"] > .p-menuitem-content > .p-menuitem-link'
-  },
   list: {
     createTeamButton: '[data-testid="create_Team_button"]',
     searchField: '[data-testid="data-table-search-input"]',
@@ -30,7 +26,7 @@ const selectors = {
     teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
     allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
     allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
-    singlePermissionToTarget: '[aria-label="Move to Target"] > .p-icon > path',
+    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
     viewContentDeliverySettingsPermission:
       '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
 
@@ -46,7 +42,7 @@ const selectors = {
 describe('Teams Permissions', () => {
   beforeEach(() => {
     cy.login()
-    cy.get(selectors.menu.teamsPermissionsMenuItem).click()
+    cy.openMenuItem('Teams Permissions');
   })
 
   it('should create a new team', () => {
