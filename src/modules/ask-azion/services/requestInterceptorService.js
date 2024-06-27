@@ -1,4 +1,5 @@
-export const requestInterceptorService = (requestDetails) => {
-  requestDetails.headers['sessionId'] = 'sessionId' // add custom header
+export const requestInterceptorService = (requestDetails, { sessionId, url }) => {
+  requestDetails.body['session_id'] = sessionId
+  requestDetails.body['url'] = url
   return requestDetails
 }

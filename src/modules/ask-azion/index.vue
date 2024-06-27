@@ -22,8 +22,15 @@
         :avatars="avatarStyles"
         :textInput="textInputStyles"
         :submitButtonStyles="submitButtonStyles"
-        :directConnection="makeConnectionConfig()"
-        :requestInterceptor="requestInterceptorService"
+        :request="makeRequestConfig()"
+        :stream="true"
+        :requestInterceptor="
+          (requestDetails) =>
+            requestInterceptorService(requestDetails, {
+              sessionId: aiAskAzionSessionId,
+              url: currentRouteFullPath
+            })
+        "
       >
       </deep-chat>
     </div>
@@ -60,8 +67,15 @@
           :avatars="avatarStyles"
           :textInput="textInputStyles"
           :submitButtonStyles="submitButtonStyles"
-          :directConnection="makeConnectionConfig()"
-          :requestInterceptor="requestInterceptorService"
+          :request="makeRequestConfig()"
+          :stream="true"
+          :requestInterceptor="
+            (requestDetails) =>
+              requestInterceptorService(requestDetails, {
+                sessionId: aiAskAzionSessionId,
+                url: currentRouteFullPath
+              })
+          "
         >
         </deep-chat>
       </div>
@@ -77,11 +91,14 @@
   import AskAzionHeader from './ask-azion-header.vue'
   import 'deep-chat'
   import { requestInterceptorService } from './services/requestInterceptorService'
-  import { makeConnectionConfig } from './services/makeConnectionConfig'
+  import { makeRequestConfig } from './services/makeRequestConfig'
+  import { makeSessionId } from './services/makeSessionId'
   import azionLogoProfile from '@/modules/ask-azion/assets/azion-logo.svg?url'
   import { useAskAzionAiChatStore } from '@/stores/ask-azion-ai-chat'
   import { computed, onMounted, ref } from 'vue'
   import hljs from 'highlight.js'
+  import { useRouter } from 'vue-router'
+  const { currentRoute } = useRouter()
 
   defineOptions({
     name: 'ai-chat-block'
@@ -89,9 +106,13 @@
 
   onMounted(() => {
     addSupportToHljs()
+    generateChatSessionId()
   })
 
   const askAzionAiChatStore = useAskAzionAiChatStore()
+
+  const currentRouteFullPath = currentRoute.value.path
+  const aiAskAzionSessionId = ref('')
 
   const deepChatStyles = ref({
     fontFamily: 'var(--font-family)',
@@ -247,4 +268,9 @@
       window.hljs = hljs
     }
   }
+
+  const generateChatSessionId = () => {
+    aiAskAzionSessionId.value = makeSessionId()
+  }
 </script>
+./services/makeRequestConfig
