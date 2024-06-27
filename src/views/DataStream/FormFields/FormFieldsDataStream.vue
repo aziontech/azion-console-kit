@@ -625,7 +625,7 @@
           <FieldTextArea
             label="API Key *"
             name="datadogApiKey"
-            :value=datadogApiKey
+            :value="datadogApiKey"
             placeholder="ij9076f1ujik17a81f938yhru5g713422"
             description="API key generated through the Datadog dashboard."
           />
@@ -884,13 +884,12 @@
   const { value: payloadFormat } = useField('payloadFormat')
 
   // kafka
-  const { value: bootstrapServers  } = useField('bootstrapServers')
+  const { value: bootstrapServers } = useField('bootstrapServers')
   const { value: kafkaTopic } = useField('kafkaTopic')
   const { value: useTls, errorMessage: useTlsError } = useField('useTls')
 
   // QRadar
   const { value: QRadarUrl } = useField('QRadarUrl')
-
 
   // s3
   const { value: host } = useField('host')
@@ -909,7 +908,7 @@
     useField('serviceAccountKey')
 
   // elasticsearch
-  const { value: elasticsearchUrl  } = useField('elasticsearchUrl')
+  const { value: elasticsearchUrl } = useField('elasticsearchUrl')
   const { value: apiKey } = useField('apiKey')
 
   // splunk
@@ -936,7 +935,7 @@
   const { value: storageAccount } = useField('storageAccount')
   const { value: containerName } = useField('containerName')
   const { value: blobToken } = useField('blobToken')
-  
+
   const listTemplates = ref([])
 
   const loaderDataStreamTemplates = async () => {
