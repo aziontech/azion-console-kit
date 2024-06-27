@@ -8,7 +8,7 @@ const generateUniqueName = (prefix) => {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    millisecond: '2-digit',
+    millisecond: '3-digit',
   }).replace(/\//g, '').replace(/:/g, '').replace(/, /g, '');
   return `${prefix}${formattedTimestamp}`;
 };
