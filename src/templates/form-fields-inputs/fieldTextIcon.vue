@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef, useSlots } from 'vue'
+  import { computed, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -16,14 +16,6 @@
       type: String,
       default: ''
     },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
     placeholder: {
       type: String,
       default: ''
@@ -32,55 +24,72 @@
       type: String,
       default: ''
     },
-    inputClass: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
       type: String,
       default: ''
+    },
+    iconPosition: {
+      type: String,
+      default: 'right'
     }
   })
 
-  const name = toRef(props, 'name')
-
-  const slots = useSlots()
-  const hasIconSlot = !!slots.icon
+  const nameInput = toRef(props, 'name')
 
   const {
     value: inputValue,
     errorMessage,
     handleBlur,
     handleChange
-  } = useField(name, undefined, {
+  } = useField(nameInput, undefined, {
     initialValue: props.value
+  })
+
+  const iconPositionClass = computed(() => {
+    return props.icon ? `p-input-icon-${props.iconPosition}` : ''
   })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
+    class="text-color text-base font-medium leading-5"
   >
-  <div class="p-inputgroup">
-    <div
-      class="p-inputgroup-addon"
-      v-if="hasIconSlot"
-    >
-      <slot name="icon"></slot>
-    </div>
-
+    {{ props.label }}
+  </label>
+  <span
+    class="w-full"
+    :class="iconPositionClass"
+  >
+    <i
+      v-if="props.icon"
+      :class="props.icon"
+      class="text-color-secondary"
+    />
     <InputText
-      :id="name"
+      :id="props.name"
       v-model="inputValue"
-      :name="name"
-      :readonly="readonly"
-      :disabled="disabled"
-      :class="inputClass"
+      :name="props.name"
+      :readonly="props.readonly"
+      :disabled="props.disabled"
       type="text"
+      class="w-full"
+      :class="{ 'p-invalid': errorMessage }"
       :placeholder="props.placeholder"
       @input="handleChange"
       @blur="handleBlur"
+      v-bind="$attrs"
     />
-    <slot name="button"></slot>
-  </div>
+  </span>
+
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"

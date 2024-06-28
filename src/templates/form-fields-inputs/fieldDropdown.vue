@@ -1,11 +1,11 @@
 <script setup>
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
-  import { computed, toRef } from 'vue'
+  import { computed, toRef, useSlots } from 'vue'
 
   const props = defineProps({
     value: {
-      type: String,
+      type: [String, Number],
       default: ''
     },
     name: {
@@ -33,16 +33,12 @@
       default: ''
     },
     optionDisabled: {
-      type: String,
+      type: [String, Function],
       default: ''
     },
     options: {
       type: Array,
       default: () => []
-    },
-    inputClass: {
-      type: String,
-      default: ''
     },
     loading: {
       type: Boolean,
@@ -69,6 +65,8 @@
   const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
 
   const name = toRef(props, 'name')
+  const slots = useSlots()
+  const hasDescriptionSlot = !!slots.description
 
   const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
@@ -117,15 +115,15 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
   >
     {{ props.label }} {{ labelSufix }}
   </label>
   <Dropdown
-    v-bind="$attrs"
     appendTo="self"
     :id="name"
-    :loading="loading"
+    :name="props.name"
+    :loading="props.loading"
     v-model="inputValue"
     :options="props.options"
     :optionLabel="props.optionLabel"
@@ -136,8 +134,15 @@
     :autoFilterFocus="props.filter"
     @change="emitChange"
     @blur="emitBlur"
-    :class="inputClass"
-    :disabled="disabled"
+    :class="{ 'p-invalid': errorMessage }"
+    v-bind="$attrs"
+    :disabled="props.disabled"
+    class="w-full"
+    :pt="{
+      filterInput: {
+        class: 'w-full'
+      }
+    }"
   >
     <template
       v-if="enableCustomLabel"
@@ -156,12 +161,15 @@
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    v-if="props.description || hasDescriptionSlot"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>

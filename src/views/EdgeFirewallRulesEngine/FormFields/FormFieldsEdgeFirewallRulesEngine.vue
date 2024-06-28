@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
@@ -551,30 +552,25 @@
           </div>
 
           <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col sm:flex-row">
-            <div class="flex h-fit mt-2 sm:max-w-lg w-full gap-2">
-              <div class="p-inputgroup">
-                <div class="p-inputgroup-addon">
-                  <i class="pi pi-dollar"></i>
-                </div>
-                <FieldDropdown
-                  :id="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
-                  :options="generateCriteriaVariableOptions()"
-                  @onChange="
-                    (selectedCriteriaVariable) =>
-                      clearCriteriaArgument({
-                        selectedCriteriaVariable,
-                        criteriaIndex,
-                        criteriaInnerRowIndex
-                      })
-                  "
-                  optionLabel="label"
-                  optionValue="value"
-                  optionDisabled="disabled"
-                  inputClass="w-full"
-                  :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
-                  :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
-                />
-              </div>
+            <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
+              <FieldDropdownIcon
+                :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
+                :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
+                :options="generateCriteriaVariableOptions()"
+                @onChange="
+                  (selectedCriteriaVariable) =>
+                    clearCriteriaArgument({
+                      selectedCriteriaVariable,
+                      criteriaIndex,
+                      criteriaInnerRowIndex
+                    })
+                "
+                optionLabel="label"
+                optionValue="value"
+                optionDisabled="disabled"
+                class="w-full"
+                icon="pi pi-dollar"
+              />
             </div>
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -587,9 +583,10 @@
                 "
                 optionLabel="label"
                 optionValue="value"
-                inputClass="w-full"
+                class="w-full"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].operator`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
               />
             </div>
 
@@ -599,6 +596,7 @@
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
+                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
               <FieldDropdown
                 v-if="showSSLStatusDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
@@ -608,7 +606,8 @@
                 optionLabel="label"
                 optionValue="value"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
-                inputClass="w-full"
+                class="w-full"
+                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
               <FieldDropdown
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
@@ -621,6 +620,7 @@
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
                 :filter="true"
+                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
             </div>
           </div>
@@ -736,7 +736,6 @@
               optionValue="value"
               optionDisabled="disabled"
               v-bind:value="behaviors[behaviorItemIndex].value.name"
-              inputClass="w-full"
               @onChange="
                 (selectedBehavior) =>
                   updateAndGenerateAvailableBehaviorsOptions({
@@ -756,7 +755,7 @@
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
             </template>
 
@@ -769,7 +768,7 @@
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
               <FieldDropdown
                 :key="`${behaviorItem.key}-mode`"
@@ -788,7 +787,7 @@
                 optionLabel="label"
                 optionValue="value"
                 v-bind:value="behaviors[behaviorItemIndex].value.mode"
-                inputClass="w-full"
+                class="w-full"
               />
             </template>
 
@@ -805,7 +804,7 @@
                 optionValue="value"
                 optionDisabled="disabled"
                 v-bind:value="behaviors[behaviorItemIndex].value.type"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
 
               <FieldNumber
@@ -832,7 +831,7 @@
                 optionValue="value"
                 optionDisabled="disabled"
                 v-bind:value="behaviors[behaviorItemIndex].value.limit_by"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
 
               <template v-if="isRateLimitBySeconds(behaviorItemIndex)">
@@ -865,7 +864,7 @@
                 id="`behaviors[${behaviorItemIndex}].content_type`"
                 :key="`${behaviorItem.key}-content_type`"
                 placeholder="Content Type"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_type"
                 :name="`behaviors[${behaviorItemIndex}].content_type`"
               />
@@ -873,7 +872,7 @@
                 id="`behaviors[${behaviorItemIndex}].content_body`"
                 :key="`${behaviorItem.key}-content_body`"
                 placeholder="Content Body"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_body"
                 :name="`behaviors[${behaviorItemIndex}].content_body`"
               />

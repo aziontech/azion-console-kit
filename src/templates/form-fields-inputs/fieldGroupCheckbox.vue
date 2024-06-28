@@ -90,11 +90,5 @@
     >
       {{ props.helpText }}
     </small>
-    <small
-      v-if="errorMessage"
-      class="p-error text-xs font-normal leading-tight"
-    >
-      {{ errorMessage }}
-    </small>
   </div>
 </template>

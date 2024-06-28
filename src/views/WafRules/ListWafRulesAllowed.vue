@@ -136,10 +136,10 @@
   })
 
   const validationSchemaAllowed = yup.object({
-    matchZones: yup.array(),
-    path: yup.string(),
-    reason: yup.string().required(),
     ruleId: yup.string().required().label('rule id'),
+    reason: yup.string().required(),
+    path: yup.string(),
+    matchZones: yup.array(),
     status: yup.boolean(),
     useRegex: yup.boolean()
   })

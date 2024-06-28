@@ -15,7 +15,7 @@ const selectors = {
   edgeApplication: {
     createButton: '.p-datatable-header > .flex-wrap > .p-button > .p-button-label',
     nameInput: '[data-testid="form-horizontal-general-name"]',
-    addressInput: '[data-testid="form-horizontal-default-origin-address-input"]',
+    addressInput: '[data-testid="form-horizontal-default-origin-address-field-text"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -27,7 +27,7 @@ const selectors = {
     criteriaOperatorDropdown:
       '[data-testid="rule-form-criteria-item-conditional-operator"] > .p-dropdown-trigger',
     criteriaOperator: 'li[aria-label="is equal"]',
-    criteriaInputValue: '[data-testid="rule-form-criteria-item-conditional-input-value"]',
+    criteriaInputValue: '[data-testid="rule-form-criteria-item-conditional-input-field-text"]',
     behaviorsDropdown: '[data-testid="rule-form-behaviors-item-name"] > .p-dropdown-trigger',
     behaviors: '#behaviors\\[0\\]\\.name_4',
     ruleTable: '.p-datatable-tbody > tr > :nth-child(2) > div',
