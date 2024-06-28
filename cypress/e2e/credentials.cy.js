@@ -1,7 +1,6 @@
+import generateUniqueName from '../support/utils'
+
 const selectors = {
-  menu: {
-    credentials: 'li[aria-label="Credentials"] > .p-menuitem-content > .p-menuitem-link'
-  },
   list: {
     createCredentialBtn: '[data-testid="create_Credential_button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -19,8 +18,7 @@ const selectors = {
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
-    },
-    toast: ':nth-child(4) > .p-toast-message-content'
+    }
   },
   form: {
     nameInput: '[data-testid="credentials-create-form__name-field__input"]',
@@ -31,15 +29,16 @@ const selectors = {
     tokenCopyButton: '[data-testid="credentials-create-form__token-field__copy-token-button"]',
     statusSwitch: '[data-testid="credentials-create-form__status-field__switch"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
-    actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
-    toast: ':nth-child(2) > .p-toast-message-content'
+    actionsCancelButton: '[data-testid="form-actions-cancel-button"]'
   }
 }
+
+const credentialName = generateUniqueName('Credential')
 
 describe('Credentials', () => {
   beforeEach(() => {
     cy.login()
-    cy.get(selectors.menu.credentials).click()
+    cy.openMenuItem('Credentials')
   })
 
   it('should create a credential from the table', () => {
@@ -59,18 +58,20 @@ describe('Credentials', () => {
     cy.get(selectors.form.actionsSubmitButton).should('be.disabled')
 
     // Act
-    cy.get(selectors.form.nameInput).type('New Credential')
+    cy.get(selectors.form.nameInput).type(credentialName)
     cy.get(selectors.form.descriptionField).type('New Credential Description')
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.form.toast).should('contain', 'successYour credential token has been created')
+    cy.verifyToast('successYour credential token has been created')
+
     cy.get(selectors.form.tokenCopyButton).click()
+    cy.verifyToast('token copied')
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchInput).type('New Credential')
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', 'New Credential')
+    cy.get(selectors.list.searchInput).type(credentialName)
+    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', credentialName)
     cy.get(selectors.list.filteredRow.lastEditorColumn).should(
       'have.text',
       Cypress.env('CYPRESS_EMAIL_STAGE')
@@ -83,6 +84,6 @@ describe('Credentials', () => {
     cy.get(selectors.list.filteredRow.actionsMenu.deleteAction).click()
     cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
     cy.get(selectors.list.deleteDialog.deleteButton).click()
-    cy.get(selectors.list.toast).should('have.text', 'Credential successfully deleted')
+    cy.verifyToast('Credential successfully deleted')
   })
 })
