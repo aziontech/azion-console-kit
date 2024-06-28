@@ -100,7 +100,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="profile__first-name__input"
+          data-testid="profile__first-name"
           label="First Name *"
           name="firstName"
           :value="firstName"
@@ -109,7 +109,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="profile__last-name__input"
+          data-testid="profile__last-name"
           label="Last Name *"
           name="lastName"
           :value="lastName"
@@ -176,7 +176,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="contact__email__input"
+          data-testid="contact__email"
           label="Email *"
           name="email"
           :value="email"
