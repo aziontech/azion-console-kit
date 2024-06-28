@@ -101,7 +101,11 @@
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    edgeFunctionID: yup.number().required()
+    edgeFunctionID: yup
+      .number()
+      .transform((value) => (Number.isNaN(value) ? null : value))
+      .required()
+      .label('Edge Function')
   })
 
   onMounted(async () => {

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Credential"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Credential"
+        data-testid="credentials__edit-view__page-heading"
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -13,12 +16,11 @@
         <template #form>
           <FormFieldsEdit @copyToken="copyToken"></FormFieldsEdit>
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </EditFormBlock>

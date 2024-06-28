@@ -1,20 +1,21 @@
-import generateUniqueName from '../support/utils';
+import generateUniqueName from '../support/utils'
 
 const selectors = {
   login: {
     emailInput: '[data-testid="signin-block__email-input"]',
     nextButton: '[data-testid="signin-block__next-button"] > .p-button-label',
     passwordInput: '[data-testid="signin-block__password-input"] > .p-inputtext',
-    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label',
+    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label'
   },
   sidebar: {
     menuToggleButton: '[data-testid="sidebar-block__toggle-button"] > .p-button-icon',
-    edgeApplicationMenuItem: '[data-testid="sidebar-block__menu-item__edge-application"] > .p-menuitem-text',
+    edgeApplicationMenuItem:
+      '[data-testid="sidebar-block__menu-item__edge-application"] > .p-menuitem-text'
   },
   edgeApplication: {
     createButton: '.p-datatable-header > .flex-wrap > .p-button > .p-button-label',
-    nameInput: '[data-testid="form-horizontal-general-name"]',
-    addressInput: '[data-testid="form-horizontal-default-origin-address-input"]',
+    nameInput: '[data-testid="form-horizontal-general-name__input"]',
+    addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -22,10 +23,12 @@ const selectors = {
     tableRowLastEditor: '[data-testid="list-table-block__column__lastEditor__row"]',
     rulesEngineTab: 'li:nth-child(6)',
     addRuleButton: '[data-testid="rules-engine-create-button"]',
-    ruleNameInput: '[data-testid="rule-form-general-name"]',
-    criteriaOperatorDropdown: '[data-testid="rule-form-criteria-item-conditional-operator"] > .p-dropdown-trigger',
+    ruleNameInput: '[data-testid="rule-form-general-name__input"]',
+    criteriaOperatorDropdown:
+      '[data-testid="rule-form-criteria-item-conditional-operator"] > .p-dropdown-trigger',
     criteriaOperator: 'li[aria-label="is equal"]',
-    criteriaInputValue: '[data-testid="rule-form-criteria-item-conditional-input-value"]',
+    criteriaInputValue:
+      '[data-testid="rule-form-criteria-item-conditional-input-field-text__input"]',
     behaviorsDropdown: '[data-testid="rule-form-behaviors-item-name"] > .p-dropdown-trigger',
     behaviors: '#behaviors\\[0\\]\\.name_4',
     ruleTable: '.p-datatable-tbody > tr > :nth-child(2) > div',
@@ -36,19 +39,13 @@ const selectors = {
   }
 }
 
-const email = Cypress.env('CYPRESS_EMAIL_STAGE')
-const password = Cypress.env('CYPRESS_PASSWORD_STAGE')
 const edgeApplicationName = generateUniqueName('EdgeApp')
 const rulesEngineName = generateUniqueName('RulesEng')
 
 describe('Edge Application', () => {
   beforeEach(() => {
     // Login
-    cy.visit('/login')
-    cy.get(selectors.login.emailInput).type(email)
-    cy.get(selectors.login.nextButton).click()
-    cy.get(selectors.login.passwordInput).type(password)
-    cy.get(selectors.login.signInButton).click()
+    cy.login()
   })
 
   it('Create and delete an edge application, and create a rule', () => {
@@ -66,7 +63,9 @@ describe('Edge Application', () => {
 
     // Verify the edge application was created
     cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('be.visible').should('have.text', edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName)
+      .should('be.visible')
+      .should('have.text', edgeApplicationName)
 
     // Navigate to Rules Engine Tab
     cy.get(selectors.edgeApplication.tableRowLastEditor).click()
@@ -86,13 +85,17 @@ describe('Edge Application', () => {
 
     // Verify the rule was created
     cy.get(selectors.edgeApplication.searchInput).type(rulesEngineName)
-    cy.get(selectors.edgeApplication.ruleTable).should('be.visible').should('have.text', rulesEngineName)
+    cy.get(selectors.edgeApplication.ruleTable)
+      .should('be.visible')
+      .should('have.text', rulesEngineName)
 
     // Delete the edge application
     cy.visit('/edge-applications')
     cy.get(selectors.edgeApplication.searchInput).clear()
     cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('be.visible').should('have.text', edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName)
+      .should('be.visible')
+      .should('have.text', edgeApplicationName)
     cy.get(selectors.edgeApplication.actionsButton).click()
     cy.get(selectors.edgeApplication.deleteButton).click()
     cy.get(selectors.edgeApplication.deleteInput).type('delete')
