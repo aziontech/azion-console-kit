@@ -1,3 +1,5 @@
+import generateUniqueName from '../support/utils'
+
 const selectors = {
   list: {
     createTeamButton: '[data-testid="create_Team_button"]',
@@ -15,9 +17,6 @@ const selectors = {
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
-    },
-    toast: {
-      content: '.p-toast-message-content'
     }
   },
   form: {
@@ -31,23 +30,21 @@ const selectors = {
       '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
 
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
-    actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
-    toast: {
-      content: ':nth-child(2) > .p-toast-message-content',
-      closeBtn: ':nth-child(2) >.p-toast-message-content .p-toast-icon-close'
-    }
+    actionsCancelButton: '[data-testid="form-actions-cancel-button"]'
   }
 }
+
+const teamName = generateUniqueName('Team')
 
 describe('Teams Permissions', () => {
   beforeEach(() => {
     cy.login()
-    cy.openMenuItem('Teams Permissions');
+    cy.openMenuItem('Teams Permissions')
   })
 
   it('should create a new team', () => {
     // Arrange
-    cy.get(selectors.list.searchField).type('New Team')
+    cy.get(selectors.list.searchField).type(teamName)
     cy.get(selectors.list.filteredRow.empty)
       .should('be.visible')
       .and('have.text', 'No teams found.')
@@ -62,7 +59,7 @@ describe('Teams Permissions', () => {
 
     // Act
     // Test different permissions scenarios and verify whether form is enabled/disabled
-    cy.get(selectors.form.teamName).type('New Team')
+    cy.get(selectors.form.teamName).type(teamName)
     cy.get(selectors.form.allPermissionsToTarget).click()
     cy.get(selectors.form.actionsSubmitButton).should('be.enabled')
 
@@ -77,14 +74,12 @@ describe('Teams Permissions', () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.form.toast.content)
-      .should('be.visible')
-      .and('contain', 'successYour Team Permission has been created')
+    cy.verifyToast('successYour Team Permission has been created')
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchField).type('New Team')
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', 'New Team')
+    cy.get(selectors.list.searchField).type(teamName)
+    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', teamName)
     cy.get(selectors.list.filteredRow.permissionsColumn).should(
       'have.text',
       'View Content Delivery SettingsEdit Content Delivery SettingsShow more (46)'
@@ -92,7 +87,6 @@ describe('Teams Permissions', () => {
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Active')
 
     // Cleanup
-    cy.get(selectors.form.toast.closeBtn).click()
     cy.get(selectors.list.actionsMenu.button).click()
     cy.get(selectors.list.actionsMenu.deleteAction).click()
 
@@ -100,12 +94,10 @@ describe('Teams Permissions', () => {
     cy.get(selectors.list.deleteDialog.deleteButton).click()
 
     cy.get(selectors.list.searchField).clear()
-    cy.get(selectors.list.searchField).type('New Team')
+    cy.get(selectors.list.searchField).type(teamName)
     cy.get(selectors.list.filteredRow.empty)
       .should('be.visible')
       .and('have.text', 'No teams found.')
-    cy.get(selectors.list.toast.content)
-      .should('be.visible')
-      .and('contain', 'Team Permission successfully deleted')
+    cy.verifyToast('Team Permission successfully deleted')
   })
 })
