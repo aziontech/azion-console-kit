@@ -7,7 +7,7 @@ const selectors = {
     searchInput: '[data-testid="data-table-search-input"]',
     filteredRow: {
       nameColumn: '[data-testid="list-table-block__column__name__row"]',
-      statusColum: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+      statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
     },
     actionsMenu: {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
@@ -50,7 +50,7 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
     cy.get(selectors.list.filteredRow.nameColumn).should('have.text', digitalCertificateName)
-    cy.get(selectors.list.filteredRow.statusColum).should('have.text', 'Pending')
+    cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
 
     // Cleanup
     cy.get(selectors.list.actionsMenu.button).click()
