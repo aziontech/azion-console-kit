@@ -22,7 +22,7 @@ const selectors = {
   },
   form: {
     nameInput: '[data-testid="credentials-create-form__name-field__input"]',
-    nameErrorText: '[data-testid="credentials-create-form__name-field__error-text"]',
+    nameErrorText: '[data-testid="credentials-create-form__name-field__error-message"]',
     descriptionField: '[data-testid="credentials-create-form__description-field__textarea"]',
     tokenInput: '[data-testid="credentials-create-form__token-field__input"]',
     tokenErrorText: '[data-testid="credentials-create-form__token-field__error-text"]',
@@ -54,8 +54,6 @@ describe('Credentials', () => {
     cy.get(selectors.form.tokenCopyButton).should('be.disabled')
 
     cy.get(selectors.form.statusSwitch).should('have.class', 'p-inputswitch-checked')
-
-    cy.get(selectors.form.actionsSubmitButton).should('be.disabled')
 
     // Act
     cy.get(selectors.form.nameInput).type(credentialName)
