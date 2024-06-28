@@ -10,7 +10,7 @@
       'bg-header hover:bg-header-button-hover': !aiChatIsOpen,
       'bg-header-button-enabled': aiChatIsOpen
     }"
-    icon="pi pi-sparkles"
+    icon="ai ai-ask-azion"
     size="small"
     class="text-white border-header"
     v-tooltip.bottom="{ value: 'Azion AI', showDelay: 200 }"
