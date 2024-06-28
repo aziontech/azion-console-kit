@@ -71,4 +71,7 @@ Cypress.Commands.add('verifyToast', (message) => {
     .then(($toast) => {
       $toast.siblings('div').find('.p-toast-icon-close').trigger('click')
     })
+    .then(() => {
+      cy.get(`[data-testid="toast-block__content__${messageText}"]`).should('not.be.visible')
+    })
 })
