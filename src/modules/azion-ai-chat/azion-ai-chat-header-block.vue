@@ -1,10 +1,14 @@
 <template>
   <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
     <h3 class="text-color text-lg font-medium">
-      Ask Azion
+      Azion AI
       <PrimeTag
         class="ml-2"
-        value="experimental"
+        value="Experimental"
+        v-tooltip.bottom="
+          'Azion AI is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
+        "
+        severity="info"
       />
     </h3>
 
@@ -16,6 +20,6 @@
   import PrimeTag from 'primevue/tag'
 
   defineOptions({
-    name: 'ask-azion-header'
+    name: 'azion-ai-chat-header'
   })
 </script>

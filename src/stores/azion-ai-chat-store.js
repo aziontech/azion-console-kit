@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
-export const useAskAzionAiChatStore = defineStore({
-  id: 'askAzionAiChat',
+export const useAzionAiChatStore = defineStore({
+  id: 'azion-ai-chat-store',
   state: () => ({
     isOpen: false
   }),

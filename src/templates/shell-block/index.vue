@@ -23,7 +23,7 @@
       class="z-10"
       :class="customClassHelper"
     />
-    <AskAzionChat
+    <AzionAiChatBlock
       class="z-20"
       :class="aiChatIsOpen"
     />
@@ -35,7 +35,7 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
-  import AskAzionChat from '@modules/ask-azion/index.vue'
+  import AzionAiChatBlock from '@modules/azion-ai-chat/index.vue'
   import FooterBlock from '@/templates/footer-block'
   import HelpBlock from '@/templates/help-center-block'
   import PageLoadingBlock from '@/templates/loading-block'
@@ -46,7 +46,7 @@
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { useHelpCenterStore } from '@/stores/help-center'
-  import { useAskAzionAiChatStore } from '@/stores/ask-azion-ai-chat'
+  import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import { useLoadingStore } from '@/stores/loading'
 
   defineOptions({ name: 'shell-block' })
@@ -57,17 +57,18 @@
   const showNavItems = computed(() => props.isLogged && !showLoading.value)
 
   const helpCenterStore = useHelpCenterStore()
-  const askAzionAiChatStore = useAskAzionAiChatStore()
+  const azionAiChatStore = useAzionAiChatStore()
 
   const accountHandler = new AccountHandler(switchAccountService, listTypeAccountService)
 
   const customClass = computed(() =>
-    helpCenterStore.isOpen || askAzionAiChatStore.isOpen ? 'active' : ''
+    helpCenterStore.isOpen || azionAiChatStore.isOpen ? 'active' : ''
   )
   const customClassHelper = computed(() => (helpCenterStore.isOpen ? 'active-helper' : ''))
   const styleHelper = '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
 
   const aiChatIsOpen = computed(() => {
-    return askAzionAiChatStore.isOpen ? 'active-helper' : ''
+    return azionAiChatStore.isOpen ? 'active-helper' : ''
   })
 </script>
+@/stores/azion-ai-chat-store
