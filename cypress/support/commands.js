@@ -63,8 +63,9 @@ Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
  * @param {string} detail - The detail text of the toast message.
  */
 Cypress.Commands.add('verifyToast', (summary, detail = '') => {
-  const customId = `[data-testid="toast-block__content__${summary}${detail}"]`
   const messageText = `${summary}${detail}`
+  const customId = `[data-testid="toast-block__content__${messageText}"]`
+
   cy.get(customId)
     .should('be.visible')
     .and('contain', messageText)
