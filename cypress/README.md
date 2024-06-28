@@ -81,12 +81,12 @@ const userName = generateUniqueName('username');
 
 To validate toasts (notifications) in tests:
 
-- Verify the presence and content of toasts.
-- Ensure toasts disappear after the expected time.
+- Execute the custom command `verifyToast()`.
+
+> Note: the command receives the whole text string of the toast as an argument. 
 
 Example:
 
 ```javascript
-cy.get('[data-testid="toast"]').should('be.visible').and('contain', 'Success message')
-cy.get('[data-testid="toast"]').should('not.exist')
+cy.verifyToast('Success!')
 ```
