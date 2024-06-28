@@ -10,6 +10,7 @@ import ExpandTextColumn from './expand-text-column.vue'
 import Tag from 'primevue/tag'
 import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
 import TextWithTagColumn from './text-with-tag-column.vue'
+import CreditCardColumn from './credit-card-column.vue'
 /**
  * Build and return a specific column based on the given appearance.
  *
@@ -27,6 +28,7 @@ import TextWithTagColumn from './text-with-tag-column.vue'
  *   - 'tag'
  *   - 'language-icon-with-text'
  *   - 'text-with-tag'
+ *   - 'credit-card-column'
  * @param {Object} params.data - The data with specific properties of the column appearance.
  * @param {Object} [params.dependencies]- (Optional) The dependencies needed for rendering this column appearance.
  *
@@ -93,6 +95,12 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(TextWithTagColumn, {
         text: data.text,
         tagProps: data.tagProps
+      })
+    case 'credit-card-column':
+      return h(CreditCardColumn, {
+        content: data.content,
+        card: data.card,
+        defaultCard: data.default,
       })
     default:
       throw new Error('Invalid column appearance')

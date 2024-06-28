@@ -39,9 +39,15 @@
   const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
 
-  const testIdError = computed(() => {
-    const id = attrs['data-testid']
-    return id ? `${id}__error-message` : 'error-message'
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-text'
+
+    return {
+      label: `${id}__label`,
+      input: `${id}__input`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
   })
 
   const {
@@ -61,11 +67,13 @@
 <template>
   <label
     :for="props.name"
+    :data-testid="customTestId.label"
     class="text-color text-base font-medium leading-5"
   >
     {{ props.label }}
   </label>
   <InputText
+    :data-testid="customTestId.input"
     ref="inputRef"
     :id="name"
     v-model="inputValue"
@@ -77,11 +85,10 @@
     @input="handleChange"
     :class="{ 'p-invalid': errorMessage }"
     @blur="handleBlur"
-    v-bind="$attrs"
   />
   <small
     v-if="errorMessage"
-    :data-testid="testIdError"
+    :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
   >
     {{ errorMessage }}
@@ -89,6 +96,7 @@
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description || hasDescriptionSlot"
+    :data-testid="customTestId.description"
   >
     <slot name="description">
       {{ props.description }}

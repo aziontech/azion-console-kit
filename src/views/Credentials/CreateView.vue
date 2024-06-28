@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Credential"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Credential"
+        data-testid="credentials__create-view__page-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock

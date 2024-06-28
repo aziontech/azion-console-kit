@@ -1,3 +1,5 @@
+import generateUniqueName from '../support/utils'
+
 const selectors = {
   list: {
     breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
@@ -18,15 +20,14 @@ const selectors = {
     }
   },
   form: {
-    digitalCertificateName: '[data-testid="digital-certificate__name-field"]',
+    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
     editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]'
-  },
-  toast: {
-    createSuccessMessage: ':nth-child(2) > .p-toast-message-content > .flex-column > .text-sm',
-    deleteSuccessMessage: ':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color'
   }
 }
+
+const digitalCertificateName = generateUniqueName('Digital Certificate')
+
 describe('Digital Certificates spec', () => {
   beforeEach(() => {
     cy.login()
@@ -39,35 +40,23 @@ describe('Digital Certificates spec', () => {
 
     // Act
     cy.get(selectors.form.digitalCertificateName).clear()
-    cy.get(selectors.form.digitalCertificateName).type('EntityName')
+    cy.get(selectors.form.digitalCertificateName).type(digitalCertificateName)
     cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.get(selectors.toast.createSuccessMessage).should(
-      'have.text',
-      'Your digital certificate has been created!'
-    )
-    cy.get(selectors.form.editPageTitle).should(
-      'have.text',
-      'Edit Digital Certificate'
-    )
+    cy.verifyToast('success', 'Your digital certificate has been created!')
+    cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
     cy.get(selectors.list.breadcumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
-    cy.get(selectors.list.searchInput).type('EntityName')
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', 'EntityName')
-    cy.get(selectors.list.filteredRow.statusColum).should(
-      'have.text',
-      'Pending'
-    )
+    cy.get(selectors.list.searchInput).type(digitalCertificateName)
+    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', digitalCertificateName)
+    cy.get(selectors.list.filteredRow.statusColum).should('have.text', 'Pending')
 
     // Cleanup
     cy.get(selectors.list.actionsMenu.button).click()
     cy.get(selectors.list.actionsMenu.deleteAction).click()
     cy.get(selectors.list.deleteDialog.confirmInput).clear()
     cy.get(selectors.list.deleteDialog.confirmInput).type('delete{enter}')
-    cy.get(selectors.toast.deleteSuccessMessage).should(
-      'have.text',
-      'Digital certificate successfully deleted!'
-    )
+    cy.verifyToast('Digital certificate successfully deleted!')
   })
 })
