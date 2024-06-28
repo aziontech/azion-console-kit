@@ -83,10 +83,10 @@ To validate toasts (notifications) in tests:
 
 - Execute the custom command `verifyToast()`.
 
-> Note: the command receives the whole text string of the toast as an argument. 
+> Note: the command receives summary and detail as arguments. 
 
 Example:
 
 ```javascript
-cy.verifyToast('Success!')
+cy.verifyToast('Success!', 'User created successfully!');
 ```

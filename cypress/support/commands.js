@@ -57,21 +57,21 @@ Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
 })
 
 /**
- * Custom command to handle toast messages.
+ * Custom command to verify the visibility and content of a toast message.
  *
- * @param {string} message - The message to verify in the toast.
- * @example
- * cy.verifyToast('Your credential token has been created')
+ * @param {string} summary - The summary text of the toast message.
+ * @param {string} detail - The detail text of the toast message.
  */
-Cypress.Commands.add('verifyToast', (message) => {
-  const messageText = typeof message === 'string' ? message : message.text
-  cy.get(`[data-testid="toast-block__content__${messageText}"]`)
+Cypress.Commands.add('verifyToast', (summary, detail = '') => {
+  const customId = `[data-testid="toast-block__content__${summary}${detail}"]`
+  const messageText = `${summary}${detail}`
+  cy.get(customId)
     .should('be.visible')
     .and('contain', messageText)
     .then(($toast) => {
       $toast.siblings('div').find('.p-toast-icon-close').trigger('click')
     })
     .then(() => {
-      cy.get(`[data-testid="toast-block__content__${messageText}"]`).should('not.be.visible')
+      cy.get(customId).should('not.be.visible')
     })
 })
