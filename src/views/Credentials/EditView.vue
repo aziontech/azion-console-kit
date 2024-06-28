@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Credential"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Credential"
+        data-testid="credentials__edit-view__page-heading"
+      />
     </template>
     <template #content>
       <EditFormBlock
