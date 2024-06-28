@@ -19,7 +19,7 @@
             outlined
             class="surface-border h-8 w-8"
             aria-label="Close"
-            v-tooltip.bottom="'New Chat'"
+            v-tooltip.bottom="'Close'"
             @click="azionAiChatStore.close()"
           /></div
       ></template>
