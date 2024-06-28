@@ -24,6 +24,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="credentials-edit-form__name-field"
           label="Name *"
           name="name"
           :value="name"
@@ -32,6 +33,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="credentials-edit-form__description-field"
           label="Description"
           name="description"
           :value="description"
