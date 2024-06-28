@@ -5,11 +5,8 @@ const selectors = {
     mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
     countryCodeFilter: '.p-dropdown-filter',
     countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    submitButton: '[data-testid="form-actions-submit-button"]',
-  },
-  toast: {
-    content: '.p-toast-message-content',
-  },
+    submitButton: '[data-testid="form-actions-submit-button"]'
+  }
 }
 
 describe('Your Settings spec', () => {
@@ -38,6 +35,6 @@ describe('Your Settings spec', () => {
 
     // Assert
     cy.wait('@patchUser')
-    cy.get(selectors.toast.content).should('have.text', 'successYour user has been updated')
+    cy.verifyToast('successYour user has been updated')
   })
 })
