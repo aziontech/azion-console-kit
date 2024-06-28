@@ -20,7 +20,7 @@ const selectors = {
     }
   },
   form: {
-    teamName: '[data-testid="teams-permissions-form__name__field-text"]',
+    teamName: '[data-testid="teams-permissions-form__name__field-text__input"]',
     teamNameError: '[data-testid="teams-permissions-form__name__field-text__error-message"]',
     teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
     allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
@@ -73,8 +73,7 @@ describe('Teams Permissions', () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.verifyToast('successYour Team Permission has been created')
-
+    cy.verifyToast('success', 'Your Team Permission has been created')
     cy.get(selectors.form.actionsCancelButton).click()
 
     cy.get(selectors.list.searchField).type(teamName)

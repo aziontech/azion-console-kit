@@ -20,7 +20,7 @@ const selectors = {
     }
   },
   form: {
-    digitalCertificateName: '[data-testid="digital-certificate__name-field"]',
+    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
     editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]'
   }
@@ -44,7 +44,7 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.verifyToast('successYour digital certificate has been created!')
+    cy.verifyToast('success', 'Your digital certificate has been created!')
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
     cy.get(selectors.list.breadcumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()

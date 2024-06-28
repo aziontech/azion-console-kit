@@ -102,7 +102,7 @@ describe('Your Settings spec', () => {
 
     // Assert
     cy.wait('@patchUser').its('request.body').should('deep.equal', payload)
-    cy.verifyToast('successYour user has been updated')
+    cy.verifyToast('success', 'Your user has been updated')
   })
 
   it('should edit user email', () => {
@@ -119,7 +119,8 @@ describe('Your Settings spec', () => {
     cy.wait('@patchUser')
 
     cy.verifyToast(
-      'Confirmation email sentCheck your inbox and follow the instructions to verify this new email.'
+      'Confirmation email sent',
+      'Check your inbox and follow the instructions to verify this new email.'
     )
   })
 })

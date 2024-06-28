@@ -35,6 +35,6 @@ describe('Your Settings spec', () => {
 
     // Assert
     cy.wait('@patchUser')
-    cy.verifyToast('successYour user has been updated')
+    cy.verifyToast('success', 'Your user has been updated')
   })
 })

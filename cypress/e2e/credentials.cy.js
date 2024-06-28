@@ -61,7 +61,7 @@ describe('Credentials', () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.verifyToast('successYour credential token has been created')
+    cy.verifyToast('success', 'Your credential token has been created')
 
     cy.get(selectors.form.tokenCopyButton).click()
     cy.verifyToast('token copied')
