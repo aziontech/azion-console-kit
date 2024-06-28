@@ -100,7 +100,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(CreditCardColumn, {
         content: data.content,
         card: data.card,
-        defaultCard: data.default,
+        defaultCard: data.default
       })
     default:
       throw new Error('Invalid column appearance')
