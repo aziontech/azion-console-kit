@@ -162,6 +162,7 @@
         </label>
         <InputText
           v-model="accountName"
+          data-testid="account-settings__account-name"
           id="accountName"
           type="text"
           :class="{ 'p-invalid': accountNameError }"
@@ -215,6 +216,7 @@
         <InputText
           v-model="companyName"
           id="companyName"
+          data-testid="account-settings__company-name"
           type="text"
           placeholder="Company S.A."
         />
@@ -233,6 +235,7 @@
           v-model="uniqueIdentifier"
           id="uniqueIdentifier"
           type="text"
+          data-testid="account-settings__company-id"
           placeholder="00.000.000/0001-00"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
@@ -277,6 +280,7 @@
             v-model="postalCode"
             id="postalCode"
             type="text"
+            data-testid="account-settings__postal-code"
             :class="{ 'p-invalid': postalCodeError }"
             placeholder="00.000.000-00"
           />
@@ -285,6 +289,7 @@
           </small>
           <small
             v-if="postalCodeError"
+            data-testid="account-settings__postal-code-error"
             class="p-error text-xs font-normal leading-tight"
           >
             {{ postalCodeError }}
