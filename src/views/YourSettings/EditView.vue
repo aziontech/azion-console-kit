@@ -5,10 +5,12 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="() => {}"
         :schema="validationSchema"
+        :editService="props.editUsersService"
         :loadService="loadUser"
-        :disableRedirect="true"
+        disableRedirect
+        disableAfterCreateToastFeedback
+        @on-edit-success="successSubmit"
       >
         <template #form>
           <FormFieldsYourSettings
@@ -16,12 +18,11 @@
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
-        <template #action-bar="{ formValid, onCancel, values }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            @onSubmit="formSubmit(values)"
+            @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </EditFormBlock>
@@ -62,7 +63,7 @@
   })
 
   const userData = ref({})
-  const loading = ref(false)
+  const userChanges = ref({})
 
   const loadUser = async () => {
     userData.value = await props.loadUserService()
@@ -83,7 +84,7 @@
     toast.add(options)
   }
 
-  const isEmailChangedOnly = (values) => {
+  const validateFormChanges = (values) => {
     const keysToCheck = [
       'firstName',
       'lastName',
@@ -99,7 +100,9 @@
     ]
 
     const changedKeys = keysToCheck.filter((key) => values[key] !== userData.value[key])
-    return changedKeys.length === 1 && changedKeys[0] === 'email'
+    const isEmailChanged = changedKeys.includes('email')
+    const areOtherKeysChanged = changedKeys.some((key) => key !== 'email')
+    return { isEmailChanged, areOtherKeysChanged }
   }
 
   const showEmailToast = () => {
@@ -110,26 +113,24 @@
     )
   }
 
-  const formSubmit = async (values) => {
-    loading.value = true
-    try {
-      const feedback = await props.editUsersService(values)
+  const successSubmit = () => {
+    const { isEmailChanged, areOtherKeysChanged } = validateFormChanges(userChanges.value)
+    userData.value = { ...userChanges.value }
 
-      if (isEmailChangedOnly(values)) {
-        return showEmailToast()
-      }
+    if (!isEmailChanged || areOtherKeysChanged) {
+      showToast('success', 'Your user has been updated')
+    }
 
-      showToast('success', feedback)
-
-      if (values.email !== userData.value.email) {
-        showEmailToast()
-      }
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      loading.value = false
+    if (isEmailChanged) {
+      showEmailToast()
     }
   }
+
+  const formSubmit = async (onSubmit, value) => {
+    userChanges.value = value
+    onSubmit()
+  }
+
   const passwordRequirementsList = ref([
     { label: '8 characters', valid: false },
     { label: '1 uppercase letter', valid: false },
@@ -155,7 +156,7 @@
           .required()
           .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
-          .test('requirements', '', (value) => {
+          .test('requirements', 'password does not meet the requirements', (value) => {
             const hasUpperCase = value && /[A-Z]/.test(value)
             const hasLowerCase = value && /[a-z]/.test(value)
             const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)

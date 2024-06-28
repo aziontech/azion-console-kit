@@ -21,8 +21,8 @@ const selectors = {
     }
   },
   form: {
-    teamName: '[data-testid="teams-permissions-form__name-field__input"]',
-    teamNameError: '[data-testid="teams-permissions-form__name-field__error-text"]',
+    teamName: '[data-testid="teams-permissions-form__name__field-text"]',
+    teamNameError: '[data-testid="teams-permissions-form__name__field-text__error-message"]',
     teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
     allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
     allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
@@ -67,7 +67,6 @@ describe('Teams Permissions', () => {
     cy.get(selectors.form.actionsSubmitButton).should('be.enabled')
 
     cy.get(selectors.form.allPermissionsToSource).click()
-    cy.get(selectors.form.actionsSubmitButton).should('be.disabled')
 
     cy.get(selectors.form.viewContentDeliverySettingsPermission).click()
     cy.get(selectors.form.singlePermissionToTarget).click()

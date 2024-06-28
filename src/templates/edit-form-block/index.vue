@@ -4,6 +4,7 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -30,11 +31,16 @@
     schema: {
       type: Object,
       required: true
+    },
+    disableAfterCreateToastFeedback: {
+      type: Boolean,
+      default: false
     }
   })
 
   const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
+  const { scrollToError } = useScrollToError()
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -99,24 +105,31 @@
     }
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      const feedback = await props.editService(values)
-      showToast('success', feedback ?? 'edited successfully')
-      blockViewRedirection.value = false
-      emit('on-edit-success', feedback)
-      if (props.disableRedirect) {
-        resetForm({ values })
+  const onSubmit = handleSubmit(
+    async (values) => {
+      try {
+        const feedback = await props.editService(values)
+        if (!props.disableAfterCreateToastFeedback) {
+          showToast('success', feedback ?? 'edited successfully')
+        }
+        blockViewRedirection.value = false
+        emit('on-edit-success', feedback)
+        if (props.disableRedirect) {
+          resetForm({ values })
+          blockViewRedirection.value = true
+          return
+        }
+        goBackToList()
+      } catch (error) {
+        emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        return
+        showToast('error', error)
       }
-      goBackToList()
-    } catch (error) {
-      emit('on-edit-fail', error)
-      blockViewRedirection.value = true
-      showToast('error', error)
+    },
+    ({ errors }) => {
+      scrollToError(errors)
     }
-  })
+  )
 
   loadInitialData()
 </script>
@@ -128,9 +141,15 @@
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
       :class="{ 'mt-4': isTabs }"
     >
-      <slot name="form" />
+      <slot
+        name="form"
+        :errors="errors"
+      />
 
-      <slot name="raw-form" />
+      <slot
+        name="raw-form"
+        :errors="errors"
+      />
     </form>
   </div>
 
@@ -141,6 +160,7 @@
   <slot
     name="action-bar"
     :onSubmit="onSubmit"
+    :handleSubmit="handleSubmit"
     :formValid="meta.valid"
     :onCancel="onCancel"
     :errors="errors"

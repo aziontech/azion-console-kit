@@ -14,15 +14,15 @@ const payload = {
 const selectors = {
   profile: {
     firstNameInput: '[data-testid="profile__first-name__input"]',
-    firstNameError: '[data-testid="profile__first-name__error-text"]',
+    firstNameError: '[data-testid="profile__first-name__input__error-message"]',
     lastNameInput: '[data-testid="profile__last-name__input"]',
-    lastNameError: '[data-testid="profile__last-name__error-text"]',
+    lastNameError: '[data-testid="profile__last-name__input__error-message"]',
     timezoneOptions: '[data-testid="profile__timezone__options"]',
     language: '[data-testid="profile__language"]',
   },
   contact: {
     emailInput: '[data-testid="contact__email__input"]',
-    emailError: '[data-testid="contact__email__error-text"]',
+    emailError: '[data-testid="contact__email__input__error-message"]',
     mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
     countryCodeFilter: '.p-dropdown-filter',
     countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,

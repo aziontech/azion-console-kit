@@ -1,7 +1,8 @@
 <script setup>
-  import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import { computed } from 'vue'
 
   const props = defineProps({
     teams: {
@@ -11,74 +12,47 @@
     }
   })
 
-  const { value: name, errorMessage: errorName } = useField('name')
-  const { value: email, errorMessage: errorEmail } = useField('email')
-  const { value: team, errorMessage: errorTeam } = useField('team')
+  const { value: name } = useField('name')
+  const { value: email } = useField('email')
+  const { value: team } = useField('team')
+
+  const loadingTeams = computed(() => props.teams.length === 0)
 </script>
 
 <template>
-  <!-- Input Name -->
-  <div class="flex flex-col w-full gap-2">
-    <label
-      for="name"
-      class="text-color text-sm font-medium"
-      >Full Name *</label
-    >
-    <InputText
-      v-model="name"
-      id="name"
-      type="text"
-      :class="{ 'p-invalid': errorName }"
-    />
-    <small
-      v-if="errorName"
-      class="p-error text-xs font-normal leading-tight"
-      >{{ errorName }}</small
-    >
-  </div>
+  <div class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6">
+    <div class="flex flex-col w-full gap-2">
+      <FieldText
+        label="Full Name *"
+        name="name"
+        :value="name"
+      />
+    </div>
 
-  <!-- Input Email -->
-  <div class="flex flex-col w-full gap-2">
-    <label
-      for="email"
-      class="text-color text-sm font-medium"
-      >Email *</label
-    >
-    <InputText
-      v-model="email"
-      id="email"
-      type="text"
-      :class="{ 'p-invalid': errorEmail }"
-    />
-    <small
-      v-if="errorEmail"
-      class="p-error text-xs font-normal leading-tight"
-      >{{ errorEmail }}</small
-    >
-  </div>
+    <div class="flex flex-col w-full gap-2">
+      <FieldText
+        label="Email *"
+        name="email"
+        type="email"
+        :value="email"
+      />
+    </div>
 
-  <!-- Input Team -->
-  <div class="flex flex-col w-full gap-2">
-    <label
-      for="team"
-      class="text-color text-sm font-medium"
-      >Team *</label
-    >
-    <Dropdown
-      appendTo="self"
-      id="team"
-      :class="{ 'p-invalid': errorTeam }"
-      v-model="team"
-      :options="props.teams"
-      optionLabel="label"
-      optionValue="value"
-      class="w-full"
-      placeholder="Select a team"
-    />
-    <small
-      v-if="errorTeam"
-      class="p-error text-xs font-normal leading-tight"
-      >{{ errorTeam }}</small
-    >
+    <div class="flex flex-col w-full gap-2">
+      <FieldDropdown
+        label="Team *"
+        name="team"
+        :options="props.teams"
+        :loading="loadingTeams"
+        :disabled="loadingTeams"
+        optionLabel="label"
+        optionValue="value"
+        :value="team"
+        id="team"
+        filter
+        appendTo="self"
+        placeholder="Select a team"
+      />
+    </div>
   </div>
 </template>
