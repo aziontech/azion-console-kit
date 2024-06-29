@@ -116,6 +116,20 @@ const selectors = {
       confirmPasswordError: '[data-testid="security__confirm-password__error-text"]',
       twoFactorToggle: '.p-inputswitch-slider',
     },
+    variables: {
+      createButton: '[data-testid="create_Variable_button"] > .p-button-label',
+      keyInput: '[data-testid="variables-form__key-field__input"]',
+      valueInput: '[data-testid="variables-form__value-field__input"]',
+      saveButton: '[data-testid="form-actions-submit-button"]',
+      cancelButton: '[data-testid="form-actions-cancel-button"]',
+      searchInput: '[data-testid="data-table-search-input"]',
+      keyRow: '[data-testid="list-table-block__column__key__row"]',
+      valueRow: '.whitespace-pre',
+      actionButton: '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
+      deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
+      deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
+      confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label',
+    },
   };
   
   export default selectors;
