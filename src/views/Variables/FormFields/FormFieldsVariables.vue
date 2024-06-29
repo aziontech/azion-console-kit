@@ -24,6 +24,7 @@
           :value="key"
           description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
           underscore."
+          data-testid="variables-form__key-field"
         />
       </div>
 
@@ -34,6 +35,7 @@
           placeholder="VARIABLE_VALUE"
           :value="value"
           description="Enter the data associated with the variable key."
+          data-testid="variables-form__value-field"
         />
       </div>
       <div class="flex gap-3 items-center">
