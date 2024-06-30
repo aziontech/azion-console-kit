@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { computed, ref, toRef, useAttrs, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -31,14 +31,24 @@
     readonly: {
       type: Boolean,
       default: false
-    },
-    inputClass: {
-      type: String,
-      default: ''
     }
   })
-
+  const inputRef = ref(null)
   const name = toRef(props, 'name')
+  const slots = useSlots()
+  const attrs = useAttrs()
+  const hasDescriptionSlot = !!slots.description
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-text'
+
+    return {
+      label: `${id}__label`,
+      input: `${id}__input`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 
   const {
     value: inputValue,
@@ -48,15 +58,23 @@
   } = useField(name, undefined, {
     initialValue: props.value
   })
+
+  defineExpose({
+    inputRef
+  })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
+    :data-testid="customTestId.label"
+    class="text-color text-base font-medium leading-5"
   >
+    {{ props.label }}
+  </label>
   <InputText
+    :data-testid="customTestId.input"
+    ref="inputRef"
     :id="name"
     v-model="inputValue"
     :name="name"
@@ -65,19 +83,23 @@
     type="text"
     :placeholder="props.placeholder"
     @input="handleChange"
+    :class="{ 'p-invalid': errorMessage }"
     @blur="handleBlur"
-    :class="inputClass"
-    v-bind="$attrs"
   />
   <small
     v-if="errorMessage"
+    :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    v-if="props.description || hasDescriptionSlot"
+    :data-testid="customTestId.description"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>

@@ -119,6 +119,7 @@
           label="Name *"
           description="Give a unique and descriptive name to identify the WAF rule set."
           name="name"
+          data-testid="waf-rules-form__name-field"
           :value="name"
           placeholder="My WAF rule"
         />

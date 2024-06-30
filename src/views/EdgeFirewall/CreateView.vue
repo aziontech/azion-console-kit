@@ -30,10 +30,10 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     domains: yup.array().label('Domains'),
-    isActive: yup.boolean().label('Active'),
     edgeFunctionsEnabled: yup.boolean().label('Edge Funcions Enabled'),
     networkProtectionEnabled: yup.boolean().label('Network Protection Enabled'),
-    wafEnabled: yup.boolean().label('WAF Enabled')
+    wafEnabled: yup.boolean().label('WAF Enabled'),
+    isActive: yup.boolean().label('Active')
   })
 
   const initialValues = {
@@ -85,12 +85,11 @@
             v-model:loadingDomains="loadingServices"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>

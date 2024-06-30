@@ -5,14 +5,13 @@
   import ContentBlock from '@/templates/content-block'
   import { computed, inject, onMounted, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
   import { removeHtmlTagFromText } from '@/helpers'
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
+  import CreateFormBlock from '@/templates/create-form-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -41,16 +40,10 @@
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
-  const toast = useToast()
   const user = useAccountStore().accountData
 
   const teams = ref([])
-  const isLoading = ref(false)
   const showInviteSession = ref(props.inviteSession.show())
-
-  const isDisabled = computed(() => {
-    return !meta.value?.valid || isLoading.value
-  })
 
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
@@ -104,35 +97,6 @@
     email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
     team: yup.string().required()
   })
-
-  const { meta, resetForm, handleSubmit } = useForm({
-    validationSchema
-  })
-
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      isLoading.value = true
-      const feedback = await props.inviteYourTeamService(values)
-      handleSuccess(feedback)
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  })
-
-  const handleSuccess = (feedback) => {
-    resetForm()
-    showToast('success', feedback)
-  }
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity: severity,
-      summary: summary
-    })
-  }
 
   const closeInviteSession = () => {
     props.inviteSession.closeInviteBlock()
@@ -305,22 +269,31 @@
               together.
             </div>
           </div>
-          <form
+          <CreateFormBlock
+            :createService="props.inviteYourTeamService"
+            :schema="validationSchema"
+            disabledCallback
             class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
-            @submit.prevent="onSubmit"
+            :unSaved="false"
           >
-            <FormFieldsHome :teams="teams"></FormFieldsHome>
-            <div class="mt-auto lg:mt-7">
-              <PrimeButton
-                severity="secondary"
-                type="submit"
-                label="Invite"
-                size="small"
-                :disabled="isDisabled"
-                class="w-full px-4 lg:w-auto"
-              />
-            </div>
-          </form>
+            <template #form>
+              <FormFieldsHome :teams="teams"></FormFieldsHome>
+            </template>
+            <template #action-bar="{ onSubmit, loading }">
+              <div class="mt-auto lg:mt-7">
+                <PrimeButton
+                  severity="secondary"
+                  type="submit"
+                  label="Invite"
+                  size="small"
+                  @click="onSubmit"
+                  :loading="loading"
+                  :disabled="loading"
+                  class="w-full px-4 lg:w-auto"
+                />
+              </div>
+            </template>
+          </CreateFormBlock>
         </div>
 
         <div class="w-full flex flex-col lg:flex-row gap-6 justify-between">

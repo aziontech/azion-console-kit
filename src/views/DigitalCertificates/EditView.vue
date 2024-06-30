@@ -16,13 +16,12 @@
             :documentationService="documentationService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
             v-if="!values.managed"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </EditFormBlock>

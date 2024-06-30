@@ -1,8 +1,9 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import TabPanel from 'primevue/tabpanel'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import CodeEditor from '../components/code-editor.vue'
@@ -24,7 +25,7 @@
   const LANGUAGE_LABEL = 'JavaScript'
   const showPreview = ref(true)
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs', null, {
     initialValue: ARGS_INITIAL_STATE
   })
@@ -60,26 +61,13 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <InputText
-              v-model="name"
-              id="name"
-              type="text"
-              :class="{ 'p-invalid': nameError }"
+            <FieldText
+              label="Name *"
+              name="name"
               placeholder="My function"
+              :value="name"
+              description="Give a unique and descriptive name to identify the function."
             />
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Give a unique and descriptive name to identify the function.</small
-            >
-            <small
-              v-if="nameError"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ nameError }}</small
-            >
           </div>
         </template>
       </FormHorizontal>
@@ -91,24 +79,14 @@
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
-            <label
-              for="language"
-              class="text-color text-base font-medium"
-              >Language</label
-            >
-            <span class="p-input-icon-right">
-              <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-              <InputText
-                :value="LANGUAGE_LABEL"
-                id="language"
-                type="text"
-                class="w-full"
-                readonly
-              />
-            </span>
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Currently, only JavaScript is supported.</small
-            >
+            <FieldTextIcon
+              label="Language"
+              name="LANGUAGE_LABEL"
+              icon="pi pi-lock"
+              :value="LANGUAGE_LABEL"
+              description="Currently, only JavaScript is supported."
+              readonly
+            />
           </div>
         </template>
       </FormHorizontal>

@@ -45,13 +45,12 @@
       <template #form>
         <FormCreateEdgeService />
       </template>
-      <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+      <template #action-bar="{ onSubmit, onCancel, loading, values }">
         <ActionBarTemplate
           v-if="props.hiddenActionBar"
           @onSubmit="formSubmit(onSubmit, values)"
           @onCancel="onCancel"
           :loading="loading"
-          :submitDisabled="!formValid"
         />
       </template>
     </EditFormBlock>

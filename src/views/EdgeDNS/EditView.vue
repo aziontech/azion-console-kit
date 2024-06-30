@@ -136,6 +136,7 @@
     }),
     edgeDNSID: yup.number()
   })
+
   const initialValuesCreateRecords = {
     name: '',
     selectedRecordType: 'A',
@@ -292,13 +293,12 @@
             <template #form>
               <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
             </template>
-            <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+            <template #action-bar="{ onSubmit, onCancel, loading }">
               <ActionBarTemplate
                 v-if="showEditFormWithActionTab"
                 @onSubmit="onSubmit"
                 @onCancel="onCancel"
                 :loading="loading"
-                :submitDisabled="!formValid"
               />
             </template>
           </EditFormBlock>

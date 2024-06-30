@@ -8,6 +8,7 @@
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'tabs-edge-node' })
 
@@ -28,6 +29,9 @@
   const router = useRouter()
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
+  const title = ref('')
+  const edgeNode = ref()
+  const toast = useToast()
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -37,15 +41,35 @@
     services: 1
   }
 
+  const getEdgeNodesData = async () => {
+    try {
+      return await props.loadEdgeNodeService({ id: edgeNodeId.value })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    }
+  }
+
   const mapTabs = ref({ ...defaultTabs })
 
-  const renderTabCurrentRouter = () => {
+  const renderTabCurrentRouter = async () => {
     const { services } = route.params
     activeTab.value = services ? 1 : 0
+    edgeNode.value = await getEdgeNodesData()
+    title.value = edgeNode.value.name
   }
 
   const changeRouteByClickingOnTab = (event) => {
     changeTab(event.index)
+  }
+
+  const updateEdgeNodesValue = async (edgeNodeValues) => {
+    title.value = edgeNodeValues.name
+    edgeNode.value = await getEdgeNodesData()
   }
 
   const changeTab = (index) => {
@@ -87,7 +111,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Node" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView
@@ -98,6 +122,7 @@
         <TabPanel header="Main Settings">
           <EditView
             v-if="mapTabs.main_settings === activeTab"
+            @handleEdgeNodesUpdated="updateEdgeNodesValue"
             :hiddenActionBar="!activeTab"
             :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
             :loadEdgeNodeService="props.loadEdgeNodeService"

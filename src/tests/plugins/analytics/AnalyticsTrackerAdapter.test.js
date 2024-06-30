@@ -49,14 +49,17 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track page load event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const mockUrl = 'test-url-ABC/q-2/t'
-    
+
     sut.product.pageLoad({
       url: mockUrl
     })
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Page Loaded', { url: mockUrl, application: fixtures.application})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Page Loaded', {
+      url: mockUrl,
+      application: fixtures.application
+    })
   })
 
   it('should return an error for invalid traits', () => {
@@ -71,7 +74,6 @@ describe('AnalyticsTrackerAdapter', () => {
     const mockUrl = '/t/q/testing'
     const secondMockUrl = '/p/v'
     const emailMock = 'email-test'
-    
 
     sut.assignGroupTraits({
       id: mockId,
@@ -102,7 +104,6 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track click to create event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name'
-    
 
     sut.product.clickToCreate({
       productName: productNameMock
@@ -110,18 +111,14 @@ describe('AnalyticsTrackerAdapter', () => {
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
-      'Clicked to Create Azion Product Name',
-      {
-        application: fixtures.application
-      }
-    )
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Azion Product Name', {
+      application: fixtures.application
+    })
   })
 
   it('should be able to track click to edit event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name'
-    
 
     sut.product.clickToEdit({
       productName: productNameMock
@@ -137,7 +134,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track a product created successfully', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
-    
+
     sut.product
       .productCreated({
         productName: productNameMock
@@ -152,7 +149,6 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track a product edited successfully', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
-    
 
     sut.product
       .productEdited({
@@ -168,7 +164,6 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track a failed event related to a product creation', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
-    
 
     sut.product
       .failedToCreate({
@@ -185,7 +180,6 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track a failed event related to edit a product', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
-    
 
     sut.product
       .failedToEdit({
@@ -201,29 +195,32 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should call userSigned when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     sut.signIn.userSignedIn()
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', { application: fixtures.application })
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {
+      application: fixtures.application
+    })
   })
 
   it('should call userFailedSignIn when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     sut.signIn.userFailedSignIn()
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', { application: fixtures.application })
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {
+      application: fixtures.application
+    })
   })
 
   it('should use the create event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const mockUrl = 'test-url-ABC/q-2/t'
     const mockLocation = 'home'
-    
 
     sut.create.createEventInHomeAndHeader({
       url: mockUrl,
@@ -241,15 +238,18 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     sut.signUp.userSignedUp({ method: 'email' }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', { method: 'email', application: fixtures.application })
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {
+      method: 'email',
+      application: fixtures.application
+    })
   })
 
   it('should track the user authorized sso event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     sut.signUp.userAuthorizedSso({ method: 'google' }).track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', {
@@ -260,12 +260,12 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     const propsMock = {
       errorType: 'api',
       fieldName: 'email',
       application: fixtures.application,
-      errorMessage: 'Invalid email',
+      errorMessage: 'Invalid email'
     }
 
     sut.signUp.userFailedSignUp({ ...propsMock }).track()
@@ -449,7 +449,9 @@ describe('AnalyticsTrackerAdapter', () => {
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {application: fixtures.application})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {
+      application: fixtures.application
+    })
   })
 
   it('should be able to track created event with correct params', () => {
@@ -462,7 +464,9 @@ describe('AnalyticsTrackerAdapter', () => {
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {application: fixtures.application})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {
+      application: fixtures.application
+    })
   })
 
   it('should be able to track failed created event with correct params', () => {

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Credentials"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Credentials"
+        data-testid="credentials__list-view__page-heading"
+      />
     </template>
     <template #content>
       <ListTableBlock
@@ -18,6 +21,7 @@
       />
       <EmptyResultsBlock
         v-else
+        data-testid="credentials__list-view__empty-results-block"
         title="No credentials have been generated"
         description="Click the button below to generate your first credential."
         createButtonLabel="Credential"

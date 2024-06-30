@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { toRef, useSlots, useAttrs, computed } from 'vue'
   import { useField } from 'vee-validate'
   import TextArea from 'primevue/textarea'
 
@@ -33,13 +33,16 @@
       default: 30
     },
     autoResize: {
-      type: Boolean,
-      default: false
+      type: Boolean
+    },
+    disabled: {
+      type: Boolean
     }
   })
 
   const name = toRef(props, 'name')
-
+  const slots = useSlots()
+  const hasDescriptionSlot = !!slots.description
   const {
     value: inputValue,
     errorMessage,
@@ -48,18 +51,35 @@
   } = useField(name, undefined, {
     initialValue: props.value
   })
+
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-text'
+
+    return {
+      label: `${id}__label`,
+      textarea: `${id}__textarea`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
+    :data-testid="customTestId.label"
+    class="text-color text-base font-medium leading-5"
   >
+    {{ props.label }}
+  </label>
   <TextArea
+    :data-testid="customTestId.textarea"
     :id="name"
     v-model="inputValue"
-    :name="name"
+    :name="props.name"
+    :disabled="props.disabled"
     type="text"
     :autoResize="props.autoResize"
     :rows="props.rows"
@@ -67,16 +87,22 @@
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"
+    :class="{ 'p-invalid': errorMessage }"
   />
   <small
     v-if="errorMessage"
+    :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description"
+    :data-testid="customTestId.description"
+    v-if="props.description || hasDescriptionSlot"
   >
-    {{ props.description }}
+    <slot name="description">
+      {{ props.description }}
+    </slot>
   </small>
 </template>

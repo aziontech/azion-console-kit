@@ -4,6 +4,8 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAttrs } from 'vue'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -31,18 +33,28 @@
     cleanForm: {
       type: Boolean,
       default: true
+    },
+    unSaved: {
+      type: Boolean,
+      default: true
     }
   })
 
   const emit = defineEmits(['on-response', 'on-response-fail'])
+  const attrs = useAttrs()
+  const { scrollToError } = useScrollToError()
 
   const router = useRouter()
   const toast = useToast()
-  const blockViewRedirection = ref(true)
+  const blockViewRedirection = ref(props.unSaved)
 
   const formHasChanges = computed(() => {
     const isDirty = useIsFormDirty()
     return blockViewRedirection.value && isDirty.value
+  })
+
+  const classForm = computed(() => {
+    return attrs.class || 'flex flex-col min-h-[calc(100vh-300px)]'
   })
 
   const { meta, errors, handleSubmit, isSubmitting, values, resetForm } = useForm({
@@ -85,27 +97,36 @@
     redirectToUrl(response.urlToEditView)
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      blockViewRedirection.value = false
-      const response = await props.createService(values)
-      handleSuccess(response)
-    } catch (error) {
-      showToast('error', error)
-      emit('on-response-fail', error)
-      blockViewRedirection.value = true
+  const onSubmit = handleSubmit(
+    async (values) => {
+      try {
+        blockViewRedirection.value = false
+        const response = await props.createService(values)
+        handleSuccess(response)
+      } catch (error) {
+        showToast('error', error)
+        emit('on-response-fail', error)
+        blockViewRedirection.value = true
+      }
+    },
+    ({ errors }) => {
+      scrollToError(errors)
     }
-  })
+  )
 </script>
 
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-300px)]">
+  <div :class="classForm">
     <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
       <slot
         name="form"
         :resetForm="resetForm"
+        :errors="errors"
       />
-      <slot name="raw-form" />
+      <slot
+        name="raw-form"
+        :errors="errors"
+      />
     </form>
     <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
     <slot

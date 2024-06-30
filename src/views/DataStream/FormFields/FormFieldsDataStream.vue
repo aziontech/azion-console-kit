@@ -5,25 +5,12 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
+        <FieldText
+          label="Name *"
+          description="Give a unique and descriptive name to identify the data stream."
+          name="name"
           placeholder="My stream"
-          :class="{ 'p-invalid': nameError }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the data stream.</small
-        >
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ nameError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -35,47 +22,30 @@
     <template #inputs>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="dataSource"
-            class="text-color text-base font-medium"
-            >Source *</label
-          >
-          <Dropdown
-            appendTo="self"
-            :class="{ 'p-invalid': dataSourceError }"
-            v-model="dataSource"
+          <FieldDropdown
+            label="Source *"
+            name="dataSource"
             :options="listDataSources"
             optionLabel="label"
             optionValue="value"
-            class="w-full"
-          />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Represents the data source the data will be collected from.
-          </small>
-        </div>
-
-        <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="template"
-            class="text-color text-base font-medium"
-            >Template *</label
-          >
-          <Dropdown
+            :value="dataSource"
             appendTo="self"
-            :class="{ 'p-invalid': templateError }"
-            v-model="template"
+            description="Represents the data source the data will be collected from."
+          />
+        </div>
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <FieldDropdown
+            label="Template *"
+            name="template"
             :options="listTemplates"
             optionLabel="label"
             optionValue="value"
-            class="w-full"
+            :value="template"
+            appendTo="self"
+            description="Represents a preset of variables for specific sources or an open template to choose variables."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Represents a preset of variables for specific sources or an open template to choose
-            variables.
-          </small>
         </div>
       </div>
-
       <div class="flex flex-col gap-2">
         <label
           for="dataset"
@@ -170,26 +140,14 @@
           class="flex flex-col sm:max-w-lg w-full gap-2"
           v-if="hasSampling"
         >
-          <label
-            for="samplingPercentage"
-            class="text-color text-base font-medium"
-            >Sampling Percentage (%)</label
-          >
-          <InputNumber
-            v-model="samplingPercentage"
-            showButtons
+          <FieldNumber
+            label="Sampling Percentage (%)"
+            name="samplingPercentage"
+            :value="samplingPercentage"
+            description="Percentage value received in return of the total data related to all domains."
             :min="0"
             :max="100"
-            :class="{ 'p-invalid': samplingPercentageError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Percentage value received in return of the total data related to all domains.
-          </small>
-          <small
-            v-if="samplingPercentageError"
-            class="p-error"
-            >{{ samplingPercentageError }}</small
-          >
         </div>
         <InlineMessage
           class="w-fit"
@@ -208,23 +166,16 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
-          for="id"
-          class="text-color text-base font-medium"
-          >Connector *</label
-        >
-        <Dropdown
-          appendTo="self"
-          :class="{ 'p-invalid': templateError }"
-          v-model="endpoint"
+        <FieldDropdown
+          label="Connector *"
+          name="endpoint"
           :options="listEndpoint"
           optionLabel="label"
           optionValue="value"
-          class="w-full"
+          :value="endpoint"
+          appendTo="self"
+          description="Each option represents a different platform and requires different values."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Each option represents a different platform and requires different values.
-        </small>
       </div>
 
       <!-- Specific Sections for Different Endpoints -->
@@ -234,26 +185,13 @@
         v-if="endpoint === 'standard'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="endpointURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="endpointUrl"
-            type="text"
-            id="endpointURL"
+          <FieldText
+            label="URL *"
+            description="Specific URL that'll receive the collected data."
+            name="endpointUrl"
+            :value="endpointUrl"
             placeholder="https://app.domain.com/"
-            :class="{ 'p-invalid': endpointUrlError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Specific URL that'll receive the collected data.
-          </small>
-          <small
-            id="endpoint-url-help"
-            class="p-error"
-            >{{ endpointUrlError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -300,49 +238,24 @@
         v-if="endpoint === 'kafka'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="bootstrapSevers"
-            class="text-color text-base font-medium"
-            >Bootstrap Servers *</label
-          >
-          <TextArea
-            v-model="bootstrapServers"
-            placeholder="host1:port1,host2:port2,..."
-            :class="{ 'p-invalid': bootstrapServersError }"
+          <FieldTextArea
+            label="Bootstrap Servers *"
+            name="bootstrapServers"
             rows="5"
-            cols="30"
+            :value="bootstrapServers"
+            placeholder="host1:port1,host2:port2,..."
+            description="List of hosts and ports in a Kafka cluster. Separate items by comma and no space.."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            List of hosts and ports in a Kafka cluster. Separate items by comma and no space.
-          </small>
-          <small
-            id="bootstrap-servers-help"
-            class="p-error"
-            >{{ bootstrapServersError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="kafkaTopic"
-            class="text-color text-base font-medium"
-            >Kafka Topic *</label
-          >
-          <InputText
-            v-model="kafkaTopic"
-            id="kafkaTopic"
+          <FieldText
+            label="Kafka Topic *"
+            name="kafkaTopic"
+            :value="kafkaTopic"
+            description="Name of the topic in a Kafka cluster."
             placeholder="analytics.fct.pageviews.0"
-            type="text"
-            :class="{ 'p-invalid': kafkaTopicError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the topic in a Kafka cluster.
-          </small>
-          <small
-            id="kafka-topic-help"
-            class="p-error"
-            >{{ kafkaTopicError }}</small
-          >
         </div>
 
         <div class="flex sm:max-w-lg w-full gap-2 items-top">
@@ -372,70 +285,33 @@
         v-if="endpoint === 's3'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="hostURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="host"
-            type="text"
+          <FieldText
+            label="URL *"
+            name="host"
+            :value="host"
+            description="Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol."
             placeholder="https://myownhost.s3.us-east-1.myprovider.com"
-            :class="{ 'p-invalid': hostError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Specific URL that'll receive the collected data. Accepts all providers that work with an
-            S3 protocol.
-          </small>
-          <small
-            id="host-help"
-            class="p-error"
-            >{{ hostError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="bucketName"
-            class="text-color text-base font-medium"
-            >Bucket Name *</label
-          >
-          <InputText
-            v-model="bucket"
-            type="text"
+          <FieldText
+            label="Bucket Name *"
+            name="bucket"
+            :value="bucket"
+            description="Name of the bucket to which the object will be sent."
             placeholder="mys3bucket"
-            :class="{ 'p-invalid': bucketError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the bucket to which the object will be sent.
-          </small>
-          <small
-            id="bucket-help"
-            class="p-error"
-            >{{ bucketError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="region"
-            class="text-color text-base font-medium"
-            >Region *</label
-          >
-          <InputText
-            v-model="region"
-            type="text"
+          <FieldText
+            label="Region *"
+            name="region"
+            :value="region"
+            description="Region in which your bucket is hosted."
             placeholder="us-east-1"
-            :class="{ 'p-invalid': regionError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Region in which your bucket is hosted.
-          </small>
-          <small
-            id="region-help"
-            class="p-error"
-            >{{ regionError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -546,70 +422,33 @@
         v-if="endpoint === 'big_query'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="projectID"
-            class="text-color text-base font-medium"
-            >Project ID *</label
-          >
-          <InputText
-            v-model="projectID"
-            type="text"
+          <FieldText
+            label="Project ID *"
+            name="projectID"
+            :value="projectID"
+            description="ID of the project in Google Cloud."
             placeholder="mycustomGBQproject01"
-            :class="{ 'p-invalid': projectIDError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            ID of the project in Google Cloud.
-          </small>
-
-          <small
-            id="project-id-help"
-            class="p-error"
-            >{{ projectIDError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="datasetID"
-            class="text-color text-base font-medium"
-            >Dataset ID *</label
-          >
-          <InputText
-            v-model="datasetID"
-            type="text"
+          <FieldText
+            label="Dataset ID *"
+            name="datasetID"
+            :value="datasetID"
+            description="Name of the dataset created on Google BigQuery. Case sensitive field."
             placeholder="myGBQdataset"
-            :class="{ 'p-invalid': datasetIDError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the dataset created on Google BigQuery. Case sensitive field.
-          </small>
-          <small
-            id="dataset-id-help"
-            class="p-error"
-            >{{ datasetIDError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="tableID"
-            class="text-color text-base font-medium"
-            >Table ID *</label
-          >
-          <InputText
-            v-model="tableID"
-            type="text"
+          <FieldText
+            label="Table ID *"
+            name="tableID"
+            :value="tableID"
+            description="Name of the table on Google BigQuery."
             placeholder="mypagaviewtable01"
-            :class="{ 'p-invalid': tableIDError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the table on Google BigQuery.
-          </small>
-          <small
-            id="table-id-help"
-            class="p-error"
-            >{{ tableIDError }}</small
-          >
         </div>
 
         <div class="flex flex-col w-full gap-2">
@@ -642,49 +481,24 @@
         v-if="endpoint === 'elasticsearch'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="elasticSearchURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="elasticsearchUrl"
-            type="text"
+          <FieldText
+            label="URL *"
+            name="elasticsearchUrl"
+            :value="elasticsearchUrl"
+            description="URL address plus the Elasticsearch index that'll receive the collected data."
             placeholder="https://elasticsearch-domain.com/myindex"
-            :class="{ 'p-invalid': elasticsearchUrlError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            URL address plus the Elasticsearch index that'll receive the collected data.
-          </small>
-          <small
-            id="elastic-search-url-help"
-            class="p-error"
-            >{{ elasticsearchUrlError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="apiKey"
-            class="text-color text-base font-medium"
-            >API Key *</label
-          >
-          <TextArea
-            id="apiKey"
-            v-model="apiKey"
-            placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
-            :class="{ 'p-invalid': apiKeyError }"
+          <FieldTextArea
+            label="API Key *"
+            name="apiKey"
+            :value="apiKey"
             rows="5"
-            cols="30"
+            placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
+            description="API key used for Elasticsearch authorization in base64 encode format."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            API key used for Elasticsearch authorization in base64 encode format.
-          </small>
-          <small
-            id="api-key-help"
-            class="p-error"
-            >{{ apiKeyError }}</small
-          >
         </div>
       </div>
 
@@ -694,49 +508,23 @@
         v-if="endpoint === 'splunk'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="splunkURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="splunkUrl"
-            type="text"
+          <FieldText
+            label="URL *"
+            name="splunkUrl"
+            :value="splunkUrl"
+            description="URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL."
             placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
-            :class="{ 'p-invalid': splunkUrlError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            URL that'll receive the collected data. If you have an alternative index to point, add
-            it at the end of the URL.
-          </small>
-          <small
-            id="splunk-url-help"
-            class="p-error"
-            >{{ splunkUrlError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="splunkApiKey"
-            class="text-color text-base font-medium"
-            >API Key *</label
-          >
-          <TextArea
-            v-model="splunkApiKey"
+          <FieldTextArea
+            label="API Key *"
+            name="splunkApiKey"
+            :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
-            :class="{ 'p-invalid': splunkApiKeyError }"
-            rows="5"
-            cols="30"
+            description="HTTP Event Collector Token provided during the Splunk installation."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            HTTP Event Collector Token provided during the Splunk installation.
-          </small>
-          <small
-            id="splunk-api-key-help"
-            class="p-error"
-            >{{ splunkApiKeyError }}</small
-          >
         </div>
       </div>
 
@@ -746,47 +534,23 @@
         v-if="endpoint === 'aws_kinesis_firehose'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="streamName"
-            class="text-color text-base font-medium"
-            >Stream Name *</label
-          >
-          <InputText
-            v-model="streamName"
-            type="text"
+          <FieldText
+            label="Stream Name *"
+            name="streamName"
+            :value="streamName"
+            description="Delivery stream name."
             placeholder="MyKDFConnector"
-            :class="{ 'p-invalid': streamNameError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Delivery stream name.
-          </small>
-          <small
-            id="stream-name-help"
-            class="p-error"
-            >{{ streamNameError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="region"
-            class="text-color text-base font-medium"
-            >Region *</label
-          >
-          <InputText
-            v-model="awsRegion"
-            type="text"
+          <FieldText
+            label="Region *"
+            name="awsRegion"
+            :value="awsRegion"
+            description="Region where the Amazon Kinesis instance is running."
             placeholder="us-east-1"
-            :class="{ 'p-invalid': awsRegionError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Region where the Amazon Kinesis instance is running.
-          </small>
-          <small
-            id="aws-region-help"
-            class="p-error"
-            >{{ awsRegionError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -848,49 +612,23 @@
         v-if="endpoint === 'datadog'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="datadogURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="datadogUrl"
-            type="text"
+          <FieldText
+            label="URL *"
+            name="datadogUrl"
+            :value="datadogUrl"
+            description="URL or URI of the Datadog endpoint."
             placeholder="https://http-intake.logs.datadoghq.com/v1/input"
-            :class="{ 'p-invalid': datadogUrlError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            URL or URI of the Datadog endpoint.
-          </small>
-          <small
-            id="datadog-url-help"
-            class="p-error"
-            >{{ datadogUrlError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="apiKey"
-            class="text-color text-base font-medium"
-            >API Key *</label
-          >
-          <TextArea
-            id="datadogApiKey"
-            v-model="datadogApiKey"
+          <FieldTextArea
+            label="API Key *"
+            name="datadogApiKey"
+            :value="datadogApiKey"
             placeholder="ij9076f1ujik17a81f938yhru5g713422"
-            :class="{ 'p-invalid': datadogApiKeyError }"
-            rows="5"
-            cols="30"
+            description="API key generated through the Datadog dashboard."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            API key generated through the Datadog dashboard.
-          </small>
-          <small
-            id="datadog-api-key-help"
-            class="p-error"
-            >{{ datadogApiKeyError }}</small
-          >
         </div>
       </div>
 
@@ -900,25 +638,13 @@
         v-if="endpoint === 'qradar'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="QRadarURL"
-            class="text-color text-base font-medium"
-            >URL *</label
-          >
-          <InputText
-            v-model="QRadarUrl"
-            type="text"
+          <FieldText
+            label="URL *"
+            name="QRadarUrl"
+            :value="QRadarUrl"
+            description="Specific URL that'll receive the collected data."
             placeholder="http://137.15.824.10:14440"
-            :class="{ 'p-invalid': QRadarUrlError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Specific URL that'll receive the collected data.
-          </small>
-          <small
-            id="qradar-url-help"
-            class="p-error"
-            >{{ QRadarUrlError }}</small
-          >
         </div>
       </div>
 
@@ -928,27 +654,13 @@
         v-if="endpoint === 'azure_monitor'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="logType"
-            class="text-color text-base font-medium"
-            >Log Type *</label
-          >
-          <InputText
-            id="logType"
-            v-model="logType"
-            type="text"
+          <FieldText
+            label="Log Type *"
+            name="logType"
+            :value="logType"
+            description="Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters."
             placeholder="AzureMonitorTest"
-            :class="{ 'p-invalid': logTypeError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Record type of the data that's being submitted. Accepts only letters, numbers, and the
-            underscore (_) character, and it can't exceed 100 characters.
-          </small>
-          <small
-            id="log-type-help"
-            class="p-error"
-            >{{ logTypeError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -978,44 +690,24 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="timeGeneratedField"
-            class="text-color text-base font-medium"
-            >Time Generated Field</label
-          >
-          <InputText
-            id="timeGeneratedField"
-            v-model="generatedField"
+          <FieldText
+            label="Time Generated Field"
+            name="generatedField"
+            :value="generatedField"
+            description="Specifies how long it’ll take for the log to be available after collection. Uses
+            ingestion time if not specified."
             placeholder="myCustomTimeField"
-            type="text"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Specifies how long it’ll take for the log to be available after collection. Uses
-            ingestion time if not specified.
-          </small>
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="workspaceID"
-            class="text-color text-base font-medium"
-            >Workspace ID *</label
-          >
-          <InputText
-            id="workspaceID"
-            v-model="workspaceID"
-            type="text"
+          <FieldText
+            label="Workspace ID *"
+            name="workspaceID"
+            :value="workspaceID"
+            description="ID of the Workspace."
             placeholder="kik73154-0426-464c-aij3-eg6d24u87c50"
-            :class="{ 'p-invalid': workspaceIDError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            ID of the Workspace.
-          </small>
-          <small
-            id="workspace-id-help"
-            class="p-error"
-            >{{ workspaceIDError }}</small
-          >
         </div>
       </div>
 
@@ -1025,73 +717,33 @@
         v-if="endpoint === 'azure_blob_storage'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="storageAccount"
-            class="text-color text-base font-medium"
-            >Storage Account *</label
-          >
-          <InputText
-            id="storageAccount"
-            v-model="storageAccount"
-            type="text"
+          <FieldText
+            label="Storage Account *"
+            name="storageAccount"
+            :value="storageAccount"
+            description="Name of the storage account."
             placeholder="mystorageaccount"
-            :class="{ 'p-invalid': storageAccountError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the storage account.
-          </small>
-          <small
-            id="storage-account-help"
-            class="p-error"
-            >{{ storageAccountError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="containerName"
-            class="text-color text-base font-medium"
-            >Container Name *</label
-          >
-          <InputText
-            id="containerName"
-            v-model="containerName"
-            type="text"
+          <FieldText
+            label="Container Name *"
+            name="containerName"
+            :value="containerName"
+            description="Name of the container."
             placeholder="mycontainer"
-            :class="{ 'p-invalid': containerNameError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Name of the container.
-          </small>
-          <small
-            id="container-name-help"
-            class="p-error"
-            >{{ containerNameError }}</small
-          >
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="blobToken"
-            class="text-color text-base font-medium"
-            >Blob SAS Token *</label
-          >
-          <InputText
-            id="blobToken"
-            v-model="blobToken"
-            type="text"
+          <FieldText
+            label="Blob SAS Token *"
+            name="blobToken"
+            :value="blobToken"
+            description="Token generated by Blob Storage. It should have create, read, write, and list accesses granted."
             placeholder="sp=oiuwdl&st=2022-04-14T18:05:08Z&se=2026-03-02T02:05:08Z&sv=2020-08-04&sr=c&sig=YUi0TBEt7XTlxXex4Jui%2Fc88h6qAgMmCY4XIXeMvxa0%3F"
-            :class="{ 'p-invalid': blobTokenError }"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Token generated by Blob Storage. It should have create, read, write, and list accesses
-            granted.
-          </small>
-          <small
-            id="blob-token-help"
-            class="p-error"
-            >{{ blobTokenError }}</small
-          >
         </div>
       </div>
     </template>
@@ -1103,64 +755,33 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="payloadFormat"
-          class="text-color text-base font-medium"
-          >Payload Format *</label
-        >
-        <InputText
-          v-model="payloadFormat"
-          type="text"
+        <FieldText
+          label="Payload Format *"
+          name="payloadFormat"
+          :value="payloadFormat"
+          description="The format that payload will be sent. The $dataset variable will be replaced by all logs already with the log line separator applied."
           placeholder="$dataset"
-          :class="{ 'p-invalid': payloadFormatError }"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
-          The format that payload will be sent. The $dataset variable will be replaced by all logs
-          already with the log line separator applied.
-        </small>
-        <small
-          id="data-set-help"
-          class="p-error"
-          >{{ payloadFormatError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="lineSeparator"
-          class="text-color text-base font-medium"
-          >Payload Log Line Separator *</label
-        >
-        <InputText
-          v-model="lineSeparator"
-          type="text"
-          :class="{ 'p-invalid': lineSeparatorError }"
+        <FieldText
+          label="Payload Log Line Separator *"
+          name="lineSeparator"
+          :value="lineSeparator"
+          :description="placeholderLineSeparator"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
-          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
-          values into different lines in NDJSON format.
-        </small>
-        <small
-          id="max-size-help"
-          class="p-error"
-          >{{ lineSeparatorError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="maxSize"
-          class="text-color text-base font-medium"
-          >Payload Max Size</label
-        >
-        <InputNumber
-          v-model="maxSize"
+        <FieldNumber
+          label="Payload Max Size"
+          name="maxSize"
+          :value="maxSize"
+          description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
           placeholder="1000000"
           :useGrouping="false"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
-          Customizable maximum size of data packets in bytes. Accepts values starting from 1000000.
-        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -1182,16 +803,18 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+
   import ButtonPrimer from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
   import InlineMessage from 'primevue/inlinemessage'
-  import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
   import PickList from 'primevue/picklist'
   import RadioButton from 'primevue/radiobutton'
-  import TextArea from 'primevue/textarea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
@@ -1244,78 +867,74 @@
 
   // Campos do formulário
   useField('status')
-  const { value: name, errorMessage: nameError } = useField('name')
-  const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
+  const { value: name } = useField('name')
+  const { value: dataSource } = useField('dataSource')
   const { value: dataSet } = useField('dataSet')
-  const { value: template, errorMessage: templateError } = useField('template')
+  const { value: template } = useField('template')
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
   const { value: hasSampling } = useField('hasSampling')
-  const { value: samplingPercentage, errorMessage: samplingPercentageError } =
-    useField('samplingPercentage')
-
+  const { value: samplingPercentage } = useField('samplingPercentage')
   // standard
-  const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
+  const { value: endpointUrl } = useField('endpointUrl')
   const { value: headers } = useField('headers')
   const { value: maxSize } = useField('maxSize')
-  const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
-  const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
+  const { value: lineSeparator } = useField('lineSeparator')
+  const { value: payloadFormat } = useField('payloadFormat')
 
   // kafka
-  const { value: bootstrapServers, errorMessage: bootstrapServersError } =
-    useField('bootstrapServers')
-  const { value: kafkaTopic, errorMessage: kafkaTopicError } = useField('kafkaTopic')
+  const { value: bootstrapServers } = useField('bootstrapServers')
+  const { value: kafkaTopic } = useField('kafkaTopic')
   const { value: useTls, errorMessage: useTlsError } = useField('useTls')
 
+  // QRadar
+  const { value: QRadarUrl } = useField('QRadarUrl')
+
   // s3
-  const { value: host, errorMessage: hostError } = useField('host')
-  const { value: bucket, errorMessage: bucketError } = useField('bucket')
-  const { value: region, errorMessage: regionError } = useField('region')
+  const { value: host } = useField('host')
+  const { value: bucket } = useField('bucket')
+  const { value: region } = useField('region')
   const { value: accessKey, errorMessage: accessKeyError } = useField('accessKey')
   const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
   const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
   const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
 
   // google big query
-  const { value: projectID, errorMessage: projectIDError } = useField('projectID')
-  const { value: datasetID, errorMessage: datasetIDError } = useField('datasetID')
-  const { value: tableID, errorMessage: tableIDError } = useField('tableID')
+  const { value: projectID } = useField('projectID')
+  const { value: datasetID } = useField('datasetID')
+  const { value: tableID } = useField('tableID')
   const { value: serviceAccountKey, errorMessage: serviceAccountKeyError } =
     useField('serviceAccountKey')
 
   // elasticsearch
-  const { value: elasticsearchUrl, errorMessage: elasticsearchUrlError } =
-    useField('elasticsearchUrl')
-  const { value: apiKey, errorMessage: apiKeyError } = useField('apiKey')
+  const { value: elasticsearchUrl } = useField('elasticsearchUrl')
+  const { value: apiKey } = useField('apiKey')
 
   // splunk
-  const { value: splunkUrl, errorMessage: splunkUrlError } = useField('splunkUrl')
-  const { value: splunkApiKey, errorMessage: splunkApiKeyError } = useField('splunkApiKey')
+  const { value: splunkUrl } = useField('splunkUrl')
+  const { value: splunkApiKey } = useField('splunkApiKey')
 
   // aws_kinesis_firehose
-  const { value: streamName, errorMessage: streamNameError } = useField('streamName')
-  const { value: awsRegion, errorMessage: awsRegionError } = useField('awsRegion')
+  const { value: streamName } = useField('streamName')
+  const { value: awsRegion } = useField('awsRegion')
   const { value: awsAccessKey, errorMessage: awsAccessKeyError } = useField('awsAccessKey')
   const { value: awsSecretKey, errorMessage: awsSecretKeyError } = useField('awsSecretKey')
 
-  // datadog
-  const { value: datadogUrl, errorMessage: datadogUrlError } = useField('datadogUrl')
-  const { value: datadogApiKey, errorMessage: datadogApiKeyError } = useField('datadogApiKey')
-
-  // QRadar
-  const { value: QRadarUrl, errorMessage: QRadarUrlError } = useField('QRadarUrl')
-
   // azure_monitor
-  const { value: logType, errorMessage: logTypeError } = useField('logType')
   const { value: sharedKey, errorMessage: sharedKeyError } = useField('sharedKey')
+  const { value: logType } = useField('logType')
   const { value: generatedField } = useField('generatedField')
-  const { value: workspaceID, errorMessage: workspaceIDError } = useField('workspaceID')
+  const { value: workspaceID } = useField('workspaceID')
+
+  // datadog
+  const { value: datadogUrl } = useField('datadogUrl')
+  const { value: datadogApiKey } = useField('datadogApiKey')
 
   // azure_blob_storage
-  const { value: storageAccount, errorMessage: storageAccountError } = useField('storageAccount')
-  const { value: containerName, errorMessage: containerNameError } = useField('containerName')
-  const { value: blobToken, errorMessage: blobTokenError } = useField('blobToken')
+  const { value: storageAccount } = useField('storageAccount')
+  const { value: containerName } = useField('containerName')
+  const { value: blobToken } = useField('blobToken')
 
   const listTemplates = ref([])
 
@@ -1362,6 +981,11 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const placeholderLineSeparator = computed(() => {
+    const text = '"\\n"'
+    return `Character that'll be used at the end of each log line. The ${text}  escape sequence breaks values into different lines in NDJSON format.`
+  })
 
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'

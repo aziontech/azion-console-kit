@@ -5,9 +5,10 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputPassword from 'primevue/password'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
   const props = defineProps({
     listTimezonesService: {
@@ -27,11 +28,11 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const selectedCountryCallCode = ref(null)
 
-  const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
-  const { value: lastName, errorMessage: errorLastName } = useField('lastName')
-  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
-  const { value: language, errorMessage: errorLanguage } = useField('language')
-  const { value: email, errorMessage: errorEmail } = useField('email')
+  const { value: firstName } = useField('firstName')
+  const { value: lastName } = useField('lastName')
+  const { value: timezone } = useField('timezone')
+  const { value: language } = useField('language')
+  const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: password, errorMessage: errorPassword } = useField('password')
@@ -97,99 +98,40 @@
     description="Modify the personal information of the account."
   >
     <template #inputs>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__profile__first-name"
-      >
-        <label
-          data-testid="profile__first-name__label"
-          for="firstName"
-          class="text-color text-base font-medium"
-          >First Name *</label
-        >
-        <InputText
-          data-testid="profile__first-name__input"
-          placeholder="John"
-          v-model="firstName"
-          id="firstName"
-          type="text"
-          :class="{ 'p-invalid': errorFirstName }"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          data-testid="profile__first-name"
+          label="First Name *"
+          name="firstName"
+          :value="firstName"
+          description="The first name of the user."
         />
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="profile__first-name__help-text"
-        >
-          The first name of the user.</small
-        >
-        <small
-          data-testid="profile__first-name__error-text"
-          id="name-help"
-          class="p-error"
-          >{{ errorFirstName }}</small
-        >
       </div>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="profile__last-name"
-      >
-        <label
-          data-testid="profile__last-name__label"
-          for="lastName"
-          class="text-color text-base font-medium"
-          >Last Name *</label
-        >
-        <InputText
-          data-testid="profile__last-name__input"
-          placeholder="Smith"
-          v-model="lastName"
-          id="lastName"
-          type="text"
-          :class="{ 'p-invalid': errorLastName }"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          data-testid="profile__last-name"
+          label="Last Name *"
+          name="lastName"
+          :value="lastName"
+          description="The last name of the user."
         />
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="profile__last-name__help-text"
-        >
-          The last name of the user.</small
-        >
-        <small
-          data-testid="profile__last-name__error-text"
-          id="name-help"
-          class="p-error"
-          >{{ errorLastName }}</small
-        >
       </div>
       <div class="flex sm:flex-row w-full flex-col gap-6">
-        <div
-          class="flex flex-col w-full sm:max-w-xs gap-2"
-          data-testid="profile__timezone"
-        >
-          <label
-            data-testid="profile__timezone__label"
-            for="timezone"
-            class="text-color text-base font-medium"
-            >Timezone *</label
-          >
-          <Dropdown
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <FieldDropdown
             data-testid="profile__timezone__options"
-            filter
-            autoFilterFocus
-            appendTo="self"
-            id="timezone"
+            label="Timezone *"
+            name="timezone"
             :options="optionsTimezone"
+            :loading="!timezone || !optionsTimezone.length"
+            :disabled="!optionsTimezone.length"
             optionLabel="label"
             optionValue="value"
-            placeholder="Loading..."
-            :loading="!timezone"
-            :class="{ 'p-invalid': errorTimezone }"
-            v-model="timezone"
+            :value="timezone"
+            filter
+            appendTo="self"
+            description="Timezone of the user."
           />
-          <small
-            class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="profile__timezone__help-text"
-          >
-            Timezone of the user.</small
-          >
         </div>
         <div
           class="flex flex-col w-full sm:max-w-xs gap-2"
@@ -208,7 +150,7 @@
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
-            :class="{ 'p-invalid': errorLanguage }"
+            name="language"
             v-model="language"
             disabled
           >
@@ -232,38 +174,17 @@
     description="Modify the contact information for the account."
   >
     <template #inputs>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__contact__email"
-      >
-        <label
-          data-testid="contact__email__label"
-          for="email"
-          class="text-color text-base font-medium"
-          >Email *</label
-        >
-        <InputText
-          data-testid="contact__email__input"
-          v-model="email"
-          id="email"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          data-testid="contact__email"
+          label="Email *"
+          name="email"
+          :value="email"
           type="email"
           autocomplete="off"
           placeholder="example@email.com"
-          :class="{ 'p-invalid': errorEmail }"
+          description="Email of the user."
         />
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="contact__email__help-text"
-        >
-          Email of the user.</small
-        >
-        <small
-          data-testid="contact__email__error-text"
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorEmail }}
-        </small>
       </div>
 
       <div
@@ -284,6 +205,7 @@
               autoFilterFocus
               appendTo="self"
               id="countryCallCode"
+              name="countryCallCode"
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               :loading="isLoadingCountry"
@@ -307,6 +229,7 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              name="mobile"
               :disabled="isLoadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
@@ -345,8 +268,9 @@
           data-testid="security__old-password__label"
           for="oldPassword"
           class="text-color text-base font-medium"
-          >Old Password *</label
         >
+          Old Password *
+        </label>
         <InputPassword
           data-testid="security__old-password__input"
           toggleMask
@@ -356,13 +280,19 @@
           autocomplete="new-password"
           :inputProps="{ autocomplete: 'new-password' }"
           :feedback="false"
+          :pt="{
+            input: {
+              name: 'oldPassword'
+            }
+          }"
         />
         <small
           data-testid="security__old-password__error-text"
           id="name-help"
           class="p-error"
-          >{{ errorOldPassword }}</small
         >
+          {{ errorOldPassword }}
+        </small>
       </div>
       <div
         class="flex flex-col sm:max-w-lg gap-2"
@@ -372,8 +302,9 @@
           data-testid="security__new-password__label"
           for="password"
           class="font-semibold text-sm"
-          >New Password *</label
         >
+          New Password *
+        </label>
         <InputPassword
           data-testid="security__new-password__input"
           toggleMask
@@ -381,6 +312,11 @@
           id="password"
           autocomplete="new-password"
           class="w-full"
+          :pt="{
+            input: {
+              name: 'password'
+            }
+          }"
           :class="{ 'p-invalid': errorPassword }"
           @input="validation()"
           :feedback="false"
@@ -388,8 +324,9 @@
         <small
           class="p-error text-xs font-normal leading-tight"
           data-testid="security__new-password__error-text"
-          >{{ errorPassword }}</small
         >
+          {{ errorPassword }}
+        </small>
 
         <label
           class="font-semibold text-sm my-2"
@@ -427,8 +364,9 @@
           data-testid="security__confirm-password__label"
           for="confirmPassword"
           class="text-color text-base font-medium"
-          >Confirm Password *</label
         >
+          Confirm Password *
+        </label>
         <InputPassword
           data-testid="security__confirm-password__input"
           toggleMask
@@ -438,13 +376,19 @@
           autocomplete="off"
           :class="{ 'p-invalid': errorConfirmPassword }"
           :feedback="false"
+          :pt="{
+            input: {
+              name: 'confirmPassword'
+            }
+          }"
         />
         <small
           data-testid="security__confirm-password__error-text"
           id="name-help"
           class="p-error"
-          >{{ errorConfirmPassword }}</small
         >
+          {{ errorConfirmPassword }}
+        </small>
       </div>
       <FieldSwitchBlock
         data-testid="your-settings-form__security__two-factor"

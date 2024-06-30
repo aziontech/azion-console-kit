@@ -12,12 +12,11 @@
         <template #form>
           <FormFieldsWafRules />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>
@@ -41,23 +40,23 @@
 
   const validationSchema = yup.object({
     name: yup.string().required(),
-    crossSiteScriptingSensitivity: yup.string(),
-    directoryTraversalSensitivity: yup.string(),
-    evadingTricksSensitivity: yup.string(),
-    fileUploadSensitivity: yup.string(),
-    identifiedAttackSensitivity: yup.string(),
-    remoteFileInclusionSensitivity: yup.string(),
+    sqlInjection: yup.boolean(),
     sqlInjectionSensitivity: yup.string(),
-    unwantedAccessSensitivity: yup.string(),
-    active: yup.boolean(),
-    fileUpload: yup.boolean(),
-    evadingTricks: yup.boolean(),
-    unwantedAccess: yup.boolean(),
-    identifiedAttack: yup.boolean(),
-    crossSiteScripting: yup.boolean(),
-    directoryTraversal: yup.boolean(),
     remoteFileInclusion: yup.boolean(),
-    sqlInjection: yup.boolean()
+    remoteFileInclusionSensitivity: yup.string(),
+    directoryTraversal: yup.boolean(),
+    directoryTraversalSensitivity: yup.string(),
+    crossSiteScripting: yup.boolean(),
+    crossSiteScriptingSensitivity: yup.string(),
+    fileUpload: yup.boolean(),
+    fileUploadSensitivity: yup.string(),
+    evadingTricks: yup.boolean(),
+    evadingTricksSensitivity: yup.string(),
+    unwantedAccess: yup.boolean(),
+    unwantedAccessSensitivity: yup.string(),
+    identifiedAttack: yup.boolean(),
+    identifiedAttackSensitivity: yup.string(),
+    active: yup.boolean()
   })
 
   const initialValues = {

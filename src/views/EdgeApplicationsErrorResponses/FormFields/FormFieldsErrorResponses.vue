@@ -3,8 +3,9 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
-  import InputNumber from 'primevue/inputnumber'
+
+  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import InputText from 'primevue/inputtext'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
@@ -116,9 +117,7 @@
   ]
   const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
   const disableOriginKey = computed(() => errorResponses.value.length < 2)
-  const statusAnyErrorResponse = computed(
-    () => errorResponses.value.filter((element) => element.value.code === 'any')[0]
-  )
+
   const { value: originId } = useField('originId')
   const {
     push: pushErrorResponse,
@@ -165,7 +164,7 @@
       </Divider>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label class="text-color text-sm font-medium leading-5">Status Code *</label>
+          <label class="text-color text-base font-medium leading-5">Status Code *</label>
           <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
             <i class="pi pi-lock text-color-secondary" />
             <InputText
@@ -177,21 +176,14 @@
           </span>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="default-maximun-ttl-seconds"
-            class="text-color text-sm font-medium leading-5"
-          >
-            Default Response TTL *
-          </label>
-          <InputNumber
+          <FieldNumber
+            label="Default Response TTL *"
+            :value="errorResponses[0].value.timeout"
+            name="errorResponses[0].timeout"
             :min="0"
             :max="31536000"
-            v-model="statusAnyErrorResponse.value.timeout"
-            showButtons
+            description="Set a TTL for all status codes in cache."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Set a TTL for all status codes in cache.
-          </small>
         </div>
       </div>
 
@@ -217,34 +209,25 @@
 
           <div class="flex flex-wrap gap-6">
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label class="text-color text-sm font-medium leading-5">Status Code *</label>
-              <Dropdown
-                appendTo="self"
-                v-model="errorResponse.value.code"
+              <FieldDropdown
+                label="Status Code *"
+                :name="`errorResponses[${index}].code`"
                 :options="STATUS_CODE_OPTIONS"
                 optionLabel="name"
-                option-value="code"
+                optionValue="code"
+                :value="errorResponses[index].value.code"
+                description="Select the HTTP status code to be customized."
               />
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                Select the HTTP status code to be customized.
-              </small>
             </div>
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="maximun-ttl-seconds"
-                class="text-color text-sm font-medium leading-5"
-              >
-                Custom Response TTL *
-              </label>
-              <InputNumber
+              <FieldNumber
+                label="Custom Response TTL *"
+                :value="errorResponses[index].value.timeout"
+                :name="`errorResponses[${index}].timeout`"
                 :min="0"
                 :max="31536000"
-                v-model="errorResponse.value.timeout"
-                showButtons
+                description="Set a TTL for the custom response."
               />
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                Set a TTL for the custom response.
-              </small>
             </div>
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -252,26 +235,19 @@
               label="Page Path"
               placeholder="/path/error_page.html"
               :name="`errorResponses[${index}].uri`"
-              :value="errorResponse.value.uri"
+              :value="errorResponses[index].value.uri"
               description="Select an origin to customize the error page path."
             />
           </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="maximun-ttl-seconds"
-              class="text-color text-sm font-medium leading-5"
-            >
-              Response Status Code
-            </label>
-            <InputNumber
+            <FieldNumber
+              label="Response Status Code"
+              :value="errorResponses[index].value.customStatusCode"
+              :name="`errorResponses[${index}].customStatusCode`"
               :min="100"
               :max="599"
-              v-model="errorResponse.value.customStatusCode"
-              showButtons
+              description="Change the status code sent in the response."
             />
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Change the status code sent in the response.
-            </small>
           </div>
         </div>
       </div>
@@ -292,20 +268,16 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
-          for="method"
-          class="text-color text-sm font-medium leading-5"
-          >Origin *</label
-        >
-        <Dropdown
-          appendTo="self"
-          inputId="originId"
-          v-model="originId"
-          :disabled="disableOriginKey"
+        <FieldDropdown
+          label="Origin *"
           :options="originOptions"
           optionLabel="name"
+          optionValue="originId"
+          class="h-fit"
+          name="originId"
+          :value="originId"
           scrollHeight="170px"
-          option-value="originId"
+          :disabled="disableOriginKey"
         />
       </div>
     </template>

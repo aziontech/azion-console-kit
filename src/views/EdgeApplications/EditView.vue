@@ -7,7 +7,7 @@
     @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
-    :isTabs="true"
+    isTabs
     data-testid="edit-edge-application-form-block"
   >
     <template #form>
@@ -19,10 +19,9 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarBlockWithTeleport
-        @onSubmit="formSubmit(onSubmit, values)"
+        @onSubmit="formSubmit(onSubmit, values, formValid)"
         @onCancel="onCancel"
         :loading="loading"
-        :submitDisabled="!formValid"
         data-testid="edit-edge-application-action-bar"
       />
     </template>
@@ -102,8 +101,9 @@
       .track()
   }
 
-  const formSubmit = async (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
     await onSubmit()
+    if (!formValid) return
     emit('updatedApplication', values)
   }
 </script>

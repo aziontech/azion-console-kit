@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Credential"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Credential"
+        data-testid="credentials__create-view__page-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock
@@ -18,12 +21,12 @@
             :generatedToken="generatedToken"
           ></FormFieldsCreate>
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
+            :submitDisabled="generatedToken"
           />
         </template>
       </CreateFormBlock>

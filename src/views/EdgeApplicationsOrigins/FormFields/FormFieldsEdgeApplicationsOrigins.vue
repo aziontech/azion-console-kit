@@ -3,9 +3,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import InputNumber from 'primevue/inputnumber'
-  import InputText from 'primevue/inputtext'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField, useFieldArray } from 'vee-validate'
@@ -55,7 +54,7 @@
     { title: 'Backup', inputValue: 'backup' }
   ]
 
-  const originKeyInput = ref('')
+  const originKeyInput = ref(null)
 
   const { value: originKey, setValue: setOriginKey } = useField('originKey')
   const { value: name } = useField('name')
@@ -112,8 +111,12 @@
   }
 
   const scrollOriginKey = () => {
-    originKeyInput.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    originKeyInput.value.inputRef.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
+
+  const descriptionOriginType = computed(() => {
+    return isLoadBalancerOriginType.value ? '' : 'Select an option to customize the origin.'
+  })
 
   watch(
     () => props.generatedOriginKey,
@@ -156,20 +159,14 @@
         class="flex w-full gap-6 items-end max-sm:flex-col max-sm:align-items-baseline flex-wrap max-sm:gap-3:flex-col"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label class="text-color text-sm font-medium leading-5">Key</label>
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i
-              class="pi pi-lock text-color-secondary"
-              v-if="true"
-            />
-            <InputText
-              class="w-full"
-              v-model="originKey"
-              ref="originKeyInput"
-              type="text"
-              :disabled="true"
-            />
-          </span>
+          <FieldText
+            label="Key"
+            name="originKey"
+            :value="originKey"
+            disabled
+            ref="originKeyInput"
+            icon="pi pi-lock"
+          />
         </div>
         <PrimeButton
           class="h-8 max-sm:w-full"
@@ -192,27 +189,19 @@
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
-        <label
-          for="originType"
-          class="text-color text-sm font-medium leading-5"
-          >Type *</label
-        >
-        <Dropdown
-          appendTo="self"
-          @change="resetAddressesFields"
-          inputId="originType"
-          v-model="originType"
+        <FieldDropdown
+          label="Type *"
+          name="originType"
           :options="props.listOrigins"
+          :loading="!props.listOrigins"
+          @change="resetAddressesFields"
+          optionValue="value"
           optionLabel="label"
-          option-value="value"
+          :value="originType"
+          inputId="originType"
           :optionDisabled="(option) => option.disabled"
+          :description="descriptionOriginType"
         />
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          v-if="!isLoadBalancerOriginType"
-        >
-          Select an option to customize the origin.
-        </small>
       </div>
       <div v-if="!isObjectStorageOriginType">
         <FieldGroupRadio
@@ -227,18 +216,14 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isLoadBalancerOriginType"
       >
-        <label
-          for="method"
-          class="text-color text-sm font-medium leading-5"
-          >Method *</label
-        >
-        <Dropdown
-          appendTo="self"
-          inputId="method"
-          v-model="method"
+        <FieldDropdown
+          label="Method *"
+          name="method"
           :options="METHOD_TYPES_OPTIONS"
+          optionValue="value"
           optionLabel="label"
-          option-value="value"
+          :value="method"
+          inputId="method"
         />
       </div>
       <div
@@ -248,7 +233,7 @@
         <FieldText
           label="Address *"
           placeholder="example.com"
-          :name="`addresses[0].address`"
+          name="addresses[0].address"
           :value="addresses[0].value.address"
           description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
@@ -463,47 +448,26 @@
     <template #inputs>
       <div class="w-full flex max-sm:flex-col gap-8 max-md:gap-6">
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="name"
-            class="text-color text-sm font-medium leading-5"
-            >Connection</label
-          >
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock text-color-secondary" />
-            <InputText
-              class="w-full"
-              v-model="connectionTimeout"
-              placeholder="60 seconds"
-              type="text"
-              disabled
-            />
-          </span>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            The amount of time that Azion will wait for a response from the origin before showing an
-            error.
-          </small>
+          <FieldText
+            label="Connection"
+            name="connectionTimeout"
+            :value="`${connectionTimeout}`"
+            disabled
+            placeholder="60 seconds"
+            icon="pi pi-lock"
+            description="The amount of time that Azion will wait for a response from the origin before showing an error."
+          />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="name"
-            class="text-color text-sm font-medium leading-5"
-          >
-            Between bytes
-          </label>
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock text-color-secondary" />
-            <InputText
-              class="w-full"
-              v-model="timeoutBetweenBytes"
-              placeholder="120 bytes"
-              type="text"
-              disabled
-            />
-          </span>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            The amount of time that Azion will wait between receiving two packets of a response from
-            the origin.
-          </small>
+          <FieldText
+            label="Between bytes"
+            name="timeoutBetweenBytes"
+            :value="`${timeoutBetweenBytes}`"
+            disabled
+            placeholder="120 bytes"
+            icon="pi pi-lock"
+            description="The amount of time that Azion will wait between receiving two packets of a response from the origin."
+          />
         </div>
       </div>
     </template>

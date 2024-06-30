@@ -4,6 +4,7 @@
   import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   defineOptions({ name: 'edit-edge-node' })
+  const emit = defineEmits(['handleEdgeNodesUpdated'])
 
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
@@ -18,6 +19,13 @@
     hashId: yup.string().required().label('Hash ID'),
     groups: yup.array().label('Groups')
   })
+
+  const formSubmit = async (onSubmit, values, formValid) => {
+    await onSubmit()
+    if (formValid) {
+      emit('handleEdgeNodesUpdated', values)
+    }
+  }
 </script>
 
 <template>
@@ -31,13 +39,12 @@
     <template #form>
       <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarTemplate
         v-if="props.hiddenActionBar"
-        @onSubmit="onSubmit"
+        @onSubmit="formSubmit(onSubmit, values, formValid)"
         @onCancel="onCancel"
         :loading="loading"
-        :submitDisabled="!formValid"
       />
     </template>
   </EditFormBlock>

@@ -33,6 +33,11 @@
             class="w-full"
             :class="renderInvalidClass(formTools.errors[`${field.name}`])"
             :feedback="false"
+            :pt="{
+              input: {
+                name: `${field.name}`
+              }
+            }"
           />
           <InputText
             v-else
@@ -41,6 +46,7 @@
             :id="field.name"
             type="text"
             v-bind="field.input"
+            :name="field.name"
             :class="renderInvalidClass(formTools.errors[`${field.name}`])"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
@@ -127,7 +133,8 @@
                 <label
                   for="name"
                   class="text-color text-base font-medium"
-                  >{{ field.label }}
+                >
+                  {{ field.label }}
                   <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
                 >
                 <Password
@@ -141,6 +148,11 @@
                   class="w-full"
                   :class="renderInvalidClass(formTools.errors[`${field.name}`])"
                   :feedback="false"
+                  :pt="{
+                    input: {
+                      name: `${field.name}`
+                    }
+                  }"
                 />
                 <InputText
                   v-else
@@ -150,6 +162,7 @@
                   type="text"
                   v-bind="field.input"
                   :class="renderInvalidClass(formTools.errors[`${field.name}`])"
+                  :name="field.name"
                 />
                 <small class="tet-xs font-normal text-color-secondary">{{
                   field.description
@@ -172,7 +185,6 @@
         :loading="submitLoading"
         @onSubmit="handleSubmit"
         @onCancel="handleCancel"
-        :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
         primaryActionLabel="Deploy"
       />
     </Teleport>
@@ -192,6 +204,7 @@
   import { useToast } from 'primevue/usetoast'
   import OAuthGithub from './oauth-github.vue'
   import { useDeploy } from '@/stores/deploy'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -241,6 +254,7 @@
   const toast = useToast()
   const inputSchema = ref({})
   const formTools = ref({})
+  const { scrollToError, scrollToErrorInDrawer } = useScrollToError()
   const isLoading = ref(true)
   const submitLoading = ref(false)
   const callbackUrl = ref('')
@@ -432,7 +446,7 @@
       validationSchema
     })
 
-    formTools.value = { errors, meta, resetForm, values, setFieldValue }
+    formTools.value = { errors, meta, resetForm, values, setFieldValue, validate }
 
     const registerFieldWithValueAndValidation = (field) => {
       if (field.value) {
@@ -466,6 +480,13 @@
 
   const handleSubmit = async () => {
     try {
+      await formTools.value.validate()
+      if (Object.keys(formTools.value.errors).length) {
+        props.isDrawer
+          ? scrollToErrorInDrawer(formTools.value.errors)
+          : scrollToError(formTools.value.errors)
+        return
+      }
       submitLoading.value = true
       emit('submitClick')
       emit('loading')

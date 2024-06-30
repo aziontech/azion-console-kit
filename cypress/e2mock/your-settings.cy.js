@@ -1,3 +1,5 @@
+import selectors from '../support/selectors';
+
 const payload = {
   country_call_code: 'BR - 55',
   email: 'testuser@cy.com',
@@ -11,46 +13,12 @@ const payload = {
   two_factor_enabled: true
 }
 
-const selectors = {
-  profile: {
-    firstNameInput: '[data-testid="profile__first-name__input"]',
-    firstNameError: '[data-testid="profile__first-name__error-text"]',
-    lastNameInput: '[data-testid="profile__last-name__input"]',
-    lastNameError: '[data-testid="profile__last-name__error-text"]',
-    timezoneOptions: '[data-testid="profile__timezone__options"]',
-    language: '[data-testid="profile__language"]',
-  },
-  contact: {
-    emailInput: '[data-testid="contact__email__input"]',
-    emailError: '[data-testid="contact__email__error-text"]',
-    mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
-    countryCodeFilter: '.p-dropdown-filter',
-    countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    mobileInput: '[data-testid="contact__mobile__input"]',
-    mobileError: '[data-testid="contact__mobile__error-text"]',
-  },
-  security: {
-    oldPasswordInput: '[data-testid="security__old-password__input"]',
-    newPasswordInput: '[data-testid="security__new-password__input"]',
-    confirmPasswordInput: '[data-testid="security__confirm-password__input"]',
-    confirmPasswordError: '[data-testid="security__confirm-password__error-text"]',
-    twoFactorToggle: '.p-inputswitch-slider',
-  },
-  form: {
-    submitButton: '[data-testid="form-actions-submit-button"]',
-  },
-  toast: {
-    content: '.p-toast-message-content',
-  },
-}
-
 describe('Your Settings spec', () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/user', { fixture: 'your-settings.json' }).as('getUser')
     cy.intercept('PATCH', '/api/v4/iam/user', { statusCode: 200, body: {} }).as('patchUser')
-
-    cy.openMenuItem('Your Settings')
+    cy.openItemThroughMenuAccount('Your Settings')
   })
 
   it('should edit user settings but the email', () => {
@@ -105,7 +73,7 @@ describe('Your Settings spec', () => {
 
     // Assert
     cy.wait('@patchUser').its('request.body').should('deep.equal', payload)
-    cy.get(selectors.toast.content).should('have.text', 'successYour user has been updated')
+    cy.verifyToast('success', 'Your user has been updated')
   })
 
   it('should edit user email', () => {
@@ -121,9 +89,9 @@ describe('Your Settings spec', () => {
     // Assert
     cy.wait('@patchUser')
 
-    cy.get(selectors.toast.content).should(
-      'have.text',
-      'Confirmation email sentCheck your inbox and follow the instructions to verify this new email.'
+    cy.verifyToast(
+      'Confirmation email sent',
+      'Check your inbox and follow the instructions to verify this new email.'
     )
   })
 })

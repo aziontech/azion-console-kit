@@ -51,11 +51,11 @@
   }
 
   const validationSchema = yup.object({
-    originId: yup.string().required(),
+    originId: yup.string().required().label('Origin'),
     errorResponses: yup.array().of(
       yup.object().shape({
         code: yup.string().required(),
-        timeout: yup.number().required(),
+        timeout: yup.number().required().label('Response TTL'),
         uri: yup.string().nullable(true),
         customStatusCode: yup.string().nullable(true)
       })
@@ -73,21 +73,22 @@
     :editService="editService"
     :loadService="loadService"
     :schema="validationSchema"
-    :isTabs="true"
+    isTabs
     @on-edit-success="handleTrackSuccessEdit"
+    disableRedirect
   >
-    <template #form>
+    <template #form="{ errors }">
       <FormFieldsErrorResponses
         :edgeApplicationId="edgeApplicationId"
         :listOriginsService="props.listOriginsService"
+        :errors="errors"
       />
     </template>
-    <template #action-bar="{ onSubmit, formValid, loading }">
+    <template #action-bar="{ onSubmit, loading }">
       <ActionBarBlockWithTeleport
         @onSubmit="onSubmit"
         @onCancel="gotToList"
         :loading="loading"
-        :submitDisabled="!formValid"
       />
     </template>
   </EditFormBlock>

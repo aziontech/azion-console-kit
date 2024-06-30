@@ -13,7 +13,8 @@
           <InlineMessage
             class="w-fit"
             severity="info"
-            >Create a Let's Encrypt™ digital certificate directly from
+          >
+            Create a Let's Encrypt™ digital certificate directly from
             <PrimeButton
               link
               size="small"
@@ -28,12 +29,11 @@
           />
         </template>
 
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>
@@ -67,13 +67,13 @@
   const createDigitalCertificateService = props.createDigitalCertificatesService
   const createCSRService = props.createDigitalCertificatesCSRService
 
-  const certificateTypes = ref({
+  const certificateTypes = {
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
     EDGE_CERTIFICATE_CSR: 'generateCSR',
     TRUSTED: 'trusted_ca_certificate'
-  })
+  }
   const CSRConditionalValidations = {
-    is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+    is: certificateTypes.EDGE_CERTIFICATE_CSR,
     then: (schema) => schema.required('Field Required')
   }
 
@@ -100,7 +100,7 @@
   })
 
   const certificateRequiredField = (certificateType) => {
-    const isTrustedCA = certificateType === certificateTypes.value.TRUSTED
+    const isTrustedCA = certificateType === certificateTypes.TRUSTED
 
     return isTrustedCA
   }
@@ -119,33 +119,33 @@
 
     // CSR Fields
     common: yup.string().when('certificateType', CSRConditionalValidations),
-    state: yup.string().when('certificateType', CSRConditionalValidations),
-    city: yup.string().when('certificateType', CSRConditionalValidations),
-    organization: yup.string().when('certificateType', CSRConditionalValidations),
-    organizationUnity: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('organization unity'),
-    privateKeyType: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('private key type'),
-    subjectAlternativeNames: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)'),
     country: yup.string().when('certificateType', {
-      is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+      is: certificateTypes.EDGE_CERTIFICATE_CSR,
       then: (schema) =>
         schema
           .required('Country/Region is a required field.')
           .max(2, 'Country/Region must be a 2-character country code.')
           .min(2, 'Country/Region must be a 2-character country code.')
     }),
+    state: yup.string().when('certificateType', CSRConditionalValidations),
+    city: yup.string().when('certificateType', CSRConditionalValidations),
+    organizationUnity: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('organization unity'),
+    organization: yup.string().when('certificateType', CSRConditionalValidations),
+    privateKeyType: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('private key type'),
     email: yup.string().when('certificateType', {
-      is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+      is: certificateTypes.EDGE_CERTIFICATE_CSR,
       then: (schema) => schema.required('Email is a required field.').email()
-    })
+    }),
+    subjectAlternativeNames: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('subject alternative names (SAN)')
   })
 
   function navigateToDomains() {
@@ -154,7 +154,7 @@
 
   watch(certificateSelection, () => {
     const isEdgeCertificateCSR =
-      certificateSelection.value === certificateTypes.value.EDGE_CERTIFICATE_CSR
+      certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
 
     createServiceBySelectedType.value = isEdgeCertificateCSR
       ? createCSRService

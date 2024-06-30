@@ -8,6 +8,7 @@
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
 
+  import { useScrollToError } from '@/composables/useScrollToError'
   defineOptions({
     name: 'create-drawer-block'
   })
@@ -40,12 +41,13 @@
     }
   })
 
+  const { scrollToErrorInDrawer } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
 
-  const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
+  const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -60,10 +62,6 @@
       }
       changeVisisbleDrawer(value, true)
     }
-  })
-
-  const disableFields = computed(() => {
-    return !meta.value.valid || isSubmitting.value
   })
 
   const formHasChanges = computed(() => {
@@ -95,25 +93,30 @@
     toast.add(options)
   }
 
-  const onSubmit = handleSubmit(async (values, formContext) => {
-    try {
-      const response = await props.createService(values)
-      blockViewRedirection.value = false
-      emit('onSuccess', response)
-      showToast('success', response.feedback)
-      showGoBack.value = props.showBarGoBack
-      if (showGoBack.value) {
+  const onSubmit = handleSubmit(
+    async (values, formContext) => {
+      try {
+        const response = await props.createService(values)
+        blockViewRedirection.value = false
+        emit('onSuccess', response)
+        showToast('success', response.feedback)
+        showGoBack.value = props.showBarGoBack
+        if (showGoBack.value) {
+          blockViewRedirection.value = true
+          return
+        }
+        formContext.resetForm()
+        toggleDrawerVisibility(false)
+      } catch (error) {
         blockViewRedirection.value = true
-        return
+        emit('onError', error)
+        showToast('error', error)
       }
-      formContext.resetForm()
-      toggleDrawerVisibility(false)
-    } catch (error) {
-      blockViewRedirection.value = true
-      emit('onError', error)
-      showToast('error', error)
+    },
+    ({ errors }) => {
+      scrollToErrorInDrawer(errors)
     }
-  })
+  )
 
   const handleGoBack = () => {
     showGoBack.value = false
@@ -149,6 +152,7 @@
       >
         <slot
           name="formFields"
+          :errors="errors"
           :disabledFields="isSubmitting"
         />
       </form>
@@ -165,7 +169,6 @@
         @onSubmit="onSubmit"
         :inDrawer="true"
         :loading="isSubmitting"
-        :submitDisabled="disableFields"
       />
     </div>
   </Sidebar>

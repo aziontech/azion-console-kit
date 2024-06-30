@@ -104,12 +104,11 @@
             :isEditForm="true"
           ></FormFieldsUsers>
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarTemplate
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </EditFormBlock>

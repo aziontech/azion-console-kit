@@ -4,7 +4,6 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
 
@@ -209,19 +208,12 @@
                 class="text-color text-sm font-medium"
                 >Header</label
               >
-              <label
-                v-else
-                class="text-color text-sm font-medium"
-                >Field
-              </label>
-              <InputText
-                v-model="matchZones[index].zone_input"
-                type="text"
+              <FieldText
+                label="Field"
+                :name="`matchZones[${index}].zone_input`"
+                :value="matchZones[index].zone_input"
+                description="Add a specific value that represents the match option or leave it blank to consider empty values."
               />
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                Add a specific value that represents the match option or leave it blank to consider
-                empty values.
-              </small>
             </div>
           </div>
           <div

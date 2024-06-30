@@ -1,17 +1,17 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { computed } from 'vue'
-
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import PrimeTextarea from 'primevue/textarea'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+
   import PrimePassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import InputSwitch from 'primevue/inputswitch'
   import { useField } from 'vee-validate'
   defineEmits(['copyToken'])
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: description } = useField('description')
   const { value: status } = useField('status')
 
@@ -34,55 +34,40 @@
   <FormHorizontal
     title="General"
     description="Create a credential to use and authenticate Edge Orchestrator services."
+    data-testid="credentials-create-form__section__general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          id="name"
-          type="text"
-          :disabled="props.generatedToken"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          data-testid="credentials-create-form__name-field"
+          label="Name *"
+          name="name"
+          :value="name"
         />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="description"
-          class="text-color text-base font-medium"
-          >Description</label
-        >
-        <PrimeTextarea
-          v-model="description"
-          id="description"
+        <FieldTextArea
+          data-testid="credentials-create-form__description-field"
+          label="Description"
+          name="description"
+          :value="description"
+          description="Description and purpose of the credential."
           rows="2"
-          cols="30"
-          class="w-full"
           :disabled="props.generatedToken"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Description and purpose of the credential.
-        </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Token"
     description="Save the credential to generate the token for Edge Orchestrator."
+    data-testid="credentials-create-form__section__token"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <label
+          data-testid="credentials-create-form__token-field__label"
           for="personalToken"
           class="text-color text-base font-medium"
         >
@@ -93,6 +78,7 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
             <PrimePassword
+              data-testid="credentials-create-form__token-field__input"
               id="personalToken"
               v-model="tokenValue"
               type="text"
@@ -103,6 +89,7 @@
             />
           </span>
           <PrimeButton
+            data-testid="credentials-create-form__token-field__copy-token-button"
             icon="pi pi-clone"
             outlined
             type="button"
@@ -115,7 +102,10 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal title="Status">
+  <FormHorizontal
+    title="Status"
+    data-testid="credentials-create-form__section__status"
+  >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <div
@@ -123,12 +113,18 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
             <InputSwitch
+              data-testid="credentials-create-form__status-field__switch"
               v-model="status"
               :disabled="props.generatedToken"
               id="active"
             />
             <div class="flex-col gap-1">
-              <div class="text-color text-sm font-normal leading-5">Active</div>
+              <div
+                class="text-color text-sm font-normal leading-5"
+                data-testid="credentials-create-form__status-field__label"
+              >
+                Active
+              </div>
             </div>
           </span>
         </div>
