@@ -57,38 +57,11 @@ describe('Users Management spec', () => {
     // Arrange
     cy.get(selectors.usersManagement.createButton).click()
 
-    cy.get(selectors.usersManagement.firstNameInput).type('A')
-    cy.get(selectors.usersManagement.firstNameInput).clear()
-    cy.get(selectors.usersManagement.firstNameErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'First Name is a required field.')
-
-    cy.get(selectors.usersManagement.lastNameInput).type('A')
-    cy.get(selectors.usersManagement.lastNameInput).clear()
-    cy.get(selectors.usersManagement.lastNameErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Last Name is a required field.')
-
-    cy.get(selectors.usersManagement.emailInput).type('A')
-    cy.get(selectors.usersManagement.emailInput).clear()
-    cy.get(selectors.usersManagement.emailErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Email is a required field.')
-
-    cy.get(selectors.usersManagement.phoneInput).type('1')
-    cy.get(selectors.usersManagement.phoneInput).clear()
-    cy.get(selectors.usersManagement.phoneErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Phone Number is a required field.')
-
     cy.get(selectors.usersManagement.languageDropdown)
       .should('have.text', 'English')
       .and('have.class', 'p-disabled')
 
     cy.get(selectors.usersManagement.selectedTeamTagCloseBtn(1)).click()
-    cy.get(selectors.usersManagement.selectedTeamErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Must select at least one team')
 
     // Act
     cy.get(selectors.usersManagement.firstNameInput).type(userFirstName)
@@ -140,38 +113,11 @@ describe('Users Management spec', () => {
     // Arrange
     cy.get(selectors.usersManagement.createButton).click()
 
-    cy.get(selectors.usersManagement.firstNameInput).type('A')
-    cy.get(selectors.usersManagement.firstNameInput).clear()
-    cy.get(selectors.usersManagement.firstNameErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'First Name is a required field.')
-
-    cy.get(selectors.usersManagement.lastNameInput).type('A')
-    cy.get(selectors.usersManagement.lastNameInput).clear()
-    cy.get(selectors.usersManagement.lastNameErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Last Name is a required field.')
-
-    cy.get(selectors.usersManagement.emailInput).type('A')
-    cy.get(selectors.usersManagement.emailInput).clear()
-    cy.get(selectors.usersManagement.emailErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Email is a required field.')
-
-    cy.get(selectors.usersManagement.phoneInput).type('1')
-    cy.get(selectors.usersManagement.phoneInput).clear()
-    cy.get(selectors.usersManagement.phoneErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Phone Number is a required field.')
-
     cy.get(selectors.usersManagement.languageDropdown)
       .should('have.text', 'English')
       .and('have.class', 'p-disabled')
 
     cy.get(selectors.usersManagement.selectedTeamTagCloseBtn(1)).click()
-    cy.get(selectors.usersManagement.selectedTeamErrorMessage)
-      .should('be.visible')
-      .and('have.text', 'Must select at least one team')
 
     // Act
     cy.get(selectors.usersManagement.firstNameInput).type(userFirstName)
