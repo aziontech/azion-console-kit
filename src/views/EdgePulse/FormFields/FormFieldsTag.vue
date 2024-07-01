@@ -46,6 +46,7 @@
         <PrimeButton
           icon="pi pi-copy"
           label="Copy"
+          data-testid="edge-pulse__pre-loading-tag-copy-button"
           class="max-md:w-full"
           outlined
           @click="$emit('handleCopy', { code: preLoadingTagCode })"
