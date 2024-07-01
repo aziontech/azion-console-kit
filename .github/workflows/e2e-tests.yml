@@ -36,3 +36,9 @@ jobs:
 
       - name: Check E2E Test Coverage
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_e2e_report
+          path: coverage
+          retention-days: 7
