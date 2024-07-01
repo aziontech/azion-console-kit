@@ -6,9 +6,13 @@
     :closable="false"
     class="max-w-2xl"
     header="Personal token has been created"
+    data-testid="copy-token-dialog__header"
   >
     <div class="flex flex-col gap-3.5">
-      <InlineMessage severity="warn">
+      <InlineMessage
+        severity="warn"
+        data-testid="copy-token-dialog__warning__inline-message"
+      >
         This token will only be displayed once. Make sure to copy and store it safely.
       </InlineMessage>
 
@@ -16,6 +20,7 @@
         <label
           for="personalToken"
           class="text-color text-base font-medium"
+          data-testid="copy-token-dialog__token-field__label"
         >
           Personal Token
         </label>
@@ -33,8 +38,12 @@
             }"
             :feedback="false"
             toggleMask
+            data-testid="copy-token-dialog__token-field__password-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="copy-token-dialog__token-field__description"
+          >
             Once the dialog is closed, the token cannot be retrieved. It'll be necessary to generate
             a new one.
           </small>
@@ -49,6 +58,7 @@
           label="Copy"
           :disabled="!personalTokenValue"
           @click="params.copy"
+          data-testid="copy-token-dialog__token-field__copy-token-button"
         />
       </div>
     </div>
@@ -58,6 +68,7 @@
         label="Confirm"
         severity="secondary"
         @click="closeDialog"
+        data-testid="copy-token-dialog__dialog-footer__confirm-button"
       />
     </template>
   </PrimeDialog>

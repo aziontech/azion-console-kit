@@ -35,6 +35,7 @@
           placeholder="My service"
           :value="name"
           description="Give a unique and descriptive name to identify the service."
+          data-testid="edge-service-form__name-field"
         />
       </div>
     </template>
