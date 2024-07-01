@@ -45,6 +45,14 @@
     step: {
       type: Number,
       default: 1
+    },
+    showButtons: {
+      type: Boolean,
+      default: true
+    },
+    useGrouping: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -56,19 +64,19 @@
     handleBlur,
     handleChange
   } = useField(name, undefined, {
-    initialValue: props.value || null
+    initialValue: props.value ?? null
   })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
     >{{ props.label }}</label
   >
   <InputNumber
     v-model="inputValue"
-    showButtons
+    :showButtons="props.showButtons"
     :placeholder="props.placeholder"
     :disabled="props.disabled"
     :readonly="props.readonly"
@@ -76,9 +84,15 @@
     :min="props.min"
     :max="props.max"
     :step="props.step"
+    :useGrouping="props.useGrouping"
     type="number"
     @input="(event) => handleChange(event.value)"
     @blur="handleBlur"
+    :pt="{
+      input: {
+        name: props.name
+      }
+    }"
     :class="[{ 'p-invalid': !!errorMessage }, props.inputClass]"
   />
 

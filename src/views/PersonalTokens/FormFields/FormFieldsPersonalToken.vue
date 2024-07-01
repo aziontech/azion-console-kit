@@ -2,8 +2,9 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
-  import PrimeTextarea from 'primevue/textarea'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -28,8 +29,8 @@
     }
   })
 
-  const { value: name, errorMessage: errorName } = useField('name')
-  const { value: description, errorMessage: errorDescription } = useField('description')
+  const { value: name } = useField('name')
+  const { value: description } = useField('description')
   const { value: selectedExpiration } = useField('selectedExpiration')
   const { setValue: setExpiration } = useField('expiresAt')
   const { value: customExpiration, errorMessage: errorCustom } = useField('customExpiration')
@@ -109,63 +110,24 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <span class="p-input-icon-right">
-          <i
-            class="pi pi-lock text-color-secondary"
-            v-if="disabledFields"
-          />
-          <InputText
-            class="w-full"
-            v-model="name"
-            id="name"
-            type="text"
-            :class="{ 'p-invalid': errorName }"
-            :disabled="disabledFields"
-          />
-        </span>
-        <small
-          v-if="errorName"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorName }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the personal token.
-        </small>
+        <FieldText
+          label="Name *"
+          name="name"
+          :value="name"
+          :disabled="disabledFields"
+          description="Give a unique and descriptive name to identify the personal token."
+        />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="description"
-          class="text-color text-base font-medium"
-          >Description</label
-        >
-        <span class="p-input-icon-right flex items-start">
-          <i
-            class="pi pi-lock text-color-secondary"
-            v-if="disabledFields"
-          />
-          <PrimeTextarea
-            id="description"
-            autoResize
-            class="w-full"
-            :class="{ 'p-invalid': errorDescription }"
-            rows="1"
-            v-model="description"
-            :disabled="disabledFields"
-          />
-        </span>
-        <small
-          v-if="errorDescription"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorDescription }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Include a description to specify the token's purpose or usage.
-        </small>
+        <FieldTextArea
+          label="Description"
+          name="description"
+          :value="description"
+          description="Include a description to specify the token's purpose or usage."
+          autoResize
+          rows="1"
+          :disabled="disabledFields"
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -213,11 +175,17 @@
               :class="{ 'p-invalid': errorCustom }"
               showIcon
               :disabled="disabledFields"
+              :pt="{
+                input: {
+                  name: 'customExpiration'
+                }
+              }"
             />
             <small
               v-if="errorCustom"
               class="p-error text-xs font-normal leading-tight"
-              >{{ errorCustom }}
+            >
+              {{ errorCustom }}
             </small>
           </div>
         </div>

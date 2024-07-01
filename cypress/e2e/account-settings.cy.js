@@ -1,10 +1,10 @@
 const selectors = {
   form: {
-    accountName: '[data-testid="account-settings__account-name"]',
-    companyName: '[data-testid="account-settings__company-name"]',
-    companyId: '[data-testid="account-settings__company-id"]',
-    postalCode: '[data-testid="account-settings__postal-code"]',
-    postalCodeError: '[data-testid="account-settings__postal-code-error"]',
+    accountName: '[data-testid="account-settings__account-name__input"]',
+    companyName: '[data-testid="account-settings__company-name__input"]',
+    companyId: '[data-testid="account-settings__company-id__input"]',
+    postalCode: '[data-testid="account-settings__postal-code__input"]',
+    postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
   },
   toast: {

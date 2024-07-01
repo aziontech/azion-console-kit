@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-edge-service' })
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
 
   const editorOptions = {
@@ -29,26 +29,13 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          label="Name *"
+          name="name"
           placeholder="My service"
+          :value="name"
+          description="Give a unique and descriptive name to identify the service."
         />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ nameError }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the service.
-        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -62,6 +49,7 @@
         <vue-monaco-editor
           v-model:value="code"
           language="shell"
+          name="code"
           :theme="theme"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :class="{ 'border-red-500 border': codeError }"

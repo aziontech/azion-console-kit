@@ -1,35 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Function">
-        <MobileCodePreview :updateObject="updateObject" />
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createEdgeFunctionsService"
-        :schema="validationSchema"
-        @on-response="handleTrackCreation"
-        @on-response-fail="handleTrackFailedCreation"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />
-        </template>
-
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-            :submitDisabled="!formValid"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import * as yup from 'yup'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
@@ -109,3 +77,34 @@
     jsonArgs: ARGS_INITIAL_STATE
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create Edge Function">
+        <MobileCodePreview :updateObject="updateObject" />
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="props.createEdgeFunctionsService"
+        :schema="validationSchema"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
+        :initialValues="initialValues"
+      >
+        <template #form>
+          <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />
+        </template>
+
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>
