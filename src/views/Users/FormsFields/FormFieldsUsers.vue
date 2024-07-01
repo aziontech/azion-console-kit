@@ -175,6 +175,7 @@
   <FormHorizontal
     title="Profile"
     description="Provide personal information to add a new user to Azion Console."
+    data-testid="users-form__section__profile"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -184,6 +185,7 @@
           placeholder="John"
           :value="firstName"
           description="The first name of the user."
+          data-testid="users-form__first-name-field"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -193,6 +195,7 @@
           placeholder="Doe"
           :value="lastName"
           description="The last name of the user."
+          data-testid="users-form__last-name-field"
         />
       </div>
       <div class="flex sm:flex-row w-full flex-col gap-6">
@@ -209,12 +212,14 @@
             filter
             appendTo="self"
             description="Timezone of the user."
+            data-testid="users-form__timezone-field"
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="language"
             class="text-color text-base font-medium"
+            data-testid="users-form__language-field__label"
           >
             Language
           </label>
@@ -227,9 +232,13 @@
             optionValue="value"
             v-model="language"
             disabled
+            data-testid="users-form__language-field__dropdown"
           >
             <template #dropdownicon>
-              <span class="pi pi-lock text-color-secondary" />
+              <span
+                class="pi pi-lock text-color-secondary"
+                data-testid="users-form__language-field__dropdown__icon"
+              />
             </template>
           </Dropdown>
         </div>
@@ -240,6 +249,7 @@
   <FormHorizontal
     title="Contact Information"
     description="Include contact information for the user to verify the account."
+    data-testid="users-form__section__contact-information"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -250,6 +260,7 @@
           :value="email"
           description="Email of the user. A confirmation email will be sent to this address upon sign up."
           type="email"
+          data-testid="users-form__email-field"
         />
       </div>
 
@@ -257,12 +268,14 @@
         <label
           for="email"
           class="text-color text-base font-medium"
+          data-testid="users-form__phone-field__label"
         >
           Phone Number *
         </label>
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              data-testid="users-form__phone-field__dropdown"
               filter
               autoFilterFocus
               appendTo="self"
@@ -295,16 +308,21 @@
               mask="?99999999999999999999"
               placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile }"
+              data-testid="users-form__phone-field__input"
             />
           </div>
         </div>
         <small
+          data-testid="users-form__phone-field__error-message"
           id="name-help"
           class="p-error"
         >
           {{ errorMobile }}
         </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="users-form__phone-field__description"
+        >
           The phone number of the user. Include country and region code.
         </small>
       </div>
@@ -314,16 +332,19 @@
   <FormHorizontal
     title="Security Settings"
     description="Determine the level of access and permissions of the user and enable Multi-Factor Authentication upon sign-in."
+    data-testid="users-form__section__security-settings"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label
           for="teams"
           class="text-color text-base font-medium"
+          data-testid="users-form__teams-field__label"
         >
           Teams
         </label>
         <MultiSelect
+          data-testid="users-form__teams-field__multiselect"
           display="chip"
           filter
           autoFilterFocus
@@ -342,18 +363,22 @@
         <small
           v-if="errorTeamsIds"
           class="p-error"
+          data-testid="users-form__teams-field__error-message"
           >{{ errorTeamsIds }}</small
         >
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="users-form__teams-field__description"
+        >
           Select a team for the user. You can create teams using Teams Permissions.</small
         >
       </div>
       <FieldGroupSwitch
+        data-testid="users-form__mfa-field"
         :isCard="false"
         input-class="w-full"
         :options="switchOptions"
-      >
-      </FieldGroupSwitch>
+      />
     </template>
   </FormHorizontal>
 </template>
