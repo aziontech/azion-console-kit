@@ -40,7 +40,7 @@ describe('Edge Pulse spec', () => {
 
   it('should copy default and pre-loading tag in edge pulse', function () {
     // Act Default tag
-    cy.get(selectors.buttons.defaultTagCopyButton).click()
+    cy.get(selectors.buttons.defaultTagCopyButton).realClick()
     cy.get(selectors.toast.defaultTagCopySuccessMessage).should('have.text', 'Copied successfully!')
     // Default tag copy assertion
     const expectedDefaultTagValue = fixtures.defaultTag.replace(/\s+/g, ' ').trim()
@@ -49,7 +49,7 @@ describe('Edge Pulse spec', () => {
 
     // Act Pre-loading tag
     cy.get(selectors.buttons.preLoadingTab).click()
-    cy.get(selectors.buttons.preLoadingTagCopyButton).click()
+    cy.get(selectors.buttons.preLoadingTagCopyButton).realClick()
     cy.get(selectors.toast.preLoadingTagCopySuccessMessage).should(
       'have.text',
       'Copied successfully!'

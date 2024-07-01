@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import selectors from '../support/selectors';
 
+import "cypress-real-events";
 
 // Function to perform login
 const login = (email, password) => {

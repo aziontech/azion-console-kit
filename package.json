@@ -33,6 +33,7 @@
     "analytics": "^0.8.11",
     "axios": "^1.6.2",
     "c3": "^0.7.20",
+    "cypress-real-events": "^1.13.0",
     "front-matter": "^4.0.2",
     "lottie-web-vue": "^2.0.7",
     "nyc": "^15.1.0",
