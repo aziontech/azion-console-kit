@@ -12,3 +12,8 @@ export const makeSessionId = () => {
   sessionID = window.crypto.randomUUID()
   return sessionID
 }
+
+export const updateSessionId = () => {
+  sessionID = window.crypto.randomUUID()
+  return sessionID
+}

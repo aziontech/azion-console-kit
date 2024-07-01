@@ -1,9 +1,9 @@
-import { makeAskAzionBaseUrl } from './makeAskAzionBaseUrl'
+import { makeAzionAiBaseUrl } from './make-azion-ai-base-url'
 /**
  * Generates a request configuration object for the Ask Azion API.
  */
 export const makeRequestConfig = () => {
   return {
-    url: `${makeAskAzionBaseUrl()}/chat-stream`
+    url: `${makeAzionAiBaseUrl()}/chat-stream`
   }
 }

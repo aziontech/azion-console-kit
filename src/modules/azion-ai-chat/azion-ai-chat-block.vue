@@ -22,9 +22,9 @@
 </template>
 <script setup>
   import 'deep-chat'
-  import { requestInterceptorService } from './services/requestInterceptorService'
-  import { makeRequestConfig } from './services/makeRequestConfig'
-  import { makeSessionId } from './services/makeSessionId'
+  import { requestInterceptorService } from './services/request-interceptor-service'
+  import { makeRequestConfig } from './services/make-request-config'
+  import { makeSessionId } from './services/make-session-id'
   import azionLogoProfile from '@/modules/azion-ai-chat/assets/azion-logo.svg?url'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
