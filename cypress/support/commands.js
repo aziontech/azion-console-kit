@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-import selectors from '../support/selectors';
+import selectors from '../support/selectors'
 
-import "cypress-real-events";
+import 'cypress-real-events'
 
 // Function to perform login
 const login = (email, password) => {
@@ -15,15 +15,17 @@ const login = (email, password) => {
 
 // Function to perform delete a product created
 const deleteProduct = (productName, path) => {
-  cy.visit(`${path}`);
+  cy.visit(`${path}`)
   cy.get(selectors.list.searchInput).clear()
   cy.get(selectors.list.searchInput).type(productName)
-  cy.get(selectors.list.filteredRow.nameColumn).should('be.visible').should('have.text', productName)
+  cy.get(selectors.list.filteredRow.nameColumn)
+    .should('be.visible')
+    .should('have.text', productName)
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
   cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
   cy.get(selectors.list.deleteDialog.deleteButton).click()
-};
+}
 
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
@@ -48,14 +50,14 @@ Cypress.Commands.add('openProductThroughSidebar', (productName) => {
 
 // Custom command to open a item through the account menu
 Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
-  cy.get(selectors.menuAccount.avatarIcon).click();
-  cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click();
-});
+  cy.get(selectors.menuAccount.avatarIcon).click()
+  cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click()
+})
 
 // Custom command to perform login using environment variables
 Cypress.Commands.add('deleteProduct', (productName, path) => {
-  deleteProduct(productName, path);
-});
+  deleteProduct(productName, path)
+})
 
 /**
  * Custom command to verify the visibility and content of a toast message.
@@ -79,11 +81,10 @@ Cypress.Commands.add('verifyToast', (summary, detail = '') => {
 })
 
 Cypress.Commands.add('assertValueCopiedToClipboard', (expectedValue) => {
-  cy.window()
-    .then((win) => {
-      return win.navigator.clipboard.readText()
+  cy.window().then((win) => {
+    win.navigator.clipboard.readText().then((text) => {
+      const actualValue = text.replace(/\s+/g, ' ').trim()
+      expect(actualValue).to.eq(expectedValue)
     })
-    .then((actualValue) => {
-      expect(actualValue.replace(/\s+/g, ' ').trim()).to.eq(expectedValue)
-    })
+  })
 })
