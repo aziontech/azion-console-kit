@@ -6,11 +6,6 @@ const selectors = {
     postalCode: '[data-testid="account-settings__postal-code__input"]',
     postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
-  },
-  toast: {
-    successMessage: ':nth-child(2) > .p-toast-message-content > .flex-column > .text-sm',
-    closeButton:
-      ':nth-child(2) > .p-toast-message-content > [data-pc-section="buttoncontainer"] > .p-toast-icon-close > .p-icon'
   }
 }
 
@@ -35,11 +30,7 @@ describe('Account Settings spec', () => {
     cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.get(selectors.toast.successMessage).should(
-      'have.text',
-      'Your account settings have been updated'
-    )
-    cy.get(selectors.toast.closeButton).click()
+    cy.verifyToast('success', 'Your account settings have been updated')
     cy.openItemThroughMenuAccount('Account Settings')
     cy.get(selectors.form.companyName).should('have.value', 'Company Teste')
     cy.get(selectors.form.companyId).should('have.value', '00.000.000/0001-00')
