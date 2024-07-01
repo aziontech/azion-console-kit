@@ -111,6 +111,7 @@
         <FieldText
           label="Name *"
           name="name"
+          data-testid="edge-firewall-form__name-field"
           :value="name"
           placeholder="My edge firewall"
           description="Give a unique and descriptive name to identify the edge firewall."
