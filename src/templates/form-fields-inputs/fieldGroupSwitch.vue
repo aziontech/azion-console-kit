@@ -1,6 +1,6 @@
 <script setup>
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import { computed, ref } from 'vue'
+  import { computed, ref, useAttrs } from 'vue'
   import PrimeDivider from 'primevue/divider'
 
   defineOptions({ name: 'FieldGroupSwitch' })
@@ -55,11 +55,28 @@
   const showDivider = (position) => {
     return position < pickListSize.value && !props.isCard
   }
+
+  const attrs = useAttrs()
+
+  const customTestId = (type, name = 'default') => {
+    const id = attrs['data-testid'] || 'field-group-switch'
+
+    const options = {
+      label: `${id}__label`,
+      switch: `${id}__switch-${name}`,
+      description: `${id}__description`
+    }
+
+    return options[type] || id
+  }
 </script>
 
 <template>
   <div :class="['flex flex-col gap-2', classStateRoot]">
-    <label class="text-color text-sm font-medium leading-5">
+    <label
+      class="text-color text-sm font-medium leading-5"
+      :data-testid="customTestId('label')"
+    >
       {{ props.label }}
     </label>
     <div
@@ -78,6 +95,7 @@
           :isCard="props.isCard"
           v-bind="item"
           :selectorClass="props.inputClass"
+          :data-testid="customTestId('switch', item.nameField)"
         >
           <template #footer>
             <slot
@@ -95,6 +113,7 @@
     <small
       class="text-xs text-color-secondary font-normal leading-5"
       v-if="props.helpText"
+      :data-testid="customTestId('description')"
     >
       {{ props.helpText }}
     </small>

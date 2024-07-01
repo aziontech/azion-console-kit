@@ -313,6 +313,7 @@
           </div>
         </div>
         <small
+          v-if="errorMobile"
           data-testid="users-form__phone-field__error-message"
           id="name-help"
           class="p-error"
