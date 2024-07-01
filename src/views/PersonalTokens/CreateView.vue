@@ -125,7 +125,7 @@
             :convertDateToLocalTimezone="convertDateToLocalTimezone"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <teleport
             to="#action-bar"
             v-if="!!personalTokenKey"
@@ -137,7 +137,6 @@
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>

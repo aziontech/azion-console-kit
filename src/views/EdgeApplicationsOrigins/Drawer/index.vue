@@ -271,7 +271,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
     @onError="handleFailedCreateOrigin"
-    :showBarGoBack="true"
+    showBarGoBack
     title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
@@ -292,7 +292,7 @@
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="handleTrackEdit"
-    :showBarGoBack="true"
+    showBarGoBack
     @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >
