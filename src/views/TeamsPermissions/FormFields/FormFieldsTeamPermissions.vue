@@ -3,7 +3,7 @@
   import { watch, ref, onMounted } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PickList from 'primevue/picklist'
   import { useField } from 'vee-validate'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -17,8 +17,8 @@
 
   const permissionsList = ref([])
 
-  const { value: name, errorMessage: errorName } = useField('name')
-  const { value: permissions } = useField('permissions')
+  const { value: name } = useField('name')
+  const { value: permissions, errorMessage: errorPermissions } = useField('permissions')
 
   const isAlreadySelected = ({ alreadySelectedPermissionsIds, id }) => {
     return alreadySelectedPermissionsIds.includes(id)
@@ -59,44 +59,24 @@
   <FormHorizontal
     data-testid="teams-permissions-form__section__general"
     title="General"
-    description="Use permissions to manage and oversee users by defining access levels of client accounts.
-"
+    description="Use permissions to manage and oversee users by defining access levels of client accounts."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          data-testid="teams-permissions-form__name-field__label"
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *
-        </label>
-        <InputText
-          data-testid="teams-permissions-form__name-field__input"
-          v-model="name"
-          type="text"
-          id="name"
-          :class="{ 'p-invalid': errorName }"
+        <FieldText
+          data-testid="teams-permissions-form__name__field-text"
+          label="Name *"
+          name="name"
+          :value="name"
+          description="Give a unique and descriptive name to identify the team."
         />
-        <small
-          class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="teams-permissions-form__name-field__description"
-        >
-          Give a unique and descriptive name to identify the team.
-        </small>
-        <small
-          v-if="errorName"
-          data-testid="teams-permissions-form__name-field__error-text"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorName }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     data-testid="teams-permissions-form__section__permissions"
     title="Permissions"
-    description="Determine the access level of accounts and assign permissions according to their team. Teams can be based on the role and tasks of account users.
-"
+    description="Determine the access level of accounts and assign permissions according to their team. Teams can be based on the role and tasks of account users."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">
@@ -104,7 +84,8 @@
           data-testid="teams-permissions-form__permissions-field__label"
           for="value"
           class="text-color text-base font-medium"
-          >Permissions *
+        >
+          Permissions *
         </label>
         <PickList
           data-testid="teams-permissions-form__permissions-field__picklist"
@@ -113,6 +94,7 @@
             sourceList: { class: ['h-80'] },
             targetList: { class: ['h-80'] }
           }"
+          name="permissions"
           dataKey="id"
           breakpoint="1400px"
           :showSourceControls="false"
@@ -139,6 +121,12 @@
           Select an item from the list and then use the arrows to move it between the available and
           selected permissions boxes. Use the double-line arrows to move all items or press the
           <code>ctrl</code> or <code>command</code> keys to select multiple items.
+        </small>
+        <small
+          v-if="errorPermissions"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ errorPermissions }}
         </small>
       </div>
     </template>

@@ -1,20 +1,27 @@
 <template>
   <Toast :pt="toastOptions">
     <template #message="{ message }">
-      <div class="flex flex-column flex-grow">
+      <div
+        class="flex flex-column flex-grow"
+        :data-testid="handleDataTestId(message)"
+      >
         <header class="flex gap-2 items-center h-8 w-[calc(100%-2.5em)] max-w-2xl">
           <Tag
             :icon="composeIconStyle(message.severity)"
             :severity="handleSeverity(message)"
             :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
           />
-          <h5 class="text-color text-base font-semibold truncate">
+          <h5
+            class="text-color text-base font-semibold truncate"
+            :data-testid="handleDataTestIdInItem(message, 'title')"
+          >
             {{ parseText(message.summary, CHAR_LIMITS.SUMMARY) }}
           </h5>
         </header>
         <p
           class="text-sm text-color-secondary font-normal mt-3"
           v-if="message.detail"
+          :data-testid="handleDataTestIdInItem(message, 'detail')"
         >
           {{ parseText(message.detail, CHAR_LIMITS.DETAIL) }}
         </p>
@@ -24,6 +31,7 @@
         >
           <PrimeButton
             v-if="message.action.link"
+            :data-testid="handleDataTestIdInItem(message, 'link')"
             link
             size="small"
             :label="message.action.link.label"
@@ -31,6 +39,7 @@
           />
           <PrimeButton
             v-if="message.action.secondary"
+            :data-testid="handleDataTestIdInItem(message, 'secondary')"
             outlined
             size="small"
             :label="message.action.secondary.label"
@@ -39,6 +48,7 @@
           <PrimeButton
             severity="secondary"
             v-if="message.action.primary"
+            :data-testid="handleDataTestIdInItem(message, 'primary')"
             size="small"
             :label="message.action.primary.label"
             @click="handleClick(message, 'primary')"
@@ -77,13 +87,45 @@
     }
   }
 
+  const isString = (str) => typeof str === 'string'
+
   const parseText = (text, charLimit) => {
-    return text.substring(0, charLimit)
+    const existsAndIsString = text && isString(text)
+    return existsAndIsString && text.substring(0, charLimit)
   }
 
   const showActions = (message) => {
     if (!message?.action) return false
     return !!Object.keys(message.action).length
+  }
+
+  const handleDataTestId = (message) => {
+    const { summary, detail } = message || {}
+
+    const summaryExists = summary && isString(summary)
+    const detailExists = detail && isString(detail)
+
+    const prefix = 'toast-block__content'
+
+    if (summaryExists && detailExists) {
+      return `${prefix}__${summary}${detail}`
+    }
+
+    if (summaryExists) {
+      return `${prefix}__${summary}`
+    }
+
+    if (detailExists) {
+      return `${prefix}__${detail}`
+    }
+
+    return prefix
+  }
+
+  const handleDataTestIdInItem = (message, item) => {
+    const dataTestid = handleDataTestId(message)
+
+    return `${dataTestid}__${item}`
   }
 
   const handleSeverity = (message) => {

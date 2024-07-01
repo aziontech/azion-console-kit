@@ -54,7 +54,7 @@
 
   const validationSchema = yup.object({
     service: yup.object().shape({
-      serviceId: yup.number().required()
+      serviceId: yup.number().required().label('Service')
     }),
     variables: yup
       .string()
