@@ -99,8 +99,8 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
     case 'credit-card-column':
       return h(CreditCardColumn, {
         content: data.content,
-        card: data.card,
-        defaultCard: data.default,
+        cardBrand: data.cardBrand,
+        tag: data.tag
       })
     default:
       throw new Error('Invalid column appearance')

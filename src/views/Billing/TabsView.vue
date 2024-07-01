@@ -4,6 +4,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import Tag from 'primevue/tag'
+  import ListView from './ListView.vue'
 
   import { ref } from 'vue'
 
@@ -12,6 +13,10 @@
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
+
+  const props = defineProps({
+    paymentServices: { type: Object, required: true }
+  })
 
   const mapTabs = ref({
     bills: 0,
@@ -77,7 +82,10 @@
           <h3>Bills</h3>
         </TabPanel>
         <TabPanel header="Payment Methods">
-          <h3>Payments Methods</h3>
+          <ListView
+            v-if="activeTab === mapTabs.payment"
+            :listPaymentService="props.paymentServices.listPaymentService"
+          ></ListView>
         </TabPanel>
       </TabView>
     </template>

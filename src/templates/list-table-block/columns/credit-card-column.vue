@@ -3,9 +3,9 @@
     <component :is="cardLogoComponent" />
     {{ content }}
     <PrimeTag
-      severity="info"
-      value="Default"
-      v-if="defaultCard"
+      :severity="severityTag"
+      :value="tag"
+      v-if="tag"
     />
   </div>
 </template>
@@ -25,15 +25,22 @@
       type: String,
       required: true
     },
-    card: {
+    cardBrand: {
       type: String,
       required: true
     },
-    defaultCard: {
-      type: Boolean,
-      required: false,
-      default: false
+    tag: {
+      type: String,
+      required: false
     }
+  })
+
+  const severityTag = computed(() => {
+    if (props.tag === 'Default') {
+      return 'info'
+    }
+
+    return 'warning'
   })
 
   const cardComponents = {
@@ -45,5 +52,5 @@
     amex: AmexLogo
   }
 
-  const cardLogoComponent = computed(() => cardComponents[props.card.toLowerCase()])
+  const cardLogoComponent = computed(() => cardComponents[props.cardBrand.toLowerCase()])
 </script>
