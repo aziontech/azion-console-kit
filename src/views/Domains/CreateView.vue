@@ -111,7 +111,7 @@
       toast.add({
         ...toastConfig,
         severity: 'error',
-        detail: 'The domain cannot be copied to the clipboard. Try copying it again.'
+        detail: 'The domain was not copied to the clipboard. Try copying it again.'
       })
     }
   }
