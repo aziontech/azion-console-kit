@@ -135,4 +135,95 @@ describe('Users Management spec', () => {
     cy.get(selectors.list.deleteDialog.deleteButton).click()
     cy.verifyToast('User successfully deleted')
   })
+
+  it('should create an account owner user without a team', () => {
+    // Arrange
+    cy.get(selectors.usersManagement.createButton).click()
+
+    cy.get(selectors.usersManagement.firstNameInput).type('A')
+    cy.get(selectors.usersManagement.firstNameInput).clear()
+    cy.get(selectors.usersManagement.firstNameErrorMessage)
+      .should('be.visible')
+      .and('have.text', 'First Name is a required field.')
+
+    cy.get(selectors.usersManagement.lastNameInput).type('A')
+    cy.get(selectors.usersManagement.lastNameInput).clear()
+    cy.get(selectors.usersManagement.lastNameErrorMessage)
+      .should('be.visible')
+      .and('have.text', 'Last Name is a required field.')
+
+    cy.get(selectors.usersManagement.emailInput).type('A')
+    cy.get(selectors.usersManagement.emailInput).clear()
+    cy.get(selectors.usersManagement.emailErrorMessage)
+      .should('be.visible')
+      .and('have.text', 'Email is a required field.')
+
+    cy.get(selectors.usersManagement.phoneInput).type('1')
+    cy.get(selectors.usersManagement.phoneInput).clear()
+    cy.get(selectors.usersManagement.phoneErrorMessage)
+      .should('be.visible')
+      .and('have.text', 'Phone Number is a required field.')
+
+    cy.get(selectors.usersManagement.languageDropdown)
+      .should('have.text', 'English')
+      .and('have.class', 'p-disabled')
+
+    cy.get(selectors.usersManagement.selectedTeamTagCloseBtn(1)).click()
+    cy.get(selectors.usersManagement.selectedTeamErrorMessage)
+      .should('be.visible')
+      .and('have.text', 'Must select at least one team')
+
+    // Act
+    cy.get(selectors.usersManagement.firstNameInput).type(userFirstName)
+    cy.get(selectors.usersManagement.firstNameErrorMessage).should('not.exist')
+
+    cy.get(selectors.usersManagement.lastNameInput).type(userLastName)
+    cy.get(selectors.usersManagement.lastNameErrorMessage).should('not.exist')
+
+    cy.get(selectors.usersManagement.timezoneDropdown).click()
+    cy.get(selectors.usersManagement.timezoneFilter).type('são')
+    cy.get(selectors.usersManagement.timezoneOption(0)).click()
+
+    cy.get(selectors.usersManagement.emailInput).type(userEmail)
+    cy.get(selectors.usersManagement.emailErrorMessage).should('not.exist')
+
+    cy.get(selectors.usersManagement.phoneInput).type('12212122121212')
+    cy.get(selectors.usersManagement.phoneErrorMessage).should('not.exist')
+
+    cy.get(selectors.usersManagement.teamDropdownTrigger).click()
+    cy.get(selectors.usersManagement.teamDropdownFilter).type('default team')
+    cy.get(selectors.usersManagement.teamOption(0)).click()
+
+    cy.get(selectors.usersManagement.switchSocialLogin).click()
+
+    cy.get(selectors.usersManagement.switchMultiFactorAuth).click()
+
+    cy.get(selectors.form.submitButton).click()
+
+    // Assert
+    cy.verifyToast('error', 'You cannot assign an account owner user to a Team.')
+
+    cy.get(selectors.usersManagement.switchSocialLogin).click()
+    cy.get(selectors.usersManagement.switchSocialLogin).click()
+    cy.get(selectors.form.submitButton).click()
+
+    cy.verifyToast('success', 'Your user has been created')
+
+    cy.get(selectors.list.searchInput).type(userFirstName)
+
+    cy.get(selectors.usersManagement.listRow('firstName')).should('have.text', userFirstName)
+    cy.get(selectors.usersManagement.listRow('lastName')).should('have.text', userLastName)
+    cy.get(selectors.usersManagement.listRow('email')).should('have.text', userEmail)
+    cy.get(selectors.usersManagement.listRow('teams')).should('be.empty')
+    cy.get(selectors.usersManagement.listRow('mfa')).should('have.text', 'Active')
+    cy.get(selectors.usersManagement.listRow('status')).should('have.text', 'Inactive')
+    cy.get(selectors.usersManagement.listRow('owner')).should('have.text', 'Yes')
+
+    // Clean up
+    cy.get(selectors.list.actionsMenu.button).click()
+    cy.get(selectors.list.actionsMenu.deleteButton).click()
+    cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
+    cy.get(selectors.list.deleteDialog.deleteButton).click()
+    cy.verifyToast('User successfully deleted')
+  })
 })
