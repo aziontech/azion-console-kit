@@ -86,7 +86,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit User"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit User"
+        data-testid="users__edit-view__page-heading"
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -102,7 +105,7 @@
             :listCountriesPhoneService="listCountriesPhoneService"
             :listTeamsService="listTeamsService"
             :isEditForm="true"
-          ></FormFieldsUsers>
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarTemplate

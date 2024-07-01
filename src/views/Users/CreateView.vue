@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create User"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create User"
+        data-testid="users__create-view__page-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock
@@ -15,7 +18,7 @@
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
             :listTeamsService="listTeamsService"
-          ></FormFieldsUsers>
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
