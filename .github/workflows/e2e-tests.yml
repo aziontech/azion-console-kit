@@ -38,7 +38,22 @@ jobs:
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
       - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
         with:
           name: coverage_e2e_report
           path: coverage
           retention-days: 7
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: cypress_screenshots
+          path: cypress/screenshots
+          retention-days: 4
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: cypress_videos
+          path: cypress/videos
+          retention-days: 1
