@@ -97,7 +97,7 @@
       toast.add({
         ...toastConfig,
         severity: 'error',
-        detail: 'The personal token cannot be copied to the clipboard. Try copying it again.'
+        detail: 'The personal token was not copied to the clipboard. Try copying it again.'
       })
     }
   }
