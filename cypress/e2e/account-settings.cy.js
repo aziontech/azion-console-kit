@@ -17,7 +17,7 @@ const selectors = {
 describe('Account Settings spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openMenuItem('Account Settings')
+    cy.openItemThroughMenuAccount('Account Settings')
   })
 
   it('should update account settings successfully', () => {
@@ -40,7 +40,7 @@ describe('Account Settings spec', () => {
       'Your account settings have been updated'
     )
     cy.get(selectors.toast.closeButton).click()
-    cy.openMenuItem('Account Settings')
+    cy.openItemThroughMenuAccount('Account Settings')
     cy.get(selectors.form.companyName).should('have.value', 'Company Teste')
     cy.get(selectors.form.companyId).should('have.value', '00.000.000/0001-00')
     cy.get(selectors.form.postalCode).should('have.value', '14055-010')

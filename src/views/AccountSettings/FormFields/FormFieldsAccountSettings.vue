@@ -195,7 +195,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
-        data-testid="account-settings__company-name"
+          data-testid="account-settings__company-name"
           label="Company Name"
           name="companyName"
           placeholder="Company S.A."
