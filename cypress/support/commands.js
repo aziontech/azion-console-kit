@@ -13,11 +13,11 @@ const login = (email, password) => {
 }
 
 // Function to perform delete a product created
-const deleteProduct = (productName, path) => {
+const deleteProduct = (productName, columnName, path) => {
   cy.visit(`${path}`);
   cy.get(selectors.list.searchInput).clear()
   cy.get(selectors.list.searchInput).type(productName)
-  cy.get(selectors.list.filteredRow.nameColumn).should('be.visible').should('have.text', productName)
+  cy.get(selectors.list.filteredRow.nameColumn(columnName)).should('be.visible').should('have.text', productName)
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
   cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
@@ -52,8 +52,8 @@ Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
 });
 
 // Custom command to perform login using environment variables
-Cypress.Commands.add('deleteProduct', (productName, path) => {
-  deleteProduct(productName, path);
+Cypress.Commands.add('deleteProduct', (productName, columnName, path) => {
+  deleteProduct(productName, columnName, path);
 });
 
 /**

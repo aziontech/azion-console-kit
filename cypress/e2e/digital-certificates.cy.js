@@ -33,6 +33,6 @@ describe('Digital Certificates spec', () => {
 
   afterEach(() => {
     // Delete the digital certificate
-    cy.deleteProduct(digitalCertificateName, '/digital-certificates')
+    cy.deleteProduct(digitalCertificateName, 'name', '/digital-certificates')
   })
 })

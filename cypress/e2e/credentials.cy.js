@@ -41,6 +41,6 @@ describe('Credentials', () => {
   })
   afterEach(() => {
     // Delete the credential
-    cy.deleteProduct(credentialName, '/credentials')
+    cy.deleteProduct(credentialName, 'name', '/credentials')
   })
 })

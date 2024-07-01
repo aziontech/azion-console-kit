@@ -57,6 +57,6 @@ describe('Teams Permissions', () => {
 
   afterEach(() => {
     // Delete the team permissions
-    cy.deleteProduct(teamsPermissionsName, '/teams-permission')
+    cy.deleteProduct(teamsPermissionsName, 'name', '/teams-permission')
   })
 })
