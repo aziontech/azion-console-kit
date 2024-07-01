@@ -57,10 +57,6 @@ describe('Users Management spec', () => {
     // Arrange
     cy.get(selectors.usersManagement.createButton).click()
 
-    cy.get(selectors.usersManagement.languageDropdown)
-      .should('have.text', 'English')
-      .and('have.class', 'p-disabled')
-
     cy.get(selectors.usersManagement.selectedTeamTagCloseBtn(1)).click()
 
     // Act
@@ -73,6 +69,10 @@ describe('Users Management spec', () => {
     cy.get(selectors.usersManagement.timezoneDropdown).click()
     cy.get(selectors.usersManagement.timezoneFilter).type('são')
     cy.get(selectors.usersManagement.timezoneOption(0)).click()
+
+    cy.get(selectors.usersManagement.languageDropdown)
+      .should('have.text', 'English')
+      .and('have.class', 'p-disabled')
 
     cy.get(selectors.usersManagement.emailInput).type(userEmail)
     cy.get(selectors.usersManagement.emailErrorMessage).should('not.exist')
@@ -113,10 +113,6 @@ describe('Users Management spec', () => {
     // Arrange
     cy.get(selectors.usersManagement.createButton).click()
 
-    cy.get(selectors.usersManagement.languageDropdown)
-      .should('have.text', 'English')
-      .and('have.class', 'p-disabled')
-
     cy.get(selectors.usersManagement.selectedTeamTagCloseBtn(1)).click()
 
     // Act
@@ -129,6 +125,10 @@ describe('Users Management spec', () => {
     cy.get(selectors.usersManagement.timezoneDropdown).click()
     cy.get(selectors.usersManagement.timezoneFilter).type('são')
     cy.get(selectors.usersManagement.timezoneOption(0)).click()
+
+    cy.get(selectors.usersManagement.languageDropdown)
+      .should('have.text', 'English')
+      .and('have.class', 'p-disabled')
 
     cy.get(selectors.usersManagement.emailInput).type(userEmail)
     cy.get(selectors.usersManagement.emailErrorMessage).should('not.exist')
