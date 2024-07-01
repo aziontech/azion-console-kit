@@ -57,10 +57,11 @@ Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
 })
 
 Cypress.Commands.add('assertValueCopiedToClipboard', (expectedValue) => {
-  cy.window().then((win) => {
-    win.navigator.clipboard.readText().then((text) => {
-      const actualValue = text.replace(/\s+/g, ' ').trim()
-      expect(actualValue).to.eq(expectedValue)
+  cy.window()
+    .then((win) => {
+      return win.navigator.clipboard.readText()
     })
-  })
+    .then((actualValue) => {
+      expect(actualValue.replace(/\s+/g, ' ').trim()).to.eq(expectedValue)
+    })
 })
