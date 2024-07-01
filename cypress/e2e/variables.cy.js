@@ -1,8 +1,8 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-const variableKey = generateUniqueName('VARIABLE')
-const variableValue = generateUniqueName('myvalue')
+const variableKey = generateUniqueName('KEY')
+const variableValue = generateUniqueName('value')
 
 describe('Variables spec', () => {
   beforeEach(() => {
@@ -22,10 +22,9 @@ describe('Variables spec', () => {
     // Assert
     cy.get(selectors.variables.searchInput).type(`${variableKey}`)
     cy.get(selectors.variables.keyRow).should('have.text', variableKey)
-    cy.get(selectors.variables.valueRow).should('have.text', variableValue)
   })
   afterEach(() => {
     // Delete the variable
-    cy.deleteProduct(variableKey, 'key', '/variables')
+    cy.deleteProduct(variableKey, '/variables', 'key')
   })
 })

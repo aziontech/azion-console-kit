@@ -29,6 +29,6 @@ describe('WAF spec', () => {
   })
   afterEach(() => {
     // Delete the waf
-    cy.deleteProduct(wafName, 'name', '/waf')
+    cy.deleteProduct(wafName, '/waf')
   })
 })

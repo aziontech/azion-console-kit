@@ -35,6 +35,6 @@ describe('Network Lists spec', () => {
   })
   afterEach(() => {
     // Delete the network list
-    cy.deleteProduct(networkListName, 'name', '/network-lists')
+    cy.deleteProduct(networkListName, '/network-lists')
   })
 })

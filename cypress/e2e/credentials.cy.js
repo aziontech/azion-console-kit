@@ -31,7 +31,7 @@ describe('Credentials', () => {
     cy.verifyToast('token copied')
     cy.get(selectors.form.actionsCancelButton).click()
     cy.get(selectors.list.searchInput).type(credentialName)
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', credentialName)
+    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', credentialName)
     cy.get(selectors.list.filteredRow.lastEditorColumn).should(
       'have.text',
       Cypress.env('CYPRESS_EMAIL_STAGE')
@@ -41,6 +41,6 @@ describe('Credentials', () => {
   })
   afterEach(() => {
     // Delete the credential
-    cy.deleteProduct(credentialName, 'name', '/credentials')
+    cy.deleteProduct(credentialName, '/credentials')
   })
 })

@@ -49,6 +49,6 @@ describe('Edge Application', () => {
 
   afterEach(() => {
     // Delete the edge application
-    cy.deleteProduct(edgeApplicationName, 'name', '/edge-applications')
+    cy.deleteProduct(edgeApplicationName, '/edge-applications')
   })
 })
