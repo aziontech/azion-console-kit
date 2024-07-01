@@ -1,12 +1,11 @@
 import generateUniqueName from '../support/utils';
 import selectors from '../support/selectors';
 
-let networkListName = ''
+const networkListName = generateUniqueName('NetworkList')
 
 describe('Network Lists spec', () => {
   beforeEach(() => {
     cy.login()
-    networkListName = generateUniqueName('NetworkList')
     cy.openProductThroughSidebar('network-lists')
   })
 
@@ -33,13 +32,9 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
     cy.get(selectors.networkLists.typeRow).should('have.text', 'ASN')
-
-    // Cleanup
-    cy.get(selectors.networkLists.actionButton).click()
-    cy.get(selectors.networkLists.deleteButton).click()
-    cy.get(selectors.networkLists.deleteInput).clear()
-    cy.get(selectors.networkLists.deleteInput).type('delete')
-    cy.get(selectors.networkLists.confirmDeleteButton).click()
-    cy.verifyToast('Resource successfully deleted')
+  })
+  afterEach(() => {
+    // Delete the network list
+    cy.deleteProduct(networkListName, '/network-lists')
   })
 })

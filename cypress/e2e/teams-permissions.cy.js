@@ -47,7 +47,7 @@ describe('Teams Permissions', () => {
     cy.get(selectors.form.actionsCancelButton).click()
 
     cy.get(selectors.list.searchField).type(teamsPermissionsName)
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', teamsPermissionsName)
+    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', teamsPermissionsName)
     cy.get(selectors.list.filteredRow.permissionsColumn).should(
       'have.text',
       'View Content Delivery SettingsEdit Content Delivery SettingsShow more (46)'

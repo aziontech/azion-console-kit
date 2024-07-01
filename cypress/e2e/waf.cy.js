@@ -1,12 +1,11 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-let wafName = ''
+const wafName = generateUniqueName('WAF')
 
 describe('WAF spec', () => {
   beforeEach(() => {
     cy.login()
-    wafName = generateUniqueName('WAF')
     cy.openProductThroughSidebar('waf-rules')
   })
 
@@ -27,13 +26,9 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.searchInput).type(`${wafName}{enter}`)
     cy.get(selectors.wafs.nameRow).should('have.text', wafName)
     cy.get(selectors.wafs.threatTypesRow).should('have.text', 'File upload')
-
-    // Cleanup
-    cy.get(selectors.wafs.actionButton).click()
-    cy.get(selectors.wafs.deleteButton).click()
-    cy.get(selectors.wafs.deleteInput).clear()
-    cy.get(selectors.wafs.deleteInput).type('delete')
-    cy.get(selectors.wafs.confirmDeleteButton).click()
-    cy.verifyToast('WAF rule successfully deleted')
+  })
+  afterEach(() => {
+    // Delete the waf
+    cy.deleteProduct(wafName, '/waf')
   })
 })
