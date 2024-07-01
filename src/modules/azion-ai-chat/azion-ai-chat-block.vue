@@ -2,7 +2,6 @@
   <deep-chat
     :stream="true"
     ref="deepChatRef"
-    :initialMessages="initialMessages"
     :chatStyle="deepChatStyles"
     :messageStyles="messageStyles"
     :avatars="avatarStyles"
@@ -17,11 +16,21 @@
         })
     "
   >
-    <div></div>
+    <div
+      class="deep-chat-temporary-message"
+      :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`"
+    >
+      <img
+        :style="`width:32px;height:32px;object-fit:cover;`"
+        :src="introMessageAiAzionLogo"
+      />
+      <div v-html="introMessage.html"></div>
+    </div>
   </deep-chat>
 </template>
 <script setup>
   import 'deep-chat'
+  import introMessageAiAzionLogo from './assets/intro-message-logo.svg?url'
   import { requestInterceptorService } from './services/request-interceptor-service'
   import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
@@ -163,10 +172,9 @@
     }
   })
 
-  const createSuggestion = ({ title, text }) => {
+  const createSuggestion = ({ text }) => {
     return `
-      <div class="deep-chat-suggestion flex flex-col gap-2 mb-2">
-        <p>${title}</p>
+      <div class="deep-chat-suggestion">
         <button style="text-align: left; min-height:2rem;transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s; border-radius: 6px; font-weight: 500;cursor: pointer; background-color: transparent; border: 1px solid var(--surface-border); color: var(--text-color); font-size: 0.875rem; padding: 0.5rem 1rem; overscroll-behavior: contain; width: auto;" class="deep-chat-suggestion-button">
             ${text}
         </button>
@@ -174,16 +182,44 @@
     `
   }
 
-  const initialMessages = ref([
-    {
-      html: `
-      <style> @import url('src/assets/main.css')</style>
+  const introMessage = ref({
+    html: `
       <style>
+        #chat-view{
+          font-size:16px;
+        }
         #chat-view #messages{
-          overscroll-behavior:none
+          overscroll-behavior:none;
+        }
+        #messages p{
+          tab-size: 4;
+          font-feature-settings: normal;
+          font-variation-settings: normal;
+          box-sizing: border-box;
+          color: var(--text-color) !important;
         }
 
-        #messages  a{
+        #messages ul, 
+        #messages ol {
+          tab-size: 4;
+          font-feature-settings: normal;
+          font-variation-settings: normal;
+          font-size: 1rem;
+          line-height: 1.75;
+          border-width: 0;
+          border-style: solid;
+          border-color: var(--text-color);
+          list-style: none;
+          box-sizing: border-box;
+          color: var(--text-color) !important;
+          overscroll-behavior: contain !important;
+          list-style-type: disc;
+          margin-top: 1.25em;
+          margin-bottom: 1.25em;
+          padding-left: 1.625em;
+        }
+
+        #messages a{
           color: var(--text-color-link) !important;
           text-decoration: underline;
           font-weight: 500;
@@ -194,23 +230,20 @@
         }
       </style>
 
-
-      <div style="display:flex;flex-direction:column;gap:12px" class="deep-chat-temporary-message">
+      <div style="display:flex;flex-direction:row;gap:1rem">
         ${createSuggestion({
-          title: 'I have a question about WAF',
-          text: 'I have a problem with my WAF configuration, can you help me set it up and test it?'
+          text: 'Show how WAF protect my application'
         })}
 
         ${createSuggestion({
-          title: 'Deploy your first application',
-          text: 'I want to know how to deploy and application at Azion'
+          text: 'Customize build metrics'
         })}
 
       </div>
       `,
-      role: 'ai'
-    }
-  ])
+    role: 'ai'
+  })
+
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
   }

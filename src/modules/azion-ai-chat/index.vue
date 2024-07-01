@@ -19,13 +19,15 @@
             outlined
             class="surface-border h-8 w-8"
             aria-label="Close"
-            v-tooltip.bottom="'Close'"
             @click="azionAiChatStore.close()"
           /></div
       ></template>
     </AzionAiChatHeader>
 
-    <div class="h-full flex justify-between flex-col">
+    <div
+      class="h-full flex justify-between flex-col"
+      :key="renderCount"
+    >
       <AzionAiChat ref="azionAiChatRef" />
     </div>
     <Sidebar
@@ -64,7 +66,10 @@
       </template>
 
       <div class="h-full w-full justify-between flex flex-col">
-        <AzionAiChat ref="azionAiChatMobileRef" />
+        <AzionAiChat
+          :key="renderCount"
+          ref="azionAiChatMobileRef"
+        />
       </div>
     </Sidebar>
   </div>
@@ -77,6 +82,7 @@
   import AzionAiChat from './azion-ai-chat-block.vue'
 
   import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
+  import { updateSessionId } from './services/make-session-id'
   import { computed, onMounted, ref } from 'vue'
   import hljs from 'highlight.js'
 
@@ -85,7 +91,7 @@
   })
   const azionAiChatRef = ref(null)
   const azionAiChatMobileRef = ref(null)
-
+  const renderCount = ref(1)
   onMounted(() => {
     addSupportToHljs()
   })
@@ -101,51 +107,14 @@
     }
   }
 
+  const updateChatRenderInstance = () => {
+    renderCount.value += 1
+  }
+
   const handleClearChat = () => {
     azionAiChatRef?.value.deepChatRef.clearMessages()
     azionAiChatMobileRef?.value.deepChatRef.clearMessages()
-
-    azionAiChatRef?.value.deepChatRef._addMessage({
-      html: `
-          <style> @import url('src/assets/main.css')</style>
-          <style>
-            #chat-view #messages{
-              overscroll-behavior:none
-            }
-
-            #messages  a{
-              color: var(--text-color-link) !important;
-              text-decoration: underline;
-              font-weight: 500;
-            }
-
-            .deep-chat-suggestion-button:hover {
-              border-color:var(--text-color) !important;
-            }
-          </style>
-      `,
-      role: 'notification'
-    })
-    azionAiChatMobileRef?.value.deepChatRef._addMessage({
-      html: `
-          <style> @import url('src/assets/main.css')</style>
-          <style>
-            #chat-view #messages{
-              overscroll-behavior:none
-            }
-
-            #messages  a{
-              color: var(--text-color-link) !important;
-              text-decoration: underline;
-              font-weight: 500;
-            }
-
-            .deep-chat-suggestion-button:hover {
-              border-color:var(--text-color) !important;
-            }
-          </style>
-      `,
-      role: 'notification'
-    })
+    updateSessionId()
+    updateChatRenderInstance()
   }
 </script>
