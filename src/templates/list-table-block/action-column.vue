@@ -13,7 +13,7 @@
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
-      :rows="MINIMUN_OF_ITEMS_PER_PAGE"
+      :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       :loading="isLoading"
     >
@@ -256,7 +256,7 @@
     }
   })
 
-  const MINIMUN_OF_ITEMS_PER_PAGE = 10
+  const MINIMUM_OF_ITEMS_PER_PAGE = 10
 
   const selectedId = ref(null)
   const filters = ref({
@@ -402,7 +402,7 @@
   })
 
   const showPagination = computed(() => {
-    return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
+    return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
   })
 
   const isRenderActions = computed(() => {
