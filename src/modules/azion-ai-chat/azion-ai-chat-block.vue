@@ -104,32 +104,6 @@
       }
     }
   })
-  const textInputStyles = ref({
-    styles: {
-      text: { color: `var(--text-color)` },
-      container: {
-        width: '100%',
-        height: '4rem',
-        border: '1px solid var(--surface-400)',
-        backgroundColor: 'var(--surface-section)',
-        boxShadow: 'none',
-        size: 22,
-        margin: '16px'
-      },
-      focus: {
-        outline: '0 none',
-        outlineOffset: 0,
-        boxShadow: '0 0 0 0.2rem rgba(243, 100, 43, 0.6235294118)',
-        borderColor: '#f3652b',
-        transition: 'all 0.2s ease-in-out'
-      }
-    },
-    placeholder: {
-      text: 'Message Azion AI',
-      style: { color: 'var(--text-color)' }
-    },
-    characterLimit: 300
-  })
   const avatarStyles = ref({
     default: {
       styles: { position: 'left' }
@@ -164,10 +138,72 @@
       }
     }
   })
+  const textInputStyles = ref({
+    styles: {
+      text: { color: `var(--text-color)` },
+      container: {
+        width: '100%',
+        height: 'auto',
+        padding: '16px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
+        border: '1px solid var(--surface-400)',
+        backgroundColor: 'var(--surface-section)',
+        boxShadow: 'none',
+        margin: '16px'
+      },
+      focus: {
+        outline: '0 none',
+        outlineOffset: 0,
+        boxShadow: '0 0 0 0.2rem rgba(243, 100, 43, 0.6235294118)',
+        borderColor: '#f3652b',
+        transition: 'all 0.2s ease-in-out'
+      }
+    },
+    placeholder: {
+      text: 'Message Azion AI',
+      style: { color: 'var(--text-color)' }
+    },
+    characterLimit: 300
+  })
+
   const submitButtonStyles = ref({
+    position: 'inside-right',
     submit: {
       container: {
-        default: { width: '24px', height: '24px', bottom: '20px', right: '20px' }
+        default: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          objectFit: 'cover',
+          width: '32px',
+          height: '32px',
+          bottom: '30px',
+          right: '36px',
+          margin: '0'
+        }
+      }
+    },
+    loading: {
+      container: {
+        default: {
+          display: 'none'
+        }
+      }
+    },
+    stop: {
+      container: {
+        default: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          objectFit: 'cover',
+          width: '28px',
+          height: '28px',
+          bottom: '32px',
+          right: '36px',
+          margin: '0'
+        }
       }
     }
   })
