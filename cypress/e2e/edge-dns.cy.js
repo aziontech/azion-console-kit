@@ -11,6 +11,7 @@ describe('Edge DNS spec', () => {
   })
 
   it('Create a Edge DNS ZOne', function() {
+    // Act
     cy.get(selectors.edgeDns.createButton).click();
     cy.get(selectors.edgeDns.nameInput).clear();
     cy.get(selectors.edgeDns.nameInput).type(zoneName);
@@ -19,6 +20,8 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.saveButton).click();
     cy.verifyToast('success','Your Edge DNS has been created');
     cy.get(selectors.edgeDns.cancelButton).click();
+    
+    // Assert
     cy.get(selectors.edgeDns.searchInput).clear();
     cy.get(selectors.edgeDns.searchInput).type(zoneName);
     cy.get(selectors.edgeDns.nameRow).should('have.text', zoneName);
