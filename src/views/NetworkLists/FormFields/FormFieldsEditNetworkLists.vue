@@ -6,6 +6,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     listCountriesService: {
@@ -54,7 +55,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My Network List"
           :value="name"
@@ -87,7 +89,8 @@
         v-if="isAsnNetWorkType"
       >
         <FieldTextArea
-          label="List *"
+          label="List"
+          required
           placeholder="1234&#10;4321"
           name="itemsValues"
           rows="2"
@@ -101,7 +104,8 @@
         v-if="isIpCidrNetworkType"
       >
         <FieldTextArea
-          label="List *"
+          label="List"
+          required
           disabled
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
           name="itemsValues"
@@ -116,11 +120,11 @@
         class="flex flex-col w-full sm:max-w-3xl gap-2"
         v-if="isCountriesNetworkType"
       >
-        <label
+        <LabelBlock
           for="select-01"
-          class="text-color text-base font-medium"
-          >Countries *</label
-        >
+          label="Countries"
+          isRequired
+        />
         <MultiSelect
           v-model="itemsValuesCountry"
           :options="countriesList"

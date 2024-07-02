@@ -6,6 +6,7 @@
   import Dropdown from 'primevue/dropdown'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import LabelBlock from '@/templates/label-block'
 
   import { ref } from 'vue'
 
@@ -102,11 +103,11 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
+        <LabelBlock
           for="ruleid"
-          class="text-color text-sm font-medium"
-          >Rule ID *</label
-        >
+          label="Rule ID"
+          isRequired
+        />
         <Dropdown
           appendTo="self"
           id="ruleid"
@@ -127,7 +128,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Description *"
+          label="Description"
+          required
           name="reason"
           placeholder="This rule was allowed because the path is being used in internal tests."
           description="Add a short description or comment to explain the reason this rule was allowed."
@@ -183,11 +185,11 @@
           </div>
 
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
+            <LabelBlock
               for="ruleid"
-              class="text-color text-sm font-medium"
-              >Match Zone *</label
-            >
+              label="Match Zone"
+              isRequired
+            />
             <Dropdown
               appendTo="self"
               id="ruleid"
@@ -221,7 +223,8 @@
             v-if="showMatchOnInputs(matchZones[index].zone)"
           >
             <FieldGroupRadio
-              label="Matches On *"
+              label="Matches On"
+              required
               :nameField="`matchZones[${index}].matches_on`"
               :isCard="false"
               :options="radioOptions"

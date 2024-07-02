@@ -34,7 +34,7 @@ describe('Your Settings spec', () => {
       .should('be.visible')
       .and('have.text', 'Last Name is a required field')
     cy.get(selectors.yourSettings.timezoneOptions).should('have.text', '(UTC +14:00) Etc/GMT-14')
-    cy.get(selectors.yourSettings.language).should('have.text', 'LanguageEnglish')
+    cy.get(selectors.yourSettings.language).should('have.text', 'Language English')
     cy.get(selectors.yourSettings.emailInput).should('have.value', 'testuser@cy.com')
     cy.get(selectors.yourSettings.emailInput).clear()
     cy.get(selectors.yourSettings.emailError)

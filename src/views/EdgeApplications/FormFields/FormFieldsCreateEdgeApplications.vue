@@ -10,6 +10,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
+  import LabelBlock from '@/templates/label-block'
 
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
@@ -210,7 +211,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My edge application"
           :value="name"
@@ -239,13 +241,12 @@
 
       <div class="flex gap-6 max-sm:flex-col">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
+          <LabelBlock
             for="port-http"
-            class="text-color text-base font-medium"
             data-testid="form-horizontal-delivery-settings-http-ports-label"
-          >
-            HTTP Ports <span v-if="checkIsProtocol.http || checkIsProtocol.https">*</span>
-          </label>
+            label="HTTP Ports"
+            :isRequired="checkIsProtocol.http || checkIsProtocol.https"
+          />
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
@@ -283,13 +284,12 @@
         </div>
 
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
+          <LabelBlock
             for="port-https"
-            class="text-color text-base font-medium"
             data-testid="form-horizontal-delivery-settings-https-ports-label"
-          >
-            HTTPS Ports <span v-if="checkIsProtocol.https">*</span>
-          </label>
+            label="HTTPS Ports"
+            :isRequired="checkIsProtocol.https"
+          />
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
@@ -372,13 +372,12 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
+        <LabelBlock
           for="origin-type"
-          class="text-color text-base font-medium"
           data-testid="form-horizontal-default-origin-type-label"
-        >
-          Type *
-        </label>
+          label="Type"
+          isRequired
+        />
         <span class="p-input-icon-right">
           <i class="pi pi-lock text-[var(--text-color-secondary)]" />
           <Dropdown
@@ -418,7 +417,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="form-horizontal-default-origin-address-field-text"
-          label="Address *"
+          label="Address"
+          required
           name="address"
           aria-describedby="address-help"
           placeholder="example.com"
@@ -430,7 +430,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="form-horizontal-default-origin-host-header-field-text"
-          label="Host Header *"
+          label="Host Header"
+          required
           name="hostHeader"
           aria-describedby="hostHeader-help"
           placeholder="${host}"

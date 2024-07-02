@@ -2,6 +2,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
   import { computed, toRef, useSlots, useAttrs } from 'vue'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -41,10 +42,6 @@
       default: () => []
     },
     loading: {
-      type: Boolean,
-      default: false
-    },
-    isRequiredField: {
       type: Boolean,
       default: false
     },
@@ -107,10 +104,6 @@
    * end of primevue workaround
    */
 
-  const labelSufix = computed(() => {
-    return props.isRequiredField ? '*' : ''
-  })
-
   const attrs = useAttrs()
 
   const customTestId = computed(() => {
@@ -127,13 +120,12 @@
 </script>
 
 <template>
-  <label
+  <LabelBlock
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
+    :label="props.label"
+    :isRequired="$attrs.required"
     :data-testid="customTestId.label"
-  >
-    {{ props.label }} {{ labelSufix }}
-  </label>
+  />
   <Dropdown
     appendTo="self"
     :id="name"

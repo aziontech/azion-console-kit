@@ -109,7 +109,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           data-testid="edge-firewall-form__name-field"
           :value="name"

@@ -7,7 +7,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           description="Give a unique and descriptive name to identify the data stream."
           name="name"
           placeholder="My stream"
@@ -26,7 +27,8 @@
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
-            label="Source *"
+            label="Source"
+            required
             name="dataSource"
             :options="listDataSources"
             optionLabel="label"
@@ -39,7 +41,8 @@
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
-            label="Template *"
+            label="Template"
+            required
             name="template"
             :options="listTemplates"
             optionLabel="label"
@@ -95,12 +98,12 @@
         v-if="domainOption === '0'"
         class="flex flex-col gap-2"
       >
-        <label
+        <LabelBlock
           for="domains"
-          class="text-color text-base font-medium"
+          label="Domains"
           data-testid="data-stream-form__domains__domains-field-label"
-          >Domains *</label
-        >
+          isRequired
+        />
         <PickList
           v-model="domains"
           :pt="{
@@ -192,7 +195,8 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
-          label="Connector *"
+          label="Connector"
+          required
           name="endpoint"
           :options="listEndpoint"
           optionLabel="label"
@@ -212,7 +216,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             description="Specific URL that'll receive the collected data."
             name="endpointUrl"
             :value="endpointUrl"
@@ -270,7 +275,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
-            label="Bootstrap Servers *"
+            label="Bootstrap Servers"
+            required
             name="bootstrapServers"
             rows="5"
             :value="bootstrapServers"
@@ -282,7 +288,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Kafka Topic *"
+            label="Kafka Topic"
+            required
             name="kafkaTopic"
             :value="kafkaTopic"
             description="Name of the topic in a Kafka cluster."
@@ -324,7 +331,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             name="host"
             :value="host"
             description="Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol."
@@ -335,7 +343,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Bucket Name *"
+            label="Bucket Name"
+            required
             name="bucket"
             :value="bucket"
             description="Name of the bucket to which the object will be sent."
@@ -346,7 +355,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Region *"
+            label="Region"
+            required
             name="region"
             :value="region"
             description="Region in which your bucket is hosted."
@@ -356,12 +366,12 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
+          <LabelBlock
             for="accessKey"
-            class="text-color text-base font-medium"
+            label="Access Key"
             data-testid="data-stream-form__destination__access-key-field-label"
-            >Access Key *</label
-          >
+            isRequired
+          />
           <PrimePassword
             id="accessKey"
             v-model="accessKey"
@@ -388,12 +398,12 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
+          <LabelBlock
             for="secretKey"
-            class="text-color text-base font-medium"
+            label="Secret Key"
             data-testid="data-stream-form__destination__secret-key-field-label"
-            >Secret Key *</label
-          >
+            isRequired
+          />
           <PrimePassword
             id="secretKey"
             v-model="secretKey"
@@ -453,11 +463,11 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label
-            class="text-color text-sm font-medium leading-tight"
+          <LabelBlock
+            label="Content Type"
+            isRequired
             data-testid="data-stream-form__destination__content-type-field-label"
-            >Content Type *</label
-          >
+          />
           <div class="flex flex-col gap-3">
             <div
               class="flex no-wrap gap-2 items-center"
@@ -489,7 +499,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Project ID *"
+            label="Project ID"
+            required
             name="projectID"
             :value="projectID"
             description="ID of the project in Google Cloud."
@@ -500,7 +511,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Dataset ID *"
+            label="Dataset ID"
+            required
             name="datasetID"
             :value="datasetID"
             description="Name of the dataset created on Google BigQuery. Case sensitive field."
@@ -511,7 +523,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Table ID *"
+            label="Table ID"
+            required
             name="tableID"
             :value="tableID"
             description="Name of the table on Google BigQuery."
@@ -521,12 +534,12 @@
         </div>
 
         <div class="flex flex-col w-full gap-2">
-          <label
+          <LabelBlock
             for="serviceAccountKey"
-            class="text-color text-base font-medium"
+            label="Service Account Key"
+            isRequired
             data-testid="data-stream-form__destination__service-account-key-field-label"
-            >Service Account Key *</label
-          >
+          />
           <vue-monaco-editor
             v-model:value="serviceAccountKey"
             language="json"
@@ -557,7 +570,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             name="elasticsearchUrl"
             :value="elasticsearchUrl"
             description="URL address plus the Elasticsearch index that'll receive the collected data."
@@ -568,7 +582,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
-            label="API Key *"
+            label="API Key"
+            required
             name="apiKey"
             :value="apiKey"
             rows="5"
@@ -586,7 +601,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             name="splunkUrl"
             :value="splunkUrl"
             description="URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL."
@@ -597,7 +613,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
-            label="API Key *"
+            label="API Key"
+            required
             name="splunkApiKey"
             :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
@@ -614,7 +631,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Stream Name *"
+            label="Stream Name"
+            required
             name="streamName"
             :value="streamName"
             description="Delivery stream name."
@@ -625,7 +643,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Region *"
+            label="Region"
+            required
             name="awsRegion"
             :value="awsRegion"
             description="Region where the Amazon Kinesis instance is running."
@@ -635,12 +654,12 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
+          <LabelBlock
             for="accessKey"
-            class="text-color text-base font-medium"
+            label="Access Key"
             data-testid="data-stream-form__destination__kinesis-access-key-field-label"
-            >Access Key *</label
-          >
+            isRequired
+          />
           <PrimePassword
             id="awsAccessKey"
             v-model="awsAccessKey"
@@ -667,12 +686,12 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
+          <LabelBlock
             for="accessKey"
-            class="text-color text-base font-medium"
+            label="Secret Key"
             data-testid="data-stream-form__destination__kinesis-secret-key-field-label"
-            >Secret Key *</label
-          >
+            isRequired
+          />
           <PrimePassword
             id="awsSecretKey"
             v-model="awsSecretKey"
@@ -706,7 +725,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             name="datadogUrl"
             :value="datadogUrl"
             description="URL or URI of the Datadog endpoint."
@@ -717,7 +737,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
-            label="API Key *"
+            label="API Key"
+            required
             name="datadogApiKey"
             :value="datadogApiKey"
             placeholder="ij9076f1ujik17a81f938yhru5g713422"
@@ -734,7 +755,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="URL *"
+            label="URL"
+            required
             name="QRadarUrl"
             :value="QRadarUrl"
             description="Specific URL that'll receive the collected data."
@@ -751,7 +773,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Log Type *"
+            label="Log Type"
+            required
             name="logType"
             :value="logType"
             description="Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters."
@@ -761,12 +784,12 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
+          <LabelBlock
             for="sharedKey"
-            class="text-color text-base font-medium"
+            label="Shared Key"
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field-label"
-            >Shared Key *</label
-          >
+            isRequired
+          />
           <PrimePassword
             id="sharedKey"
             v-model="sharedKey"
@@ -806,7 +829,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Workspace ID *"
+            label="Workspace ID"
+            required
             name="workspaceID"
             :value="workspaceID"
             description="ID of the Workspace."
@@ -823,7 +847,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Storage Account *"
+            label="Storage Account"
+            required
             name="storageAccount"
             :value="storageAccount"
             description="Name of the storage account."
@@ -833,7 +858,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Container Name *"
+            label="Container Name"
+            required
             name="containerName"
             :value="containerName"
             description="Name of the container."
@@ -844,7 +870,8 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Blob SAS Token *"
+            label="Blob SAS Token"
+            required
             name="blobToken"
             :value="blobToken"
             description="Token generated by Blob Storage. It should have create, read, write, and list accesses granted."
@@ -863,7 +890,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Payload Format *"
+          label="Payload Format"
+          required
           name="payloadFormat"
           :value="payloadFormat"
           description="The format that payload will be sent. The $dataset variable will be replaced by all logs already with the log line separator applied."
@@ -874,7 +902,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Payload Log Line Separator *"
+          label="Payload Log Line Separator"
+          required
           name="lineSeparator"
           :value="lineSeparator"
           :description="placeholderLineSeparator"
@@ -921,7 +950,7 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-
+  import LabelBlock from '@/templates/label-block'
   import ButtonPrimer from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
   import InputSwitch from 'primevue/inputswitch'

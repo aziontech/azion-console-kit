@@ -11,6 +11,7 @@
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import LabelBlock from '@/templates/label-block'
 
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
@@ -255,7 +256,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           name="name"
-          label="Name *"
+          label="Name"
+          required
           placeholder="My cache setting"
           description="Give a unique and descriptive name to identify the setting."
         />
@@ -280,11 +282,11 @@
         v-if="showMaxTtl"
         class="flex flex-col sm:max-w-xs w-full gap-2"
       >
-        <label
+        <LabelBlock
           for="browserCacheSettingsMaximumTtl"
-          class="text-color text-sm font-medium"
-          >Maximum TTL (seconds) *</label
-        >
+          label="Maximum TTL (seconds)"
+          isRequired
+        />
 
         <InputNumber
           showButtons
@@ -445,7 +447,8 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
       >
         <FieldTextArea
-          label="Query String Fields *"
+          label="Query String Fields"
+          required
           name="queryStringFields"
           :value="queryStringFields"
           placeholder="name"
@@ -471,7 +474,8 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
       >
         <FieldTextArea
-          label="Cookie Names *"
+          label="Cookie Names"
+          required
           name="cookieNames"
           :value="cookieNames"
           placeholder="cookie_name"
@@ -490,7 +494,10 @@
         v-if="showDeviceGroupFields"
         class="flex flex-col w-full sm:max-w-3xl gap-2"
       >
-        <label class="text-color text-sm font-medium leading-5">Device Group ID</label>
+        <LabelBlock
+          label="Device Group ID"
+          isRequired
+        />
         <div class="flex flex-col gap-2 max-w-lg">
           <div
             v-for="(deviceGroupItem, index) in deviceGroup"
