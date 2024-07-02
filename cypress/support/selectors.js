@@ -198,6 +198,27 @@ const selectors = {
     postalCode: '[data-testid="account-settings__postal-code__input"]',
     postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
+  },
+  dataStream: {
+    createButton: '[data-testid="create_Stream_button"]',
+    nameInput: '[data-testid="data-stream-form__general__name-field__input"]',
+    sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
+    templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
+    editorBody: '.view-lines',
+    connectorDropdown: '[data-testid="data-stream-form__destination__connector-field__dropdown"]',
+    httpConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
+      headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
+      payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
+      separatorInput:
+        '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
+      maxSizeInput:
+        '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
+    },
+    statusSlider: '[data-testid="data-stream-form__section__status"] input',
+    list: {
+      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+    }
   }
 }
 
