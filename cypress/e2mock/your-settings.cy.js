@@ -1,4 +1,4 @@
-import selectors from '../support/selectors';
+import selectors from '../support/selectors'
 
 const payload = {
   country_call_code: 'BR - 55',

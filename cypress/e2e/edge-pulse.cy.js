@@ -1,21 +1,4 @@
-const selectors = {
-  buttons: {
-    defaultTagCopyButton: '[data-testid="edge-pulse__default-tag-copy-button"] > .p-button-label',
-    preLoadingTab: '[data-testid="edge-pulse__pre-loading-tab"]',
-    preLoadingTagCopyButton:
-      '[data-testid="edge-pulse__pre-loading-tag-copy-button"] > .p-button-label'
-  },
-  toast: {
-    defaultTagCopySuccessMessage:
-      ':nth-child(2) > .p-toast-message-content > .flex-column > .flex > .text-color',
-    defaultTagCopyCloseButton:
-      ':nth-child(2) > .p-toast-message-content > [data-pc-section="buttoncontainer"] > .p-toast-icon-close > .p-icon',
-    preLoadingTagCopySuccessMessage:
-      ':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color',
-    preLoadingTagCopyCloseButton:
-      ':nth-child(3) > .p-toast-message-content > [data-pc-section="buttoncontainer"] > .p-toast-icon-close'
-  }
-}
+import selectors from '../support/selectors'
 
 const fixtures = {
   preLoadingTag: `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`,
@@ -40,23 +23,21 @@ describe('Edge Pulse spec', () => {
 
   it('should copy default and pre-loading tag in edge pulse', function () {
     // Act Default tag
-    cy.get(selectors.buttons.defaultTagCopyButton).realClick()
-    cy.get(selectors.toast.defaultTagCopySuccessMessage).should('have.text', 'Copied successfully!')
+    cy.get(selectors.edgePulse.defaultTagCopyButton).realClick()
+    cy.get(selectors.edgePulse.defaultTagCopySuccessMessage).should('have.text', 'Copied successfully!')
     // Default tag copy assertion
     const expectedDefaultTagValue = fixtures.defaultTag.replace(/\s+/g, ' ').trim()
     cy.assertValueCopiedToClipboard(expectedDefaultTagValue)
-    cy.get(selectors.toast.defaultTagCopyCloseButton).click()
+    cy.get(selectors.edgePulse.defaultTagCopyCloseButton).click()
 
     // Act Pre-loading tag
-    cy.get(selectors.buttons.preLoadingTab).click()
-    cy.get(selectors.buttons.preLoadingTagCopyButton).realClick()
-    cy.get(selectors.toast.preLoadingTagCopySuccessMessage).should(
-      'have.text',
-      'Copied successfully!'
-    )
+    cy.get(selectors.edgePulse.preLoadingTab).click()
+    cy.get(selectors.edgePulse.preLoadingTagCopyButton).realClick()
+    cy.verifyToast('Copied successfully!')
+
     // Pre-loading tag copy assertion
     const expectedPreLoadingTagValue = fixtures.preLoadingTag.replace(/\s+/g, ' ').trim()
     cy.assertValueCopiedToClipboard(expectedPreLoadingTagValue)
-    cy.get(selectors.toast.preLoadingTagCopyCloseButton).click()
+    cy.verifyToast('Copied successfully!')
   })
 })

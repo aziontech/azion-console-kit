@@ -1,26 +1,5 @@
 import generateUniqueName from '../support/utils'
-
-const selectors = {
-  list: {
-    createTokenButton: '[data-testid="create_Personal Token_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    filteredRecord: {
-      nameColumn: '[data-testid="list-table-block__column__name__row"]',
-      menuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteButton: '.p-menuitem-content > .p-menuitem-link'
-    },
-    deleteDialog: {
-      confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]'
-    }
-  },
-  form: {
-    tokenName: '[data-testid="personal-token-form__name-field__input"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
-    copyTokenDialogHeader: '[data-testid="copy-token-dialog__header"] > .p-dialog-header',
-    copyTokenButton: '[data-testid="copy-token-dialog__token-field__copy-token-button"]',
-    closeCopyDialogButton: '[data-testid="copy-token-dialog__dialog-footer__confirm-button"]'
-  }
-}
+import selectors from '../support/selectors'
 
 const personalTokenName = generateUniqueName('Personal Token')
 
@@ -32,29 +11,26 @@ describe('Personal Token spec', () => {
 
   it('should create and delete a personal token', () => {
     // Arrange
-    cy.get(selectors.list.createTokenButton).click()
-    cy.get(selectors.form.tokenName).type(personalTokenName)
+    cy.get(selectors.personalTokens.createTokenButton).click()
+    cy.get(selectors.personalTokens.tokenName).type(personalTokenName)
 
     // Act
     // Verify if copy token dialog is displayed after save
-    cy.get(selectors.form.submitButton).click()
-    cy.get(selectors.form.copyTokenDialogHeader).should(
-      'have.text',
-      'Personal token has been created'
-    )
-    cy.get(selectors.form.copyTokenButton).click()
+    cy.get(selectors.personalTokens.submitButton).click()
+    cy.get(selectors.personalTokens.copyTokenDialogHeader).should('have.text', 'Personal token has been created')
+    cy.get(selectors.personalTokens.copyTokenButton).click()
     cy.verifyToast('Personal Token copied to clipboard!')
-    cy.get(selectors.form.closeCopyDialogButton).click()
+    cy.get(selectors.personalTokens.closeCopyDialogButton).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(personalTokenName)
-    cy.get(selectors.list.filteredRecord.nameColumn).should('have.text', personalTokenName)
+    cy.get(selectors.personalTokens.searchInput).type(personalTokenName)
+    cy.get(selectors.personalTokens.filteredRecordNameColumn).should('have.text', personalTokenName)
 
     // Cleanup
-    cy.get(selectors.list.filteredRecord.menuButton).click()
-    cy.get(selectors.list.filteredRecord.deleteButton).click()
-    cy.get(selectors.list.deleteDialog.confirmationInputField).clear()
-    cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
+    cy.get(selectors.personalTokens.filteredRecordMenuButton).click()
+    cy.get(selectors.personalTokens.filteredRecordDeleteButton).click()
+    cy.get(selectors.personalTokens.deleteDialogConfirmationInputField).clear()
+    cy.get(selectors.personalTokens.deleteDialogConfirmationInputField).type('delete{enter}')
     cy.verifyToast('Personal token successfully deleted')
   })
 })
