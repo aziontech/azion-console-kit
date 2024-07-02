@@ -18,9 +18,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: yarn ci
-
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         env: 
