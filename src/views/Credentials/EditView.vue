@@ -69,7 +69,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'token copied'
+      summary: 'Successfully copied!'
     })
   }
 </script>

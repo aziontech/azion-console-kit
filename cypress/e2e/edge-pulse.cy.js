@@ -24,20 +24,19 @@ describe('Edge Pulse spec', () => {
   it('should copy default and pre-loading tag in edge pulse', function () {
     // Act Default tag
     cy.get(selectors.edgePulse.defaultTagCopyButton).realClick()
-    cy.get(selectors.edgePulse.defaultTagCopySuccessMessage).should('have.text', 'Copied successfully!')
+    cy.verifyToast('Successfully copied!')
+
     // Default tag copy assertion
     const expectedDefaultTagValue = fixtures.defaultTag.replace(/\s+/g, ' ').trim()
     cy.assertValueCopiedToClipboard(expectedDefaultTagValue)
-    cy.get(selectors.edgePulse.defaultTagCopyCloseButton).click()
 
     // Act Pre-loading tag
     cy.get(selectors.edgePulse.preLoadingTab).click()
     cy.get(selectors.edgePulse.preLoadingTagCopyButton).realClick()
-    cy.verifyToast('Copied successfully!')
+    cy.verifyToast('Successfully copied!')
 
     // Pre-loading tag copy assertion
     const expectedPreLoadingTagValue = fixtures.preLoadingTag.replace(/\s+/g, ' ').trim()
     cy.assertValueCopiedToClipboard(expectedPreLoadingTagValue)
-    cy.verifyToast('Copied successfully!')
   })
 })

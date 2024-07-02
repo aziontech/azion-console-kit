@@ -19,7 +19,7 @@ describe('Personal Token spec', () => {
     cy.get(selectors.personalTokens.submitButton).click()
     cy.get(selectors.personalTokens.copyTokenDialogHeader).should('have.text', 'Personal token has been created')
     cy.get(selectors.personalTokens.copyTokenButton).click()
-    cy.verifyToast('Personal Token copied to clipboard!')
+    cy.verifyToast('Successfully copied!')
     cy.get(selectors.personalTokens.closeCopyDialogButton).click()
 
     // Assert

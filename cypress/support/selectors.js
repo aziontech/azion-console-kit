@@ -225,6 +225,14 @@ const selectors = {
     copyTokenDialogHeader: '[data-testid="copy-token-dialog__header"] > .p-dialog-header',
     copyTokenButton: '[data-testid="copy-token-dialog__token-field__copy-token-button"]',
     closeCopyDialogButton: '[data-testid="copy-token-dialog__dialog-footer__confirm-button"]'
+  },
+  accountSettings: {
+    accountName: '[data-testid="account-settings__account-name__input"]',
+    companyName: '[data-testid="account-settings__company-name__input"]',
+    companyId: '[data-testid="account-settings__company-id__input"]',
+    postalCode: '[data-testid="account-settings__postal-code__input"]',
+    postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
+    submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
   }
 }
 

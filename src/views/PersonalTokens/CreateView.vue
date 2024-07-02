@@ -87,7 +87,7 @@
     const toastConfig = {
       closable: true,
       severity: 'success',
-      summary: 'Personal Token copied to clipboard!'
+      summary: 'Successfully copied!'
     }
 
     try {
@@ -97,7 +97,7 @@
       toast.add({
         ...toastConfig,
         severity: 'error',
-        detail: 'The Personal Token could not be copied to clipboard. Please try again.'
+        detail: 'The personal token was not copied to the clipboard. Try copying it again.'
       })
     }
   }

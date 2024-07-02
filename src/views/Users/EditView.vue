@@ -65,8 +65,8 @@
       const toastConfig = {
         closable: true,
         severity: 'warn',
-        summary: 'Confirmation email',
-        detail: 'We have sent you a confirmation email.'
+        summary: 'Email sent',
+        detail: 'The user must check the inbox and follow the instructions to verify this email.'
       }
       toast.add({ ...toastConfig })
     }
