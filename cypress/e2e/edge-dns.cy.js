@@ -27,6 +27,8 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.statusRow).should('have.text', 'Active');
   })
   afterEach(() => {
-    cy.deleteProduct(zoneName, '/edge-dns')
+    cy.deleteProduct(zoneName, '/edge-dns').then(() => {
+      cy.verifyToast('Your Edge DNS has been deleted')
+    })
   })
 })
