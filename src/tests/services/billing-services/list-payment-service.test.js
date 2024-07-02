@@ -42,7 +42,7 @@ const makeSut = () => {
   }
 }
 
-describe('PaymentServices', () => {
+describe('BillingServices', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
