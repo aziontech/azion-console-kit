@@ -1,5 +1,5 @@
 <template>
-  <ListTableNoHeaderBlock
+  <ListTable
     v-if="hasContentToList"
     :columns="paymentsColumns"
     :listService="props.listPaymentService"
@@ -20,7 +20,7 @@
         />
       </div>
     </template>
-  </ListTableNoHeaderBlock>
+  </ListTable>
   <EmptyResultsBlock
     v-else
     title="No payment method has been added"
@@ -39,7 +39,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import ListTable from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 
