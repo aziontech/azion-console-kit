@@ -2,6 +2,7 @@
   <deep-chat
     :stream="true"
     ref="deepChatRef"
+    :errorMessages="errorMessages"
     :chatStyle="deepChatStyles"
     :messageStyles="messageStyles"
     :avatars="avatarStyles"
@@ -55,6 +56,12 @@
   const currentRouteFullPath = currentRoute.value.path
   const aiAskAzionSessionId = ref('')
 
+  const errorMessages = ref({
+    overrides: {
+      default: 'Fail to connect, please try again.'
+    }
+  })
+
   const deepChatStyles = ref({
     fontFamily: 'var(--font-family)',
     width: '100%',
@@ -101,6 +108,12 @@
       },
       loading: {
         bubble: { backgroundColor: 'var(--surface-200)' }
+      }
+    },
+    error: {
+      bubble: {
+        color: 'var(--text-color)',
+        backgroundColor: 'var(--surface-200)'
       }
     }
   })
