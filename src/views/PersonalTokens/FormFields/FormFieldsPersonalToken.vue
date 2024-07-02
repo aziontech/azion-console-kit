@@ -106,7 +106,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description=""
+    data-testid="personal-token-form__section__general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -116,6 +116,7 @@
           :value="name"
           :disabled="disabledFields"
           description="Give a unique and descriptive name to identify the personal token."
+          data-testid="personal-token-form__name-field"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -127,6 +128,7 @@
           autoResize
           rows="1"
           :disabled="disabledFields"
+          data-testid="personal-token-form__description-field"
         />
       </div>
     </template>
@@ -141,11 +143,13 @@
         <label
           for="selectedExpiration"
           class="text-color text-base font-medium"
+          data-testid="personal-token-form__expiration-label"
           >Expires within *</label
         >
         <div class="flex sm:flex-row w-full flex-col gap-6">
           <div class="w-full sm:max-w-xs">
             <Dropdown
+              data-testid="personal-token-form__expiration-dropdown"
               appendTo="self"
               class="w-full"
               id="selectedExpiration"
@@ -167,6 +171,7 @@
           <div class="w-full sm:max-w-xs">
             <Calendar
               v-if="isCustomDateSelected"
+              data-testid="personal-token-form__expiration__calendar"
               class="w-full"
               @date-select="updateExpiration"
               v-model="customExpiration"
@@ -183,6 +188,7 @@
             />
             <small
               v-if="errorCustom"
+              data-testid="personal-token-form__expiration__error-message"
               class="p-error text-xs font-normal leading-tight"
             >
               {{ errorCustom }}

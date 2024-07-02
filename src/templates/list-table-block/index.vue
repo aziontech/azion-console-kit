@@ -161,7 +161,12 @@
           data-testid="data-table-empty-content"
         >
           <div class="my-4 flex flex-col gap-3 justify-center items-start">
-            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+            <p
+              class="text-md font-normal text-secondary"
+              data-testid="list-table-block__empty-message"
+            >
+              {{ emptyListMessage }}
+            </p>
           </div>
         </slot>
       </template>
