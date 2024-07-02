@@ -20,9 +20,10 @@ describe('Edge DNS spec', () => {
     cy.verifyToast('success','Your Edge DNS has been created');
     cy.get(selectors.edgeDns.cancelButton).click();
     cy.get(selectors.edgeDns.searchInput).clear();
-    cy.get(selectors.edgeDns.searchInput).type('Zone12345678');
-    cy.get(selectors.edgeDns.nameRow).should('have.text', 'Zone12345678');
-    cy.get(selectors.edgeDns.domainRow).should('contain', 'zone12345678');
+    cy.get(selectors.edgeDns.searchInput).type(zoneName);
+    cy.get(selectors.edgeDns.nameRow).should('have.text', zoneName);
+    cy.get(selectors.edgeDns.showMore).click();
+    cy.get(selectors.edgeDns.domainRow).should('contain', zoneName.toLowerCase());
     cy.get(selectors.edgeDns.statusRow).should('have.text', 'Active');
   })
   afterEach(() => {
