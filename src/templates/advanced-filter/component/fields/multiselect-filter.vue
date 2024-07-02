@@ -71,7 +71,7 @@
         detail: error,
         closable: true,
         severity: 'error',
-        summary: 'Error'
+        summary: 'Loading failed'
       })
       throw new Error(error)
     } finally {

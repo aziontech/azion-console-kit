@@ -1,5 +1,5 @@
 import generateUniqueName from '../support/utils'
-import selectors from '../support/selectors';
+import selectors from '../support/selectors'
 
 const credentialName = generateUniqueName('Credential')
 
@@ -28,7 +28,7 @@ describe('Credentials', () => {
     // Assert
     cy.verifyToast('success', 'Your credential token has been created')
     cy.get(selectors.credential.tokenCopyButton).click()
-    cy.verifyToast('token copied')
+    cy.verifyToast('Successfully copied!')
     cy.get(selectors.form.actionsCancelButton).click()
     cy.get(selectors.list.searchInput).type(credentialName)
     cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', credentialName)

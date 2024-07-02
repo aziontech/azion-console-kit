@@ -132,7 +132,7 @@
         props.informationForDeletion.selectedID,
         props.informationForDeletion.selectedItemData
       )
-      toastConfig.summary = feedback ?? 'Deleted successfully!'
+      toastConfig.summary = feedback ?? 'Successfully deleted!'
       emit('successfullyDeleted')
       resetForm()
     } catch (error) {
