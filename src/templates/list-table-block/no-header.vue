@@ -350,7 +350,7 @@
   const actionOptions = (rowData) => {
     const actionOptions = []
 
-    if (props.rowActions && props.rowActions.length > 0) {
+    if (props.rowActions?.length) {
       props.rowActions.forEach((action) => {
         if (action.visibleAction?.(rowData)) return
 

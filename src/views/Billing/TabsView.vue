@@ -18,14 +18,14 @@
     paymentServices: { type: Object, required: true }
   })
 
-  const mapTabs = ref({
+  const TABS_MAP = {
     bills: 0,
     payment: 1
-  })
+  }
 
   const getTabFromValue = (selectedTabIndex) => {
-    const tabNames = Object.keys(mapTabs.value)
-    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
+    const tabNames = Object.keys(TABS_MAP)
+    const selectedTab = tabNames.find((tabName) => TABS_MAP[tabName] === selectedTabIndex)
     return selectedTab
   }
 
@@ -50,7 +50,7 @@
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    const activeTabIndexByRoute = mapTabs.value[tab]
+    const activeTabIndexByRoute = TABS_MAP[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
@@ -83,7 +83,7 @@
         </TabPanel>
         <TabPanel header="Payment Methods">
           <ListView
-            v-if="activeTab === mapTabs.payment"
+            v-if="activeTab === TABS_MAP.payment"
             :listPaymentService="props.paymentServices.listPaymentService"
             :deletePaymentService="props.paymentServices.deletePaymentService"
             :setAsDefaultPaymentService="props.paymentServices.setAsDefaultPaymentService"

@@ -18,12 +18,15 @@ const formatDate = (month, year) => {
   return `${formatMonth}/${year}`
 }
 
-const isExpired = (month, year) => {
+const getExpiredString = (month, year) => {
   const currentDate = new Date()
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth() + 1
 
-  if (year < currentYear || (year === currentYear && month < currentMonth)) {
+  const isExpiredByYear = year < currentYear
+  const isExpiredByMonth = year === currentYear && month < currentMonth
+
+  if (isExpiredByYear || isExpiredByMonth) {
     return 'Expired'
   } else {
     return ''
@@ -39,21 +42,21 @@ const adapt = (httpResponse) => {
 
   const responseData = Array.isArray(httpResponse.body.results) ? httpResponse.body.results : []
 
-  const responseDataSorted = responseData.sort((currentCard, nextCard) =>
-    currentCard.is_default === nextCard.is_default ? 0 : currentCard.is_default ? -1 : 1
+  const responseDataSorted = responseData.sort(
+    (currentCard, nextCard) => nextCard.is_default - currentCard.is_default
   )
 
   const parseBilling = responseDataSorted.map((card) => {
     return {
       id: card.id,
-      cardHolder: card.card_holder.toLowerCase(),
+      cardHolder: card.card_holder,
       cardExpiration: {
         expiringDate: formatDate(card.card_expiration_month, card.card_expiration_year),
-        status: isExpired(card.card_expiration_month, card.card_expiration_year)
+        status: getExpiredString(card.card_expiration_month, card.card_expiration_year)
       },
       cardData: {
         cardNumber: card.card_last_4_digits,
-        cardBrand: card.card_brand,
+        cardBrand: card.card_brand.toLowerCase(),
         status: card.is_default ? 'Default' : ''
       },
       isDefault: card.is_default

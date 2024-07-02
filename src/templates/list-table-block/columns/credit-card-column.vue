@@ -42,5 +42,5 @@
     amex: defineAsyncComponent(() => import('@/assets/svg/credit-card-logos/amex-card.vue'))
   }
 
-  const cardLogoComponent = computed(() => cardComponents[props.cardBrand.toLowerCase()])
+  const cardLogoComponent = computed(() => cardComponents[props.cardBrand])
 </script>

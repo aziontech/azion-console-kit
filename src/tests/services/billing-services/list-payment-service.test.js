@@ -85,7 +85,7 @@ describe('BillingService', () => {
           status: ''
         },
         cardData: {
-          cardBrand: 'Visa',
+          cardBrand: 'visa',
           cardNumber: '4242',
           status: 'Default'
         },
@@ -99,7 +99,7 @@ describe('BillingService', () => {
           status: 'Expired'
         },
         cardData: {
-          cardBrand: 'Visa',
+          cardBrand: 'visa',
           cardNumber: '4242',
           status: ''
         },
