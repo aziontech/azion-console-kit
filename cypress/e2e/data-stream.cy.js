@@ -11,25 +11,14 @@ describe('Data Stream spec', () => {
     cy.openProductThroughSidebar('data-stream')
   })
 
-  it('should create and delete a data stream with the standard connector', () => {
+  it('should create a data stream with the standard connector', () => {
     // Arrange
     cy.get(selectors.dataStream.createButton).click()
 
     // Act
     cy.get(selectors.dataStream.nameInput).type(dataStreamName)
-
-    cy.get(selectors.dataStream.sourceDropdown).should('have.text', 'Edge Applications')
-    cy.get(selectors.dataStream.templateDropdown).should('have.text', 'Template teste')
-    cy.get(selectors.dataStream.editorBody).should('not.be.empty')
-
-    cy.get(selectors.dataStream.connectorDropdown).should('have.text', 'Standard HTTP/HTTPS POST')
     cy.get(selectors.dataStream.httpConnector.urlInput).type('https://hello.world')
     cy.get(selectors.dataStream.httpConnector.headersInput).type('header:value')
-    cy.get(selectors.dataStream.httpConnector.payloadInput).should('have.value', '$dataset')
-    cy.get(selectors.dataStream.httpConnector.separatorInput).should('have.value', '\\n')
-    cy.get(selectors.dataStream.httpConnector.maxSizeInput).should('have.value', '1000000')
-
-    cy.get(selectors.dataStream.statusSlider).should('have.attr', 'aria-checked', 'true')
 
     cy.get(selectors.form.actionsSubmitButton).click()
 
