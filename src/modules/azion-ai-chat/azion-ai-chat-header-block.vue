@@ -12,7 +12,9 @@
       />
     </h3>
 
-    <slot name="header-actions"> </slot>
+    <div class="flex gap-4">
+      <slot name="header-actions"></slot>
+    </div>
   </div>
 </template>
 

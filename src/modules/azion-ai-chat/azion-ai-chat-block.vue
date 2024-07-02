@@ -17,21 +17,37 @@
         })
     "
   >
-    <div
-      class="deep-chat-temporary-message"
-      :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`"
-    >
-      <img
-        :style="`width:32px;height:32px;object-fit:cover;`"
-        :src="introMessageAiAzionLogo"
-      />
-      <div v-html="introMessage.html"></div>
+    <div class="deep-chat-temporary-message">
+      <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
+        <img
+          :style="`width:32px;height:32px;object-fit:cover;`"
+          :src="introMessageAiAzionLogo"
+        />
+        <div
+          :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
+        >
+          <AzionAiChatSuggestion
+            @click="handleSubmitSuggestion(0)"
+            text="Error when importing Domains"
+            :iconSrc="suggestionIconMetrics"
+          />
+          <AzionAiChatSuggestion
+            @click="handleSubmitSuggestion(1)"
+            text="Error when creating WAF"
+            :icon-src="suggestionIconSecurity"
+          />
+        </div>
+      </div>
+      <div v-html="introMessageWithResetStyles.html" />
     </div>
   </deep-chat>
 </template>
 <script setup>
   import 'deep-chat'
   import introMessageAiAzionLogo from './assets/intro-message-logo.svg?url'
+  import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
+  import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
+  import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
   import { requestInterceptorService } from './services/request-interceptor-service'
   import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
@@ -49,6 +65,7 @@
   })
 
   const deepChatRef = ref(null)
+
   defineExpose({
     deepChatRef
   })
@@ -61,7 +78,6 @@
       default: 'Fail to connect, please try again.'
     }
   })
-
   const deepChatStyles = ref({
     fontFamily: 'var(--font-family)',
     width: '100%',
@@ -72,7 +88,6 @@
     border: '1px solid var(--surface-border)',
     overflow: 'hidden'
   })
-
   const messageStyles = ref({
     default: {
       shared: {
@@ -179,7 +194,6 @@
     },
     characterLimit: 300
   })
-
   const submitButtonStyles = ref({
     position: 'inside-right',
     submit: {
@@ -220,18 +234,7 @@
       }
     }
   })
-
-  const createSuggestion = ({ text }) => {
-    return `
-      <div class="deep-chat-suggestion">
-        <button style="text-align: left; min-height:2rem;transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s; border-radius: 6px; font-weight: 500;cursor: pointer; background-color: transparent; border: 1px solid var(--surface-border); color: var(--text-color); font-size: 0.875rem; padding: 0.5rem 1rem; overscroll-behavior: contain; width: auto;" class="deep-chat-suggestion-button">
-            ${text}
-        </button>
-      </div>
-    `
-  }
-
-  const introMessage = ref({
+  const introMessageWithResetStyles = ref({
     html: `
       <style>
         #chat-view{
@@ -278,21 +281,19 @@
           border-color:var(--text-color) !important;
         }
       </style>
-
-      <div style="display:flex;flex-direction:row;gap:1rem">
-        ${createSuggestion({
-          text: 'Show how WAF protect my application'
-        })}
-
-        ${createSuggestion({
-          text: 'Customize build metrics'
-        })}
-
-      </div>
       `,
     role: 'ai'
   })
 
+  const handleSubmitSuggestion = (suggestionIndex) => {
+    const suggestionsOptions = [
+      'How to create an domain and import it to Azion?',
+      'How to create an Waf app to protect my application?'
+    ]
+
+    const suggestion = suggestionsOptions[suggestionIndex]
+    deepChatRef.value.submitUserMessage({ text: suggestion })
+  }
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
   }

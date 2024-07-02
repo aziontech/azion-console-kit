@@ -5,23 +5,22 @@
   >
     <AzionAiChatHeader>
       <template #header-actions>
-        <div class="flex gap-4">
-          <PrimeButton
-            icon="pi pi-pen-to-square"
-            outlined
-            class="surface-border h-8 w-8"
-            aria-label="New Chat"
-            v-tooltip.bottom="'New Chat'"
-            @click="handleClearChat"
-          />
-          <PrimeButton
-            icon="pi pi-times"
-            outlined
-            class="surface-border h-8 w-8"
-            aria-label="Close"
-            @click="azionAiChatStore.close()"
-          /></div
-      ></template>
+        <PrimeButton
+          icon="pi pi-pen-to-square"
+          outlined
+          class="surface-border h-8 w-8"
+          aria-label="New Chat"
+          v-tooltip.bottom="'New Chat'"
+          @click="handleClearChat"
+        />
+        <PrimeButton
+          icon="pi pi-times"
+          outlined
+          class="surface-border h-8 w-8"
+          aria-label="Close"
+          @click="azionAiChatStore.close()"
+        />
+      </template>
     </AzionAiChatHeader>
 
     <div
