@@ -4,7 +4,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import Tag from 'primevue/tag'
-  import ListView from './ListView.vue'
+  import ListView from './PaymentListView.vue'
 
   import { ref } from 'vue'
 
@@ -85,6 +85,9 @@
           <ListView
             v-if="activeTab === mapTabs.payment"
             :listPaymentService="props.paymentServices.listPaymentService"
+            :deletePaymentService="props.paymentServices.deletePaymentService"
+            :setAsDefaultPaymentService="props.paymentServices.setAsDefaultPaymentService"
+            :documentPaymentService="props.paymentServices.documentPaymentService"
           ></ListView>
         </TabPanel>
       </TabView>

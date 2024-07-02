@@ -46,17 +46,17 @@ const adapt = (httpResponse) => {
   const parseBilling = responseDataSorted.map((card) => {
     return {
       id: card.id,
-      cardHolder: card.card_holder,
+      cardHolder: card.card_holder.toLowerCase(),
       cardExpiration: {
-        content: formatDate(card.card_expiration_month, card.card_expiration_year),
-        cardBrand: '',
-        tag: isExpired(card.card_expiration_month, card.card_expiration_year)
+        expiringDate: formatDate(card.card_expiration_month, card.card_expiration_year),
+        status: isExpired(card.card_expiration_month, card.card_expiration_year)
       },
       cardData: {
-        content: card.card_last_4_digits,
+        cardNumber: card.card_last_4_digits,
         cardBrand: card.card_brand,
-        tag: card.is_default ? 'Default' : ''
-      }
+        status: card.is_default ? 'Default' : ''
+      },
+      isDefault: card.is_default
     }
   })
 
