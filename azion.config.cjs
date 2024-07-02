@@ -1,5 +1,5 @@
 /* if you have two environments for the same application */
-const environment = process.env.VITE_ENVIRONMENT || 'production';
+const environment = process.env.VITE_ENVIRONMENT || 'production'
 //const config = require(`./azion/${environment}/azion.json`)
 
 /* eslint-env node */
@@ -11,25 +11,27 @@ const environment = process.env.VITE_ENVIRONMENT || 'production';
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
-    return origin?.map(origin => ({
+    return origin?.map((origin) => ({
       ...origin,
       hostHeader: `stage-${origin.hostHeader}`,
-      addresses: origin.addresses?.map(addr => `stage-${addr}`)
-    }));
+      addresses: origin.addresses?.map((addr) => `stage-${addr}`)
+    }))
   }
-  return origin;
-};
+  return origin
+}
 
 const addStageSuffixToCookies = (cookieName) => {
-  return environment === 'stage' ? `${cookieName}_stg` : cookieName;
-};
-
+  return environment === 'stage' ? `${cookieName}_stg` : cookieName
+}
 
 const cacheConfig = [
   {
     name: 'Statics - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'ignore'
+    },
     methods: {
       post: false,
       options: false
@@ -45,6 +47,9 @@ const cacheConfig = [
     name: 'Marketplace - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'varies'
+    },
     methods: {
       post: false,
       options: false
@@ -57,6 +62,9 @@ const cacheConfig = [
     name: 'Cities - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'varies',
+    },
     methods: {
       post: false,
       options: false
@@ -67,7 +75,7 @@ const cacheConfig = [
     edge: {
       maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
     }
-  },
+  }
 ]
 
 const commonRules = [
@@ -232,7 +240,7 @@ const backRules = [
       rewrite: '/graphql/',
       setCache: 'Cities - Cache'
     }
-  },
+  }
 ]
 
 const AzionConfig = {
@@ -306,7 +314,9 @@ const AzionConfig = {
             captured: 'azrt_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('_azrt')}`
           },
-          setCookie: `${addStageSuffixToCookies('_azrt')}=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            '_azrt'
+          )}=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('_azrt')
         }
       },
@@ -322,7 +332,9 @@ const AzionConfig = {
             captured: 'azsid_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('azsid')}`
           },
-          setCookie: `${addStageSuffixToCookies('azsid')}=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            'azsid'
+          )}=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('azsid')
         }
       },
@@ -338,7 +350,9 @@ const AzionConfig = {
             captured: 'azat_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('_azat')}`
           },
-          setCookie: `${addStageSuffixToCookies('_azat')}=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            '_azat'
+          )}=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('_azat')
         }
       },
