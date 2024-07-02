@@ -117,7 +117,7 @@
   }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'Domain copied to clipboard!')
+    showToast('success', 'Successfully copied!')
   }
 
   const scrollToTop = () => {

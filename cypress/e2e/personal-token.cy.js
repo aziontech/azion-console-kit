@@ -43,7 +43,7 @@ describe('Personal Token spec', () => {
       'Personal token has been created'
     )
     cy.get(selectors.form.copyTokenButton).click()
-    cy.verifyToast('Personal Token copied to clipboard!')
+    cy.verifyToast('Successfully copied!')
     cy.get(selectors.form.closeCopyDialogButton).click()
 
     // Assert

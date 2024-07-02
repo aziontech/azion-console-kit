@@ -3,10 +3,10 @@
     <DialogAuthorize
       v-model:visible="authorizeDialogVisible"
       modal
-      header="Are you sure?"
+      header="Authorize Nodes"
       class="w-[40vw]"
     >
-      <p class="text-color-secondary">1 nodes will be authorized.</p>
+      <p class="text-color-secondary">The selected node(s) will be authorized.</p>
 
       <template #footer>
         <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
@@ -72,7 +72,7 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'Edge Nodes authorized successfully!'
+            summary: 'Successfully authorized!'
           })
           this.authorizeDialogVisible = false
         }

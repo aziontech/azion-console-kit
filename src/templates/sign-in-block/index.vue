@@ -216,7 +216,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Error',
+        summary: 'Verification failed',
         detail: errorMessage
       })
     }

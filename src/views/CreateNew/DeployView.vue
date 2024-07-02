@@ -200,7 +200,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Created successfully',
+        summary: 'Successfully created!',
         detail: successMessage
       })
     } catch (error) {
@@ -208,7 +208,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Creation Failed',
+        summary: 'Creation failed',
         detail: failMessage
       })
     } finally {

@@ -156,6 +156,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
+          data-testid="account-settings__account-name"
           label="Account Name"
           required
           name="accountName"
@@ -195,6 +196,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
+          data-testid="account-settings__company-name"
           label="Company Name"
           name="companyName"
           placeholder="Company S.A."
@@ -204,6 +206,7 @@
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
+          data-testid="account-settings__company-id"
           label="Company ID"
           name="uniqueIdentifier"
           placeholder="00.000.000/0001-00"
@@ -234,6 +237,7 @@
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldText
+            data-testid="account-settings__postal-code"
             label="Postal Code"
             required
             name="postalCode"
