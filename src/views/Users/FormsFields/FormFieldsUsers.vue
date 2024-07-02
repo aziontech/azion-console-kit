@@ -220,7 +220,7 @@
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
-            label="language"
+            label="Language"
             data-testid="users-form__language-field__label"
           />
           <Dropdown
