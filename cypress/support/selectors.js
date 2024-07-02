@@ -99,28 +99,24 @@ const selectors = {
     tokenCopyButton: '[data-testid="credentials-create-form__token-field__copy-token-button"]',
     statusSwitch: '[data-testid="credentials-create-form__status-field__switch"]'
   },
-  contact: {
-    emailInput: '[data-testid="contact__email__input"]',
-    emailError: '[data-testid="contact__email__error-message"]',
-    mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
+  yourSettings: {
+    emailInput: '[data-testid="your-settings-form__email__input"]',
+    emailError: '[data-testid="your-settings-form__email__error-message"]',
+    mobileCountryCodeOptions: '[data-testid="your-settings-form__country-code__dropdown"]',
     countryCodeFilter: '.p-dropdown-filter',
     countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    mobileInput: '[data-testid="contact__mobile__input"]',
-    mobileError: '[data-testid="contact__mobile__error-text"]'
-  },
-  profile: {
-    firstNameInput: '[data-testid="profile__first-name__input"]',
-    firstNameError: '[data-testid="profile__first-name__error-message"]',
-    lastNameInput: '[data-testid="profile__last-name__input"]',
-    lastNameError: '[data-testid="profile__last-name__error-message"]',
-    timezoneOptions: '[data-testid="profile__timezone__options__dropdown"]',
-    language: '[data-testid="profile__language"]'
-  },
-  security: {
-    oldPasswordInput: '[data-testid="security__old-password__input"]',
-    newPasswordInput: '[data-testid="security__new-password__input"]',
-    confirmPasswordInput: '[data-testid="security__confirm-password__input"]',
-    confirmPasswordError: '[data-testid="security__confirm-password__error-text"]',
+    mobileInput: '[data-testid="your-settings-form__mobile__input"]',
+    mobileError: '[data-testid="your-settings-form__mobile__error-message"]',
+    firstNameInput: '[data-testid="your-settings-form__first-name__input"]',
+    firstNameError: '[data-testid="your-settings-form__first-name__error-message"]',
+    lastNameInput: '[data-testid="your-settings-form__last-name__input"]',
+    lastNameError: '[data-testid="your-settings-form__last-name__error-message"]',
+    timezoneOptions: '[data-testid="your-settings-form__timezone__dropdown"]',
+    language: '[data-testid="your-settings-form__language"]',
+    oldPasswordInput: '[data-testid="your-settings-form__old-password__input"]',
+    newPasswordInput: '[data-testid="your-settings-form__new-password__input"]',
+    confirmPasswordInput: '[data-testid="your-settings-form__confirm-password__input"]',
+    confirmPasswordError: '[data-testid="your-settings-form__confirm-password__error-message"]',
     twoFactorToggle: '.p-inputswitch-slider'
   },
   networkLists: {
