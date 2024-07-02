@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { toRef, computed, useAttrs } from 'vue'
   import { useField } from 'vee-validate'
   import InputNumber from 'primevue/inputnumber'
   import LabelBlock from '@/templates/label-block'
@@ -67,11 +67,25 @@
   } = useField(name, undefined, {
     initialValue: props.value ?? null
   })
+
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-number'
+
+    return {
+      label: `${id}__label`,
+      input: `${id}__input`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 </script>
 
 <template>
   <LabelBlock
     :for="props.name"
+    :data-testid="customTestId.label"
     :label="props.label"
     :isRequired="$attrs.required"
   />
@@ -95,15 +109,18 @@
       }
     }"
     :class="[{ 'p-invalid': !!errorMessage }, props.inputClass]"
+    :data-testid="customTestId.input"
   />
 
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
+    :data-testid="customTestId.error"
     >{{ errorMessage }}</small
   >
   <small
     class="text-xs text-color-secondary font-normal leading-5"
+    :data-testid="customTestId.description"
     v-if="props.description"
   >
     {{ props.description }}

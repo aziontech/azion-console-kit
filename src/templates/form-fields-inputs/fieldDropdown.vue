@@ -1,7 +1,7 @@
 <script setup>
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
-  import { computed, toRef, useSlots } from 'vue'
+  import { computed, toRef, useSlots, useAttrs } from 'vue'
   import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
@@ -103,6 +103,20 @@
   /**
    * end of primevue workaround
    */
+
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-dropdown'
+
+    return {
+      label: `${id}__label`,
+      dropdown: `${id}__dropdown`,
+      value: `${id}__value`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 </script>
 
 <template>
@@ -110,6 +124,7 @@
     :for="props.name"
     :label="props.label"
     :isRequired="$attrs.required"
+    :data-testid="customTestId.label"
   />
   <Dropdown
     appendTo="self"
@@ -135,12 +150,13 @@
         class: 'w-full'
       }
     }"
+    :data-testid="customTestId.dropdown"
   >
     <template
       v-if="enableCustomLabel"
       #value="slotProps"
     >
-      <span>
+      <span :data-testid="customTestId.value">
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
@@ -152,12 +168,14 @@
 
   <small
     v-if="errorMessage"
+    :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
   >
     {{ errorMessage }}
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
+    :data-testid="customTestId.description"
     v-if="props.description || hasDescriptionSlot"
   >
     <slot name="description">

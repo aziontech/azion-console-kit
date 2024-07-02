@@ -103,7 +103,7 @@
           :value="networkListType"
           appendTo="self"
           description="Each list type accepts different values."
-          data-testid="network-list-form__type__dropdown"
+          data-testid="network-list-form__type"
         />
       </div>
       <div
