@@ -6,7 +6,7 @@
   import Tag from 'primevue/tag'
   import ListView from './PaymentListView.vue'
 
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
 
@@ -48,8 +48,10 @@
     })
   }
 
+  const isPaymentTabActive = computed(() =>  activeTab.value === TABS_MAP.payment)
+
   const renderTabCurrentRouter = async () => {
-    const { tab = 0 } = route.params
+    const { tab = TABS_MAP.bills } = route.params
     const activeTabIndexByRoute = TABS_MAP[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
@@ -83,7 +85,7 @@
         </TabPanel>
         <TabPanel header="Payment Methods">
           <ListView
-            v-if="activeTab === TABS_MAP.payment"
+            v-if="isPaymentTabActive"
             :listPaymentService="props.paymentServices.listPaymentService"
             :deletePaymentService="props.paymentServices.deletePaymentService"
             :setAsDefaultPaymentService="props.paymentServices.setAsDefaultPaymentService"

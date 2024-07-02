@@ -26,23 +26,19 @@ const getExpiredString = (month, year) => {
   const isExpiredByYear = year < currentYear
   const isExpiredByMonth = year === currentYear && month < currentMonth
 
-  if (isExpiredByYear || isExpiredByMonth) {
-    return 'Expired'
-  } else {
-    return ''
-  }
+  return isExpiredByYear || isExpiredByMonth ? 'Expired' : ''
 }
 
 const adapt = (httpResponse) => {
-  /**
-   * Necessary until the API gets the common pattern
-   * of returning the array of data inside results property
-   * like other andpoints.
-   */
 
-  const responseData = Array.isArray(httpResponse.body.results) ? httpResponse.body.results : []
+  if(!httpResponse.body.results) {
+    return {
+      body: [],
+      statusCode: httpResponse.statusCode
+    }
+  }
 
-  const responseDataSorted = responseData.sort(
+  const responseDataSorted = httpResponse.body.results.sort(
     (currentCard, nextCard) => nextCard.is_default - currentCard.is_default
   )
 

@@ -19,11 +19,12 @@ describe('PaymentServices', () => {
         is_default: true
       }
     })
+    const paymentIdMock = 1
     const { sut } = makeSut()
-    await sut(4040)
+    await sut(paymentIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/payments/credit_cards/4040',
+      url: `v4/payments/credit_cards/${paymentIdMock}`,
       method: 'PATCH',
       body: {
         is_default: true
@@ -38,9 +39,11 @@ describe('PaymentServices', () => {
         is_default: true
       }
     })
+    const paymentIdMock = 1
+
     const { sut } = makeSut()
 
-    const data = await sut(10)
+    const data = await sut(paymentIdMock)
 
     expect(data).toStrictEqual('Payment successfully set as default')
   })
@@ -54,9 +57,12 @@ describe('PaymentServices', () => {
         [errorKey]: [apiErrorMock]
       }
     })
+
+    const paymentIdMock = 1
+
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(1)
+    const feedbackMessage = sut(paymentIdMock)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -88,9 +94,10 @@ describe('PaymentServices', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
+      const paymentIdMock = 1
       const { sut } = makeSut()
 
-      const response = sut(1)
+      const response = sut(paymentIdMock)
 
       expect(response).rejects.toBe(expectedError)
     }

@@ -9,7 +9,7 @@ const makeSut = () => {
   }
 }
 
-describe('PaymentService', () => {
+describe('PaymentServices', () => {
   it('should return the API base url to payment service', () => {
     const { sut } = makeSut()
     const version = 'v4'
