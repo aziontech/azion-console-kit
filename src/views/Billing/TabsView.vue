@@ -48,7 +48,7 @@
     })
   }
 
-  const isPaymentTabActive = computed(() =>  activeTab.value === TABS_MAP.payment)
+  const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
 
   const renderTabCurrentRouter = async () => {
     const { tab = TABS_MAP.bills } = route.params

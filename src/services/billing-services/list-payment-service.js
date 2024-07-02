@@ -30,8 +30,7 @@ const getExpiredString = (month, year) => {
 }
 
 const adapt = (httpResponse) => {
-
-  if(!httpResponse.body.results) {
+  if (!httpResponse.body.results) {
     return {
       body: [],
       statusCode: httpResponse.statusCode

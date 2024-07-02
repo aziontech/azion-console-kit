@@ -66,7 +66,7 @@ describe('PaymentServices', () => {
     })
   })
 
-  it('should parsed correctly all returned payment', async () => {
+  it('should parse correctly all returned payment methods', async () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
