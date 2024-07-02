@@ -13,7 +13,8 @@
       (requestDetails) =>
         requestInterceptorService(requestDetails, {
           sessionId: aiAskAzionSessionId,
-          url: currentRouteFullPath
+          url: currentRouteFullPath,
+          userName: account.name
         })
     "
   >
@@ -54,7 +55,9 @@
   import azionLogoProfile from '@/modules/azion-ai-chat/assets/azion-logo.svg?url'
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
   const { currentRoute } = useRouter()
+  const { account } = useAccountStore()
 
   defineOptions({
     name: 'azion-ai-chat-block'
@@ -62,6 +65,7 @@
 
   onMounted(() => {
     generateChatSessionId()
+    getUserNameInfo()
   })
 
   const deepChatRef = ref(null)
@@ -72,6 +76,7 @@
 
   const currentRouteFullPath = currentRoute.value.path
   const aiAskAzionSessionId = ref('')
+  const accountName = ref('')
 
   const errorMessages = ref({
     overrides: {
@@ -296,5 +301,8 @@
   }
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
+  }
+  const getUserNameInfo = () => {
+    accountName.value = account.name
   }
 </script>
