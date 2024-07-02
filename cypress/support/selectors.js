@@ -76,11 +76,12 @@ const selectors = {
     addRuleButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     criteriaOperatorDropdown:
-      '[data-testid="rule-form-criteria-item-conditional-operator"] > .p-dropdown-trigger',
+      '[data-testid="rule-form-criteria-item-conditional-operator__dropdown"] > .p-dropdown-trigger',
     criteriaOperator: 'li[aria-label="is equal"]',
     criteriaInputValue:
       '[data-testid="rule-form-criteria-item-conditional-input-field-text__input"]',
-    behaviorsDropdown: '[data-testid="rule-form-behaviors-item-name"] > .p-dropdown-trigger',
+    behaviorsDropdown:
+      '[data-testid="rule-form-behaviors-item-name__dropdown"] > .p-dropdown-trigger',
     behaviors: '#behaviors\\[0\\]\\.name_4',
     ruleTable: '.p-datatable-tbody > tr > :nth-child(2) > div',
     actionsButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
@@ -112,7 +113,7 @@ const selectors = {
     firstNameError: '[data-testid="profile__first-name__error-message"]',
     lastNameInput: '[data-testid="profile__last-name__input"]',
     lastNameError: '[data-testid="profile__last-name__error-message"]',
-    timezoneOptions: '[data-testid="profile__timezone__options"]',
+    timezoneOptions: '[data-testid="profile__timezone__options__dropdown"]',
     language: '[data-testid="profile__language"]'
   },
   security: {
@@ -124,9 +125,9 @@ const selectors = {
   },
   networkLists: {
     createButton: '[data-testid="create_Network List_button"] > .p-button-label',
-    nameInput: '[data-testid="network-list-form__name__input',
-    typeDropdown: '[data-testid="network-list-form__type__dropdown',
-    asnTextarea: '[data-testid="network-list-form__asn-list__textarea',
+    nameInput: '[data-testid="network-list-form__name__input"]',
+    typeDropdown: '[data-testid="network-list-form__type__dropdown"]',
+    asnTextarea: '[data-testid="network-list-form__asn-list__textarea"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
