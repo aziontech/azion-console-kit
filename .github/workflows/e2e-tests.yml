@@ -38,7 +38,7 @@ jobs:
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
       - name: Remove lcov intermediate files
-        run: rm -rf coverage/lcov-report
+        run: rm -rf coverage/e2e/lcov-report
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
