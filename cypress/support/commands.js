@@ -1,10 +1,12 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-import selectors from '../support/selectors';
+import selectors from '../support/selectors'
+
+import 'cypress-real-events'
 
 /**
  * Performs login using provided email and password.
- * 
+ *
  * @param {string} email - The user's email address.
  * @param {string} password - The user's password.
  */
@@ -24,22 +26,24 @@ const login = (email, password) => {
  * @param {string} path - The URL path where the product list is located.
  */
 const deleteProduct = (productName, path, columnName) => {
-  cy.visit(`${path}`);
+  cy.visit(`${path}`)
   cy.get(selectors.list.searchInput).clear()
   cy.get(selectors.list.searchInput).type(productName)
-  cy.get(selectors.list.filteredRow.nameColumn(columnName)).should('be.visible').should('have.text', productName)
+  cy.get(selectors.list.filteredRow.nameColumn(columnName))
+    .should('be.visible')
+    .should('have.text', productName)
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
   cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
   cy.get(selectors.list.deleteDialog.deleteButton).click()
-};
+}
 
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
-  console.log('Uncaught exception in test:', runnable.title);
-  console.error('Uncaught exception:', err);
-  return false;
-});
+  console.log('Uncaught exception in test:', runnable.title)
+  console.error('Uncaught exception:', err)
+  return false
+})
 
 /**
  * Performs login using environment variables for email and password.
@@ -67,20 +71,20 @@ Cypress.Commands.add('openProductThroughSidebar', (productName) => {
  * @param {string} menuAccountLabel - The label of the item in the account menu.
  */
 Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
-  cy.get(selectors.menuAccount.avatarIcon).click();
-  cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click();
-});
+  cy.get(selectors.menuAccount.avatarIcon).click()
+  cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click()
+})
 
 /**
  * Deletes a product using the provided name, optional column name, and path.
- * 
+ *
  * @param {string} productName - The name of the product to delete.
  * @param {string} path - The URL path where the product list is located.
  * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
  */
 Cypress.Commands.add('deleteProduct', (productName, path, columnName = 'name') => {
-  deleteProduct(productName, path, columnName);
-});
+  deleteProduct(productName, path, columnName)
+})
 
 /**
  * Verifies the visibility and content of a toast message.
@@ -101,4 +105,18 @@ Cypress.Commands.add('verifyToast', (summary, detail = '') => {
     .then(() => {
       cy.get(customId).should('not.be.visible')
     })
+})
+
+/**
+ * Asserts that the expected value has been copied to the clipboard.
+ *
+ * @param {string} expectedValue - The expected value that should have been copied to the clipboard.
+ */
+Cypress.Commands.add('assertValueCopiedToClipboard', (expectedValue) => {
+  cy.window().then((win) => {
+    win.navigator.clipboard.readText().then((text) => {
+      const actualValue = text.replace(/\s+/g, ' ').trim()
+      expect(actualValue).to.eq(expectedValue)
+    })
+  })
 })

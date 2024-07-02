@@ -479,7 +479,7 @@
           toast.add({
             closable: true,
             severity: 'error',
-            summary: `Error in ${behavior.name} load.`
+            summary: `Error loading ${behavior.name}.`
           })
         }
       }
@@ -692,8 +692,7 @@
         severity="info"
         data-testid="rule-form-phase-message"
       >
-        Once a rule is created, its phase cannot be changed. If you want to change the phase, you
-        must create a new rule.
+        Once a rule is created, its phase cannot be changed. To change the phase, create a new rule.
       </InlineMessage>
 
       <FieldGroupRadio

@@ -9,12 +9,26 @@
         class="w-full grow flex flex-col gap-8"
       >
         <!-- Default -->
-        <TabPanel header="Default Tag">
+        <TabPanel
+          :pt="{
+            headerAction: {
+              'data-testid': 'edge-pulse__default-tab'
+            }
+          }"
+          header="Default Tag"
+        >
           <FormFieldsDefault @handleCopy="handleCopy"></FormFieldsDefault>
         </TabPanel>
 
         <!-- Pre-loading -->
-        <TabPanel header="Pre-loading Tag">
+        <TabPanel
+          :pt="{
+            headerAction: {
+              'data-testid': 'edge-pulse__pre-loading-tab'
+            }
+          }"
+          header="Pre-loading Tag"
+        >
           <div class="w-full">
             <FormFieldsTag @handleCopy="handleCopy"></FormFieldsTag>
           </div>
@@ -41,7 +55,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Copied successfully!'
+      summary: 'Successfully copied!'
     })
   }
   const handleCopy = ({ code }) => {
