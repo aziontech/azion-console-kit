@@ -1,18 +1,9 @@
-const selectors = {
-  contact: {
-    mobileInput: '[data-testid="contact__mobile__input"]',
-    mobileErrorText: '[data-testid="contact__mobile__error-text"]',
-    mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
-    countryCodeFilter: '.p-dropdown-filter',
-    countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    submitButton: '[data-testid="form-actions-submit-button"]'
-  }
-}
+import selectors from '../support/selectors';
 
 describe('Your Settings spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openMenuItem('Your Settings')
+    cy.openItemThroughMenuAccount('Your Settings')
   })
 
   it('should edit user phone number', () => {
@@ -20,7 +11,7 @@ describe('Your Settings spec', () => {
     cy.intercept('PATCH', '/api/v4/iam/user').as('patchUser')
 
     cy.get(selectors.contact.mobileInput).clear()
-    cy.get(selectors.contact.mobileErrorText)
+    cy.get(selectors.contact.mobileError)
       .should('be.visible')
       .and('have.text', 'Phone Number is a required field')
 
@@ -30,8 +21,7 @@ describe('Your Settings spec', () => {
     cy.get(selectors.contact.countryCodeFilter).type('br')
     cy.get(selectors.contact.countryCodeOption(0)).click()
     cy.get(selectors.contact.mobileInput).type('424242424242')
-
-    cy.get(selectors.contact.submitButton).click()
+    cy.get(selectors.form.submitButton).click()
 
     // Assert
     cy.wait('@patchUser')

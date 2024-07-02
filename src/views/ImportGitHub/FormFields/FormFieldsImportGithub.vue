@@ -78,7 +78,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Save failed',
         detail: error
       })
     } finally {
@@ -105,7 +105,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Listing failed',
         detail: error
       })
     } finally {
@@ -134,7 +134,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Loading failed',
         detail: error
       })
     } finally {
@@ -169,7 +169,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Setting failed',
         detail: error
       })
     }

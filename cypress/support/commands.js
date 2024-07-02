@@ -1,23 +1,41 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
+import selectors from '../support/selectors'
 
-// Define selectors for elements
-const selectors = {
-  menu: {
-    avatarIcon: '[data-testid="profile-block__avatar"]',
-    menuItem: (menuItemLabel) =>
-      `li[aria-label="${menuItemLabel}"] > .p-menuitem-content > .p-menuitem-link`
-  },
-  login: {
-    emailInput: '[data-testid="signin-block__email-input"]',
-    nextButton: '[data-testid="signin-block__next-button"] > .p-button-label',
-    passwordInput: '[data-testid="signin-block__password-input"] > .p-inputtext',
-    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label'
-  },
-  sidebar: {
-    toggleButton: '[data-testid="sidebar-block__toggle-button"]',
-    menuItem: (productName) => `[data-testid="sidebar-block__menu-item__${productName}"]`
-  }
+import 'cypress-real-events'
+
+/**
+ * Performs login using provided email and password.
+ *
+ * @param {string} email - The user's email address.
+ * @param {string} password - The user's password.
+ */
+const login = (email, password) => {
+  cy.visit('/login')
+  cy.get(selectors.login.emailInput).type(email)
+  cy.get(selectors.login.nextButton).click()
+  cy.get(selectors.login.passwordInput).type(password, { log: false })
+  cy.get(selectors.login.signInButton).click()
+}
+
+/**
+ * Deletes a product based on its name and optional column name.
+ *
+ * @param {string} productName - The name of the product to delete.
+ * @param {string} columnName - The name of the column containing the product name.
+ * @param {string} path - The URL path where the product list is located.
+ */
+const deleteProduct = (productName, path, columnName) => {
+  cy.visit(`${path}`)
+  cy.get(selectors.list.searchInput).clear()
+  cy.get(selectors.list.searchInput).type(productName)
+  cy.get(selectors.list.filteredRow.nameColumn(columnName))
+    .should('be.visible')
+    .should('have.text', productName)
+  cy.get(selectors.list.actionsMenu.button).click()
+  cy.get(selectors.list.actionsMenu.deleteButton).click()
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
+  cy.get(selectors.list.deleteDialog.deleteButton).click()
 }
 
 // Disable test failure for all uncaught exceptions
@@ -27,16 +45,9 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return false
 })
 
-// Function to perform login
-const login = (email, password) => {
-  cy.visit('/login')
-  cy.get(selectors.login.emailInput).type(email)
-  cy.get(selectors.login.nextButton).click()
-  cy.get(selectors.login.passwordInput).type(password, { log: false })
-  cy.get(selectors.login.signInButton).click()
-}
-
-// Custom command to perform login using environment variables
+/**
+ * Performs login using environment variables for email and password.
+ */
 Cypress.Commands.add('login', () => {
   const email = Cypress.env('CYPRESS_EMAIL_STAGE')
   const password = Cypress.env('CYPRESS_PASSWORD_STAGE')
@@ -44,23 +55,42 @@ Cypress.Commands.add('login', () => {
   login(email, password)
 })
 
-// Custom command to open a product through the sidebar menu
+/**
+ * Opens a product through the sidebar menu.
+ *
+ * @param {string} productName - The name of the product to open.
+ */
 Cypress.Commands.add('openProductThroughSidebar', (productName) => {
-  cy.get(selectors.sidebar.toggleButton).click()
-  cy.get(selectors.sidebar.menuItem(productName)).click()
-})
-
-// Custom command to open a menu item
-Cypress.Commands.add('openMenuItem', (menuItemLabel) => {
-  cy.get(selectors.menu.avatarIcon).click()
-  cy.get(selectors.menu.menuItem(menuItemLabel)).click()
+  cy.get(selectors.menuSidebar.toggleButton).click()
+  cy.get(selectors.menuSidebar.menuItem(productName)).click()
 })
 
 /**
- * Custom command to verify the visibility and content of a toast message.
+ * Opens an item through the account menu.
+ *
+ * @param {string} menuAccountLabel - The label of the item in the account menu.
+ */
+Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
+  cy.get(selectors.menuAccount.avatarIcon).click()
+  cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click()
+})
+
+/**
+ * Deletes a product using the provided name, optional column name, and path.
+ *
+ * @param {string} productName - The name of the product to delete.
+ * @param {string} path - The URL path where the product list is located.
+ * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
+ */
+Cypress.Commands.add('deleteProduct', (productName, path, columnName = 'name') => {
+  deleteProduct(productName, path, columnName)
+})
+
+/**
+ * Verifies the visibility and content of a toast message.
  *
  * @param {string} summary - The summary text of the toast message.
- * @param {string} detail - The detail text of the toast message.
+ * @param {string} [detail=''] - The detail text of the toast message (optional).
  */
 Cypress.Commands.add('verifyToast', (summary, detail = '') => {
   const messageText = `${summary}${detail}`
@@ -75,4 +105,18 @@ Cypress.Commands.add('verifyToast', (summary, detail = '') => {
     .then(() => {
       cy.get(customId).should('not.be.visible')
     })
+})
+
+/**
+ * Asserts that the expected value has been copied to the clipboard.
+ *
+ * @param {string} expectedValue - The expected value that should have been copied to the clipboard.
+ */
+Cypress.Commands.add('assertValueCopiedToClipboard', (expectedValue) => {
+  cy.window().then((win) => {
+    win.navigator.clipboard.readText().then((text) => {
+      const actualValue = text.replace(/\s+/g, ' ').trim()
+      expect(actualValue).to.eq(expectedValue)
+    })
+  })
 })

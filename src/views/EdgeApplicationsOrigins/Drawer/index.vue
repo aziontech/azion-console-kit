@@ -219,7 +219,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Origin key copied to clipboard!'
+      summary: 'Successfully copied!'
     })
   }
 

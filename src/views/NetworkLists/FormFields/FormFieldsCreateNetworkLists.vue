@@ -79,6 +79,7 @@
           placeholder="My Network List"
           :value="name"
           description="Give a unique and descriptive name to identify the network list."
+          data-testid="network-list-form__name"
         />
       </div>
     </template>
@@ -99,6 +100,7 @@
           :value="networkListType"
           appendTo="self"
           description="Each list type accepts different values."
+          data-testid="network-list-form__type__dropdown"
         />
       </div>
       <div
@@ -114,6 +116,7 @@
           :value="asn"
           description="Separate each ASN value by using a new line. Duplicated entries are automatically
           removed."
+          data-testid="network-list-form__asn-list"
         />
       </div>
       <div
@@ -130,6 +133,7 @@
           description="Separate each address value by using a new line and, optionally, use <code>#</code> to add
           a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
           removed."
+          data-testid="network-list-form__ipcidr-list"
         />
       </div>
       <div
@@ -153,6 +157,7 @@
           :class="{ 'p-invalid': selectedCountriesError }"
           class="w-full"
           display="chip"
+          data-testid="network-list-form__countries__multiselect"
         />
         <small
           v-if="selectedCountriesError"
