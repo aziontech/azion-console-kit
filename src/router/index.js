@@ -34,8 +34,8 @@ import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import { settingsRoutes } from '@routes/your-settings-routes'
 import { githubRoutes } from '@routes/github-routes'
 import { importGithubRoutes } from '@routes/import-github-routes'
+import { billingRoutes } from '@/router/routes/billing-routes'
 import { createRouter, createWebHistory } from 'vue-router'
-
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import redirectToManager from './hooks/redirectToManager'
@@ -77,6 +77,7 @@ const router = createRouter({
     realTimeMetricsRoutes,
     realTimeEventsRoutes,
     githubRoutes,
+    billingRoutes,
     importGithubRoutes
   ].concat(errorRoutes)
 })
