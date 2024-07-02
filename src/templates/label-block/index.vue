@@ -1,6 +1,4 @@
 <script setup>
-  import { defineProps } from 'vue'
-
   defineOptions({ name: 'label-block' })
 
   const props = defineProps({
