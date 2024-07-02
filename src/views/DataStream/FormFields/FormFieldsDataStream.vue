@@ -2,6 +2,7 @@
   <FormHorizontal
     title="General"
     description="Create a stream to feed your data platforms with logs from your applications."
+    data-testid="data-stream-form__section__general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -10,6 +11,7 @@
           description="Give a unique and descriptive name to identify the data stream."
           name="name"
           placeholder="My stream"
+          data-testid="data-stream-form__general__name-field"
         />
       </div>
     </template>
@@ -18,6 +20,7 @@
   <FormHorizontal
     title="Data Settings"
     description="Define the source and the variables from which data should be collected."
+    data-testid="data-stream-form__section__data-settings"
   >
     <template #inputs>
       <div class="flex flex-wrap gap-6">
@@ -31,6 +34,7 @@
             :value="dataSource"
             appendTo="self"
             description="Represents the data source the data will be collected from."
+            data-testid="data-stream-form__data-settings__data-source-field"
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -43,6 +47,7 @@
             :value="template"
             appendTo="self"
             description="Represents a preset of variables for specific sources or an open template to choose variables."
+            data-testid="data-stream-form__data-settings__template-field"
           />
         </div>
       </div>
@@ -58,8 +63,12 @@
           :theme="theme"
           :options="dataSetMonacoOptions"
           class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
+          data-testid="data-stream-form__data-settings__data-set-field"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="data-stream-form__data-settings__data-set-description"
+        >
           Exhibits or allows writing the variables that'll be sent to the connector in a JSON
           format.
         </small>
@@ -69,6 +78,7 @@
   <FormHorizontal
     title="Domains"
     description="Associate domains with this stream to define the addresses from which the data will be collected."
+    data-testid="data-stream-form__section__domains"
   >
     <template #inputs>
       <div class="flex flex-col gap-4">
@@ -77,6 +87,7 @@
           nameField="domainOption"
           :isCard="false"
           :options="domainsRadioOptions"
+          data-testid="data-stream-form__domains__options-field"
         />
       </div>
 
@@ -87,6 +98,7 @@
         <label
           for="domains"
           class="text-color text-base font-medium"
+          data-testid="data-stream-form__domains__domains-field-label"
           >Domains *</label
         >
         <PickList
@@ -99,19 +111,27 @@
           breakpoint="1400px"
           :showSourceControls="false"
           :showTargetControls="false"
+          data-testid="data-stream-form__domains__domains-field"
         >
           <template #sourceheader>Available Domains</template>
           <template #targetheader>Chosen Domains</template>
           <template #item="slotProps">
             <div class="flex flex-wrap p-2 align-items-center gap-3">
               <div class="flex-1 flex flex-column gap-2">
-                <span class="font-normal">{{ slotProps.item.name }}</span>
+                <span
+                  class="font-normal"
+                  data-testid="data-stream-form__domains__domains-name"
+                  >{{ slotProps.item.name }}</span
+                >
               </div>
             </div>
           </template>
         </PickList>
 
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="data-stream-form__domains__domains-description"
+        >
           Select an item from the list and then use the arrows to move it between the available and
           selected domains boxes. Use the double-line arrows to move all items or press the
           <code>ctrl</code> or <code>command</code> keys to select multiple items.
@@ -124,6 +144,7 @@
     title="Sampling"
     class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
+    data-testid="data-stream-form__section__sampling"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
@@ -134,6 +155,7 @@
           :isCard="false"
           title="Active"
           subtitle="Once enabled, you can only have one active stream in your account. If it's later disabled, the Add option will become available again on the creation page."
+          data-testid="data-stream-form__sampling__active-field"
         />
 
         <div
@@ -147,12 +169,14 @@
             description="Percentage value received in return of the total data related to all domains."
             :min="0"
             :max="100"
+            data-testid="data-stream-form__sampling__percentage-field"
           />
         </div>
         <InlineMessage
           class="w-fit"
           severity="warn"
           v-if="hasSampling"
+          data-testid="data-stream-form__sampling__inline-message"
         >
           After activating and saving these settings, all other streams will become inactive.
         </InlineMessage>
@@ -163,6 +187,7 @@
   <FormHorizontal
     title="Destination"
     description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform."
+    data-testid="data-stream-form__section__destination"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -175,6 +200,7 @@
           :value="endpoint"
           appendTo="self"
           description="Each option represents a different platform and requires different values."
+          data-testid="data-stream-form__destination__connector-field"
         />
       </div>
 
@@ -191,6 +217,7 @@
             name="endpointUrl"
             :value="endpointUrl"
             placeholder="https://app.domain.com/"
+            data-testid="data-stream-form__destination__url-field"
           />
         </div>
 
@@ -198,6 +225,7 @@
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__headers-field-label"
             >Custom Headers</label
           >
           <div
@@ -210,6 +238,7 @@
               type="text"
               id="header-value"
               placeholder="header-name:value"
+              data-testid="data-stream-form__destination__headers-field-input"
             />
             <ButtonPrimer
               icon="pi pi-trash"
@@ -217,6 +246,7 @@
               outlined
               v-if="header.deleted"
               @click="removeHeader(index)"
+              data-testid="data-stream-form__destination__headers-field-remove-button"
             />
           </div>
 
@@ -228,6 +258,7 @@
             size="small"
             class="w-fit"
             @click="addHeader()"
+            data-testid="data-stream-form__destination__headers-field-add-button"
           />
         </div>
       </div>
@@ -245,6 +276,7 @@
             :value="bootstrapServers"
             placeholder="host1:port1,host2:port2,..."
             description="List of hosts and ports in a Kafka cluster. Separate items by comma and no space.."
+            data-testid="data-stream-form__destination__bootstrap-servers-field"
           />
         </div>
 
@@ -255,6 +287,7 @@
             :value="kafkaTopic"
             description="Name of the topic in a Kafka cluster."
             placeholder="analytics.fct.pageviews.0"
+            data-testid="data-stream-form__destination__kafka-topic-field"
           />
         </div>
 
@@ -264,14 +297,19 @@
             id="useTls"
             class="flex-shrink-0 flex-grow"
             :class="{ 'p-invalid': useTlsError }"
+            data-testid="data-stream-form__destination__use-tls-field"
           />
           <div class="flex flex-col gap-1">
             <label
               for="useTls"
               class="text-sm font-normal leading-tight"
+              data-testid="data-stream-form__destination__use-tls-field-label"
               >Enable Transport Layer Security (TLS)</label
             >
-            <small class="text-xs text-color-secondary font-normal leading-5">
+            <small
+              class="text-xs text-color-secondary font-normal leading-5"
+              data-testid="data-stream-form__destination__use-tls-field-description"
+            >
               Send encrypted data to secure communication. Make sure the receiving connector uses a
               trusted CA certificate.
             </small>
@@ -291,6 +329,7 @@
             :value="host"
             description="Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol."
             placeholder="https://myownhost.s3.us-east-1.myprovider.com"
+            data-testid="data-stream-form__destination__url-field"
           />
         </div>
 
@@ -301,6 +340,7 @@
             :value="bucket"
             description="Name of the bucket to which the object will be sent."
             placeholder="mys3bucket"
+            data-testid="data-stream-form__destination__bucket-field"
           />
         </div>
 
@@ -311,6 +351,7 @@
             :value="region"
             description="Region in which your bucket is hosted."
             placeholder="us-east-1"
+            data-testid="data-stream-form__destination__region-field"
           />
         </div>
 
@@ -318,6 +359,7 @@
           <label
             for="accessKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__access-key-field-label"
             >Access Key *</label
           >
           <PrimePassword
@@ -329,13 +371,18 @@
             :feedback="false"
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
+            data-testid="data-stream-form__destination__access-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__access-key-field-description"
+          >
             Public key to access the bucket.
           </small>
           <small
             id="access-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__access-key-field-error-message"
             >{{ accessKeyError }}</small
           >
         </div>
@@ -344,6 +391,7 @@
           <label
             for="secretKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__secret-key-field-label"
             >Secret Key *</label
           >
           <PrimePassword
@@ -355,13 +403,18 @@
             :class="{ 'p-invalid': secretKeyError }"
             :feedback="false"
             toggleMask
+            data-testid="data-stream-form__destination__secret-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__secret-key-field-description"
+          >
             Secret key to access the bucket.
           </small>
           <small
             id="secret-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__secret-key-field-error-message"
             >{{ secretKeyError }}</small
           >
         </div>
@@ -370,6 +423,7 @@
           <label
             for="objectKeyPrefix"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__object-key-prefix-field-label"
             >Object Key Prefix</label
           >
           <PrimePassword
@@ -381,20 +435,29 @@
             :class="{ 'p-invalid': objectKeyError }"
             :feedback="false"
             toggleMask
+            data-testid="data-stream-form__destination__object-key-prefix-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__object-key-prefix-field-description"
+          >
             Prefix added to the name of the uploaded object to appear on the files that'll be sent.
             Composed of Prefix + Timestamp + UUID.
           </small>
           <small
             id="object-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__object-key-prefix-field-error-message"
             >{{ objectKeyError }}</small
           >
         </div>
 
         <div class="flex flex-col gap-2">
-          <label class="text-color text-sm font-medium leading-tight">Content Type *</label>
+          <label
+            class="text-color text-sm font-medium leading-tight"
+            data-testid="data-stream-form__destination__content-type-field-label"
+            >Content Type *</label
+          >
           <div class="flex flex-col gap-3">
             <div
               class="flex no-wrap gap-2 items-center"
@@ -407,10 +470,13 @@
                 inputId="contentType"
                 :name="contentTypeItem.value"
                 :value="contentTypeItem.value"
+                data-testid="data-stream-form__destination__content-type-field-radio"
               />
-              <label class="text-color text-sm font-normal leading-tight">{{
-                contentTypeItem.label
-              }}</label>
+              <label
+                class="text-color text-sm font-normal leading-tight"
+                data-testid="data-stream-form__destination__content-type-field-label"
+                >{{ contentTypeItem.label }}</label
+              >
             </div>
           </div>
         </div>
@@ -428,6 +494,7 @@
             :value="projectID"
             description="ID of the project in Google Cloud."
             placeholder="mycustomGBQproject01"
+            data-testid="data-stream-form__destination__project-id-field"
           />
         </div>
 
@@ -438,6 +505,7 @@
             :value="datasetID"
             description="Name of the dataset created on Google BigQuery. Case sensitive field."
             placeholder="myGBQdataset"
+            data-testid="data-stream-form__destination__dataset-id-field"
           />
         </div>
 
@@ -448,6 +516,7 @@
             :value="tableID"
             description="Name of the table on Google BigQuery."
             placeholder="mypagaviewtable01"
+            data-testid="data-stream-form__destination__table-id-field"
           />
         </div>
 
@@ -455,6 +524,7 @@
           <label
             for="serviceAccountKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__service-account-key-field-label"
             >Service Account Key *</label
           >
           <vue-monaco-editor
@@ -463,13 +533,18 @@
             :theme="theme"
             :options="serviceAccountMonacoOptions"
             class="min-h-[300px] surface-border border rounded-md overflow-hidden"
+            data-testid="data-stream-form__destination__service-account-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__service-account-key-field-description"
+          >
             JSON file provided by Google Cloud used to authenticate with Google services.
           </small>
           <small
             id="service-account-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__service-account-key-field-error-message"
             >{{ serviceAccountKeyError }}</small
           >
         </div>
@@ -487,6 +562,7 @@
             :value="elasticsearchUrl"
             description="URL address plus the Elasticsearch index that'll receive the collected data."
             placeholder="https://elasticsearch-domain.com/myindex"
+            data-testid="data-stream-form__destination__elasticsearch-url-field"
           />
         </div>
 
@@ -498,6 +574,7 @@
             rows="5"
             placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
             description="API key used for Elasticsearch authorization in base64 encode format."
+            data-testid="data-stream-form__destination__api-key-field"
           />
         </div>
       </div>
@@ -514,6 +591,7 @@
             :value="splunkUrl"
             description="URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL."
             placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
+            data-testid="data-stream-form__destination__splunk-url-field"
           />
         </div>
 
@@ -524,6 +602,7 @@
             :value="splunkApiKey"
             placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
             description="HTTP Event Collector Token provided during the Splunk installation."
+            data-testid="data-stream-form__destination__splunk-api-key-field"
           />
         </div>
       </div>
@@ -540,6 +619,7 @@
             :value="streamName"
             description="Delivery stream name."
             placeholder="MyKDFConnector"
+            data-testid="data-stream-form__destination__kinesis-stream-name-field"
           />
         </div>
 
@@ -550,6 +630,7 @@
             :value="awsRegion"
             description="Region where the Amazon Kinesis instance is running."
             placeholder="us-east-1"
+            data-testid="data-stream-form__destination__kinesis-region-field"
           />
         </div>
 
@@ -557,6 +638,7 @@
           <label
             for="accessKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__kinesis-access-key-field-label"
             >Access Key *</label
           >
           <PrimePassword
@@ -568,13 +650,18 @@
             :class="{ 'p-invalid': awsAccessKeyError }"
             :feedback="false"
             toggleMask
+            data-testid="data-stream-form__destination__kinesis-access-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__kinesis-access-key-field-description"
+          >
             Public key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-access-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__kinesis-access-key-field-error"
             >{{ awsAccessKeyError }}</small
           >
         </div>
@@ -583,6 +670,7 @@
           <label
             for="accessKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field-label"
             >Secret Key *</label
           >
           <PrimePassword
@@ -594,13 +682,18 @@
             :class="{ 'p-invalid': awsSecretKeyError }"
             :feedback="false"
             toggleMask
+            data-testid="data-stream-form__destination__kinesis-secret-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field-description"
+          >
             Secret key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-secret-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field-error"
             >{{ awsSecretKeyError }}</small
           >
         </div>
@@ -618,6 +711,7 @@
             :value="datadogUrl"
             description="URL or URI of the Datadog endpoint."
             placeholder="https://http-intake.logs.datadoghq.com/v1/input"
+            data-testid="data-stream-form__destination__datadog-url-field"
           />
         </div>
 
@@ -628,6 +722,7 @@
             :value="datadogApiKey"
             placeholder="ij9076f1ujik17a81f938yhru5g713422"
             description="API key generated through the Datadog dashboard."
+            data-testid="data-stream-form__destination__datadog-api-key-field"
           />
         </div>
       </div>
@@ -644,6 +739,7 @@
             :value="QRadarUrl"
             description="Specific URL that'll receive the collected data."
             placeholder="http://137.15.824.10:14440"
+            data-testid="data-stream-form__destination__qradar-url-field"
           />
         </div>
       </div>
@@ -660,6 +756,7 @@
             :value="logType"
             description="Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters."
             placeholder="AzureMonitorTest"
+            data-testid="data-stream-form__destination__azure-monitor-log-type-field"
           />
         </div>
 
@@ -667,6 +764,7 @@
           <label
             for="sharedKey"
             class="text-color text-base font-medium"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-label"
             >Shared Key *</label
           >
           <PrimePassword
@@ -678,13 +776,18 @@
             :class="{ 'p-invalid': sharedKeyError }"
             :feedback="false"
             toggleMask
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-input"
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-description"
+          >
             Shared Key of the Workspace.
           </small>
           <small
             id="shared-key-help"
             class="p-error"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-error-message"
             >{{ sharedKeyError }}</small
           >
         </div>
@@ -697,6 +800,7 @@
             description="Specifies how long it’ll take for the log to be available after collection. Uses
             ingestion time if not specified."
             placeholder="myCustomTimeField"
+            data-testid="data-stream-form__destination__azure-monitor-generated-field-field"
           />
         </div>
 
@@ -707,6 +811,7 @@
             :value="workspaceID"
             description="ID of the Workspace."
             placeholder="kik73154-0426-464c-aij3-eg6d24u87c50"
+            data-testid="data-stream-form__destination__azure-monitor-workspace-id-field"
           />
         </div>
       </div>
@@ -733,6 +838,7 @@
             :value="containerName"
             description="Name of the container."
             placeholder="mycontainer"
+            data-testid="data-stream-form__destination__azure-blob-storage-container-name-field"
           />
         </div>
 
@@ -743,6 +849,7 @@
             :value="blobToken"
             description="Token generated by Blob Storage. It should have create, read, write, and list accesses granted."
             placeholder="sp=oiuwdl&st=2022-04-14T18:05:08Z&se=2026-03-02T02:05:08Z&sv=2020-08-04&sr=c&sig=YUi0TBEt7XTlxXex4Jui%2Fc88h6qAgMmCY4XIXeMvxa0%3F"
+            data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field"
           />
         </div>
       </div>
@@ -761,6 +868,7 @@
           :value="payloadFormat"
           description="The format that payload will be sent. The $dataset variable will be replaced by all logs already with the log line separator applied."
           placeholder="$dataset"
+          data-testid="data-stream-form__destination__payload-format-field"
         />
       </div>
 
@@ -770,6 +878,7 @@
           name="lineSeparator"
           :value="lineSeparator"
           :description="placeholderLineSeparator"
+          data-testid="data-stream-form__destination__payload-line-separator-field"
         />
       </div>
 
@@ -781,11 +890,15 @@
           description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
           placeholder="1000000"
           :useGrouping="false"
+          data-testid="data-stream-form__destination__payload-max-size-field"
         />
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal title="Status">
+  <FormHorizontal
+    title="Status"
+    data-testid="data-stream-form__section__status"
+  >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
@@ -794,6 +907,7 @@
           auto
           :isCard="false"
           title="Active"
+          data-testid="data-stream-form__status__status-field"
         />
       </div>
     </template>
