@@ -76,11 +76,12 @@ const selectors = {
     addRuleButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     criteriaOperatorDropdown:
-      '[data-testid="rule-form-criteria-item-conditional-operator"] > .p-dropdown-trigger',
+      '[data-testid="rule-form-criteria-item-conditional-operator__dropdown"] > .p-dropdown-trigger',
     criteriaOperator: 'li[aria-label="is equal"]',
     criteriaInputValue:
       '[data-testid="rule-form-criteria-item-conditional-input-field-text__input"]',
-    behaviorsDropdown: '[data-testid="rule-form-behaviors-item-name"] > .p-dropdown-trigger',
+    behaviorsDropdown:
+      '[data-testid="rule-form-behaviors-item-name__dropdown"] > .p-dropdown-trigger',
     behaviors: '#behaviors\\[0\\]\\.name_4',
     ruleTable: '.p-datatable-tbody > tr > :nth-child(2) > div',
     actionsButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
@@ -98,35 +99,31 @@ const selectors = {
     tokenCopyButton: '[data-testid="credentials-create-form__token-field__copy-token-button"]',
     statusSwitch: '[data-testid="credentials-create-form__status-field__switch"]'
   },
-  contact: {
-    emailInput: '[data-testid="contact__email__input"]',
-    emailError: '[data-testid="contact__email__error-message"]',
-    mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
+  yourSettings: {
+    emailInput: '[data-testid="your-settings-form__email__input"]',
+    emailError: '[data-testid="your-settings-form__email__error-message"]',
+    mobileCountryCodeOptions: '[data-testid="your-settings-form__country-code__dropdown"]',
     countryCodeFilter: '.p-dropdown-filter',
     countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    mobileInput: '[data-testid="contact__mobile__input"]',
-    mobileError: '[data-testid="contact__mobile__error-text"]'
-  },
-  profile: {
-    firstNameInput: '[data-testid="profile__first-name__input"]',
-    firstNameError: '[data-testid="profile__first-name__error-message"]',
-    lastNameInput: '[data-testid="profile__last-name__input"]',
-    lastNameError: '[data-testid="profile__last-name__error-message"]',
-    timezoneOptions: '[data-testid="profile__timezone__options"]',
-    language: '[data-testid="profile__language"]'
-  },
-  security: {
-    oldPasswordInput: '[data-testid="security__old-password__input"]',
-    newPasswordInput: '[data-testid="security__new-password__input"]',
-    confirmPasswordInput: '[data-testid="security__confirm-password__input"]',
-    confirmPasswordError: '[data-testid="security__confirm-password__error-text"]',
+    mobileInput: '[data-testid="your-settings-form__mobile__input"]',
+    mobileError: '[data-testid="your-settings-form__mobile__error-message"]',
+    firstNameInput: '[data-testid="your-settings-form__first-name__input"]',
+    firstNameError: '[data-testid="your-settings-form__first-name__error-message"]',
+    lastNameInput: '[data-testid="your-settings-form__last-name__input"]',
+    lastNameError: '[data-testid="your-settings-form__last-name__error-message"]',
+    timezoneOptions: '[data-testid="your-settings-form__timezone__dropdown"]',
+    language: '[data-testid="your-settings-form__language"]',
+    oldPasswordInput: '[data-testid="your-settings-form__old-password__input"]',
+    newPasswordInput: '[data-testid="your-settings-form__new-password__input"]',
+    confirmPasswordInput: '[data-testid="your-settings-form__confirm-password__input"]',
+    confirmPasswordError: '[data-testid="your-settings-form__confirm-password__error-message"]',
     twoFactorToggle: '.p-inputswitch-slider'
   },
   networkLists: {
     createButton: '[data-testid="create_Network List_button"] > .p-button-label',
-    nameInput: '[data-testid="network-list-form__name__input',
-    typeDropdown: '[data-testid="network-list-form__type__dropdown',
-    asnTextarea: '[data-testid="network-list-form__asn-list__textarea',
+    nameInput: '[data-testid="network-list-form__name__input"]',
+    typeDropdown: '[data-testid="network-list-form__type__dropdown"]',
+    asnTextarea: '[data-testid="network-list-form__asn-list__textarea"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -198,6 +195,27 @@ const selectors = {
     postalCode: '[data-testid="account-settings__postal-code__input"]',
     postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
+  },
+  dataStream: {
+    createButton: '[data-testid="create_Stream_button"]',
+    nameInput: '[data-testid="data-stream-form__general__name-field__input"]',
+    sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
+    templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
+    editorBody: '.view-lines',
+    connectorDropdown: '[data-testid="data-stream-form__destination__connector-field__dropdown"]',
+    httpConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
+      headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
+      payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
+      separatorInput:
+        '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
+      maxSizeInput:
+        '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
+    },
+    statusSlider: '[data-testid="data-stream-form__section__status"] input',
+    list: {
+      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+    }
   },
   edgeDns:{
     createButton: '[data-testid="create_Zone_button"] > .p-button-label',

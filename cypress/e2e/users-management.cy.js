@@ -25,8 +25,8 @@ const selectors = {
     phoneInput: '[data-testid="users-form__phone-field__input"]',
     phoneErrorMessage: '[data-testid="users-form__phone-field__error-message"]',
     languageDropdown: '[data-testid="users-form__language-field__dropdown"]',
-    timezoneDropdown: '[data-testid="users-form__timezone-field"]',
-    timezoneFilter: '[data-testid="users-form__timezone-field"] .p-dropdown-filter',
+    timezoneDropdown: '[data-testid="users-form__timezone-field__dropdown"]',
+    timezoneFilter: '[data-testid="users-form__timezone-field__dropdown"] .p-dropdown-filter',
     timezoneOption: (index) => `#timezone_${index}`,
     teamDropdownTrigger:
       '[data-testid="users-form__teams-field__multiselect"] .p-multiselect-trigger',
