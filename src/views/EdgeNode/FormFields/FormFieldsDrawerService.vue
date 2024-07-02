@@ -47,7 +47,8 @@
         <div class="flex flex-col gap-2">
           <div class="flex w-80 sm:max-w-lg flex-col items-start gap-2">
             <FieldDropdown
-              label="Service *"
+              label="Service"
+              required
               name="service"
               :options="props.listServices"
               :loading="props.listServices.length === 0"

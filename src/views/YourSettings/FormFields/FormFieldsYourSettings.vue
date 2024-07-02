@@ -9,6 +9,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputPassword from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     listTimezonesService: {
@@ -101,7 +102,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="profile__first-name"
-          label="First Name *"
+          label="First Name"
+          required
           name="firstName"
           :value="firstName"
           description="The first name of the user."
@@ -110,7 +112,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="profile__last-name"
-          label="Last Name *"
+          label="Last Name"
+          required
           name="lastName"
           :value="lastName"
           description="The last name of the user."
@@ -120,7 +123,8 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
             data-testid="profile__timezone__options"
-            label="Timezone *"
+            label="Timezone"
+            required
             name="timezone"
             :options="optionsTimezone"
             :loading="!timezone || !optionsTimezone.length"
@@ -137,12 +141,11 @@
           class="flex flex-col w-full sm:max-w-xs gap-2"
           data-testid="profile__language"
         >
-          <label
+          <LabelBlock
             data-testid="profile__language__label"
             for="language"
-            class="text-color text-base font-medium"
-            >Language</label
-          >
+            label="Language"
+          />
           <Dropdown
             data-testid="profile__language__options"
             appendTo="self"
@@ -177,7 +180,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="contact__email"
-          label="Email *"
+          label="Email"
+          required
           name="email"
           :value="email"
           type="email"
@@ -191,12 +195,12 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         data-testid="your-settings-form__contact__mobile"
       >
-        <label
+        <LabelBlock
           data-testid="contact__mobile__label"
           for="mobile"
-          class="text-color text-base font-medium"
-          >Phone Number *</label
-        >
+          label="Phone Number"
+          isRequired
+        />
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
@@ -264,13 +268,12 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         data-testid="your-settings-form__security__old-password"
       >
-        <label
+        <LabelBlock
           data-testid="security__old-password__label"
           for="oldPassword"
-          class="text-color text-base font-medium"
-        >
-          Old Password *
-        </label>
+          label="Old Password"
+          isRequired
+        />
         <InputPassword
           data-testid="security__old-password__input"
           toggleMask
@@ -298,13 +301,12 @@
         class="flex flex-col sm:max-w-lg gap-2"
         data-testid="your-settings-form__security__new-password"
       >
-        <label
+        <LabelBlock
           data-testid="security__new-password__label"
           for="password"
-          class="font-semibold text-sm"
-        >
-          New Password *
-        </label>
+          label="New Password"
+          isRequired
+        />
         <InputPassword
           data-testid="security__new-password__input"
           toggleMask
@@ -360,13 +362,12 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         data-testid="your-settings-form__security__confirm-password"
       >
-        <label
+        <LabelBlock
           data-testid="security__confirm-password__label"
           for="confirmPassword"
-          class="text-color text-base font-medium"
-        >
-          Confirm Password *
-        </label>
+          label="Confirm Password"
+          isRequired
+        />
         <InputPassword
           data-testid="security__confirm-password__input"
           toggleMask

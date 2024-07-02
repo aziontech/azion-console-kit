@@ -2,6 +2,7 @@
   import { toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputNumber from 'primevue/inputnumber'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -69,11 +70,11 @@
 </script>
 
 <template>
-  <label
+  <LabelBlock
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
-    >{{ props.label }}</label
-  >
+    :label="props.label"
+    :isRequired="$attrs.required"
+  />
   <InputNumber
     v-model="inputValue"
     :showButtons="props.showButtons"

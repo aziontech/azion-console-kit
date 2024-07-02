@@ -2,6 +2,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
   import { computed, toRef, useSlots } from 'vue'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -41,10 +42,6 @@
       default: () => []
     },
     loading: {
-      type: Boolean,
-      default: false
-    },
-    isRequiredField: {
       type: Boolean,
       default: false
     },
@@ -106,19 +103,14 @@
   /**
    * end of primevue workaround
    */
-
-  const labelSufix = computed(() => {
-    return props.isRequiredField ? '*' : ''
-  })
 </script>
 
 <template>
-  <label
+  <LabelBlock
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
-  >
-    {{ props.label }} {{ labelSufix }}
-  </label>
+    :label="props.label"
+    :isRequired="$attrs.required"
+  />
   <Dropdown
     appendTo="self"
     :id="name"

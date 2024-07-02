@@ -5,7 +5,7 @@
   import { computed, ref, watch } from 'vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-
+  import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
@@ -180,7 +180,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="First Name *"
+          label="First Name"
+          required
           name="firstName"
           placeholder="John"
           :value="firstName"
@@ -190,7 +191,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Last Name *"
+          label="Last Name"
+          required
           name="lastName"
           placeholder="Doe"
           :value="lastName"
@@ -201,7 +203,8 @@
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
-            label="Timezone *"
+            label="Timezone"
+            required
             name="timezone"
             :options="optionsTimezone"
             :loading="!timezone && !optionsTimezone.length"
@@ -216,13 +219,10 @@
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="language"
-            class="text-color text-base font-medium"
+          <LabelBlock
+            label="language"
             data-testid="users-form__language-field__label"
-          >
-            Language
-          </label>
+          />
           <Dropdown
             appendTo="self"
             id="language"
@@ -254,7 +254,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Email *"
+          label="Email"
+          required
           name="email"
           placeholder="example@email.com"
           :value="email"
@@ -265,13 +266,11 @@
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="email"
-          class="text-color text-base font-medium"
+        <LabelBlock
           data-testid="users-form__phone-field__label"
-        >
-          Phone Number *
-        </label>
+          label="Phone Number"
+          isRequired
+        />
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown

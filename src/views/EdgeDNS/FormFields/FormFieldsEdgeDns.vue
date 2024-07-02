@@ -24,7 +24,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My zone"
           description="Give a unique and descriptive name to identify your zone."
@@ -39,7 +40,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Domain Name *"
+          label="Domain Name"
+          required
           name="domain"
           placeholder="mydomain.com"
         >

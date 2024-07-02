@@ -4,6 +4,7 @@
   import Dropdown from 'primevue/dropdown'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import LabelBlock from '@/templates/label-block'
 
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
@@ -111,7 +112,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           :value="name"
           :disabled="disabledFields"
@@ -140,12 +142,12 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label
-          for="selectedExpiration"
-          class="text-color text-base font-medium"
+        <LabelBlock
           data-testid="personal-token-form__expiration-label"
-          >Expires within *</label
-        >
+          for="selectedExpiration"
+          label="Expires within"
+          isRequired
+        />
         <div class="flex sm:flex-row w-full flex-col gap-6">
           <div class="w-full sm:max-w-xs">
             <Dropdown

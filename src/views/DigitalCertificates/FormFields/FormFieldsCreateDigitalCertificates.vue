@@ -83,7 +83,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="digitalCertificateName"
           placeholder="My digital certificate"
           :value="digitalCertificateName"
@@ -142,7 +143,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Subject Name *"
+          label="Subject Name"
+          required
           placeholder="example.com"
           :value="common"
           name="common"
@@ -150,7 +152,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Country/Region *"
+          label="Country/Region"
+          required
           placeholder="BR"
           :value="country"
           name="country"
@@ -158,7 +161,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="State/Province *"
+          label="State/Province"
+          required
           placeholder="São Paulo"
           :value="state"
           name="state"
@@ -166,7 +170,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="City/Locality *"
+          label="City/Locality"
+          required
           placeholder="São Paulo"
           :value="city"
           name="city"
@@ -174,7 +179,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Organization *"
+          label="Organization"
+          required
           placeholder="Company Name S.A."
           :value="organization"
           name="organization"
@@ -182,7 +188,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Organization Unit *"
+          label="Organization Unit"
+          required
           placeholder="IT Department"
           :value="organizationUnity"
           name="organizationUnity"
@@ -190,7 +197,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Email *"
+          label="Email"
+          required
           placeholder="example@email.com"
           type="email"
           :value="email"
@@ -209,7 +217,8 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Subject Alternative Names (SAN) *"
+          label="Subject Alternative Names (SAN)"
+          required
           placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"
           name="subjectAlternativeNames"
           :value="subjectAlternativeNames"
@@ -227,7 +236,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Certificate *"
+          label="Certificate"
+          required
           placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           name="certificate"
           :value="certificate"

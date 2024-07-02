@@ -139,7 +139,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           placeholder="My origin"
           name="name"
           :value="name"
@@ -190,7 +191,8 @@
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <FieldDropdown
-          label="Type *"
+          label="Type"
+          required
           name="originType"
           :options="props.listOrigins"
           :loading="!props.listOrigins"
@@ -217,7 +219,8 @@
         v-if="isLoadBalancerOriginType"
       >
         <FieldDropdown
-          label="Method *"
+          label="Method"
+          required
           name="method"
           :options="METHOD_TYPES_OPTIONS"
           optionValue="value"
@@ -231,7 +234,8 @@
         v-if="isSingleOriginType"
       >
         <FieldText
-          label="Address *"
+          label="Address"
+          required
           placeholder="example.com"
           name="addresses[0].address"
           :value="addresses[0].value.address"
@@ -243,7 +247,8 @@
         v-if="!isObjectStorageOriginType"
       >
         <FieldText
-          label="Host Header *"
+          label="Host Header"
+          required
           placeholder="${host}"
           name="hostHeader"
           :value="hostHeader"
@@ -268,7 +273,8 @@
         v-if="isObjectStorageOriginType"
       >
         <FieldText
-          label="Bucket Name *"
+          label="Bucket Name"
+          required
           name="bucketName"
           :value="bucketName"
           description="Name of the bucket created using Azion Edge Storage."
@@ -332,7 +338,8 @@
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Address *"
+            label="Address"
+            required
             placeholder="example.com"
             :name="`addresses[${index}].address`"
             :value="addresses[index].value.address"
@@ -413,7 +420,8 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Region Name *"
+            label="Region Name"
+            required
             name="hmacRegionName"
             :value="hmacRegionName"
             description="Enter the Region supported by the object storage provider."
@@ -421,7 +429,8 @@
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Access Key *"
+            label="Access Key"
+            required
             name="hmacAccessKey"
             :value="hmacAccessKey"
             description="Enter the Access Key provided by the object storage provider."
@@ -429,7 +438,8 @@
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Secret Key *"
+            label="Secret Key"
+            required
             name="hmacSecretKey"
             :value="hmacSecretKey"
             description="Enter the Secret Key provided by the object storage provider."
