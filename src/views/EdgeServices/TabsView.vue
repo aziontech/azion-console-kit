@@ -49,7 +49,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
+        summary: 'Loading failed',
         detail: error
       })
     }

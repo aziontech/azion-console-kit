@@ -18,22 +18,26 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Key *"
+          label="Key"
+          required
           name="key"
           placeholder="VARIABLE_KEY_NAME"
           :value="key"
           description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
           underscore."
+          data-testid="variables-form__key-field"
         />
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Value *"
+          label="Value"
+          required
           name="value"
           placeholder="VARIABLE_VALUE"
           :value="value"
           description="Enter the data associated with the variable key."
+          data-testid="variables-form__value-field"
         />
       </div>
       <div class="flex gap-3 items-center">

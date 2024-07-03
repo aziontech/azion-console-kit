@@ -17,7 +17,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           :value="name"
           placeholder="My device group"
@@ -35,7 +36,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Regular Expression *"
+          label="Regular Expression"
+          required
           placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
           name="userAgent"
           :value="userAgent"

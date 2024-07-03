@@ -86,7 +86,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitle"></PageHeadingBlock>
+      <PageHeadingBlock
+        :pageTitle="pageTitle"
+        data-testid="users__list-view__page-heading"
+      />
     </template>
     <template #content>
       <ListTableBlock
@@ -108,6 +111,7 @@
         createButtonLabel="User"
         createPagePath="users/create"
         :documentationService="props.documentationService"
+        data-testid="users__list-view__empty-results-block"
       >
         <template #illustration>
           <Illustration />

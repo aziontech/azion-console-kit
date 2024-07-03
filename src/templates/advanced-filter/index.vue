@@ -126,7 +126,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Error',
+        summary: 'Processing failed',
         detail: error
       })
       return null

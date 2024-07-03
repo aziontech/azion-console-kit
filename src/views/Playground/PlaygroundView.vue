@@ -25,6 +25,10 @@
         label="Info Toasts"
         @click="triggerToasts('info')"
       />
+      <LabelBlock
+        label="Label"
+        isRequired
+      />
     </div>
   </div>
 </template>
@@ -32,7 +36,7 @@
 <script setup>
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
-
+  import LabelBlock from '@/templates/label-block'
   const toast = useToast()
 
   const triggerToasts = (type) => {

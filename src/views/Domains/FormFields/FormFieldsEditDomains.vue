@@ -41,10 +41,6 @@
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
-  const CNAMELabel = computed(() => {
-    return cnameAccessOnly.value ? 'CNAME *' : 'CNAME'
-  })
-
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
   })
@@ -103,7 +99,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My domain"
           :value="name"
@@ -160,7 +157,8 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
-          label="Edge Application *"
+          label="Edge Application"
+          required
           name="edgeApplication"
           :options="edgeApplicationOptions"
           :loading="!edgeApplicationOptions.length"
@@ -185,7 +183,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          :label="CNAMELabel"
+          label="CNAME"
+          :required="cnameAccessOnly"
           name="cnames"
           rows="2"
           :value="cnames"
@@ -240,7 +239,8 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
         <FieldDropdown
-          label="Trusted CA Certificate *"
+          label="Trusted CA Certificate"
+          required
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
           :loading="!trustedCACertificatesOptions.length"

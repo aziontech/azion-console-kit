@@ -1,3 +1,5 @@
+import selectors from '../support/selectors'
+
 const payload = {
   country_call_code: 'BR - 55',
   email: 'testuser@cy.com',
@@ -11,93 +13,62 @@ const payload = {
   two_factor_enabled: true
 }
 
-const selectors = {
-  profile: {
-    firstNameInput: '[data-testid="profile__first-name__input"]',
-    firstNameError: '[data-testid="profile__first-name__error-message"]',
-    lastNameInput: '[data-testid="profile__last-name__input"]',
-    lastNameError: '[data-testid="profile__last-name__error-message"]',
-    timezoneOptions: '[data-testid="profile__timezone__options"]',
-    language: '[data-testid="profile__language"]'
-  },
-  contact: {
-    emailInput: '[data-testid="contact__email__input"]',
-    emailError: '[data-testid="contact__email__error-message"]',
-    mobileCountryCodeOptions: '[data-testid="contact__mobile__country-code-options"]',
-    countryCodeFilter: '.p-dropdown-filter',
-    countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    mobileInput: '[data-testid="contact__mobile__input"]',
-    mobileError: '[data-testid="contact__mobile__error-text"]'
-  },
-  security: {
-    oldPasswordInput: '[data-testid="security__old-password__input"]',
-    newPasswordInput: '[data-testid="security__new-password__input"]',
-    confirmPasswordInput: '[data-testid="security__confirm-password__input"]',
-    confirmPasswordError: '[data-testid="security__confirm-password__error-text"]',
-    twoFactorToggle: '.p-inputswitch-slider'
-  },
-  form: {
-    submitButton: '[data-testid="form-actions-submit-button"]'
-  }
-}
-
 describe('Your Settings spec', () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/user', { fixture: 'your-settings.json' }).as('getUser')
     cy.intercept('PATCH', '/api/v4/iam/user', { statusCode: 200, body: {} }).as('patchUser')
-
-    cy.openMenuItem('Your Settings')
+    cy.openItemThroughMenuAccount('Your Settings')
   })
 
   it('should edit user settings but the email', () => {
     // Arrange
-    cy.get(selectors.profile.firstNameInput).should('have.value', 'Clean User')
-    cy.get(selectors.profile.firstNameInput).clear()
-    cy.get(selectors.profile.firstNameError)
+    cy.get(selectors.yourSettings.firstNameInput).should('have.value', 'Clean User')
+    cy.get(selectors.yourSettings.firstNameInput).clear()
+    cy.get(selectors.yourSettings.firstNameError)
       .should('be.visible')
       .and('have.text', 'First Name is a required field')
-    cy.get(selectors.profile.lastNameInput).should('have.value', 'Cypress')
-    cy.get(selectors.profile.lastNameInput).clear()
-    cy.get(selectors.profile.lastNameError)
+    cy.get(selectors.yourSettings.lastNameInput).should('have.value', 'Cypress')
+    cy.get(selectors.yourSettings.lastNameInput).clear()
+    cy.get(selectors.yourSettings.lastNameError)
       .should('be.visible')
       .and('have.text', 'Last Name is a required field')
-    cy.get(selectors.profile.timezoneOptions).should('have.text', '(UTC +14:00) Etc/GMT-14')
-    cy.get(selectors.profile.language).should('have.text', 'LanguageEnglish')
-    cy.get(selectors.contact.emailInput).should('have.value', 'testuser@cy.com')
-    cy.get(selectors.contact.emailInput).clear()
-    cy.get(selectors.contact.emailError)
+    cy.get(selectors.yourSettings.timezoneOptions).should('have.text', '(UTC +14:00) Etc/GMT-14')
+    cy.get(selectors.yourSettings.language).should('have.text', 'Language English')
+    cy.get(selectors.yourSettings.emailInput).should('have.value', 'testuser@cy.com')
+    cy.get(selectors.yourSettings.emailInput).clear()
+    cy.get(selectors.yourSettings.emailError)
       .should('be.visible')
       .and('have.text', 'Email is a required field')
-    cy.get(selectors.contact.mobileCountryCodeOptions).should('have.text', 'US +1')
-    cy.get(selectors.contact.mobileInput).should('have.value', '1234567890')
-    cy.get(selectors.contact.mobileInput).clear()
-    cy.get(selectors.contact.mobileError)
+    cy.get(selectors.yourSettings.mobileCountryCodeOptions).should('have.text', 'US +1')
+    cy.get(selectors.yourSettings.mobileInput).should('have.value', '1234567890')
+    cy.get(selectors.yourSettings.mobileInput).clear()
+    cy.get(selectors.yourSettings.mobileError)
       .should('be.visible')
       .and('have.text', 'Phone Number is a required field')
 
     // Act
-    cy.get(selectors.profile.firstNameInput).type('Edited User')
-    cy.get(selectors.profile.lastNameInput).type('Cy')
-    cy.get(selectors.profile.timezoneOptions).click()
-    cy.get(selectors.contact.countryCodeFilter).clear()
-    cy.get(selectors.contact.countryCodeFilter).type('são')
+    cy.get(selectors.yourSettings.firstNameInput).type('Edited User')
+    cy.get(selectors.yourSettings.lastNameInput).type('Cy')
+    cy.get(selectors.yourSettings.timezoneOptions).click()
+    cy.get(selectors.yourSettings.countryCodeFilter).clear()
+    cy.get(selectors.yourSettings.countryCodeFilter).type('são')
     cy.get('#timezone_0').click()
-    cy.get(selectors.contact.emailInput).type('testuser@cy.com')
-    cy.get(selectors.contact.mobileCountryCodeOptions).click()
-    cy.get(selectors.contact.countryCodeFilter).clear()
-    cy.get(selectors.contact.countryCodeFilter).type('br')
-    cy.get(selectors.contact.countryCodeOption(0)).click()
-    cy.get(selectors.contact.mobileInput).type('987654321')
-    cy.get(selectors.security.oldPasswordInput).type('AAAaaa123!!!')
-    cy.get(selectors.security.newPasswordInput).type('AAAaaa123!!!')
-    cy.get(selectors.security.confirmPasswordInput).type('A')
-    cy.get(selectors.security.confirmPasswordError)
+    cy.get(selectors.yourSettings.emailInput).type('testuser@cy.com')
+    cy.get(selectors.yourSettings.mobileCountryCodeOptions).click()
+    cy.get(selectors.yourSettings.countryCodeFilter).clear()
+    cy.get(selectors.yourSettings.countryCodeFilter).type('br')
+    cy.get(selectors.yourSettings.countryCodeOption(0)).click()
+    cy.get(selectors.yourSettings.mobileInput).type('987654321')
+    cy.get(selectors.yourSettings.oldPasswordInput).type('AAAaaa123!!!')
+    cy.get(selectors.yourSettings.newPasswordInput).type('AAAaaa123!!!')
+    cy.get(selectors.yourSettings.confirmPasswordInput).type('A')
+    cy.get(selectors.yourSettings.confirmPasswordError)
       .should('be.visible')
       .and('have.text', 'Passwords must match')
-    cy.get(selectors.security.confirmPasswordInput).type('AAaaa123!!!')
+    cy.get(selectors.yourSettings.confirmPasswordInput).type('AAaaa123!!!')
 
-    cy.get(selectors.security.twoFactorToggle).click()
+    cy.get(selectors.yourSettings.twoFactorToggle).click()
     cy.get(selectors.form.submitButton).click()
 
     // Assert
@@ -107,11 +78,11 @@ describe('Your Settings spec', () => {
 
   it('should edit user email', () => {
     // Arrange
-    cy.get(selectors.contact.emailInput).should('have.value', 'testuser@cy.com')
-    cy.get(selectors.contact.emailInput).clear()
+    cy.get(selectors.yourSettings.emailInput).should('have.value', 'testuser@cy.com')
+    cy.get(selectors.yourSettings.emailInput).clear()
 
     // Act
-    cy.get(selectors.contact.emailInput).type('testuser@cy.com.br')
+    cy.get(selectors.yourSettings.emailInput).type('testuser@cy.com.br')
 
     cy.get(selectors.form.submitButton).click()
 

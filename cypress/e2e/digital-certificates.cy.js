@@ -1,32 +1,7 @@
-import generateUniqueName from '../support/utils'
+import generateUniqueName from '../support/utils';
+import selectors from '../support/selectors';
 
-const selectors = {
-  list: {
-    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
-    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    filteredRow: {
-      nameColumn: '[data-testid="list-table-block__column__name__row"]',
-      statusColum: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
-    },
-    actionsMenu: {
-      button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteAction: '.p-menuitem-content > .p-menuitem-link'
-    },
-    deleteDialog: {
-      confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
-      deleteButton: '[data-testid="delete-dialog-footer-delete-button"]',
-      confirmInput: '#confirm-input'
-    }
-  },
-  form: {
-    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
-    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]'
-  }
-}
-
-const digitalCertificateName = generateUniqueName('Digital Certificate')
+const digitalCertificateName = generateUniqueName('CertificateName')
 
 describe('Digital Certificates spec', () => {
   beforeEach(() => {
@@ -49,14 +24,15 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.list.breadcumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', digitalCertificateName)
-    cy.get(selectors.list.filteredRow.statusColum).should('have.text', 'Pending')
+    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', digitalCertificateName)
+    cy.get(selectors.list.filteredRow.statusColumn).should(
+      'have.text',
+      'Pending'
+    )
+  })
 
-    // Cleanup
-    cy.get(selectors.list.actionsMenu.button).click()
-    cy.get(selectors.list.actionsMenu.deleteAction).click()
-    cy.get(selectors.list.deleteDialog.confirmInput).clear()
-    cy.get(selectors.list.deleteDialog.confirmInput).type('delete{enter}')
-    cy.verifyToast('Digital certificate successfully deleted!')
+  afterEach(() => {
+    // Delete the digital certificate
+    cy.deleteProduct(digitalCertificateName, '/digital-certificates')
   })
 })

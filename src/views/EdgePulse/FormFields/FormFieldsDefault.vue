@@ -55,6 +55,7 @@
           label="Copy"
           icon="pi pi-copy"
           class="max-md:w-full"
+          data-testid="edge-pulse__default-tag-copy-button"
           @click="$emit('handleCopy', { code: defaultTagCode })"
           outlined
         />

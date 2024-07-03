@@ -135,7 +135,7 @@
             label="Copy"
             @click="copyCSRToclipboard"
           />
-          <small v-if="csrCopied">Copied successfully!</small>
+          <small v-if="csrCopied">Successfully copied!</small>
         </div>
       </template>
     </FormHorizontal>

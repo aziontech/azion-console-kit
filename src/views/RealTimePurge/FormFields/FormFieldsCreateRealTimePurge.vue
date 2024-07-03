@@ -126,7 +126,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Arguments List *"
+          label="Arguments List"
+          required
           name="argumentsPurge"
           rows="2"
           :placeholder="computedPurgeArgumentsPlaceHolder"

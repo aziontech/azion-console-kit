@@ -116,9 +116,11 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           description="Give a unique and descriptive name to identify the WAF rule set."
           name="name"
+          data-testid="waf-rules-form__name-field"
           :value="name"
           placeholder="My WAF rule"
         />

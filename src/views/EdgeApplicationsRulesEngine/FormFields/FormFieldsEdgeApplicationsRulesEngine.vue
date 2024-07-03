@@ -479,7 +479,7 @@
           toast.add({
             closable: true,
             severity: 'error',
-            summary: `Error in ${behavior.name} load.`
+            summary: `Error loading ${behavior.name}.`
           })
         }
       }
@@ -654,7 +654,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           :readonly="checkPhaseIsDefaultValue"
           :disabled="checkPhaseIsDefaultValue"
@@ -692,8 +693,7 @@
         severity="info"
         data-testid="rule-form-phase-message"
       >
-        Once a rule is created, its phase cannot be changed. If you want to change the phase, you
-        must create a new rule.
+        Once a rule is created, its phase cannot be changed. To change the phase, create a new rule.
       </InlineMessage>
 
       <FieldGroupRadio

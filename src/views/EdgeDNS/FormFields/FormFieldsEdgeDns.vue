@@ -24,9 +24,11 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My zone"
+          data-testid="edge-dns-form__name"
           description="Give a unique and descriptive name to identify your zone."
         />
       </div>
@@ -39,9 +41,11 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Domain Name *"
+          label="Domain Name"
+          required
           name="domain"
           placeholder="mydomain.com"
+          data-testid="edge-dns-form__domain"
         >
           <template #description>
             Add the root domain name. Example: <code>mydomain.com</code>.
@@ -59,6 +63,7 @@
           auto
           :isCard="false"
           title="Active"
+          data-testid="edge-dns-form__status"
         />
       </div>
     </template>

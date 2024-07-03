@@ -10,7 +10,7 @@
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
-
+  import LabelBlock from '@/templates/label-block'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')
@@ -117,12 +117,11 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
-        <label
+        <LabelBlock
           for="name"
-          class="text-color text-base font-medium"
-        >
-          Name *
-        </label>
+          label="Name"
+          isRequired
+        />
         <div class="p-inputgroup">
           <InputText
             v-model="name"
@@ -147,7 +146,8 @@
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldDropdown
-            label="Record Type *"
+            label="Record Type"
+            required
             name="selectedRecordType"
             :options="recordsTypes"
             :loading="!recordsTypes.length"
@@ -170,7 +170,8 @@
 
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldNumber
-            label="TTL (seconds) *"
+            label="TTL (seconds)"
+            required
             name="ttl"
             description="Decide the time-to-live (TTL) value a response can be cached for on a resolver server."
             placeholder="TTL (seconds):"
@@ -185,7 +186,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Value *"
+          label="Value"
+          required
           name="value"
           :placeholder="selectedRecordTypeInfo?.valuePlaceholder"
           :description="selectedRecordTypeInfo?.valueTip"
@@ -202,7 +204,8 @@
       <div class="flex gap-6 flex-wrap">
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldDropdown
-            label="Policy Type *"
+            label="Policy Type"
+            required
             name="selectedPolicy"
             :options="policyList"
             :loading="!policyList.length"
@@ -222,7 +225,8 @@
           v-if="isWeightedPolicy"
         >
           <FieldNumber
-            label="Weight *"
+            label="Weight"
+            required
             name="weight"
             description="Specify the weight for each record. Accepts integers between 0 and 255."
             placeholder="Weight"
@@ -240,7 +244,8 @@
         v-if="isWeightedPolicy"
       >
         <FieldTextArea
-          label="Description *"
+          label="Description"
+          required
           name="description"
           placeholder="add the description"
           description="Differentiate records with the same Name and Type by adding a description that identifies each one. Accepts up to 45 characters."

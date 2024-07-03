@@ -1,6 +1,6 @@
 {
   "name": "azion-platform-kit",
-  "version": "1.16.3",
+  "version": "1.17.0",
   "private": true,
   "type": "module",
   "repository": {
@@ -17,6 +17,7 @@
     "test:unit:coverage": "TZ=UTC vitest run --coverage",
     "test:e2e": "start-server-and-test preview http://localhost:5173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 5173' http://localhost:5173 'cypress open --e2e --browser chrome'",
+    "test:e2e:electron": "start-server-and-test 'vite dev --port 5173' http://localhost:5173 'cypress open --e2e --browser electron'",
     "test:e2e:dev-run": "start-server-and-test 'vite dev --port 5173' http://localhost:5173 'cypress run'",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
@@ -33,6 +34,7 @@
     "axios": "^1.6.2",
     "c3": "^0.7.20",
     "deep-chat": "^1.4.11",
+    "cypress-real-events": "^1.13.0",
     "front-matter": "^4.0.2",
     "highlight.js": "^11.9.0",
     "lottie-web-vue": "^2.0.7",

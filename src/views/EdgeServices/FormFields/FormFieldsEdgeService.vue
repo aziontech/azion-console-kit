@@ -30,11 +30,13 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           name="name"
           placeholder="My service"
           :value="name"
           description="Give a unique and descriptive name to identify the service."
+          data-testid="edge-service-form__name-field"
         />
       </div>
     </template>

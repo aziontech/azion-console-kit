@@ -149,7 +149,7 @@
               <PrimeMenu
                 :ref="assignMenuRef(rowData.id)"
                 id="overlay_menu"
-                v-bind:model="actionOptions(rowData?.status)"
+                v-bind:model="actionOptions(rowData)"
                 :popup="true"
                 data-testid="data-table-actions-column-menu"
               />
@@ -171,7 +171,12 @@
               class="my-4 flex flex-col gap-3 justify-center items-start"
               data-testid="data-table-empty-message-container"
             >
-              <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+              <p
+                class="text-md font-normal text-secondary"
+                data-testid="table-block-no-header__empty-message"
+              >
+                {{ emptyListMessage }}
+              </p>
             </div>
           </slot>
         </template>
@@ -307,6 +312,10 @@
     isReorderAllEnabled: {
       type: Boolean,
       default: false
+    },
+    rowActions: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -338,24 +347,32 @@
     return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
   })
 
-  const actionOptions = (showAuthorize) => {
-    const actionOptions = props.deleteService
-      ? [
-          {
-            label: 'Delete',
-            icon: 'pi pi-fw pi-trash',
-            command: () => openDeleteDialog()
-          }
-        ]
-      : []
-    if (props.authorizeNode && showAuthorize !== 'Authorized') {
-      actionOptions.push({
-        label: 'Authorize',
-        icon: 'pi pi-lock-open',
-        command: () => authorizeEdgeNode()
+  const actionOptions = (rowData) => {
+    const actionOptions = []
+
+    if (props.rowActions?.length) {
+      props.rowActions.forEach((action) => {
+        if (action.visibleAction?.(rowData)) return
+
+        actionOptions.push({
+          ...action,
+          disabled: rowData?.isDefault ? rowData?.isDefault : false,
+          command: () => action.command(rowData)
+        })
       })
     }
+
+    if (props.deleteService) {
+      actionOptions.push({
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        severity: 'error',
+        command: () => openDeleteDialog()
+      })
+    }
+
     showActions.value = actionOptions.length > 0
+
     return actionOptions
   }
 
@@ -403,10 +420,6 @@
       return
     }
     router.push({ path: `${props.editPagePath}/${item.id}` })
-  }
-
-  const authorizeEdgeNode = () => {
-    emit('authorize', selectedId.value)
   }
 
   const openDeleteDialog = () => {

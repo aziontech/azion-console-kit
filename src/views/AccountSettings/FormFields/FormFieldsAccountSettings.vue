@@ -156,7 +156,9 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
-          label="Account Name *"
+          data-testid="account-settings__account-name"
+          label="Account Name"
+          required
           name="accountName"
           placeholder="Company"
           :value="accountName"
@@ -194,6 +196,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
+          data-testid="account-settings__company-name"
           label="Company Name"
           name="companyName"
           placeholder="Company S.A."
@@ -203,6 +206,7 @@
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <FieldText
+          data-testid="account-settings__company-id"
           label="Company ID"
           name="uniqueIdentifier"
           placeholder="00.000.000/0001-00"
@@ -233,7 +237,9 @@
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldText
-            label="Postal Code *"
+            data-testid="account-settings__postal-code"
+            label="Postal Code"
+            required
             name="postalCode"
             placeholder="00.000.000-00"
             :value="postalCode"
@@ -242,7 +248,8 @@
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldDropdown
-            label="Country *"
+            label="Country"
+            required
             name="country"
             :options="countriesOptions.options"
             :loading="!countriesOptions.done"
@@ -259,7 +266,8 @@
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldDropdown
-            label="State/Region *"
+            label="State/Region"
+            required
             name="region"
             :options="regionsOptions.options"
             :loading="!regionsOptions.done"
@@ -274,7 +282,8 @@
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldDropdown
-            label="City *"
+            label="City"
+            required
             name="city"
             :options="citiesOptions.options"
             :loading="!citiesOptions.done"
@@ -291,7 +300,8 @@
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <FieldText
-            label="Address *"
+            label="Address"
+            required
             name="address"
             placeholder="123 Example Ave."
             :value="address"
