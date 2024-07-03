@@ -216,6 +216,18 @@ const selectors = {
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
     }
+  },
+  edgeDns:{
+    createButton: '[data-testid="create_Zone_button"] > .p-button-label',
+    nameInput: '[data-testid="edge-dns-form__name__input"]',
+    domainInput: '[data-testid="edge-dns-form__domain__input"]',
+    saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',
+    searchInput: '[data-testid="data-table-search-input"]',
+    nameRow: '[data-testid="list-table-block__column__name__row"]',
+    showMore: '.underline',
+    domainRow: '.whitespace-pre',
+    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
   }
 }
 
