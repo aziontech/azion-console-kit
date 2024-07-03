@@ -237,6 +237,10 @@ const selectors = {
       serviceAccountKeyInput:
         '[data-testid="data-stream-form__destination__service-account-key-field__input"]'
     },
+    elasticSearchConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__elasticsearch-url-field__input"]',
+      apiKeyTextarea: '[data-testid="data-stream-form__destination__api-key-field__textarea"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
