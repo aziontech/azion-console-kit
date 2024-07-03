@@ -65,6 +65,7 @@ Cypress.Commands.add('login', () => {
     cy.log('Running in CI/CD environment');
     email = Cypress.env('CYPRESS_EMAIL');
     password = Cypress.env('CYPRESS_PASSWORD');
+    throw new Error(`Running in CI/CD environment`);
   } else {
     switch (environment) {
       case 'preview-prod':
