@@ -1,7 +1,7 @@
 <script setup>
   import EmptyResultsBlock from '@templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import Drawer from './Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
@@ -130,18 +130,27 @@
       header: 'Last Editor'
     }
   ])
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'rule',
+      icon: 'pi pi-trash',
+      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
+    }
+  ]
 </script>
 <template>
   <Drawer
     ref="drawerRef"
-    :edgeFirewallId="props.edgeFirewallId"
-    :edgeFirewallModules="props.edgeFirewallModules"
-    :createService="props.createEdgeFirewallRulesEngineService"
-    :listFunctionsService="props.listFunctionsService"
-    :listWafRulesService="props.listWafRulesService"
-    :loadService="props.loadEdgeFirewallRulesEngineService"
-    :editService="props.editEdgeFirewallRulesEngineService"
-    :listNetworkListService="props.listNetworkListService"
+    :edgeFirewallId="edgeFirewallId"
+    :edgeFirewallModules="edgeFirewallModules"
+    :createService="createEdgeFirewallRulesEngineService"
+    :listFunctionsService="listFunctionsService"
+    :listWafRulesService="listWafRulesService"
+    :loadService="loadEdgeFirewallRulesEngineService"
+    :editService="editEdgeFirewallRulesEngineService"
+    :listNetworkListService="listNetworkListService"
     @onSuccess="reloadList"
   />
 
@@ -150,14 +159,14 @@
     ref="listTableBlockRef"
     :reorderableRows="true"
     :listService="listEdgeFirewallRulesEngineServiceWithDecorator"
-    :deleteService="deleteEdgeFirewallRulesEngineServiceWithDecorator"
     :onReorderService="reorderRulesEngineWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
-    pageTitleDelete="rule"
     :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
     emptyListMessage="No rules have been created."
+    :actions="actions"
+    isTabs
   >
     <template #addButton>
       <PrimeButton
@@ -172,7 +181,7 @@
     title="No rule has been created"
     description="Click the button below to create your first rule."
     createButtonLabel="Rule"
-    :documentationService="props.documentationService"
+    :documentationService="documentationService"
     :inTabs="true"
   >
     <template #default>
