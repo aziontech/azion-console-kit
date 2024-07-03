@@ -1,13 +1,9 @@
-/* if you have two environments for the same application */
-const environment = process.env.VITE_ENVIRONMENT || 'production'
-//const config = require(`./azion/${environment}/azion.json`)
-
+/* if you have two environments for the same application
+/* you can import your config based on environment value, 
+/* ex: require(`./azion/${environment}/azion.json`)
+*/
 /* eslint-env node */
-//const config = require(`./azion/azion.json`) ?? null
-//const myDomain =
-//  config.domain.domain_name && config.domain.domain_name.trim() !== ''
-//    ? config.domain.domain_name
-//    : 'console.azion.com'
+const environment = process.env.VITE_ENVIRONMENT || 'production'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
@@ -63,7 +59,7 @@ const cacheConfig = [
     stale: false,
     queryStringSort: false,
     cacheByQueryString: {
-      option: 'varies',
+      option: 'varies'
     },
     methods: {
       post: false,
@@ -286,18 +282,6 @@ const AzionConfig = {
       hostHeader: 'script-runner.azion.com',
       addresses: ['script-runner.azion.com']
     }
-    // {
-    //   name: 'origin-iam',
-    //   type: 'single_origin',
-    //   hostHeader: 'iam.azion.com',
-    //   addresses: ['iam.azion.com']
-    // },
-    // {
-    //   name: 'origin-variables',
-    //   type: 'single_origin',
-    //   hostHeader: 'variables.azion.com',
-    //   addresses: ['variables.azion.com']
-    // }
   ]),
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
@@ -372,16 +356,6 @@ const AzionConfig = {
           ]
         }
       }
-      // {
-      //   name: 'CSP Header - Content Secure Policy',
-      //  description: 'Sets a comprehensive Content Security Policy (CSP) header to enhance security by defining a whitelist of sources from which various types of resources can be loaded. This policy helps mitigate various types of attacks including Cross-Site Scripting (XSS) and data injection.',
-      //   match: '^\\/',
-      //   behavior: {
-      //     setHeaders: [
-      //       `Content-Security-Policy: default-src 'self' *.azion.com https://storage.googleapis.com cdn.segment.com api.segment.io; connect-src 'self' *.azion.com https://storage.googleapis.com cdn.segment.com api.segment.io https://www.google-analytics.com https://www.clarity.ms https://*.clarity.ms; frame-src https://feedback.fish *.azion.com https://www.google.com; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; style-src https://storage.googleapis.com https://console.azion.com https://fonts.azion.com cdn.jsdelivr.net 'unsafe-hashes' 'unsafe-inline'; font-src https://storage.googleapis.com https://console.azion.com https://fonts.azion.com data:; script-src https://storage.googleapis.com *.azion.com https://feedback.fish 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms; style-src-elem https://storage.googleapis.com *.azion.com https://feedback.fish cdn.jsdelivr.net 'unsafe-inline' https://${myDomain}; script-src-elem https://storage.googleapis.com *.azion.com https://feedback.fish https://cdn.jsdelivr.net https://cdn.segment.com https://www.google.com https://www.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com https://www.google-analytics.com https://www.clarity.ms https://*.clarity.ms 'unsafe-inline' https://${myDomain}; img-src *`
-      //     ]
-      //   }
-      // }
     ]
   }
 }
