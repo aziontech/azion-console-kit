@@ -188,6 +188,41 @@ const selectors = {
     deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
   },
+  edgePulse: {
+    defaultTagCopyButton: '[data-testid="edge-pulse__default-tag-copy-button"] > .p-button-label',
+    preLoadingTab: '[data-testid="edge-pulse__pre-loading-tab"]',
+    preLoadingTagCopyButton:
+      '[data-testid="edge-pulse__pre-loading-tag-copy-button"] > .p-button-label'
+  },
+  edgeServices: {
+    createServiceButton: '[data-testid="create_Service_button"]',
+    searchInput: '[data-testid="data-table-search-input"]',
+    filteredRowNameColumn: '[data-testid="list-table-block__column__name__row"]',
+    filteredRowStatusColumn:
+      '[data-testid="list-table-block__column__labelActive__row"] > .p-tag-value',
+    actionsMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+    actionsMenuDeleteAction:
+      '#overlay_menu_1 > .p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
+    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+    serviceName: '[data-testid="edge-service-form__name-field__input"]',
+    nameRequiredLabel: '[data-testid="edge-service-form__name-field__error-message"]',
+    submitButton: '[data-testid="form-actions-submit-button"]',
+    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+    cancelButton: '[data-testid="form-actions-cancel-button"]'
+  },
+  personalTokens: {
+    createTokenButton: '[data-testid="create_Personal Token_button"]',
+    searchInput: '[data-testid="data-table-search-input"]',
+    filteredRecordNameColumn: '[data-testid="list-table-block__column__name__row"]',
+    filteredRecordMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+    filteredRecordDeleteButton: '.p-menuitem-content > .p-menuitem-link',
+    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+    tokenName: '[data-testid="personal-token-form__name-field__input"]',
+    submitButton: '[data-testid="form-actions-submit-button"]',
+    copyTokenDialogHeader: '[data-testid="copy-token-dialog__header"] > .p-dialog-header',
+    copyTokenButton: '[data-testid="copy-token-dialog__token-field__copy-token-button"]',
+    closeCopyDialogButton: '[data-testid="copy-token-dialog__dialog-footer__confirm-button"]'
+  },
   accountSettings: {
     accountName: '[data-testid="account-settings__account-name__input"]',
     companyName: '[data-testid="account-settings__company-name__input"]',
