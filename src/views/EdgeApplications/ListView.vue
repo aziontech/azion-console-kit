@@ -4,7 +4,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
@@ -28,6 +28,14 @@
   })
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'edge application',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeApplicationService
+    }
+  ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -84,18 +92,17 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="edge application"
         addButtonLabel="Edge Application"
         createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
-        :listService="props.listEdgeApplicationsService"
-        :deleteService="props.deleteEdgeApplicationService"
+        :listService="listEdgeApplicationsService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge applications found."
         data-testid="edge-applications-list-table-block"
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
