@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentBaseUrl } from './make-payment-base-url'
+import { formatDateMonthAndYear, getExpiredDate } from '../../helpers/convert-date'
 
 export const listPaymentService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,21 +13,10 @@ export const listPaymentService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
-const formatDate = (month, year) => {
-  const formatMonth = month < 10 ? `0${month}` : month
-
-  return `${formatMonth}/${year}`
-}
-
-const getExpiredString = (month, year) => {
-  const currentDate = new Date()
-  const currentYear = currentDate.getFullYear()
-  const currentMonth = currentDate.getMonth() + 1
-
-  const isExpiredByYear = year < currentYear
-  const isExpiredByMonth = year === currentYear && month < currentMonth
-
-  return isExpiredByYear || isExpiredByMonth ? 'Expired' : ''
+const convertStringToDate = (dateString) => {
+  const [month, year] = dateString.split('/')
+  const dateValue = new Date(parseInt(year), parseInt(month) - 1)
+  return dateValue
 }
 
 const adapt = (httpResponse) => {
@@ -42,18 +32,23 @@ const adapt = (httpResponse) => {
   )
 
   const parseBilling = responseDataSorted.map((card) => {
+    const cardDate = formatDateMonthAndYear(card.card_expiration_month, card.card_expiration_year)
+
     return {
       id: card.id,
       cardHolder: card.card_holder,
       cardExpiration: {
-        expiringDate: formatDate(card.card_expiration_month, card.card_expiration_year),
-        status: getExpiredString(card.card_expiration_month, card.card_expiration_year)
+        expiringDate: cardDate,
+        status: getExpiredDate(card.card_expiration_month, card.card_expiration_year)
       },
       cardData: {
         cardNumber: card.card_last_4_digits,
         cardBrand: card.card_brand.toLowerCase(),
         status: card.is_default ? 'Default' : ''
       },
+      expiringDateByOrder: convertStringToDate(cardDate),
+      expiringDateSearch: cardDate,
+      cardNumberSearch: card.card_last_4_digits,
       isDefault: card.is_default
     }
   })
