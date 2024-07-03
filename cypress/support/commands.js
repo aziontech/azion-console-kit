@@ -57,6 +57,10 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 Cypress.Commands.add('login', () => {
   const environment = Cypress.env('environment') || 'dev';
   const isCI = process.env.GITHUB_ACTIONS === 'true';
+  
+  cy.log(`Environment variable GITHUB_ACTIONS: ${process.env.GITHUB_ACTIONS}`);
+  cy.log(`isCI: ${isCI}`);
+  
   cy.log(`Logging into ${environment} environment`);
 
   let email, password;
@@ -65,7 +69,10 @@ Cypress.Commands.add('login', () => {
     cy.log('Running in CI/CD environment');
     email = Cypress.env('CYPRESS_EMAIL');
     password = Cypress.env('CYPRESS_PASSWORD');
-    throw new Error(`Running in CI/CD environment`);
+
+    if (!email || !password) {
+      throw new Error('Email or Password not set for CI/CD environment');
+    }
   } else {
     switch (environment) {
       case 'preview-prod':
