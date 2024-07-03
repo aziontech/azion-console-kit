@@ -1,6 +1,9 @@
 import selectors from '../support/selectors'
 import generateUniqueName from '../support/utils'
 
+let domainName
+let edgeAppName
+
 describe('Domains spec', () => {
   beforeEach(() => {
     cy.login()
@@ -8,8 +11,8 @@ describe('Domains spec', () => {
 
   it('should create and delete a domain using a edge application', () => {
     // Arrange
-    const domainName = generateUniqueName('domain')
-    const edgeAppName = generateUniqueName('edgeApp')
+    domainName = generateUniqueName('domain')
+    edgeAppName = generateUniqueName('edgeApp')
     cy.openProductThroughSidebar('edge-application')
     cy.get(selectors.edgeApplication.createButton).click()
     cy.get(selectors.edgeApplication.nameInput).type(edgeAppName)
@@ -44,12 +47,12 @@ describe('Domains spec', () => {
       'Succesfully created!',
       'The domain is now available in the Domain management section.'
     )
-    cy.get(selectors.form.actionsCancelButton).click()
-    cy.get(selectors.list.searchInput).type(domainName)
-    cy.get(selectors.list.actionsMenu.button).click()
-    cy.get(selectors.domains.actionDelete).click()
-    cy.get(selectors.list.deleteDialog.confirmationInputField).clear()
-    cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
-    cy.verifyToast('Resource successfully deleted')
+  })
+
+  afterEach(() => {
+    // Cleanup
+    cy.deleteProduct(domainName, '/domains').then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
   })
 })

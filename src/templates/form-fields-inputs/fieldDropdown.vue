@@ -63,7 +63,7 @@
 
   const name = toRef(props, 'name')
   const slots = useSlots()
-  
+
   const hasDescriptionSlot = !!slots.description
   const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
