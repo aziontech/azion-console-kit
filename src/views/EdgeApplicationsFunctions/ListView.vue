@@ -1,22 +1,22 @@
 <template>
   <DrawerFunction
     ref="drawerFunctionRef"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createFunctionService="props.createFunctionService"
-    :listEdgeFunctionsService="props.listEdgeFunctionsService"
-    :loadFunctionService="props.loadFunctionService"
-    :editFunctionService="props.editFunctionService"
+    :edgeApplicationId="edgeApplicationId"
+    :createFunctionService="createFunctionService"
+    :listEdgeFunctionsService="listEdgeFunctionsService"
+    :loadFunctionService="loadFunctionService"
+    :editFunctionService="editFunctionService"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listFunctionsEdgeApplicationsRef"
       :listService="listFunctionsInstance"
-      :deleteService="deleteFunctionsWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
-      pageTitleDelete="function instance"
       @on-load-data="handleLoadData"
+      :actions="actions"
+      isTabs
     >
       <template #addButton>
         <PrimeButton
@@ -54,7 +54,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import DrawerFunction from './Drawer'
@@ -162,4 +162,13 @@
     }
     hasContentToList.value = true
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'function instance',
+      icon: 'pi pi-trash',
+      service: deleteFunctionsWithDecorator
+    }
+  ]
 </script>
