@@ -1,5 +1,8 @@
 <template>
-  <div class="max-w-full">
+  <div
+    class="max-w-full"
+    data-testid="data-table-search-input"
+  >
     <DataTable
       class="overflow-clip rounded-md"
       v-if="!isLoading"
