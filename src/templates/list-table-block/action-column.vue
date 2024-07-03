@@ -117,7 +117,7 @@
               size="small"
               :icon="getActionIcon"
               outlined
-              @click="executeCommand(rowData.id)"
+              @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
             />
           </div>
@@ -314,7 +314,7 @@
               const bodyDelete = {
                 data: {
                   title: action.title,
-                  selectedID: selectedId.value,
+                  selectedID: rowData.id,
                   deleteDialogVisible: true,
                   deleteService: action.service,
                   rerender: Math.random()
