@@ -246,6 +246,15 @@ const selectors = {
       apiKeyTextarea:
         '[data-testid="data-stream-form__destination__splunk-api-key-field__textarea"]'
     },
+    awsKinesisConnector: {
+      streamNameInput:
+        '[data-testid="data-stream-form__destination__kinesis-stream-name-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__kinesis-region-field__input"]',
+      accessKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-access-key-field__input"]',
+      secretKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-secret-key-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
