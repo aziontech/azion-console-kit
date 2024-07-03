@@ -12,11 +12,11 @@
     <ListTableBlock
       ref="listFunctionsEdgeFirewallRef"
       :listService="listFunctionsInstance"
-      :deleteService="deleteFunctionsWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
-      pageTitleDelete="function instance"
       @on-load-data="handleLoadData"
+      :actions="actions"
+      isTabs
     >
       <template #addButton>
         <PrimeButton
@@ -54,7 +54,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import DrawerFunction from './Drawer'
   import { computed, ref } from 'vue'
 
@@ -153,4 +153,13 @@
     }
     hasContentToList.value = true
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'function instance',
+      icon: 'pi pi-trash',
+      service: deleteFunctionsWithDecorator
+    }
+  ]
 </script>
