@@ -8,6 +8,8 @@ describe('Account Settings spec', () => {
   beforeEach(() => {
     cy.login()
     cy.openItemThroughMenuAccount('Account Settings')
+    cy.intercept('graphql/cities/').as('getCities')
+    cy.wait('@getCities')
   })
 
   it('should update account settings successfully', () => {
@@ -17,7 +19,10 @@ describe('Account Settings spec', () => {
     cy.get(selectors.accountSettings.companyId).clear()
     cy.get(selectors.accountSettings.companyId).type(companyId)
     cy.get(selectors.accountSettings.postalCode).clear()
-    cy.get(selectors.accountSettings.postalCodeError).should('have.text', 'Postal Code is a required field')
+    cy.get(selectors.accountSettings.postalCodeError).should(
+      'have.text',
+      'Postal Code is a required field'
+    )
     cy.get(selectors.accountSettings.postalCode).type(postalCode)
 
     // Act
