@@ -6,7 +6,7 @@ const wafName = generateUniqueName('WAF')
 describe('WAF spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('waf-rules')
+    cy.openProduct('WAF Rules')
   })
 
   it('Create a WAF ', function() {
@@ -29,6 +29,6 @@ describe('WAF spec', () => {
   })
   afterEach(() => {
     // Delete the waf
-    cy.deleteProduct(wafName, '/waf')
+    cy.deleteProduct({ entityName: wafName, productName: 'WAF Rules' })
   })
 })

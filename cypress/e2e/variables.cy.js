@@ -7,7 +7,7 @@ const variableValue = generateUniqueName('value')
 describe('Variables spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('variables')
+    cy.openProduct('Variables')
   })
 
   it('Create a variable', function() {
@@ -25,6 +25,6 @@ describe('Variables spec', () => {
   })
   afterEach(() => {
     // Delete the variable
-    cy.deleteProduct(variableKey, '/variables', 'key')
+    cy.deleteProduct({ entityName: variableKey, columnName: 'key', productName: 'Variables' })
   })
 })

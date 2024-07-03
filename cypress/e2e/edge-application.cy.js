@@ -8,7 +8,7 @@ describe('Edge Application', () => {
   beforeEach(() => {
     // Login
     cy.login()
-    cy.openProductThroughSidebar('edge-application')
+    cy.openProduct('Edge Application')
   })
 
   it('Create and delete an edge application, and create a rule', () => {
@@ -49,6 +49,6 @@ describe('Edge Application', () => {
 
   afterEach(() => {
     // Delete the edge application
-    cy.deleteProduct(edgeApplicationName, '/edge-applications')
+    cy.deleteProduct({ entityName: edgeApplicationName, productName: '/edge-applications' })
   })
 })

@@ -18,7 +18,7 @@ const fixtures = {
 describe('Edge Pulse spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('edge-pulse')
+    cy.openProduct('Edge Pulse')
   })
 
   it('should copy default and pre-loading tag in edge pulse', function () {

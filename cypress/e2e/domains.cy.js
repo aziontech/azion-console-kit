@@ -13,7 +13,7 @@ describe('Domains spec', () => {
     // Arrange
     domainName = generateUniqueName('domain')
     edgeAppName = generateUniqueName('edgeApp')
-    cy.openProductThroughSidebar('edge-application')
+    cy.openProduct('Edge Application')
     cy.get(selectors.edgeApplication.createButton).click()
     cy.get(selectors.edgeApplication.nameInput).type(edgeAppName)
     cy.get(selectors.edgeApplication.addressInput).type(`${edgeAppName}.edge.app`)
@@ -26,7 +26,7 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 
     // Arrange
-    cy.openProductThroughSidebar('domains')
+    cy.openProduct('Domains')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
@@ -51,7 +51,7 @@ describe('Domains spec', () => {
 
   afterEach(() => {
     // Cleanup
-    cy.deleteProduct(domainName, '/domains').then(() => {
+    cy.deleteProduct({ entityName: domainName, productName: 'Domains' }).then(() => {
       cy.verifyToast('Resource successfully deleted')
     })
   })

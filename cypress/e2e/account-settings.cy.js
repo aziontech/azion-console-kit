@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 describe('Account Settings spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Account Settings')
+    cy.openProduct('Account Settings')
   })
 
   it('should update account settings successfully', () => {
@@ -22,7 +22,7 @@ describe('Account Settings spec', () => {
 
     // Assert
     cy.verifyToast('success', 'Your account settings have been updated')
-    cy.openItemThroughMenuAccount('Account Settings')
+    cy.openProduct('Account Settings')
     cy.get(selectors.accountSettings.companyName).should('have.value', 'Company Teste')
     cy.get(selectors.accountSettings.companyId).should('have.value', '00.000.000/0001-00')
     cy.get(selectors.accountSettings.postalCode).should('have.value', '14055-010')
