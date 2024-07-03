@@ -207,7 +207,7 @@ const selectors = {
     connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,
     httpConnector: {
       urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
-      headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
+      headersInput: '[data-testid="data-stream-form__destination__headers-field__input"]',
       payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
       separatorInput:
         '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
@@ -220,6 +220,15 @@ const selectors = {
       topicInput: '[data-testid="data-stream-form__destination__kafka-topic-field__input"]',
       useTlsSlider:
         '[data-testid="data-stream-form__destination__use-tls-field"] > .p-inputswitch-slider'
+    },
+    s3Connector: {
+      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
+      bucketInput: '[data-testid="data-stream-form__destination__bucket-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__region-field__input"]',
+      accessKeyInput: '[data-testid="data-stream-form__destination__access-key-field__input"]',
+      secretKeyInput: '[data-testid="data-stream-form__destination__secret-key-field__input"]',
+      objectKeyPrefixInput:
+        '[data-testid="data-stream-form__destination__object-key-prefix-field__input"]'
     },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
