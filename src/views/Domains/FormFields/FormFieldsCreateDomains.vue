@@ -99,6 +99,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="domains-form__name-field"
           label="Name *"
           name="name"
           placeholder="My domain"
@@ -116,6 +117,7 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
+          data-testid="domains-form__edge-application-field"
           label="Edge Application *"
           name="edgeApplication"
           :options="edgeApplicationOptions"
@@ -130,6 +132,7 @@
         />
       </div>
       <FieldSwitchBlock
+        data-testid="domains-form__cname-access-only-field"
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"
         auto
@@ -139,6 +142,7 @@
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="domains-form__cnames-field"
           :label="CNAMELabel"
           name="cnames"
           rows="2"
@@ -148,6 +152,7 @@
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
+          data-testid="domains-form__edge-certificate-field"
           label="Digital Certificate"
           name="edgeCertificate"
           :options="edgeCertificatesOptions"
@@ -170,6 +175,7 @@
   >
     <template #inputs>
       <FieldSwitchBlock
+        data-testid="domains-form__mtls-is-enabled-field"
         nameField="mtlsIsEnabled"
         name="mtlsIsEnabled"
         auto
@@ -192,6 +198,7 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
         <FieldDropdown
+          data-testid="domains-form__mtls-trusted-certificate-field"
           label="Trusted CA Certificate *"
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
@@ -211,6 +218,7 @@
   <form-horizontal title="Status">
     <template #inputs>
       <FieldSwitchBlock
+        data-testid="domains-form__active-field"
         nameField="active"
         name="active"
         auto

@@ -1,7 +1,7 @@
 <script setup>
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
-  import { computed, toRef, useSlots } from 'vue'
+  import { computed, toRef, useSlots, useAttrs } from 'vue'
 
   const props = defineProps({
     value: {
@@ -66,7 +66,19 @@
 
   const name = toRef(props, 'name')
   const slots = useSlots()
+  const attrs = useAttrs()
   const hasDescriptionSlot = !!slots.description
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-text'
+
+    return {
+      label: `${id}__label`,
+      input: `${id}__input`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 
   const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
@@ -115,11 +127,13 @@
 <template>
   <label
     :for="props.name"
+    :data-testid="customTestId.label"
     class="text-color text-base font-medium leading-5"
   >
     {{ props.label }} {{ labelSufix }}
   </label>
   <Dropdown
+    :data-testid="customTestId.input"
     appendTo="self"
     :id="name"
     :name="props.name"
@@ -160,6 +174,7 @@
 
   <small
     v-if="errorMessage"
+    :data-testid="customTestId.error"
     class="p-error text-xs font-normal leading-tight"
   >
     {{ errorMessage }}
@@ -167,6 +182,7 @@
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description || hasDescriptionSlot"
+    :data-testid="customTestId.description"
   >
     <slot name="description">
       {{ props.description }}

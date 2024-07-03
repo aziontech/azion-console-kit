@@ -198,7 +198,21 @@ const selectors = {
     postalCode: '[data-testid="account-settings__postal-code__input"]',
     postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
-  }
+  },
+  domains: {
+    createButton: '[data-testid="create_Domain_button"]',
+    nameInput: '[data-testid="domains-form__name-field__input"]',
+    edgeApplicationField: '[data-testid="domains-form__edge-application-field"] > .p-dropdown-label',
+    dropdownFilter: '.p-dropdown-filter',
+    edgeApplicationOption: '#edgeApplication_0',
+    cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
+    dialogTitle: '.p-dialog-header > .p-dialog-title',
+    domainField: '[data-testid="domains-dialog__domain-field__input"]',
+    copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
+    confirmButton: '[data-testid="domains-dialog__confirm__button"]',
+    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+    actionDelete: '.p-menuitem-content > .p-menuitem-link'
+  },
 }
 
 export default selectors
