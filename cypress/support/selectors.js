@@ -260,6 +260,9 @@ const selectors = {
       apiKeyTextarea:
         '[data-testid="data-stream-form__destination__datadog-api-key-field__textarea"]'
     },
+    ibmQRadarConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__qradar-url-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
