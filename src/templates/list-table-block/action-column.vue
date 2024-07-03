@@ -363,6 +363,7 @@
                 data: {
                   title: action.title,
                   selectedID: rowData.id,
+                  selectedItemData: rowData,
                   deleteDialogVisible: true,
                   deleteService: action.service,
                   rerender: Math.random()
