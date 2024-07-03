@@ -6,17 +6,16 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="domain"
         addButtonLabel="Domain"
         :createPagePath="createDomainPath"
         editPagePath="domains/edit"
         :listService="listDomainsService"
-        :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No domains found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -39,7 +38,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -69,6 +68,14 @@
   const createDomainPath = 'domains/create?origin=list'
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'domain',
+      icon: 'pi pi-trash',
+      service: props.deleteDomainService
+    }
+  ]
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
