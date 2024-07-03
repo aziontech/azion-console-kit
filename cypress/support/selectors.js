@@ -18,6 +18,9 @@ const selectors = {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
       deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
     },
+    singleActionsMenu: {
+      button: '[data-testid="data-table-actions-column-body-action-button"]'
+    },
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
@@ -252,7 +255,7 @@ const selectors = {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
     }
   },
-  edgeDns:{
+  edgeDns: {
     createButton: '[data-testid="create_Zone_button"] > .p-button-label',
     nameInput: '[data-testid="edge-dns-form__name__input"]',
     domainInput: '[data-testid="edge-dns-form__domain__input"]',
@@ -262,7 +265,7 @@ const selectors = {
     nameRow: '[data-testid="list-table-block__column__name__row"]',
     showMore: '.underline',
     domainRow: '.whitespace-pre',
-    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
   }
 }
 

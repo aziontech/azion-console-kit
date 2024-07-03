@@ -38,6 +38,25 @@ const deleteProduct = (productName, path, columnName) => {
   cy.get(selectors.list.deleteDialog.deleteButton).click()
 }
 
+/**
+ * Deletes a product based on its name and optional column name for lists that have only one action button.
+ *
+ * @param {string} productName - The name of the product to delete.
+ * @param {string} columnName - The name of the column containing the product name.
+ * @param {string} path - The URL path where the product list is located.
+ */
+const deleteProductSingleActionColumn = (productName, path, columnName) => {
+  cy.visit(`${path}`)
+  cy.get(selectors.list.searchInput).clear()
+  cy.get(selectors.list.searchInput).type(productName)
+  cy.get(selectors.list.filteredRow.nameColumn(columnName))
+    .should('be.visible')
+    .should('have.text', productName)
+  cy.get(selectors.list.singleActionsMenu.button).click()
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
+  cy.get(selectors.list.deleteDialog.deleteButton).click()
+}
+
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
   console.log('Uncaught exception in test:', runnable.title)
@@ -85,6 +104,21 @@ Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
 Cypress.Commands.add('deleteProduct', (productName, path, columnName = 'name') => {
   deleteProduct(productName, path, columnName)
 })
+
+/**
+ * Deletes a product using the provided name, optional column name, and path.
+ * Use this for lists with only one action button.
+ *
+ * @param {string} productName - The name of the product to delete.
+ * @param {string} path - The URL path where the product list is located.
+ * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
+ */
+Cypress.Commands.add(
+  'deleteProductSingleActionColumn',
+  (productName, path, columnName = 'name') => {
+    deleteProductSingleActionColumn(productName, path, columnName)
+  }
+)
 
 /**
  * Verifies the visibility and content of a toast message.
