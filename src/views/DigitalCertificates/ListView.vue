@@ -7,14 +7,13 @@
       <ListTableBlock
         v-if="hasContentToList"
         :listService="listDigitalCertificatesService"
-        :deleteService="deleteDigitalCertificatesService"
         :columns="getColumns"
-        pageTitleDelete="digital certificate"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         @on-load-data="handleLoadData"
         emptyListMessage="No digital certificates found."
+        :actions="actions"
       />
 
       <EmptyResultsBlock
@@ -33,81 +32,79 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { ref, computed } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-  export default {
-    name: 'digital-certificates-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+  defineOptions({ name: 'digital-certificates-view' })
+
+  const props = defineProps({
+    listDigitalCertificatesService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listDigitalCertificatesService: {
-        required: true,
-        type: Function
-      },
-      deleteDigitalCertificatesService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
+    deleteDigitalCertificatesService: {
+      required: true,
+      type: Function
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'subjectName',
-            header: 'Subject Names'
-          },
-          {
-            field: 'issuer',
-            header: 'Issuer'
-          },
-          {
-            field: 'type',
-            header: 'Type'
-          },
-          {
-            field: 'validity',
-            header: 'Expiration Date'
-          },
-          {
-            field: 'status',
-            header: 'Status',
-            sortField: 'status.content',
-            type: 'component',
-            component: (columnData) =>
-              columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'digital certificate',
+      icon: 'pi pi-trash',
+      service: props.deleteDigitalCertificatesService
+    }
+  ]
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'subjectName',
+        header: 'Subject Names'
+      },
+      {
+        field: 'issuer',
+        header: 'Issuer'
+      },
+      {
+        field: 'type',
+        header: 'Type'
+      },
+      {
+        field: 'validity',
+        header: 'Expiration Date'
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        sortField: 'status.content',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+      }
+    ]
+  })
 </script>
