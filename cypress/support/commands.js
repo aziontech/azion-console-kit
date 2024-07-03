@@ -56,7 +56,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
  */
 Cypress.Commands.add('login', () => {
   const environment = Cypress.env('environment') || 'dev';
-  const isCI = process.env('GITHUB_ACTIONS') === 'true';
+  const isCI = process.env.GITHUB_ACTIONS === 'true';
   cy.log(`Logging into ${environment} environment`);
 
   let email, password;
