@@ -202,7 +202,9 @@ const selectors = {
     sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
     templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
     editorBody: '.view-lines',
-    connectorDropdown: '[data-testid="data-stream-form__destination__connector-field__dropdown"]',
+    connectorDropdown:
+      '[data-testid="data-stream-form__destination__connector-field__dropdown"] > .p-dropdown-trigger',
+    connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,
     httpConnector: {
       urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
       headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
@@ -212,12 +214,19 @@ const selectors = {
       maxSizeInput:
         '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
     },
+    kafkaConnector: {
+      serverTextarea:
+        '[data-testid="data-stream-form__destination__bootstrap-servers-field__textarea"]',
+      topicInput: '[data-testid="data-stream-form__destination__kafka-topic-field__input"]',
+      useTlsSlider:
+        '[data-testid="data-stream-form__destination__use-tls-field"] > .p-inputswitch-slider'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
     }
   },
-  edgeDns:{
+  edgeDns: {
     createButton: '[data-testid="create_Zone_button"] > .p-button-label',
     nameInput: '[data-testid="edge-dns-form__name__input"]',
     domainInput: '[data-testid="edge-dns-form__domain__input"]',
@@ -227,7 +236,7 @@ const selectors = {
     nameRow: '[data-testid="list-table-block__column__name__row"]',
     showMore: '.underline',
     domainRow: '.whitespace-pre',
-    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
   }
 }
 
