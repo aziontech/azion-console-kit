@@ -62,6 +62,7 @@ Cypress.Commands.add('login', () => {
   let email, password;
 
   if (isCI) {
+    cy.log('Running in CI/CD environment');
     email = Cypress.env('CYPRESS_EMAIL');
     password = Cypress.env('CYPRESS_PASSWORD');
   } else {
