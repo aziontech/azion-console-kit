@@ -1,6 +1,7 @@
 <template>
   <div
     class="max-w-full"
+    :class="isTabs ? 'mt-4' : ''"
     data-testid="data-table-container"
   >
     <DataTable
@@ -296,6 +297,10 @@
     actions: {
       type: Array,
       default: () => []
+    },
+    isTabs: {
+      type: Boolean,
+      default: false
     }
   })
 

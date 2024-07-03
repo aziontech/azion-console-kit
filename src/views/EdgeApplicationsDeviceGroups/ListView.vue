@@ -2,7 +2,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
@@ -107,28 +107,37 @@
   const deleteDeviceGroupsWithDecorator = async (id) => {
     return await props.deleteDeviceGroupService(id, props.edgeApplicationId)
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'device group',
+      icon: 'pi pi-trash',
+      service: deleteDeviceGroupsWithDecorator
+    }
+  ]
 </script>
 
 <template>
   <DrawerDeviceGroups
     ref="drawerDeviceGroups"
     @onSuccess="handleSuccess"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createDeviceGroupService="props.createDeviceGroupService"
-    :loadDeviceGroupService="props.loadDeviceGroupService"
-    :editDeviceGroupService="props.editDeviceGroupService"
-    :documentationService="props.documentationService"
+    :edgeApplicationId="edgeApplicationId"
+    :createDeviceGroupService="createDeviceGroupService"
+    :loadDeviceGroupService="loadDeviceGroupService"
+    :editDeviceGroupService="editDeviceGroupService"
+    :documentationService="documentationService"
   />
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listDeviceGroupsEdgeApplicationsRef"
-      pageTitleDelete="device group"
       :listService="listDeviceGroupsWithDecorator"
-      :deleteService="deleteDeviceGroupsWithDecorator"
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
       emptyListMessage="No device groups found."
+      :actions="actions"
+      isTabs
     >
       <template #addButton>
         <PrimeButton
