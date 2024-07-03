@@ -6,10 +6,8 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listEdgeFunctionsService"
-        :deleteService="props.deleteEdgeFunctionsService"
+        :listService="listEdgeFunctionsService"
         :columns="getColumns"
-        pageTitleDelete="edge function"
         addButtonLabel="Edge Function"
         createPagePath="edge-functions/create?origin=list"
         editPagePath="edge-functions/edit"
@@ -17,6 +15,7 @@
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge functions found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -24,7 +23,7 @@
         description="Click the button below to create your first function."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -38,7 +37,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -62,6 +61,14 @@
   })
 
   let hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'edge function',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeFunctionsService
+    }
+  ]
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
