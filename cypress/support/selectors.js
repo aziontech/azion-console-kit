@@ -263,6 +263,16 @@ const selectors = {
     ibmQRadarConnector: {
       urlInput: '[data-testid="data-stream-form__destination__qradar-url-field__input"]'
     },
+    azureMonitorConnector: {
+      logTypeInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-log-type-field__input"]',
+      sharedKeyInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"]',
+      timeGeneratedFieldInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-generated-field__input"]',
+      workspaceIdInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-workspace-id-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`

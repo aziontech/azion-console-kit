@@ -823,7 +823,7 @@
             description="Specifies how long it’ll take for the log to be available after collection. Uses
             ingestion time if not specified."
             placeholder="myCustomTimeField"
-            data-testid="data-stream-form__destination__azure-monitor-generated-field__field"
+            data-testid="data-stream-form__destination__azure-monitor-generated-field"
           />
         </div>
 
