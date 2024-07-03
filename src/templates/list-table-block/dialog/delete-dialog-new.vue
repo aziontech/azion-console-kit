@@ -129,6 +129,7 @@
       showToast('success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
+      dialogRef.value.close()
     } catch (error) {
       showToast('error', 'Error', error)
     } finally {

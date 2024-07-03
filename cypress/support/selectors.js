@@ -18,6 +18,9 @@ const selectors = {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
       deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
     },
+    singleActionsMenu: {
+      button: '[data-testid="data-table-actions-column-body-action-button"]'
+    },
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
@@ -267,8 +270,7 @@ const selectors = {
   domains: {
     createButton: '[data-testid="create_Domain_button"]',
     nameInput: '[data-testid="domains-form__name-field__input"]',
-    edgeApplicationField:
-      '[data-testid="domains-form__edge-application-field__dropdown"]',
+    edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
     dropdownFilter: '.p-dropdown-filter',
     edgeApplicationOption: '#edgeApplication_0',
     cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',

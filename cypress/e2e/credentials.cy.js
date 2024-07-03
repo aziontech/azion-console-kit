@@ -8,6 +8,10 @@ describe('Credentials', () => {
     cy.login()
     cy.openItemThroughMenuAccount('Credentials')
   })
+  afterEach(() => {
+    // Delete the credential
+    cy.deleteProductSingleActionColumn(credentialName, '/credentials')
+  })
 
   it('should create a credential from the table', () => {
     // Arrange
@@ -38,9 +42,5 @@ describe('Credentials', () => {
     )
     cy.get(selectors.list.filteredRow.lastModifiedColumn).should('not.be.empty')
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Active')
-  })
-  afterEach(() => {
-    // Delete the credential
-    cy.deleteProduct(credentialName, '/credentials')
   })
 })
