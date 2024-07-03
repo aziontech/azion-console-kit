@@ -6,7 +6,6 @@ export default defineConfig({
   projectId: 'azion-console-kit',
   e2e: {
     specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
-    baseUrl: 'http://localhost:5173',
     defaultCommandTimeout: 15000,
     video: true,
     experimentalStudio: true,
@@ -17,8 +16,11 @@ export default defineConfig({
     }
   },
   env: {
-    CYPRESS_EMAIL_STAGE: process.env.CYPRESS_EMAIL_STAGE,
-    CYPRESS_PASSWORD_STAGE: process.env.CYPRESS_PASSWORD_STAGE,
-    CYPRESS_USERNAME_STAGE: process.env.CYPRESS_USERNAME_STAGE
+    // TODO: remove this WORKAROUND for https://github.com/cypress-io/cypress/issues/20647,
+    baseUrl: 'http://localhost:5173',
+    isCI: process.env.GITHUB_ACTIONS,
+    CYPRESS_EMAIL: process.env.DEV_CYPRESS_EMAIL,
+    CYPRESS_PASSWORD: process.env.DEV_CYPRESS_PASSWORD,
+    CYPRESS_USERNAME: process.env.DEV_CYPRESS_USERNAME,
   }
 })
