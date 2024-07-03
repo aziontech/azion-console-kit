@@ -15,6 +15,7 @@
   import * as yup from 'yup'
   import PermissionsFieldset from '../components/PermissionsFieldset'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import LabelBlock from '@/templates/label-block'
 
   const router = useRouter()
 
@@ -228,11 +229,11 @@
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-8">
                 <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                  <label
+                  <LabelBlock
                     for="edge_application"
-                    class="text-color text-base font-medium"
-                    >Edge Application *
-                  </label>
+                    label="Edge Application"
+                    isRequired
+                  />
                   <Dropdown
                     filter
                     autoFilterFocus

@@ -11,6 +11,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
+  import LabelBlock from '@/templates/label-block'
 
   const toast = useToast()
   const router = useRouter()
@@ -249,11 +250,11 @@
         class="flex flex-col sm:flex-row gap-4"
       >
         <div class="flex flex-col sm:w-2/5 gap-2">
-          <label
+          <LabelBlock
             for="gitScope"
-            class="text-color text-sm font-medium leading-5"
-            >Git Scope *</label
-          >
+            label="Git Scope"
+            isRequired
+          />
           <Dropdown
             name="gitScope"
             v-model="gitScope"
@@ -317,7 +318,8 @@
             filter
             :disabled="!gitScope"
             placeholder="Select a repository"
-            label="Repository *"
+            label="Repository"
+            required
             name="repository"
             :value="repository"
             :loading="loadingRepositories"
@@ -339,7 +341,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Application Name *"
+          label="Application Name"
+          required
           name="applicationName"
           :value="applicationName"
           description="Give a unique name to the application. It’ll also be used for the bucket for storage and the edge function."
@@ -348,11 +351,11 @@
 
       <div class="flex flex-col sm:flex-row gap-4">
         <div class="flex flex-col sm:w-2/5 gap-2">
-          <label
+          <LabelBlock
             for="preset"
-            class="text-color text-sm font-medium leading-5"
-            >Preset *</label
-          >
+            label="Preset"
+            isRequired
+          />
           <Dropdown
             name="preset"
             v-model="preset"
@@ -410,7 +413,8 @@
             optionDisabled="disabled"
             placeholder="Select the mode"
             :disabled="!preset"
-            label="Mode *"
+            label="Mode"
+            required
             name="mode"
             :value="mode"
             description="Defines the operational mode of application within the framework."
@@ -420,7 +424,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Root Directory *"
+          label="Root Directory"
+          required
           name="rootDirectory"
           placeholder="/"
           :value="rootDirectory"
@@ -429,7 +434,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Install Command *"
+          label="Install Command"
+          required
           name="installCommand"
           placeholder="npm install"
           :value="installCommand"
@@ -468,7 +474,8 @@
           <div class="flex gap-4">
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
-                label="Key *"
+                label="Key"
+                required
                 autocapitalize="characters"
                 :name="`newVariables[${index}].key`"
                 :value="newVariables[index].key"
@@ -481,7 +488,8 @@
             </div>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
-                label="Value *"
+                label="Value"
+                required
                 :name="`newVariables[${index}].value`"
                 :value="newVariables[index].value"
                 placeholder="VARIABLE_VALUE"

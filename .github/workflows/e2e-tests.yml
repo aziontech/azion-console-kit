@@ -18,9 +18,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: yarn ci
-
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         env: 
@@ -36,6 +33,9 @@ jobs:
 
       - name: Check E2E Test Coverage
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
+
+      - name: Remove lcov intermediate files
+        run: rm -rf coverage/e2e/lcov-report
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}

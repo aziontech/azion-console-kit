@@ -2,6 +2,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
   import { computed, toRef, useSlots, useAttrs } from 'vue'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -44,10 +45,6 @@
       type: Boolean,
       default: false
     },
-    isRequiredField: {
-      type: Boolean,
-      default: false
-    },
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
@@ -66,20 +63,8 @@
 
   const name = toRef(props, 'name')
   const slots = useSlots()
-  const attrs = useAttrs()
+  
   const hasDescriptionSlot = !!slots.description
-
-  const customTestId = computed(() => {
-    const id = attrs['data-testid'] || 'field-text'
-
-    return {
-      label: `${id}__label`,
-      input: `${id}__input`,
-      description: `${id}__description`,
-      error: `${id}__error-message`
-    }
-  })
-
   const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
   })
@@ -119,21 +104,29 @@
    * end of primevue workaround
    */
 
-  const labelSufix = computed(() => {
-    return props.isRequiredField ? '*' : ''
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-dropdown'
+
+    return {
+      label: `${id}__label`,
+      dropdown: `${id}__dropdown`,
+      value: `${id}__value`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
   })
 </script>
 
 <template>
-  <label
+  <LabelBlock
     :for="props.name"
+    :label="props.label"
+    :isRequired="$attrs.required"
     :data-testid="customTestId.label"
-    class="text-color text-base font-medium leading-5"
-  >
-    {{ props.label }} {{ labelSufix }}
-  </label>
+  />
   <Dropdown
-    :data-testid="customTestId.input"
     appendTo="self"
     :id="name"
     :name="props.name"
@@ -157,12 +150,13 @@
         class: 'w-full'
       }
     }"
+    :data-testid="customTestId.dropdown"
   >
     <template
       v-if="enableCustomLabel"
       #value="slotProps"
     >
-      <span>
+      <span :data-testid="customTestId.value">
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
@@ -181,8 +175,8 @@
   </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
-    v-if="props.description || hasDescriptionSlot"
     :data-testid="customTestId.description"
+    v-if="props.description || hasDescriptionSlot"
   >
     <slot name="description">
       {{ props.description }}

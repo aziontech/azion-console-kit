@@ -5,6 +5,7 @@
   import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import LabelBlock from '@/templates/label-block'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 
@@ -77,7 +78,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Path *"
+          label="Path"
+          required
           name="name"
           placeholder="/tmp/myresource"
           :disabled="isFieldDisabled"
@@ -108,11 +110,10 @@
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">
           <div class="flex flex-col w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-sm not-italic font-medium leading-5"
-              >Content *</label
-            >
+            <LabelBlock
+              label="Content"
+              isRequired
+            />
             <div class="flex flex-col h-full gap-2">
               <vue-monaco-editor
                 v-model:value="content"

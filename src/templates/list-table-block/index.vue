@@ -355,6 +355,7 @@
 
         actionOptions.push({
           ...action,
+          disabled: rowData?.isDefault ? rowData?.isDefault : false,
           command: () => action.command(rowData)
         })
       })

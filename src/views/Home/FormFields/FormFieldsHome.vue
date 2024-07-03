@@ -23,7 +23,8 @@
   <div class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6">
     <div class="flex flex-col w-full gap-2">
       <FieldText
-        label="Full Name *"
+        label="Full Name"
+        required
         name="name"
         :value="name"
       />
@@ -31,7 +32,8 @@
 
     <div class="flex flex-col w-full gap-2">
       <FieldText
-        label="Email *"
+        label="Email"
+        required
         name="email"
         type="email"
         :value="email"
@@ -40,7 +42,8 @@
 
     <div class="flex flex-col w-full gap-2">
       <FieldDropdown
-        label="Team *"
+        label="Team"
+        required
         name="team"
         :options="props.teams"
         :loading="loadingTeams"
