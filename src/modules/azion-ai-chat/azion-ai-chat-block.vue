@@ -29,12 +29,12 @@
         >
           <AzionAiChatSuggestion
             @click="handleSubmitSuggestion(0)"
-            text="Error when importing Domains"
+            text="How do I configure a domain?"
             :iconSrc="suggestionIconMetrics"
           />
           <AzionAiChatSuggestion
             @click="handleSubmitSuggestion(1)"
-            text="Error when creating WAF"
+            text="How to create a WAF?"
             :icon-src="suggestionIconSecurity"
           />
         </div>
@@ -292,8 +292,8 @@
 
   const handleSubmitSuggestion = (suggestionIndex) => {
     const suggestionsOptions = [
-      'How to create an domain and import it to Azion?',
-      'How to create an Waf app to protect my application?'
+      'How do I configure a domain at Azion?',
+      'How to create WAF rules to protect my edge application?'
     ]
 
     const suggestion = suggestionsOptions[suggestionIndex]
