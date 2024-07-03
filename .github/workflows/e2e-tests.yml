@@ -26,7 +26,7 @@ jobs:
         env:
           DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
           DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
-          DEV_CYPRESS_USERNAME: ${{ secrets.DEV_CYPRESS_USERNAME }}      
+          DEV_CYPRESS_USERNAME: ${{ secrets.DEV_CYPRESS_USERNAME }}
         with:
           build: yarn build
           start: yarn dev
