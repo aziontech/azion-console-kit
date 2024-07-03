@@ -230,6 +230,13 @@ const selectors = {
       objectKeyPrefixInput:
         '[data-testid="data-stream-form__destination__object-key-prefix-field__input"]'
     },
+    bigQueryConnector: {
+      projectIdInput: '[data-testid="data-stream-form__destination__project-id-field__input"]',
+      datasetIdInput: '[data-testid="data-stream-form__destination__dataset-id-field__input"]',
+      tableIdInput: '[data-testid="data-stream-form__destination__table-id-field__input"]',
+      serviceAccountKeyInput:
+        '[data-testid="data-stream-form__destination__service-account-key-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
