@@ -56,19 +56,29 @@ Cypress.on('uncaught:exception', (err, runnable) => {
  */
 Cypress.Commands.add('login', () => {
   const environment = Cypress.env('environment') || 'dev';
+  const isCI = Cypress.env('CI') === 'true';
   cy.log(`Logging into ${environment} environment`);
 
   let email, password;
 
-  if (environment === 'preview-prod') {
-    email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL');
-    password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD');
-  } else if (environment === 'prod') {
-    email = Cypress.env('PROD_CYPRESS_EMAIL');
-    password = Cypress.env('PROD_CYPRESS_PASSWORD');
+  if (isCI) {
+    email = Cypress.env('CYPRESS_EMAIL');
+    password = Cypress.env('CYPRESS_PASSWORD');
   } else {
-    email = Cypress.env('DEV_CYPRESS_EMAIL');
-    password = Cypress.env('DEV_CYPRESS_PASSWORD');
+    switch (environment) {
+      case 'preview-prod':
+        email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL');
+        password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD');
+        break;
+      case 'prod':
+        email = Cypress.env('PROD_CYPRESS_EMAIL');
+        password = Cypress.env('PROD_CYPRESS_PASSWORD');
+        break;
+      default:
+        email = Cypress.env('DEV_CYPRESS_EMAIL');
+        password = Cypress.env('DEV_CYPRESS_PASSWORD');
+        break;
+    }
   }
 
   if (!email || !password) {
@@ -78,6 +88,7 @@ Cypress.Commands.add('login', () => {
   cy.log(`🔐 Authenticating | ${email}`);
   login(email, password);
 });
+
 
 
 /**
