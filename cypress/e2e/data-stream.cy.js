@@ -205,7 +205,7 @@ describe('Data Stream spec', () => {
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
   })
 
-  it.only('should create a data stream with the splunk connector', () => {
+  it('should create a data stream with the splunk connector', () => {
     // Arrange
     cy.intercept('api/v3/data_streaming/templates').as('getTemplates')
 
