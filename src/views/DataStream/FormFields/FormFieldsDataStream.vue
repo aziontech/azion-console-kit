@@ -853,6 +853,7 @@
             :value="storageAccount"
             description="Name of the storage account."
             placeholder="mystorageaccount"
+            data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field"
           />
         </div>
 

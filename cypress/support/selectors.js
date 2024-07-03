@@ -273,6 +273,14 @@ const selectors = {
       workspaceIdInput:
         '[data-testid="data-stream-form__destination__azure-monitor-workspace-id-field__input"]'
     },
+    azureBlobStorageConnector: {
+      storageAccountInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field__input"]',
+      containerNameInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-container-name-field__input"]',
+      blobSasTokenInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
