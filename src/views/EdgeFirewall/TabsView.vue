@@ -17,7 +17,7 @@
   const props = defineProps({
     edgeFirewallServices: { type: Object, required: true },
     listDomainsService: { type: Function, required: true },
-    rulesEngineServices: { type: Function, required: true },
+    rulesEngineServices: { type: Object, required: true },
     listNetworkListService: { type: Function, required: true }
   })
 

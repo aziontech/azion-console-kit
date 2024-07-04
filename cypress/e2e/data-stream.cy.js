@@ -8,7 +8,7 @@ describe('Data Stream spec', () => {
     dataStreamName = generateUniqueName('DataStream')
 
     cy.login()
-    cy.openProductThroughSidebar('data-stream')
+    cy.openProduct('Data Stream')
   })
 
   it('should create a data stream with the standard connector', () => {
@@ -456,7 +456,7 @@ describe('Data Stream spec', () => {
 
   afterEach(() => {
     // Cleanup
-    cy.deleteProduct(dataStreamName, '/data-stream').then(() => {
+    cy.deleteProduct({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
       cy.verifyToast('Data Stream successfully deleted')
     })
   })

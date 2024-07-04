@@ -18,6 +18,12 @@ Before you begin, ensure that you have the following:
 - [Node.js](https://nodejs.org/) version 18 or later
 - [Yarn](https://yarnpkg.com/) package manager
 
+ If you are not a JS developer and don't want to install yarn and node, you can use Docker:
+```bash
+alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
+```
+
+
 ### Setup
 
 1. Clone the repository and navigate to the root folder.
@@ -34,29 +40,22 @@ Before you begin, ensure that you have the following:
      $ yarn dev --host
     ```
 
-The webapp becomes available at [http://localhost:5173](http://localhost:5173).
-
-### Using Docker
-
-If you prefer not to run things on your machine, you can use Docker:
-
-```bash
-alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
-```
+The console becomes available at [http://localhost:5173](http://localhost:5173).
 
 ## Configuration 💻
 
-### Personal token
+### Skipping login with a personal token
 
-For a faster setup, create a personal token via [Azion Console](https://console.azion.com/) and save it in a `.env.development` file:
+To avoid login screen, you can create a personal token via [Azion Console](https://console.azion.com/) and save it in a `.env.development` file:
 
 ```bash
 echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 ```
 
-### API configuration
+### Setting the API environment (STAGE/PRODUCTION)
 
-By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs. To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
+By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs. 
+To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
 
 ```bash
 VITE_ENVIRONMENT='PRODUCTION'
@@ -89,14 +88,6 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
     > This step is responsible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
 
    💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
-
-4. Deploy your Project
-
-    ```bash
-    azion deploy
-    ```
-
-    One of the rules used in `azion.config.cjs` _(to rewrite the authentication cookie using your domain)_ needs the created domain to work. So, **after the first deploy**, just run the `Azion deploy` command again and everything should work 🚀
 
 After a few seconds, access your project on the domain provided by the CLI.
 

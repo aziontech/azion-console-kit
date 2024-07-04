@@ -7,7 +7,7 @@ describe('Edge DNS spec', () => {
   beforeEach(() => {
     cy.login()
     zoneName = generateUniqueName('DNSZone')
-    cy.openProductThroughSidebar('edge-dns')
+    cy.openProduct('Edge DNS')
   })
 
   it('Create a Edge DNS Zone', function () {
@@ -103,7 +103,7 @@ describe('Edge DNS spec', () => {
   })
 
   afterEach(() => {
-    cy.deleteProduct(zoneName, '/edge-dns').then(() => {
+    cy.deleteProduct({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
       cy.verifyToast('Your Edge DNS has been deleted')
     })
   })
