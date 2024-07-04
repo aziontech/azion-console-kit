@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { convertValueToDate, convertDateToLocalTimezone } from '@/helpers/convert-date'
+import {
+  convertValueToDate,
+  convertDateToLocalTimezone,
+  formatDateMonthAndYear
+} from '@/helpers/convert-date'
 
 describe('convertDate', () => {
   it('should convert a given value to a date string in a specific format', () => {
@@ -17,5 +21,23 @@ describe('convertDate', () => {
     const expectedDate = '2022-01-01T23:59:59'
 
     expect(convertedDate).toBe(expectedDate)
+  })
+
+  it('Format month and year to "MM/YYYY"', () => {
+    const month = 5
+    const year = 2022
+    const expectedDateString = '05/2022'
+    const actualDateString = formatDateMonthAndYear(month, year)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('Format single-digit month and year to "MM/YYYY"', () => {
+    const month = 11
+    const year = 2023
+    const expectedDateString = '11/2023'
+    const actualDateString = formatDateMonthAndYear(month, year)
+
+    expect(actualDateString).toEqual(expectedDateString)
   })
 })
