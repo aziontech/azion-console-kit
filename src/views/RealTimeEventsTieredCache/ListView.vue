@@ -1,6 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -133,6 +133,7 @@
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
+    isTabs
   />
 
   <EmptyResultsBlock

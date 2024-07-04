@@ -49,7 +49,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import DialogPurge from './Dialog'
