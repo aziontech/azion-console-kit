@@ -2,14 +2,12 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, ref } from 'vue'
   defineOptions({ name: 'list-edge-service' })
-
-  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     listEdgeServiceServices: {
@@ -30,30 +28,7 @@
     }
   })
 
-  const router = useRouter()
   const hasContentToList = ref(true)
-  const selectRow = ref({})
-  const visibleDialog = ref(false)
-  const actionsRow = ref([
-    {
-      label: 'Deactivate',
-      icon: 'pi pi-minus-circle',
-      visibleAction: (item) => !item.active,
-      command: (item) => {
-        selectRow.value = item
-        visibleDialog.value = true
-      }
-    },
-    {
-      label: 'Activate',
-      icon: 'pi pi-plus-circle',
-      visibleAction: (item) => item.active,
-      command: (item) => {
-        selectRow.value = item
-        visibleDialog.value = true
-      }
-    }
-  ])
 
   const getColumns = computed(() => [
     {
@@ -85,9 +60,48 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
-  const updateView = () => {
-    router.go({ name: 'edge-services' })
-  }
+
+  const actions = [
+    {
+      type: 'dialog',
+      label: 'Activate',
+      icon: 'pi pi-plus-circle',
+      visibleAction: (item) => !item.active,
+      dialog: {
+        component: EdgeServicesToggleStatus,
+        body: (item, updatedTable) => ({
+          data: {
+            selectRow: item,
+            service: props.editEdgeServiceServices
+          },
+          onClose: (opt) => opt.data.updated && updatedTable()
+        })
+      }
+    },
+    {
+      type: 'dialog',
+      label: 'Deactivate',
+      icon: 'pi pi-minus-circle',
+      visibleAction: (item) => item.active,
+      dialog: {
+        component: EdgeServicesToggleStatus,
+        body: (item, updatedTable) => ({
+          data: {
+            selectRow: item,
+            service: props.editEdgeServiceServices
+          },
+          onClose: (opt) => opt.data.updated && updatedTable()
+        })
+      }
+    },
+    {
+      type: 'delete',
+      label: 'Delete',
+      title: 'service',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeServiceServices
+    }
+  ]
 </script>
 
 <template>
@@ -96,23 +110,15 @@
       <PageHeadingBlock pageTitle="Edge Services"></PageHeadingBlock>
     </template>
     <template #content>
-      <EdgeServicesToggleStatus
-        v-model:visible="visibleDialog"
-        :serviceUpdate="props.editEdgeServiceServices"
-        :selectRow="selectRow"
-        @updateService="updateView"
-      />
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listEdgeServiceServices"
-        :deleteService="props.deleteEdgeServiceServices"
+        :listService="listEdgeServiceServices"
         :columns="getColumns"
-        pageTitleDelete="service"
         addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
-        :rowActions="actionsRow"
+        :actions="actions"
         emptyListMessage="No services found."
       />
 
@@ -122,7 +128,7 @@
         description="Click the button below to create your first service."
         createButtonLabel="Service"
         createPagePath="edge-services/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />

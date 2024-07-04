@@ -129,7 +129,7 @@
       showToast('success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
-      dialogRef.value.close()
+      dialogRef.value.close({ updated: true })
     } catch (error) {
       showToast('error', 'Error', error)
     } finally {
@@ -148,7 +148,7 @@
 
   const cancelDialog = () => {
     resetForm()
-    dialogRef.value.close()
+    dialogRef.value.close({ updated: false })
   }
 
   const getLoadingIcon = computed(() => {

@@ -7,6 +7,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
+
   defineOptions({ name: 'list-edge-node' })
 
   const props = defineProps({

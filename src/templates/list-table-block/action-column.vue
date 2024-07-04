@@ -356,7 +356,7 @@
         command: () => {
           switch (action.type) {
             case 'dialog':
-              openDialog(action.dialog.component, action.dialog.body(rowData))
+              openDialog(action.dialog.component, action.dialog.body(rowData, updatedTable))
               break
             case 'delete':
               const bodyDelete = {
@@ -368,7 +368,7 @@
                   deleteService: action.service,
                   rerender: Math.random()
                 },
-                onClose: () => updatedTable()
+                onClose: (opt) => opt.data.updated && updatedTable()
               }
               openDialog(DeleteDialog, bodyDelete)
               break
