@@ -53,6 +53,11 @@ export default async function beforeEachRoute(to, __, next) {
       accountInfo.jobRole = accountJobRole.jobRole
 
       accountStore.setAccountData(accountInfo)
+
+      if (accountInfo.status !== 'BLOCKED') {
+        return next('/billing/payment?paymentSession=true')
+      }
+
       return next()
     } catch {
       return next('/login')
