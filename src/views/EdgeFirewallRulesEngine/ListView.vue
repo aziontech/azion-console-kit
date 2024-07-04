@@ -1,7 +1,7 @@
 <script setup>
   import EmptyResultsBlock from '@templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
+  import ListTableBlock from '@/templates/list-table-block/index.vue'
   import Drawer from './Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'

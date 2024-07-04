@@ -1,6 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
+  import ListTableBlock from '@/templates/list-table-block/index.vue'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'

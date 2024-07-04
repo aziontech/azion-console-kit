@@ -1,7 +1,7 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
+  import ListTableBlock from '@/templates/list-table-block/index.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'

@@ -1,6 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
+  import ListTableBlock from '@/templates/list-table-block/index.vue'
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
