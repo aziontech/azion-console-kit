@@ -47,7 +47,7 @@
                   icon="pi pi-plus"
                   :label="addButtonLabel"
                   v-if="addButtonLabel"
-                  data-testid="data-table-add-button"
+                  :data-testid="`create_${addButtonLabel}_button`"
                 />
               </slot>
             </div>
