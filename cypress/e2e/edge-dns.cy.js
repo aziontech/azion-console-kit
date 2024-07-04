@@ -30,7 +30,7 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.statusRow).should('have.text', 'Active')
   })
 
-  it.only('Create a record of type A', () => {
+  it('Create a record of type A', () => {
     // Arrange
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
