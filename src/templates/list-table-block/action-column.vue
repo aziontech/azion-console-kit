@@ -1,6 +1,7 @@
 <template>
   <div
     class="max-w-full"
+    :class="isTabs ? 'mt-4' : ''"
     data-testid="data-table-container"
   >
     <DataTable
@@ -53,14 +54,12 @@
           </slot>
         </div>
       </template>
-
       <Column
         v-if="reorderableRows"
         rowReorder
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
       />
-
       <Column
         sortable
         v-for="col of selectedColumns"
@@ -85,7 +84,6 @@
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -183,7 +181,6 @@
         </slot>
       </template>
     </DataTable>
-
     <DataTable
       v-else
       :value="Array(10)"
@@ -250,9 +247,7 @@
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog-new.vue'
   import { useDialog } from 'primevue/usedialog'
-
   defineOptions({ name: 'list-table-block-new' })
-
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
@@ -296,11 +291,13 @@
     actions: {
       type: Array,
       default: () => []
+    },
+    isTabs: {
+      type: Boolean,
+      default: false
     }
   })
-
   const MINIMUM_OF_ITEMS_PER_PAGE = 10
-
   const selectedId = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -328,7 +325,6 @@
       summary: severity,
       detail
     }
-
     toast.add(options)
   }
 
@@ -358,6 +354,7 @@
                 data: {
                   title: action.title,
                   selectedID: rowData.id,
+                  selectedItemData: rowData,
                   deleteDialogVisible: true,
                   deleteService: action.service,
                   rerender: Math.random()
@@ -373,18 +370,14 @@
         }
       }
     }
-
     const actions = props.actions
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
-
     return actions
   }
-
   const loadData = async ({ page }) => {
     try {
       isLoading.value = true
-
       const response = props.isGraphql
         ? await props.listService()
         : await props.listService({ page })
@@ -396,12 +389,10 @@
       isLoading.value = false
     }
   }
-
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
-
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -409,7 +400,6 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
-
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit')
     if (props.editInDrawer) {
@@ -418,46 +408,38 @@
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
-
   const executeCommand = (rowData) => {
     const { command } = actionOptions(rowData)[0]
     command()
   }
-
   const updatedTable = () => {
     loadData({ page: 1 })
   }
-
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
   }
-
   const setMenuRefForRow = (rowDataID, document) => {
     const tableRef = (menuRef.value[rowDataID] = document)
     return tableRef
   }
-
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
-
     return [...filters, ...filtersPath]
   })
-
   const showPagination = computed(() => {
     return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
   })
-
   const isRenderActions = computed(() => {
     return props.actions && props.actions.length > 1
   })
-
   const getActionIcon = computed(() => {
     return props.actions[0].icon
   })
-
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
 </script>
+
+NEW

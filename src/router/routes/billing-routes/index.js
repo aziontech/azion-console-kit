@@ -12,7 +12,7 @@ export const billingRoutes = {
       component: () => import('@views/Billing/TabsView.vue'),
       props: {
         paymentServices: {
-          listPaymentService: BillingServices.listPaymentService,
+          listPaymentMethodsService: BillingServices.listPaymentMethodsService,
           deletePaymentService: BillingServices.deletePaymentService,
           setAsDefaultPaymentService: BillingServices.setAsDefaultPaymentService,
           documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods

@@ -1,7 +1,7 @@
 <template>
   <h2 class="text-lg font-medium line-height-1 mt-4">Payment History</h2>
   <ListTable
-    v-if="!hasContentToList"
+    v-if="hasContentToList"
     isTabs
     :enableEditClick="false"
     :columns="paymentsColumns"
@@ -13,7 +13,7 @@
   <EmptyResultsBlock
     v-else
     title="No payment history has been added"
-    description="Click the button below to add a payment history."
+    description="No payment history is available at the moment. Please check back later."
     :inTabs="true"
     :documentationService="props.documentPaymentHistoryService"
   >
@@ -62,7 +62,7 @@
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
-          columnAppearance: 'text-with-clipboard',
+          columnAppearance: 'text-full-with-clipboard',
           dependencies: {
             copyContentService: props.clipboardWrite
           }

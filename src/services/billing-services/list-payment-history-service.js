@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentBaseUrl } from './make-payment-base-url'
-import { getStaticUrlsByEnvironment } from '@/helpers'
+import { formatDateToUS, getStaticUrlsByEnvironment } from '@/helpers'
 
 export const listPaymentHistoryService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -31,7 +31,7 @@ const STATUS_AS_TAG = {
 const adapt = (httpResponse) => {
   const managerUrl = getStaticUrlsByEnvironment('manager')
 
-  const parseBilling = httpResponse.body.data.map((card) => {
+  const parseBilling = httpResponse.body.data?.map((card) => {
     const typeCard = card.card_brand?.toLowerCase()
     const statusTag = STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged
 
@@ -47,12 +47,12 @@ const adapt = (httpResponse) => {
       },
       invoiceUrl: `${managerUrl}${card.invoice_url}`,
       status: statusTag,
-      paymentDate: card.payment_due
+      paymentDate: formatDateToUS(card.payment_due)
     }
   })
 
   return {
-    body: parseBilling,
+    body: parseBilling || [],
     statusCode: httpResponse.statusCode
   }
 }
