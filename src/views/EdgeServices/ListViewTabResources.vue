@@ -1,7 +1,7 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
@@ -96,6 +96,16 @@
     }
     hasContentToList.value = true
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      label: 'Delete',
+      title: 'resource',
+      icon: 'pi pi-trash',
+      service: deleteResourcesServicesWithDecorator
+    }
+  ]
 </script>
 
 <template>
@@ -112,12 +122,12 @@
       <ListTableBlock
         ref="listResourcesEdgeServiceRef"
         :listService="listResourcesServicesWithDecorator"
-        :deleteService="deleteResourcesServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="resource"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
         emptyListMessage="No resources found."
+        :actions="actions"
+        isTabs
       >
         <template #addButton>
           <PrimeButton
