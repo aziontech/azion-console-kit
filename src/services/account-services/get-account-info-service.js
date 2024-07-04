@@ -19,6 +19,7 @@ const adapt = (httpResponse) => {
 
   body.accountTypeIcon = getAccountTypeIcon(body.kind)
   body.accountTypeName = getAccountTypeName(body.kind)
+  body.isUserBlocked = body.status === 'BLOCKED'
 
   return {
     body,

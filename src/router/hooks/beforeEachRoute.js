@@ -54,6 +54,10 @@ export default async function beforeEachRoute(to, __, next) {
 
       accountStore.setAccountData(accountInfo)
 
+      if (accountInfo.isUserBlocked) {
+        return next('/billing/payment?paymentSession=true')
+      }
+
       return next()
     } catch {
       return next('/login')
