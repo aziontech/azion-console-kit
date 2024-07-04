@@ -368,6 +368,10 @@ const selectors = {
     confirmButton: '[data-testid="domains-dialog__confirm__button"]',
     pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
     actionDelete: '.p-menuitem-content > .p-menuitem-link'
+  },
+  purge: {
+    createButton: '[data-testid="create_Purge_button"]',
+    argumentsField: '[data-testid="purge__arguments-field__textarea"]'
   }
 }
 

@@ -126,6 +126,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="purge__arguments-field"
           label="Arguments List"
           required
           name="argumentsPurge"
