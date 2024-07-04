@@ -1,7 +1,7 @@
 <template>
   <div
     class="max-w-full"
-    :class="isTabs ? 'mt-4' : ''"
+    :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
     <DataTable
@@ -293,8 +293,7 @@
       default: () => []
     },
     isTabs: {
-      type: Boolean,
-      default: false
+      type: Boolean
     }
   })
   const MINIMUM_OF_ITEMS_PER_PAGE = 10
