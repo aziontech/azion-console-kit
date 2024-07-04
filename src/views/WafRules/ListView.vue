@@ -6,14 +6,13 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listWafRulesService"
-        :deleteService="props.deleteWafRulesService"
+        :listService="listWafRulesService"
         :columns="getColumns"
-        pageTitleDelete="WAF rule"
         addButtonLabel="WAF Rule"
         createPagePath="waf/create"
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -21,7 +20,7 @@
         description="Click the button below to create your first WAF rule."
         createButtonLabel="WAF Rule"
         createPagePath="waf/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -34,7 +33,7 @@
 <script setup>
   import { ref, computed } from 'vue'
 
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
@@ -57,6 +56,14 @@
   })
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'WAF rule',
+      icon: 'pi pi-trash',
+      service: props.deleteWafRulesService
+    }
+  ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
