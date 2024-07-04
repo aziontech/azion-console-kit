@@ -7,7 +7,7 @@ const postalCode = '14055-010'
 describe('Account Settings spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Account Settings')
+    cy.openProduct('Account Settings')
     cy.intercept('graphql/cities/').as('getCities')
     cy.wait('@getCities')
   })
@@ -30,7 +30,7 @@ describe('Account Settings spec', () => {
 
     // Assert
     cy.verifyToast('success', 'Your account settings have been updated')
-    cy.openItemThroughMenuAccount('Account Settings')
+    cy.openProduct('Account Settings')
     cy.get(selectors.accountSettings.companyName).should('have.value', companyName)
     cy.get(selectors.accountSettings.companyId).should('have.value', companyId)
     cy.get(selectors.accountSettings.postalCode).should('have.value', postalCode)

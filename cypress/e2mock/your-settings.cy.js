@@ -18,7 +18,7 @@ describe('Your Settings spec', () => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/user', { fixture: 'your-settings.json' }).as('getUser')
     cy.intercept('PATCH', '/api/v4/iam/user', { statusCode: 200, body: {} }).as('patchUser')
-    cy.openItemThroughMenuAccount('Your Settings')
+    cy.openProduct('Your Settings')
   })
 
   it('should edit user settings but the email', () => {

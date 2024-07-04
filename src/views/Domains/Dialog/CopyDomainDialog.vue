@@ -23,6 +23,7 @@
         <span class="p-input-icon-right w-full flex flex-col items-start gap-2">
           <PrimeInputText
             id="domain"
+            data-testid="domains-dialog__domain-field__input"
             v-model="domainValue"
             type="text"
             class="flex flex-col w-full"
@@ -40,6 +41,7 @@
       <div class="flex justify-start w-full">
         <PrimeButton
           icon="pi pi-clone"
+          data-testid="domains-dialog__copy-domain__button"
           outlined
           type="button"
           aria-label="Copy"
@@ -60,6 +62,7 @@
 
     <template #footer>
       <PrimeButton
+        data-testid="domains-dialog__confirm__button"
         label="Confirm"
         severity="secondary"
         @click="closeDialog"

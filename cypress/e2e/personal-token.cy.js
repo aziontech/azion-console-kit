@@ -6,7 +6,7 @@ const personalTokenName = generateUniqueName('Personal Token')
 describe('Personal Token spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Personal Token')
+    cy.openProduct('Personal Token')
   })
 
   it('should create and delete a personal token', () => {

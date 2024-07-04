@@ -6,11 +6,11 @@ const credentialName = generateUniqueName('Credential')
 describe('Credentials', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Credentials')
+    cy.openProduct('Credentials')
   })
   afterEach(() => {
     // Delete the credential
-    cy.deleteProductSingleActionColumn(credentialName, '/credentials')
+    cy.deleteProductSingleActionColumn({ entityName: credentialName, productName: 'Credentials' })
   })
 
   it('should create a credential from the table', () => {

@@ -7,7 +7,7 @@ describe('Edge DNS spec', () => {
   beforeEach(() => {
     cy.login()
     zoneName = generateUniqueName('DNSZone')
-    cy.openProductThroughSidebar('edge-dns')
+    cy.openProduct('Edge DNS')
   })
 
   it('Create a Edge DNS ZOne', function() {
@@ -20,7 +20,7 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.saveButton).click();
     cy.verifyToast('success','Your Edge DNS has been created');
     cy.get(selectors.edgeDns.cancelButton).click();
-    
+
     // Assert
     cy.get(selectors.edgeDns.searchInput).clear();
     cy.get(selectors.edgeDns.searchInput).type(zoneName);
@@ -30,7 +30,7 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.statusRow).should('have.text', 'Active');
   })
   afterEach(() => {
-    cy.deleteProduct(zoneName, '/edge-dns').then(() => {
+    cy.deleteProduct({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
       cy.verifyToast('Your Edge DNS has been deleted')
     })
   })
