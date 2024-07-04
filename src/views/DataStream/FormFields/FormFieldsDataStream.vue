@@ -108,7 +108,9 @@
           v-model="domains"
           :pt="{
             sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] }
+            targetList: { class: ['h-80'] },
+            sourceWrapper: { class: 'max-w-[340px]' },
+            targetWrapper: { class: 'max-w-[340px]' }
           }"
           dataKey="domainID"
           breakpoint="1400px"
@@ -119,7 +121,7 @@
           <template #sourceheader>Available Domains</template>
           <template #targetheader>Chosen Domains</template>
           <template #item="slotProps">
-            <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
               <div class="flex-1 flex flex-column gap-2">
                 <span
                   class="font-normal"
