@@ -1186,6 +1186,11 @@
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.27.8.tgz"
   integrity sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==
 
+"@stripe/stripe-js@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-4.1.0.tgz#11a54478df28b7a2d146251f645fb26e9efc9bfd"
+  integrity sha512-HhstGRUz/4JdbZpb26OcOf8Qb/cFR02arvHvgz4sPFLSnI6ZNHC53Jc6JP/FGNwxtrF719YyUnK0gGy4oyhucQ==
+
 "@tailwindcss/typography@^0.5.10":
   version "0.5.10"
   resolved "https://registry.npmjs.org/@tailwindcss/typography/-/typography-0.5.10.tgz"

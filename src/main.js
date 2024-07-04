@@ -23,6 +23,7 @@ import * as HelpCenterServices from '@/services/help-center-services'
 import DialogService from 'primevue/dialogservice'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+import StripeIntegrationPlugin from '@/plugins/StripeIntegrationPlugin'
 
 import App from './App.vue'
 import router from './router'
@@ -30,7 +31,6 @@ import router from './router'
 const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
-
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
@@ -39,6 +39,7 @@ app.use(pinia)
 app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
+app.use(StripeIntegrationPlugin)
 app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'

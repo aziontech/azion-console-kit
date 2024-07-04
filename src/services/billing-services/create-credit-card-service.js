@@ -1,12 +1,12 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeCredentialsBaseUrl } from './make-credentials-base-url'
+import { makePaymentsBaseUrl } from './make-payments-base-url'
 
-export const createCredentialService = async (payload) => {
+export const createCreditCardService = async (payload, stripeInstance) => {  
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeCredentialsBaseUrl()}`,
+    url: `${makePaymentsBaseUrl()}/credits_cards`,
     method: 'POST',
-    body: adapt(payload)
+    body: adapt(payload, stripeInstance)
   })
 
   return parseHttpResponse(httpResponse)
@@ -42,7 +42,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your credential token has been created',
+        feedback: 'Your credit card has been added',
         urlToEditView: '/credentials',
         token: httpResponse.body.token
       }
@@ -65,10 +65,29 @@ const parseHttpResponse = (httpResponse) => {
   }
 }
 
-const adapt = (payload) => {
+const adapt = async (payload, stripeInstance) => {
+  const expirationMonth = payload.expirationDate.slice('/')[0]
+  const expirationYear = '20'+payload.expirationDate.slice('/')[1]
+  const cardData = {
+    type: 'card',
+    card:{
+      number: payload.cardNumber,
+      exp_month: expirationMonth,
+      exp_year: expirationYear,
+      cvc: payload.securityCode,
+    }
+  }
+  const  teste = await stripeInstance.createToken(cardData)
+  console.log(teste)
+  if (stripeError) {
+    throw new Errors.InternalServerError().message
+  }
+
   return {
-    name: payload.name,
-    description: payload.description,
-    status: payload.status
+    stripe_token: stripeToken,
+    card_holder: payload.name,
+    card_expiration_month: expirationMonth,
+    card_expiration_year: expirationYear,
+    
   }
 }
