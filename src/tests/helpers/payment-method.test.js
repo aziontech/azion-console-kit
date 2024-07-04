@@ -2,21 +2,20 @@ import { describe, it, expect } from 'vitest'
 import { getExpiredDate } from '@/helpers/payment-method'
 
 function getPreviousMonth() {
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth(); 
-  const currentYear = currentDate.getFullYear();
-  
-  let previousMonth = currentMonth - 1;
-  let previousYear = currentYear;
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+
+  let previousMonth = currentMonth - 1
+  let previousYear = currentYear
 
   if (previousMonth < 0) {
-      previousMonth = 11; 
-      previousYear--;
+    previousMonth = 11
+    previousYear--
   }
 
-  return { month: previousMonth + 1, year: previousYear }; 
+  return { month: previousMonth + 1, year: previousYear }
 }
-
 
 function getNextMonth() {
   const currentDate = new Date()
