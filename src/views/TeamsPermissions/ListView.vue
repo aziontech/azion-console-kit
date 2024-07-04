@@ -9,15 +9,14 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="pros.listTeamPermissionService"
-        :deleteService="pros.deleteTeamPermissionService"
+        :listService="listTeamPermissionService"
         :columns="getColumns"
-        pageTitleDelete="team"
         addButtonLabel="Team"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No teams found."
+        :actions="actions"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -41,17 +40,26 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref } from 'vue'
 
-  const pros = defineProps({
+  const props = defineProps({
     listTeamPermissionService: { required: true, type: Function },
     deleteTeamPermissionService: { required: true, type: Function },
     documentationService: { required: true, type: Function }
   })
+
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'team',
+      icon: 'pi pi-trash',
+      service: props.deleteTeamPermissionService
+    }
+  ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
