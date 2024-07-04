@@ -3,7 +3,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import ListTableBlock from '@/templates/list-table-block/index.vue'
+  import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
   import { computed, ref, watch } from 'vue'

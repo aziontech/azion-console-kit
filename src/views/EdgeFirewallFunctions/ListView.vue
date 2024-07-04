@@ -54,7 +54,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block/index.vue'
+  import ListTableBlock from '@/templates/list-table-block'
   import DrawerFunction from './Drawer'
   import { computed, ref } from 'vue'
 
