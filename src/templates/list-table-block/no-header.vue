@@ -47,7 +47,7 @@
                   icon="pi pi-plus"
                   :label="addButtonLabel"
                   v-if="addButtonLabel"
-                  data-testid="data-table-add-button"
+                  :data-testid="`create_${addButtonLabel}_button`"
                 />
               </slot>
             </div>
@@ -89,11 +89,14 @@
             <template v-if="col.type !== 'component'">
               <div
                 v-html="rowData[col.field]"
-                data-testid="data-table-column-cell"
+                :data-testid="`list-table-block__column__${col.field}__row`"
               />
             </template>
             <template v-else>
-              <component :is="col.component(rowData[col.field])" />
+              <component
+                :is="col.component(rowData[col.field])"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+              />
             </template>
           </template>
         </Column>
@@ -151,7 +154,7 @@
                 id="overlay_menu"
                 v-bind:model="actionOptions(rowData)"
                 :popup="true"
-                data-testid="data-table-actions-column-menu"
+                data-testid="data-table-actions-column-body-actions-menu"
               />
               <PrimeButton
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
@@ -160,7 +163,7 @@
                 outlined
                 @click="(event) => toggleActionsMenu(event, rowData)"
                 class="cursor-pointer table-button"
-                data-testid="data-table-actions-column-actions-button"
+                data-testid="data-table-actions-column-body-actions-menu-button"
               />
             </div>
           </template>

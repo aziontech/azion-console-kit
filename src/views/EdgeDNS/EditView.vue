@@ -282,7 +282,14 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: {
+              'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
+            }
+          }"
+        >
           <EditFormBlock
             :editService="editEdgeDNSService"
             :loadService="loadEdgeDNSService"
@@ -303,7 +310,14 @@
             </template>
           </EditFormBlock>
         </TabPanel>
-        <TabPanel header="Records">
+        <TabPanel
+          header="Records"
+          :pt="{
+            root: {
+              'data-testid': 'edge-dns-edit-view__records__tab-panel'
+            }
+          }"
+        >
           <div v-if="showRecords">
             <ListTableNoHeaderBlock
               ref="listEDNSResourcesRef"
@@ -322,6 +336,7 @@
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
+                  data-testid="create_Record_button"
                 />
               </template>
             </ListTableNoHeaderBlock>
@@ -342,6 +357,7 @@
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
+                  data-testid="create_Record_button"
                 />
               </template>
               <template #illustration>

@@ -288,3 +288,13 @@ Cypress.Commands.overwrite('visit', (original, ...args) => {
     resolve(original(target.toString(), ...args))
   })
 })
+
+/**
+ * Deletes an entity from the loaded list.
+ **/
+Cypress.Commands.add('deleteEntityFromList', () => {
+  cy.get(selectors.list.actionsMenu.button).click()
+  cy.get(selectors.list.actionsMenu.deleteButton).click()
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
+  cy.get(selectors.list.deleteDialog.deleteButton).click()
+})
