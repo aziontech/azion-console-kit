@@ -352,7 +352,7 @@ const AzionConfig = {
             'Strict-Transport-Security: max-age=2592000; includeSubDomains',
             'Referrer-Policy: strict-origin-when-cross-origin',
             'X-XSS-Protection: 1; mode=block',
-            'Cross-Origin-Opener-Policy: same-origin'
+            'Cross-Origin-Opener-Policy: same-origin-allow-popups'
           ]
         }
       }
