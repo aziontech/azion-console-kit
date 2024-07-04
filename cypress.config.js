@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
 import codeCoverageTask from '@cypress/code-coverage/task'
+import fs from 'fs';
 
 export default defineConfig({
   projectId: 'azion-console-kit',
@@ -12,6 +13,11 @@ export default defineConfig({
     experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
       codeCoverageTask(on, config)
+      on('after:spec', (spec, results) => {
+        if (results && results.video && results.stats.failures === 0) {
+          fs.unlinkSync(results.video)
+        }
+      })
       return config
     }
   },
