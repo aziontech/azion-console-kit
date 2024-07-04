@@ -20,10 +20,10 @@ jobs:
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
-        env: 
-          CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
-          CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
-          CYPRESS_USERNAME_STAGE: ${{ secrets.CYPRESS_USERNAME_STAGE }}
+        env:
+          DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
+          DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
+          DEV_CYPRESS_USERNAME: ${{ secrets.DEV_CYPRESS_USERNAME }}
         with:
           build: yarn build
           start: yarn dev

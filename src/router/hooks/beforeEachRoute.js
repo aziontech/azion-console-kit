@@ -53,6 +53,7 @@ export default async function beforeEachRoute(to, __, next) {
       accountInfo.jobRole = accountJobRole.jobRole
 
       accountStore.setAccountData(accountInfo)
+
       return next()
     } catch {
       return next('/login')

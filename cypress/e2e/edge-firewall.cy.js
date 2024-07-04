@@ -7,7 +7,7 @@ describe('Edge Firewall spec', () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
-    cy.openProductThroughSidebar('edge-firewall')
+    cy.openProduct('Edge Firewall')
   })
 
   it('Create an Edge Firewall ', function () {

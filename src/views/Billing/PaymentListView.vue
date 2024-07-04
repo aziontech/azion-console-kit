@@ -13,9 +13,11 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Add Credit"
+          outlined
         />
         <PrimeButton
           icon="pi pi-plus"
+          severity="secondary"
           label="Add Payment Method"
         />
       </div>
@@ -71,19 +73,21 @@
     {
       field: 'cardData',
       header: 'Card Number',
-      filterPath: 'cardData.value',
+      filterPath: 'cardNumberSearch',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'credit-card-column' })
     },
     {
       field: 'cardHolder',
-      header: 'Card Holder'
+      header: 'Card Holder',
+      sortField: 'cardHolder'
     },
     {
       field: 'cardExpiration',
       header: 'Expires in',
-      filterPath: 'cardExpiration.value',
+      sortField: 'expiringDateByOrder',
+      filterPath: 'expiringDateSearch',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'credit-expiration-column' })
