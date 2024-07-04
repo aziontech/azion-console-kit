@@ -38,8 +38,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeA',
       recordType: 'A',
       recordTypeOption: 0,
-      ttl: 100,
-      value: '0.0.0.0',
+      ttl: 7,
+      value: '10.0.0.1',
       policyType: 'weighted',
       policyTypeOption: 1,
       weight: 10,
@@ -117,8 +117,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeAAAA',
       recordType: 'AAAA',
       recordTypeOption: 1,
-      ttl: 100,
-      value: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+      ttl: 1,
+      value: '2800:3f0:4001:805::200e',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -189,8 +189,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeANAME',
       recordType: 'ANAME',
       recordTypeOption: 2,
-      ttl: 100,
-      value: 'example.com',
+      ttl: 20,
+      value: '1234x.xx.azioncdn.net',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -217,7 +217,6 @@ describe('Edge DNS spec', () => {
     cy.get(selectors.edgeDns.records.nameInput).type(recordTypeFixtures.name)
     cy.get(selectors.edgeDns.records.recordTypeDropdown).click()
     cy.get(selectors.edgeDns.records.recordTypeOption(recordTypeFixtures.recordTypeOption)).click()
-    cy.get(selectors.edgeDns.records.ttlInput).type(recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.records.valueTextarea).type(recordTypeFixtures.value)
     cy.get(selectors.edgeDns.records.policyTypeDropdown).click()
     cy.get(selectors.edgeDns.records.policyTypeOption(recordTypeFixtures.policyTypeOption)).click()
@@ -261,7 +260,7 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeCAA',
       recordType: 'CAA',
       recordTypeOption: 3,
-      ttl: 100,
+      ttl: 10,
       value: '0 issue "letsencrypt.org"',
       policyType: 'simple',
       policyTypeOption: 0,
@@ -334,7 +333,7 @@ describe('Edge DNS spec', () => {
       recordType: 'CNAME',
       recordTypeOption: 4,
       ttl: 100,
-      value: 'example.com',
+      value: 'azion.net',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -405,8 +404,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeDS',
       recordType: 'DS',
       recordTypeOption: 5,
-      ttl: 100,
-      value: '12345 8 2 49FD46E6C4B45C55D4AC',
+      ttl: 3600,
+      value: '2371 13 2 72c48090c5b4b3e42f6b0170a156d1fda6aca0ba02cd8c2a0c35fc14d7c1bf93',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -477,8 +476,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeMX',
       recordType: 'MX',
       recordTypeOption: 6,
-      ttl: 100,
-      value: '10 mail.example.com',
+      ttl: 5,
+      value: '1 aspmx.l.google.com\n2 aspmx3.googlemail.com',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -549,8 +548,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeNS',
       recordType: 'NS',
       recordTypeOption: 7,
-      ttl: 100,
-      value: '10 mail.example.com',
+      ttl: 20,
+      value: 'ns4.aziondns.net\nns5.aziondns.com\nns6.aziondns.org',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -621,8 +620,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypePTR',
       recordType: 'PTR',
       recordTypeOption: 8,
-      ttl: 100,
-      value: 'example.com',
+      ttl: 9090,
+      value: 'ptrtesting.com',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -693,8 +692,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeSRV',
       recordType: 'SRV',
       recordTypeOption: 9,
-      ttl: 100,
-      value: '10 5 5060 sipserver.example.com',
+      ttl: 28,
+      value: '10 60 5060 bigbox.example.com',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
@@ -765,8 +764,8 @@ describe('Edge DNS spec', () => {
       name: 'recordTypeTXT',
       recordType: 'TXT',
       recordTypeOption: 10,
-      ttl: 100,
-      value: '"v=spf1 include:example.com ~all"',
+      ttl: 2733,
+      value: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget',
       policyType: 'simple',
       policyTypeOption: 0,
       description: '-'
