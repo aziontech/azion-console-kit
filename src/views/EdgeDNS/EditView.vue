@@ -336,7 +336,7 @@
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
-                  data-testid="create-Record-button"
+                  data-testid="create_Record_button"
                 />
               </template>
             </ListTableNoHeaderBlock>
@@ -357,7 +357,7 @@
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
-                  data-testid="create-Record-button"
+                  data-testid="create_Record_button"
                 />
               </template>
               <template #illustration>
