@@ -15,7 +15,12 @@ export const billingRoutes = {
           listPaymentService: BillingServices.listPaymentService,
           deletePaymentService: BillingServices.deletePaymentService,
           setAsDefaultPaymentService: BillingServices.setAsDefaultPaymentService,
-          documentPaymentService: Helpers.documentationCatalog.paymentMethods
+          documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods
+        },
+        billsServices: {
+          listPaymentHistoryService: BillingServices.listPaymentHistoryService,
+          clipboardWrite: Helpers.clipboardWrite,
+          documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory
         }
       },
       meta: {
