@@ -1,10 +1,25 @@
 import { describe, it, expect } from 'vitest'
 import { getExpiredDate } from '@/helpers/payment-method'
 
+function getNextMonth() {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+
+  let nextMonth = currentMonth + 1
+  let nextYear = currentYear
+
+  if (nextMonth > 11) {
+    nextMonth = 0
+    nextYear++
+  }
+
+  return { month: nextMonth + 1, year: nextYear }
+}
+
 describe('PaymentMethodHelper', () => {
   it('Check expiration status for a future date', () => {
-    const month = 10
-    const year = 2024
+    const { month, year } = getNextMonth()
 
     const expectedStatus = ''
     const actualStatus = getExpiredDate(month, year)
@@ -13,11 +28,19 @@ describe('PaymentMethodHelper', () => {
   })
 
   it('Check expiration status for a past date', () => {
-    const month = 5
-    const year = 2021
+    const { month, year } = getNextMonth()
 
     const expectedStatus = 'Expired'
-    const actualStatus = getExpiredDate(month, year)
+    const actualStatus = getExpiredDate(month, year - 2)
+
+    expect(actualStatus).toEqual(expectedStatus)
+  })
+
+  it('Check expiration status for a the current year, but expired', () => {
+    const { month, year } = getNextMonth()
+
+    const expectedStatus = 'Expired'
+    const actualStatus = getExpiredDate(month - 2, year)
 
     expect(actualStatus).toEqual(expectedStatus)
   })

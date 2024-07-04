@@ -33,9 +33,9 @@ describe('convertDate', () => {
   })
 
   it('Format single-digit month and year to "MM/YYYY"', () => {
-    const month = 9
+    const month = 11
     const year = 2023
-    const expectedDateString = '09/2023'
+    const expectedDateString = '11/2023'
     const actualDateString = formatDateMonthAndYear(month, year)
 
     expect(actualDateString).toEqual(expectedDateString)
