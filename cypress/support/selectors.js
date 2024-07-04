@@ -349,7 +349,10 @@ const selectors = {
       valueTextarea: '[data-testid="edge-dns-records-form__settings__value-field__textarea"]',
       policyTypeDropdown:
         '[data-testid="edge-dns-records-form__policy__policy-type-field__dropdown"] > .p-dropdown-trigger',
-      policyTypeOption: (policyType) => `#selectedPolicy_${policyType}`
+      policyTypeOption: (policyType) => `#selectedPolicy_${policyType}`,
+      weightInput: '[data-testid="edge-dns-records-form__policy__weight-field__input"]',
+      descriptionTextarea:
+        '[data-testid="edge-dns-records-form__policy__description-field__textarea"]'
     }
   },
   domains: {
