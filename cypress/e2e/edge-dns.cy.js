@@ -35,7 +35,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'www',
+      name: generateUniqueName('record'),
       recordType: 'A',
       recordTypeOption: 0,
       ttl: 7,
@@ -111,7 +111,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'aaaa',
+      name: generateUniqueName('record'),
       recordType: 'AAAA',
       recordTypeOption: 1,
       ttl: 1,
@@ -180,7 +180,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'aname',
+      name: generateUniqueName('record'),
       recordType: 'ANAME',
       recordTypeOption: 2,
       ttl: 20,
@@ -248,7 +248,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'caa',
+      name: generateUniqueName('record'),
       recordType: 'CAA',
       recordTypeOption: 3,
       ttl: 10,
@@ -317,7 +317,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'cname',
+      name: generateUniqueName('record'),
       recordType: 'CNAME',
       recordTypeOption: 4,
       ttl: 100,
@@ -386,7 +386,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'ds',
+      name: generateUniqueName('record'),
       recordType: 'DS',
       recordTypeOption: 5,
       ttl: 3600,
@@ -455,7 +455,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'mail',
+      name: generateUniqueName('record'),
       recordType: 'MX',
       recordTypeOption: 6,
       ttl: 5,
@@ -524,7 +524,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'nsx',
+      name: generateUniqueName('record'),
       recordType: 'NS',
       recordTypeOption: 7,
       ttl: 20,
@@ -593,7 +593,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: '4.3.2.1.in-addr.arpa',
+      name: generateUniqueName('4.3.2.1.in-addr.arpa'),
       recordType: 'PTR',
       recordTypeOption: 8,
       ttl: 9090,
@@ -662,7 +662,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: '_sip._tcp',
+      name: generateUniqueName('_sip._tcp'),
       recordType: 'SRV',
       recordTypeOption: 9,
       ttl: 28,
@@ -731,7 +731,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'txt',
+      name: generateUniqueName('record'),
       recordType: 'TXT',
       recordTypeOption: 10,
       ttl: 2733,
