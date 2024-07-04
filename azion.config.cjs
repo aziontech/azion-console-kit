@@ -1,35 +1,33 @@
-/* if you have two environments for the same application */
-const environment = process.env.VITE_ENVIRONMENT || 'production';
-//const config = require(`./azion/${environment}/azion.json`)
-
+/* if you have two environments for the same application
+/* you can import your config based on environment value, 
+/* ex: require(`./azion/${environment}/azion.json`)
+*/
 /* eslint-env node */
-//const config = require(`./azion/azion.json`) ?? null
-//const myDomain =
-//  config.domain.domain_name && config.domain.domain_name.trim() !== ''
-//    ? config.domain.domain_name
-//    : 'console.azion.com'
+const environment = process.env.VITE_ENVIRONMENT || 'production'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
-    return origin?.map(origin => ({
+    return origin?.map((origin) => ({
       ...origin,
       hostHeader: `stage-${origin.hostHeader}`,
-      addresses: origin.addresses?.map(addr => `stage-${addr}`)
-    }));
+      addresses: origin.addresses?.map((addr) => `stage-${addr}`)
+    }))
   }
-  return origin;
-};
+  return origin
+}
 
 const addStageSuffixToCookies = (cookieName) => {
-  return environment === 'stage' ? `${cookieName}_stg` : cookieName;
-};
-
+  return environment === 'stage' ? `${cookieName}_stg` : cookieName
+}
 
 const cacheConfig = [
   {
     name: 'Statics - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'ignore'
+    },
     methods: {
       post: false,
       options: false
@@ -45,6 +43,9 @@ const cacheConfig = [
     name: 'Marketplace - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'varies'
+    },
     methods: {
       post: false,
       options: false
@@ -57,6 +58,9 @@ const cacheConfig = [
     name: 'Cities - Cache',
     stale: false,
     queryStringSort: false,
+    cacheByQueryString: {
+      option: 'varies'
+    },
     methods: {
       post: false,
       options: false
@@ -67,7 +71,7 @@ const cacheConfig = [
     edge: {
       maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
     }
-  },
+  }
 ]
 
 const commonRules = [
@@ -232,7 +236,7 @@ const backRules = [
       rewrite: '/graphql/',
       setCache: 'Cities - Cache'
     }
-  },
+  }
 ]
 
 const AzionConfig = {
@@ -278,18 +282,6 @@ const AzionConfig = {
       hostHeader: 'script-runner.azion.com',
       addresses: ['script-runner.azion.com']
     }
-    // {
-    //   name: 'origin-iam',
-    //   type: 'single_origin',
-    //   hostHeader: 'iam.azion.com',
-    //   addresses: ['iam.azion.com']
-    // },
-    // {
-    //   name: 'origin-variables',
-    //   type: 'single_origin',
-    //   hostHeader: 'variables.azion.com',
-    //   addresses: ['variables.azion.com']
-    // }
   ]),
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
@@ -306,7 +298,9 @@ const AzionConfig = {
             captured: 'azrt_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('_azrt')}`
           },
-          setCookie: `${addStageSuffixToCookies('_azrt')}=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            '_azrt'
+          )}=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('_azrt')
         }
       },
@@ -322,7 +316,9 @@ const AzionConfig = {
             captured: 'azsid_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('azsid')}`
           },
-          setCookie: `${addStageSuffixToCookies('azsid')}=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            'azsid'
+          )}=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('azsid')
         }
       },
@@ -338,7 +334,9 @@ const AzionConfig = {
             captured: 'azat_arr',
             subject: `upstream_cookie_${addStageSuffixToCookies('_azat')}`
           },
-          setCookie: `${addStageSuffixToCookies('_azat')}=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `${addStageSuffixToCookies(
+            '_azat'
+          )}=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: addStageSuffixToCookies('_azat')
         }
       },
@@ -358,16 +356,6 @@ const AzionConfig = {
           ]
         }
       }
-      // {
-      //   name: 'CSP Header - Content Secure Policy',
-      //  description: 'Sets a comprehensive Content Security Policy (CSP) header to enhance security by defining a whitelist of sources from which various types of resources can be loaded. This policy helps mitigate various types of attacks including Cross-Site Scripting (XSS) and data injection.',
-      //   match: '^\\/',
-      //   behavior: {
-      //     setHeaders: [
-      //       `Content-Security-Policy: default-src 'self' *.azion.com https://storage.googleapis.com cdn.segment.com api.segment.io; connect-src 'self' *.azion.com https://storage.googleapis.com cdn.segment.com api.segment.io https://www.google-analytics.com https://www.clarity.ms https://*.clarity.ms; frame-src https://feedback.fish *.azion.com https://www.google.com; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; style-src https://storage.googleapis.com https://console.azion.com https://fonts.azion.com cdn.jsdelivr.net 'unsafe-hashes' 'unsafe-inline'; font-src https://storage.googleapis.com https://console.azion.com https://fonts.azion.com data:; script-src https://storage.googleapis.com *.azion.com https://feedback.fish 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms; style-src-elem https://storage.googleapis.com *.azion.com https://feedback.fish cdn.jsdelivr.net 'unsafe-inline' https://${myDomain}; script-src-elem https://storage.googleapis.com *.azion.com https://feedback.fish https://cdn.jsdelivr.net https://cdn.segment.com https://www.google.com https://www.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com https://www.google-analytics.com https://www.clarity.ms https://*.clarity.ms 'unsafe-inline' https://${myDomain}; img-src *`
-      //     ]
-      //   }
-      // }
     ]
   }
 }

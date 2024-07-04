@@ -1,10 +1,4 @@
-const selectors = {
-  buttons: {
-    defaultTagCopyButton: '[data-testid="edge-pulse__default-tag-copy-button"]',
-    preLoadingTab: '[data-testid="edge-pulse__pre-loading-tab"]',
-    preLoadingTagCopyButton: '[data-testid="edge-pulse__pre-loading-tag-copy-button"]'
-  }
-}
+import selectors from '../support/selectors'
 
 const fixtures = {
   preLoadingTag: `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`,
@@ -24,12 +18,12 @@ const fixtures = {
 describe('Edge Pulse spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('edge-pulse')
+    cy.openProduct('Edge Pulse')
   })
 
   it('should copy default and pre-loading tag in edge pulse', function () {
     // Act Default tag
-    cy.get(selectors.buttons.defaultTagCopyButton).realClick()
+    cy.get(selectors.edgePulse.defaultTagCopyButton).realClick()
     cy.verifyToast('Successfully copied!')
 
     // Default tag copy assertion
@@ -37,8 +31,8 @@ describe('Edge Pulse spec', () => {
     cy.assertValueCopiedToClipboard(expectedDefaultTagValue)
 
     // Act Pre-loading tag
-    cy.get(selectors.buttons.preLoadingTab).click()
-    cy.get(selectors.buttons.preLoadingTagCopyButton).realClick()
+    cy.get(selectors.edgePulse.preLoadingTab).click()
+    cy.get(selectors.edgePulse.preLoadingTagCopyButton).realClick()
     cy.verifyToast('Successfully copied!')
 
     // Pre-loading tag copy assertion

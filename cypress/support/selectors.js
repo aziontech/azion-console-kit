@@ -18,6 +18,9 @@ const selectors = {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
       deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
     },
+    singleActionsMenu: {
+      button: '[data-testid="data-table-actions-column-body-action-button"]'
+    },
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
@@ -188,6 +191,41 @@ const selectors = {
     deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
   },
+  edgePulse: {
+    defaultTagCopyButton: '[data-testid="edge-pulse__default-tag-copy-button"] > .p-button-label',
+    preLoadingTab: '[data-testid="edge-pulse__pre-loading-tab"]',
+    preLoadingTagCopyButton:
+      '[data-testid="edge-pulse__pre-loading-tag-copy-button"] > .p-button-label'
+  },
+  edgeServices: {
+    createServiceButton: '[data-testid="create_Service_button"]',
+    searchInput: '[data-testid="data-table-search-input"]',
+    filteredRowNameColumn: '[data-testid="list-table-block__column__name__row"]',
+    filteredRowStatusColumn:
+      '[data-testid="list-table-block__column__labelActive__row"] > .p-tag-value',
+    actionsMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+    actionsMenuDeleteAction:
+      '#overlay_menu_1 > .p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
+    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+    serviceName: '[data-testid="edge-service-form__name-field__input"]',
+    nameRequiredLabel: '[data-testid="edge-service-form__name-field__error-message"]',
+    submitButton: '[data-testid="form-actions-submit-button"]',
+    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+    cancelButton: '[data-testid="form-actions-cancel-button"]'
+  },
+  personalTokens: {
+    createTokenButton: '[data-testid="create_Personal Token_button"]',
+    searchInput: '[data-testid="data-table-search-input"]',
+    filteredRecordNameColumn: '[data-testid="list-table-block__column__name__row"]',
+    filteredRecordMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+    filteredRecordDeleteButton: '.p-menuitem-content > .p-menuitem-link',
+    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+    tokenName: '[data-testid="personal-token-form__name-field__input"]',
+    submitButton: '[data-testid="form-actions-submit-button"]',
+    copyTokenDialogHeader: '[data-testid="copy-token-dialog__header"] > .p-dialog-header',
+    copyTokenButton: '[data-testid="copy-token-dialog__token-field__copy-token-button"]',
+    closeCopyDialogButton: '[data-testid="copy-token-dialog__dialog-footer__confirm-button"]'
+  },
   accountSettings: {
     accountName: '[data-testid="account-settings__account-name__input"]',
     companyName: '[data-testid="account-settings__company-name__input"]',
@@ -202,20 +240,115 @@ const selectors = {
     sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
     templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
     editorBody: '.view-lines',
-    connectorDropdown: '[data-testid="data-stream-form__destination__connector-field__dropdown"]',
+    connectorDropdown:
+      '[data-testid="data-stream-form__destination__connector-field__dropdown"] > .p-dropdown-trigger',
+    connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,
     httpConnector: {
       urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
-      headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
+      headersInput: '[data-testid="data-stream-form__destination__headers-field__input"]',
       payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
       separatorInput:
         '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
       maxSizeInput:
         '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
     },
+    kafkaConnector: {
+      serverTextarea:
+        '[data-testid="data-stream-form__destination__bootstrap-servers-field__textarea"]',
+      topicInput: '[data-testid="data-stream-form__destination__kafka-topic-field__input"]',
+      useTlsSlider:
+        '[data-testid="data-stream-form__destination__use-tls-field"] > .p-inputswitch-slider'
+    },
+    s3Connector: {
+      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
+      bucketInput: '[data-testid="data-stream-form__destination__bucket-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__region-field__input"]',
+      accessKeyInput: '[data-testid="data-stream-form__destination__access-key-field__input"]',
+      secretKeyInput: '[data-testid="data-stream-form__destination__secret-key-field__input"]',
+      objectKeyPrefixInput:
+        '[data-testid="data-stream-form__destination__object-key-prefix-field__input"]'
+    },
+    bigQueryConnector: {
+      projectIdInput: '[data-testid="data-stream-form__destination__project-id-field__input"]',
+      datasetIdInput: '[data-testid="data-stream-form__destination__dataset-id-field__input"]',
+      tableIdInput: '[data-testid="data-stream-form__destination__table-id-field__input"]',
+      serviceAccountKeyInput:
+        '[data-testid="data-stream-form__destination__service-account-key-field__input"]'
+    },
+    elasticsearchConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__elasticsearch-url-field__input"]',
+      apiKeyTextarea: '[data-testid="data-stream-form__destination__api-key-field__textarea"]'
+    },
+    splunkConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__splunk-url-field__input"]',
+      apiKeyTextarea:
+        '[data-testid="data-stream-form__destination__splunk-api-key-field__textarea"]'
+    },
+    awsKinesisConnector: {
+      streamNameInput:
+        '[data-testid="data-stream-form__destination__kinesis-stream-name-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__kinesis-region-field__input"]',
+      accessKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-access-key-field__input"]',
+      secretKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-secret-key-field__input"]'
+    },
+    datadogConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__datadog-url-field__input"]',
+      apiKeyTextarea:
+        '[data-testid="data-stream-form__destination__datadog-api-key-field__textarea"]'
+    },
+    ibmQRadarConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__qradar-url-field__input"]'
+    },
+    azureMonitorConnector: {
+      logTypeInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-log-type-field__input"]',
+      sharedKeyInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"]',
+      timeGeneratedFieldInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-generated-field__input"]',
+      workspaceIdInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-workspace-id-field__input"]'
+    },
+    azureBlobStorageConnector: {
+      storageAccountInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field__input"]',
+      containerNameInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-container-name-field__input"]',
+      blobSasTokenInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
     }
+  },
+  edgeDns: {
+    createButton: '[data-testid="create_Zone_button"] > .p-button-label',
+    nameInput: '[data-testid="edge-dns-form__name__input"]',
+    domainInput: '[data-testid="edge-dns-form__domain__input"]',
+    saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',
+    searchInput: '[data-testid="data-table-search-input"]',
+    nameRow: '[data-testid="list-table-block__column__name__row"]',
+    showMore: '.underline',
+    domainRow: '.whitespace-pre',
+    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+  },
+  domains: {
+    createButton: '[data-testid="create_Domain_button"]',
+    nameInput: '[data-testid="domains-form__name-field__input"]',
+    edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
+    dropdownFilter: '.p-dropdown-filter',
+    edgeApplicationOption: '#edgeApplication_0',
+    cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
+    dialogTitle: '.p-dialog-header > .p-dialog-title',
+    domainField: '[data-testid="domains-dialog__domain-field__input"]',
+    copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
+    confirmButton: '[data-testid="domains-dialog__confirm__button"]',
+    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+    actionDelete: '.p-menuitem-content > .p-menuitem-link'
   }
 }
 

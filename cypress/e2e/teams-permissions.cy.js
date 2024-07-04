@@ -6,7 +6,7 @@ const teamsPermissionsName = generateUniqueName('TeamName')
 describe('Teams Permissions', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Teams Permissions');
+    cy.openProduct('Teams Permissions');
   })
 
   it('should create a new team', () => {
@@ -57,6 +57,6 @@ describe('Teams Permissions', () => {
 
   afterEach(() => {
     // Delete the team permissions
-    cy.deleteProduct(teamsPermissionsName, '/teams-permission')
+    cy.deleteProduct({ entityName: teamsPermissionsName, productName: 'Teams Permissions' })
   })
 })

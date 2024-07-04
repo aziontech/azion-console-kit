@@ -89,7 +89,10 @@ describe('BillingServices', () => {
           cardNumber: '4242',
           status: 'Default'
         },
-        isDefault: fixtures.paymentMockIsDefault.is_default
+        isDefault: fixtures.paymentMockIsDefault.is_default,
+        expiringDateByOrder: new Date('2030-05-01T00:00:00.000Z'),
+        expiringDateSearch: '05/2030',
+        cardNumberSearch: fixtures.paymentMock.card_last_4_digits
       },
       {
         id: fixtures.paymentMock.id,
@@ -103,7 +106,10 @@ describe('BillingServices', () => {
           cardNumber: '4242',
           status: ''
         },
-        isDefault: fixtures.paymentMock.is_default
+        isDefault: fixtures.paymentMock.is_default,
+        expiringDateByOrder: new Date('2019-05-01T00:00:00.000Z'),
+        expiringDateSearch: '05/2019',
+        cardNumberSearch: fixtures.paymentMock.card_last_4_digits
       }
     ])
   })

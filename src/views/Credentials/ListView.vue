@@ -10,14 +10,13 @@
       <ListTableBlock
         v-if="hasContentToList"
         :listService="listCredentialsService"
-        :deleteService="deleteCredentialService"
         :columns="getColumns"
-        pageTitleDelete="credential"
         addButtonLabel="Credential"
         editPagePath="credentials/edit"
         createPagePath="credentials/create"
         @on-load-data="handleLoadData"
         emptyListMessage="No credentials found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -36,67 +35,75 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { computed, ref } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-  export default {
-    name: 'credentials-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+  defineOptions({ name: 'credentials-view' })
+
+  const props = defineProps({
+    listCredentialsService: {
+      type: Function,
+      required: true
     },
-    props: {
-      listCredentialsService: Function,
-      deleteCredentialService: Function,
-      documentationService: Function
+    deleteCredentialService: {
+      type: Function,
+      required: true
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'lastEditor',
-            header: 'Last Editor'
-          },
-          {
-            field: 'lastModified',
-            sortField: 'lastModifiedDate',
-            header: 'Last Modified'
-          },
-          {
-            field: 'status',
-            header: 'Status',
-            filterPath: 'status.content',
-            sortField: 'status.content',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-            }
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      type: Function,
+      required: true
     }
+  })
+
+  const hasContentToList = ref(true)
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'credential',
+      icon: 'pi pi-trash',
+      service: props.deleteCredentialService
+    }
+  ]
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        sortField: 'lastModifiedDate',
+        header: 'Last Modified'
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        filterPath: 'status.content',
+        sortField: 'status.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
+      }
+    ]
+  })
 </script>

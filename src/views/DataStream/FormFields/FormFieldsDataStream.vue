@@ -101,14 +101,16 @@
         <LabelBlock
           for="domains"
           label="Domains"
-          data-testid="data-stream-form__domains__domains-field-label"
+          data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
         <PickList
           v-model="domains"
           :pt="{
             sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] }
+            targetList: { class: ['h-80'] },
+            sourceWrapper: { class: 'max-w-[340px]' },
+            targetWrapper: { class: 'max-w-[340px]' }
           }"
           dataKey="domainID"
           breakpoint="1400px"
@@ -119,7 +121,7 @@
           <template #sourceheader>Available Domains</template>
           <template #targetheader>Chosen Domains</template>
           <template #item="slotProps">
-            <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
               <div class="flex-1 flex flex-column gap-2">
                 <span
                   class="font-normal"
@@ -230,7 +232,7 @@
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
-            data-testid="data-stream-form__destination__headers-field-label"
+            data-testid="data-stream-form__destination__headers-field__label"
             >Custom Headers</label
           >
           <div
@@ -243,7 +245,7 @@
               type="text"
               id="header-value"
               placeholder="header-name:value"
-              data-testid="data-stream-form__destination__headers-field-input"
+              data-testid="data-stream-form__destination__headers-field__input"
             />
             <ButtonPrimer
               icon="pi pi-trash"
@@ -251,7 +253,7 @@
               outlined
               v-if="header.deleted"
               @click="removeHeader(index)"
-              data-testid="data-stream-form__destination__headers-field-remove-button"
+              data-testid="data-stream-form__destination__headers-field__remove-button"
             />
           </div>
 
@@ -263,7 +265,7 @@
             size="small"
             class="w-fit"
             @click="addHeader()"
-            data-testid="data-stream-form__destination__headers-field-add-button"
+            data-testid="data-stream-form__destination__headers-field__add-button"
           />
         </div>
       </div>
@@ -310,12 +312,12 @@
             <label
               for="useTls"
               class="text-sm font-normal leading-tight"
-              data-testid="data-stream-form__destination__use-tls-field-label"
+              data-testid="data-stream-form__destination__use-tls-field__label"
               >Enable Transport Layer Security (TLS)</label
             >
             <small
               class="text-xs text-color-secondary font-normal leading-5"
-              data-testid="data-stream-form__destination__use-tls-field-description"
+              data-testid="data-stream-form__destination__use-tls-field__description"
             >
               Send encrypted data to secure communication. Make sure the receiving connector uses a
               trusted CA certificate.
@@ -369,7 +371,7 @@
           <LabelBlock
             for="accessKey"
             label="Access Key"
-            data-testid="data-stream-form__destination__access-key-field-label"
+            data-testid="data-stream-form__destination__access-key-field__label"
             isRequired
           />
           <PrimePassword
@@ -381,18 +383,18 @@
             :feedback="false"
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
-            data-testid="data-stream-form__destination__access-key-field-input"
+            data-testid="data-stream-form__destination__access-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__access-key-field-description"
+            data-testid="data-stream-form__destination__access-key-field__description"
           >
             Public key to access the bucket.
           </small>
           <small
             id="access-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__access-key-field-error-message"
+            data-testid="data-stream-form__destination__access-key-field__error-message"
             >{{ accessKeyError }}</small
           >
         </div>
@@ -401,7 +403,7 @@
           <LabelBlock
             for="secretKey"
             label="Secret Key"
-            data-testid="data-stream-form__destination__secret-key-field-label"
+            data-testid="data-stream-form__destination__secret-key-field__label"
             isRequired
           />
           <PrimePassword
@@ -413,18 +415,18 @@
             :class="{ 'p-invalid': secretKeyError }"
             :feedback="false"
             toggleMask
-            data-testid="data-stream-form__destination__secret-key-field-input"
+            data-testid="data-stream-form__destination__secret-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__secret-key-field-description"
+            data-testid="data-stream-form__destination__secret-key-field__description"
           >
             Secret key to access the bucket.
           </small>
           <small
             id="secret-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__secret-key-field-error-message"
+            data-testid="data-stream-form__destination__secret-key-field__error-message"
             >{{ secretKeyError }}</small
           >
         </div>
@@ -433,7 +435,7 @@
           <label
             for="objectKeyPrefix"
             class="text-color text-base font-medium"
-            data-testid="data-stream-form__destination__object-key-prefix-field-label"
+            data-testid="data-stream-form__destination__object-key-prefix-field__label"
             >Object Key Prefix</label
           >
           <PrimePassword
@@ -445,11 +447,11 @@
             :class="{ 'p-invalid': objectKeyError }"
             :feedback="false"
             toggleMask
-            data-testid="data-stream-form__destination__object-key-prefix-field-input"
+            data-testid="data-stream-form__destination__object-key-prefix-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__object-key-prefix-field-description"
+            data-testid="data-stream-form__destination__object-key-prefix-field__description"
           >
             Prefix added to the name of the uploaded object to appear on the files that'll be sent.
             Composed of Prefix + Timestamp + UUID.
@@ -457,7 +459,7 @@
           <small
             id="object-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__object-key-prefix-field-error-message"
+            data-testid="data-stream-form__destination__object-key-prefix-field__error-message"
             >{{ objectKeyError }}</small
           >
         </div>
@@ -466,7 +468,7 @@
           <LabelBlock
             label="Content Type"
             isRequired
-            data-testid="data-stream-form__destination__content-type-field-label"
+            data-testid="data-stream-form__destination__content-type-field__label"
           />
           <div class="flex flex-col gap-3">
             <div
@@ -480,11 +482,11 @@
                 inputId="contentType"
                 :name="contentTypeItem.value"
                 :value="contentTypeItem.value"
-                data-testid="data-stream-form__destination__content-type-field-radio"
+                data-testid="data-stream-form__destination__content-type-field__radio"
               />
               <label
                 class="text-color text-sm font-normal leading-tight"
-                data-testid="data-stream-form__destination__content-type-field-label"
+                data-testid="data-stream-form__destination__content-type-field__label"
                 >{{ contentTypeItem.label }}</label
               >
             </div>
@@ -538,7 +540,7 @@
             for="serviceAccountKey"
             label="Service Account Key"
             isRequired
-            data-testid="data-stream-form__destination__service-account-key-field-label"
+            data-testid="data-stream-form__destination__service-account-key-field__label"
           />
           <vue-monaco-editor
             v-model:value="serviceAccountKey"
@@ -546,18 +548,18 @@
             :theme="theme"
             :options="serviceAccountMonacoOptions"
             class="min-h-[300px] surface-border border rounded-md overflow-hidden"
-            data-testid="data-stream-form__destination__service-account-key-field-input"
+            data-testid="data-stream-form__destination__service-account-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__service-account-key-field-description"
+            data-testid="data-stream-form__destination__service-account-key-field__description"
           >
             JSON file provided by Google Cloud used to authenticate with Google services.
           </small>
           <small
             id="service-account-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__service-account-key-field-error-message"
+            data-testid="data-stream-form__destination__service-account-key-field__error-message"
             >{{ serviceAccountKeyError }}</small
           >
         </div>
@@ -657,7 +659,7 @@
           <LabelBlock
             for="accessKey"
             label="Access Key"
-            data-testid="data-stream-form__destination__kinesis-access-key-field-label"
+            data-testid="data-stream-form__destination__kinesis-access-key-field__label"
             isRequired
           />
           <PrimePassword
@@ -669,18 +671,18 @@
             :class="{ 'p-invalid': awsAccessKeyError }"
             :feedback="false"
             toggleMask
-            data-testid="data-stream-form__destination__kinesis-access-key-field-input"
+            data-testid="data-stream-form__destination__kinesis-access-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__kinesis-access-key-field-description"
+            data-testid="data-stream-form__destination__kinesis-access-key-field__description"
           >
             Public key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-access-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__kinesis-access-key-field-error"
+            data-testid="data-stream-form__destination__kinesis-access-key-field__error"
             >{{ awsAccessKeyError }}</small
           >
         </div>
@@ -689,7 +691,7 @@
           <LabelBlock
             for="accessKey"
             label="Secret Key"
-            data-testid="data-stream-form__destination__kinesis-secret-key-field-label"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field__label"
             isRequired
           />
           <PrimePassword
@@ -701,18 +703,18 @@
             :class="{ 'p-invalid': awsSecretKeyError }"
             :feedback="false"
             toggleMask
-            data-testid="data-stream-form__destination__kinesis-secret-key-field-input"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__kinesis-secret-key-field-description"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field__description"
           >
             Secret key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-secret-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__kinesis-secret-key-field-error"
+            data-testid="data-stream-form__destination__kinesis-secret-key-field__error"
             >{{ awsSecretKeyError }}</small
           >
         </div>
@@ -787,7 +789,7 @@
           <LabelBlock
             for="sharedKey"
             label="Shared Key"
-            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-label"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field__label"
             isRequired
           />
           <PrimePassword
@@ -799,18 +801,18 @@
             :class="{ 'p-invalid': sharedKeyError }"
             :feedback="false"
             toggleMask
-            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-input"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
-            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-description"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field__description"
           >
             Shared Key of the Workspace.
           </small>
           <small
             id="shared-key-help"
             class="p-error"
-            data-testid="data-stream-form__destination__azure-monitor-shared-key-field-error-message"
+            data-testid="data-stream-form__destination__azure-monitor-shared-key-field__error-message"
             >{{ sharedKeyError }}</small
           >
         </div>
@@ -823,7 +825,7 @@
             description="Specifies how long it’ll take for the log to be available after collection. Uses
             ingestion time if not specified."
             placeholder="myCustomTimeField"
-            data-testid="data-stream-form__destination__azure-monitor-generated-field-field"
+            data-testid="data-stream-form__destination__azure-monitor-generated-field"
           />
         </div>
 
@@ -853,6 +855,7 @@
             :value="storageAccount"
             description="Name of the storage account."
             placeholder="mystorageaccount"
+            data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field"
           />
         </div>
 

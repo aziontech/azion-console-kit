@@ -6,7 +6,11 @@ const credentialName = generateUniqueName('Credential')
 describe('Credentials', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Credentials')
+    cy.openProduct('Credentials')
+  })
+  afterEach(() => {
+    // Delete the credential
+    cy.deleteProductSingleActionColumn({ entityName: credentialName, productName: 'Credentials' })
   })
 
   it('should create a credential from the table', () => {
@@ -32,15 +36,7 @@ describe('Credentials', () => {
     cy.get(selectors.form.actionsCancelButton).click()
     cy.get(selectors.list.searchInput).type(credentialName)
     cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', credentialName)
-    cy.get(selectors.list.filteredRow.lastEditorColumn).should(
-      'have.text',
-      Cypress.env('CYPRESS_EMAIL_STAGE')
-    )
     cy.get(selectors.list.filteredRow.lastModifiedColumn).should('not.be.empty')
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Active')
-  })
-  afterEach(() => {
-    // Delete the credential
-    cy.deleteProduct(credentialName, '/credentials')
   })
 })

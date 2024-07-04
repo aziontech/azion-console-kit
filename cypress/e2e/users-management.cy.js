@@ -50,7 +50,7 @@ const userEmail = `${userFirstName}@azion.com`
 describe('Users Management spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Users Management')
+    cy.openProduct('Users Management')
   })
 
   it('should create a regular user with a team', () => {
