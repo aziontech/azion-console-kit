@@ -74,45 +74,43 @@ Cypress.on('uncaught:exception', (err, runnable) => {
  * @throws Will throw an error if the email or password is not set for the specified environment.
  */
 Cypress.Commands.add('login', () => {
-  const environment = Cypress.env('environment') || 'dev';
-  const isCI = Cypress.env('isCI') === 'true';
+  const environment = Cypress.env('environment') || 'dev'
+  const isCI = Cypress.env('isCI') === 'true'
 
-  let email, password;
+  let email, password
 
   if (isCI) {
-    cy.log('Running in CI/CD environment');
-    email = Cypress.env('CYPRESS_EMAIL');
-    password = Cypress.env('CYPRESS_PASSWORD');
+    cy.log('Running in CI/CD environment')
+    email = Cypress.env('CYPRESS_EMAIL')
+    password = Cypress.env('CYPRESS_PASSWORD')
 
     if (!email || !password) {
-      throw new Error('Email or Password not set for CI/CD environment');
+      throw new Error('Email or Password not set for CI/CD environment')
     }
   } else {
     switch (environment) {
       case 'preview-prod':
-        email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL');
-        password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD');
-        break;
+        email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL')
+        password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD')
+        break
       case 'prod':
-        email = Cypress.env('PROD_CYPRESS_EMAIL');
-        password = Cypress.env('PROD_CYPRESS_PASSWORD');
-        break;
+        email = Cypress.env('PROD_CYPRESS_EMAIL')
+        password = Cypress.env('PROD_CYPRESS_PASSWORD')
+        break
       default:
-        email = Cypress.env('DEV_CYPRESS_EMAIL');
-        password = Cypress.env('DEV_CYPRESS_PASSWORD');
-        break;
+        email = Cypress.env('DEV_CYPRESS_EMAIL')
+        password = Cypress.env('DEV_CYPRESS_PASSWORD')
+        break
     }
   }
 
   if (!email || !password) {
-    throw new Error(`Email or Password not set for ${environment} environment`);
+    throw new Error(`Email or Password not set for ${environment} environment`)
   }
 
-  cy.log(`🔐 Authenticating | ${email}`);
-  login(email, password);
-});
-
-
+  cy.log(`🔐 Authenticating | ${email}`)
+  login(email, password)
+})
 
 /**
  * Opens a product through the sidebar menu.
@@ -279,14 +277,14 @@ Cypress.Commands.add('openProduct', (productName) => {
  * @returns {Promise} - Resolves when the visit command completes.
  */
 Cypress.Commands.overwrite('visit', (original, ...args) => {
-  if (!Cypress.env("baseUrl")) {
-    throw new Error("Not found $.env.baseUrl but it is required");
+  if (!Cypress.env('baseUrl')) {
+    throw new Error('Not found $.env.baseUrl but it is required')
   }
 
-  const relative = args.shift();
-  const target = new URL(relative, new URL(Cypress.env("baseUrl")));
+  const relative = args.shift()
+  const target = new URL(relative, new URL(Cypress.env('baseUrl')))
 
   return new Promise((resolve) => {
-    resolve(original(target.toString(), ...args));
-  });
-});
+    resolve(original(target.toString(), ...args))
+  })
+})
