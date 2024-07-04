@@ -7,14 +7,13 @@
       <ListTableBlock
         v-if="hasContentToList"
         :listService="listPersonalTokensService"
-        :deleteService="deletePersonalTokenService"
         :columns="getColumns"
-        pageTitleDelete="personal token"
         addButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
         @on-load-data="handleLoadData"
         :enableEditClick="false"
         emptyListMessage="No personal tokens found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -36,12 +35,12 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/action-column.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { ref } from 'vue'
 
-  defineProps({
+  const props = defineProps({
     listPersonalTokensService: {
       type: Function,
       required: true
@@ -57,6 +56,14 @@
   })
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'personal token',
+      icon: 'pi pi-trash',
+      service: props.deletePersonalTokenService
+    }
+  ]
 
   const getColumns = ref([
     {
