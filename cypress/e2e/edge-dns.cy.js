@@ -523,7 +523,10 @@ describe('Edge DNS spec', () => {
       'have.text',
       recordTypeFixtures.recordType
     )
-    cy.get(selectors.edgeDns.list.columnName('value')).should('have.text', recordTypeFixtures.value)
+    cy.get(selectors.edgeDns.list.columnName('value')).should(
+      'have.text',
+      recordTypeFixtures.value.replaceAll('\n', ' ')
+    )
     cy.get(selectors.edgeDns.list.columnName('ttl')).should('have.text', recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.list.columnName('policy')).should(
       'have.text',
@@ -595,7 +598,10 @@ describe('Edge DNS spec', () => {
       'have.text',
       recordTypeFixtures.recordType
     )
-    cy.get(selectors.edgeDns.list.columnName('value')).should('have.text', recordTypeFixtures.value)
+    cy.get(selectors.edgeDns.list.columnName('value')).should(
+      'have.text',
+      recordTypeFixtures.value.replaceAll('\n', ' ')
+    )
     cy.get(selectors.edgeDns.list.columnName('ttl')).should('have.text', recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.list.columnName('policy')).should(
       'have.text',
