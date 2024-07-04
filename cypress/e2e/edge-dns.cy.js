@@ -35,7 +35,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeA',
+      name: 'www',
       recordType: 'A',
       recordTypeOption: 0,
       ttl: 7,
@@ -79,11 +79,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -114,7 +111,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeAAAA',
+      name: 'aaaa',
       recordType: 'AAAA',
       recordTypeOption: 1,
       ttl: 1,
@@ -155,11 +152,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -186,7 +180,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeANAME',
+      name: 'aname',
       recordType: 'ANAME',
       recordTypeOption: 2,
       ttl: 20,
@@ -226,11 +220,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -257,7 +248,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeCAA',
+      name: 'caa',
       recordType: 'CAA',
       recordTypeOption: 3,
       ttl: 10,
@@ -298,11 +289,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -329,7 +317,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeCNAME',
+      name: 'cname',
       recordType: 'CNAME',
       recordTypeOption: 4,
       ttl: 100,
@@ -370,11 +358,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -401,7 +386,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeDS',
+      name: 'ds',
       recordType: 'DS',
       recordTypeOption: 5,
       ttl: 3600,
@@ -442,11 +427,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -473,7 +455,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeMX',
+      name: 'mail',
       recordType: 'MX',
       recordTypeOption: 6,
       ttl: 5,
@@ -514,11 +496,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -545,7 +524,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeNS',
+      name: 'nsx',
       recordType: 'NS',
       recordTypeOption: 7,
       ttl: 20,
@@ -586,11 +565,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -617,7 +593,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypePTR',
+      name: '4.3.2.1.in-addr.arpa',
       recordType: 'PTR',
       recordTypeOption: 8,
       ttl: 9090,
@@ -658,11 +634,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -689,7 +662,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeSRV',
+      name: '_sip._tcp',
       recordType: 'SRV',
       recordTypeOption: 9,
       ttl: 28,
@@ -730,11 +703,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
@@ -761,7 +731,7 @@ describe('Edge DNS spec', () => {
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
     const recordTypeFixtures = {
-      name: 'recordTypeTXT',
+      name: 'txt',
       recordType: 'TXT',
       recordTypeOption: 10,
       ttl: 2733,
@@ -802,11 +772,8 @@ describe('Edge DNS spec', () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name.toLocaleLowerCase())
-    cy.get(selectors.edgeDns.list.columnName('name')).should(
-      'have.text',
-      recordTypeFixtures.name.toLocaleLowerCase()
-    )
+    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
       recordTypeFixtures.recordType
