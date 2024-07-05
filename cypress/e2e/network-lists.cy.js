@@ -1,5 +1,5 @@
-import generateUniqueName from '../support/utils';
-import selectors from '../support/selectors';
+import generateUniqueName from '../support/utils'
+import selectors from '../support/selectors'
 
 const networkListName = generateUniqueName('NetworkList')
 
@@ -9,7 +9,7 @@ describe('Network Lists spec', () => {
     cy.openProduct('Network Lists')
   })
 
-  it('Create a ASN Network List', function() {
+  it('Create a ASN Network List', function () {
     // Act
     cy.get(selectors.networkLists.createButton).click()
 
@@ -33,8 +33,11 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
     cy.get(selectors.networkLists.typeRow).should('have.text', 'ASN')
   })
+
   afterEach(() => {
     // Delete the network list
-    cy.deleteProduct({ entityName: networkListName, productName: 'Network Lists' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
   })
 })
