@@ -40,7 +40,8 @@
     cardNumber.value = elements.value.create('cardNumber', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif"
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
         },
         '::placeholder': {
           color: '#ededed'
@@ -56,7 +57,8 @@
     cardExpiry.value = elements.value.create('cardExpiry', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif"
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
         },
         '::placeholder': {
           color: '#ededed'
@@ -71,7 +73,8 @@
     cardCvc.value = elements.value.create('cardCvc', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif"
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
         },
         '::placeholder': {
           color: '#ededed'
