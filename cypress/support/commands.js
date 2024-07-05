@@ -19,6 +19,8 @@ const login = (email, password) => {
     cy.get(selectors.login.signInButton).click()
     cy.location('pathname').should('eq', '/')
   })
+
+  cy.visit('/')
 }
 
 // Disable test failure for all uncaught exceptions
