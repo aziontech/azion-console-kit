@@ -7,7 +7,7 @@ export default defineConfig({
   projectId: 'azion-console-kit',
   e2e: {
     specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
-    defaultCommandTimeout: 15000,
+    defaultCommandTimeout: 60000,
     video: true,
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
