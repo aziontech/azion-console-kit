@@ -1,0 +1,293 @@
+<script setup>
+  import { computed, ref, inject, onMounted } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+  import ActionBarBlock from '@/templates/action-bar-block'
+  import GoBack from '@/templates/action-bar-block/go-back'
+  import Sidebar from 'primevue/sidebar'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  defineOptions({
+    name: 'add-payment-method-block'
+  })
+  const stripePromise = inject('stripe')
+  const stripe = ref(null)
+  const isSubmitting = ref(false)
+  const elements = ref(null)
+  const cardNumber = ref(null)
+  const cardExpiry = ref(null)
+  const cardCvc = ref(null)
+  const cardholderName = ref('')
+
+  const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
+  const props = defineProps({
+    createService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const toast = useToast()
+  const showGoBack = ref(false)
+
+  onMounted(async () => {
+    stripe.value = await stripePromise
+    elements.value = stripe.value.elements()
+
+    cardNumber.value = elements.value.create('cardNumber', {
+      style: {
+        base: {
+          color: '#fff',
+          fontFamily: 'Arial, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aaa'
+          },
+          backgroundColor: '#222'
+        },
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a'
+        }
+      },
+      showIcon: true
+    })
+
+    cardExpiry.value = elements.value.create('cardExpiry', {
+      style: {
+        base: {
+          color: '#fff',
+          fontFamily: 'Arial, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aaa'
+          },
+          backgroundColor: '#222'
+        },
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a'
+        }
+      }
+    })
+
+    cardCvc.value = elements.value.create('cardCvc', {
+      style: {
+        base: {
+          color: '#fff',
+          fontFamily: 'Arial, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aaa'
+          },
+          backgroundColor: '#222'
+        },
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a'
+        }
+      }
+    })
+
+    cardNumber.value.mount('#card-number-element')
+    cardExpiry.value.mount('#card-expiry-element')
+    cardCvc.value.mount('#card-cvc-element')
+  })
+
+  const visibleDrawer = computed({
+    get: () => props.visible,
+    set: (value) => {
+      changeVisisbleDrawer(value, true)
+    }
+  })
+
+  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+    emit('update:visible', isVisible)
+    if (isResetForm) resetForm()
+  }
+
+  const toggleDrawerVisibility = (isVisible) => {
+    visibleDrawer.value = isVisible
+  }
+
+  const closeDrawer = () => {
+    toggleDrawerVisibility(false)
+  }
+
+  const showToast = (severity, summary) => {
+    const options = {
+      closable: true,
+      severity: severity,
+      summary: severity,
+      detail: summary
+    }
+
+    toast.add(options)
+  }
+
+  const handleSubmit = async () => {
+    isSubmitting.value = true
+    const { token } = await stripe.value.createToken(cardNumber.value, {
+      name: cardholderName.value
+    })
+    const payload = {
+      stripe_token: token.id,
+      card_id: token.card.id,
+      card_brand: token.card.brand,
+      card_holder: token.card.name,
+      card_last_4_digits: token.card.last4,
+      card_expiration_month: token.card.exp_month,
+      card_expiration_year: token.card.exp_year
+    }
+    try {
+      const response = await props.createService(payload)
+      emit('onSuccess', response)
+      showToast('success', response.feedback)
+      showGoBack.value = props.showBarGoBack
+      if (showGoBack.value) {
+        blockViewRedirection.value = true
+        return
+      }
+      formContext.resetForm()
+      toggleDrawerVisibility(false)
+    } catch (error) {
+      emit('onError', error)
+      showToast('error', error)
+    }
+    isSubmitting.value = false
+  }
+
+  const handleGoBack = () => {
+    showGoBack.value = false
+    toggleDrawerVisibility(false)
+  }
+</script>
+
+<template>
+  <Sidebar
+    v-model:visible="visibleDrawer"
+    :update:visible="toggleDrawerVisibility"
+    position="right"
+    :pt="{
+      root: { class: 'max-w-4xl w-full' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
+      content: { class: 'p-8' }
+    }"
+  >
+    <template #header>
+      <h2>Add Payment Method</h2>
+      <FeedbackFish />
+    </template>
+
+    <div class="flex w-full">
+      <FormHorizontal
+        :isDrawer="true"
+        title="Payment Method"
+      >
+        <template #inputs>
+          <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
+            <form
+              ref="form"
+              @submit.prevent="handleSubmit"
+              class="space-y-4"
+            >
+              <div class="flex flex-wrap gap-6">
+                <div class="flex flex-col sm:max-w-xs w-full gap-2">
+                  <label
+                    for="cardholder-name"
+                    class="text-white"
+                    >Card Holder Name</label
+                  >
+                  <input
+                    id="cardholder-name"
+                    v-model="cardholderName"
+                    class="stripe-input"
+                    placeholder="Morgana Johann"
+                  />
+                </div>
+                <div class="flex flex-col sm:max-w-xs w-full gap-2">
+                  <label
+                    for="card-number-element"
+                    class="text-white"
+                    >Card Number</label
+                  >
+                  <div
+                    id="card-number-element"
+                    class="stripe-input"
+                  ></div>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-6">
+                <div class="flex flex-col sm:max-w-xs w-full gap-2">
+                  <label
+                    for="card-expiry-element"
+                    class="text-white"
+                    >Expiration Date</label
+                  >
+                  <div
+                    id="card-expiry-element"
+                    class="stripe-input"
+                  ></div>
+                </div>
+                <div class="flex flex-col sm:max-w-xs w-full gap-2">
+                  <label
+                    for="card-cvc-element"
+                    class="text-white"
+                    >Security Code (CVC)</label
+                  >
+                  <div
+                    id="card-cvc-element"
+                    class="stripe-input"
+                  ></div>
+                </div>
+              </div>
+              <div
+                id="card-errors"
+                class="card-errors"
+                role="alert"
+              ></div>
+            </form>
+          </div>
+        </template>
+      </FormHorizontal>
+    </div>
+    <div class="fixed w-full left-0 bottom-0">
+      <GoBack
+        :goBack="handleGoBack"
+        v-if="showGoBack"
+        :inDrawer="true"
+      />
+      <ActionBarBlock
+        v-else
+        @onCancel="closeDrawer"
+        @onSubmit="handleSubmit"
+        :inDrawer="true"
+        :loading="isSubmitting"
+      />
+    </div>
+  </Sidebar>
+</template>
+<style scoped>
+  /* Estilos para os elementos Stripe */
+  .stripe-input {
+    border: 1px solid #666;
+    padding: 12px;
+    border-radius: 4px;
+    background-color: #222;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .card-errors {
+    color: red;
+    margin-top: 10px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+</style>

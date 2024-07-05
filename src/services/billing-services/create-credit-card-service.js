@@ -2,11 +2,12 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentsBaseUrl } from './make-payments-base-url'
 
-export const createCreditCardService = async (payload, stripeInstance) => {  
+export const createCreditCardService = async (payload) => {  
+  console.log(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePaymentsBaseUrl()}/credits_cards`,
     method: 'POST',
-    body: adapt(payload, stripeInstance)
+    body: payload
   })
 
   return parseHttpResponse(httpResponse)
@@ -43,7 +44,6 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your credit card has been added',
-        urlToEditView: '/credentials',
         token: httpResponse.body.token
       }
     case 400:
@@ -62,32 +62,5 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.InternalServerError().message
     default:
       throw new Errors.UnexpectedError().message
-  }
-}
-
-const adapt = async (payload, stripeInstance) => {
-  const expirationMonth = payload.expirationDate.slice('/')[0]
-  const expirationYear = '20'+payload.expirationDate.slice('/')[1]
-  const cardData = {
-    type: 'card',
-    card:{
-      number: payload.cardNumber,
-      exp_month: expirationMonth,
-      exp_year: expirationYear,
-      cvc: payload.securityCode,
-    }
-  }
-  const  teste = await stripeInstance.createToken(cardData)
-  console.log(teste)
-  if (stripeError) {
-    throw new Errors.InternalServerError().message
-  }
-
-  return {
-    stripe_token: stripeToken,
-    card_holder: payload.name,
-    card_expiration_month: expirationMonth,
-    card_expiration_year: expirationYear,
-    
   }
 }
