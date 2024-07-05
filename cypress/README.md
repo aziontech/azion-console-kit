@@ -19,6 +19,7 @@ This document defines the standards and best practices to be followed for develo
     - [Example Usage](#example-usage)
   - [Validating Toasts](#validating-toasts)
   - [Validating Values Copied to Clipboard](#validating-values-copied-to-clipboard)
+  - [Deleting Entities](#deleting-entities)
 
 ## Naming `data-testid`
 
@@ -114,3 +115,24 @@ cy.assertValueCopiedToClipboard('Expected Value');
 ```
 
 This command checks whether the current value in the clipboard matches the expected value provided. It removes all extra white spaces and compares the resulting value with the expected value. If the values do not match, the test will fail.
+
+## Deleting Entities
+
+To delete entities in tests:
+
+- Execute the custom command `deleteEntityFromLoadedList()` when already in the list of entities. This command does not require any arguments.
+
+Example:
+
+```javascript
+cy.deleteEntityFromLoadedList();
+```
+
+- Execute the custom command `deleteEntityFromList()` when not in the list of entities. This command requires the name of the entity, the product name, and the column name where the entity name is displayed in the list. This command uses cy.visit to navigate to the list of entities.
+
+Example:
+
+```javascript
+cy.deleteEntityFromList({ entityName: 'Entity Name', productName: 'Product Name', columnName: 'Name' });
+```
+
