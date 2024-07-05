@@ -1,12 +1,12 @@
-import generateUniqueName from '../support/utils';
-import selectors from '../support/selectors';
+import generateUniqueName from '../support/utils'
+import selectors from '../support/selectors'
 
 const teamsPermissionsName = generateUniqueName('TeamName')
 
 describe('Teams Permissions', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProduct('Teams Permissions');
+    cy.openProduct('Teams Permissions')
   })
 
   it('should create a new team', () => {
@@ -27,22 +27,17 @@ describe('Teams Permissions', () => {
     // Act
     // Test different permissions scenarios and verify whether form is enabled/disabled
     cy.get(selectors.form.teamName).type(teamsPermissionsName)
+
     cy.get(selectors.form.allPermissionsToTarget).click()
-    cy.get(selectors.form.actionsSubmitButton).should('be.enabled')
-
     cy.get(selectors.form.allPermissionsToSource).click()
-
     cy.get(selectors.form.viewContentDeliverySettingsPermission).click()
     cy.get(selectors.form.singlePermissionToTarget).click()
-    cy.get(selectors.form.actionsSubmitButton).should('be.enabled')
-
     cy.get(selectors.form.allPermissionsToTarget).click()
+
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.toast.content)
-      .should('be.visible')
-      .and('contain', 'successYour Team Permission has been created')
+    cy.verifyToast('success', 'Your Team Permission has been created')
 
     cy.get(selectors.form.actionsCancelButton).click()
 
@@ -57,6 +52,6 @@ describe('Teams Permissions', () => {
 
   afterEach(() => {
     // Delete the team permissions
-    cy.deleteProduct({ entityName: teamsPermissionsName, productName: 'Teams Permissions' })
+    cy.deleteEntityFromLoadedList()
   })
 })

@@ -456,7 +456,7 @@ describe('Data Stream spec', () => {
 
   afterEach(() => {
     // Cleanup
-    cy.deleteProduct({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
+    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
       cy.verifyToast('Data Stream successfully deleted')
     })
   })
