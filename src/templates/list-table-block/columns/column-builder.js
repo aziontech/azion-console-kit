@@ -2,6 +2,7 @@ import { h } from 'vue'
 import AvatarWithTextTooltipColumn from './avatar-with-text-tooltip-column.vue'
 import AvatarWithTextColumn from './avatar-with-text-column.vue'
 import TextWithClipboardColumn from './text-with-clipboard-column.vue'
+import TextFullWithClipboardColumn from './text-full-with-clipboard-column.vue'
 import ClickableText from './clickable-text-column.vue'
 import ClickableLink from './clickable-link-column.vue'
 import ClickableTag from './clickable-tag-column.vue'
@@ -78,6 +79,11 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'text-with-clipboard':
       return h(TextWithClipboardColumn, {
+        content: data.content,
+        copyContentService: dependencies.copyContentService
+      })
+    case 'text-full-with-clipboard':
+      return h(TextFullWithClipboardColumn, {
         content: data.content,
         copyContentService: dependencies.copyContentService
       })

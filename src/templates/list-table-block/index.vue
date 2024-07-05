@@ -152,7 +152,7 @@
             data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
-              :ref="(document) => setMenuRefForRow(rowData.id, document)"
+              :ref="setMenuRefForRow(rowData.id)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
@@ -438,9 +438,12 @@
     return rowData[field]
   }
 
-  const setMenuRefForRow = (rowDataID, document) => {
-    const tableRef = (menuRef.value[rowDataID] = document)
-    return tableRef
+  const setMenuRefForRow = (rowDataID) => {
+    return (document) => {
+      if (document !== null) {
+        menuRef.value[rowDataID] = document
+      }
+    }
   }
 
   const filterBy = computed(() => {

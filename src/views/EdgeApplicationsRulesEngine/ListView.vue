@@ -100,6 +100,7 @@
         header: 'Status',
         type: 'component',
         filterPath: 'status.content',
+        sortField: 'status.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

@@ -131,6 +131,7 @@
     {
       field: 'status',
       header: 'Status',
+      sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {

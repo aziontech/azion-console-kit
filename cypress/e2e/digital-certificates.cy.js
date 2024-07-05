@@ -1,5 +1,5 @@
-import generateUniqueName from '../support/utils';
-import selectors from '../support/selectors';
+import generateUniqueName from '../support/utils'
+import selectors from '../support/selectors'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
@@ -9,7 +9,7 @@ describe('Digital Certificates spec', () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it('should create and delete a new digital certificate', function () {
+  it('should create a new digital certificate', function () {
     // Arrange
     cy.get(selectors.list.createDigitalCertificateButton).click()
 
@@ -25,14 +25,13 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
     cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', digitalCertificateName)
-    cy.get(selectors.list.filteredRow.statusColumn).should(
-      'have.text',
-      'Pending'
-    )
+    cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 
   afterEach(() => {
     // Delete the digital certificate
-    cy.deleteProduct({ entityName: digitalCertificateName, productName: 'Digital Certificates' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Digital certificate successfully deleted!')
+    })
   })
 })

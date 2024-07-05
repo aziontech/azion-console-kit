@@ -3,13 +3,13 @@ import selectors from '../support/selectors'
 
 const edgeServiceName = generateUniqueName('EdgeService')
 
-describe('template spec', () => {
+describe('Edge Services spec', () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')
   })
 
-  it('should create and delete an edge service', () => {
+  it('should create an edge service', () => {
     // Arrange
     cy.get(selectors.edgeServices.createServiceButton).click()
 
@@ -25,12 +25,11 @@ describe('template spec', () => {
     cy.get(selectors.edgeServices.filteredRowNameColumn).should('have.text', edgeServiceName)
 
     cy.get(selectors.edgeServices.filteredRowStatusColumn).should('have.text', 'Inactive')
+  })
 
-    // Cleanup
-    cy.get(selectors.edgeServices.actionsMenuButton).click()
-    cy.get(selectors.edgeServices.actionsMenuDeleteAction).click()
-    cy.get(selectors.edgeServices.deleteDialogConfirmationInputField).clear()
-    cy.get(selectors.edgeServices.deleteDialogConfirmationInputField).type('delete{enter}')
-    cy.verifyToast('Resource successfully deleted')
+  afterEach(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
   })
 })

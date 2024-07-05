@@ -137,6 +137,7 @@
             />
           </span>
           <PrimeButton
+            data-testid="domains-form__copy-domain__button"
             icon="pi pi-clone"
             outlined
             type="button"

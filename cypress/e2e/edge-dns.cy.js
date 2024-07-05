@@ -101,7 +101,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -170,7 +170,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -238,7 +238,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -307,7 +307,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -376,7 +376,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -445,7 +445,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -514,7 +514,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -583,7 +583,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -652,7 +652,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -721,7 +721,7 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
@@ -790,13 +790,13 @@ describe('Edge DNS spec', () => {
     )
 
     // Cleanup
-    cy.deleteEntityFromList().then(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Edge DNS Record successfully deleted')
     })
   })
 
   afterEach(() => {
-    cy.deleteProduct({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
+    cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
       cy.verifyToast('Your Edge DNS has been deleted')
     })
   })

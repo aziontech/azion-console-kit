@@ -1,11 +1,12 @@
 <template>
-  <ListTable
+  <ListTableBlock
     v-if="hasContentToList"
+    :enableEditClick="false"
+    isTabs
     :columns="paymentsColumns"
-    :listService="props.listPaymentService"
-    :deleteService="props.deletePaymentService"
+    :listService="props.listPaymentMethodsService"
     @on-load-data="handleLoadData"
-    :rowActions="actionsRow"
+    :actions="actionsRow"
     emptyListMessage="No payment method found."
   >
     <template #addButton>
@@ -22,14 +23,14 @@
         />
       </div>
     </template>
-  </ListTable>
+  </ListTableBlock>
   <EmptyResultsBlock
     v-else
     title="No payment method has been added"
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     :inTabs="true"
-    :documentationService="props.documentPaymentService"
+    :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
       <Illustration />
@@ -41,7 +42,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTable from '@templates/list-table-block'
+  import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 
@@ -51,7 +52,7 @@
   const toast = useToast()
 
   const props = defineProps({
-    listPaymentService: {
+    listPaymentMethodsService: {
       type: Function,
       required: true
     },
@@ -63,7 +64,7 @@
       type: Function,
       required: true
     },
-    documentPaymentService: {
+    documentPaymentMethodService: {
       type: Function,
       required: true
     }
@@ -122,10 +123,17 @@
   const actionsRow = ref([
     {
       label: 'Set as default',
+      type: 'action',
       icon: 'pi pi-fw pi-check-circle',
-      command: async (item) => {
+      commandAction: async (item) => {
         await setPaymentAsDefault(item)
       }
+    },
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'Payment Method',
+      service: props.deletePaymentService
     }
   ])
 </script>
