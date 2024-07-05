@@ -40,14 +40,11 @@
     cardNumber.value = elements.value.create('cardNumber', {
       style: {
         base: {
-          color: '#fff',
-          fontFamily: 'Arial, sans-serif',
-          fontSmoothing: 'antialiased',
-          fontSize: '16px',
-          '::placeholder': {
-            color: '#aaa'
-          },
-          backgroundColor: '#222'
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
+        },
+        '::placeholder': {
+          color: '#ededed'
         },
         invalid: {
           color: '#fa755a',
@@ -60,14 +57,11 @@
     cardExpiry.value = elements.value.create('cardExpiry', {
       style: {
         base: {
-          color: '#fff',
-          fontFamily: 'Arial, sans-serif',
-          fontSmoothing: 'antialiased',
-          fontSize: '16px',
-          '::placeholder': {
-            color: '#aaa'
-          },
-          backgroundColor: '#222'
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
+        },
+        '::placeholder': {
+          color: '#ededed'
         },
         invalid: {
           color: '#fa755a',
@@ -79,14 +73,11 @@
     cardCvc.value = elements.value.create('cardCvc', {
       style: {
         base: {
-          color: '#fff',
-          fontFamily: 'Arial, sans-serif',
-          fontSmoothing: 'antialiased',
-          fontSize: '16px',
-          '::placeholder': {
-            color: '#aaa'
-          },
-          backgroundColor: '#222'
+          fontFamily: "'Roboto', sans-serif",
+          color: '#ffffff'
+        },
+        '::placeholder': {
+          color: '#ededed'
         },
         invalid: {
           color: '#fa755a',
@@ -203,7 +194,7 @@
                   <input
                     id="cardholder-name"
                     v-model="cardholderName"
-                    class="stripe-input"
+                    class="p-component p-inputtext"
                     placeholder="Morgana Johann"
                   />
                 </div>
@@ -272,17 +263,28 @@
     </div>
   </Sidebar>
 </template>
+
 <style scoped>
   /* Estilos para os elementos Stripe */
   .stripe-input {
-    height: 45px;
-    border: 1px solid #666;
-    padding: 12px;
-    border-radius: 4px;
-    background-color: #222;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    width: 100%;
+    @apply py-2 px-2 text-base border border-[var(--surface-border)] rounded-md;
+  }
+  .stripe-input:hover {
+    outline: 0 none;
+    outline-offset: 0;
+    border-color: #f3652b;
+  }
+  .stripe-input:enabled:focus,
+  .stripe-input:focus-visible {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem rgba(243, 100, 43, 0.6235294118);
+    border-color: #f3652b;
+  }
+  .azion-light .stripe-input {
+    @apply bg-[var(--surface-100)];
+  }
+  .azion-dark .stripe-input {
+    @apply bg-[var(--surface-300)];
   }
 </style>
