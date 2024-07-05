@@ -119,8 +119,30 @@
             dependencies: {
               copyContentService: props.clipboardWrite
             }
+<<<<<<< HEAD
           })
         }
+=======
+          },
+          {
+            field: 'status',
+            header: 'Status',
+            type: 'component',
+            filterPath: 'status.content',
+            sortField: 'status.content',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
+          }
+        ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
+>>>>>>> dev
       },
       {
         field: 'status',
