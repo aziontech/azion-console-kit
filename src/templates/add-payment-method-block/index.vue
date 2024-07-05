@@ -4,12 +4,14 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
+  import { useAccountStore } from '@/stores/account'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   defineOptions({
     name: 'add-payment-method-block'
   })
   const stripePromise = inject('stripe')
+  const accountStore = useAccountStore()
   const stripe = ref(null)
   const isSubmitting = ref(false)
   const elements = ref(null)
@@ -103,9 +105,8 @@
     }
   })
 
-  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+  const changeVisisbleDrawer = (isVisible) => {
     emit('update:visible', isVisible)
-    if (isResetForm) resetForm()
   }
 
   const toggleDrawerVisibility = (isVisible) => {
@@ -132,7 +133,11 @@
     const { token } = await stripe.value.createToken(cardNumber.value, {
       name: cardholderName.value
     })
+    const accountData = accountStore.account
+    console.log(accountData)
     const payload = {
+      card_address_zip: accountData.postal_code,
+      card_country: accountData.country,
       stripe_token: token.id,
       card_id: token.card.id,
       card_brand: token.card.brand,
@@ -144,13 +149,12 @@
     try {
       const response = await props.createService(payload)
       emit('onSuccess', response)
-      showToast('success', response.feedback)
+      showToast('Success', response.feedback)
       showGoBack.value = props.showBarGoBack
       if (showGoBack.value) {
         blockViewRedirection.value = true
         return
       }
-      formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
       emit('onError', error)
@@ -282,12 +286,4 @@
     width: 100%;
   }
 
-  .card-errors {
-    color: red;
-    margin-top: 10px;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
 </style>

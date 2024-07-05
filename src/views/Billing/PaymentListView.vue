@@ -51,6 +51,10 @@
   const toast = useToast()
 
   const props = defineProps({
+    createPaymentMethodService: {
+      type: Function,
+      required: true,
+    },
     listPaymentService: {
       type: Function,
       required: true

@@ -43,7 +43,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your credit card has been added',
+        feedback: 'Your Credit Card has been added',
         token: httpResponse.body.token
       }
     case 400:

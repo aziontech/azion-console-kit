@@ -15,7 +15,7 @@
   const activeTab = ref(0)
 
   const props = defineProps({
-    paymentServices: { type: Object, required: true }
+    paymentServices: { type: Object, required: true },
   })
 
   const TABS_MAP = {
