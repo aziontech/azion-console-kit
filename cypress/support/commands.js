@@ -240,7 +240,7 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
     .should('have.text', entityName)
 
   cy.get('body').then(($body) => {
-    if ($body.find(selectors.list.actionsMenu.button).length > 0) {
+    if ($body.find(selectors.list.actionsMenu.button).length) {
       deleteEntityFromMultipleActionColumn()
     } else {
       deleteEntityFromSingleActionColumn()
@@ -253,7 +253,7 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
  */
 const deleteEntityFromLoadedList = () => {
   cy.get('body').then(($body) => {
-    if ($body.find(selectors.list.actionsMenu.button).length > 0) {
+    if ($body.find(selectors.list.actionsMenu.button).length) {
       deleteEntityFromMultipleActionColumn()
     } else {
       deleteEntityFromSingleActionColumn()
