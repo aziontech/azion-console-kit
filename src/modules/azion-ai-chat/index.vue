@@ -43,7 +43,7 @@
     >
       <template #header>
         <div class="flex items-center justify-between">
-          <h2>
+          <h2 class="flex items-center gap-2">
             Azion AI
 
             <PrimeTag
