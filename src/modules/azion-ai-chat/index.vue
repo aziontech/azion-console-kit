@@ -43,7 +43,18 @@
     >
       <template #header>
         <div class="flex items-center justify-between">
-          <h2>Azion AI</h2>
+          <h2>
+            Azion AI
+
+            <PrimeTag
+              class="ml-2"
+              value="Experimental"
+              v-tooltip.bottom="
+                'Azion AI is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
+              "
+              severity="info"
+            />
+          </h2>
           <div class="gap-4 flex">
             <PrimeButton
               icon="pi pi-pen-to-square"
@@ -75,6 +86,7 @@
 </template>
 
 <script setup>
+  import PrimeTag from 'primevue/tag'
   import Sidebar from 'primevue/sidebar'
   import PrimeButton from 'primevue/button'
   import AzionAiChatHeader from './azion-ai-chat-header-block.vue'
