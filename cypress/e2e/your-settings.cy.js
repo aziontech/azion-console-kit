@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 describe('Your Settings spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Your Settings')
+    cy.openProduct('Your Settings')
   })
 
   it('should edit user phone number', () => {

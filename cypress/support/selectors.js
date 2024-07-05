@@ -18,6 +18,9 @@ const selectors = {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
       deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
     },
+    singleActionsMenu: {
+      button: '[data-testid="data-table-actions-column-body-action-button"]'
+    },
     deleteDialog: {
       confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
       deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
@@ -237,22 +240,91 @@ const selectors = {
     sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
     templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
     editorBody: '.view-lines',
-    connectorDropdown: '[data-testid="data-stream-form__destination__connector-field__dropdown"]',
+    connectorDropdown:
+      '[data-testid="data-stream-form__destination__connector-field__dropdown"] > .p-dropdown-trigger',
+    connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,
     httpConnector: {
       urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
-      headersInput: '[data-testid="data-stream-form__destination__headers-field-input"]',
+      headersInput: '[data-testid="data-stream-form__destination__headers-field__input"]',
       payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
       separatorInput:
         '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
       maxSizeInput:
         '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
     },
+    kafkaConnector: {
+      serverTextarea:
+        '[data-testid="data-stream-form__destination__bootstrap-servers-field__textarea"]',
+      topicInput: '[data-testid="data-stream-form__destination__kafka-topic-field__input"]',
+      useTlsSlider:
+        '[data-testid="data-stream-form__destination__use-tls-field"] > .p-inputswitch-slider'
+    },
+    s3Connector: {
+      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
+      bucketInput: '[data-testid="data-stream-form__destination__bucket-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__region-field__input"]',
+      accessKeyInput: '[data-testid="data-stream-form__destination__access-key-field__input"]',
+      secretKeyInput: '[data-testid="data-stream-form__destination__secret-key-field__input"]',
+      objectKeyPrefixInput:
+        '[data-testid="data-stream-form__destination__object-key-prefix-field__input"]'
+    },
+    bigQueryConnector: {
+      projectIdInput: '[data-testid="data-stream-form__destination__project-id-field__input"]',
+      datasetIdInput: '[data-testid="data-stream-form__destination__dataset-id-field__input"]',
+      tableIdInput: '[data-testid="data-stream-form__destination__table-id-field__input"]',
+      serviceAccountKeyInput:
+        '[data-testid="data-stream-form__destination__service-account-key-field__input"]'
+    },
+    elasticsearchConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__elasticsearch-url-field__input"]',
+      apiKeyTextarea: '[data-testid="data-stream-form__destination__api-key-field__textarea"]'
+    },
+    splunkConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__splunk-url-field__input"]',
+      apiKeyTextarea:
+        '[data-testid="data-stream-form__destination__splunk-api-key-field__textarea"]'
+    },
+    awsKinesisConnector: {
+      streamNameInput:
+        '[data-testid="data-stream-form__destination__kinesis-stream-name-field__input"]',
+      regionInput: '[data-testid="data-stream-form__destination__kinesis-region-field__input"]',
+      accessKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-access-key-field__input"]',
+      secretKeyInput:
+        '[data-testid="data-stream-form__destination__kinesis-secret-key-field__input"]'
+    },
+    datadogConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__datadog-url-field__input"]',
+      apiKeyTextarea:
+        '[data-testid="data-stream-form__destination__datadog-api-key-field__textarea"]'
+    },
+    ibmQRadarConnector: {
+      urlInput: '[data-testid="data-stream-form__destination__qradar-url-field__input"]'
+    },
+    azureMonitorConnector: {
+      logTypeInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-log-type-field__input"]',
+      sharedKeyInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"]',
+      timeGeneratedFieldInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-generated-field__input"]',
+      workspaceIdInput:
+        '[data-testid="data-stream-form__destination__azure-monitor-workspace-id-field__input"]'
+    },
+    azureBlobStorageConnector: {
+      storageAccountInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field__input"]',
+      containerNameInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-container-name-field__input"]',
+      blobSasTokenInput:
+        '[data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field__input"]'
+    },
     statusSlider: '[data-testid="data-stream-form__section__status"] input',
     list: {
       columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
     }
   },
-  edgeDns:{
+  edgeDns: {
     createButton: '[data-testid="create_Zone_button"] > .p-button-label',
     nameInput: '[data-testid="edge-dns-form__name__input"]',
     domainInput: '[data-testid="edge-dns-form__domain__input"]',
@@ -263,6 +335,43 @@ const selectors = {
     showMore: '.underline',
     domainRow: '.whitespace-pre',
     statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    list: {
+      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+    },
+    records: {
+      tab: '[data-testid="edge-dns-edit-view__records__tab-panel"] > a',
+      createButton: '[data-testid="create_Record_button"]',
+      nameInput: '[data-testid="edge-dns-records-form__settings__name-field__input"]',
+      recordTypeDropdown:
+        '[data-testid="edge-dns-records-form__settings__record-type-field__dropdown"] > .p-dropdown-trigger',
+      recordTypeOption: (recordType) => `#selectedRecordType_${recordType}`,
+      ttlInput: '[data-testid="edge-dns-records-form__settings__ttl-field__input"]',
+      valueTextarea: '[data-testid="edge-dns-records-form__settings__value-field__textarea"]',
+      policyTypeDropdown:
+        '[data-testid="edge-dns-records-form__policy__policy-type-field__dropdown"] > .p-dropdown-trigger',
+      policyTypeOption: (policyType) => `#selectedPolicy_${policyType}`,
+      weightInput: '[data-testid="edge-dns-records-form__policy__weight-field__input"]',
+      descriptionTextarea:
+        '[data-testid="edge-dns-records-form__policy__description-field__textarea"]'
+    }
+  },
+  domains: {
+    createButton: '[data-testid="create_Domain_button"]',
+    nameInput: '[data-testid="domains-form__name-field__input"]',
+    edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
+    dropdownFilter: '.p-dropdown-filter',
+    edgeApplicationOption: '#edgeApplication_0',
+    cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
+    dialogTitle: '.p-dialog-header > .p-dialog-title',
+    domainField: '[data-testid="domains-dialog__domain-field__input"]',
+    copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
+    confirmButton: '[data-testid="domains-dialog__confirm__button"]',
+    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
+    actionDelete: '.p-menuitem-content > .p-menuitem-link'
+  },
+  purge: {
+    createButton: '[data-testid="create_Purge_button"]',
+    argumentsField: '[data-testid="purge__arguments-field__textarea"]'
   }
 }
 

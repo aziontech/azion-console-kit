@@ -1,5 +1,9 @@
 <template>
-  <div class="max-w-full">
+  <div
+    class="max-w-full"
+    :class="{ 'mt-4': isTabs }"
+    data-testid="data-table-container"
+  >
     <DataTable
       class="overflow-clip rounded-md"
       v-if="!isLoading"
@@ -16,19 +20,29 @@
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       :loading="isLoading"
+      data-testid="data-table"
     >
       <template #header>
-        <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="flex flex-row p-input-icon-left items-center max-sm:w-full">
+        <div
+          class="flex flex-wrap justify-between gap-2 w-full"
+          data-testid="data-table-header"
+        >
+          <span
+            class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+            data-testid="data-table-search"
+          >
             <i class="pi pi-search" />
             <InputText
               class="h-8 w-full md:min-w-[320px]"
               v-model.trim="filters.global.value"
-              :data-testid="`search_input`"
+              data-testid="data-table-search-input"
               placeholder="Search"
             />
           </span>
-          <slot name="addButton">
+          <slot
+            name="addButton"
+            data-testid="data-table-add-button"
+          >
             <PrimeButton
               class="max-sm:w-full"
               @click="navigateToAddPage"
@@ -40,13 +54,12 @@
           </slot>
         </div>
       </template>
-
       <Column
         v-if="reorderableRows"
         rowReorder
         headerStyle="width: 3rem"
+        data-testid="data-table-reorder-column"
       />
-
       <Column
         sortable
         v-for="col of selectedColumns"
@@ -54,6 +67,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
@@ -70,20 +84,24 @@
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
         headerStyle="width: 13rem"
+        data-testid="data-table-actions-column"
       >
         <template #header>
-          <div class="flex justify-end w-full">
+          <div
+            class="flex justify-end w-full"
+            data-testid="data-table-actions-column-header"
+          >
             <PrimeButton
               outlined
               icon="ai ai-column"
               class="table-button"
               @click="toggleColumnSelector"
               v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              data-testid="data-table-actions-column-header-toggle-columns"
             >
             </PrimeButton>
             <OverlayPanel
@@ -91,6 +109,7 @@
               :pt="{
                 content: { class: 'p-0' }
               }"
+              data-testid="data-table-actions-column-header-toggle-columns-panel"
             >
               <Listbox
                 v-model="selectedColumns"
@@ -100,6 +119,7 @@
                 optionLabel="header"
                 optionGroupLabel="label"
                 optionGroupChildren="items"
+                data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
               >
                 <template #optiongroup="slotProps">
                   <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
@@ -112,24 +132,28 @@
           <div
             class="flex justify-end"
             v-if="!isRenderActions"
+            data-testid="data-table-actions-column-body-action"
           >
             <PrimeButton
               size="small"
               :icon="getActionIcon"
               outlined
-              @click="executeCommand(rowData.id)"
+              @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
+              data-testid="data-table-actions-column-body-action-button"
             />
           </div>
           <div
             class="flex justify-end"
             v-if="isRenderActions"
+            data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
               :ref="(document) => setMenuRefForRow(rowData.id, document)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
+              data-testid="data-table-actions-column-body-actions-menu"
             />
             <PrimeButton
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
@@ -138,34 +162,48 @@
               outlined
               @click="(event) => toggleActionsMenu(event, rowData.id)"
               class="cursor-pointer table-button"
+              data-testid="data-table-actions-column-body-actions-menu-button"
             />
           </div>
         </template>
       </Column>
       <template #empty>
-        <slot name="noRecordsFound">
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+        <slot
+          name="noRecordsFound"
+          data-testid="data-table-empty-content"
+        >
+          <div
+            class="my-4 flex flex-col gap-3 justify-center items-start"
+            data-testid="list-table-block__empty-message"
+          >
             <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
         </slot>
       </template>
     </DataTable>
-
     <DataTable
       v-else
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
       }"
+      data-testid="data-table-skeleton"
     >
       <template #header>
-        <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="flex flex-row h-8 p-input-icon-left max-sm:w-full">
+        <div
+          class="flex flex-wrap justify-between gap-2 w-full"
+          data-testid="data-table-skeleton-header"
+        >
+          <span
+            class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
+            data-testid="data-table-skeleton-search"
+          >
             <i class="pi pi-search" />
             <InputText
               class="w-full h-8 md:min-w-[320px]"
               v-model="filters.global.value"
               placeholder="Search"
+              data-testid="data-table-skeleton-search-input"
             />
           </span>
           <PrimeButton
@@ -174,6 +212,7 @@
             icon="pi pi-plus"
             :label="addButtonLabel"
             v-if="addButtonLabel"
+            data-testid="data-table-skeleton-add-button"
           />
         </div>
       </template>
@@ -183,6 +222,7 @@
         :key="col.field"
         :field="col.field"
         :header="col.header"
+        data-testid="data-table-skeleton-column"
       >
         <template #body>
           <Skeleton />
@@ -207,9 +247,7 @@
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog-new.vue'
   import { useDialog } from 'primevue/usedialog'
-
   defineOptions({ name: 'list-table-block-new' })
-
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
@@ -253,11 +291,12 @@
     actions: {
       type: Array,
       default: () => []
+    },
+    isTabs: {
+      type: Boolean
     }
   })
-
   const MINIMUM_OF_ITEMS_PER_PAGE = 10
-
   const selectedId = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -285,7 +324,6 @@
       summary: severity,
       detail
     }
-
     toast.add(options)
   }
 
@@ -314,7 +352,8 @@
               const bodyDelete = {
                 data: {
                   title: action.title,
-                  selectedID: selectedId.value,
+                  selectedID: rowData.id,
+                  selectedItemData: rowData,
                   deleteDialogVisible: true,
                   deleteService: action.service,
                   rerender: Math.random()
@@ -330,18 +369,14 @@
         }
       }
     }
-
     const actions = props.actions
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
-
     return actions
   }
-
   const loadData = async ({ page }) => {
     try {
       isLoading.value = true
-
       const response = props.isGraphql
         ? await props.listService()
         : await props.listService({ page })
@@ -353,12 +388,10 @@
       isLoading.value = false
     }
   }
-
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
-
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -366,7 +399,6 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
-
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit')
     if (props.editInDrawer) {
@@ -375,46 +407,38 @@
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
-
   const executeCommand = (rowData) => {
     const { command } = actionOptions(rowData)[0]
     command()
   }
-
   const updatedTable = () => {
     loadData({ page: 1 })
   }
-
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
   }
-
   const setMenuRefForRow = (rowDataID, document) => {
     const tableRef = (menuRef.value[rowDataID] = document)
     return tableRef
   }
-
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
-
     return [...filters, ...filtersPath]
   })
-
   const showPagination = computed(() => {
     return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
   })
-
   const isRenderActions = computed(() => {
     return props.actions && props.actions.length > 1
   })
-
   const getActionIcon = computed(() => {
     return props.actions[0].icon
   })
-
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
 </script>
+
+NEW

@@ -1,11 +1,12 @@
 <template>
   <ListTable
     v-if="hasContentToList"
+    :enableEditClick="false"
+    isTabs
     :columns="paymentsColumns"
-    :listService="props.listPaymentService"
-    :deleteService="props.deletePaymentService"
+    :listService="props.listPaymentMethodsService"
     @on-load-data="handleLoadData"
-    :rowActions="actionsRow"
+    :actions="actionsRow"
     emptyListMessage="No payment method found."
   >
     <template #addButton>
@@ -13,9 +14,11 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Add Credit"
+          outlined
         />
         <PrimeButton
           icon="pi pi-plus"
+          severity="secondary"
           label="Add Payment Method"
         />
       </div>
@@ -27,7 +30,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     :inTabs="true"
-    :documentationService="props.documentPaymentService"
+    :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
       <Illustration />
@@ -39,7 +42,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTable from '@templates/list-table-block'
+  import ListTable from '@templates/list-table-block/action-column'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 
@@ -49,7 +52,7 @@
   const toast = useToast()
 
   const props = defineProps({
-    listPaymentService: {
+    listPaymentMethodsService: {
       type: Function,
       required: true
     },
@@ -61,7 +64,7 @@
       type: Function,
       required: true
     },
-    documentPaymentService: {
+    documentPaymentMethodService: {
       type: Function,
       required: true
     }
@@ -71,19 +74,21 @@
     {
       field: 'cardData',
       header: 'Card Number',
-      filterPath: 'cardData.value',
+      filterPath: 'cardNumberSearch',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'credit-card-column' })
     },
     {
       field: 'cardHolder',
-      header: 'Card Holder'
+      header: 'Card Holder',
+      sortField: 'cardHolder'
     },
     {
       field: 'cardExpiration',
       header: 'Expires in',
-      filterPath: 'cardExpiration.value',
+      sortField: 'expiringDateByOrder',
+      filterPath: 'expiringDateSearch',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'credit-expiration-column' })
@@ -118,10 +123,17 @@
   const actionsRow = ref([
     {
       label: 'Set as default',
+      type: 'action',
       icon: 'pi pi-fw pi-check-circle',
-      command: async (item) => {
+      commandAction: async (item) => {
         await setPaymentAsDefault(item)
       }
+    },
+    {
+      label: 'Delete',
+      type: 'delete',
+      title: 'Payment Method',
+      service: props.deletePaymentService
     }
   ])
 </script>

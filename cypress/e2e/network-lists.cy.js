@@ -6,7 +6,7 @@ const networkListName = generateUniqueName('NetworkList')
 describe('Network Lists spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('network-lists')
+    cy.openProduct('Network Lists')
   })
 
   it('Create a ASN Network List', function() {
@@ -35,6 +35,6 @@ describe('Network Lists spec', () => {
   })
   afterEach(() => {
     // Delete the network list
-    cy.deleteProduct(networkListName, '/network-lists')
+    cy.deleteProduct({ entityName: networkListName, productName: 'Network Lists' })
   })
 })

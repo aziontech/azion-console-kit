@@ -7,7 +7,7 @@ describe('Functions spec', () => {
   beforeEach(() => {
     cy.login()
     functionName = generateUniqueName('Function')
-    cy.openProductThroughSidebar('edge-functions')
+    cy.openProduct('Edge Functions')
   })
   it('Create a function', function() {
     // Act
@@ -26,6 +26,6 @@ describe('Functions spec', () => {
     cy.get(selectors.functions.initiatorTypeRow).should('have.text', 'edge_application')
   })
   afterEach(() => {
-    cy.deleteProduct(functionName, '/edge-functions')
+    cy.deleteProduct({ entityName: functionName, productName: 'Edge Functions' })
   })
 })

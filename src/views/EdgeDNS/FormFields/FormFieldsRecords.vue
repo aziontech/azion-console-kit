@@ -114,6 +114,7 @@
     :isDrawer="true"
     title="Settings"
     description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain. The accepted value's format varies according to the chosen record type."
+    data-testid="edge-dns-records-form__section__settings"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -121,6 +122,7 @@
           for="name"
           label="Name"
           isRequired
+          data-testid="edge-dns-records-form__settings__name-field__label"
         />
         <div class="p-inputgroup">
           <InputText
@@ -130,14 +132,24 @@
             id="name"
             type="text"
             :class="{ 'p-invalid': errorName }"
+            data-testid="edge-dns-records-form__settings__name-field__input"
           />
-          <span class="p-inputgroup-addon"> .{{ edgeDNSStore.domain }} </span>
+          <span
+            class="p-inputgroup-addon"
+            data-testid="edge-dns-records-form__settings__name-field__suffix"
+          >
+            .{{ edgeDNSStore.domain }}
+          </span>
         </div>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Use @ to create a record for the root domain.
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="edge-dns-records-form__settings__name-field__description"
+        >
+          > Use @ to create a record for the root domain.
         </small>
         <small
           v-if="errorName"
+          data-testid="edge-dns-records-form__settings__name-field__error-message"
           class="p-error text-xs font-normal leading-tight"
         >
           {{ errorName }}
@@ -156,6 +168,7 @@
             optionValue="value"
             :value="selectedRecordType"
             placeholder="Select a Record Type"
+            data-testid="edge-dns-records-form__settings__record-type-field"
           >
             <template #description>
               <PrimeButton
@@ -163,6 +176,7 @@
                 link
                 class="text-xs p-0 leading-5 text-start"
                 @click="documentationGuideProducts.edgeDnsRecordTypes"
+                data-testid="edge-dns-records-form__settings__record-type-field__read-more-btn"
               />
             </template>
           </FieldDropdown>
@@ -180,6 +194,7 @@
             showButtons
             :disabled="!enableTTLField"
             :step="1"
+            data-testid="edge-dns-records-form__settings__ttl-field"
           />
         </div>
       </div>
@@ -191,6 +206,7 @@
           name="value"
           :placeholder="selectedRecordTypeInfo?.valuePlaceholder"
           :description="selectedRecordTypeInfo?.valueTip"
+          data-testid="edge-dns-records-form__settings__value-field"
         />
       </div>
     </template>
@@ -199,6 +215,7 @@
     :isDrawer="true"
     title="Policy"
     description="Choose the policy type to specify how Edge DNS should deal with requests answered by this record."
+    data-testid="edge-dns-records-form__section__policy"
   >
     <template #inputs>
       <div class="flex gap-6 flex-wrap">
@@ -213,6 +230,7 @@
             optionValue="value"
             :value="selectedPolicy"
             placeholder="Select a Record Type"
+            data-testid="edge-dns-records-form__policy__policy-type-field"
           >
             <template #description>
               Choose <code>Simple</code> to use the standard DNS functionality or
@@ -235,6 +253,7 @@
             :min="0"
             :max="255"
             :step="1"
+            data-testid="edge-dns-records-form__policy__weight-field"
           />
         </div>
       </div>
@@ -249,6 +268,7 @@
           name="description"
           placeholder="add the description"
           description="Differentiate records with the same Name and Type by adding a description that identifies each one. Accepts up to 45 characters."
+          data-testid="edge-dns-records-form__policy__description-field"
         />
       </div>
     </template>

@@ -6,7 +6,7 @@ const digitalCertificateName = generateUniqueName('CertificateName')
 describe('Digital Certificates spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('digital-certificates')
+    cy.openProduct('Digital Certificates')
   })
 
   it('should create and delete a new digital certificate', function () {
@@ -33,6 +33,6 @@ describe('Digital Certificates spec', () => {
 
   afterEach(() => {
     // Delete the digital certificate
-    cy.deleteProduct(digitalCertificateName, '/digital-certificates')
+    cy.deleteProduct({ entityName: digitalCertificateName, productName: 'Digital Certificates' })
   })
 })

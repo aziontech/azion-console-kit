@@ -6,7 +6,7 @@ const edgeServiceName = generateUniqueName('EdgeService')
 describe('template spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.openProductThroughSidebar('edge-services')
+    cy.openProduct('Edge Services')
   })
 
   it('should create and delete an edge service', () => {
