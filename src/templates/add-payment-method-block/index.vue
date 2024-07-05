@@ -6,7 +6,9 @@
   import Sidebar from 'primevue/sidebar'
   import { useAccountStore } from '@/stores/account'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import LabelBlock from '@/templates/label-block'
   defineOptions({
     name: 'add-payment-method-block'
   })
@@ -134,7 +136,6 @@
       name: cardholderName.value
     })
     const accountData = accountStore.account
-    console.log(accountData)
     const payload = {
       card_address_zip: accountData.postal_code,
       card_country: accountData.country,
@@ -151,10 +152,6 @@
       emit('onSuccess', response)
       showToast('Success', response.feedback)
       showGoBack.value = props.showBarGoBack
-      if (showGoBack.value) {
-        blockViewRedirection.value = true
-        return
-      }
       toggleDrawerVisibility(false)
     } catch (error) {
       emit('onError', error)
@@ -199,11 +196,10 @@
             >
               <div class="flex flex-wrap gap-6">
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
-                  <label
-                    for="cardholder-name"
-                    class="text-white"
-                    >Card Holder Name</label
-                  >
+                  <LabelBlock
+                    label="Card Holder Name"
+                    isRequired="true"
+                  />
                   <input
                     id="cardholder-name"
                     v-model="cardholderName"
@@ -212,11 +208,10 @@
                   />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
-                  <label
-                    for="card-number-element"
-                    class="text-white"
-                    >Card Number</label
-                  >
+                  <LabelBlock
+                    label="Card Number"
+                    isRequired="true"
+                  />
                   <div
                     id="card-number-element"
                     class="stripe-input"
@@ -225,27 +220,31 @@
               </div>
               <div class="flex flex-wrap gap-6">
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
-                  <label
-                    for="card-expiry-element"
-                    class="text-white"
-                    >Expiration Date</label
-                  >
+                  <LabelBlock
+                    label="Expiration Date"
+                    isRequired="true"
+                  />
                   <div
                     id="card-expiry-element"
                     class="stripe-input"
                   ></div>
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
-                  <label
-                    for="card-cvc-element"
-                    class="text-white"
-                    >Security Code (CVC)</label
-                  >
+                  <LabelBlock
+                    label="Security Code (CVC)"
+                    isRequired="true"
+                  />
                   <div
                     id="card-cvc-element"
                     class="stripe-input"
                   ></div>
                 </div>
+              </div>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <InlineMessage severity="info"
+                  >This is a sensitive data is handled by a PCI Compliant payment
+                  partner.</InlineMessage
+                >
               </div>
               <div
                 id="card-errors"
@@ -276,6 +275,7 @@
 <style scoped>
   /* Estilos para os elementos Stripe */
   .stripe-input {
+    height: 45px;
     border: 1px solid #666;
     padding: 12px;
     border-radius: 4px;
@@ -285,5 +285,4 @@
     font-size: 16px;
     width: 100%;
   }
-
 </style>

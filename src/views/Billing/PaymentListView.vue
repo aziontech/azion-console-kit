@@ -1,4 +1,9 @@
 <template>
+  <CreatePaymentMethodBlock
+    :createService="props.createPaymentMethodService"
+    v-if="showCreatePaymentMethodDrawer"
+    v-model:visible="showCreatePaymentMethodDrawer"
+  />
   <ListTable
     v-if="hasContentToList"
     :columns="paymentsColumns"
@@ -18,6 +23,7 @@
         <PrimeButton
           icon="pi pi-plus"
           severity="secondary"
+          @click="openDrawerCreatePaymentMethod"
           label="Add Payment Method"
         />
       </div>
@@ -41,11 +47,12 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import CreatePaymentMethodBlock from '@templates/add-payment-method-block'
   import ListTable from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 
-  import { ref } from 'vue'
+  import { ref} from 'vue'
 
   const hasContentToList = ref(true)
   const toast = useToast()
@@ -53,7 +60,7 @@
   const props = defineProps({
     createPaymentMethodService: {
       type: Function,
-      required: true,
+      required: true
     },
     listPaymentService: {
       type: Function,
@@ -73,6 +80,7 @@
     }
   })
 
+  const showCreatePaymentMethodDrawer = ref(false)
   const paymentsColumns = ref([
     {
       field: 'cardData',
@@ -101,6 +109,11 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const openDrawerCreatePaymentMethod = () => {
+    showCreatePaymentMethodDrawer.value = true
+  }
+
 
   const showToast = (severity, detail) => {
     if (!detail) return

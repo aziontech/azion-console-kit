@@ -88,6 +88,7 @@
             v-if="isPaymentTabActive"
             :listPaymentService="props.paymentServices.listPaymentService"
             :deletePaymentService="props.paymentServices.deletePaymentService"
+            :createPaymentMethodService="props.paymentServices.createPaymentMethodService"
             :setAsDefaultPaymentService="props.paymentServices.setAsDefaultPaymentService"
             :documentPaymentService="props.paymentServices.documentPaymentService"
           ></ListView>

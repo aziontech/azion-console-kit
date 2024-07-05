@@ -15,7 +15,8 @@ export const billingRoutes = {
           listPaymentService: BillingServices.listPaymentService,
           deletePaymentService: BillingServices.deletePaymentService,
           setAsDefaultPaymentService: BillingServices.setAsDefaultPaymentService,
-          documentPaymentService: Helpers.documentationCatalog.paymentMethods
+          documentPaymentService: Helpers.documentationCatalog.paymentMethods,
+          createPaymentMethodService: BillingServices.createCreditCardService,
         }
       },
       meta: {
