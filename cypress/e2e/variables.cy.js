@@ -10,7 +10,7 @@ describe('Variables spec', () => {
     cy.openProduct('Variables')
   })
 
-  it('Create a variable', function() {
+  it('Create a variable', function () {
     // Act
     cy.get(selectors.variables.createButton).click()
     cy.get(selectors.variables.keyInput).type(variableKey)
@@ -23,8 +23,11 @@ describe('Variables spec', () => {
     cy.get(selectors.variables.searchInput).type(`${variableKey}`)
     cy.get(selectors.variables.keyRow).should('have.text', variableKey)
   })
+
   afterEach(() => {
     // Delete the variable
-    cy.deleteProduct({ entityName: variableKey, columnName: 'key', productName: 'Variables' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Variable successfully deleted')
+    })
   })
 })

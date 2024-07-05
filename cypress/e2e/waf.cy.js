@@ -9,7 +9,7 @@ describe('WAF spec', () => {
     cy.openProduct('WAF Rules')
   })
 
-  it('Create a WAF ', function() {
+  it('Create a WAF ', function () {
     // Act
     cy.get(selectors.wafs.createButton).click()
     cy.get(selectors.wafs.nameInput).clear('')
@@ -27,8 +27,11 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.nameRow).should('have.text', wafName)
     cy.get(selectors.wafs.threatTypesRow).should('have.text', 'File upload')
   })
+
   afterEach(() => {
     // Delete the waf
-    cy.deleteProduct({ entityName: wafName, productName: 'WAF Rules' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('WAF rule successfully deleted')
+    })
   })
 })

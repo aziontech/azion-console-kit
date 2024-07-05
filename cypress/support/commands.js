@@ -11,50 +11,16 @@ import 'cypress-real-events'
  * @param {string} password - The user's password.
  */
 const login = (email, password) => {
-  cy.visit('/login')
-  cy.get(selectors.login.emailInput).type(email)
-  cy.get(selectors.login.nextButton).click()
-  cy.get(selectors.login.passwordInput).type(password, { log: false })
-  cy.get(selectors.login.signInButton).click()
-}
+  cy.session(email, () => {
+    cy.visit('/login')
+    cy.get(selectors.login.emailInput).type(email)
+    cy.get(selectors.login.nextButton).click()
+    cy.get(selectors.login.passwordInput).type(password, { log: false })
+    cy.get(selectors.login.signInButton).click()
+    cy.location('pathname').should('eq', '/')
+  })
 
-/**
- * Deletes a product based on its name and optional column name.
- *
- * @param {string} entityName - The entityname to delete.
- * @param {string} columnName - The name of the column containing the product name.
- * @param {string} productName - The name of product to access.
- */
-const deleteProduct = (entityName, productName, columnName) => {
-  cy.openProduct(productName)
-  cy.get(selectors.list.searchInput).clear()
-  cy.get(selectors.list.searchInput).type(entityName)
-  cy.get(selectors.list.filteredRow.nameColumn(columnName))
-    .should('be.visible')
-    .should('have.text', entityName)
-  cy.get(selectors.list.actionsMenu.button).click()
-  cy.get(selectors.list.actionsMenu.deleteButton).click()
-  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
-  cy.get(selectors.list.deleteDialog.deleteButton).click()
-}
-
-/**
- * Deletes a product based on its name and optional column name for lists that have only one action button.
- *
- * @param {string} entityName - The entityname to delete.
- * @param {string} columnName - The name of the column containing the product name.
- * @param {string} productName - The name of product to access.
- */
-const deleteProductSingleActionColumn = (entityName, productName, columnName) => {
-  cy.openProduct(productName)
-  cy.get(selectors.list.searchInput).clear()
-  cy.get(selectors.list.searchInput).type(entityName)
-  cy.get(selectors.list.filteredRow.nameColumn(columnName))
-    .should('be.visible')
-    .should('have.text', entityName)
-  cy.get(selectors.list.singleActionsMenu.button).click()
-  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
-  cy.get(selectors.list.deleteDialog.deleteButton).click()
+  cy.visit('/')
 }
 
 // Disable test failure for all uncaught exceptions
@@ -131,32 +97,6 @@ Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
   cy.get(selectors.menuAccount.avatarIcon).click()
   cy.get(selectors.menuAccount.menuItem(menuAccountLabel)).click()
 })
-
-/**
- * Deletes a product using the provided name, optional column name, and path.
- *
- * @param {string} productName - The name of the product to delete.
- * @param {string} path - The URL path where the product list is located.
- * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
- */
-Cypress.Commands.add('deleteProduct', ({ entityName, productName, columnName = 'name' } = {}) => {
-  deleteProduct(entityName, productName, columnName)
-})
-
-/**
- * Deletes a product using the provided name, optional column name, and path.
- * Use this for lists with only one action button.
- *
- * @param {string} productName - The name of the product to delete.
- * @param {string} path - The URL path where the product list is located.
- * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
- */
-Cypress.Commands.add(
-  'deleteProductSingleActionColumn',
-  ({ entityName, productName, columnName = 'name' } = {}) => {
-    deleteProductSingleActionColumn(entityName, productName, columnName)
-  }
-)
 
 /**
  * Verifies the visibility and content of a toast message.
@@ -290,11 +230,70 @@ Cypress.Commands.overwrite('visit', (original, ...args) => {
 })
 
 /**
- * Deletes an entity from the loaded list.
- **/
-Cypress.Commands.add('deleteEntityFromList', () => {
+ * Deletes a product based on its name and optional column name.
+ *
+ * @param {string} entityName - The entityname to delete.
+ * @param {string} columnName - The name of the column containing the product name.
+ * @param {string} productName - The name of product to access.
+ */
+const deleteEntityFromList = (entityName, productName, columnName) => {
+  cy.openProduct(productName)
+  cy.get(selectors.list.searchInput).clear()
+  cy.get(selectors.list.searchInput).type(entityName)
+  cy.get(selectors.list.filteredRow.nameColumn(columnName))
+    .should('be.visible')
+    .should('have.text', entityName)
+
+  cy.get('body').then(($body) => {
+    if ($body.find(selectors.list.actionsMenu.button).length) {
+      deleteEntityFromMultipleActionColumn()
+    } else {
+      deleteEntityFromSingleActionColumn()
+    }
+  })
+}
+
+/**
+ * Deletes an entity from the loaded list. Used to avoid cy.visit an already loaded list.
+ */
+const deleteEntityFromLoadedList = () => {
+  cy.get('body').then(($body) => {
+    if ($body.find(selectors.list.actionsMenu.button).length) {
+      deleteEntityFromMultipleActionColumn()
+    } else {
+      deleteEntityFromSingleActionColumn()
+    }
+  })
+}
+
+const deleteEntityFromSingleActionColumn = () => {
+  cy.get(selectors.list.singleActionsMenu.button).click()
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
+}
+
+const deleteEntityFromMultipleActionColumn = () => {
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
-  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
-  cy.get(selectors.list.deleteDialog.deleteButton).click()
+  cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
+}
+
+/**
+ * Deletes a product using the provided name, optional column name, and path.
+ *
+ * @param {string} productName - The name of the product to delete.
+ * @param {string} path - The URL path where the product list is located.
+ * @param {string} [columnName='name'] - The name of the column containing the product name (defaults to 'name').
+ */
+Cypress.Commands.add(
+  'deleteEntityFromList',
+  ({ entityName, productName, columnName = 'name' } = {}) => {
+    deleteEntityFromList(entityName, productName, columnName)
+  }
+)
+
+/**
+ * Deletes an entity from the loaded list.
+ **/
+Cypress.Commands.add('deleteEntityFromLoadedList', () => {
+  deleteEntityFromLoadedList()
 })
