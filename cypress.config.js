@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
 import codeCoverageTask from '@cypress/code-coverage/task'
-import fs from 'fs';
+import fs from 'fs'
 
 export default defineConfig({
   projectId: 'azion-console-kit',
@@ -14,12 +14,13 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       codeCoverageTask(on, config)
       on('after:spec', (spec, results) => {
-        if (results && results.video && results.stats.failures === 0) {
+        if (results?.video && results?.stats?.failures === 0) {
           fs.unlinkSync(results.video)
         }
       })
       return config
-    }
+    },
+    testIsolation: false
   },
   env: {
     // TODO: remove this WORKAROUND for https://github.com/cypress-io/cypress/issues/20647,
@@ -27,6 +28,6 @@ export default defineConfig({
     isCI: process.env.GITHUB_ACTIONS,
     CYPRESS_EMAIL: process.env.DEV_CYPRESS_EMAIL,
     CYPRESS_PASSWORD: process.env.DEV_CYPRESS_PASSWORD,
-    CYPRESS_USERNAME: process.env.DEV_CYPRESS_USERNAME,
+    CYPRESS_USERNAME: process.env.DEV_CYPRESS_USERNAME
   }
 })
