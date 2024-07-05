@@ -95,6 +95,7 @@
         field: 'status',
         header: 'Status',
         filterPath: 'status.content',
+        sortField: 'status.content',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({

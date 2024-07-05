@@ -3,7 +3,7 @@ import { makePaymentBaseUrl } from './make-payment-base-url'
 import { formatDateMonthAndYear } from '@/helpers/convert-date'
 import { getExpiredDate } from '@/helpers/payment-method'
 
-export const listPaymentService = async () => {
+export const listPaymentMethodsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePaymentBaseUrl()}/credit_cards?page_size=200`,
     method: 'GET'
@@ -34,7 +34,8 @@ const adapt = (httpResponse) => {
 
   const parseBilling = responseDataSorted.map((card) => {
     const cardDate = formatDateMonthAndYear(card.card_expiration_month, card.card_expiration_year)
-
+    const statusCard = card.is_default ? 'Default' : ''
+    const typeCard = card.card_brand?.toLowerCase()
     return {
       id: card.id,
       cardHolder: card.card_holder,
@@ -43,9 +44,10 @@ const adapt = (httpResponse) => {
         status: getExpiredDate(card.card_expiration_month, card.card_expiration_year)
       },
       cardData: {
-        cardNumber: card.card_last_4_digits,
-        cardBrand: card.card_brand.toLowerCase(),
-        status: card.is_default ? 'Default' : ''
+        cardNumber: `Ending in ${card.card_last_4_digits}`,
+        cardBrand: typeCard,
+        status: statusCard,
+        value: `${typeCard} ${card.card_last_4_digits} ${statusCard}`
       },
       expiringDateByOrder: convertStringToDate(cardDate),
       expiringDateSearch: cardDate,
