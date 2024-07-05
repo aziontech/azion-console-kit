@@ -32,16 +32,6 @@
 
   const toast = useToast()
   const showGoBack = ref(false)
-  const appearance = {
-    rules: {
-      '.Input': {
-        color: 'var(--text-color)',
-      },
-
-      // See all supported class names and selector syntax below
-    }
-  };
-
 
   onMounted(async () => {
     stripe.value = await stripePromise
@@ -50,7 +40,7 @@
     cardNumber.value = elements.value.create('cardNumber', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif",
+          fontFamily: "'Roboto', sans-serif"
         },
         '::placeholder': {
           color: '#ededed'
@@ -66,7 +56,7 @@
     cardExpiry.value = elements.value.create('cardExpiry', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif",
+          fontFamily: "'Roboto', sans-serif"
         },
         '::placeholder': {
           color: '#ededed'
@@ -75,13 +65,13 @@
           color: '#fa755a',
           iconColor: '#fa755a'
         }
-      },
+      }
     })
 
     cardCvc.value = elements.value.create('cardCvc', {
       style: {
         base: {
-          fontFamily: "'Roboto', sans-serif",
+          fontFamily: "'Roboto', sans-serif"
         },
         '::placeholder': {
           color: '#ededed'
@@ -90,7 +80,7 @@
           color: '#fa755a',
           iconColor: '#fa755a'
         }
-      },
+      }
     })
 
     cardNumber.value.mount('#card-number-element')
@@ -270,6 +260,7 @@
     </div>
   </Sidebar>
 </template>
+
 <style scoped>
   /* Estilos para os elementos Stripe */
   .stripe-input {
@@ -280,7 +271,8 @@
     outline-offset: 0;
     border-color: #f3652b;
   }
-  .stripe-input:enabled:focus, .stripe-input:focus-visible {
+  .stripe-input:enabled:focus,
+  .stripe-input:focus-visible {
     outline: 0 none;
     outline-offset: 0;
     box-shadow: 0 0 0 0.2rem rgba(243, 100, 43, 0.6235294118);
@@ -292,5 +284,4 @@
   .azion-dark .stripe-input {
     @apply bg-[var(--surface-300)];
   }
-
 </style>
