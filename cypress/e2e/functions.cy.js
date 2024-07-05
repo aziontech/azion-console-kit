@@ -9,7 +9,7 @@ describe('Functions spec', () => {
     functionName = generateUniqueName('Function')
     cy.openProduct('Edge Functions')
   })
-  it('Create a function', function() {
+  it('Create a function', function () {
     // Act
     cy.get(selectors.functions.createButton).click()
     cy.get(selectors.functions.nameInput).clear()
@@ -25,7 +25,10 @@ describe('Functions spec', () => {
     cy.get(selectors.functions.languageRow).should('have.text', 'JavaScript')
     cy.get(selectors.functions.initiatorTypeRow).should('have.text', 'edge_application')
   })
+
   afterEach(() => {
-    cy.deleteProduct({ entityName: functionName, productName: 'Edge Functions' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Edge function successfully deleted')
+    })
   })
 })

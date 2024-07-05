@@ -15,7 +15,7 @@
   import ExpandTextColumn from './expand-text-column.vue'
 
   export default {
-    name: 'avatar-with-text-column',
+    name: 'text-with-clipboard-column',
     components: {
       PrimeButton,
       ExpandTextColumn

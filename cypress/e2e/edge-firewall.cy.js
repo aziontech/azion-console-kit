@@ -24,13 +24,12 @@ describe('Edge Firewall spec', () => {
     cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
+  })
 
-    // Cleanup
-    cy.get(selectors.wafs.actionButton).click()
-    cy.get(selectors.wafs.deleteButton).click()
-    cy.get(selectors.wafs.deleteInput).clear()
-    cy.get(selectors.wafs.deleteInput).type('delete')
-    cy.get(selectors.wafs.confirmDeleteButton).click()
-    cy.verifyToast('Edge Firewall successfully deleted')
+  afterEach(() => {
+    // Delete the firewall
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Edge Firewall successfully deleted')
+    })
   })
 })

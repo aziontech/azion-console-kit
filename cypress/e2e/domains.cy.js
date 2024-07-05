@@ -9,7 +9,7 @@ describe('Domains spec', () => {
     cy.login()
   })
 
-  it('should create and delete a domain using a edge application', () => {
+  it('should create a domain using an edge application', () => {
     // Arrange
     domainName = generateUniqueName('domain')
     edgeAppName = generateUniqueName('edgeApp')
@@ -51,9 +51,9 @@ describe('Domains spec', () => {
 
   afterEach(() => {
     // Cleanup
-    cy.deleteProduct({ entityName: domainName, productName: 'Domains' }).then(() => {
+    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
       cy.verifyToast('Resource successfully deleted')
     })
-    cy.deleteProduct({ entityName: edgeAppName, productName: 'Edge Application' })
+    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })
