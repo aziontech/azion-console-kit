@@ -11,7 +11,6 @@
 </template>
 
 <script setup>
-  import { defineProps } from 'vue'
   import PrimeButton from 'primevue/button'
   defineOptions({ name: 'text-full-with-clipboard-column' })
 
