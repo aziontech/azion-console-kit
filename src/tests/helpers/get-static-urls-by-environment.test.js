@@ -28,20 +28,17 @@ const scenarios = [
   {
     section: 'billing',
     env: 'development',
-    expected:
-      'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
+    expected: 'https://stage-console.azion.com/billing/payment?paymentSession=true'
   },
   {
     section: 'billing',
     env: 'stage',
-    expected:
-      'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
+    expected: 'https://stage-console.azion.com/billing/payment?paymentSession=true'
   },
   {
     section: 'billing',
     env: 'production',
-    expected:
-      'https://manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
+    expected: 'https://console.azion.com/billing/payment?paymentSession=true'
   },
   {
     section: 'playground',
