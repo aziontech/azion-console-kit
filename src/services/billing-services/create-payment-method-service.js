@@ -2,7 +2,7 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentBaseUrl } from './make-payment-base-url'
 
-export const createCreditCardService = async (payload) => {  
+export const createPaymentMethodService = async (payload) => {  
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePaymentBaseUrl()}/credit_cards`,
     method: 'POST',

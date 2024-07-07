@@ -53,7 +53,7 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 
-  import { ref} from 'vue'
+  import { ref } from 'vue'
 
   const hasContentToList = ref(true)
   const toast = useToast()

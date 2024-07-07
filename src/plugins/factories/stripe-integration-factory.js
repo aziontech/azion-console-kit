@@ -1,4 +1,4 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js'
 
 const environment = {
   development: {
@@ -26,7 +26,7 @@ export function makeStripeClient(environment) {
   }
 
   const stripeToken = getStripeToken(environment)
-  const stripePromise = loadStripe(stripeToken);
+  const stripePromise = loadStripe(stripeToken)
 
   return stripePromise
 }

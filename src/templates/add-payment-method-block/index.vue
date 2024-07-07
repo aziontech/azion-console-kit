@@ -22,6 +22,7 @@
   const cardCvc = ref(null)
   const cardholderName = ref('')
 
+
   const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     createService: {
@@ -36,29 +37,12 @@
   onMounted(async () => {
     stripe.value = await stripePromise
     elements.value = stripe.value.elements()
-
-    cardNumber.value = elements.value.create('cardNumber', {
+    const theme = accountStore.currentTheme
+    const inputStyles = {
       style: {
         base: {
           fontFamily: "'Roboto', sans-serif",
-          color: '#ffffff'
-        },
-        '::placeholder': {
-          color: '#ededed'
-        },
-        invalid: {
-          color: '#fa755a',
-          iconColor: '#fa755a'
-        }
-      },
-      showIcon: true
-    })
-
-    cardExpiry.value = elements.value.create('cardExpiry', {
-      style: {
-        base: {
-          fontFamily: "'Roboto', sans-serif",
-          color: '#ffffff'
+          color: theme === 'dark' ? '#ffffff' : '#000000'
         },
         '::placeholder': {
           color: '#ededed'
@@ -68,23 +52,10 @@
           iconColor: '#fa755a'
         }
       }
-    })
-
-    cardCvc.value = elements.value.create('cardCvc', {
-      style: {
-        base: {
-          fontFamily: "'Roboto', sans-serif",
-          color: '#ffffff'
-        },
-        '::placeholder': {
-          color: '#ededed'
-        },
-        invalid: {
-          color: '#fa755a',
-          iconColor: '#fa755a'
-        }
-      }
-    })
+    }
+    cardNumber.value = elements.value.create('cardNumber', { ...inputStyles, showIcon: true })
+    cardExpiry.value = elements.value.create('cardExpiry', inputStyles)
+    cardCvc.value = elements.value.create('cardCvc', inputStyles)
 
     cardNumber.value.mount('#card-number-element')
     cardExpiry.value.mount('#card-expiry-element')
@@ -123,30 +94,37 @@
 
   const handleSubmit = async () => {
     isSubmitting.value = true
-    const { token } = await stripe.value.createToken(cardNumber.value, {
+
+    const { token, error:submitionErrors } = await stripe.value.createToken(cardNumber.value, {
       name: cardholderName.value
     })
-    const accountData = accountStore.account
-    const payload = {
-      card_address_zip: accountData.postal_code,
-      card_country: accountData.country,
-      stripe_token: token.id,
-      card_id: token.card.id,
-      card_brand: token.card.brand,
-      card_holder: token.card.name,
-      card_last_4_digits: token.card.last4,
-      card_expiration_month: token.card.exp_month,
-      card_expiration_year: token.card.exp_year
-    }
-    try {
-      const response = await props.createService(payload)
-      emit('onSuccess', response)
-      showToast('Success', response.feedback)
-      showGoBack.value = props.showBarGoBack
-      toggleDrawerVisibility(false)
-    } catch (error) {
-      emit('onError', error)
-      showToast('error', error)
+    if (submitionErrors !== undefined) {
+      showToast('error', submitionErrors.message)
+    } 
+    if (submitionErrors === undefined) {
+      const accountData = accountStore.account
+      const payload = {
+        card_address_zip: accountData.postal_code,
+        card_country: accountData.country,
+        stripe_token: token.id,
+        card_id: token.card.id,
+        card_brand: token.card.brand,
+        card_holder: token.card.name,
+        card_last_4_digits: token.card.last4,
+        card_expiration_month: token.card.exp_month,
+        card_expiration_year: token.card.exp_year
+      }
+      try {
+
+        const response = await props.createService(payload)
+        emit('onSuccess', response)
+        showToast('success', response.feedback)
+        showGoBack.value = props.showBarGoBack
+        toggleDrawerVisibility(false)
+      } catch (error) {
+        emit('onError', error)
+        showToast('error', error)
+      }
     }
     isSubmitting.value = false
   }
@@ -189,7 +167,7 @@
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
                     label="Card Holder Name"
-                    isRequired="true"
+                    :isRequired="true"
                   />
                   <input
                     id="cardholder-name"
@@ -201,7 +179,7 @@
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
                     label="Card Number"
-                    isRequired="true"
+                    :isRequired="true"
                   />
                   <div
                     id="card-number-element"
@@ -213,7 +191,7 @@
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
                     label="Expiration Date"
-                    isRequired="true"
+                    :isRequired="true"
                   />
                   <div
                     id="card-expiry-element"
@@ -223,7 +201,7 @@
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
                     label="Security Code (CVC)"
-                    isRequired="true"
+                    :isRequired="true"
                   />
                   <div
                     id="card-cvc-element"
@@ -237,11 +215,6 @@
                   partner.</InlineMessage
                 >
               </div>
-              <div
-                id="card-errors"
-                class="card-errors"
-                role="alert"
-              ></div>
             </form>
           </div>
         </template>
