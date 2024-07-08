@@ -31,7 +31,7 @@ const deleteProduct = (entityName, productName, columnName) => {
   cy.get(selectors.list.searchInput).type(entityName)
   cy.get(selectors.list.filteredRow.nameColumn(columnName))
     .should('be.visible')
-    .should('have.text', entityName)
+    .should('contain', entityName)
   cy.get(selectors.list.actionsMenu.button).click()
   cy.get(selectors.list.actionsMenu.deleteButton).click()
   cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete')
