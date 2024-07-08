@@ -161,7 +161,7 @@
   const behaviorsResponseOptions = ref([
     {
       label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`,
-      value: 'add_response_cookie',
+      value: 'set_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },

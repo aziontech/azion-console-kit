@@ -4,7 +4,7 @@
     v-if="showCreatePaymentMethodDrawer"
     v-model:visible="showCreatePaymentMethodDrawer"
   />
-  <ListTable
+  <ListTableBlock
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
@@ -29,7 +29,7 @@
         />
       </div>
     </template>
-  </ListTable>
+  </ListTableBlock>
   <EmptyResultsBlock
     v-else
     title="No payment method has been added"
@@ -49,7 +49,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CreatePaymentMethodBlock from '@templates/add-payment-method-block'
-  import ListTable from '@templates/list-table-block/action-column'
+  import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
 

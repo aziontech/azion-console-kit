@@ -3,7 +3,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
   import { computed, ref, watch } from 'vue'
@@ -179,36 +179,43 @@
   const removeReorderForRequestPhaseFirstItem = computed(
     () => selectedPhase.value === 'Response phase'
   )
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'rule',
+      icon: 'pi pi-trash',
+      service: deleteRulesEngineWithDecorator
+    }
+  ]
 </script>
 
 <template>
   <DrawerRulesEngine
     ref="drawerRulesEngineRef"
-    :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-    :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
-    :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
-    :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
-    :listOriginsService="props.listOriginsService"
-    :listCacheSettingsService="props.listCacheSettingsService"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createRulesEngineService="props.createRulesEngineService"
-    :editRulesEngineService="props.editRulesEngineService"
-    :loadRulesEngineService="props.loadRulesEngineService"
-    :documentationService="props.documentationService"
-    :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
-    :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+    :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
+    :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
+    :isImageOptimizationEnabled="isImageOptimizationEnabled"
+    :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
+    :listOriginsService="listOriginsService"
+    :listCacheSettingsService="listCacheSettingsService"
+    :edgeApplicationId="edgeApplicationId"
+    :createRulesEngineService="createRulesEngineService"
+    :editRulesEngineService="editRulesEngineService"
+    :loadRulesEngineService="loadRulesEngineService"
+    :documentationService="documentationService"
+    :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
+    :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
   <ListTableBlock
     ref="listRulesEngineRef"
-    pageTitleDelete="rule"
     :reorderableRows="true"
     :columns="getColumns"
     :onReorderService="reorderRulesEngineWithDecorator"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
-    :deleteService="deleteRulesEngineWithDecorator"
     @on-load-data="handleLoadData"
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
@@ -216,6 +223,8 @@
     emptyListMessage="No rules have been created."
     :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
     data-testid="rules-engine-list"
+    :actions="actions"
+    isTabs
   >
     <template #addButton>
       <div
@@ -242,7 +251,7 @@
         :title="titleEmptyState"
         :description="descriptionEmptyState"
         :createButtonLabel="selectedPhase"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
         :inTabs="true"
         :noBorder="true"
         data-testid="rules-engine-empty-results"

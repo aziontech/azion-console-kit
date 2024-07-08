@@ -48,6 +48,7 @@
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
+    isTabs
   >
     <template #header>
       <advancedFilter
@@ -114,7 +115,7 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
 
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import ListTableNoHeaderBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 
