@@ -20,7 +20,7 @@
         :isGraphql="true"
         :enableEditClick="false"
         emptyListMessage="No purge found."
-        :rowActions="actionsRow"
+        :actions="actionsRow"
       >
       </ListTableBlock>
       <EmptyResultsBlock

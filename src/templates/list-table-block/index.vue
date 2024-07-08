@@ -296,7 +296,7 @@
     },
     actions: {
       type: Array,
-      default: () => []
+      required: true
     },
     isTabs: {
       type: Boolean,
