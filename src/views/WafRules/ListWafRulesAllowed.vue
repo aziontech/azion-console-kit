@@ -164,7 +164,7 @@
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
     {
-      field: 'reason',
+      field: 'description',
       header: 'Description',
       type: 'component',
       component: (columnData) =>
