@@ -260,6 +260,7 @@
             filter
             appendTo="self"
             description="Account owner's country."
+            data-testid="account-settings__country"
           />
         </div>
       </div>
@@ -278,6 +279,7 @@
             appendTo="self"
             :disabled="hasNoCountryListOrNotSelected"
             description="Account owner's state or region."
+            data-testid="account-settings__region"
           />
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -294,6 +296,7 @@
             appendTo="self"
             :disabled="hasNoRegionListOrNotSelected"
             description="Account owner's city."
+            data-testid="account-settings__city"
           />
         </div>
       </div>
@@ -306,6 +309,7 @@
             placeholder="123 Example Ave."
             :value="address"
             description="Account owner's street address."
+            data-testid="account-settings__address"
           />
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -315,6 +319,7 @@
             placeholder="1st floor"
             :value="complement"
             description="Additional information for the address."
+            data-testid="account-settings__complement"
           />
         </div>
       </div>
@@ -330,6 +335,7 @@
           :isCard="false"
           input-class="w-full"
           :options="switchOptions"
+          data-testid="account-settings__login-settings"
         />
       </div>
     </template>
