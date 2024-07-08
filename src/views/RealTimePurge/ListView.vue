@@ -37,12 +37,6 @@
       </EmptyResultsBlock>
     </template>
   </ContentBlock>
-  <DialogPurge
-    @closeDialog="closeDialog"
-    v-model:visible="showDialogPurge"
-    :isLoading="isLoading"
-    @repurge="repurgeEvent"
-  ></DialogPurge>
 </template>
 
 <script setup>
@@ -72,7 +66,6 @@
   const hasContentToList = ref(true)
   const showDialogPurge = ref(false)
   const isLoading = ref(null)
-  const purgeToRepurge = ref()
   const toast = useToast()
 
   const handleLoadData = (event) => {
@@ -82,11 +75,6 @@
   const closeDialog = () => {
     isLoading.value = null
     showDialogPurge.value = false
-  }
-
-  const openDialogPurge = (item) => {
-    showDialogPurge.value = true
-    purgeToRepurge.value = item
   }
 
   const showToast = (severity, detail) => {
@@ -101,11 +89,11 @@
     toast.add(options)
   }
 
-  const repurgeEvent = async () => {
+  const repurgeEvent = async (purgeToRepurge) => {
     const dataPurge = {
-      purgeType: purgeToRepurge.value.type,
-      argumentsPurge: purgeToRepurge.value.arguments,
-      layer: purgeToRepurge.value.layer
+      purgeType: purgeToRepurge.type,
+      argumentsPurge: purgeToRepurge.arguments,
+      layer: purgeToRepurge.layer
     }
     try {
       const { feedback } = await props.createRealTimePurgeService(dataPurge)
@@ -118,15 +106,22 @@
     }
   }
 
-  const actionsRow = ref([
+  const actionsRow = [
     {
+      type: 'dialog',
       label: 'Repurge',
       icon: 'pi pi-refresh',
-      command: (item) => {
-        openDialogPurge(item)
+      dialog: {
+        component: DialogPurge,
+        body: (item) => ({
+          data: {
+            isLoading,
+            repurge: repurgeEvent(item)
+          }
+        })
       }
     }
-  ])
+  ]
 
   const getColumns = computed(() => {
     return [
