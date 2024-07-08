@@ -10,7 +10,7 @@ import { createPaymentMethodService } from '@/services/billing-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  payload : {
+  payload: {
     card_address_zip: '12345678',
     card_country: 'Brazil',
     stripe_token: 'pk_test',
@@ -20,7 +20,7 @@ const fixtures = {
     card_last_4_digits: '4242',
     card_expiration_month: '2',
     card_expiration_year: '2028'
-  },
+  }
 }
 
 const makeSut = () => {
@@ -33,7 +33,7 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
+      statusCode: 201
     })
 
     const { sut } = makeSut()
@@ -49,7 +49,7 @@ describe('DigitalCertificatesServices', () => {
 
   it('should return a feedback when successfully create an payment method', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
+      statusCode: 201
     })
 
     const { sut } = makeSut()

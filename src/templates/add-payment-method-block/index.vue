@@ -12,11 +12,11 @@
   defineOptions({
     name: 'add-payment-method-block'
   })
-  const stripePromise = inject('stripe')
+  const stripePlugin = inject('stripe')
   const accountStore = useAccountStore()
   const stripe = ref(null)
   const isSubmitting = ref(false)
-  const elements = ref(null)
+  const stripeComponents = ref(null)
   const cardNumber = ref(null)
   const cardExpiry = ref(null)
   const cardCvc = ref(null)
@@ -34,8 +34,13 @@
   const showGoBack = ref(false)
 
   onMounted(async () => {
-    stripe.value = await stripePromise
-    elements.value = stripe.value.elements()
+    await initializeStripeComponents()
+    addStripeComponentsToTemplate()
+  })
+
+  const initializeStripeComponents = async () => {
+    stripe.value = await stripePlugin
+    stripeComponents.value = stripe.value.elements()
     const theme = accountStore.currentTheme
     const inputStyles = {
       style: {
@@ -52,14 +57,16 @@
         }
       }
     }
-    cardNumber.value = elements.value.create('cardNumber', { ...inputStyles, showIcon: true })
-    cardExpiry.value = elements.value.create('cardExpiry', inputStyles)
-    cardCvc.value = elements.value.create('cardCvc', inputStyles)
+    cardNumber.value = stripeComponents.value.create('cardNumber', { ...inputStyles, showIcon: true })
+    cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
+    cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
+  }
 
+  const addStripeComponentsToTemplate = () => {
     cardNumber.value.mount('#card-number-element')
     cardExpiry.value.mount('#card-expiry-element')
     cardCvc.value.mount('#card-cvc-element')
-  })
+  }
 
   const visibleDrawer = computed({
     get: () => props.visible,

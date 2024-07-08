@@ -34,19 +34,18 @@ const extractApiError = (httpResponse) => {
   return `${apiKeyError}: ${apiValidationError}`
 }
 
-
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {string} The result message based on the status code.
+ * @returns {Object} The result object with feedback message
  * @throws {Error} If there is an error with the response.
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your Credit Card has been added',
+        feedback: 'Your Credit Card has been added'
       }
     case 400:
       const apiError400 = extractApiError(httpResponse)
