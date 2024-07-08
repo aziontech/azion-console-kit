@@ -2,10 +2,11 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block'
   import DrawerService from '@/views/EdgeNode/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+
   defineOptions({ name: 'list-edge-node-resources-tab' })
 
   const props = defineProps({
@@ -83,29 +84,38 @@
     }
     hasContentToList.value = true
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'service',
+      icon: 'pi pi-trash',
+      service: deleteServicesWithDecorator
+    }
+  ]
 </script>
 
 <template>
   <div class="flex flex-col h-full">
     <DrawerService
       ref="drawerServiceRef"
-      :edgeNodeId="props.edgeNodeId"
-      :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-      :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
-      :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
-      :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
+      :edgeNodeId="edgeNodeId"
+      :listServiceEdgeNodeService="listServiceEdgeNodeService"
+      :createServiceEdgeNodeService="createServiceEdgeNodeService"
+      :editServiceEdgeNodeService="editServiceEdgeNodeService"
+      :loadServiceEdgeNodeService="loadServiceEdgeNodeService"
       @onSuccess="reloadServicesList"
     />
     <div v-if="hasContentToList">
       <ListTableBlock
         ref="listServiceEdgeNodeRef"
         :listService="listServicesWithDecorator"
-        :deleteService="deleteServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
         emptyListMessage="No services found."
+        :actions="actions"
+        isTabs
       >
         <template #addButton>
           <PrimeButton
@@ -120,7 +130,7 @@
       v-else
       title="No services have been provisioned"
       description="Click the button below to provision your first service."
-      :documentationService="props.documentationServiceServices"
+      :documentationService="documentationServiceServices"
       :inTabs="true"
     >
       <template #default>

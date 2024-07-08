@@ -433,7 +433,7 @@
     return props.actions && props.actions.length > 1
   })
   const getActionIcon = computed(() => {
-    return props.actions[0].icon
+    return props.actions[0]?.icon
   })
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0
