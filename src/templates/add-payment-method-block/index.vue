@@ -57,7 +57,10 @@
         }
       }
     }
-    cardNumber.value = stripeComponents.value.create('cardNumber', { ...inputStyles, showIcon: true })
+    cardNumber.value = stripeComponents.value.create('cardNumber', {
+      ...inputStyles,
+      showIcon: true
+    })
     cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
     cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
   }
@@ -243,7 +246,6 @@
 </template>
 
 <style scoped>
-  /* Estilos para os elementos Stripe */
   .stripe-input {
     @apply py-2 px-2 text-base border border-[var(--surface-border)] rounded-md;
   }

@@ -82,10 +82,12 @@
     }
   })
 
-  
   const showCreatePaymentMethodDrawer = ref(false)
   const debouncedDrawerAnimate = 300
-  const loadCreatePaymentMethodDrawer = refDebounced(showCreatePaymentMethodDrawer, debouncedDrawerAnimate)
+  const loadCreatePaymentMethodDrawer = refDebounced(
+    showCreatePaymentMethodDrawer,
+    debouncedDrawerAnimate
+  )
 
   const paymentsColumns = ref([
     {
