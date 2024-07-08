@@ -15,12 +15,11 @@
   const router = useRouter()
   const activeTab = ref(0)
 
-  
   const props = defineProps({
     paymentServices: { type: Object, required: true },
     billsServices: { type: Object, required: true }
   })
-  
+
   const TABS_MAP = {
     bills: 0,
     payment: 1

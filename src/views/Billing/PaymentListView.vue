@@ -115,7 +115,6 @@
     showCreatePaymentMethodDrawer.value = true
   }
 
-
   const showToast = (severity, detail) => {
     if (!detail) return
     const options = {

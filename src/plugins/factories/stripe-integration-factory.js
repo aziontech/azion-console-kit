@@ -2,7 +2,7 @@ import { loadStripe } from '@stripe/stripe-js'
 
 const environment = {
   development: {
-    stripeToken: 'pk_test'
+    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
   },
   stage: {
     stripeToken: ''

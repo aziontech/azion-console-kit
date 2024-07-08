@@ -22,7 +22,6 @@
   const cardCvc = ref(null)
   const cardholderName = ref('')
 
-
   const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     createService: {
@@ -95,12 +94,12 @@
   const handleSubmit = async () => {
     isSubmitting.value = true
 
-    const { token, error:submitionErrors } = await stripe.value.createToken(cardNumber.value, {
+    const { token, error: submitionErrors } = await stripe.value.createToken(cardNumber.value, {
       name: cardholderName.value
     })
     if (submitionErrors !== undefined) {
       showToast('error', submitionErrors.message)
-    } 
+    }
     if (submitionErrors === undefined) {
       const accountData = accountStore.account
       const payload = {
@@ -115,7 +114,6 @@
         card_expiration_year: token.card.exp_year
       }
       try {
-
         const response = await props.createService(payload)
         emit('onSuccess', response)
         showToast('success', response.feedback)

@@ -2,7 +2,7 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentBaseUrl } from './make-payment-base-url'
 
-export const createPaymentMethodService = async (payload) => {  
+export const createPaymentMethodService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePaymentBaseUrl()}/credit_cards`,
     method: 'POST',
@@ -13,12 +13,13 @@ export const createPaymentMethodService = async (payload) => {
 }
 
 /**
+/**
  * @param {Object} errorSchema - The error schema.
  * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
+ * @returns {string} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
+  return `${errorSchema[key]}`
 }
 
 /**
@@ -27,9 +28,12 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errors = extractErrorKey(httpResponse.body, 'errors')
-  return errors
+  const apiKeyError = Object.keys(httpResponse.body)[0]
+  const apiValidationError = extractErrorKey(httpResponse.body, apiKeyError)
+
+  return `${apiKeyError}: ${apiValidationError}`
 }
+
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
@@ -43,14 +47,10 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Credit Card has been added',
-        token: httpResponse.body.token
       }
     case 400:
       const apiError400 = extractApiError(httpResponse)
       throw new Error(apiError400).message
-    case 422:
-      const apiError422 = extractApiError(httpResponse)
-      throw new Error(apiError422).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
