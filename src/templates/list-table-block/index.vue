@@ -356,21 +356,23 @@
         command: () => {
           switch (action.type) {
             case 'dialog':
-              openDialog(action.dialog.component, action.dialog.body(rowData, updatedTable))
+              openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              const bodyDelete = {
-                data: {
-                  title: action.title,
-                  selectedID: rowData.id,
-                  selectedItemData: rowData,
-                  deleteDialogVisible: true,
-                  deleteService: action.service,
-                  rerender: Math.random()
-                },
-                onClose: (opt) => opt.data.updated && updatedTable()
+              {
+                const bodyDelete = {
+                  data: {
+                    title: action.title,
+                    selectedID: rowData.id,
+                    selectedItemData: rowData,
+                    deleteDialogVisible: true,
+                    deleteService: action.service,
+                    rerender: Math.random()
+                  },
+                  onClose: (opt) => opt.data.updated && reload()
+                }
+                openDialog(DeleteDialog, bodyDelete)
               }
-              openDialog(DeleteDialog, bodyDelete)
               break
             case 'action':
               action.commandAction(rowData)
@@ -430,9 +432,11 @@
     command()
   }
 
-  const updatedTable = () => {
+  const reload = () => {
     loadData({ page: 1 })
   }
+
+  defineExpose({ reload })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
