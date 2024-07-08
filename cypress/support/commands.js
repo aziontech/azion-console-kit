@@ -55,6 +55,10 @@ Cypress.Commands.add('login', () => {
     }
   } else {
     switch (environment) {
+      case 'stage':
+        email = Cypress.env('STAGE_CYPRESS_EMAIL')
+        password = Cypress.env('STAGE_CYPRESS_PASSWORD')
+        break
       case 'preview-prod':
         email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL')
         password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD')

@@ -7,7 +7,6 @@ const envOverride = {
   baseUrl: 'http://console.azion.com',
   CYPRESS_EMAIL: process.env.PROD_CYPRESS_EMAIL,
   CYPRESS_PASSWORD: process.env.PROD_CYPRESS_PASSWORD,
-  CYPRESS_USERNAME: process.env.PROD_CYPRESS_USERNAME,
 };
 
 export default defineConfig({
