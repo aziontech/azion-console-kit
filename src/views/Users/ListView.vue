@@ -7,8 +7,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref } from 'vue'
 
-  const hasContentToList = ref(true)
-  const pageTitle = 'Users'
   const props = defineProps({
     listUsersService: {
       required: true,
@@ -23,6 +21,17 @@
       type: Function
     }
   })
+
+  const hasContentToList = ref(true)
+  const pageTitle = 'Users'
+  const actions = [
+    {
+      type: 'delete',
+      title: 'user',
+      icon: 'pi pi-trash',
+      service: props.deleteUsersService
+    }
+  ]
 
   const getColumns = computed(() => [
     {
@@ -55,6 +64,7 @@
     {
       field: 'status',
       header: 'Status',
+      sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
@@ -94,15 +104,14 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listUsersService"
-        :deleteService="props.deleteUsersService"
+        :listService="listUsersService"
         :columns="getColumns"
-        pageTitleDelete="user"
         addButtonLabel="User"
         createPagePath="users/create"
         editPagePath="users/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No users found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -110,7 +119,7 @@
         description=" Click the button below to create your first user."
         createButtonLabel="User"
         createPagePath="users/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
         data-testid="users__list-view__empty-results-block"
       >
         <template #illustration>

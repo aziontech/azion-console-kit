@@ -5,6 +5,7 @@
   import TabView from 'primevue/tabview'
   import Tag from 'primevue/tag'
   import ListView from './PaymentListView.vue'
+  import BillsView from '@/views/Billing/BillsView.vue'
 
   import { ref, computed } from 'vue'
 
@@ -15,7 +16,8 @@
   const activeTab = ref(0)
 
   const props = defineProps({
-    paymentServices: { type: Object, required: true }
+    paymentServices: { type: Object, required: true },
+    billsServices: { type: Object, required: true }
   })
 
   const TABS_MAP = {
@@ -70,7 +72,7 @@
             severity="secondary"
             icon="pi pi-refresh"
             value="Last Updated - MM/DD/2023 02:32 PM"
-          ></Tag>
+          />
         </template>
       </PageHeadingBlock>
     </template>
@@ -81,15 +83,12 @@
         class="w-full h-full"
       >
         <TabPanel header="Bills">
-          <h3>Bills</h3>
+          <BillsView v-bind="props.billsServices" />
         </TabPanel>
         <TabPanel header="Payment Methods">
           <ListView
             v-if="isPaymentTabActive"
-            :listPaymentService="props.paymentServices.listPaymentService"
-            :deletePaymentService="props.paymentServices.deletePaymentService"
-            :setAsDefaultPaymentService="props.paymentServices.setAsDefaultPaymentService"
-            :documentPaymentService="props.paymentServices.documentPaymentService"
+            v-bind="props.paymentServices"
           ></ListView>
         </TabPanel>
       </TabView>

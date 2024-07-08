@@ -1,8 +1,9 @@
 <template>
   <PrimeDialog
-    v-model:visible="deleteDialogVisible"
+    blockScroll
     modal
-    :header="`Delete ${informationForDeletion.title}`"
+    visible
+    :header="`Delete ${data.title}`"
     :draggable="false"
     class="max-w-2xl"
     @keyup.enter="removeItem()"
@@ -25,8 +26,8 @@
           class="pt-4 text-color-secondary"
           data-testid="delete-dialog-warning-message-details"
         >
-          This {{ informationForDeletion.title }} will be deleted along with any associated settings
-          or instances. Check Help Center for more details.
+          This {{ data.title }} will be deleted along with any associated settings or instances.
+          Check Help Center for more details.
         </p>
       </div>
 
@@ -59,6 +60,14 @@
       </div>
     </div>
 
+    <template #closeicon>
+      <PrimeButton
+        outlined
+        @click="cancelDialog()"
+        icon="pi pi-times"
+      />
+    </template>
+
     <template #footer>
       <PrimeButton
         outlined
@@ -71,7 +80,7 @@
         label="Delete"
         icon-pos="right"
         @click="removeItem()"
-        :icon="calculateLoadIconByLoadingState"
+        :icon="getLoadingIcon"
         :disabled="isDisabled"
         data-testid="delete-dialog-footer-delete-button"
       ></PrimeButton>
@@ -80,16 +89,23 @@
 </template>
 
 <script setup>
+  import { computed, ref, watch, inject } from 'vue'
+  import { useField, useForm } from 'vee-validate'
+  import { useToast } from 'primevue/usetoast'
+  import * as yup from 'yup'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Message from 'primevue/message'
-  import { useToast } from 'primevue/usetoast'
-  import { useField, useForm } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
-  import * as yup from 'yup'
+
+  const emit = defineEmits(['successfullyDeleted'])
 
   const toast = useToast()
+  const dialogRef = inject('dialogRef')
+
+  const data = dialogRef.value.data
+  const loading = ref(false)
+  const canDelete = ref(false)
 
   const validationSchema = yup.object({
     confirmation: yup.string().equals(['delete'], '').required('This is a required field')
@@ -104,57 +120,38 @@
 
   const { value: confirmation } = useField('confirmation')
 
-  const emit = defineEmits(['successfullyDeleted'])
-  const props = defineProps({
-    informationForDeletion: {
-      type: Object,
-      required: true
-    }
-  })
-
-  const loading = ref(false)
-  const canDelete = ref(false)
-  const deleteDialogVisible = ref(false)
-
   const removeItem = async () => {
-    if (canDelete.value === false) return
-    if (!meta.value.valid) return
+    if (!canDelete.value || !meta.value.valid) return
 
     loading.value = true
-    let toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: ''
-    }
-
     try {
-      const feedback = await props.informationForDeletion.deleteService(
-        props.informationForDeletion.selectedID,
-        props.informationForDeletion.selectedItemData
-      )
-      toastConfig.summary = feedback ?? 'Successfully deleted!'
+      const feedback = await data.deleteService(data.selectedID, data.selectedItemData)
+      showToast('success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
+      dialogRef.value.close({ updated: true })
     } catch (error) {
-      toastConfig = {
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error
-      }
+      showToast('error', 'Error', error)
     } finally {
-      deleteDialogVisible.value = false
-      toast.add(toastConfig)
       loading.value = false
     }
   }
 
-  const cancelDialog = () => {
-    deleteDialogVisible.value = false
-    resetForm()
+  const showToast = (severity, summary, detail = '') => {
+    toast.add({
+      closable: true,
+      severity,
+      summary,
+      detail
+    })
   }
 
-  const calculateLoadIconByLoadingState = computed(() => {
+  const cancelDialog = () => {
+    resetForm()
+    dialogRef.value.close({ updated: false })
+  }
+
+  const getLoadingIcon = computed(() => {
     return loading.value ? 'pi pi-spin pi-spinner' : ''
   })
 
@@ -163,16 +160,16 @@
   })
 
   watch(
-    () => props.informationForDeletion,
+    () => data,
     (value) => {
       if (value) {
         canDelete.value = false
         resetForm()
-        deleteDialogVisible.value = props.informationForDeletion.deleteDialogVisible
       }
     },
     { deep: true }
   )
+
   watch(
     () => confirmation.value,
     (value) => {

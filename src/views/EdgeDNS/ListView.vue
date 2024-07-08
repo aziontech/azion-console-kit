@@ -20,14 +20,13 @@
       <ListTableBlock
         v-if="hasContentToList"
         :listService="listEdgeDNSService"
-        :deleteService="deleteEdgeDNSService"
         :columns="getColumns"
-        pageTitleDelete="zone"
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No zone found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -45,7 +44,9 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { ref, computed } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
@@ -54,86 +55,84 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
 
-  export default {
-    name: 'edge-dns-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PrimeButton,
-      PageHeadingBlock
-    },
-    data: () => ({
-      hasContentToList: true
-    }),
-    props: {
-      listEdgeDNSService: {
-        required: true,
-        type: Function
-      },
-      deleteEdgeDNSService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      },
-      clipboardWrite: {
-        required: true,
-        type: Function
-      }
-    },
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
+  defineOptions({ name: 'edge-dns-view' })
 
-          {
-            field: 'domain',
-            header: 'Domain',
-            type: 'component',
-            filterPath: 'domain.content',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'text-with-clipboard',
-                dependencies: {
-                  copyContentService: this.clipboardWrite
-                }
-              })
-            }
-          },
-          {
-            field: 'status',
-            header: 'Status',
-            type: 'component',
-            filterPath: 'status.content',
-            component: (columnData) =>
-              columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-          }
-        ]
-      }
+  const props = defineProps({
+    listEdgeDNSService: {
+      required: true,
+      type: Function
     },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      },
-      handleCopyNameServers() {
-        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
-        this.$toast.add({
-          closable: true,
-          severity: 'success',
-          summary: 'Successfully copied!'
-        })
-      }
+    deleteEdgeDNSService: {
+      required: true,
+      type: Function
+    },
+    documentationService: {
+      required: true,
+      type: Function
+    },
+    clipboardWrite: {
+      required: true,
+      type: Function
     }
+  })
+
+  const toast = useToast()
+  const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'zone',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeDNSService
+    }
+  ]
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
+
+  const handleCopyNameServers = () => {
+    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Successfully copied!'
+    })
+  }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+
+      {
+        field: 'domain',
+        header: 'Domain',
+        type: 'component',
+        filterPath: 'domain.content',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        type: 'component',
+        filterPath: 'status.content',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+      }
+    ]
+  })
 </script>

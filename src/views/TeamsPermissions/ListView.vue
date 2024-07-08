@@ -9,15 +9,14 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="pros.listTeamPermissionService"
-        :deleteService="pros.deleteTeamPermissionService"
+        :listService="listTeamPermissionService"
         :columns="getColumns"
-        pageTitleDelete="team"
         addButtonLabel="Team"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No teams found."
+        :actions="actions"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -46,12 +45,21 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref } from 'vue'
 
-  const pros = defineProps({
+  const props = defineProps({
     listTeamPermissionService: { required: true, type: Function },
     deleteTeamPermissionService: { required: true, type: Function },
     documentationService: { required: true, type: Function }
   })
+
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'team',
+      icon: 'pi pi-trash',
+      service: props.deleteTeamPermissionService
+    }
+  ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event

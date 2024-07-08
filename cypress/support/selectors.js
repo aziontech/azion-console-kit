@@ -1,13 +1,14 @@
 const selectors = {
   list: {
     createTeamButton: '[data-testid="create_Team_button"]',
+    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
+    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
     searchInput: '[data-testid="data-table-search-input"]',
     searchField: '[data-testid="data-table-search-input"]',
     filteredRow: {
       nameColumn: (columnName = 'name') =>
         `[data-testid="list-table-block__column__${columnName}__row"]`,
       statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-      permissionsColumn: '.p-selectable-row > :nth-child(2)',
       empty: 'tr.p-datatable-emptymessage > td',
       lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
       lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'
@@ -36,6 +37,7 @@ const selectors = {
     singlePermissionToTarget: 'button[aria-label="Move to Target"]',
     viewContentDeliverySettingsPermission:
       '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
+    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
@@ -331,7 +333,26 @@ const selectors = {
     nameRow: '[data-testid="list-table-block__column__name__row"]',
     showMore: '.underline',
     domainRow: '.whitespace-pre',
-    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    list: {
+      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+    },
+    records: {
+      tab: '[data-testid="edge-dns-edit-view__records__tab-panel"] > a',
+      createButton: '[data-testid="create_Record_button"]',
+      nameInput: '[data-testid="edge-dns-records-form__settings__name-field__input"]',
+      recordTypeDropdown:
+        '[data-testid="edge-dns-records-form__settings__record-type-field__dropdown"] > .p-dropdown-trigger',
+      recordTypeOption: (recordType) => `#selectedRecordType_${recordType}`,
+      ttlInput: '[data-testid="edge-dns-records-form__settings__ttl-field__input"]',
+      valueTextarea: '[data-testid="edge-dns-records-form__settings__value-field__textarea"]',
+      policyTypeDropdown:
+        '[data-testid="edge-dns-records-form__policy__policy-type-field__dropdown"] > .p-dropdown-trigger',
+      policyTypeOption: (policyType) => `#selectedPolicy_${policyType}`,
+      weightInput: '[data-testid="edge-dns-records-form__policy__weight-field__input"]',
+      descriptionTextarea:
+        '[data-testid="edge-dns-records-form__policy__description-field__textarea"]'
+    }
   },
   domains: {
     createButton: '[data-testid="create_Domain_button"]',
@@ -376,6 +397,50 @@ const selectors = {
       '[inputvalue="trusted_ca_certificate"] > .p-card-body > .p-card-content > .p-4',
     editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
     trustedCATextArea: '[data-testid="trusted-certificates-form__certificate-field__textarea"]'
+  },
+  purge: {
+    createButton: '[data-testid="create_Purge_button"]',
+    argumentsField: '[data-testid="purge__arguments-field__textarea"]'
+  },
+  usersManagement: {
+    createButton: '[data-testid="create_User_button"]',
+    firstNameInput: '[data-testid="users-form__first-name-field__input"]',
+    firstNameErrorMessage: '[data-testid="users-form__first-name-field__error-message"]',
+    lastNameInput: '[data-testid="users-form__last-name-field__input"]',
+    lastNameErrorMessage: '[data-testid="users-form__last-name-field__error-message"]',
+    emailInput: '[data-testid="users-form__email-field__input"]',
+    emailErrorMessage: '[data-testid="users-form__email-field__error-message"]',
+    phoneInput: '[data-testid="users-form__phone-field__input"]',
+    phoneErrorMessage: '[data-testid="users-form__phone-field__error-message"]',
+    languageDropdown: '[data-testid="users-form__language-field__dropdown"]',
+    timezoneDropdown: '[data-testid="users-form__timezone-field__dropdown"]',
+    timezoneFilter: '[data-testid="users-form__timezone-field__dropdown"] .p-dropdown-filter',
+    timezoneOption: (index) => `#timezone_${index}`,
+    teamDropdownTrigger:
+      '[data-testid="users-form__teams-field__multiselect"] .p-multiselect-trigger',
+    teamDropdownFilter: '[aria-owns="teams_list"].p-multiselect-filter',
+    teamOption: (index) => `#teams_${index}`,
+    selectedTeamTag: (optionNumber) =>
+      `[data-testid="users-form__teams-field__multiselect"] :nth-child(${optionNumber})`,
+    selectedTeamTagCloseBtn: (optionNumber) =>
+      `[data-testid="users-form__teams-field__multiselect"] :nth-child(${optionNumber}) .p-icon`,
+    selectedTeamErrorMessage: '[data-testid="users-form__teams-field__error-message"]',
+    switchSocialLogin: '[data-testid="users-form__mfa-field__switch-isAccountOwner"]',
+    switchMultiFactorAuth: '[data-testid="users-form__mfa-field__switch-twoFactorEnabled"]',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+  },
+  teams: {
+    createTeamButton: '[data-testid="create_Team_button"]',
+    nameInput: '[data-testid="teams-permissions-form__name__field-text__input"]',
+    statusSwitch: '[data-testid="teams-permissions-form__form-fields__status"]',
+    sourceList: '.p-picklist-list.p-picklist-source-list',
+    targetList: '.p-picklist-list.p-picklist-target-list',
+    allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
+    allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
+    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
+    permission: (permissionName) =>
+      `[data-testid="teams-permissions-form__permissions-field__picklist__item-${permissionName}"]`,
+    listRow: (rowName) => `[data-testid="list-table-block__column__${rowName}__row"]`
   }
 }
 

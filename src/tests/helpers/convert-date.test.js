@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   convertValueToDate,
   convertDateToLocalTimezone,
+  formatDateToUS,
   formatDateMonthAndYear
 } from '@/helpers/convert-date'
 
@@ -21,6 +22,35 @@ describe('convertDate', () => {
     const expectedDate = '2022-01-01T23:59:59'
 
     expect(convertedDate).toBe(expectedDate)
+  })
+
+  it('should format a date string to "MM/DD/YYYY"', () => {
+    const input = '2024-07-02'
+    const expectedDateString = '07/02/2024'
+    const actualDateString = formatDateToUS(input)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('should format a timestamp to "MM/DD/YYYY"', () => {
+    const input = 1720224000000 // timestamp for '2024-07-02'
+    const expectedDateString = '07/06/2024'
+    const actualDateString = formatDateToUS(input)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('should format a Date object to "MM/DD/YYYY"', () => {
+    const input = new Date('2024-07-02')
+    const expectedDateString = '07/02/2024'
+    const actualDateString = formatDateToUS(input)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('should throw an error for an invalid date', () => {
+    const input = 'invalid-date'
+    expect(() => formatDateToUS(input)).toThrow('Invalid date')
   })
 
   it('Format month and year to "MM/YYYY"', () => {

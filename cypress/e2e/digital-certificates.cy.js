@@ -10,7 +10,7 @@ describe('Digital Certificates spec', () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it('should create and delete a new digital certificate', function () {
+  it('should create a new digital certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
 
@@ -53,6 +53,8 @@ describe('Digital Certificates spec', () => {
 
   afterEach(() => {
     // Delete the digital certificate
-    cy.deleteProduct({ entityName: digitalCertificateName, productName: 'Digital Certificates' })
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Digital certificate successfully deleted!')
+    })
   })
 })

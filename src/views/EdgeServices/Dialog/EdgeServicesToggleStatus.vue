@@ -1,36 +1,14 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
+  import { inject, computed } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   defineOptions({ name: 'edge-services-toggle-status' })
 
-  const emit = defineEmits(['update:visible', 'updateService'])
-
-  const props = defineProps({
-    serviceUpdate: {
-      type: Function,
-      required: true
-    },
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    selectRow: {
-      type: Object,
-      required: true
-    }
-  })
+  const dialogRef = inject('dialogRef')
+  const params = dialogRef.value.data
 
   const toast = useToast()
-  const visibleDialog = computed({
-    get: () => props.visible,
-    set: (value) => {
-      emit('update:visible', value)
-    }
-  })
-  const title = ref('')
-  const description = ref('')
   const statusTexts = {
     active: {
       titleStatus: 'Active',
@@ -51,49 +29,48 @@
     })
   }
 
-  const openDialog = (value) => {
-    visibleDialog.value = value
-  }
-
-  const onCancel = () => {
-    openDialog(false)
-  }
-
   const onConfirm = async () => {
-    if (!props.selectRow?.id) return
+    if (!params.selectRow?.id) return
     try {
-      const { id, active } = props.selectRow
-      const feedback = await props.serviceUpdate({ edgeServiceID: id, active: !active })
-      openDialog(false)
+      const { id, active } = params.selectRow
+      const feedback = await params.service({ id, active: !active })
       showToast('success', feedback)
-      emit('updateService')
+      dialogRef.value.close({ updated: true })
     } catch (error) {
-      openDialog(false)
       showToast('error', error)
+      closeDialog()
     }
   }
 
-  watch(
-    () => props.visible,
-    (value) => {
-      if (!value) return
+  const closeDialog = () => {
+    dialogRef.value.close({ updated: false })
+  }
 
-      const isActive = props.selectRow?.active
-      const { titleStatus, descriptionStatus } = statusTexts[isActive ? 'inactive' : 'active']
+  const getStatusTexts = (isActive) => {
+    return isActive ? statusTexts.inactive : statusTexts.active
+  }
 
-      title.value = `${titleStatus} Edge Service`
-      description.value = `Are you sure to ${descriptionStatus} the ${props.selectRow?.name}?`
-    }
-  )
+  const getTitleContent = computed(() => {
+    const isActive = params.selectRow?.active
+    const { titleStatus } = getStatusTexts(isActive)
+
+    return `${titleStatus} Edge Service`
+  })
+
+  const getDescriptionContent = computed(() => {
+    const isActive = params.selectRow?.active
+    const { descriptionStatus } = getStatusTexts(isActive)
+
+    return `Are you sure to ${descriptionStatus} the ${params.selectRow?.name}?`
+  })
 </script>
 
 <template>
   <div>
     <PrimeDialog
       :blockScroll="true"
-      v-model:visible="visibleDialog"
-      :update:visible="openDialog"
       modal
+      visible
       :pt="{
         root: { class: 'p-0 w-[576px]' },
         header: { class: 'flex p-5' },
@@ -102,17 +79,24 @@
       }"
     >
       <template #header>
-        <h5 class="text-lg not-italic font-bold leading-5">{{ title }}</h5>
+        <h5 class="text-lg not-italic font-bold leading-5">{{ getTitleContent }}</h5>
       </template>
       <div class="flex items-center flex-1 text-color-secondary text-sm font-normal leading-5">
-        {{ description }}
+        {{ getDescriptionContent }}
       </div>
+      <template #closeicon>
+        <PrimeButton
+          outlined
+          @click="closeDialog()"
+          icon="pi pi-times"
+        />
+      </template>
       <template #footer>
         <PrimeButton
           severity="primary"
           label="Cancel"
           outlined
-          @click="onCancel"
+          @click="closeDialog()"
         />
         <PrimeButton
           class="m-0"

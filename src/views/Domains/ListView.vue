@@ -6,17 +6,16 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="domain"
         addButtonLabel="Domain"
         :createPagePath="createDomainPath"
         editPagePath="domains/edit"
         :listService="listDomainsService"
-        :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No domains found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -69,6 +68,14 @@
   const createDomainPath = 'domains/create?origin=list'
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'domain',
+      icon: 'pi pi-trash',
+      service: props.deleteDomainService
+    }
+  ]
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({

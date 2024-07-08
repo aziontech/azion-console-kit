@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listPaymentService } from '@/services/billing-services'
+import { listPaymentMethodsService } from '@/services/billing-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 
@@ -35,7 +35,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listPaymentService
+  const sut = listPaymentMethodsService
 
   return {
     sut
@@ -86,8 +86,9 @@ describe('BillingServices', () => {
         },
         cardData: {
           cardBrand: 'visa',
-          cardNumber: '4242',
-          status: 'Default'
+          cardNumber: 'Ending in 4242',
+          status: 'Default',
+          value: 'visa 4242 Default'
         },
         isDefault: fixtures.paymentMockIsDefault.is_default,
         expiringDateByOrder: new Date('2030-05-01T00:00:00.000Z'),
@@ -103,8 +104,9 @@ describe('BillingServices', () => {
         },
         cardData: {
           cardBrand: 'visa',
-          cardNumber: '4242',
-          status: ''
+          cardNumber: 'Ending in 4242',
+          status: '',
+          value: 'visa 4242 '
         },
         isDefault: fixtures.paymentMock.is_default,
         expiringDateByOrder: new Date('2019-05-01T00:00:00.000Z'),

@@ -155,7 +155,7 @@ describe('Domains spec', () => {
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
 
-    // Assert
+    // Assert - create a domain
     cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
     cy.get(selectors.domains.domainField).should('be.visible')
     cy.get(selectors.domains.copyDomainButton).click()
@@ -186,9 +186,9 @@ describe('Domains spec', () => {
 
   afterEach(() => {
     // Cleanup
-    cy.deleteProduct({ entityName: domainName, productName: 'Domains' }).then(() => {
+    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
       cy.verifyToast('Resource successfully deleted')
     })
-    cy.deleteProduct({ entityName: edgeAppName, productName: 'Edge Application' })
+    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })
