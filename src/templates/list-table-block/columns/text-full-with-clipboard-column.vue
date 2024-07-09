@@ -17,7 +17,7 @@
 
   const props = defineProps({
     content: {
-      type: String,
+      type: String
     },
     copyContentService: {
       required: true,
