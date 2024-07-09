@@ -1,6 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
@@ -59,6 +59,15 @@
     })
   }
 
+  const actions = [
+    {
+      type: 'delete',
+      title: 'cache setting',
+      icon: 'pi pi-trash',
+      service: deleteCacheSettingsServiceWithDecorator
+    }
+  ]
+
   const openCreateDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
@@ -99,12 +108,12 @@
 <template>
   <Drawer
     ref="drawerRef"
-    :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createService="props.createCacheSettingsService"
-    :loadService="props.loadCacheSettingsService"
-    :editService="props.editCacheSettingsService"
-    :showTieredCache="props.isTieredCacheEnabled"
+    :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
+    :edgeApplicationId="edgeApplicationId"
+    :createService="createCacheSettingsService"
+    :loadService="loadCacheSettingsService"
+    :editService="editCacheSettingsService"
+    :showTieredCache="isTieredCacheEnabled"
     @onSuccess="reloadList"
   />
 
@@ -112,12 +121,12 @@
     v-if="hasContentToList"
     ref="listTableBlockRef"
     :listService="listCacheSettingsServiceWithDecorator"
-    :deleteService="deleteCacheSettingsServiceWithDecorator"
     :columns="getColumns"
-    pageTitleDelete="cache setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No cache settings found."
+    :actions="actions"
+    isTabs
   >
     <template #addButton>
       <PrimeButton

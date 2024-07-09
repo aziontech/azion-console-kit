@@ -7,6 +7,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { computed, ref } from 'vue'
+
   defineOptions({ name: 'list-edge-node' })
 
   const props = defineProps({
@@ -54,25 +55,34 @@
     }
   ])
 
-  const edgeNodeSelected = ref({})
-
-  const actionsRow = ref([
-    {
-      label: 'Authorize',
-      icon: 'pi pi-fw pi-check-square',
-      command: (item) => {
-        edgeNodeSelected.value = {
-          edgeNodeID: item.id,
-          openDialog: true,
-          rerender: Math.random()
-        }
-      }
-    }
-  ])
-
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      label: 'Delete',
+      title: 'edge node',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeNodeService
+    },
+    {
+      type: 'dialog',
+      label: 'Authorize',
+      icon: 'pi pi-fw pi-check-square',
+      dialog: {
+        component: Authorize,
+        body: (item) => ({
+          data: {
+            edgeNodeID: item.id,
+            openDialog: true,
+            rerender: Math.random()
+          }
+        })
+      }
+    }
+  ]
 </script>
 <template>
   <ContentBlock>
@@ -80,21 +90,18 @@
       <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
     </template>
     <template #content>
-      <Authorize :authorize="edgeNodeSelected" />
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listEdgeNodeService"
-        :deleteService="props.deleteEdgeNodeService"
+        :listService="listEdgeNodeService"
         :columns="getColumns"
-        pageTitleDelete="edge node"
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
-        :rowActions="actionsRow"
         emptyListMessage="No edge nodes found."
+        :actions="actions"
       />
       <EmptyEdgeNode
         v-else
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />

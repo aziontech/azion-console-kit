@@ -1,7 +1,7 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import ListTableBlock from '@/templates/list-table-block'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
@@ -129,6 +129,15 @@
     }
     hasContentToList.value = true
   }
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'origin',
+      icon: 'pi pi-trash',
+      service: deleteOriginWithDecorator
+    }
+  ]
 </script>
 
 <template>
@@ -147,12 +156,13 @@
     <ListTableBlock
       ref="listOriginsEdgeApplicationsRef"
       :listService="listOriginsWithDecorator"
-      :deleteService="deleteOriginWithDecorator"
       :columns="getColumns"
       pageTitleDelete="origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
       emptyListMessage="No origins found."
+      :actions="actions"
+      isTabs
     >
       <template #addButton>
         <PrimeButton

@@ -2,14 +2,12 @@ const selectors = {
   list: {
     breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
     createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
-    createTeamButton: '[data-testid="create_Team_button"]',
     searchInput: '[data-testid="data-table-search-input"]',
     searchField: '[data-testid="data-table-search-input"]',
     filteredRow: {
       nameColumn: (columnName = 'name') =>
         `[data-testid="list-table-block__column__${columnName}__row"]`,
       statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-      permissionsColumn: '.p-selectable-row > :nth-child(2)',
       empty: 'tr.p-datatable-emptymessage > td',
       lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
       lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'
@@ -31,14 +29,6 @@ const selectors = {
   },
   form: {
     digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
-    teamName: '[data-testid="teams-permissions-form__name__field-text__input"]',
-    teamNameError: '[data-testid="teams-permissions-form__name__field-text__error-message"]',
-    teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
-    allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
-    allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
-    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
-    viewContentDeliverySettingsPermission:
-      '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
@@ -399,6 +389,19 @@ const selectors = {
     switchSocialLogin: '[data-testid="users-form__mfa-field__switch-isAccountOwner"]',
     switchMultiFactorAuth: '[data-testid="users-form__mfa-field__switch-twoFactorEnabled"]',
     listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+  },
+  teams: {
+    createTeamButton: '[data-testid="create_Team_button"]',
+    nameInput: '[data-testid="teams-permissions-form__name__field-text__input"]',
+    statusSwitch: '[data-testid="teams-permissions-form__form-fields__status"]',
+    sourceList: '.p-picklist-list.p-picklist-source-list',
+    targetList: '.p-picklist-list.p-picklist-target-list',
+    allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
+    allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
+    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
+    permission: (permissionName) =>
+      `[data-testid="teams-permissions-form__permissions-field__picklist__item-${permissionName}"]`,
+    listRow: (rowName) => `[data-testid="list-table-block__column__${rowName}__row"]`
   }
 }
 

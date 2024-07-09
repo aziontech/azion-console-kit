@@ -1,6 +1,6 @@
 <template>
   <h2 class="text-lg font-medium line-height-1 mt-4">Payment History</h2>
-  <ListTable
+  <ListTableBlock
     v-if="hasContentToList"
     isTabs
     :enableEditClick="false"
@@ -27,7 +27,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTable from '@templates/list-table-block/action-column'
+  import ListTableBlock from '@templates/list-table-block'
 
   import { ref } from 'vue'
 

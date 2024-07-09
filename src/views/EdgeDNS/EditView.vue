@@ -6,7 +6,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import ListTableNoHeaderBlock from '@templates/list-table-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
@@ -256,6 +256,15 @@
       tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'record',
+      icon: 'pi pi-trash',
+      service: deleteRecordsServiceEdgeDNSDecorator
+    }
+  ]
 </script>
 
 <template>
@@ -322,14 +331,14 @@
             <ListTableNoHeaderBlock
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
-              pageTitleDelete="record"
               addButtonLabel="Record"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
-              :deleteService="deleteRecordsServiceEdgeDNSDecorator"
               @on-load-data="handleLoadData"
               emptyListMessage="No records found."
+              :actions="actions"
+              isTabs
             >
               <template #addButton>
                 <PrimeButton
