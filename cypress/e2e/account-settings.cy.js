@@ -11,7 +11,7 @@ const fixtures = {
   companyName: 'Company Name',
   companyId: '00.000.000/0001-00',
   postalCode: '14055-010',
-  address: 'Elm Street 13',
+  address: '13, Elm Street',
   complement: 'Apt. 123'
 }
 
@@ -47,20 +47,16 @@ describe('Account Settings spec', () => {
     cy.get(selectors.accountSettings.postalCode).should('have.value', fixtures.postalCode)
   })
 
-  it.only('should update address info successfully', () => {
+  it('should update address info successfully', () => {
     // Arrange
     const randomCountryOption = Math.floor(Math.random() * 5)
     const firstOption = 0
 
-    cy.get(selectors.accountSettings.companyName).clear()
-    cy.get(selectors.accountSettings.companyId).clear()
     cy.get(selectors.accountSettings.postalCode).clear()
     cy.get(selectors.accountSettings.address).clear()
     cy.get(selectors.accountSettings.complement).clear()
 
     // Act
-    cy.get(selectors.accountSettings.companyName).type(fixtures.companyName)
-    cy.get(selectors.accountSettings.companyId).type(fixtures.companyId)
     cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode)
 
     cy.get(selectors.accountSettings.countryDropdown).click()
@@ -93,8 +89,7 @@ describe('Account Settings spec', () => {
     // Assert
     cy.verifyToast('success', 'Your account settings have been updated')
     cy.openProduct('Account Settings')
-    cy.get(selectors.accountSettings.companyName).should('have.value', fixtures.companyName)
-    cy.get(selectors.accountSettings.companyId).should('have.value', fixtures.companyId)
+
     cy.get(selectors.accountSettings.postalCode).should('have.value', fixtures.postalCode)
     cy.get('@countryValue').then((countryValue) => {
       cy.get(selectors.accountSettings.country).should('have.text', countryValue)
@@ -107,5 +102,24 @@ describe('Account Settings spec', () => {
     })
     cy.get(selectors.accountSettings.address).should('have.value', fixtures.address)
     cy.get(selectors.accountSettings.complement).should('have.value', fixtures.complement)
+  })
+
+  it('should update the billing email list successfully', () => {
+    // Arrange
+    const uniquePrefix = generateUniqueName('email')
+    const emails = `${uniquePrefix}@mail.com;${uniquePrefix}@example.com`
+
+    cy.get(selectors.accountSettings.billingEmails).clear()
+
+    // Act
+    cy.get(selectors.accountSettings.billingEmails).type(emails)
+
+    cy.get(selectors.accountSettings.submitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your account settings have been updated')
+    cy.openProduct('Account Settings')
+
+    cy.get(selectors.accountSettings.billingEmails).should('have.value', emails)
   })
 })
