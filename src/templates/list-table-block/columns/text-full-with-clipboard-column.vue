@@ -1,7 +1,8 @@
 <template>
   <div class="gap-2 flex items-center">
-    {{ content }}
+    {{ content || '-' }}
     <PrimeButton
+      v-if="content"
       outlined
       icon="pi pi-copy"
       @click.stop="handleCopyContent"
@@ -17,7 +18,6 @@
   const props = defineProps({
     content: {
       type: String,
-      required: true
     },
     copyContentService: {
       required: true,

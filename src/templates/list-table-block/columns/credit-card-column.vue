@@ -1,23 +1,22 @@
 <template>
   <div class="flex items-center gap-3">
-    <component :is="cardLogoComponent" />
-    {{ cardNumber }}
+    <cardFlagBlock :cardFlag="props.cardBrand" />
+    {{ props.cardNumber || '-' }}
     <PrimeTag
       severity="info"
-      :value="status"
-      v-if="status"
+      :value="props.status"
+      v-if="props.status"
     />
   </div>
 </template>
 
 <script setup>
   import PrimeTag from 'primevue/tag'
-  import { defineAsyncComponent, computed } from 'vue'
+  import cardFlagBlock from '@templates/card-flag-block'
 
   const props = defineProps({
     cardNumber: {
       type: String,
-      required: true
     },
     cardBrand: {
       type: String,
@@ -28,19 +27,4 @@
       required: false
     }
   })
-
-  const cardComponents = {
-    visa: defineAsyncComponent(() => import('@/assets/svg/credit-card-logos/visa-card.vue')),
-    mastercard: defineAsyncComponent(() =>
-      import('@/assets/svg/credit-card-logos/mastercard-card.vue')
-    ),
-    jcb: defineAsyncComponent(() => import('@/assets/svg/credit-card-logos/jcb-card.vue')),
-    discover: defineAsyncComponent(() =>
-      import('@/assets/svg/credit-card-logos/discover-card.vue')
-    ),
-    diners: defineAsyncComponent(() => import('@/assets/svg/credit-card-logos/diners-card.vue')),
-    amex: defineAsyncComponent(() => import('@/assets/svg/credit-card-logos/amex-card.vue'))
-  }
-
-  const cardLogoComponent = computed(() => cardComponents[props.cardBrand])
 </script>
