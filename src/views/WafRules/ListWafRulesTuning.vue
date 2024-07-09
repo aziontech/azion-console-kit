@@ -49,7 +49,7 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     isTabs
-    :actions="[]"
+    :actions="noActionToDisplay"
   >
     <template #header>
       <advancedFilter
@@ -182,6 +182,7 @@
   const domainNames = ref('')
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
+  const noActionToDisplay = []
 
   const valueDomains = computed({
     get: () => {

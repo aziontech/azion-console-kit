@@ -246,7 +246,6 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
@@ -317,25 +316,12 @@
   const menuRef = ref({})
 
   const dialog = useDialog()
-  const toast = useToast()
   const router = useRouter()
 
   onMounted(() => {
     loadData({ page: 1 })
     selectedColumns.value = props.columns
   })
-
-  const showToast = (severity, detail) => {
-    if (!detail) return
-    const options = {
-      closable: true,
-      severity,
-      summary: severity,
-      detail
-    }
-
-    toast.add(options)
-  }
 
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
@@ -390,20 +376,19 @@
   }
 
   const loadData = async ({ page }) => {
-    try {
-      let response
-      if (props.listService) {
+    if (props.listService) {
+      try {
         isLoading.value = true
-        response = props.isGraphql ? await props.listService() : await props.listService({ page })
+        const response = props.isGraphql
+          ? await props.listService()
+          : await props.listService({ page })
         data.value = response
-      } else {
-        data.value = []
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching data:', error)
+      } finally {
+        isLoading.value = false
       }
-    } catch (error) {
-      data.value = []
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
     }
   }
 
