@@ -3,9 +3,11 @@
     :createService="props.createPaymentMethodService"
     v-model:visible="showCreatePaymentMethodDrawer"
     v-if="loadCreatePaymentMethodDrawer"
+    @onSuccess="reloadList"
   />
   <ListTableBlock
     v-if="hasContentToList"
+    ref="listPaymentMethodsRef"
     :enableEditClick="false"
     isTabs
     :columns="paymentsColumns"
@@ -83,6 +85,7 @@
   })
 
   const showCreatePaymentMethodDrawer = ref(false)
+  const listPaymentMethodsRef = ref('')
   const debouncedDrawerAnimate = 300
   const loadCreatePaymentMethodDrawer = refDebounced(
     showCreatePaymentMethodDrawer,
@@ -120,6 +123,14 @@
 
   const openDrawerCreatePaymentMethod = () => {
     showCreatePaymentMethodDrawer.value = true
+  }
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listPaymentMethodsRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 
   const showToast = (severity, detail) => {
