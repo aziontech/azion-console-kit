@@ -220,6 +220,7 @@ const selectors = {
     accountName: '[data-testid="account-settings__account-name__input"]',
     companyName: '[data-testid="account-settings__company-name__input"]',
     companyId: '[data-testid="account-settings__company-id__input"]',
+    billingEmails: '[data-testid="account-settings__billing-emails__textarea"]',
     postalCode: '[data-testid="account-settings__postal-code__input"]',
     dropdownFilter: '.p-dropdown-filter',
     country: '[data-testid="account-settings__country__dropdown"]',

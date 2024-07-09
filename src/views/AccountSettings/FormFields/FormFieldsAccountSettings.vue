@@ -220,6 +220,7 @@
           placeholder="example@email.com;holder@email.com"
           name="billingEmails"
           :value="billingEmails"
+          data-testid="account-settings__billing-emails"
         >
           <template #description>
             Billing information will be forwarded to all emails listed in this field. Separate each
