@@ -8,7 +8,7 @@
   import InputText from 'primevue/inputtext'
   import { ref } from 'vue'
   import cardFlagBlock from '@templates/card-flag-block'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
 
   const { value: amount, errorMessage } = useField('amount')
 
@@ -20,20 +20,32 @@
     loading: {
       type: Boolean,
       default: false
+    },
+    closeDrawer: {
+      type: Function,
+      required: true
     }
   })
 
   const card = ref(props.cardDefault?.cardData)
 
+  const VIEW_BILLING_TABS_PAYMENT = {
+    name: 'billing-tabs',
+    params: {
+      tab: 'payment'
+    }
+  }
+
   const router = useRouter()
+  const route = useRoute()
 
   const goToPaymentMethod = () => {
-    router.go({
-      name: 'billing-tabs',
-      params: {
-        tab: 'payment'
-      }
-    })
+    const { name, params } = VIEW_BILLING_TABS_PAYMENT
+    if (route.name === name && route.params.tab === params.tab) {
+      props.closeDrawer()
+      return
+    }
+    router.push({ name, params })
   }
 </script>
 

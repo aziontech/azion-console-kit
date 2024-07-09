@@ -64,10 +64,11 @@
     @onSuccess="handleCreateCredit"
     title="Add credit to your account"
   >
-    <template #formFields="{ disabledFields }">
+    <template #formFields="{ disabledFields, closeDrawer }">
       <FormFieldsCreateCredit
         :cardDefault="props.cardDefault"
         :loading="disabledFields"
+        :closeDrawer="closeDrawer"
       />
     </template>
     <template #actionBar="{ closeDrawer, onSubmit, isSubmitting }">
