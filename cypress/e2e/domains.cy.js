@@ -139,7 +139,7 @@ describe('Domains spec', () => {
     )
   })
 
-  it('should edit a domain successfully', () => {
+  it.only('should edit a domain successfully', () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
 
@@ -167,7 +167,8 @@ describe('Domains spec', () => {
     )
 
     // Act
-    cy.get(selectors.domains.fieldTextInput).clear('', { delay: 3000 })
+    cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
+    cy.get(selectors.domains.fieldTextInput).clear()
     cy.get(selectors.domains.fieldTextInput).type(`${domainName}-edit`)
     cy.get(selectors.domains.cnamesField).clear()
     cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.domain.app`)
