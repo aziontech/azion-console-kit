@@ -3,7 +3,7 @@
   "bucket": "consolekitstage",
   "preset": "vue",
   "mode": "deliver",
-  "env": "production",
+  "env": "stage",
   "prefix": "20240625173729",
   "not-first-run": true,
   "function": {
