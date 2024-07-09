@@ -132,8 +132,8 @@
       showToast('error', error)
     } finally {
       showGoBack.value = props.showBarGoBack
-        toggleDrawerVisibility(false)
-        isSubmitting.value = false
+      toggleDrawerVisibility(false)
+      isSubmitting.value = false
     }
   }
 
