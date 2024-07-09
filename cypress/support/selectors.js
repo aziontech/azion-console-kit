@@ -234,6 +234,10 @@ const selectors = {
     cityOption: (optionIdx) => `#city_${optionIdx}`,
     address: '[data-testid="account-settings__address__input"]',
     complement: '[data-testid="account-settings__complement__input"]',
+    socialLogin:
+      '[data-testid="account-settings__login-settings__switch-isSocialLoginEnabled__switch"] > .p-inputswitch-slider',
+    enforceMfa:
+      '[data-testid="account-settings__login-settings__switch-isEnabledMfaToAllUsers__switch"] > .p-inputswitch-slider',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
   },
   dataStream: {
