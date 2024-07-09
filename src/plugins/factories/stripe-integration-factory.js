@@ -8,7 +8,7 @@ const environment = {
     stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
   },
   production: {
-    stripeToken: ''
+    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
   }
 }
 
@@ -17,6 +17,8 @@ function getStripeToken(env) {
 }
 
 export function makeStripeClient(environment) {
+  // eslint-disable-next-line no-console
+  console.log(environment)
   if (!environment) {
     throw Error('Provide an environment to select correct tracking token')
   }
