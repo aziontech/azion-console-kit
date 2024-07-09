@@ -154,6 +154,7 @@
           name="formFields"
           :errors="errors"
           :disabledFields="isSubmitting"
+          :closeDrawer="closeDrawer"
         />
       </form>
     </div>
