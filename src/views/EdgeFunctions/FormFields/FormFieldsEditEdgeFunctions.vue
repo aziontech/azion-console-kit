@@ -73,7 +73,7 @@
     return previewValues
   })
 
-  const radioOptions = ref([
+  const initiatorTypeOptions = ref([
     {
       title: 'Edge Application',
       subtitle: 'Runs the edge function on edge servers to reduce latency.',
@@ -149,7 +149,7 @@
               required
               nameField="initiatorType"
               isCard
-              :options="radioOptions"
+              :options="initiatorTypeOptions"
             />
           </div>
         </template>
