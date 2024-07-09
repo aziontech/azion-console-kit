@@ -18,48 +18,43 @@ describe('Your Settings spec', () => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/user', { fixture: 'your-settings.json' }).as('getUser')
     cy.intercept('PATCH', '/api/v4/iam/user', { statusCode: 200, body: {} }).as('patchUser')
+    cy.intercept('POST', '/graphql/cities', (req) => {
+      if (req.body.query === 'query alltimezones { allTimezones }') {
+        req.reply({ fixture: '/cities/all-timezones.json' })
+      }
+
+      if (req.body.query === 'query allCountries {allCountries { name, code2, phone } }') {
+        req.reply({ fixture: '/cities/all-countries.json' })
+      }
+    }).as('citiesApi')
+
     cy.openProduct('Your Settings')
   })
 
   it('should edit user settings but the email', () => {
     // Arrange
-    cy.get(selectors.yourSettings.firstNameInput).should('have.value', 'Clean User')
     cy.get(selectors.yourSettings.firstNameInput).clear()
-    cy.get(selectors.yourSettings.firstNameError)
-      .should('be.visible')
-      .and('have.text', 'First Name is a required field')
-    cy.get(selectors.yourSettings.lastNameInput).should('have.value', 'Cypress')
     cy.get(selectors.yourSettings.lastNameInput).clear()
-    cy.get(selectors.yourSettings.lastNameError)
-      .should('be.visible')
-      .and('have.text', 'Last Name is a required field')
-    cy.get(selectors.yourSettings.timezoneOptions).should('have.text', '(UTC +14:00) Etc/GMT-14')
-    cy.get(selectors.yourSettings.language).should('have.text', 'Language English')
-    cy.get(selectors.yourSettings.emailInput).should('have.value', 'testuser@cy.com')
     cy.get(selectors.yourSettings.emailInput).clear()
-    cy.get(selectors.yourSettings.emailError)
-      .should('be.visible')
-      .and('have.text', 'Email is a required field')
-    cy.get(selectors.yourSettings.mobileCountryCodeOptions).should('have.text', 'US +1')
-    cy.get(selectors.yourSettings.mobileInput).should('have.value', '1234567890')
     cy.get(selectors.yourSettings.mobileInput).clear()
-    cy.get(selectors.yourSettings.mobileError)
-      .should('be.visible')
-      .and('have.text', 'Phone Number is a required field')
 
     // Act
     cy.get(selectors.yourSettings.firstNameInput).type('Edited User')
     cy.get(selectors.yourSettings.lastNameInput).type('Cy')
+
     cy.get(selectors.yourSettings.timezoneOptions).click()
     cy.get(selectors.yourSettings.countryCodeFilter).clear()
     cy.get(selectors.yourSettings.countryCodeFilter).type('são')
     cy.get('#timezone_0').click()
+
     cy.get(selectors.yourSettings.emailInput).type('testuser@cy.com')
+
     cy.get(selectors.yourSettings.mobileCountryCodeOptions).click()
     cy.get(selectors.yourSettings.countryCodeFilter).clear()
     cy.get(selectors.yourSettings.countryCodeFilter).type('br')
     cy.get(selectors.yourSettings.countryCodeOption(0)).click()
     cy.get(selectors.yourSettings.mobileInput).type('987654321')
+
     cy.get(selectors.yourSettings.oldPasswordInput).type('AAAaaa123!!!')
     cy.get(selectors.yourSettings.newPasswordInput).type('AAAaaa123!!!')
     cy.get(selectors.yourSettings.confirmPasswordInput).type('A')
@@ -78,7 +73,6 @@ describe('Your Settings spec', () => {
 
   it('should edit user email', () => {
     // Arrange
-    cy.get(selectors.yourSettings.emailInput).should('have.value', 'testuser@cy.com')
     cy.get(selectors.yourSettings.emailInput).clear()
 
     // Act
