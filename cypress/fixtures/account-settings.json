@@ -1,0 +1,29 @@
+{
+  "data": {
+      "id": 1234,
+      "name": "Test User",
+      "company_name": "Company Name",
+      "is_active": true,
+      "unique_identifier": "00.000.000/0001-00",
+      "is_social_login_enabled": false,
+      "is_enabled_mfa_to_all_users": false,
+      "company_size": null,
+      "job_function": "software-developer",
+      "country": 1149361,
+      "first_login": false,
+      "address": "13, Elm Street",
+      "complement": "Apt. 123",
+      "city": 1142170,
+      "postal_code": "00000-000",
+      "region": 1147745,
+      "role": null,
+      "client_id": "1234i",
+      "billing_emails": "user@mail.com",
+      "status": "TRIAL",
+      "is_trustworthy": false,
+      "is_deleted": false,
+      "map_group_id": null,
+      "parent_id": 123,
+      "account_type": "client"
+  }
+}
