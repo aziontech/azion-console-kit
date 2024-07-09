@@ -103,38 +103,38 @@
 
   const handleSubmit = async () => {
     isSubmitting.value = true
-
-    const { token, error: submitionErrors } = await stripe.value.createToken(cardNumber.value, {
-      name: cardholderName.value
-    })
-    if (submitionErrors !== undefined) {
-      showToast('error', submitionErrors.message)
-    }
-    if (submitionErrors === undefined) {
-      const accountData = accountStore.account
-      const payload = {
-        card_address_zip: accountData.postal_code,
-        card_country: accountData.country,
-        stripe_token: token.id,
-        card_id: token.card.id,
-        card_brand: token.card.brand,
-        card_holder: token.card.name,
-        card_last_4_digits: token.card.last4,
-        card_expiration_month: token.card.exp_month,
-        card_expiration_year: token.card.exp_year
+    try {
+      const { token, error: submitionErrors } = await stripe.value.createToken(cardNumber.value, {
+        name: cardholderName.value
+      })
+      if (submitionErrors !== undefined) {
+        showToast('error', submitionErrors.message)
       }
-      try {
+      if (submitionErrors === undefined) {
+        const accountData = accountStore.account
+        const payload = {
+          card_address_zip: accountData.postal_code,
+          card_country: accountData.country,
+          stripe_token: token.id,
+          card_id: token.card.id,
+          card_brand: token.card.brand,
+          card_holder: token.card.name,
+          card_last_4_digits: token.card.last4,
+          card_expiration_month: token.card.exp_month,
+          card_expiration_year: token.card.exp_year
+        }
         const response = await props.createService(payload)
         emit('onSuccess', response)
         showToast('success', response.feedback)
-        showGoBack.value = props.showBarGoBack
-        toggleDrawerVisibility(false)
-      } catch (error) {
-        emit('onError', error)
-        showToast('error', error)
       }
+    } catch (error) {
+      emit('onError', error)
+      showToast('error', error)
+    } finally {
+      showGoBack.value = props.showBarGoBack
+        toggleDrawerVisibility(false)
+        isSubmitting.value = false
     }
-    isSubmitting.value = false
   }
 
   const handleGoBack = () => {

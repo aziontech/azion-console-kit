@@ -5,7 +5,7 @@ const environment = {
     stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
   },
   stage: {
-    stripeToken: ''
+    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
   },
   production: {
     stripeToken: ''
