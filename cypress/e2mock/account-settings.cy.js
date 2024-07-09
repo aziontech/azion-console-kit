@@ -54,4 +54,21 @@ describe('Your Settings spec', () => {
       .its('request.body')
       .should('have.property', 'is_enabled_mfa_to_all_users', true)
   })
+
+  it('should enable social login', () => {
+    // Arrange
+    cy.intercept('PATCH', '/api/v4/iam/account', { statusCode: 200, body: {} }).as('patchAccount')
+
+    // Act
+    cy.get(selectors.accountSettings.socialLogin).click()
+
+    cy.get(selectors.accountSettings.submitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your account settings have been updated')
+
+    cy.wait('@patchAccount')
+      .its('request.body')
+      .should('have.property', 'is_social_login_enabled', true)
+  })
 })
