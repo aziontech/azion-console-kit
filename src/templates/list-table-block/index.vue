@@ -391,12 +391,14 @@
 
   const loadData = async ({ page }) => {
     try {
-      isLoading.value = true
-
-      const response = props.isGraphql
-        ? await props.listService()
-        : await props.listService({ page })
-      data.value = response
+      let response
+      if (props.listService) {
+        isLoading.value = true
+        response = props.isGraphql ? await props.listService() : await props.listService({ page })
+        data.value = response
+      } else {
+        data.value = []
+      }
     } catch (error) {
       data.value = []
       showToast('error', error)
