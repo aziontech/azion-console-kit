@@ -1,6 +1,5 @@
 const selectors = {
   list: {
-    createTeamButton: '[data-testid="create_Team_button"]',
     breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
     createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -29,15 +28,6 @@ const selectors = {
     }
   },
   form: {
-    teamName: '[data-testid="teams-permissions-form__name__field-text__input"]',
-    teamNameError: '[data-testid="teams-permissions-form__name__field-text__error-message"]',
-    teamStatus: '[data-testid="teams-permissions-form__form-fields__status"]',
-    allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
-    allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
-    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
-    viewContentDeliverySettingsPermission:
-      '[data-testid="teams-permissions-form__permissions-field__picklist__item-View Content Delivery Settings"]',
-    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
     submitButton: '[data-testid="form-actions-submit-button"]',

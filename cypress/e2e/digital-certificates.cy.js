@@ -53,7 +53,7 @@ describe('Digital Certificates spec', () => {
 
   afterEach(() => {
     // Delete the digital certificate
-    cy.deleteEntityFromLoadedList().then(() => {
+    cy.deleteEntityFromList({ entityName: digitalCertificateName, productName: 'Digital Certificates' }).then(() => {
       cy.verifyToast('Digital certificate successfully deleted!')
     })
   })
