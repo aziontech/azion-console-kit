@@ -16,7 +16,7 @@
 
   const props = defineProps({
     cardNumber: {
-      type: String,
+      type: String
     },
     cardBrand: {
       type: String,
