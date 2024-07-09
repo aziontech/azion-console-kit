@@ -246,11 +246,11 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -296,7 +296,7 @@
     },
     actions: {
       type: Array,
-      required: true
+      default: () => []
     },
     isTabs: {
       type: Boolean,
@@ -317,25 +317,13 @@
   const menuRef = ref({})
 
   const dialog = useDialog()
-  const toast = useToast()
   const router = useRouter()
+  const toast = useToast()
 
   onMounted(() => {
     loadData({ page: 1 })
     selectedColumns.value = props.columns
   })
-
-  const showToast = (severity, detail) => {
-    if (!detail) return
-    const options = {
-      closable: true,
-      severity,
-      summary: severity,
-      detail
-    }
-
-    toast.add(options)
-  }
 
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
@@ -390,18 +378,24 @@
   }
 
   const loadData = async ({ page }) => {
-    try {
-      isLoading.value = true
-
-      const response = props.isGraphql
-        ? await props.listService()
-        : await props.listService({ page })
-      data.value = response
-    } catch (error) {
-      data.value = []
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
+    if (props.listService) {
+      try {
+        isLoading.value = true
+        const response = props.isGraphql
+          ? await props.listService()
+          : await props.listService({ page })
+        data.value = response
+      } catch (error) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: 'Error fetching data:',
+          error
+        })
+      } finally {
+        isLoading.value = false
+      }
     }
   }
 
