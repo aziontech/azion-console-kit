@@ -141,7 +141,7 @@
       <FormHorizontal
         class="mt-8"
         title="Initiator Type"
-        description=""
+        description="This determines how and where your edge function will be deployed and triggered."
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
