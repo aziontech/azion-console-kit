@@ -15,6 +15,7 @@ export const billingRoutes = {
           listPaymentMethodsService: BillingServices.listPaymentMethodsService,
           deletePaymentService: BillingServices.deletePaymentService,
           setAsDefaultPaymentService: BillingServices.setAsDefaultPaymentService,
+          createPaymentMethodService: BillingServices.createPaymentMethodService,
           documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods,
           addCreditService: BillingServices.addCreditService
         },
