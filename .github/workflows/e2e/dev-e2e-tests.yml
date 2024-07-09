@@ -1,4 +1,4 @@
-name: Dev E2E Tests
+name: E2E Tests
 
 on:
     pull_request:
@@ -8,7 +8,7 @@ on:
         - dev
 
 jobs:
-  run-dev-e2e-tests:
+  run-e2e-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
