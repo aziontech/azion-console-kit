@@ -10,6 +10,7 @@
   import CodePreview from '../components/code-preview.vue'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
 
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
@@ -26,6 +27,7 @@
   const showPreview = ref(true)
 
   const { value: name } = useField('name')
+
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs', null, {
     initialValue: ARGS_INITIAL_STATE
   })
@@ -49,6 +51,19 @@
     emit('update:previewData', previewValues)
     return previewValues
   })
+
+  const radioOptions = ref([
+    {
+      title: 'Edge Application',
+      subtitle: 'Runs the edge function on edge servers to reduce latency.',
+      inputValue: 'edge_application'
+    },
+    {
+      title: 'Edge Firewall',
+      subtitle: 'Applies the edge function on edge servers to enhance security.',
+      inputValue: 'edge_firewall'
+    }
+  ])
 </script>
 
 <template>
@@ -87,6 +102,23 @@
               :value="LANGUAGE_LABEL"
               description="Currently, only JavaScript is supported."
               readonly
+            />
+          </div>
+        </template>
+      </FormHorizontal>
+
+      <FormHorizontal
+        class="mt-8"
+        title="Initiator Type"
+        description="This determines how and where your edge function will be deployed and triggered."
+      >
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <FieldGroupRadio
+              required
+              nameField="initiatorType"
+              isCard
+              :options="radioOptions"
             />
           </div>
         </template>
