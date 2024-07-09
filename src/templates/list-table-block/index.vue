@@ -250,6 +250,7 @@
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -295,7 +296,7 @@
     },
     actions: {
       type: Array,
-      required: true
+      default: () => []
     },
     isTabs: {
       type: Boolean,
@@ -317,6 +318,7 @@
 
   const dialog = useDialog()
   const router = useRouter()
+  const toast = useToast()
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -384,8 +386,13 @@
           : await props.listService({ page })
         data.value = response
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching data:', error)
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: 'Error fetching data:',
+          error
+        })
       } finally {
         isLoading.value = false
       }
