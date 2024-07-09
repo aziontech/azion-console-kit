@@ -21,6 +21,7 @@ import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
 import DialogService from 'primevue/dialogservice'
+import StripeIntegrationPlugin from '@/plugins/StripeIntegrationPlugin'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 
@@ -39,6 +40,7 @@ app.use(pinia)
 app.use(router)
 app.use(DialogService)
 app.use(TrackerPlugin)
+app.use(StripeIntegrationPlugin)
 app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'
