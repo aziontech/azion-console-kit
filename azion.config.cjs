@@ -3,7 +3,9 @@
 /* ex: require(`./azion/${environment}/azion.json`)
 */
 /* eslint-env node */
-const environment = process.env.VITE_ENVIRONMENT || 'production'
+const environment = process.env.MODE || 'production'
+// eslint-disable-next-line no-console
+console.log(process.env)
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {

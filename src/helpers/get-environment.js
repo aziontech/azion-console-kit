@@ -2,5 +2,8 @@
  * @returns {'development'|'stage'|'production'}
  */
 export const getEnvironment = () => {
-  return import.meta.env.MODE
+  const environment = import.meta.env
+  // eslint-disable-next-line no-console
+  console.log('🚀 ~ getEnvironment ~ environment:', environment);
+  return environment.MODE
 }
