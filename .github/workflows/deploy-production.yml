@@ -33,5 +33,5 @@ jobs:
       - name: Build & Deploy
         run: azion deploy --auto --config-dir azion/production
         env:
-          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}          
-          MODE: production
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          NODE_ENV: production
