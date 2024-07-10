@@ -89,9 +89,13 @@
     return edgeFirewall.value?.name || ''
   })
 
-  const showFunctionsTab = computed(() => {
-    return edgeFirewall.value?.edgeFunctionsEnabled
+  const showFunctions = computed(() => {
+    return {
+      tab: edgeFirewall.value?.edgeFunctionsEnabled,
+      list: activeTab.value === mapTabs.value.functions
+    }
   })
+
   const showRulesEngine = computed(() => {
     return activeTab.value === mapTabs.value.rulesEngine
   })
@@ -164,12 +168,13 @@
         class="w-full h-full"
         v-if="edgeFirewall"
       >
-        <TabPanel header="Main Settings"
+        <TabPanel
+          header="Main Settings"
           :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__main-settings-tab'
-                }
-              }"
+            headerAction: {
+              'data-testid': 'edge-firewall__main-settings-tab'
+            }
+          }"
         >
           <EditView
             v-if="showMainSettingsTab"
@@ -183,25 +188,26 @@
         </TabPanel>
         <TabPanel
           header="Functions Instances"
-          v-if="showFunctionsTab"
+          v-if="showFunctions.tab"
           :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__functions-tab'
-                }
-              }"
+            headerAction: {
+              'data-testid': 'edge-firewall__functions-tab'
+            }
+          }"
         >
           <EdgeFirewallFunctionsListView
-            v-if="showFunctionsTab"
+            v-if="showFunctions.list"
             v-bind="props.edgeFirewallServices"
             :edgeFirewallID="edgeFirewallId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine"
+        <TabPanel
+          header="Rules Engine"
           :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__rules-engine-tab'
-                }
-              }"
+            headerAction: {
+              'data-testid': 'edge-firewall__rules-engine-tab'
+            }
+          }"
         >
           <EdgeFirewallRulesEngineListView
             v-if="showRulesEngine"
