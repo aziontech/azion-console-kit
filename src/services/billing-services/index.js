@@ -10,6 +10,6 @@ export {
   listPaymentHistoryService,
   deletePaymentService,
   setAsDefaultPaymentService,
+  addCreditService,
   createPaymentMethodService,
-  addCreditService
 }
