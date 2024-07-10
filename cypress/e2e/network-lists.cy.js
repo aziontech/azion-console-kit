@@ -34,6 +34,32 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
     cy.get(selectors.networkLists.typeRow).should('have.text', 'ASN')
   })
+
+  it('Create a Countries Network List', function () {
+    // Act
+    cy.get(selectors.networkLists.createButton).click()
+
+    cy.get(selectors.networkLists.nameInput).clear()
+    cy.get(selectors.networkLists.nameInput).type(`${networkListName}`)
+
+    cy.get(selectors.networkLists.typeDropdown).click()
+    cy.get(selectors.networkLists.typeDropdown).find('li').eq(1).should('have.text', 'Countries').click()
+
+    cy.get(selectors.networkLists.countriesMultiselect).click()
+    cy.get('.p-multiselect-item').eq(0).click()
+    cy.get('.p-multiselect-item').eq(1).click()
+    
+    cy.get(selectors.networkLists.saveButton).click()
+    cy.verifyToast('success', 'Your network list has been created')
+    cy.get(selectors.networkLists.cancelButton).click()
+
+    // Assert
+    cy.get(selectors.networkLists.searchInput).clear()
+    cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
+    cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
+    cy.get(selectors.networkLists.typeRow).should('have.text', 'Countries')
+  })
+
   it('Create a IP/CIDR Network List', function () {
     // Act
     cy.get(selectors.networkLists.createButton).click()
@@ -64,4 +90,5 @@ describe('Network Lists spec', () => {
       cy.verifyToast('Resource successfully deleted')
     })
   })
+
 })
