@@ -2,13 +2,10 @@
 /* you can import your config based on environment value, 
 /* ex: require(`./azion/${environment}/azion.json`)
 */
-
-const { getEnvironment } = require("@/helpers")
-
 /* eslint-env node */
-const environment = getEnvironment()
+const environment = process.env.MODE || 'production'
 // eslint-disable-next-line no-console
-console.log('🚀 ~ environment:', environment);
+console.log(process.env)
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
