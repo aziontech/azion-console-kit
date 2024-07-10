@@ -164,8 +164,10 @@
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     :isReorderAllEnabled="true"
+    data-testid="Rules List"
     @on-load-data="handleLoadData"
     emptyListMessage="No rules have been created."
+    addButtonLabel="Rules Engine"
     :actions="actions"
     isTabs
   >
@@ -178,7 +180,7 @@
     </template>
   </ListTableBlock>
   <EmptyResultsBlock
-    v-else
+    v-el
     title="No rule has been created"
     description="Click the button below to create your first rule."
     createButtonLabel="Rule"
@@ -191,6 +193,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Rules Engine"
+        data-testid="create_Rules Engine_button"
         @click="openCreateDrawer"
       />
     </template>
