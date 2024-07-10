@@ -885,6 +885,93 @@ const REPORTS = [
     dashboardId: '352149476039721549',
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalRequests
+  },
+  /**
+   * Deploy
+   * Nodes metrics - Metrics Analysis
+   */
+  {
+    id: 'ID-deste-report-deve-ser-unico',
+    chartOwner: 'azion',
+    label: 'Total Data Streamed',
+    description: REPORTS_TEXTS.dataStream.dataStreamed.totalData.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataUnit: 'bytes',
+    dataset: 'dataStreamedMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'dataStreamed'
+      }
+    ],
+    limit: 5000,
+    groupBy: [],
+    orderDirection: 'ASC',
+    dashboardId: 'node-metrics-id-123-321',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalDataStreamed
+  },
+  {
+    id: 'ID-deste-report-deve-ser-unico-11',
+    chartOwner: 'azion',
+    label: 'Total Data Streamed 2',
+    description: REPORTS_TEXTS.dataStream.dataStreamed.totalData.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataUnit: 'bytes',
+    dataset: 'dataStreamedMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'dataStreamed'
+      }
+    ],
+    limit: 5000,
+    groupBy: [],
+    orderDirection: 'ASC',
+    dashboardId: 'node-metrics-id-123-321',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalDataStreamed
+  },
+  /**
+   * Deploy
+   * Nodes metrics - Metrics Analysis 2
+   * Para olhar os data sets e props , acessar : https://manager.azion.com/metrics/graphql
+   */
+  {
+    id: 'ID-deste-report-deve-ser-unico-2',
+    chartOwner: 'azion',
+    label: 'Total Data Streamed',
+    description: REPORTS_TEXTS.dataStream.dataStreamed.totalData.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'bar',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataUnit: 'bytes',
+    dataset: 'dataStreamedMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'dataStreamed'
+      }
+    ],
+    limit: 5000,
+    groupBy: [],
+    orderDirection: 'ASC',
+    dashboardId: 'node-metrics-id-123-321-ABC',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalDataStreamed
   }
 ]
 

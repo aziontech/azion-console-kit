@@ -22,6 +22,10 @@
  * @property {number} id - The unique identifier of the group.
  * @property {Page[]} pagesDashboards - The list of pages in the group.
  */
+
+/**
+ * @type {Object.<string, Page[]>}
+ */
 const PAGES_DASHBOARDS = {
   build: [
     {
@@ -144,9 +148,40 @@ const PAGES_DASHBOARDS = {
         }
       ]
     }
+  ],
+  deploy: [
+    {
+      id: 9, // desde que seja único, não tem problema
+      label: 'Node metrics',
+      path: 'nodes-metrics', // usado para colocar na URL do browser e poder dar cpy paste do estado via url state.
+      groupId: 4, /// mesmo valor do =>> GROUP_DASHBOARDS[3].id
+      dashboards: [
+        {
+          id: 'node-metrics-id-123-321',
+          label: 'Metrics Analysis', // nome do dashboard, que aparece na tela como uma tab.
+          path: 'analysis', // usado para colocar na URL do browser e poder dar cpy paste do estado via url state. Se justa ao outro path acima.
+          dataset: 'dataStreamedMetrics' // usar um dataset criado no beholder se não ele não acha dados.
+        },
+        {
+          id: 'node-metrics-id-123-321-ABC',
+          label: 'Metrics Analysis 2', // nome do dashboard, que aparece na tela como uma tab.
+          path: 'analysis-2', // usado para colocar na URL do browser e poder dar cpy paste do estado via url state. Se justa ao outro path acima.
+          dataset: 'imagesProcessedMetrics' // usar um dataset criado no beholder se não ele não acha dados.
+        }
+        // {
+        //   id: 'node-metrics-id-123-321-ABC',
+        //   label: 'Metrics Analysis Responses',
+        //   path: 'analysis-responses',
+        //   dataset: 'sera-criado-no-beholder-para-usar'
+        // }
+      ]
+    }
   ]
 }
 
+/**
+ * @type {Group[]}
+ */
 const GROUP_DASHBOARDS = [
   {
     label: 'Build',
@@ -165,6 +200,12 @@ const GROUP_DASHBOARDS = [
     value: 'observe',
     id: 3,
     pagesDashboards: PAGES_DASHBOARDS.observe
+  },
+  {
+    label: 'Deploy',
+    value: 'deploy',
+    id: 4,
+    pagesDashboards: PAGES_DASHBOARDS.deploy
   }
 ]
 
