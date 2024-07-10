@@ -73,7 +73,7 @@
     return previewValues
   })
 
-  const initiatorTypeOptions = ref([
+  const initiatorTypeOptions = [
     {
       title: 'Edge Application',
       subtitle: 'Runs the edge function on edge servers to reduce latency.',
@@ -84,7 +84,7 @@
       subtitle: 'Applies the edge function on edge servers to enhance security.',
       inputValue: 'edge_firewall'
     }
-  ])
+  ]
 </script>
 
 <template>
