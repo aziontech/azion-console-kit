@@ -6,6 +6,8 @@
   import Tag from 'primevue/tag'
   import ListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
+  import YourServicePlan from './DetailsBills/YourServicePlan'
+  import CurrentInvoice from './DetailsBills/CurrentInvoice'
 
   import { ref, computed } from 'vue'
 
@@ -83,6 +85,10 @@
         class="w-full h-full"
       >
         <TabPanel header="Bills">
+          <div class="w-full flex flex-col sm:flex-row gap-8 mt-6">
+            <CurrentInvoice></CurrentInvoice>
+            <YourServicePlan></YourServicePlan>
+          </div>
           <BillsView v-bind="props.billsServices" />
         </TabPanel>
         <TabPanel header="Payment Methods">
