@@ -129,19 +129,12 @@ const selectors = {
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
   },
   variables: {
-    createButton: '[data-testid="create_Variable_button"] > .p-button-label',
+    createButton: '[data-testid="create_Variable_button"]',
     keyInput: '[data-testid="variables-form__key-field__input"]',
     valueInput: '[data-testid="variables-form__value-field__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    keyRow: '[data-testid="list-table-block__column__key__row"]',
-    valueRow: '.whitespace-pre',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
+    secretToggle: '[data-testid="variables-form__secret-field__switch"] > .p-inputswitch-slider',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    showMore: '[data-testid="list-table-block__column__value__row"] .underline'
   },
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
