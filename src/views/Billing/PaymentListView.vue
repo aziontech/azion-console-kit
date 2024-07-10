@@ -1,15 +1,23 @@
 <template>
+  <Drawer
+    ref="drawerRef"
+    :cardDefault="cardDefault"
+    :createService="props.addCreditService"
+  />
+
   <CreatePaymentMethodBlock
     :createService="props.createPaymentMethodService"
     v-model:visible="showCreatePaymentMethodDrawer"
     v-if="loadCreatePaymentMethodDrawer"
+    @onSuccess="reloadList"
   />
   <ListTableBlock
+    ref="listPaymentMethodsRef"
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
     :columns="paymentsColumns"
-    :listService="props.listPaymentMethodsService"
+    :listService="listPaymentMethodsServiceWithDecorator"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
@@ -19,6 +27,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Add Credit"
+          @click="openCreateCreditDrawer"
           outlined
         />
         <PrimeButton
@@ -35,7 +44,7 @@
     title="No payment method has been added"
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
-    :inTabs="true"
+    inTabs
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -53,6 +62,7 @@
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import Drawer from './Drawer'
 
   import { ref } from 'vue'
 
@@ -79,9 +89,16 @@
     documentPaymentMethodService: {
       type: Function,
       required: true
+    },
+    addCreditService: {
+      type: Function,
+      required: true
     }
   })
 
+  const drawerRef = ref('')
+  const cardDefault = ref({})
+  const listPaymentMethodsRef = ref('')
   const showCreatePaymentMethodDrawer = ref(false)
   const debouncedDrawerAnimate = 300
   const loadCreatePaymentMethodDrawer = refDebounced(
@@ -110,7 +127,7 @@
       filterPath: 'expiringDateSearch',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'credit-expiration-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'text-with-tag' })
     }
   ])
 
@@ -159,4 +176,23 @@
       service: props.deletePaymentService
     }
   ])
+
+  const listPaymentMethodsServiceWithDecorator = async () => {
+    const listPaymentMethods = await props.listPaymentMethodsService()
+    const [firstCard] = listPaymentMethods
+    cardDefault.value = firstCard
+    return listPaymentMethods
+  }
+
+  const openCreateCreditDrawer = () => {
+    if (cardDefault.value.isDefault) drawerRef.value.openCreateDrawer()
+  }
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listPaymentMethodsRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 </script>
