@@ -1,31 +1,37 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-const wafName = generateUniqueName('WAF')
+let wafName
+const breadcrumbToListIndex = 2
 
 describe('WAF spec', () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('WAF Rules')
+
+    wafName = generateUniqueName('WAF')
   })
 
-  it('Create a WAF ', function () {
-    // Act
+  it('should create a WAF ', function () {
+    // Arrange
     cy.get(selectors.wafs.createButton).click()
-    cy.get(selectors.wafs.nameInput).clear('')
+
+    cy.get(selectors.wafs.nameInput).clear()
+
+    // Act
     cy.get(selectors.wafs.nameInput).type(wafName)
 
-    cy.get(selectors.wafs.saveButton).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your waf rule has been created')
-    cy.get(selectors.wafs.cancelButton).click()
-    cy.get(selectors.wafs.cancelButton).click()
-    cy.get(selectors.wafs.cancelButton).click()
+
+    cy.get(selectors.wafs.breadcumb(breadcrumbToListIndex)).click()
+
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(wafName)
 
     // Assert
-    cy.get(selectors.wafs.searchInput).clear()
-    cy.get(selectors.wafs.searchInput).type(`${wafName}{enter}`)
-    cy.get(selectors.wafs.nameRow).should('have.text', wafName)
-    cy.get(selectors.wafs.threatTypesRow).should('have.text', 'File upload')
+    cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
+    cy.get(selectors.wafs.listRow('threatTypes')).should('have.text', 'File upload')
   })
 
   afterEach(() => {
