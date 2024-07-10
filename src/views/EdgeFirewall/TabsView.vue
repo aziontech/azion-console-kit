@@ -89,9 +89,13 @@
     return edgeFirewall.value?.name || ''
   })
 
-  const showFunctionsTab = computed(() => {
-    return edgeFirewall.value?.edgeFunctionsEnabled
+  const showFunctions = computed(() => {
+    return {
+      tab: edgeFirewall.value?.edgeFunctionsEnabled,
+      list: activeTab.value === mapTabs.value.functions
+    }
   })
+
   const showRulesEngine = computed(() => {
     return activeTab.value === mapTabs.value.rulesEngine
   })
@@ -164,13 +168,7 @@
         class="w-full h-full"
         v-if="edgeFirewall"
       >
-        <TabPanel header="Main Settings"
-          :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__main-settings-tab'
-                }
-              }"
-        >
+        <TabPanel header="Main Settings">
           <EditView
             v-if="showMainSettingsTab"
             :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
@@ -183,26 +181,15 @@
         </TabPanel>
         <TabPanel
           header="Functions Instances"
-          v-if="showFunctionsTab"
-          :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__functions-tab'
-                }
-              }"
+          v-if="showFunctions.tab"
         >
           <EdgeFirewallFunctionsListView
-            v-if="showFunctionsTab"
+            v-if="showFunctions.list"
             v-bind="props.edgeFirewallServices"
             :edgeFirewallID="edgeFirewallId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine"
-          :pt="{
-                headerAction: {
-                  'data-testid': 'edge-firewall__rules-engine-tab'
-                }
-              }"
-        >
+        <TabPanel header="Rules Engine">
           <EdgeFirewallRulesEngineListView
             v-if="showRulesEngine"
             :edgeFirewallModules="edgeFirewallModules"
