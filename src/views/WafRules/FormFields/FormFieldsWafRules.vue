@@ -148,6 +148,7 @@
                 inputClass=""
                 :name="item.dropdown.value"
                 :value="item.dropdown.initialValue"
+                :data-testid="`waf-rules-form__${item.dropdown.value}-field`"
               />
             </div>
           </template>
@@ -165,6 +166,7 @@
           :isCard="false"
           title="Active"
           :disabled="props.disabledActive"
+          data-testid="waf-rules-form__active-field"
         />
       </div>
     </template>
