@@ -4,8 +4,9 @@
 */
 /* eslint-env node */
 const environment = process.env.MODE || 'production'
+
 // eslint-disable-next-line no-console
-console.log(process.env)
+console.log('🚀 ~ process.env:', process.env.MODE)
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
