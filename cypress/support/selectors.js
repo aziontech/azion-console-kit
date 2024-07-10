@@ -132,9 +132,9 @@ const selectors = {
     createButton: '[data-testid="create_Variable_button"]',
     keyInput: '[data-testid="variables-form__key-field__input"]',
     valueInput: '[data-testid="variables-form__value-field__input"]',
-    secretToggle:
-      '[data-testid="data-testid="variables-form__secret-field__switch""] > .p-inputswitch-slider',
-    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
+    secretToggle: '[data-testid="variables-form__secret-field__switch"] > .p-inputswitch-slider',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    showMore: '[data-testid="list-table-block__column__value__row"] .underline'
   },
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
