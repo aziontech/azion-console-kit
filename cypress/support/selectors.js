@@ -28,7 +28,6 @@ const selectors = {
     }
   },
   form: {
-    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
@@ -366,7 +365,37 @@ const selectors = {
     copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
     confirmButton: '[data-testid="domains-dialog__confirm__button"]',
     pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    actionDelete: '.p-menuitem-content > .p-menuitem-link'
+    digitalCertificateFieldSelectedValue:
+      ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    digitalCertificateDropdown:
+      '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
+    letsEncryptDropdownOption: '#edgeCertificate_1',
+    editPageTitle: '[data-testid="page_title_Edit Domain"]',
+    enableMtlsSwitch:
+      '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
+    dropdownTrustedCA:
+      '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown"] > .p-dropdown-label',
+    trustedCAFirstDropdownOption: '#mtlsTrustedCertificate_0',
+    mtlsTrustedCAFieldSelectedValue:
+      ':nth-child(4) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    fieldTextInput: '[data-testid="field-text__input"]',
+    domainUri: '[data-testid="edit-domains-form__domain-field__input"]',
+    editFormCopyDomainButton: '[data-testid="edit-domains-form__domain-field__copy-button"]',
+    activeSwitchEditForm: '[data-testid="edit-domains-form__active-field__switch"]',
+    formActionsSubmitButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    dataTableSearchInput: '[data-testid="data-table-search-input"]',
+    listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',
+    listTableBlockColumnActiveRow:
+      '[data-testid="list-table-block__column__active__row"] > .p-tag-value'
+  },
+  digitalCertificates: {
+    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
+    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
+    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
+    importTrustedCARadioOption:
+      '[inputvalue="trusted_ca_certificate"] > .p-card-body > .p-card-content > .p-4',
+    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
+    trustedCATextArea: '[data-testid="trusted-certificates-form__certificate-field__textarea"]'
   },
   purge: {
     createButton: '[data-testid="create_Purge_button"]',
