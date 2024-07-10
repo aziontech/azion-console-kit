@@ -68,12 +68,13 @@
 
 <template>
   <TabView class="w-full">
-    <TabPanel header="Main Settings"
+    <TabPanel
+      header="Main Settings"
       :pt="{
-            headerAction: {
-              'data-testid': 'edge-functions__main-settings-tab'
-            }
-          }"
+        headerAction: {
+          'data-testid': 'edge-functions__main-settings-tab'
+        }
+      }"
     >
       <FormHorizontal
         class="mt-8"
@@ -147,12 +148,13 @@
         </template>
       </FormHorizontal>
     </TabPanel>
-    <TabPanel header="Code"
+    <TabPanel
+      header="Code"
       :pt="{
-            headerAction: {
-              'data-testid': 'edge-functions__main-settings-tab'
-            }
-          }"
+        headerAction: {
+          'data-testid': 'edge-functions__main-settings-tab'
+        }
+      }"
     >
       <Splitter
         :style="{ height: SPLITTER_PROPS.height }"
@@ -203,12 +205,13 @@
       </div>
     </TabPanel>
 
-    <TabPanel header="Arguments"
+    <TabPanel
+      header="Arguments"
       :pt="{
-            headerAction: {
-              'data-testid': 'edge-functions__main-settings-tab'
-            }
-          }"
+        headerAction: {
+          'data-testid': 'edge-functions__main-settings-tab'
+        }
+      }"
     >
       <Splitter
         :style="{ height: SPLITTER_PROPS.height }"
