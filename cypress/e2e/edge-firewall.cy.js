@@ -50,42 +50,31 @@ describe('Edge Firewall spec', () => {
     cy.get(selectors.edgeFirewall.functionInstanceTableColumnInstanced).should('have.text', 'Edge Firewall Test Function - NAO DELETAR')
 
     // Act - Create a rule do run the function
-    // vai pra tab de rules engine
-    cy.get('[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title').click()
-    // Clica no botao de create
-    cy.get('.rounded-md > .gap-5 > .flex > .p-button > .p-button-label').click()
-    // preenche nome
-    cy.get('[data-testid="edge-firewall-rule-form__name__input"]').click()
-    cy.get('[data-testid="edge-firewall-rule-form__name__input"]').type(ruleName)
-    // preenche descrição
-    cy.get('[data-testid="edge-firewall-rule-form__description__input"]').clear()
-    cy.get('[data-testid="edge-firewall-rule-form__description__input"]').type('My Rule Description')
-    // seleciona request uri
-    cy.get('#criteria\\[0\\]\\[0\\]\\.variable > .p-dropdown-trigger').click()
-    cy.get('#criteria\\[0\\]\\[0\\]\\.variable_11').click()
-    // seleciona starts with
-    cy.get(':nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label').click()
-    cy.get('#criteria\\[0\\]\\[0\\]\\.operator_2').click()
-    // digita / como valor
-    cy.get(':nth-child(3) > [data-testid="field-text__input"]').clear()
-    cy.get(':nth-child(3) > [data-testid="field-text__input"]').type('/')
-    // seleciona run function
-    cy.get(':nth-child(1) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label').click()
-    cy.get('#behaviors\\[0\\]\\.name_4').click()
-    // seleciona function instance criada
-    cy.get('.gap-3 > :nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label').click()
-    cy.get('#behaviors\\[0\\]\\.functionId_0').click()
-    // salva
-    cy.get('[data-testid="form-actions-submit-button"] > .p-button-label').click()
-
+    cy.get(selectors.edgeFirewall.rulesEngineTab).click()
+    cy.get(selectors.edgeFirewall.createRuleButton).click()
+    cy.get(selectors.edgeFirewall.ruleNameInput).click()
+    cy.get(selectors.edgeFirewall.ruleNameInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.ruleDescriptionInput).clear()
+    cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
+    cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownRequestUri).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaOperatorStartsWith).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaInput).clear()
+    cy.get(selectors.edgeFirewall.ruleCriteriaInput).type('/')
+    cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleBehaviorRunFunction).click()
+    cy.get(selectors.edgeFirewall.ruleBehaviorFunctionToRunDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleBehaviorFunctionToRun).click()
+    cy.get(selectors.edgeFirewall.ruleSubmit).click()
     cy.verifyToast('success', 'Rule Engine successfully created')
-
+    
     // Assert - Find the created rule
-    cy.get('[data-testid="data-table-search-input"]').clear()
-    cy.get('[data-testid="data-table-search-input"]').type(ruleName)
-    cy.get('[data-testid="list-table-block__column__name__row"]').should('have.text', ruleName)
-    cy.get('.underline').click()
-    cy.get('.whitespace-pre').should('have.text', 'My Rule Description')
+    cy.get(selectors.edgeFirewall.rulesTableSearchInput).clear()
+    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.rulesTableColumnName).should('have.text', ruleName)
+    cy.get(selectors.edgeFirewall.rulesTableColumnDescriptionShowMore).click()
+    cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should('have.text', 'My Rule Description')
 
     // Cleanup - Remove the created rule
     cy.deleteEntityFromLoadedList().then(() => {
