@@ -139,7 +139,7 @@ describe('Domains spec', () => {
     )
   })
 
-  it.only('should edit a domain successfully', () => {
+  it('should edit a domain successfully', () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
 
