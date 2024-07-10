@@ -341,6 +341,11 @@
   resolved "https://registry.npmjs.org/@babel/helper-plugin-utils/-/helper-plugin-utils-7.22.5.tgz"
   integrity sha512-uLls06UVKgFG9QD4OeFYLEGteMIAa5kpTPcFL28yuCIIzsf6ZyKZMllKVOCZFhiZ5ptnwX4mtKdWCBE/uT4amg==
 
+"@babel/helper-plugin-utils@^7.24.7":
+  version "7.24.7"
+  resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.24.7.tgz#98c84fe6fe3d0d3ae7bfc3a5e166a46844feb2a0"
+  integrity sha512-Rq76wjt7yz9AAc1KnlRKNAi/dMSVWgDRx43FHoJEbcYU6xOWaE2dVPwcdTukJrjxS65GITyfbvEYHvkirZ6uEg==
+
 "@babel/helper-replace-supers@^7.22.9":
   version "7.22.9"
   resolved "https://registry.npmjs.org/@babel/helper-replace-supers/-/helper-replace-supers-7.22.9.tgz"
@@ -492,6 +497,13 @@
   integrity sha512-gvyP4hZrgrs/wWMaocvxZ44Hw0b3W8Pe+cMxc8V1ULQ07oh8VNbIRaoD1LRZVTvD+0nieDKjfgKg89sD7rrKrg==
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
+
+"@babel/plugin-syntax-jsx@^7.24.7":
+  version "7.24.7"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-jsx/-/plugin-syntax-jsx-7.24.7.tgz#39a1fa4a7e3d3d7f34e2acc6be585b718d30e02d"
+  integrity sha512-6ddciUPe/mpMnOKv/U+RSd2vvVy+Yw/JfBB0ZHYjEZt9NLHmCUylNYlsbqCCS1Bffjlb0fCwC9Vqz+sBz6PsiQ==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.24.7"
 
 "@babel/plugin-syntax-typescript@^7.22.5":
   version "7.22.5"
@@ -788,6 +800,15 @@
     istanbul-lib-coverage "^3.0.0"
     js-yaml "4.1.0"
     nyc "15.1.0"
+
+"@cypress/grep@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@cypress/grep/-/grep-4.1.0.tgz#77dba973f0023ce01f5d2481a257f3e55c8f73ee"
+  integrity sha512-yUscMiUgM28VDPrNxL19/BhgHZOVrAPrzVsuEcy6mqPqDYt8H8fIaHeeGQPW4CbMu/ry9sehjH561WDDBIXOIg==
+  dependencies:
+    debug "^4.3.4"
+    find-test-names "^1.28.18"
+    globby "^11.0.4"
 
 "@cypress/request@^3.0.0":
   version "3.0.1"
@@ -2965,7 +2986,7 @@ debug@^3.1.0:
   dependencies:
     ms "^2.1.1"
 
-debug@^4.3.1:
+debug@^4.3.1, debug@^4.3.3:
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.5.tgz#e83444eceb9fedd4a1da56d671ae2446a01a6e1e"
   integrity sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==
@@ -3531,6 +3552,18 @@ find-cache-dir@^3.2.0:
     make-dir "^3.0.2"
     pkg-dir "^4.1.0"
 
+find-test-names@^1.28.18:
+  version "1.28.22"
+  resolved "https://registry.yarnpkg.com/find-test-names/-/find-test-names-1.28.22.tgz#c7156bcc6c9e60e55bc32df54fd00cf4fdf752b0"
+  integrity sha512-cnQaOMvA75FZF4BYfr9DbxxUcoATlRpzcorgkf7It7JLLdD1G5ZBU6PSaDYR8Ssj/ugJH2BvWZwnDPbRLWMI/g==
+  dependencies:
+    "@babel/parser" "^7.24.7"
+    "@babel/plugin-syntax-jsx" "^7.24.7"
+    acorn-walk "^8.2.0"
+    debug "^4.3.3"
+    globby "^11.0.4"
+    simple-bin-help "^1.8.0"
+
 find-up@^4.0.0, find-up@^4.1.0:
   version "4.1.0"
   resolved "https://registry.npmjs.org/find-up/-/find-up-4.1.0.tgz"
@@ -3799,7 +3832,7 @@ globals@^13.19.0, globals@^13.20.0:
   dependencies:
     type-fest "^0.20.2"
 
-globby@11.1.0:
+globby@11.1.0, globby@^11.0.4:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/globby/-/globby-11.1.0.tgz#bd4be98bb042f83d796f7e3811991fbe82a0d34b"
   integrity sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==
@@ -5641,6 +5674,11 @@ signal-exit@^3.0.2, signal-exit@^3.0.3, signal-exit@^3.0.7:
   version "3.0.7"
   resolved "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.7.tgz"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
+
+simple-bin-help@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/simple-bin-help/-/simple-bin-help-1.8.0.tgz#21bb82c6bccd9fa8678f9c0fadf2956b54e2160a"
+  integrity sha512-0LxHn+P1lF5r2WwVB/za3hLRIsYoLaNq1CXqjbrs3ZvLuvlWnRKrUjEWzV7umZL7hpQ7xULiQMV+0iXdRa5iFg==
 
 sirv@^2.0.3:
   version "2.0.3"
