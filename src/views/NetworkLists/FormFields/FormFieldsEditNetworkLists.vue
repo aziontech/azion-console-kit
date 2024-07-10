@@ -83,6 +83,7 @@
           :value="networkListType"
           appendTo="self"
           description="Each list type accepts different values."
+          data-testid="network-list-form__type"
         />
       </div>
       <div
@@ -108,7 +109,6 @@
         <FieldTextArea
           label="List"
           required
-          disabled
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
           name="itemsValues"
           rows="16"

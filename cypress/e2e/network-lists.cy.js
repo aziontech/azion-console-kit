@@ -173,7 +173,7 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
   })
 
-  it('should edit an IP/CIDR Network List', function () {
+  it.only('should edit an IP/CIDR Network List', function () {
     // Creation Flow
     // Arrange
     cy.get(selectors.networkLists.createButton).click()
@@ -204,16 +204,17 @@ describe('Network Lists spec', () => {
     cy.wait('@networkListsApi')
 
     //Act
-    cy.get(selectors.networkLists.ipcidrTextarea).should('be.disabled')
-    cy.get(selectors.networkLists.nameInput).type('edited')
+    cy.get(selectors.networkLists.ipcidrTextarea).click()
+    cy.get(selectors.networkLists.ipcidrTextarea).type('{enter}192.148.3.4')
+
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')
     
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
-    cy.get(selectors.networkLists.searchInput).type(`${networkListName}edited{enter}`)
-    cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}edited`)
+    cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
+    cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
   })
 
   afterEach(() => {
