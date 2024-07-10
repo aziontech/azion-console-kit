@@ -11,5 +11,5 @@ export {
   deletePaymentService,
   setAsDefaultPaymentService,
   addCreditService,
-  createPaymentMethodService,
+  createPaymentMethodService
 }
