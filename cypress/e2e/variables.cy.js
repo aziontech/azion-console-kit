@@ -1,27 +1,32 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-const variableKey = generateUniqueName('KEY')
-const variableValue = generateUniqueName('value')
+let variableKey
+let variableValue
 
 describe('Variables spec', () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Variables')
+
+    variableKey = generateUniqueName('KEY')
+    variableValue = generateUniqueName('value')
   })
 
-  it('Create a variable', function () {
-    // Act
+  it('should create a variable', function () {
+    // Arrange
     cy.get(selectors.variables.createButton).click()
+
+    // Act
     cy.get(selectors.variables.keyInput).type(variableKey)
     cy.get(selectors.variables.valueInput).type(variableValue)
-    cy.get(selectors.variables.saveButton).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your variable has been created')
-    cy.get(selectors.variables.cancelButton).click()
+    cy.get(selectors.form.actionsCancelButton).click()
 
     // Assert
-    cy.get(selectors.variables.searchInput).type(`${variableKey}`)
-    cy.get(selectors.variables.keyRow).should('have.text', variableKey)
+    cy.get(selectors.list.searchInput).type(`${variableKey}`)
+    cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
   })
 
   afterEach(() => {
