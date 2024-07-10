@@ -30,7 +30,7 @@ To ensure consistency and ease of maintenance for tests, we use the following st
 ```
 
 Examples::
-- `list-table-block__column__name__row`
+- `list-table-block__column-name__row`
 - `header__button__submit`
 
 **Notes:**
