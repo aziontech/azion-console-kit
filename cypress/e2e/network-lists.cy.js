@@ -41,7 +41,6 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.nameInput).clear()
     cy.get(selectors.networkLists.nameInput).type(`${networkListName}`)
 
-    // ALISSON'S NOTE : Dropdowns have dynamic IDs, so find/eq are needed
     cy.get(selectors.networkLists.typeDropdown).click()
     cy.get(selectors.networkLists.typeDropdown).find('li').eq(2).should('have.text', 'IP/CIDR').click()
 
