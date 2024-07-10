@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
       inputs:
         specName:
-          description: 'Test file name (without .cy.js extension)'
+          description: 'Test file name (without .cy.js)'
           required: true
         environmentName:
           description: 'Environment name (dev | stage | prod)'
@@ -38,7 +38,7 @@ jobs:
           wait-on: "http://localhost:5173/"
           wait-on-timeout: 120
           spec: cypress/e2e/${{ github.event.inputs.specName }}.cy.js
-          config: cypress.config.${{ github.event.inputs.environmentName }}.js
+          config-file: cypress.config.${{ github.event.inputs.environmentName }}.js
           env: environment=${{ github.event.inputs.environmentName }}
 
       - name: Upload Manual Cypress Screenshots

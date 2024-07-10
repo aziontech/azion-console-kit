@@ -21,7 +21,7 @@ jobs:
           STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
         with:
           browser: chrome
-          config: cypress.config.stage.js
+          config-file: cypress.config.stage.js
           env: environment=stage
 
       - name: Check E2E Test Coverage

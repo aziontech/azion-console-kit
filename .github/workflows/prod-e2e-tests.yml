@@ -21,7 +21,7 @@ jobs:
           PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
         with:
           browser: chrome
-          config: cypress.config.prod.js
+          config-file: cypress.config.prod.js
           env: environment=prod
 
       - name: Check E2E Test Coverage
