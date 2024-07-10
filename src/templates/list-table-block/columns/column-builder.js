@@ -12,7 +12,6 @@ import Tag from 'primevue/tag'
 import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
 import TextWithTagColumn from './text-with-tag-column.vue'
 import CreditCardColumn from './credit-card-column.vue'
-import CreditExpirationColumn from './credit-expiration-column.vue'
 /**
  * Build and return a specific column based on the given appearance.
  *
@@ -107,11 +106,6 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(CreditCardColumn, {
         cardNumber: data.cardNumber,
         cardBrand: data.cardBrand,
-        status: data.status
-      })
-    case 'credit-expiration-column':
-      return h(CreditExpirationColumn, {
-        expiringDate: data.expiringDate,
         status: data.status
       })
     default:

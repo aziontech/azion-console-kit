@@ -28,7 +28,6 @@ const selectors = {
     }
   },
   form: {
-    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
     actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
     actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
     submitButton: '[data-testid="form-actions-submit-button"]',
@@ -129,19 +128,12 @@ const selectors = {
     confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
   },
   variables: {
-    createButton: '[data-testid="create_Variable_button"] > .p-button-label',
+    createButton: '[data-testid="create_Variable_button"]',
     keyInput: '[data-testid="variables-form__key-field__input"]',
     valueInput: '[data-testid="variables-form__value-field__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    keyRow: '[data-testid="list-table-block__column__key__row"]',
-    valueRow: '.whitespace-pre',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
+    secretToggle: '[data-testid="variables-form__secret-field__switch"] > .p-inputswitch-slider',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    showMore: '[data-testid="list-table-block__column__value__row"] .underline'
   },
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
@@ -238,8 +230,24 @@ const selectors = {
     accountName: '[data-testid="account-settings__account-name__input"]',
     companyName: '[data-testid="account-settings__company-name__input"]',
     companyId: '[data-testid="account-settings__company-id__input"]',
+    billingEmails: '[data-testid="account-settings__billing-emails__textarea"]',
     postalCode: '[data-testid="account-settings__postal-code__input"]',
-    postalCodeError: '[data-testid="account-settings__postal-code__error-message"]',
+    dropdownFilter: '.p-dropdown-filter',
+    country: '[data-testid="account-settings__country__dropdown"]',
+    countryDropdown: '[data-testid="account-settings__country__dropdown"] > .p-dropdown-trigger',
+    countryOption: (optionIdx) => `#country_${optionIdx}`,
+    region: '[data-testid="account-settings__region__dropdown"]',
+    regionDropdown: '[data-testid="account-settings__region__dropdown"] > .p-dropdown-trigger',
+    regionOption: (optionIdx) => `#region_${optionIdx}`,
+    city: '[data-testid="account-settings__city__dropdown"]',
+    cityDropdown: '[data-testid="account-settings__city__dropdown"] > .p-dropdown-trigger',
+    cityOption: (optionIdx) => `#city_${optionIdx}`,
+    address: '[data-testid="account-settings__address__input"]',
+    complement: '[data-testid="account-settings__complement__input"]',
+    socialLogin:
+      '[data-testid="account-settings__login-settings__switch-isSocialLoginEnabled__switch"] > .p-inputswitch-slider',
+    enforceMfa:
+      '[data-testid="account-settings__login-settings__switch-isEnabledMfaToAllUsers__switch"] > .p-inputswitch-slider',
     submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
   },
   dataStream: {
@@ -375,7 +383,37 @@ const selectors = {
     copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
     confirmButton: '[data-testid="domains-dialog__confirm__button"]',
     pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    actionDelete: '.p-menuitem-content > .p-menuitem-link'
+    digitalCertificateFieldSelectedValue:
+      ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    digitalCertificateDropdown:
+      '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
+    letsEncryptDropdownOption: '#edgeCertificate_1',
+    editPageTitle: '[data-testid="page_title_Edit Domain"]',
+    enableMtlsSwitch:
+      '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
+    dropdownTrustedCA:
+      '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown"] > .p-dropdown-label',
+    trustedCAFirstDropdownOption: '#mtlsTrustedCertificate_0',
+    mtlsTrustedCAFieldSelectedValue:
+      ':nth-child(4) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    fieldTextInput: '[data-testid="field-text__input"]',
+    domainUri: '[data-testid="edit-domains-form__domain-field__input"]',
+    editFormCopyDomainButton: '[data-testid="edit-domains-form__domain-field__copy-button"]',
+    activeSwitchEditForm: '[data-testid="edit-domains-form__active-field__switch"]',
+    formActionsSubmitButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    dataTableSearchInput: '[data-testid="data-table-search-input"]',
+    listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',
+    listTableBlockColumnActiveRow:
+      '[data-testid="list-table-block__column__active__row"] > .p-tag-value'
+  },
+  digitalCertificates: {
+    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
+    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
+    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
+    importTrustedCARadioOption:
+      '[inputvalue="trusted_ca_certificate"] > .p-card-body > .p-card-content > .p-4',
+    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
+    trustedCATextArea: '[data-testid="trusted-certificates-form__certificate-field__textarea"]'
   },
   purge: {
     createButton: '[data-testid="create_Purge_button"]',

@@ -51,8 +51,8 @@ describe('Edge Application', () => {
 
   afterEach(() => {
     // Delete the edge application
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
+    cy.deleteEntityFromList({ entityName: edgeApplicationName, productName: 'Edge Application' }).then(() => {
+      cy.verifyToast('Resource successfully deleted')
     })
   })
 })

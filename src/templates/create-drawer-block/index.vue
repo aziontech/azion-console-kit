@@ -154,22 +154,31 @@
           name="formFields"
           :errors="errors"
           :disabledFields="isSubmitting"
+          :closeDrawer="closeDrawer"
         />
       </form>
     </div>
     <div class="fixed w-full left-0 bottom-0">
-      <GoBack
+      <slot
+        name="actionBar"
         :goBack="handleGoBack"
-        v-if="showGoBack"
-        :inDrawer="true"
-      />
-      <ActionBarBlock
-        v-else
-        @onCancel="closeDrawer"
-        @onSubmit="onSubmit"
-        :inDrawer="true"
-        :loading="isSubmitting"
-      />
+        :closeDrawer="closeDrawer"
+        :onSubmit="onSubmit"
+        :isSubmitting="isSubmitting"
+      >
+        <GoBack
+          :goBack="handleGoBack"
+          v-if="showGoBack"
+          :inDrawer="true"
+        />
+        <ActionBarBlock
+          v-else
+          @onCancel="closeDrawer"
+          @onSubmit="onSubmit"
+          :inDrawer="true"
+          :loading="isSubmitting"
+        />
+      </slot>
     </div>
   </Sidebar>
   <DialogUnsavedBlock

@@ -8,6 +8,12 @@ import istanbul from 'vite-plugin-istanbul';
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
+  
+  // eslint-disable-next-line no-console
+  console.log('🚀 ~ getConfig ~ env:VITE_ENVIRONMENT', env);
+  // eslint-disable-next-line no-console
+  console.log('🚀 ~ getConfig ~ env:VITE_ENVIRONMENT', env.VITE_ENVIRONMENT);
+
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-'
 
   return {

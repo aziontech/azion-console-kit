@@ -64,6 +64,7 @@
       }
       return isValidJson
     }),
+    initiatorType: yup.string().required().label('Initiator Type'),
     active: yup.boolean(),
     language: yup.string()
   })
@@ -74,7 +75,8 @@
     active: true,
     language: 'javascript',
     code: HelloWorldSample,
-    jsonArgs: ARGS_INITIAL_STATE
+    jsonArgs: ARGS_INITIAL_STATE,
+    initiatorType: 'edge_application'
   }
 </script>
 
