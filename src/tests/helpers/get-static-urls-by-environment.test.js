@@ -80,7 +80,7 @@ describe('getStaticUrlsByEnvironment', () => {
   it.each(scenarios)(
     'should return the static URL for the $section in the $env environment',
     ({ section, env, expected }) => {
-      vi.stubEnv('MODE', env)
+      vi.stubEnv('VITE_ENVIRONMENT', env)
 
       const { sut } = makeSut()
 
