@@ -168,7 +168,14 @@
         class="w-full h-full"
         v-if="edgeFirewall"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            headerAction: {
+              'data-testid': 'edge-firewall__main-settings-tab'
+            }
+          }"
+        >
           <EditView
             v-if="showMainSettingsTab"
             :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
@@ -182,6 +189,11 @@
         <TabPanel
           header="Functions Instances"
           v-if="showFunctions.tab"
+          :pt="{
+            headerAction: {
+              'data-testid': 'edge-firewall__functions-tab'
+            }
+          }"
         >
           <EdgeFirewallFunctionsListView
             v-if="showFunctions.list"
@@ -189,7 +201,14 @@
             :edgeFirewallID="edgeFirewallId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine">
+        <TabPanel
+          header="Rules Engine"
+          :pt="{
+            headerAction: {
+              'data-testid': 'edge-firewall__rules-engine-tab'
+            }
+          }"
+        >
           <EdgeFirewallRulesEngineListView
             v-if="showRulesEngine"
             :edgeFirewallModules="edgeFirewallModules"
