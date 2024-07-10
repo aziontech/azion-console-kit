@@ -1,0 +1,58 @@
+name: Manual E2E Tests
+
+on:
+  workflow_dispatch:
+      inputs:
+        specName:
+          description: 'Test file name (without .cy.js)'
+          required: true
+        environmentName:
+          description: 'Environment name (dev | stage | prod)'
+          required: true
+
+jobs:
+  run-manual-e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run Manual Cypress Tests
+        uses: cypress-io/github-action@v6
+        env:
+          DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
+          DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
+          STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
+          STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
+          PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
+          PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
+        with:
+          build: yarn build
+          start: yarn dev
+          browser: chrome
+          wait-on: "http://localhost:5173/"
+          wait-on-timeout: 120
+          spec: cypress/e2e/${{ github.event.inputs.specName }}.cy.js
+          config-file: cypress.config.${{ github.event.inputs.environmentName }}.js
+          env: environment=${{ github.event.inputs.environmentName }}
+
+      - name: Upload Manual Cypress Screenshots
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: cypress_screenshots
+          path: cypress/screenshots
+          retention-days: 4
+
+      - name: Upload Manual Cypress Videos
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: cypress_videos
+          path: cypress/videos
+          retention-days: 1

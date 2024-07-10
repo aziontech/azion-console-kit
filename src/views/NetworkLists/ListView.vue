@@ -7,14 +7,13 @@
       <ListTableBlock
         v-if="hasContentToList"
         :listService="listNetworkListService"
-        :deleteService="deleteNetworkListService"
         :columns="getColumns"
-        pageTitleDelete="network list"
         addButtonLabel="Network List"
         createPagePath="network-lists/create"
         editPagePath="network-lists/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No network lists found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -32,66 +31,64 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { computed, ref } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-  export default {
-    name: 'network-list-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      PageHeadingBlock,
-      ContentBlock
+  defineOptions({ name: 'network-list-view' })
+
+  const props = defineProps({
+    listNetworkListService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listNetworkListService: {
-        required: true,
-        type: Function
-      },
-      deleteNetworkListService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
+    deleteNetworkListService: {
+      required: true,
+      type: Function
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'listType',
-            header: 'List Type'
-          },
-          {
-            field: 'lastEditor',
-            header: 'Last Editor'
-          },
-          {
-            field: 'lastModified',
-            sortField: 'lastModifiedDate',
-            header: 'Last Modified'
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'network list',
+      icon: 'pi pi-trash',
+      service: props.deleteNetworkListService
+    }
+  ]
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'listType',
+        header: 'List Type'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        sortField: 'lastModifiedDate',
+        header: 'Last Modified'
+      }
+    ]
+  })
 </script>

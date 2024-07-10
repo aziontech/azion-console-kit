@@ -21,7 +21,7 @@
     {{ props.label }}
     <div
       v-if="props.isRequired"
-      class="text-sm text-orange-500"
+      class="text-sm text-orange-500 flex gap-1"
     >
       *
       <span class="text-[0.625rem] text-color-secondary">(Required)</span>

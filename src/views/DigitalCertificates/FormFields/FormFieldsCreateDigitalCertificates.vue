@@ -236,6 +236,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="trusted-certificates-form__certificate-field"
           label="Certificate"
           required
           placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"

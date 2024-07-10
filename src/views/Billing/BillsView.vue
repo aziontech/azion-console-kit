@@ -1,6 +1,110 @@
 <template>
-  <h2 class="text-lg font-medium line-height-1 mt-4">Payment History</h2>
-  <ListTable
+  <div class="w-full flex flex-col-reverse sm:flex-row gap-6 mt-6">
+    <div
+      class="w-full sm:w-1/2 flex flex-col justify-between h-[25.00rem] border surface-border rounded-md"
+    >
+      <div class="p-3 md:p-6 flex flex-col gap-4">
+        <div class="flex justify-between">
+          <span class="font-medium text-lg text-color">Current Invoice</span>
+          <PrimeButton
+            icon="pi pi-file"
+            outlined
+            label="Details"
+          />
+        </div>
+        <div class="flex justify-between mt-4">
+          <span class="text-color-secondary text-sm">Billing Period</span>
+          <span class="font-medium text-color text-sm">MM/DD/2024 - MM/DD/2024</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Products Charges</span>
+          <span class="text-color text-sm"
+            ><span class="text-color-secondary text-sm"
+              ><span class="text-color-secondary text-sm">$</span></span
+            >
+            5.00</span
+          >
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
+          <span class="text-color text-sm">
+            <span class="text-color-secondary text-sm">$</span> 0.00</span
+          >
+        </div>
+      </div>
+
+      <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Credit Used for Payment</span>
+          <span class="text-color"> <span class="text-color-secondary text-sm">$</span> 5.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm flex items-center gap-3">
+            <b class="font-medium text-2xl text-color"> Total </b>
+            (Amount Payable)
+          </span>
+          <span class="font-medium text-2xl">
+            <span class="text-color-secondary text-sm font-medium">$</span> 0.00</span
+          >
+        </div>
+      </div>
+    </div>
+    <div
+      class="w-full sm:w-1/2 h-[25.00rem] border surface-border rounded-md flex flex-col justify-between"
+    >
+      <div class="p-3 md:p-6 flex flex-col gap-4">
+        <div class="flex justify-between">
+          <span class="font-medium text-lg text-color">Your Service Plan</span>
+          <PrimeButton
+            icon="pi pi-arrow-up-right"
+            outlined
+            iconPos="right"
+            label="Show Other Plans"
+          />
+        </div>
+        <div class="flex items-center gap-4 mb-2">
+          <span class="font-medium text-3xl text-color">Developer Plan</span>
+          <Tag
+            severity="secondary"
+            value="Free Trial"
+          />
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Plan Start Date</span>
+          <span class="font-medium text-color text-sm">MM/DD/2023</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Payment Method</span>
+          <span class="font-medium text-color text-sm">Final 4242</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Payment Currency</span>
+          <span class="font-medium text-color text-sm"
+            >Dollar USD (<span class="text-color-secondary text-sm">$</span>)</span
+          >
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Credit Balance</span>
+          <span><span class="text-color-secondary text-sm">$</span> 5.00</span>
+        </div>
+      </div>
+
+      <div class="p-3 md:p-6 border-t surface-border flex flex-col gap-4">
+        <p class="text-sm text-color-secondary">
+          Consumptions made up to the last day of the month will be included in this invoice. Change
+          <router-link
+            to=""
+            class="text-[var(--text-color-link)]"
+            >payment methods.</router-link
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
+
+  <ListTableBlock
     v-if="hasContentToList"
     isTabs
     :enableEditClick="false"
@@ -27,7 +131,9 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTable from '@templates/list-table-block/action-column'
+  import ListTableBlock from '@templates/list-table-block'
+  import PrimeButton from 'primevue/button'
+  import Tag from 'primevue/tag'
 
   import { ref } from 'vue'
 

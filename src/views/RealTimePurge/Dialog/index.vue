@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import Message from 'primevue/message'
@@ -7,40 +7,20 @@
 
   defineOptions({ name: 'dialog-real-time-purge' })
 
-  const emit = defineEmits(['update:visible', 'closeDialog', 'repurge'])
-
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    isLoading: {
-      type: Boolean,
-      default: false
-    }
-  })
-
-  const showDialog = ref(false)
   const loading = ref(false)
+  const dialogRef = inject('dialogRef')
 
   const closeDialog = () => {
-    emit('closeDialog')
+    dialogRef.value.close()
   }
 
   const handleRealTimePurge = () => {
-    emit('repurge')
+    dialogRef.value.data.repurge()
     loading.value = true
   }
 
   watch(
-    () => props.visible,
-    (value) => {
-      showDialog.value = value
-    }
-  )
-
-  watch(
-    () => props.isLoading,
+    () => dialogRef.value.data.isLoading,
     (value) => {
       loading.value = value
     }
@@ -51,7 +31,7 @@
   <div>
     <PrimeDialog
       :blockScroll="true"
-      v-model:visible="showDialog"
+      visible
       modal
       @hide="closeDialog"
       :pt="{

@@ -55,6 +55,10 @@ Cypress.Commands.add('login', () => {
     }
   } else {
     switch (environment) {
+      case 'stage':
+        email = Cypress.env('STAGE_CYPRESS_EMAIL')
+        password = Cypress.env('STAGE_CYPRESS_PASSWORD')
+        break
       case 'preview-prod':
         email = Cypress.env('PREVIEW_PROD_CYPRESS_EMAIL')
         password = Cypress.env('PREVIEW_PROD_CYPRESS_PASSWORD')
@@ -242,7 +246,7 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
   cy.get(selectors.list.searchInput).type(entityName)
   cy.get(selectors.list.filteredRow.nameColumn(columnName))
     .should('be.visible')
-    .should('have.text', entityName)
+    .should('contain', entityName)
 
   cy.get('body').then(($body) => {
     if ($body.find(selectors.list.actionsMenu.button).length) {

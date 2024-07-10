@@ -1,0 +1,135 @@
+<script setup>
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import InputNumber from 'primevue/inputnumber'
+  import LabelBlock from '@/templates/label-block'
+  import { useField } from 'vee-validate'
+  import InlineMessage from 'primevue/inlinemessage'
+  import PrimeButton from 'primevue/button'
+  import InputText from 'primevue/inputtext'
+  import { ref } from 'vue'
+  import cardFlagBlock from '@templates/card-flag-block'
+  import { useRoute, useRouter } from 'vue-router'
+
+  const { value: amount, errorMessage } = useField('amount')
+
+  const props = defineProps({
+    cardDefault: {
+      type: Object,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    closeDrawer: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const card = ref(props.cardDefault?.cardData)
+
+  const VIEW_BILLING_TABS_PAYMENT = {
+    name: 'billing-tabs',
+    params: {
+      tab: 'payment'
+    }
+  }
+
+  const router = useRouter()
+  const route = useRoute()
+
+  const goToPaymentMethod = () => {
+    const { name, params } = VIEW_BILLING_TABS_PAYMENT
+    if (route.name === name && route.params.tab === params.tab) {
+      props.closeDrawer()
+      return
+    }
+    router.push({ name, params })
+  }
+</script>
+
+<template>
+  <FormHorizontal
+    :isDrawer="true"
+    title="Amount"
+  >
+    <template #inputs>
+      <div class="flex gap-6 max-sm:flex-col">
+        <div class="flex flex-col w-full flex-1 gap-2">
+          <LabelBlock
+            for="field-amount"
+            label="Amount"
+            isRequired
+          />
+          <div
+            class="p-inputgroup h-fit"
+            :class="{ 'border border-red-500 rounded-md surface-border': errorMessage }"
+          >
+            <div class="p-inputgroup-addon">$</div>
+
+            <InputNumber
+              inputId="field-amount"
+              v-model="amount"
+              placeholder="99.99"
+              :inputClass="errorMessage ? 'border-red-500' : ''"
+              :max-fraction-digits="2"
+              :min-fraction-digits="2"
+              :min="0.5"
+              highlight-on-focus
+              :disabled="props.loading"
+              :pt="{
+                input: {
+                  name: 'amount'
+                }
+              }"
+            />
+          </div>
+
+          <small
+            v-if="errorMessage"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ errorMessage }}
+          </small>
+        </div>
+
+        <div class="flex flex-col w-full flex-1 gap-2">
+          <label
+            for="field-card"
+            class="text-color text-base font-medium leading-5 flex gap-1 align-items-center"
+          >
+            Paying with
+          </label>
+          <div class="p-inputgroup h-fit">
+            <div class="p-inputgroup-addon">
+              <cardFlagBlock :cardFlag="card.cardBrand" />
+            </div>
+            <InputText
+              v-model="card.cardNumber"
+              readonly
+              disabled
+              type="text"
+            />
+          </div>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Default Payment Method
+          </small>
+        </div>
+      </div>
+      <InlineMessage
+        severity="info"
+        class="text-sm"
+      >
+        Consumptions made up to the last day of the month will be included in this invoice. Change
+        <PrimeButton
+          label="Payment Method"
+          link
+          class="p-0"
+          @click="goToPaymentMethod"
+        />
+        .
+      </InlineMessage>
+    </template>
+  </FormHorizontal>
+</template>
