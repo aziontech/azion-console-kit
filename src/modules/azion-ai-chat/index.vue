@@ -94,8 +94,9 @@
 
   import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import { updateSessionId } from './services/make-session-id'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import hljs from 'highlight.js'
+  import { AZION_MESSAGE_TYPE } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
   defineOptions({
     name: 'azion-ai-chat-root-block'
@@ -104,7 +105,12 @@
   const azionAiChatMobileRef = ref(null)
   const renderCount = ref(1)
   onMounted(() => {
+    window.addEventListener('message', aiCustomPromptListenerHandler)
     addSupportToHljs()
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('message', aiCustomPromptListenerHandler)
   })
 
   const azionAiChatStore = useAzionAiChatStore()
@@ -127,5 +133,15 @@
     azionAiChatMobileRef?.value.deepChatRef.clearMessages()
     updateSessionId()
     updateChatRenderInstance()
+  }
+
+  const aiCustomPromptListenerHandler = (event) => {
+    if (event.data.type === AZION_MESSAGE_TYPE) {
+      azionAiChatStore.open()
+      azionAiChatRef?.value.deepChatRef.submitUserMessage({ text: event.data.prompt })
+      setTimeout(() => {
+        azionAiChatMobileRef?.value.deepChatRef.submitUserMessage({ text: event.data.prompt })
+      }, 100)
+    }
   }
 </script>
