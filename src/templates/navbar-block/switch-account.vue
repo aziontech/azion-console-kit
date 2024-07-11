@@ -14,6 +14,7 @@
   import { computed, inject } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import SwitchAccountBlock from '@/templates/switch-account-block'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
 
   const props = defineProps({
     listTypeAccountService: {
@@ -26,6 +27,7 @@
     }
   })
 
+  const billingUrl = getStaticUrlsByEnvironment('billing')
   const user = useAccountStore().accountData
   const openSwitchAccount = inject('openSwitchAccount')
   const profileMenuDefault = [
@@ -39,7 +41,9 @@
     },
     {
       label: 'Billing & Subscriptions',
-      to: '/billing-subscriptions'
+      command: () => {
+        window.open(billingUrl, '_blank')
+      }
     },
     {
       label: 'Credentials',

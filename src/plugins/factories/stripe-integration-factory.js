@@ -17,8 +17,6 @@ function getStripeToken(env) {
 }
 
 export function makeStripeClient(environment) {
-  // eslint-disable-next-line no-console
-  console.log(environment)
   if (!environment) {
     throw Error('Provide an environment to select correct tracking token')
   }

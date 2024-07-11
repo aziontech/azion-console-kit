@@ -64,7 +64,8 @@
   import { useToast } from 'primevue/usetoast'
   import Drawer from './Drawer'
 
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
 
   const hasContentToList = ref(true)
   const toast = useToast()
@@ -97,6 +98,8 @@
   })
 
   const drawerRef = ref('')
+  const route = useRoute()
+  const router = useRouter()
   const cardDefault = ref({})
   const listPaymentMethodsRef = ref('')
   const showCreatePaymentMethodDrawer = ref(false)
@@ -195,4 +198,15 @@
     }
     hasContentToList.value = true
   }
+
+  const showPaymentMethod = () => {
+    if (route.query.paymentSession) {
+      openDrawerCreatePaymentMethod()
+      router.push({ query: {} })
+    }
+  }
+
+  onMounted(async () => {
+    showPaymentMethod()
+  })
 </script>

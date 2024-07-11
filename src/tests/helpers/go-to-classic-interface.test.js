@@ -29,7 +29,7 @@ describe('GoToClassicInterface', () => {
       redirectUrl: 'https://manager.azion.com'
     }
   ])(`should return correct value based on valid environment`, ({ environment, redirectUrl }) => {
-    vi.stubEnv('MODE', environment)
+    vi.stubEnv('VITE_ENVIRONMENT', environment)
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
@@ -39,7 +39,7 @@ describe('GoToClassicInterface', () => {
   })
 
   it('should not redirect when invalid environment is used', () => {
-    vi.stubEnv('MODE', 'invalid-stub-env')
+    vi.stubEnv('VITE_ENVIRONMENT', 'invalid-stub-env')
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
