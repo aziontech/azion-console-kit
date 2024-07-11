@@ -35,7 +35,8 @@ const scenarios = [
   {
     section: 'billing',
     env: 'stage',
-    expected: 'https://stage-console.azion.com/billing'
+    expected:
+      'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },
   {
     section: 'billing',
