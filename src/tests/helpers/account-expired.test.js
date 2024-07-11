@@ -80,7 +80,7 @@ describe('checkAccountStatus', () => {
   })
 
   it.each(scenarios.withRedirect)('$label', ({ status, env, expected }) => () => {
-    vi.stubEnv('MODE', env)
+    vi.stubEnv('VITE_ENVIRONMENT', env)
     const spyReplace = vi.spyOn(window.location, 'replace')
 
     const { sut } = makeSut()
@@ -91,7 +91,7 @@ describe('checkAccountStatus', () => {
   })
 
   it.each(scenarios.withoutRedirect)('$label', ({ status, env }) => () => {
-    vi.stubEnv('MODE', env)
+    vi.stubEnv('VITE_ENVIRONMENT', env)
     const spyReplace = vi.spyOn(window.location, 'replace')
 
     const { sut } = makeSut()

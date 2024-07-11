@@ -5,7 +5,7 @@ let firewallName = ''
 let functionInstanceName = ''
 let ruleName = ''
 
-describe('Edge Firewall spec', () => {
+describe('Edge Firewall spec', { tags: ['run',] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
