@@ -1,13 +1,17 @@
 import { getEnvironment } from './get-environment'
 
+const currentRoute = window.location.origin
+
 const urls = {
   manager: {
     stage: 'https://stage-manager.azion.com',
     production: 'https://manager.azion.com'
   },
   billing: {
-    stage: 'https://stage-console.azion.com/billing/payment?paymentSession=true',
-    production: 'https://console.azion.com/billing/payment?paymentSession=true'
+    development: `${currentRoute}/billing`,
+    stage: 'https://stage-console.azion.com/billing',
+    production:
+      'https://manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },
   playground: {
     stage: 'https://stage-manager.azion.com/metrics/graphql',
