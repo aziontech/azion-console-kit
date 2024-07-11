@@ -138,7 +138,12 @@ const selectors = {
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
     nameInput: '[data-testid="waf-rules-form__name-field__input"]',
-    breadcumb: (position) => `.p-breadcrumb li.menuitem:nth-child(${position})`,
+    threatTypeSwitch: (name) =>
+      `[data-testid="field-group-switch__switch-${name}__switch"] > .p-inputswitch-slider`,
+    dropdownTrigger: (name) =>
+      `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
+    dropdownOptions: (name, position) => `#${name}_${position}`,
+    breadcumbToList: '.p-breadcrumb-list li.p-menuitem:nth-child(3) .p-menuitem-link',
     listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
     seeMore: (columnName) =>
       `[data-testid="list-table-block__column__${columnName}__row"] .underline`
