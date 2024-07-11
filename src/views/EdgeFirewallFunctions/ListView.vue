@@ -16,7 +16,6 @@
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
       @on-load-data="handleLoadData"
-      data-testid="Function Instances List"
       :actions="actions"
       isTabs
     >

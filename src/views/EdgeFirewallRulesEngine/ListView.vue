@@ -164,7 +164,6 @@
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     :isReorderAllEnabled="true"
-    data-testid="Rules List"
     @on-load-data="handleLoadData"
     emptyListMessage="No rules have been created."
     addButtonLabel="Rules Engine"

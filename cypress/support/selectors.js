@@ -175,7 +175,7 @@ const selectors = {
     functionInstanceDropdownIcon: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-trigger > .p-icon',
     functionInstanceDropdownFunction: '#edgeFunctionID_0',
     functionInstanceSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    functionInstanceTableSearchInput: '[data-testid="Function Instances List"] > [data-testid="data-table"] > .p-datatable-header > [data-testid="data-table-header"] > [data-testid="data-table-search"] > [data-testid="data-table-search-input"]',
+    functionInstanceTableSearchInput: '[data-testid="data-table-search-input"]',
     functionInstanceTableColumnName: '[data-testid="list-table-block__column__name__row"]',
     functionInstanceTableColumnInstanced: '[data-testid="list-table-block__column__functionInstanced__row"]',
     createRuleButton: '[data-testid="create_Rules Engine_button"] > .p-button-label',

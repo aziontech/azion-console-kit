@@ -25,12 +25,26 @@ describe('Edge Firewall spec', { tags: ['run',] }, () => {
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
     cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.saveButton).click()
+    cy.verifyToast('success', 'Your Edge Firewall has been created')
+
+    cy.get(selectors.edgeFirewall.searchInput).clear()
+    cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
+    cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
+  })
+
+  it('Create an Edge Firewall and run a function', function () {
+    // Act - create Edge Firewall
+    cy.get(selectors.edgeFirewall.createButton).click()
+    cy.get(selectors.edgeFirewall.nameInput).clear()
+    cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
     cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
     cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
     cy.get(selectors.edgeFirewall.saveButton).click()
     cy.verifyToast('success', 'Your Edge Firewall has been created')
-
-    // Act - create Edge Function instance
+  
+      // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
@@ -68,7 +82,7 @@ describe('Edge Firewall spec', { tags: ['run',] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorFunctionToRun).click()
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
     cy.verifyToast('success', 'Rule Engine successfully created')
-    
+
     // Assert - Find the created rule
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).clear()
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
