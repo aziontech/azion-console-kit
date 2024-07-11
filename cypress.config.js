@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
 import codeCoverageTask from '@cypress/code-coverage/task'
-import registerCypressGrep from '@cypress/grep/src/plugin';
+import registerCypressGrep from '@cypress/grep/src/plugin'
 import fs from 'fs'
 
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
-      registerCypressGrep(config);
+      registerCypressGrep(config)
       codeCoverageTask(on, config)
       on('after:spec', (spec, results) => {
         if (results?.video && results?.stats?.failures === 0) {

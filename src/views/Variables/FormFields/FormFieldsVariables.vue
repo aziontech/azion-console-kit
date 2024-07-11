@@ -47,6 +47,7 @@
           auto
           :isCard="false"
           title="Secret"
+          data-testid="variables-form__secret-field"
         />
       </div>
     </template>

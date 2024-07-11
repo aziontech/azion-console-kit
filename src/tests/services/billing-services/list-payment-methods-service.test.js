@@ -81,8 +81,8 @@ describe('BillingServices', () => {
         id: fixtures.paymentMock.id,
         cardHolder: fixtures.paymentMock.card_holder,
         cardExpiration: {
-          expiringDate: '05/2030',
-          status: ''
+          tagProps: {},
+          text: '05/2030'
         },
         cardData: {
           cardBrand: 'visa',
@@ -99,8 +99,8 @@ describe('BillingServices', () => {
         id: fixtures.paymentMock.id,
         cardHolder: fixtures.paymentMock.card_holder,
         cardExpiration: {
-          expiringDate: '05/2019',
-          status: 'Expired'
+          tagProps: { severity: 'warning', value: 'Expired' },
+          text: '05/2019'
         },
         cardData: {
           cardBrand: 'visa',

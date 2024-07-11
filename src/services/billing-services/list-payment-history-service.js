@@ -38,10 +38,10 @@ const adapt = (httpResponse) => {
     return {
       amount: card.amount_with_currency,
       invoiceNumber: {
-        content: card.invoice_number || '-'
+        content: card.invoice_number
       },
       paymentMethod: {
-        cardNumber: card.payment_method_details || '-',
+        cardNumber: card.payment_method_details,
         cardBrand: typeCard,
         value: `${typeCard} ${card.payment_method_details}`
       },
