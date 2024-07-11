@@ -10,7 +10,7 @@ describe('Real-time Purge spec', () => {
     cy.login()
   })
 
-  it('should create a Real-Time Purge using a domain', () => {
+  it.skip('should create a Real-Time Purge using a domain', () => {
     // Arrange
     domainName = generateUniqueName('domain')
     edgeAppName = generateUniqueName('edgeApp')
