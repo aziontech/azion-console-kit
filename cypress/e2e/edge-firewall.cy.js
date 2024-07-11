@@ -15,19 +15,21 @@ describe('Edge Firewall spec', { tags: ['run',] }, () => {
   })
   afterEach(() => {
     // Delete the firewall
-    cy.deleteEntityFromLoadedList().then(() => {
+    cy.deleteEntityFromList({ entityName: firewallName, productName: 'Edge Firewall' }).then(() => {
       cy.verifyToast('Edge Firewall successfully deleted')
     })
   })
 
   it('Create an Edge Firewall ', function () {
-    // Act - create Edge Firewall
+    // Act
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
     cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
     cy.get(selectors.edgeFirewall.saveButton).click()
     cy.verifyToast('success', 'Your Edge Firewall has been created')
+    cy.get(selectors.edgeFirewall.cancelButton).click()
 
+    // Assert
     cy.get(selectors.edgeFirewall.searchInput).clear()
     cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
