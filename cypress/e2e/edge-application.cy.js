@@ -4,7 +4,7 @@ import selectors from '../support/selectors'
 const edgeApplicationName = generateUniqueName('EdgeApp')
 const rulesEngineName = generateUniqueName('RulesEng')
 
-describe('Edge Application', () => {
+describe('Edge Application', { tags: ['run',] }, () => {
   beforeEach(() => {
     // Login
     cy.login()

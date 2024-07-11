@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 let functionName = ''
 
-describe('Functions spec', () => {
+describe('Functions spec', { tags: ['run',] }, () => {
   beforeEach(() => {
     cy.login()
     functionName = generateUniqueName('Function')

@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 const edgeServiceName = generateUniqueName('EdgeService')
 
-describe('Edge Services spec', () => {
+describe('Edge Services spec', { tags: ['run',] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')
