@@ -116,7 +116,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Name *"
+          label="Name"
+          required
           description="Give a unique and descriptive name to identify the WAF rule set."
           name="name"
           data-testid="waf-rules-form__name-field"
@@ -147,6 +148,7 @@
                 inputClass=""
                 :name="item.dropdown.value"
                 :value="item.dropdown.initialValue"
+                :data-testid="`waf-rules-form__${item.dropdown.value}-field`"
               />
             </div>
           </template>
@@ -164,6 +166,7 @@
           :isCard="false"
           title="Active"
           :disabled="props.disabledActive"
+          data-testid="waf-rules-form__active-field"
         />
       </div>
     </template>

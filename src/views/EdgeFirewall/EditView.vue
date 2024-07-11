@@ -82,9 +82,9 @@
           v-model:loadingDomains="loadingServices"
         />
       </template>
-      <template #action-bar="{ onSubmit, onCancel, loading, values }">
+      <template #action-bar="{ onSubmit, onCancel, formValid, loading, values }">
         <ActionBarTemplate
-          @onSubmit="formSubmit(onSubmit, values)"
+          @onSubmit="formSubmit(onSubmit, values, formValid)"
           @onCancel="onCancel"
           :loading="loading"
           :submitDisabled="loadingServices"

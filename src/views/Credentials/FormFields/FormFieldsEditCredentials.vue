@@ -25,7 +25,8 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="credentials-edit-form__name-field"
-          label="Name *"
+          label="Name"
+          required
           name="name"
           :value="name"
         />

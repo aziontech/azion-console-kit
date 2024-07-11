@@ -5,6 +5,7 @@
     :nameId="props.name"
     @change="changeState"
     :inputClass="props.selectorClass"
+    :data-testid="customTestId.selector"
   >
     <template #selector>
       <InputSwitch
@@ -14,6 +15,7 @@
         @change="stopPropagation"
         v-model="inputValue"
         :readonly="readonly"
+        :data-testid="customTestId.switch"
       />
     </template>
     <template #footer>
@@ -27,7 +29,7 @@
   import SelectorBlock from '@/templates/selector-block'
 
   import { useField } from 'vee-validate'
-  import { toRefs } from 'vue'
+  import { toRefs, useAttrs, computed } from 'vue'
 
   defineOptions({ name: 'FieldSwitchBlock' })
 
@@ -82,6 +84,17 @@
 
   const { nameField } = toRefs(props)
   const emit = defineEmits(['onSwitchChange'])
+
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-switch'
+
+    return {
+      selector: `${id}__selector`,
+      switch: `${id}__switch`
+    }
+  })
 
   const {
     value: inputValue,

@@ -1,6 +1,7 @@
 <template>
   <div
     class="max-w-full"
+    :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
     <DataTable
@@ -16,7 +17,7 @@
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
-      :rows="MINIMUN_OF_ITEMS_PER_PAGE"
+      :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
@@ -34,8 +35,8 @@
             <InputText
               class="h-8 w-full md:min-w-[320px]"
               v-model.trim="filters.global.value"
-              placeholder="Search"
               data-testid="data-table-search-input"
+              placeholder="Search"
             />
           </span>
           <slot
@@ -79,7 +80,7 @@
           </template>
           <template v-else>
             <component
-              :is="col.component(rowData[col.field])"
+              :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
             ></component>
           </template>
@@ -133,11 +134,25 @@
         <template #body="{ data: rowData }">
           <div
             class="flex justify-end"
-            v-if="showActions"
+            v-if="!isRenderActions"
+            data-testid="data-table-actions-column-body-action"
+          >
+            <PrimeButton
+              size="small"
+              :icon="getActionIcon"
+              outlined
+              @click="executeCommand(rowData)"
+              class="cursor-pointer table-button"
+              data-testid="data-table-actions-column-body-action-button"
+            />
+          </div>
+          <div
+            class="flex justify-end"
+            v-if="isRenderActions"
             data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
-              :ref="assignMenuRef(rowData.id)"
+              :ref="setMenuRefForRow(rowData.id)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
@@ -160,7 +175,10 @@
           name="noRecordsFound"
           data-testid="data-table-empty-content"
         >
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+          <div
+            class="my-4 flex flex-col gap-3 justify-center items-start"
+            data-testid="list-table-block__empty-message"
+          >
             <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
         </slot>
@@ -216,11 +234,6 @@
       </Column>
     </DataTable>
   </div>
-  <DeleteDialog
-    :informationForDeletion="informationForDeletion"
-    @successfullyDeleted="updatedTable()"
-    data-testid="delete-dialog"
-  />
 </template>
 
 <script setup>
@@ -233,12 +246,14 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog'
+  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
 
-  defineOptions({ name: 'list-table-block' })
+  defineOptions({ name: 'list-table-block-new' })
+
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
@@ -248,10 +263,6 @@
     },
     isGraphql: {
       type: Boolean
-    },
-    pageTitleDelete: {
-      type: String,
-      required: true
     },
     createPagePath: {
       type: String,
@@ -272,9 +283,6 @@
       required: true,
       type: Function
     },
-    deleteService: {
-      type: Function
-    },
     enableEditClick: {
       type: Boolean,
       default: true
@@ -282,17 +290,21 @@
     reorderableRows: {
       type: Boolean
     },
-    rowActions: {
-      type: Array,
-      default: () => []
-    },
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
+    },
+    actions: {
+      type: Array,
+      default: () => []
+    },
+    isTabs: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const MINIMUN_OF_ITEMS_PER_PAGE = 10
+  const MINIMUM_OF_ITEMS_PER_PAGE = 10
 
   const selectedId = ref(null)
   const filters = ref({
@@ -301,38 +313,18 @@
   const isLoading = ref(false)
   const data = ref([])
   const selectedColumns = ref([])
-  const informationForDeletion = ref({})
-  const showActions = ref(true)
+  const columnSelectorPanel = ref(null)
+  const menuRef = ref({})
+
+  const dialog = useDialog()
+  const router = useRouter()
+  const toast = useToast()
 
   onMounted(() => {
     loadData({ page: 1 })
     selectedColumns.value = props.columns
   })
 
-  const filterBy = computed(() => {
-    const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
-    const filters = props.columns.map((item) => item.field)
-
-    return [...filters, ...filtersPath]
-  })
-
-  const showToast = (severity, detail) => {
-    if (!detail) return
-    const options = {
-      closable: true,
-      severity,
-      summary: severity,
-      detail
-    }
-
-    toast.add(options)
-  }
-
-  const showPagination = computed(() => {
-    return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
-  })
-
-  const columnSelectorPanel = ref(null)
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
@@ -341,62 +333,77 @@
     data.value = event.value
   }
 
-  const actionOptions = (rowData) => {
-    const actionOptions = []
-
-    if (props.rowActions && props.rowActions.length > 0) {
-      props.rowActions.forEach((action) => {
-        if (action.visibleAction?.(rowData)) return
-
-        actionOptions.push({
-          ...action,
-          command: () => action.command(rowData)
-        })
-      })
-    }
-
-    if (props.deleteService) {
-      actionOptions.push({
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => openDeleteDialog()
-      })
-    }
-
-    showActions.value = actionOptions.length > 0
-
-    return actionOptions
+  const openDialog = (dialogComponent, body) => {
+    dialog.open(dialogComponent, body)
   }
-  const toast = useToast()
+
+  const actionOptions = (rowData) => {
+    const createActionOption = (action) => {
+      return {
+        ...action,
+        command: () => {
+          switch (action.type) {
+            case 'dialog':
+              openDialog(action.dialog.component, action.dialog.body(rowData, reload))
+              break
+            case 'delete':
+              {
+                const bodyDelete = {
+                  data: {
+                    title: action.title,
+                    selectedID: rowData.id,
+                    selectedItemData: rowData,
+                    deleteDialogVisible: true,
+                    deleteService: action.service,
+                    rerender: Math.random()
+                  },
+                  onClose: (opt) => opt.data.updated && reload()
+                }
+                openDialog(DeleteDialog, bodyDelete)
+              }
+              break
+            case 'action':
+              action.commandAction(rowData)
+              break
+          }
+        }
+      }
+    }
+
+    const actions = props.actions
+      .filter((action) => !action.visibleAction || action.visibleAction(rowData))
+      .map(createActionOption)
+
+    return actions
+  }
 
   const loadData = async ({ page }) => {
-    try {
-      isLoading.value = true
-      let response = null
-      if (props.isGraphql) {
-        response = await props.listService()
+    if (props.listService) {
+      try {
+        isLoading.value = true
+        const response = props.isGraphql
+          ? await props.listService()
+          : await props.listService({ page })
+        data.value = response
+      } catch (error) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: 'Error fetching data:',
+          error
+        })
+      } finally {
+        isLoading.value = false
       }
-      if (!props.isGraphql) {
-        response = await props.listService({ page })
-      }
-      data.value = response
-    } catch (error) {
-      data.value = []
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
     }
   }
-
-  const router = useRouter()
 
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
 
-  const menuRef = ref({})
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -404,37 +411,57 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
+
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit')
     if (props.editInDrawer) {
       props.editInDrawer(item)
-      return
-    }
-    if (props.enableEditClick) {
+    } else if (props.enableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
-  const openDeleteDialog = () => {
-    informationForDeletion.value = {
-      title: props.pageTitleDelete,
-      selectedID: selectedId.value,
-      deleteService: props.deleteService,
-      deleteDialogVisible: true,
-      rerender: Math.random()
-    }
+
+  const executeCommand = (rowData) => {
+    const { command } = actionOptions(rowData)[0]
+    command()
   }
 
-  const updatedTable = () => {
+  const reload = () => {
     loadData({ page: 1 })
   }
 
-  const assignMenuRef = (id) => {
+  defineExpose({ reload })
+
+  const extractFieldValue = (rowData, field) => {
+    return rowData[field]
+  }
+
+  const setMenuRefForRow = (rowDataID) => {
     return (document) => {
       if (document !== null) {
-        menuRef.value[id] = document
+        menuRef.value[rowDataID] = document
       }
     }
   }
+
+  const filterBy = computed(() => {
+    const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
+    const filters = props.columns.map((item) => item.field)
+
+    return [...filters, ...filtersPath]
+  })
+
+  const showPagination = computed(() => {
+    return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
+  })
+
+  const isRenderActions = computed(() => {
+    return props.actions && props.actions.length > 1
+  })
+
+  const getActionIcon = computed(() => {
+    return props.actions[0].icon
+  })
 
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0

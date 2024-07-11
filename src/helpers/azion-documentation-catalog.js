@@ -51,5 +51,9 @@ export const documentationGuideProducts = {
     openDocumentationProducts('edge-orchestrator/edge-services/#resources'),
   edgeDnsRecordTypes: () => openDocumentationProducts('secure/edge-dns/#type'),
   generateLetsEncryptCertificate: () =>
-    openDocumentationProducts('guides/how-to-generate-a-lets-encrypt-certificate')
+    openDocumentationProducts('guides/how-to-generate-a-lets-encrypt-certificate'),
+  paymentMethods: () =>
+    openDocumentationProducts('guides/billing-and-subscriptions/#payment-methods'),
+  paymentHistory: () =>
+    openDocumentationProducts('guides/billing-and-subscriptions/#payment-history')
 }

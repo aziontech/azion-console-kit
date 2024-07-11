@@ -6,10 +6,8 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listEdgeFunctionsService"
-        :deleteService="props.deleteEdgeFunctionsService"
+        :listService="listEdgeFunctionsService"
         :columns="getColumns"
-        pageTitleDelete="edge function"
         addButtonLabel="Edge Function"
         createPagePath="edge-functions/create?origin=list"
         editPagePath="edge-functions/edit"
@@ -17,6 +15,7 @@
         @on-before-go-to-add-page="handleCreateTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge functions found."
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else
@@ -24,7 +23,7 @@
         description="Click the button below to create your first function."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -62,6 +61,14 @@
   })
 
   let hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'edge function',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeFunctionsService
+    }
+  ]
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
@@ -124,6 +131,7 @@
     {
       field: 'status',
       header: 'Status',
+      sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {

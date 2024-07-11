@@ -21,6 +21,40 @@ const convertValueToDate = (value) => {
 }
 
 /**
+ * Converts a given date to MM/DD/YYYY format.
+ *
+ * @param {Date | string | number} value - The date to be formatted. Can be a Date object, a timestamp, or a string that the Date constructor can parse.
+ * @returns {string} The formatted date in MM/DD/YYYY format.
+ */
+const formatDateToUS = (value) => {
+  const date = new Date(value)
+
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date')
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date)
+}
+
+/**
+ * Convert separate month and year values and add them together
+ *
+ * @param {number} month - The month
+ * @param {number} year - The year
+ * @returns {string} The string date formated MM/YYYY
+ */
+
+const formatDateMonthAndYear = (month, year) => {
+  const formatMonth = month < 10 ? `0${month}` : month
+
+  return `${formatMonth}/${year}`
+}
+
+/**
  * Formats a given date to ISO format without milliseconds.
  *
  * @param {Date} value - The date to be formatted.
@@ -69,4 +103,4 @@ const convertDateToLocalTimezone = (date, utcOffset) => {
   return formatToEndOfDayIsoDate(userRealDate)
 }
 
-export { convertValueToDate, convertDateToLocalTimezone }
+export { convertValueToDate, convertDateToLocalTimezone, formatDateMonthAndYear, formatDateToUS }

@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
+
   defineOptions({ name: 'edge-firewall-view' })
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -27,6 +28,14 @@
   })
 
   const hasContentToList = ref(true)
+  const actions = [
+    {
+      type: 'delete',
+      title: 'edge firewall',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeFirewallService
+    }
+  ]
 
   const getColumns = computed(() => [
     {
@@ -44,6 +53,7 @@
     {
       field: 'status',
       header: 'Status',
+      sortField: 'status.content',
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
@@ -89,17 +99,16 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="edge firewall"
         addButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
-        :listService="props.listEdgeFirewallService"
-        :deleteService="props.deleteEdgeFirewallService"
+        :listService="listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
+        :actions="actions"
       />
       <EmptyResultsBlock
         v-else

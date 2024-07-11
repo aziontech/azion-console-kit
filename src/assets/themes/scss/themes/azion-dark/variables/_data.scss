@@ -8,7 +8,7 @@ $paginatorTextColor: $textSecondaryColor;
 
 /// Border of a paginator
 /// @group data
-$paginatorBorder: solid #3e3e3e;
+$paginatorBorder: solid var(--surface-border);
 
 /// Border width of a paginator
 /// @group data
@@ -104,7 +104,7 @@ $tableHeaderCellFontWeight: 600;
 
 /// Border of a table header cell
 /// @group data
-$tableHeaderCellBorder: 1px solid #3e3e3e;
+$tableHeaderCellBorder: 1px solid var(--surface-border);
 
 /// Border width of a table header cell
 /// @group data
@@ -168,7 +168,7 @@ $tableBodyRowTextHoverColor: $textColor;
 
 /// Border for a cell of a table toby row
 /// @group data
-$tableBodyCellBorder: 1px solid #3e3e3e;
+$tableBodyCellBorder: 1px solid var(--surface-border);
 
 /// Border width for a cell of a table toby row
 /// @group data
@@ -199,7 +199,7 @@ $tableFooterCellFontWeight: 600;
 
 /// Border of a table footer cell
 /// @group data
-$tableFooterCellBorder: 1px solid #3e3e3e;
+$tableFooterCellBorder: 1px solid var(--surface-border);
 
 /// Border width of a table footer cell
 /// @group data
@@ -211,7 +211,7 @@ $tableResizerHelperBg: $primaryColor;
 
 /// Border of a table footer
 /// @group data
-$tableFooterBorder: 1px solid #3e3e3e;
+$tableFooterBorder: 1px solid var(--surface-border);
 
 /// Border width of a table footer
 /// @group data
@@ -263,7 +263,7 @@ $dataViewContentBorder: 0 none;
 
 /// Border for an item of a dataview in list orientation
 /// @group data
-$dataViewListItemBorder: solid #3e3e3e;
+$dataViewListItemBorder: solid var(--surface-border);
 
 /// Border width for an item of a dataview in list orientation
 /// @group data
@@ -339,8 +339,8 @@ $timelineEventConnectorSize: 2px;
 
 /// Color of a timeline event
 /// @group data
-$timelineEventColor: #3e3e3e;
+$timelineEventColor: var(--surface-border);
 
 /// Color of a line to connect to organization chart nodes
 /// @group data
-$organizationChartConnectorColor: #3e3e3e;
+$organizationChartConnectorColor: var(--surface-border);

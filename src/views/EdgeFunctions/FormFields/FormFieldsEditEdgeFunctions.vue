@@ -7,6 +7,7 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
   import { useField } from 'vee-validate'
@@ -28,6 +29,7 @@
   })
 
   const { value: name } = useField('name')
+
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
   const { value: code, errorMessage: codeError } = useField('code')
@@ -70,6 +72,19 @@
     emit('update:previewData', previewValues)
     return previewValues
   })
+
+  const initiatorTypeOptions = [
+    {
+      title: 'Edge Application',
+      subtitle: 'Runs the edge function on edge servers to reduce latency.',
+      inputValue: 'edge_application'
+    },
+    {
+      title: 'Edge Firewall',
+      subtitle: 'Applies the edge function on edge servers to enhance security.',
+      inputValue: 'edge_firewall'
+    }
+  ]
 </script>
 
 <template>
@@ -83,7 +98,8 @@
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <FieldText
-              label="Name *"
+              label="Name"
+              required
               name="name"
               placeholder="My function"
               :value="name"
@@ -118,6 +134,23 @@
             <small class="text-xs text-color-secondary font-normal leading-5">
               Language isn't an editable field.</small
             >
+          </div>
+        </template>
+      </FormHorizontal>
+
+      <FormHorizontal
+        class="mt-8"
+        title="Initiator Type"
+        description="This determines how and where your edge function will be deployed and triggered."
+      >
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <FieldGroupRadio
+              required
+              nameField="initiatorType"
+              isCard
+              :options="initiatorTypeOptions"
+            />
           </div>
         </template>
       </FormHorizontal>

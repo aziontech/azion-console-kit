@@ -6,7 +6,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import ListTableNoHeaderBlock from '@templates/list-table-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
@@ -192,7 +192,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Copied successfully!'
+      summary: 'Successfully copied!'
     })
   }
 
@@ -256,6 +256,15 @@
       tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'record',
+      icon: 'pi pi-trash',
+      service: deleteRecordsServiceEdgeDNSDecorator
+    }
+  ]
 </script>
 
 <template>
@@ -282,7 +291,14 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: {
+              'data-testid': 'edge-dns-edit-view__main-settings__tab-panel'
+            }
+          }"
+        >
           <EditFormBlock
             :editService="editEdgeDNSService"
             :loadService="loadEdgeDNSService"
@@ -303,25 +319,33 @@
             </template>
           </EditFormBlock>
         </TabPanel>
-        <TabPanel header="Records">
+        <TabPanel
+          header="Records"
+          :pt="{
+            root: {
+              'data-testid': 'edge-dns-edit-view__records__tab-panel'
+            }
+          }"
+        >
           <div v-if="showRecords">
             <ListTableNoHeaderBlock
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
-              pageTitleDelete="record"
               addButtonLabel="Record"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
-              :deleteService="deleteRecordsServiceEdgeDNSDecorator"
               @on-load-data="handleLoadData"
               emptyListMessage="No records found."
+              :actions="actions"
+              isTabs
             >
               <template #addButton>
                 <PrimeButton
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
+                  data-testid="create_Record_button"
                 />
               </template>
             </ListTableNoHeaderBlock>
@@ -342,6 +366,7 @@
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
+                  data-testid="create_Record_button"
                 />
               </template>
               <template #illustration>

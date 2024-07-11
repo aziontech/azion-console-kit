@@ -16,12 +16,11 @@
           v-for="field in removeHiddenFields(inputSchema.fields)"
           :key="field.name"
         >
-          <label
+          <LabelBlock
             for="name"
-            class="text-color text-base font-medium"
-            >{{ field.label }}
-            <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
-          >
+            :label="field.label"
+            :isRequired="field.attrs && field.attrs.required"
+          />
           <Password
             autocomplete="off"
             v-if="field.type === 'password'"
@@ -95,7 +94,7 @@
                 <FieldDropdown
                   :options="listOfIntegrations"
                   :name="field.name"
-                  :isRequiredField="field.attrs.required"
+                  :required="field.attrs.required"
                   :label="field.label"
                   :value="setIntegration"
                   placeholder="Select a scope"
@@ -130,13 +129,11 @@
                 class="flex flex-col sm:max-w-lg w-full gap-2"
                 v-if="isHandleField(field.name)"
               >
-                <label
+                <LabelBlock
                   for="name"
-                  class="text-color text-base font-medium"
-                >
-                  {{ field.label }}
-                  <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
-                >
+                  :label="field.label"
+                  :isRequired="field.attrs && field.attrs.required"
+                />
                 <Password
                   v-if="field.type === 'password'"
                   autocomplete="off"
@@ -205,6 +202,7 @@
   import OAuthGithub from './oauth-github.vue'
   import { useDeploy } from '@/stores/deploy'
   import { useScrollToError } from '@/composables/useScrollToError'
+  import LabelBlock from '@/templates/label-block'
 
   defineOptions({ name: 'templateEngineBlock' })
 

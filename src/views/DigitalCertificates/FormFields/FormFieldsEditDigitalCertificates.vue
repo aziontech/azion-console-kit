@@ -135,7 +135,7 @@
             label="Copy"
             @click="copyCSRToclipboard"
           />
-          <small v-if="csrCopied">Copied successfully!</small>
+          <small v-if="csrCopied">Successfully copied!</small>
         </div>
       </template>
     </FormHorizontal>
@@ -191,6 +191,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"
+            data-testid="trusted-certificates-form__certificate-field"
             name="certificate"
             :value="certificate"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."

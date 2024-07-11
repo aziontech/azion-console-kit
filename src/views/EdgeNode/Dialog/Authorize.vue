@@ -1,12 +1,21 @@
 <template>
   <div>
     <DialogAuthorize
-      v-model:visible="authorizeDialogVisible"
+      :blockScroll="true"
+      visible
       modal
-      header="Are you sure?"
+      header="Authorize Nodes"
       class="w-[40vw]"
     >
-      <p class="text-color-secondary">1 nodes will be authorized.</p>
+      <p class="text-color-secondary">The selected node(s) will be authorized.</p>
+
+      <template #closeicon>
+        <PrimeButton
+          outlined
+          @click="closeDialog()"
+          icon="pi pi-times"
+        />
+      </template>
 
       <template #footer>
         <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
@@ -14,7 +23,7 @@
             severity="primary"
             outlined
             label="Cancel"
-            @click="authorizeDialogVisible = false"
+            @click="closeDialog()"
           ></PrimeButton>
           <PrimeButton
             severity="primary"
@@ -27,70 +36,47 @@
   </div>
 </template>
 
-<script>
+<script setup>
+  import { inject } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import DialogAuthorize from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import * as EdgeNodeService from '@/services/edge-node-services'
 
-  export default {
-    name: 'Authorize-Dialog',
+  defineOptions({ name: 'Authorize-Dialog' })
 
-    props: {
-      authorize: {
-        required: true,
-        type: Object
-      }
-    },
+  const emit = defineEmits(['authorizeCancel'])
 
-    components: {
-      DialogAuthorize,
-      PrimeButton
-    },
+  const dialogRef = inject('dialogRef')
+  const toast = useToast()
+  const params = dialogRef.value.data
 
-    data() {
-      return {
-        authorizeDialogVisible: false
-      }
-    },
-
-    methods: {
-      async authorizeEdgeNode() {
-        try {
-          this.$toast.add({
-            closable: true,
-            severity: 'info',
-            summary: 'Processing request'
-          })
-          await EdgeNodeService.authorizeEdgeNodeService(this.authorize.edgeNodeID)
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: 'Edge Nodes authorized successfully!'
-          })
-          this.authorizeDialogVisible = false
-        }
-      }
-    },
-
-    watch: {
-      authorize: {
-        deep: true,
-        handler() {
-          this.authorizeDialogVisible = this.authorize.openDialog
-        }
-      },
-      authorizeDialogVisible() {
-        if (!this.authorizeDialogVisible) {
-          this.$emit('authorizeCancel')
-        }
-      }
+  const authorizeEdgeNode = async () => {
+    try {
+      toast.add({
+        closable: true,
+        severity: 'info',
+        summary: 'Processing request'
+      })
+      await EdgeNodeService.authorizeEdgeNodeService(params.edgeNodeID)
+      emit('authorizeCancel')
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Successfully authorized!'
+      })
+      closeDialog()
     }
+  }
+
+  const closeDialog = () => {
+    dialogRef.value.close()
   }
 </script>

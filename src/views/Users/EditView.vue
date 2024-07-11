@@ -65,8 +65,8 @@
       const toastConfig = {
         closable: true,
         severity: 'warn',
-        summary: 'Confirmation email',
-        detail: 'We have sent you a confirmation email.'
+        summary: 'Email sent',
+        detail: 'The user must check the inbox and follow the instructions to verify this email.'
       }
       toast.add({ ...toastConfig })
     }
@@ -86,7 +86,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit User"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit User"
+        data-testid="users__edit-view__page-heading"
+      />
     </template>
     <template #content>
       <EditFormBlock
@@ -102,7 +105,7 @@
             :listCountriesPhoneService="listCountriesPhoneService"
             :listTeamsService="listTeamsService"
             :isEditForm="true"
-          ></FormFieldsUsers>
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarTemplate

@@ -9,6 +9,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputPassword from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     listTimezonesService: {
@@ -93,15 +94,16 @@
 
 <template>
   <FormHorizontal
-    data-testid="your-settings-form__profile"
+    data-testid="your-settings-form__section__profile"
     title="Profile"
     description="Modify the personal information of the account."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="profile__first-name"
-          label="First Name *"
+          data-testid="your-settings-form__first-name"
+          label="First Name"
+          required
           name="firstName"
           :value="firstName"
           description="The first name of the user."
@@ -109,8 +111,9 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="profile__last-name"
-          label="Last Name *"
+          data-testid="your-settings-form__last-name"
+          label="Last Name"
+          required
           name="lastName"
           :value="lastName"
           description="The last name of the user."
@@ -119,8 +122,9 @@
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
-            data-testid="profile__timezone__options"
-            label="Timezone *"
+            data-testid="your-settings-form__timezone"
+            label="Timezone"
+            required
             name="timezone"
             :options="optionsTimezone"
             :loading="!timezone || !optionsTimezone.length"
@@ -135,16 +139,15 @@
         </div>
         <div
           class="flex flex-col w-full sm:max-w-xs gap-2"
-          data-testid="profile__language"
+          data-testid="your-settings-form__language"
         >
-          <label
-            data-testid="profile__language__label"
+          <LabelBlock
+            data-testid="your-settings-form__language__label"
             for="language"
-            class="text-color text-base font-medium"
-            >Language</label
-          >
+            label="Language"
+          />
           <Dropdown
-            data-testid="profile__language__options"
+            data-testid="your-settings-form__language__dropdown"
             appendTo="self"
             id="language"
             :options="optionsLanguage"
@@ -156,7 +159,7 @@
           >
             <small
               class="text-xs text-color-secondary font-normal leading-5"
-              data-testid="profile__language__help-text"
+              data-testid="your-settings-form__language__description"
             >
               Sets the Azion Console language for the user.</small
             >
@@ -176,8 +179,9 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          data-testid="contact__email"
-          label="Email *"
+          data-testid="your-settings-form__email"
+          label="Email"
+          required
           name="email"
           :value="email"
           type="email"
@@ -189,18 +193,18 @@
 
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__contact__mobile"
+        data-testid="your-settings-form__mobile"
       >
-        <label
-          data-testid="contact__mobile__label"
+        <LabelBlock
+          data-testid="your-settings-form__mobile__label"
           for="mobile"
-          class="text-color text-base font-medium"
-          >Phone Number *</label
-        >
+          label="Phone Number"
+          isRequired
+        />
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
-              data-testid="contact__mobile__country-code-options"
+              data-testid="your-settings-form__country-code__dropdown"
               filter
               autoFilterFocus
               appendTo="self"
@@ -225,7 +229,7 @@
             </Dropdown>
 
             <InputMask
-              data-testid="contact__mobile__input"
+              data-testid="your-settings-form__mobile__input"
               date="phone"
               v-model="mobile"
               class="w-full"
@@ -239,12 +243,12 @@
         </div>
         <small
           class="text-xs text-color-secondary font-normal leading-5"
-          data-testid="contact__mobile__help-text"
+          data-testid="your-settings-form__mobile__description"
         >
           The phone number of the user. Include country and region code.
         </small>
         <small
-          data-testid="contact__mobile__error-text"
+          data-testid="your-settings-form__mobile__error-message"
           id="name-help"
           class="p-error"
         >
@@ -257,22 +261,21 @@
   <FormHorizontal
     title="Security Settings"
     description="Modify password and confirm the password to save the new settings. Account Owners can enable or disable MFA for the account."
-    data-testid="your-settings-form__security"
+    data-testid="your-settings-form__section__security"
   >
     <template #inputs>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__security__old-password"
+        data-testid="your-settings-form__old-password"
       >
-        <label
-          data-testid="security__old-password__label"
+        <LabelBlock
+          data-testid="your-settings-form__old-password__label"
           for="oldPassword"
-          class="text-color text-base font-medium"
-        >
-          Old Password *
-        </label>
+          label="Old Password"
+          isRequired
+        />
         <InputPassword
-          data-testid="security__old-password__input"
+          data-testid="your-settings-form__old-password__input"
           toggleMask
           v-model="oldPassword"
           id="oldPassword"
@@ -287,7 +290,7 @@
           }"
         />
         <small
-          data-testid="security__old-password__error-text"
+          data-testid="your-settings-form__old-password__error-message"
           id="name-help"
           class="p-error"
         >
@@ -296,17 +299,16 @@
       </div>
       <div
         class="flex flex-col sm:max-w-lg gap-2"
-        data-testid="your-settings-form__security__new-password"
+        data-testid="your-settings-form__new-password"
       >
-        <label
-          data-testid="security__new-password__label"
+        <LabelBlock
+          data-testid="your-settings-form__new-password__label"
           for="password"
-          class="font-semibold text-sm"
-        >
-          New Password *
-        </label>
+          label="New Password"
+          isRequired
+        />
         <InputPassword
-          data-testid="security__new-password__input"
+          data-testid="your-settings-form__new-password__input"
           toggleMask
           v-model="password"
           id="password"
@@ -323,19 +325,19 @@
         />
         <small
           class="p-error text-xs font-normal leading-tight"
-          data-testid="security__new-password__error-text"
+          data-testid="your-settings-form__new-password__error-message"
         >
           {{ errorPassword }}
         </small>
 
         <label
           class="font-semibold text-sm my-2"
-          data-testid="security__new-password__requirement-text"
+          data-testid="your-settings-form__new-password__requirement-label"
           >Must have at least:</label
         >
         <ul
           class="text-color-secondary list-inside space-y-3"
-          data-testid="security__new-password__requirement-list"
+          data-testid="your-settings-form__new-password__requirement-list"
         >
           <li
             class="flex gap-3 items-center text-color-secondary"
@@ -358,17 +360,16 @@
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        data-testid="your-settings-form__security__confirm-password"
+        data-testid="your-settings-form__confirm-password"
       >
-        <label
-          data-testid="security__confirm-password__label"
+        <LabelBlock
+          data-testid="your-settings-form__confirm-password__label"
           for="confirmPassword"
-          class="text-color text-base font-medium"
-        >
-          Confirm Password *
-        </label>
+          label="Confirm Password"
+          isRequired
+        />
         <InputPassword
-          data-testid="security__confirm-password__input"
+          data-testid="your-settings-form__confirm-password__input"
           toggleMask
           v-model="confirmPassword"
           id="confirmPassword"
@@ -383,7 +384,7 @@
           }"
         />
         <small
-          data-testid="security__confirm-password__error-text"
+          data-testid="your-settings-form__confirm-password__error-message"
           id="name-help"
           class="p-error"
         >
@@ -391,7 +392,7 @@
         </small>
       </div>
       <FieldSwitchBlock
-        data-testid="your-settings-form__security__two-factor"
+        data-testid="your-settings-form__enforce-mfa"
         nameField="twoFactorEnabled"
         name="twoFactorEnabled"
         auto

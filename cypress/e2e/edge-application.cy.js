@@ -1,14 +1,14 @@
-import generateUniqueName from '../support/utils';
-import selectors from '../support/selectors';
+import generateUniqueName from '../support/utils'
+import selectors from '../support/selectors'
 
 const edgeApplicationName = generateUniqueName('EdgeApp')
 const rulesEngineName = generateUniqueName('RulesEng')
 
-describe('Edge Application', () => {
+describe('Edge Application', { tags: ['run',] }, () => {
   beforeEach(() => {
     // Login
     cy.login()
-    cy.openProductThroughSidebar('edge-application')
+    cy.openProduct('Edge Application')
   })
 
   it('Create and delete an edge application, and create a rule', () => {
@@ -44,11 +44,15 @@ describe('Edge Application', () => {
 
     // Verify the rule was created
     cy.get(selectors.edgeApplication.searchInput).type(rulesEngineName)
-    cy.get(selectors.edgeApplication.ruleTable).should('be.visible').should('have.text', rulesEngineName)
+    cy.get(selectors.edgeApplication.ruleTable)
+      .should('be.visible')
+      .should('have.text', rulesEngineName)
   })
 
   afterEach(() => {
     // Delete the edge application
-    cy.deleteProduct(edgeApplicationName,'/edge-applications')
+    cy.deleteEntityFromList({ entityName: edgeApplicationName, productName: 'Edge Application' }).then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
   })
 })

@@ -10,7 +10,7 @@
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
-
+  import LabelBlock from '@/templates/label-block'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')
@@ -114,15 +114,16 @@
     :isDrawer="true"
     title="Settings"
     description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain. The accepted value's format varies according to the chosen record type."
+    data-testid="edge-dns-records-form__section__settings"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
-        <label
+        <LabelBlock
           for="name"
-          class="text-color text-base font-medium"
-        >
-          Name *
-        </label>
+          label="Name"
+          isRequired
+          data-testid="edge-dns-records-form__settings__name-field__label"
+        />
         <div class="p-inputgroup">
           <InputText
             v-model="name"
@@ -131,14 +132,24 @@
             id="name"
             type="text"
             :class="{ 'p-invalid': errorName }"
+            data-testid="edge-dns-records-form__settings__name-field__input"
           />
-          <span class="p-inputgroup-addon"> .{{ edgeDNSStore.domain }} </span>
+          <span
+            class="p-inputgroup-addon"
+            data-testid="edge-dns-records-form__settings__name-field__suffix"
+          >
+            .{{ edgeDNSStore.domain }}
+          </span>
         </div>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Use @ to create a record for the root domain.
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="edge-dns-records-form__settings__name-field__description"
+        >
+          > Use @ to create a record for the root domain.
         </small>
         <small
           v-if="errorName"
+          data-testid="edge-dns-records-form__settings__name-field__error-message"
           class="p-error text-xs font-normal leading-tight"
         >
           {{ errorName }}
@@ -147,7 +158,8 @@
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldDropdown
-            label="Record Type *"
+            label="Record Type"
+            required
             name="selectedRecordType"
             :options="recordsTypes"
             :loading="!recordsTypes.length"
@@ -156,6 +168,7 @@
             optionValue="value"
             :value="selectedRecordType"
             placeholder="Select a Record Type"
+            data-testid="edge-dns-records-form__settings__record-type-field"
           >
             <template #description>
               <PrimeButton
@@ -163,6 +176,7 @@
                 link
                 class="text-xs p-0 leading-5 text-start"
                 @click="documentationGuideProducts.edgeDnsRecordTypes"
+                data-testid="edge-dns-records-form__settings__record-type-field__read-more-btn"
               />
             </template>
           </FieldDropdown>
@@ -170,7 +184,8 @@
 
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldNumber
-            label="TTL (seconds) *"
+            label="TTL (seconds)"
+            required
             name="ttl"
             description="Decide the time-to-live (TTL) value a response can be cached for on a resolver server."
             placeholder="TTL (seconds):"
@@ -179,16 +194,19 @@
             showButtons
             :disabled="!enableTTLField"
             :step="1"
+            data-testid="edge-dns-records-form__settings__ttl-field"
           />
         </div>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Value *"
+          label="Value"
+          required
           name="value"
           :placeholder="selectedRecordTypeInfo?.valuePlaceholder"
           :description="selectedRecordTypeInfo?.valueTip"
+          data-testid="edge-dns-records-form__settings__value-field"
         />
       </div>
     </template>
@@ -197,12 +215,14 @@
     :isDrawer="true"
     title="Policy"
     description="Choose the policy type to specify how Edge DNS should deal with requests answered by this record."
+    data-testid="edge-dns-records-form__section__policy"
   >
     <template #inputs>
       <div class="flex gap-6 flex-wrap">
         <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <FieldDropdown
-            label="Policy Type *"
+            label="Policy Type"
+            required
             name="selectedPolicy"
             :options="policyList"
             :loading="!policyList.length"
@@ -210,6 +230,7 @@
             optionValue="value"
             :value="selectedPolicy"
             placeholder="Select a Record Type"
+            data-testid="edge-dns-records-form__policy__policy-type-field"
           >
             <template #description>
               Choose <code>Simple</code> to use the standard DNS functionality or
@@ -222,7 +243,8 @@
           v-if="isWeightedPolicy"
         >
           <FieldNumber
-            label="Weight *"
+            label="Weight"
+            required
             name="weight"
             description="Specify the weight for each record. Accepts integers between 0 and 255."
             placeholder="Weight"
@@ -231,6 +253,7 @@
             :min="0"
             :max="255"
             :step="1"
+            data-testid="edge-dns-records-form__policy__weight-field"
           />
         </div>
       </div>
@@ -240,10 +263,12 @@
         v-if="isWeightedPolicy"
       >
         <FieldTextArea
-          label="Description *"
+          label="Description"
+          required
           name="description"
           placeholder="add the description"
           description="Differentiate records with the same Name and Type by adding a description that identifies each one. Accepts up to 45 characters."
+          data-testid="edge-dns-records-form__policy__description-field"
         />
       </div>
     </template>

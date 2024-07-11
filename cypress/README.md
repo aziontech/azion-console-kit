@@ -4,12 +4,22 @@ This document defines the standards and best practices to be followed for develo
 
 ## Table of Contents
 
-- [Naming `data-testid`](#naming-data-testid)
-- [Naming Test Files](#naming-test-files)
-- [Using CSS Selectors in Tests](#using-css-selectors-in-tests)
-- [Using `e2mock` to Mock Components](#using-e2mock-to-mock-components)
-- [Generating Names for Dynamic Entities](#generating-names-for-dynamic-entities)
-- [Validating Toasts](#validating-toasts)
+- [E2E Test Development Standards](#e2e-test-development-standards)
+  - [Table of Contents](#table-of-contents)
+  - [Naming `data-testid`](#naming-data-testid)
+  - [Naming Test Files](#naming-test-files)
+  - [Using CSS Selectors in Tests](#using-css-selectors-in-tests)
+    - [Specific vs. Generic Selectors](#specific-vs-generic-selectors)
+    - [Use of Classes and IDs](#use-of-classes-and-ids)
+    - [Selector Priority](#selector-priority)
+  - [Using `e2mock` to Mock Components](#using-e2mock-to-mock-components)
+    - [Use Cases](#use-cases)
+    - [Implications](#implications)
+  - [Generating Names for Dynamic Entities](#generating-names-for-dynamic-entities)
+    - [Example Usage](#example-usage)
+  - [Validating Toasts](#validating-toasts)
+  - [Validating Values Copied to Clipboard](#validating-values-copied-to-clipboard)
+  - [Deleting Entities](#deleting-entities)
 
 ## Naming `data-testid`
 
@@ -39,7 +49,7 @@ Example:
 
 ### Specific vs. Generic Selectors
 
-- Prefer specific selectors for tests (`data-testid`) over generic selectors to ensure tests are less susceptible to breaking due to layout changes.    
+- Prefer specific selectors for tests (`data-testid`) over generic selectors to ensure tests are less susceptible to breaking due to layout changes.
 
 ### Use of Classes and IDs
 
@@ -83,10 +93,46 @@ To validate toasts (notifications) in tests:
 
 - Execute the custom command `verifyToast()`.
 
-> Note: the command receives summary and detail as arguments. 
+> Note: the command receives summary and detail as arguments.
 
 Example:
 
 ```javascript
 cy.verifyToast('Success!', 'User created successfully!');
 ```
+
+## Validating Values Copied to Clipboard
+
+To validate values that have been copied to the clipboard in tests:
+
+- Execute the custom command `assertValueCopiedToClipboard()`.
+
+> Note: the command takes the expected value that should have been copied to the clipboard as an argument.
+
+Example:
+```javascript
+cy.assertValueCopiedToClipboard('Expected Value');
+```
+
+This command checks whether the current value in the clipboard matches the expected value provided. It removes all extra white spaces and compares the resulting value with the expected value. If the values do not match, the test will fail.
+
+## Deleting Entities
+
+To delete entities in tests:
+
+- Execute the custom command `deleteEntityFromLoadedList()` when already in the list of entities. This command does not require any arguments.
+
+Example:
+
+```javascript
+cy.deleteEntityFromLoadedList();
+```
+
+- Execute the custom command `deleteEntityFromList()` when not in the list of entities. This command requires the name of the entity, the product name, and the column name where the entity name is displayed in the list. This command uses cy.visit to navigate to the list of entities.
+
+Example:
+
+```javascript
+cy.deleteEntityFromList({ entityName: 'Entity Name', productName: 'Product Name', columnName: 'Name' });
+```
+

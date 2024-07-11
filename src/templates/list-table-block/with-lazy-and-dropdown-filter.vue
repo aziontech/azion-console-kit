@@ -69,10 +69,16 @@
         >
           <template #body="{ data: rowData }">
             <template v-if="col.type !== 'component'">
-              <div v-html="rowData[col.field]" />
+              <div
+                v-html="rowData[col.field]"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+              />
             </template>
             <template v-else>
-              <component :is="col.component({ ...rowData[col.field], value: rowData })" />
+              <component
+                :is="col.component({ ...rowData[col.field], value: rowData })"
+                :data-testid="`list-table-block__column__${col.field}__row`"
+              />
             </template>
           </template>
         </Column>
@@ -115,7 +121,12 @@
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-start">
-            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+            <p
+              class="text-md font-normal text-secondary"
+              data-testid="table-block-with-lazy-and-dropdown-filter__empty-message"
+            >
+              {{ emptyListMessage }}
+            </p>
           </div>
         </template>
       </DataTable>

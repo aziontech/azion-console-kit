@@ -37,7 +37,7 @@
       class="w-full sm:max-w-xs"
     />
   </div>
-  <ListTableNoHeaderBlock
+  <ListTableBlock
     v-show="showListTable"
     pageTitleDelete="WAF rules tuning"
     :columns="wafRulesAllowedColumns"
@@ -48,6 +48,7 @@
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
+    isTabs
   >
     <template #header>
       <advancedFilter
@@ -57,7 +58,7 @@
         @applyFilter="filterSearch"
       />
     </template>
-  </ListTableNoHeaderBlock>
+  </ListTableBlock>
 
   <EmptyResultsBlock
     v-if="!showListTable"
@@ -114,7 +115,7 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
 
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 

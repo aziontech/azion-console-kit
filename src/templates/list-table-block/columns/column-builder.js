@@ -2,6 +2,7 @@ import { h } from 'vue'
 import AvatarWithTextTooltipColumn from './avatar-with-text-tooltip-column.vue'
 import AvatarWithTextColumn from './avatar-with-text-column.vue'
 import TextWithClipboardColumn from './text-with-clipboard-column.vue'
+import TextFullWithClipboardColumn from './text-full-with-clipboard-column.vue'
 import ClickableText from './clickable-text-column.vue'
 import ClickableLink from './clickable-link-column.vue'
 import ClickableTag from './clickable-tag-column.vue'
@@ -80,6 +81,11 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
         content: data.content,
         copyContentService: dependencies.copyContentService
       })
+    case 'text-full-with-clipboard':
+      return h(TextFullWithClipboardColumn, {
+        content: data.content,
+        copyContentService: dependencies.copyContentService
+      })
     case 'tag':
       return h(Tag, {
         value: data.content,
@@ -98,9 +104,9 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'credit-card-column':
       return h(CreditCardColumn, {
-        content: data.content,
-        card: data.card,
-        defaultCard: data.default
+        cardNumber: data.cardNumber,
+        cardBrand: data.cardBrand,
+        status: data.status
       })
     default:
       throw new Error('Invalid column appearance')

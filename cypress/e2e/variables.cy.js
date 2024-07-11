@@ -1,38 +1,85 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-let variableName = ''
+let variableKey
+let variableValue
 
 describe('Variables spec', () => {
   beforeEach(() => {
     cy.login()
-    variableName = generateUniqueName('VARIABLE')
-    cy.openProductThroughSidebar('variables')
+    cy.openProduct('Variables')
+
+    variableKey = generateUniqueName('KEY')
+    variableValue = generateUniqueName('value')
   })
 
-  it('Create a variable', function() {
-    // Act
+  it('should create a variable', function () {
+    // Arrange
     cy.get(selectors.variables.createButton).click()
-    cy.get(selectors.variables.keyInput).clear('')
-    cy.get(selectors.variables.keyInput).type(variableName)
-    cy.get(selectors.variables.valueInput).clear()
-    cy.get(selectors.variables.valueInput).type('myvalue')
-    cy.get(selectors.variables.saveButton).click()
+
+    // Act
+    cy.get(selectors.variables.keyInput).type(variableKey)
+    cy.get(selectors.variables.valueInput).type(variableValue)
+    cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your variable has been created')
-    cy.get(selectors.variables.cancelButton).click()
+    cy.get(selectors.form.actionsCancelButton).click()
 
     // Assert
-    cy.get(selectors.variables.searchInput).clear()
-    cy.get(selectors.variables.searchInput).type(`${variableName}{enter}`)
-    cy.get(selectors.variables.keyRow).should('have.text', variableName)
-    cy.get(selectors.variables.valueRow).should('have.text', 'myvalue')
+    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
+  })
 
-    // Cleanup
-    cy.get(selectors.variables.actionButton).click()
-    cy.get(selectors.variables.deleteButton).click()
-    cy.get(selectors.variables.deleteInput).clear()
-    cy.get(selectors.variables.deleteInput).type('delete')
-    cy.get(selectors.variables.confirmDeleteButton).click()
-    cy.verifyToast('Variable successfully deleted')
+  it('should edit a variable', function () {
+    // Creation Flow
+    // Arrange
+    const secretValue = '********'
+    cy.get(selectors.variables.createButton).click()
+
+    // Act
+    cy.get(selectors.variables.keyInput).type(variableKey)
+    cy.get(selectors.variables.valueInput).type(variableValue)
+    cy.get(selectors.variables.secretToggle).click()
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your variable has been created')
+
+    cy.get(selectors.variables.valueInput).should('have.value', secretValue)
+    cy.get(selectors.form.actionsCancelButton).click()
+
+    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
+    cy.get(selectors.variables.listRow('value')).should('have.text', secretValue)
+
+    // Edit Flow
+    // Arrange
+    cy.intercept('GET', '/api/v3/variables/*').as('variablesApi')
+
+    cy.get(selectors.variables.listRow('key')).click()
+
+    cy.wait('@variablesApi')
+    cy.get(selectors.variables.secretToggle).click()
+
+    // Act
+    cy.get(selectors.variables.valueInput).clear()
+    cy.get(selectors.variables.valueInput).type(variableValue)
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your variable has been updated')
+
+    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
+    cy.get(selectors.variables.showMore).click()
+    cy.get(selectors.variables.listRow('value')).should('contain.text', variableValue)
+  })
+
+  afterEach(() => {
+    // Delete the variable
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Variable successfully deleted')
+    })
   })
 })

@@ -18,7 +18,8 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Key *"
+          label="Key"
+          required
           name="key"
           placeholder="VARIABLE_KEY_NAME"
           :value="key"
@@ -30,7 +31,8 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Value *"
+          label="Value"
+          required
           name="value"
           placeholder="VARIABLE_VALUE"
           :value="value"
@@ -45,6 +47,7 @@
           auto
           :isCard="false"
           title="Secret"
+          data-testid="variables-form__secret-field"
         />
       </div>
     </template>

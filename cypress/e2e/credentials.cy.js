@@ -1,12 +1,12 @@
 import generateUniqueName from '../support/utils'
-import selectors from '../support/selectors';
+import selectors from '../support/selectors'
 
 const credentialName = generateUniqueName('Credential')
 
-describe('Credentials', () => {
+describe('Credentials', { tags: ['run',] }, () => {
   beforeEach(() => {
     cy.login()
-    cy.openItemThroughMenuAccount('Credentials')
+    cy.openProduct('Credentials')
   })
 
   it('should create a credential from the table', () => {
@@ -28,19 +28,17 @@ describe('Credentials', () => {
     // Assert
     cy.verifyToast('success', 'Your credential token has been created')
     cy.get(selectors.credential.tokenCopyButton).click()
-    cy.verifyToast('token copied')
+    cy.verifyToast('Successfully copied!')
     cy.get(selectors.form.actionsCancelButton).click()
     cy.get(selectors.list.searchInput).type(credentialName)
-    cy.get(selectors.list.filteredRow.nameColumn).should('have.text', credentialName)
-    cy.get(selectors.list.filteredRow.lastEditorColumn).should(
-      'have.text',
-      Cypress.env('CYPRESS_EMAIL_STAGE')
-    )
+    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', credentialName)
     cy.get(selectors.list.filteredRow.lastModifiedColumn).should('not.be.empty')
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Active')
   })
+
   afterEach(() => {
-    // Delete the credential
-    cy.deleteProduct(credentialName, '/credentials')
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Credential successfully deleted')
+    })
   })
 })

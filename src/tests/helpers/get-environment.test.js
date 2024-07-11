@@ -17,7 +17,7 @@ describe('getEnvironment', () => {
   it.each(['development', 'stage', 'production'])(
     'should return the environment mode as "%s"',
     (env) => {
-      vi.stubEnv('MODE', env)
+      vi.stubEnv('VITE_ENVIRONMENT', env)
 
       const { sut } = makeSut()
       const mode = sut()
