@@ -138,16 +138,15 @@ const selectors = {
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
     nameInput: '[data-testid="waf-rules-form__name-field__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"]',
-    threatTypesRow: '[data-testid="list-table-block__column__threatTypes__row"] > :nth-child(1)',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
+    threatTypeSwitch: (name) =>
+      `[data-testid="field-group-switch__switch-${name}__switch"] > .p-inputswitch-slider`,
+    dropdownTrigger: (name) =>
+      `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
+    dropdownOptions: (name, position) => `#${name}_${position}`,
+    breadcumbToList: '.p-breadcrumb-list li.p-menuitem:nth-child(3) .p-menuitem-link',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    seeMore: (columnName) =>
+      `[data-testid="list-table-block__column__${columnName}__row"] .underline`
   },
   functions: {
     createButton: '[data-testid="create_Edge Function_button"] > .p-button-label',
