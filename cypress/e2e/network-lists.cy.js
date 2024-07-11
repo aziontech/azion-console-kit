@@ -173,7 +173,7 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
   })
 
-  it.only('should edit an IP/CIDR Network List', function () {
+  it('should edit an IP/CIDR Network List', function () {
     // Creation Flow
     // Arrange
     cy.get(selectors.networkLists.createButton).click()
