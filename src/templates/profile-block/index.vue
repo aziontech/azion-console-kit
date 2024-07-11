@@ -290,7 +290,7 @@
 </template>
 
 <script setup>
-  import { getStaticUrlsByEnvironment } from '@/helpers'
+  import { getEnvironment, getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
@@ -308,6 +308,9 @@
   const { currentTheme } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
+  const billingUrl = getStaticUrlsByEnvironment('billing')
+  const environment = getEnvironment()
+
   const profile = ref(null)
   const showProfile = ref(false)
   const profileMenuDefault = [
@@ -322,7 +325,10 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
-        const billingUrl = getStaticUrlsByEnvironment('billing')
+        if (environment !== 'production') {
+          window.location.replace(billingUrl)
+          return
+        }
         window.open(billingUrl, '_blank')
       }
     },
