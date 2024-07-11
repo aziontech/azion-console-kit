@@ -123,6 +123,7 @@ const selectors = {
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
     nameRow: '[data-testid="list-table-block__column__name__row"]',
+    countriesListOption: (recordType) => `#countriesList_${recordType}`,
     typeRow: '[data-testid="list-table-block__column__listType__row"]',
     actionButton:
       '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',

@@ -45,8 +45,8 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.typeDropdown).find('li').eq(1).should('have.text', 'Countries').click()
 
     cy.get(selectors.networkLists.countriesMultiselect).click()
-    cy.get('.p-multiselect-item').eq(0).click()
-    cy.get('.p-multiselect-item').eq(1).click()
+    cy.get(selectors.networkLists.countriesListOption(0)).click()
+    cy.get(selectors.networkLists.countriesListOption(1)).click()
     
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
@@ -141,8 +141,8 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.typeDropdown).find('li').eq(1).should('have.text', 'Countries').click()
 
     cy.get(selectors.networkLists.countriesMultiselect).click()
-    cy.get('.p-multiselect-item').eq(0).click()
-    cy.get('.p-multiselect-item').eq(1).click()
+    cy.get(selectors.networkLists.countriesListOption(0)).click()
+    cy.get(selectors.networkLists.countriesListOption(1)).click()
     
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
@@ -161,8 +161,8 @@ describe('Network Lists spec', () => {
 
     //Act
     cy.get(selectors.networkLists.countriesMultiselect).click()
-    cy.get('.p-multiselect-item').eq(0).click()
-    cy.get('.p-multiselect-item').eq(2).click()
+    cy.get(selectors.networkLists.countriesListOption(0)).click()
+    cy.get(selectors.networkLists.countriesListOption(3)).click()
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')

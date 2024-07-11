@@ -129,6 +129,7 @@
           isRequired
         />
         <MultiSelect
+          id="countriesList"
           v-model="itemsValuesCountry"
           :options="countriesList"
           name="itemsValuesCountry"
