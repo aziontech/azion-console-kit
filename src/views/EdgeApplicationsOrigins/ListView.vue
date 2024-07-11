@@ -168,6 +168,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Origin"
+          data-testid="origins__add-button"
           @click="openCreateOriginDrawer"
           class="w-full sm:w-auto"
         />
