@@ -179,7 +179,7 @@
     </template>
   </ListTableBlock>
   <EmptyResultsBlock
-    v-el
+    v-else
     title="No rule has been created"
     description="Click the button below to create your first rule."
     createButtonLabel="Rule"
