@@ -9,7 +9,8 @@ const urls = {
   },
   billing: {
     development: `${currentRoute}/billing`,
-    stage: 'https://stage-console.azion.com/billing',
+    stage:
+      'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods',
     production:
       'https://manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },

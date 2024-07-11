@@ -87,8 +87,9 @@
           <span
             class="text-sm"
             data-testid="profile-block__theme__label"
-            >Theme</span
           >
+            Theme
+          </span>
           <Dropdown
             data-testid="profile-block__theme__options"
             appendTo="self"
@@ -290,7 +291,7 @@
 </template>
 
 <script setup>
-  import { getEnvironment, getStaticUrlsByEnvironment } from '@/helpers'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
@@ -309,7 +310,6 @@
   const setTheme = useAccountStore().setTheme
 
   const billingUrl = getStaticUrlsByEnvironment('billing')
-  const environment = getEnvironment()
 
   const profile = ref(null)
   const showProfile = ref(false)
@@ -325,10 +325,6 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
-        if (environment !== 'production') {
-          window.location.replace(billingUrl)
-          return
-        }
         window.open(billingUrl, '_blank')
       }
     },
