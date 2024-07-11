@@ -2,5 +2,7 @@
  * @returns {'development'|'stage'|'production'}
  */
 export const getEnvironment = () => {
-  return import.meta.env.VITE_ENVIRONMENT
+  const environment = import.meta.env
+
+  return environment.VITE_ENVIRONMENT || environment.MODE
 }
