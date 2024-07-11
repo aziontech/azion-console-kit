@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 let dataStreamName
 
-describe('Data Stream spec', { tags: ['run',] }, () => {
+describe('Data Stream spec', () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
