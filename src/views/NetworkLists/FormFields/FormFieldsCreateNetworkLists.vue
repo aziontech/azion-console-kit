@@ -151,6 +151,7 @@
           isRequired
         />
         <MultiSelect
+          id="countriesList"
           v-model="selectedCountries"
           :options="countriesList"
           filter
