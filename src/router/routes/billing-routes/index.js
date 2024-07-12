@@ -37,7 +37,7 @@ export const billingRoutes = {
     {
       path: 'invoice-details',
       name: 'billing-invoice-details',
-      component: () => import('@/views/Billing/InvoiceDetailsView.vue'),
+      component: () => import('@/views/Billing/InvoiceDetailsView.vue')
     }
   ]
 }
