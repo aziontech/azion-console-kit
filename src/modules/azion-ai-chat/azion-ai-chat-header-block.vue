@@ -5,9 +5,7 @@
       <PrimeTag
         class="ml-2"
         value="Experimental"
-        v-tooltip.bottom="
-          'Azion AI is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
-        "
+        v-tooltip.bottom="experimentalMessageWarning"
         severity="info"
       />
     </h3>
@@ -20,8 +18,13 @@
 
 <script setup>
   import PrimeTag from 'primevue/tag'
+  import { ref } from 'vue'
 
   defineOptions({
     name: 'azion-ai-chat-header'
   })
+
+  const experimentalMessageWarning = ref(
+    'Azion AI is in the experimental stage and may generate inaccurate or misleading information. Always validate its answers.'
+  )
 </script>

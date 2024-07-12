@@ -80,7 +80,7 @@
 
   const errorMessages = ref({
     overrides: {
-      default: 'Fail to connect, please try again.'
+      default: 'Connection failed. Try sending your message again.'
     }
   })
   const deepChatStyles = ref({
@@ -194,7 +194,7 @@
       }
     },
     placeholder: {
-      text: 'Message Azion AI',
+      text: 'Ask Azion AI for help',
       style: { color: 'var(--text-color)' }
     },
     characterLimit: 300
