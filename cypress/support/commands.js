@@ -233,6 +233,10 @@ Cypress.Commands.overwrite('visit', (original, ...args) => {
   })
 })
 
+Cypress.Commands.overwrite('type', (originalFn, subject, text, options) => {
+  return originalFn(subject, text, { ...options, delay: 1 });
+});
+
 /**
  * Deletes a product based on its name and optional column name.
  *
