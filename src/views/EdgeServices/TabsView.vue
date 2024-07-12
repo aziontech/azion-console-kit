@@ -118,7 +118,12 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: { 'data-testid': 'edge-service-tabs__tab__main-settings' }
+          }"
+        >
           <EditView
             v-if="mapTabs.main_settings === activeTab"
             :hiddenActionBar="!activeTab"
@@ -129,7 +134,10 @@
             :isTab="true"
           />
         </TabPanel>
-        <TabPanel header="Resources">
+        <TabPanel
+          header="Resources"
+          :pt="{ root: { 'data-testid': 'edge-service-tabs__tab__resources' } }"
+        >
           <ListViewTabResources
             v-if="mapTabs.resources === activeTab"
             :edgeServiceId="edgeServiceId"
