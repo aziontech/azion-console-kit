@@ -100,7 +100,7 @@
         icon="ai ai-ask-azion"
         v-tooltip.bottom="'Need help?'"
         v-prompt="
-          'Help me to create an Domain, give me instructions for each field of create Domain form.'
+          'Please assist me in creating a domain. Provide detailed instructions for each field in the domain creation form.'
         "
       ></PrimeButton>
     </template>
@@ -129,7 +129,7 @@
         icon="ai ai-ask-azion"
         v-tooltip.bottom="'Need help?'"
         v-prompt="
-          'Explain me the use of the CNAME field and the CNAME Access Only option. Also tell me about the diference between Digital Certificate Options'
+          'Please explain the use of the CNAME field and the CNAME Access Only option. Additionally, describe the differences between the digital certificate options.'
         "
       ></PrimeButton>
     </template>
