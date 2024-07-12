@@ -33,9 +33,9 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.postalCode).clear()
 
     // Act
-    cy.get(selectors.accountSettings.companyName).type(fixtures.companyName)
-    cy.get(selectors.accountSettings.companyId).type(fixtures.companyId)
-    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode)
+    cy.get(selectors.accountSettings.companyName).type(fixtures.companyName, {delay: 0})
+    cy.get(selectors.accountSettings.companyId).type(fixtures.companyId, {delay: 0})
+    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, {delay: 0})
 
     cy.get(selectors.accountSettings.submitButton).click()
 
@@ -57,7 +57,7 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.complement).clear()
 
     // Act
-    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode)
+    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, {delay: 0})
 
     cy.get(selectors.accountSettings.countryDropdown).click()
     cy.get(selectors.accountSettings.countryOption(randomCountryOption)).click()
@@ -81,8 +81,8 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     // store city alias value to be used for validation
     cy.get(selectors.accountSettings.city).invoke('text').as('cityValue')
 
-    cy.get(selectors.accountSettings.address).type(fixtures.address)
-    cy.get(selectors.accountSettings.complement).type(fixtures.complement)
+    cy.get(selectors.accountSettings.address).type(fixtures.address, {delay: 0})
+    cy.get(selectors.accountSettings.complement).type(fixtures.complement, {delay: 0})
 
     cy.get(selectors.accountSettings.submitButton).click()
 
@@ -112,7 +112,7 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.billingEmails).clear()
 
     // Act
-    cy.get(selectors.accountSettings.billingEmails).type(emails)
+    cy.get(selectors.accountSettings.billingEmails).type(emails, {delay: 0})
 
     cy.get(selectors.accountSettings.submitButton).click()
 
