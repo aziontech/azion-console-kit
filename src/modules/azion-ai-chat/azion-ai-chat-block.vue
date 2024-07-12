@@ -29,12 +29,12 @@
         >
           <AzionAiChatSuggestion
             @click="handleSubmitSuggestion(0)"
-            text="How do I configure a domain?"
+            text="How do I build an edge application?"
             :iconSrc="suggestionIconMetrics"
           />
           <AzionAiChatSuggestion
             @click="handleSubmitSuggestion(1)"
-            text="How to create a WAF?"
+            text="How do I protect my application?"
             :icon-src="suggestionIconSecurity"
           />
         </div>
@@ -292,8 +292,8 @@
 
   const handleSubmitSuggestion = (suggestionIndex) => {
     const suggestionsOptions = [
-      'How do I configure a domain at Azion?',
-      'How to create WAF rules to protect my edge application?'
+      `I want to build an edge application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`,
+      `I've already deployed an edge application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
     ]
 
     const suggestion = suggestionsOptions[suggestionIndex]
