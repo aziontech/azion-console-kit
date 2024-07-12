@@ -3,11 +3,11 @@ import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const billingRoutes = {
-  path: '/billing/:tab?',
+  path: '/billing',
   name: 'billing',
   children: [
     {
-      path: '',
+      path: ':tab?',
       name: 'billing-tabs',
       component: () => import('@views/Billing/TabsView.vue'),
       props: {
@@ -33,6 +33,11 @@ export const billingRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'invoice-details',
+      name: 'billing-invoice-details',
+      component: () => import('@/views/Billing/InvoiceDetailsView.vue'),
     }
   ]
 }
