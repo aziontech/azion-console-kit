@@ -55,12 +55,12 @@
   const initiatorTypeOptions = [
     {
       title: 'Edge Application',
-      subtitle: 'Runs the edge function on edge servers to reduce latency.',
+      subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
       inputValue: 'edge_application'
     },
     {
       title: 'Edge Firewall',
-      subtitle: 'Applies the edge function on edge servers to enhance security.',
+      subtitle: 'Functions are executed by a firewall to apply security policies.',
       inputValue: 'edge_firewall'
     }
   ]
@@ -110,7 +110,7 @@
       <FormHorizontal
         class="mt-8"
         title="Initiator Type"
-        description="This determines how and where your edge function will be deployed and triggered."
+        description="Define the source or trigger that executes the edge function."
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
