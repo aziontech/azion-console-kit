@@ -16,6 +16,7 @@
     class="deep-chat-suggestion-button"
     :style="`
     width: 230px;
+    text-align:left;
     max-width:100%;
     height: 102px;
     padding: 16px;
