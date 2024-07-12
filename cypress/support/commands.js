@@ -18,7 +18,8 @@ const login = (email, password) => {
     cy.get(selectors.login.passwordInput).type(password, { log: false })
     cy.get(selectors.login.signInButton).click()
     cy.location('pathname').should('eq', '/')
-  })
+  },
+  {cacheAcrossSpecs: true})
 
   cy.visit('/')
 }
