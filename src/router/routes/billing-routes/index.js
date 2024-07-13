@@ -22,7 +22,9 @@ export const billingRoutes = {
         billsServices: {
           listPaymentHistoryService: BillingServices.listPaymentHistoryService,
           clipboardWrite: Helpers.clipboardWrite,
-          documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory
+          documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
+          loadYourServicePlanService: BillingServices.loadYourServicePlanService,
+          openPlans: Helpers.openShowMorePlan
         }
       },
       meta: {

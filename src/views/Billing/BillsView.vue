@@ -60,22 +60,35 @@
             outlined
             iconPos="right"
             label="Show Other Plans"
+            @click="showOtherPlans"
           />
         </div>
         <div class="flex items-center gap-4 mb-2">
-          <span class="font-medium text-3xl text-color">Developer Plan</span>
+          <span class="font-medium text-3xl text-color"
+            >{{ yourServicePlan.servicePlan }} Plan</span
+          >
           <Tag
+            v-if="yourServicePlan.isTrial"
             severity="secondary"
             value="Free Trial"
           />
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Plan Start Date</span>
-          <span class="font-medium text-color text-sm">MM/DD/2023</span>
+          <span class="font-medium text-color text-sm"> {{ yourServicePlan.paymentDate }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Method</span>
-          <span class="font-medium text-color text-sm">Final 4242</span>
+          <span class="font-medium text-color text-sm">
+            <span
+              class="flex gap-2"
+              v-if="yourServicePlan.cardBrand"
+            >
+              <cardFlagBlock :cardFlag="yourServicePlan.cardBrand" />
+              Final {{ yourServicePlan.cardLast4Digits }}
+            </span>
+            <span v-else>---</span>
+          </span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Currency</span>
@@ -85,7 +98,10 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Balance</span>
-          <span><span class="text-color-secondary text-sm">$</span> 5.00</span>
+          <span
+            ><span class="text-color-secondary text-sm">$</span>
+            {{ yourServicePlan.creditBalance }}</span
+          >
         </div>
       </div>
 
@@ -93,7 +109,7 @@
         <p class="text-sm text-color-secondary">
           Consumptions made up to the last day of the month will be included in this invoice. Change
           <router-link
-            to=""
+            to="payment"
             class="text-[var(--text-color-link)]"
             >payment methods.</router-link
           >
@@ -134,10 +150,12 @@
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
+  import cardFlagBlock from '@templates/card-flag-block'
 
   import { ref } from 'vue'
 
   const hasContentToList = ref(true)
+  const yourServicePlan = ref({})
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -148,7 +166,15 @@
       type: Function,
       required: true
     },
+    loadYourServicePlanService: {
+      type: Function,
+      required: true
+    },
     clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    openPlans: {
       type: Function,
       required: true
     }
@@ -217,4 +243,14 @@
       }
     }
   ])
+
+  const showOtherPlans = () => {
+    props.openPlans()
+  }
+
+  const getYourServicePlan = async () => {
+    yourServicePlan.value = await props.loadYourServicePlanService()
+  }
+
+  getYourServicePlan()
 </script>

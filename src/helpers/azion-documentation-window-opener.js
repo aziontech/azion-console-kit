@@ -10,6 +10,7 @@ export const AZION_BLOG = 'https://www.azion.com/en/blog/'
 export const AZION_DISCORD = 'https://discord.com/invite/Yp9N7RMVZy'
 export const AZION_GITHUB = 'https://github.com/aziontech/azion-platform-kit'
 export const AZION_X = 'https://x.com/aziontech'
+export const AZION_PLAN = 'https://www.azion.com/en/professional-services'
 
 export const openAzionSite = () => {
   window.open(AZION_SITE, '_blank')
@@ -53,4 +54,8 @@ export const openContactSupport = () => {
 
 export const openGoogleAuthenticatorAppDocumentation = () => {
   window.open(GOOGLE_AUTHENTICATOR_DOCUMENTATION, '_blank')
+}
+
+export const openShowMorePlan = () => {
+  window.open(AZION_PLAN, '_blank')
 }
