@@ -272,7 +272,7 @@
           v-for="(tab, index) in filteredTabs"
           :pt="{
             headerAction: {
-              'id': `tab_${index}`
+              id: `tab_${index}`
             }
           }"
           :key="index"

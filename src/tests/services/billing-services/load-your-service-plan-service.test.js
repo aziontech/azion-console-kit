@@ -5,6 +5,7 @@ import graphQLApi from '@/services/axios/makeEventsApi'
 import { useAccountStore } from '@/stores/account'
 import { createPinia } from 'pinia'
 import { loadContractServicePlan } from '@/services/contract-services'
+import { formatDateToUSBilling } from '@/helpers/convert-date'
 
 const getFirstDayCurrentDate = () => {
   const currentDate = new Date()
@@ -124,6 +125,8 @@ describe('BillingService', () => {
   })
 
   it('should parse correctly each returned item servicePlan "Developer"', async () => {
+    const { firstDayOfMonth } = getFirstDayCurrentDate()
+
     useAccountStore.mockReturnValue({
       accountData: fixtures.accountDataDeveloperPlan
     })
@@ -141,12 +144,14 @@ describe('BillingService', () => {
       creditBalance: '300.00',
       currency: 'USD',
       isTrial: true,
-      paymentDate: '07/01/2024',
+      paymentDate: formatDateToUSBilling(firstDayOfMonth),
       servicePlan: 'Developer'
     })
   })
 
   it('should parse correctly each returned item servicePlan "Business"', async () => {
+    const { firstDayOfMonth } = getFirstDayCurrentDate()
+
     useAccountStore.mockReturnValue({
       accountData: fixtures.accountDataBusinessPlan
     })
@@ -169,12 +174,14 @@ describe('BillingService', () => {
       creditBalance: '23.02',
       currency: 'USD',
       isTrial: false,
-      paymentDate: '07/01/2024',
+      paymentDate: formatDateToUSBilling(firstDayOfMonth),
       servicePlan: 'Business'
     })
   })
 
   it('should return 0.00 when it do not find a value in the disclaimer ', async () => {
+    const { firstDayOfMonth } = getFirstDayCurrentDate()
+
     useAccountStore.mockReturnValue({
       accountData: fixtures.accountDataWithoutCreditBalance
     })
@@ -197,7 +204,7 @@ describe('BillingService', () => {
       creditBalance: '0.00',
       currency: 'USD',
       isTrial: false,
-      paymentDate: '07/01/2024',
+      paymentDate: formatDateToUSBilling(firstDayOfMonth),
       servicePlan: 'Business'
     })
   })

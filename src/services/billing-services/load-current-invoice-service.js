@@ -29,11 +29,14 @@ export const loadBillingCurrentInvoiceService = async () => {
     }`
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeBillingBaseUrl()}`,
-    method: 'POST',
-    body: payload
-  }, graphQLApi)
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: `${makeBillingBaseUrl()}`,
+      method: 'POST',
+      body: payload
+    },
+    graphQLApi
+  )
 
   httpResponse = adapt(httpResponse)
 
@@ -48,7 +51,7 @@ const adapt = (httpResponse) => {
       billingPeriod: `${formatPeriod(invoice.periodFrom)} - ${formatPeriod(invoice.periodTo)}`,
       productChanges: '-',
       servicePlan: '-',
-      creditUsedForPayment: 0.00
+      creditUsedForPayment: 0.0
     }
   })
   return {
