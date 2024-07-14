@@ -108,10 +108,10 @@
       <div class="p-3 md:p-6 border-t surface-border flex flex-col gap-4">
         <p class="text-sm text-color-secondary">
           Consumptions made up to the last day of the month will be included in this invoice. Change
-          <router-link
-            to="payment"
-            class="text-[var(--text-color-link)]"
-            >payment methods.</router-link
+          <span
+            @click="goToPayment"
+            class="text-[var(--text-color-link)] cursor-pointer"
+            >payment methods.</span
           >
         </p>
       </div>
@@ -156,6 +156,7 @@
 
   const hasContentToList = ref(true)
   const yourServicePlan = ref({})
+  const emit = defineEmits(['changeTab'])
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -250,6 +251,9 @@
 
   const getYourServicePlan = async () => {
     yourServicePlan.value = await props.loadYourServicePlanService()
+  }
+  const goToPayment = () => {
+    emit('changeTab', 1)
   }
 
   getYourServicePlan()
