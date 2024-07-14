@@ -139,6 +139,53 @@ describe('Edge Application', { tags: ['run',] }, () => {
     cy.get(selectors.edgeApplication.searchInput).type(originName)
     cy.get(selectors.edgeApplication.tableRowAddress).should('have.text', 'test2.com')
   })
+  it.only('should add an error response', () => {
+    //edge application creation
+    //arrange
+    cy.get(selectors.edgeApplication.createButton).click()
+
+    //act
+    cy.get(selectors.edgeApplication.nameInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.addressInput).clear()
+    cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org')
+    cy.get(selectors.edgeApplication.saveButton).click()
+    cy.get(selectors.edgeApplication.cancelButton).click()
+
+    //assert
+    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', edgeApplicationName)
+
+    //add error response
+    //arrange
+    cy.get(selectors.edgeApplication.tableRowLastEditor).click()
+    cy.get(selectors.edgeApplication.tabOption(3)).click()
+
+    //act
+    //add error response 1
+    cy.get(selectors.edgeApplication.addErrorResponse).click()
+    cy.get(selectors.edgeApplication.errorResponseStatusCodes(1)).click()
+    cy.get(selectors.edgeApplication.errorResponseStatusCodes(1)).find('li').eq(0).click()
+    cy.get(selectors.edgeApplication.errorResponsePaths(1)).type('/test/')
+    cy.get(selectors.edgeApplication.errorResponseCustomStatus(1)).type('200')
+
+    //add erro response 2
+    cy.get(selectors.edgeApplication.addErrorResponse).click()
+    cy.get(selectors.edgeApplication.errorResponseStatusCodes(2)).click()
+    cy.get(selectors.edgeApplication.errorResponseStatusCodes(2)).find('li').eq(1).click()
+    cy.get(selectors.edgeApplication.errorResponsePaths(2)).type('/test/test2')
+    cy.get(selectors.edgeApplication.errorResponseCustomStatus(2)).type('200')
+
+    //select origin
+    cy.get(selectors.edgeApplication.errorResponseOrigin).click()
+    cy.get(selectors.edgeApplication.errorResponseOrigin).find('li').eq(0).click()
+
+    //save
+    cy.get(selectors.edgeApplication.saveButton).click()
+    cy.get(selectors.edgeApplication.cancelButton).click()
+
+    //assert
+    cy.verifyToast('success', 'Your Error Responses has been edited')
+  })
 
   afterEach(() => {
     // Delete the edge application
