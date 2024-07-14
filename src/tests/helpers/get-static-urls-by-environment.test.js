@@ -1,6 +1,8 @@
 import { getStaticUrlsByEnvironment } from '@/helpers'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+const url = window.location.origin
+
 const makeSut = () => {
   const sut = getStaticUrlsByEnvironment
 
@@ -28,17 +30,19 @@ const scenarios = [
   {
     section: 'billing',
     env: 'development',
-    expected: 'https://stage-console.azion.com/billing/payment?paymentSession=true'
+    expected: `${url}/billing`
   },
   {
     section: 'billing',
     env: 'stage',
-    expected: 'https://stage-console.azion.com/billing/payment?paymentSession=true'
+    expected:
+      'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },
   {
     section: 'billing',
     env: 'production',
-    expected: 'https://console.azion.com/billing/payment?paymentSession=true'
+    expected:
+      'https://manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },
   {
     section: 'playground',

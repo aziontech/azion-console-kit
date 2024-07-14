@@ -215,6 +215,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <FieldDropdown
                 label="Status Code"
+                data-testid="error-responses-form__status-code"
                 required
                 :name="`errorResponses[${index}].code`"
                 :options="STATUS_CODE_OPTIONS"
@@ -261,6 +262,7 @@
         <Divider />
         <PrimeButton
           @click="addErrorResponse"
+          data-testid="error-responses-form__add-button"
           label="Add Error Response"
           outlined
           icon="pi pi-plus-circle"

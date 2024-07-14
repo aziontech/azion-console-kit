@@ -11,6 +11,7 @@
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listFunctionsEdgeFirewallRef"
+      addButtonLabel="Function Instance"
       :listService="listFunctionsInstance"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
@@ -41,6 +42,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Function Instance"
+        data-testid="create_Function Instance_button"
         @click="openCreateFunctionDrawer"
       />
     </template>
