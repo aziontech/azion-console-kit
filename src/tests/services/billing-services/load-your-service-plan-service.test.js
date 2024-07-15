@@ -1,10 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadYourServicePlanService } from '@/services/billing-services'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import graphQLApi from '@/services/axios/makeEventsApi'
-import { useAccountStore } from '@/stores/account'
-import { createPinia } from 'pinia'
-import { loadContractServicePlan } from '@/services/contract-services'
+import { describe, expect, it, vi } from 'vitest'
+import graphQLApi from '@/services/axios/makeGraphQl'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
 
 const getFirstDayCurrentDate = () => {
@@ -30,33 +27,12 @@ const fixtures = {
     currency: 'USD',
     paymentDate: '2024-07-01'
   },
-  accountDataDeveloperPlan: {
-    name: 'Paulo Sobrinho',
-    full_name: 'Paulo Sobrinho Ferreira',
-    disclaimer:
-      "Welcome to your trial period. You have USD 300.00 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
-    status: 'TRIAL',
-    client_id: '8048e',
-    user_id: 3652
-  },
-  accountDataBusinessPlan: {
-    name: 'Paulo Sobrinho',
-    full_name: 'Paulo Sobrinho Ferreira',
-    disclaimer:
-      "Welcome to your trial period. You have USD 23.02 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
-    status: 'BUSINESS',
-    client_id: '8048e',
-    user_id: 3652
-  },
-  accountDataWithoutCreditBalance: {
-    name: 'Paulo Sobrinho',
-    full_name: 'Paulo Sobrinho Ferreira',
-    disclaimer:
-      "Welcome to your trial period. You have USD to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
-    status: 'BUSINESS',
-    client_id: '8048e',
-    user_id: 3652
-  }
+  disclaimerTwentyThree:
+    "Welcome to your trial period. You have USD 23.40 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
+  disclaimerZero:
+    "Welcome to your trial period. You have USD  to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
+  disclaimerDefault:
+    "Welcome to your trial period. You have USD 300.00 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>."
 }
 
 const makeSut = () => {
@@ -64,18 +40,8 @@ const makeSut = () => {
 
   return { sut }
 }
-vi.mock('@/stores/account')
-vi.mock('@/services/contract-services')
-
 describe('BillingService', () => {
-  beforeEach(() => {
-    createPinia()
-  })
-
   it('should call api with correct params', async () => {
-    useAccountStore.mockReturnValue({
-      accountData: fixtures.accountDataDeveloperPlan
-    })
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
@@ -85,15 +51,9 @@ describe('BillingService', () => {
       }
     })
 
-    loadContractServicePlan.mockReturnValue({
-      isDeveloperSupportPlan: true,
-      yourServicePlan: 'Developer'
-    })
-
     const { sut } = makeSut()
-    const token = 'token'
-    const apiClient = graphQLApi(token)
-    await sut(apiClient)
+
+    await sut(fixtures.disclaimerDefault)
     const { lastDayOfMonth, firstDayOfMonth } = getFirstDayCurrentDate()
 
     const payload = {
@@ -114,88 +74,46 @@ describe('BillingService', () => {
         }
       }`
     }
-    expect(requestSpy).not.toHaveBeenCalledWith(
+    expect(requestSpy).toHaveBeenCalledWith(
       {
         url: '/billing',
         method: 'POST',
         body: payload
       },
-      apiClient
+      graphQLApi
     )
   })
-
-  it('should parse correctly each returned item servicePlan "Developer"', async () => {
+  it('should return 23.40 value in the disclaimer ', async () => {
     const { firstDayOfMonth } = getFirstDayCurrentDate()
 
-    useAccountStore.mockReturnValue({
-      accountData: fixtures.accountDataDeveloperPlan
-    })
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: { payments: [fixtures.paymentMock] } }
-    })
-    const { sut } = makeSut()
-    const result = await sut({})
-
-    expect(result).toEqual({
-      amount: 0,
-      cardBrand: 'visa',
-      cardLast4Digits: '4123',
-      creditBalance: '300.00',
-      currency: 'USD',
-      isTrial: true,
-      paymentDate: formatDateToUSBilling(firstDayOfMonth),
-      servicePlan: 'Developer'
-    })
-  })
-
-  it('should parse correctly each returned item servicePlan "Business"', async () => {
-    const { firstDayOfMonth } = getFirstDayCurrentDate()
-
-    useAccountStore.mockReturnValue({
-      accountData: fixtures.accountDataBusinessPlan
-    })
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { payments: [fixtures.paymentMock] } }
     })
 
-    loadContractServicePlan.mockReturnValue({
-      isDeveloperSupportPlan: true,
-      yourServicePlan: 'Business'
-    })
     const { sut } = makeSut()
-    const result = await sut({})
+    const result = await sut(fixtures.disclaimerTwentyThree)
 
     expect(result).toEqual({
       amount: 0,
       cardBrand: 'visa',
       cardLast4Digits: '4123',
-      creditBalance: '23.02',
+      creditBalance: '23.40',
       currency: 'USD',
-      isTrial: false,
-      paymentDate: formatDateToUSBilling(firstDayOfMonth),
-      servicePlan: 'Business'
+      paymentDate: formatDateToUSBilling(firstDayOfMonth)
     })
   })
 
   it('should return 0.00 when it do not find a value in the disclaimer ', async () => {
     const { firstDayOfMonth } = getFirstDayCurrentDate()
 
-    useAccountStore.mockReturnValue({
-      accountData: fixtures.accountDataWithoutCreditBalance
-    })
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { payments: [fixtures.paymentMock] } }
     })
 
-    loadContractServicePlan.mockReturnValue({
-      isDeveloperSupportPlan: true,
-      yourServicePlan: 'Business'
-    })
     const { sut } = makeSut()
-    const result = await sut({})
+    const result = await sut(fixtures.disclaimerZero)
 
     expect(result).toEqual({
       amount: 0,
@@ -203,9 +121,7 @@ describe('BillingService', () => {
       cardLast4Digits: '4123',
       creditBalance: '0.00',
       currency: 'USD',
-      isTrial: false,
-      paymentDate: formatDateToUSBilling(firstDayOfMonth),
-      servicePlan: 'Business'
+      paymentDate: formatDateToUSBilling(firstDayOfMonth)
     })
   })
 })

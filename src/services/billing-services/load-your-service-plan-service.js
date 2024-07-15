@@ -1,13 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import graphQLApi from '../axios/makeGraphQl'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
-import { loadContractServicePlan } from '@/services/contract-services'
-import { useAccountStore } from '@/stores/account'
 
-export const loadYourServicePlanService = async () => {
-  const accountStore = useAccountStore()
-  const accountData = accountStore.accountData
-
+export const loadYourServicePlanService = async (disclaimer = '') => {
   const { lastDayOfMonth, firstDayOfMonth } = getFirstDayCurrentDate()
 
   const payload = {
@@ -38,11 +33,7 @@ export const loadYourServicePlanService = async () => {
     graphQLApi
   )
 
-  const { yourServicePlan } = await loadContractServicePlan({
-    clientId: accountData.client_id
-  })
-
-  httpResponse = adapt(httpResponse, yourServicePlan, accountData)
+  httpResponse = adapt(httpResponse, disclaimer)
 
   return parseHttpResponse(httpResponse)
 }
@@ -58,7 +49,7 @@ function extractPriceFromString(sentence) {
   }
 }
 
-const adapt = (httpResponse, servicePlan, accountData) => {
+const adapt = (httpResponse, disclaimer) => {
   const [yourServicePlan] = httpResponse.body.data.payments
 
   const parseYourServicePlan = {
@@ -67,9 +58,7 @@ const adapt = (httpResponse, servicePlan, accountData) => {
     currency: yourServicePlan.currency,
     cardBrand: yourServicePlan.cardBrand.toLowerCase(),
     cardLast4Digits: yourServicePlan.cardLast4Digits,
-    isTrial: accountData.status === 'TRIAL',
-    creditBalance: extractPriceFromString(accountData.disclaimer),
-    servicePlan
+    creditBalance: extractPriceFromString(disclaimer)
   }
 
   return {

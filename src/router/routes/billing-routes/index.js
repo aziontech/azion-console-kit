@@ -1,4 +1,6 @@
 import * as BillingServices from '@/services/billing-services'
+import * as ContractServices from '@/services/contract-services'
+
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -24,7 +26,8 @@ export const billingRoutes = {
           clipboardWrite: Helpers.clipboardWrite,
           documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
           loadYourServicePlanService: BillingServices.loadYourServicePlanService,
-          openPlans: Helpers.openShowMorePlan
+          openPlans: Helpers.openShowMorePlan,
+          loadContractServicePlan: ContractServices.loadContractServicePlan
         }
       },
       meta: {

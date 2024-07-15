@@ -64,11 +64,9 @@
           />
         </div>
         <div class="flex items-center gap-4 mb-2">
-          <span class="font-medium text-3xl text-color"
-            >{{ yourServicePlan.servicePlan }} Plan</span
-          >
+          <span class="font-medium text-3xl text-color">{{ servicePlan }} Plan</span>
           <Tag
-            v-if="yourServicePlan.isTrial"
+            v-if="isTrail"
             severity="secondary"
             value="Free Trial"
           />
@@ -151,12 +149,15 @@
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
+  import { useAccountStore } from '@/stores/account'
 
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
 
   const hasContentToList = ref(true)
   const yourServicePlan = ref({})
+  const servicePlan = ref('')
   const emit = defineEmits(['changeTab'])
+  const user = useAccountStore().accountData
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -176,6 +177,10 @@
       required: true
     },
     openPlans: {
+      type: Function,
+      required: true
+    },
+    loadContractServicePlan: {
       type: Function,
       required: true
     }
@@ -250,11 +255,25 @@
   }
 
   const getYourServicePlan = async () => {
-    yourServicePlan.value = await props.loadYourServicePlanService()
+    yourServicePlan.value = await props.loadYourServicePlanService(user.disclaimer)
   }
+
+  const getLoadContractService = async () => {
+    const { yourServicePlan } = await props.loadContractServicePlan({
+      clientId: user.client_id
+    })
+    servicePlan.value = yourServicePlan
+  }
+
   const goToPayment = () => {
     emit('changeTab', 1)
   }
 
-  getYourServicePlan()
+  const getAllInfos = async () => {
+    await Promise.all([getLoadContractService(), getYourServicePlan()])
+  }
+
+  const isTrail = computed(() => user.status === 'TRIAL')
+
+  getAllInfos()
 </script>
