@@ -11,7 +11,7 @@
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">
         <div class="flex gap-3.5 flex-col">
           <div
-            class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-white overflow-hidden"
+            class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-white overflow-hidden box-border"
           >
             <img
               :src="solution.vendor.icon"
