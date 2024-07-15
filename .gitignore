@@ -42,3 +42,4 @@ cypress.env.*
 
 src/views/Playground/PlaygroundView.vue
 /cypress/downloads
+/cypress/reports

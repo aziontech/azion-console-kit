@@ -18,6 +18,7 @@ import './commands'
 import './utils'
 import '@cypress/code-coverage/support'
 import registerCypressGrep from '@cypress/grep'
+import 'cypress-mochawesome-reporter/register';
 
 registerCypressGrep()
 
