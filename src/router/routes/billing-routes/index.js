@@ -1,13 +1,15 @@
 import * as BillingServices from '@/services/billing-services'
+import * as ContractServices from '@/services/contract-services'
+
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const billingRoutes = {
-  path: '/billing/:tab?',
+  path: '/billing',
   name: 'billing',
   children: [
     {
-      path: '',
+      path: ':tab?',
       name: 'billing-tabs',
       component: () => import('@views/Billing/TabsView.vue'),
       props: {
@@ -22,7 +24,10 @@ export const billingRoutes = {
         billsServices: {
           listPaymentHistoryService: BillingServices.listPaymentHistoryService,
           clipboardWrite: Helpers.clipboardWrite,
-          documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory
+          documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
+          loadYourServicePlanService: BillingServices.loadYourServicePlanService,
+          openPlans: Helpers.openShowMorePlan,
+          loadContractServicePlan: ContractServices.loadContractServicePlan
         }
       },
       meta: {
@@ -33,6 +38,11 @@ export const billingRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'invoice-details',
+      name: 'billing-invoice-details',
+      component: () => import('@/views/Billing/InvoiceDetailsView.vue')
     }
   ]
 }

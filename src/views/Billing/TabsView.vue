@@ -83,7 +83,10 @@
         class="w-full h-full"
       >
         <TabPanel header="Bills">
-          <BillsView v-bind="props.billsServices" />
+          <BillsView
+            v-bind="props.billsServices"
+            @changeTab="changeTab"
+          />
         </TabPanel>
         <TabPanel header="Payment Methods">
           <ListView

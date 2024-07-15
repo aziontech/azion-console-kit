@@ -8,7 +8,6 @@ import istanbul from 'vite-plugin-istanbul'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
-
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-'
 
   return {
@@ -19,6 +18,7 @@ const getConfig = () => {
         nycrcPath: '.nycrc'
       })
     ],
+    logLevel: 'warn',
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
@@ -49,6 +49,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}cities.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
+        },
+        '/graphql/billing': {
+          target: `${URLStartPrefix}manager.azion.com`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
         '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,

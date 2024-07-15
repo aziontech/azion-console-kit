@@ -215,6 +215,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <FieldDropdown
                 label="Status Code"
+                :data-testid="`error-responses-form__error-response__${index}__status-code`"
                 required
                 :name="`errorResponses[${index}].code`"
                 :options="STATUS_CODE_OPTIONS"
@@ -240,6 +241,7 @@
             <FieldText
               label="Page Path"
               placeholder="/path/error_page.html"
+              :data-testid="`error-responses-form__error-response__${index}__path`"
               :name="`errorResponses[${index}].uri`"
               :value="errorResponses[index].value.uri"
               description="Select an origin to customize the error page path."
@@ -248,6 +250,7 @@
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <FieldNumber
               label="Response Status Code"
+              :data-testid="`error-responses-form__error-response__${index}__custom-status`"
               :value="errorResponses[index].value.customStatusCode"
               :name="`errorResponses[${index}].customStatusCode`"
               :min="100"
@@ -261,6 +264,7 @@
         <Divider />
         <PrimeButton
           @click="addErrorResponse"
+          data-testid="error-responses-form__add-button"
           label="Add Error Response"
           outlined
           icon="pi pi-plus-circle"
@@ -279,6 +283,7 @@
           required
           :options="originOptions"
           optionLabel="name"
+          data-testid="error-responses-form__origin"
           optionValue="originId"
           class="h-fit"
           name="originId"

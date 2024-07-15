@@ -28,6 +28,7 @@
     <PrimeButton
       severity="primary"
       outlined
+      data-testid="action-bar__go-back"
       class="max-md:w-full"
       label="Back to list"
       @click="handleClick"

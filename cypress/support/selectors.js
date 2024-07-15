@@ -14,7 +14,7 @@ const selectors = {
     },
     actionsMenu: {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
+      deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
     },
     singleActionsMenu: {
       button: '[data-testid="data-table-actions-column-body-action-button"]'
@@ -58,13 +58,28 @@ const selectors = {
   edgeApplication: {
     createButton: '.p-datatable-header > .flex-wrap > .p-button > .p-button-label',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
+    originType: '[data-testid="origin-form__origin-type__dropdown"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    originAddressInput: '[data-testid="origin-form__address__input"]',
+    goBackButton: '[data-testid="action-bar__go-back"]',
+    leavePageButton: '[data-testid="dialog-unsaved__leave-page"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
     tableRowName: '[data-testid="list-table-block__column__name__row"]',
     tableRowLastEditor: '[data-testid="list-table-block__column__lastEditor__row"]',
+    tableRowAddress: '[data-testid="list-table-block__column__addresses__row"]',
+    addErrorResponse: '[data-testid="error-responses-form__add-button"]',
+    errorResponseOrigin: '[data-testid="error-responses-form__origin__dropdown"]',
+    errorResponseStatusCodes: (optionIdx) =>
+      `[data-testid="error-responses-form__error-response__${optionIdx}__status-code__dropdown"]`,
+    errorResponseCustomStatus: (optionIdx) =>
+      `[data-testid="error-responses-form__error-response__${optionIdx}__custom-status__input"]`,
+    errorResponsePaths: (optionIdx) =>
+      `[data-testid="error-responses-form__error-response__${optionIdx}__path__input"]`,
     rulesEngineTab: 'li:nth-child(6)',
+    tabOption: (optionIdx) => `#tab_${optionIdx}`,
+    createOrigin: '[data-testid="origins__add-button"]',
     addRuleButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     criteriaOperatorDropdown:
@@ -116,10 +131,13 @@ const selectors = {
     nameInput: '[data-testid="network-list-form__name__input"]',
     typeDropdown: '[data-testid="network-list-form__type__dropdown"]',
     asnTextarea: '[data-testid="network-list-form__asn-list__textarea"]',
+    ipcidrTextarea: '[data-testid="network-list-form__ipcidr-list__textarea"]',
+    countriesMultiselect: '[data-testid="network-list-form__countries__multiselect"]',
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
     nameRow: '[data-testid="list-table-block__column__name__row"]',
+    countriesListOption: (recordType) => `#countriesList_${recordType}`,
     typeRow: '[data-testid="list-table-block__column__listType__row"]',
     actionButton:
       '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
@@ -138,16 +156,15 @@ const selectors = {
   wafs: {
     createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
     nameInput: '[data-testid="waf-rules-form__name-field__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"]',
-    threatTypesRow: '[data-testid="list-table-block__column__threatTypes__row"] > :nth-child(1)',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
+    threatTypeSwitch: (name) =>
+      `[data-testid="field-group-switch__switch-${name}__switch"] > .p-inputswitch-slider`,
+    dropdownTrigger: (name) =>
+      `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
+    dropdownOptions: (name, position) => `#${name}_${position}`,
+    breadcumbToList: '.p-breadcrumb-list li.p-menuitem:nth-child(3) .p-menuitem-link',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    seeMore: (columnName) =>
+      `[data-testid="list-table-block__column__${columnName}__row"] .underline`
   },
   functions: {
     createButton: '[data-testid="create_Edge Function_button"] > .p-button-label',
@@ -162,6 +179,49 @@ const selectors = {
   edgeFirewall: {
     createButton: '[data-testid="create_Edge Firewall_button"] > .p-button-label',
     nameInput: '[data-testid="edge-firewall-form__name-field__input"]',
+    edgeFunctionSwitch:
+      '[data-testid="field-group-switch__switch-edgeFunctionsEnabled__switch"] > .p-inputswitch-slider',
+    wafEnabledSwitch:
+      '[data-testid="field-group-switch__switch-wafEnabled__switch"] > .p-inputswitch-slider',
+    networkProtectionSwitch:
+      '[data-testid="field-group-switch__switch-networkProtectionEnabled__switch"] > .p-inputswitch-slider',
+    mainSettingsTab: '[data-testid="edge-firewall__main-settings-tab"] > .p-tabview-title',
+    functionsTab: '[data-testid="edge-firewall__functions-tab"] > .p-tabview-title',
+    rulesEngineTab: '[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title',
+    createFunctionInstanceButton:
+      '[data-testid="create_Function Instance_button"] > .p-button-label',
+    functionInstanceName: '[data-testid="field-text__input"]',
+    functionInstanceDropdown: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    functionInstanceDropdownFilter: '.p-dropdown-filter',
+    functionInstanceDropdownIcon:
+      '[data-testid="field-dropdown__dropdown"] > .p-dropdown-trigger > .p-icon',
+    functionInstanceDropdownFunction: '#edgeFunctionID_0',
+    functionInstanceSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    functionInstanceTableSearchInput: '[data-testid="data-table-search-input"]',
+    functionInstanceTableColumnName: '[data-testid="list-table-block__column__name__row"]',
+    functionInstanceTableColumnInstanced:
+      '[data-testid="list-table-block__column__functionInstanced__row"]',
+    createRuleButton: '[data-testid="create_Rules Engine_button"] > .p-button-label',
+    ruleNameInput: '[data-testid="edge-firewall-rule-form__name__input"]',
+    ruleDescriptionInput: '[data-testid="edge-firewall-rule-form__description__input"]',
+    ruleCriteriaVariableDropdown: '#criteria\\[0\\]\\[0\\]\\.variable > .p-dropdown-trigger',
+    ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
+    ruleCriteriaOperatorDropdown:
+      ':nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
+    ruleCriteriaInput: ':nth-child(3) > [data-testid="field-text__input"]',
+    ruleBehaviorDropdown:
+      ':nth-child(1) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
+    ruleBehaviorFunctionToRunDropdown:
+      '.gap-3 > :nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    ruleBehaviorFunctionToRun: '#behaviors\\[0\\]\\.functionId_0',
+    ruleSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
+    rulesTableSearchInput: '[data-testid="data-table-search-input"]',
+    rulesTableColumnName: '[data-testid="list-table-block__column__name__row"]',
+    rulesTableColumnDescriptionShowMore: '.underline',
+    rulesTableColumnDescription: '.whitespace-pre',
+
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
@@ -181,19 +241,20 @@ const selectors = {
   },
   edgeServices: {
     createServiceButton: '[data-testid="create_Service_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    filteredRowNameColumn: '[data-testid="list-table-block__column__name__row"]',
-    filteredRowStatusColumn:
-      '[data-testid="list-table-block__column__labelActive__row"] > .p-tag-value',
-    actionsMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-    actionsMenuDeleteAction:
-      '#overlay_menu_1 > .p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
-    serviceName: '[data-testid="edge-service-form__name-field__input"]',
-    nameRequiredLabel: '[data-testid="edge-service-form__name-field__error-message"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
+    createResourceButton: '[data-testid="list-table-block__create-resource-button"]',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
     pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    cancelButton: '[data-testid="form-actions-cancel-button"]'
+    serviceName: '[data-testid="edge-service-form__name-field__input"]',
+    variablesField: '[data-testid="edge-service-form__variables-field"] .view-lines',
+    status: '[data-testid="edge-service-form__status__active-field"] input',
+    statusSwitch: '[data-testid="edge-service-form__status__active-field"] .p-inputswitch-slider',
+    mainSettingsTab: '[data-testid="edge-service-tabs__tab__main-settings"] a',
+    resoucesTab: '[data-testid="edge-service-tabs__tab__resources"] a',
+    pathField: '[data-testid="edge-service-drawer-form__path-field__input"]',
+    contentTypeField: '[data-testid="edge-service-drawer-form__content-field"] .view-lines',
+    typeDropdownTrigger:
+      '[data-testid="edge-service-drawer-form__type-field__dropdown"] > .p-dropdown-trigger',
+    typeDropdownOptions: (position) => `#contentType_${position}`
   },
   personalTokens: {
     createTokenButton: '[data-testid="create_Personal Token_button"]',

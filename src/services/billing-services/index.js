@@ -4,6 +4,9 @@ import { deletePaymentService } from './delete-payment-service'
 import { setAsDefaultPaymentService } from './set-as-default-payment-service'
 import { addCreditService } from './add-credit-service'
 import { createPaymentMethodService } from './create-payment-method-service'
+import { loadYourServicePlanService } from './load-your-service-plan-service'
+import { makeBillingBaseUrl } from './make-billing-base-url'
+import { loadBillingCurrentInvoiceService } from './load-current-invoice-service'
 
 export {
   listPaymentMethodsService,
@@ -11,5 +14,8 @@ export {
   deletePaymentService,
   setAsDefaultPaymentService,
   addCreditService,
-  createPaymentMethodService
+  createPaymentMethodService,
+  loadYourServicePlanService,
+  makeBillingBaseUrl,
+  loadBillingCurrentInvoiceService
 }
