@@ -14,7 +14,7 @@ const selectors = {
     },
     actionsMenu: {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
+      deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
     },
     singleActionsMenu: {
       button: '[data-testid="data-table-actions-column-body-action-button"]'

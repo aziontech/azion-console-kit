@@ -31,6 +31,7 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
   it('should edit a resource in an edge service', () => {
     // Arrange
     cy.intercept('/api/v3/edge_services/*').as('loadEdgeService')
+    cy.intercept('/api/v3/edge_services/*/resources/*').as('loadResource')
     const fixtures = {
       path: `/tmp/${edgeServiceName}`,
       contentType: `value=${edgeServiceName}`
@@ -73,7 +74,9 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
 
     // Act
     // edit service
-    cy.wait(2000)
+
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000) // waiting for api response is not working because of page update
     cy.get(selectors.edgeServices.statusSwitch).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -84,11 +87,9 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
 
     cy.get(selectors.list.searchInput).type(fixtures.path)
     cy.get(selectors.edgeServices.listRow('name')).click()
-
+    cy.wait('@loadResource')
     cy.get(selectors.edgeServices.typeDropdownTrigger).click()
     cy.get(selectors.edgeServices.typeDropdownOptions(1)).click()
-
-    cy.get(selectors.edgeServices.contentTypeField).type(`{enter}${fixtures.contentType}`)
 
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Edge Service Resource has been updated')
