@@ -55,6 +55,10 @@ const selectors = {
     menuItem: (menuAccountLabel) =>
       `li[aria-label="${menuAccountLabel}"] > .p-menuitem-content > .p-menuitem-link`
   },
+  activityHistory: {
+    searchInput: '[data-testid="events-search-input"]',
+    timeLineEvent: '[data-testid="events-timeline-event-name"]',
+  },
   edgeApplication: {
     createButton: '.p-datatable-header > .flex-wrap > .p-button > .p-button-label',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
