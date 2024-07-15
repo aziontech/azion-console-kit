@@ -10,12 +10,12 @@ const fixtures = {
         {
           billId: 2707388,
           billDetailId: 170072532,
-          totalValue: "0.00",
-          createdDate: "2024-07-01",
-          periodFrom: "2024-07-01",
-          periodTo: "2024-07-31",
-          invoiceNumber: "USALLC-4697w052024",
-          currency: "BRL"
+          totalValue: '0.00',
+          createdDate: '2024-07-01',
+          periodFrom: '2024-07-01',
+          periodTo: '2024-07-31',
+          invoiceNumber: 'USALLC-4697w052024',
+          currency: 'BRL'
         }
       ]
     }
