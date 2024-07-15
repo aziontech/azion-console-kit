@@ -8,6 +8,7 @@ import {
   openAzionDiscord,
   openAzionGithub,
   openAzionX,
+  openShowMorePlan,
   AZION_API_DOCUMENTATION,
   AZION_DOCUMENTATION,
   AZION_DOCUMENTATION_PRODUCTS,
@@ -20,7 +21,8 @@ import {
   AZION_BLOG,
   AZION_DISCORD,
   AZION_GITHUB,
-  AZION_X
+  AZION_X,
+  AZION_PLAN
 } from '@/helpers/azion-documentation-window-opener'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 
@@ -118,5 +120,13 @@ describe('AzionDocumentationWindowOpener', () => {
     openAzionX()
 
     expect(openWindowSpy).toHaveBeenCalledWith(AZION_X, '_blank')
+  })
+
+  it('should open a new window with Azion Plans link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+
+    openShowMorePlan()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(AZION_PLAN, '_blank')
   })
 })
