@@ -16,6 +16,7 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
     }
   })
 
+  // TODO: remove skip when the bug is fixed
   it.skip('should create an edge service', () => {
     // Arrange
     cy.intercept('POST', '/api/v3/edge_services').as('saveEdgeService')
