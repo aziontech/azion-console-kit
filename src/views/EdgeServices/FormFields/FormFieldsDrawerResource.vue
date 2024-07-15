@@ -85,6 +85,7 @@
           :disabled="isFieldDisabled"
           :value="name"
           description="The path where the resource will be saved on the edge node."
+          data-testid="edge-service-drawer-form__path-field"
         />
       </div>
       <div class="flex flex-col sm:w-2/5 gap-2">
@@ -96,6 +97,7 @@
           inputClass="w-full"
           name="contentType"
           :value="contentType"
+          data-testid="edge-service-drawer-form__type-field"
         />
       </div>
       <div v-show="isShellScript">
@@ -105,6 +107,7 @@
           nameField="trigger"
           :isCard="false"
           :options="triggerRadioOptions"
+          data-testid="edge-service-drawer-form__type-field"
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
@@ -123,6 +126,7 @@
                 class="min-h-[200px] overflow-clip surface-border border rounded-md"
                 :class="{ 'border-red-500 border': contentError }"
                 :options="editorOptions"
+                data-testid="edge-service-drawer-form__content-field"
               />
               <small
                 v-if="contentError"

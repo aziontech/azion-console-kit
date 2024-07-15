@@ -14,7 +14,7 @@ const selectors = {
     },
     actionsMenu: {
       button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteButton: '[data-testid="data-table-actions-column-body-actions-menu"]'
+      deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
     },
     singleActionsMenu: {
       button: '[data-testid="data-table-actions-column-body-action-button"]'
@@ -224,19 +224,19 @@ const selectors = {
   },
   edgeServices: {
     createServiceButton: '[data-testid="create_Service_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    filteredRowNameColumn: '[data-testid="list-table-block__column__name__row"]',
-    filteredRowStatusColumn:
-      '[data-testid="list-table-block__column__labelActive__row"] > .p-tag-value',
-    actionsMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-    actionsMenuDeleteAction:
-      '#overlay_menu_1 > .p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
-    serviceName: '[data-testid="edge-service-form__name-field__input"]',
-    nameRequiredLabel: '[data-testid="edge-service-form__name-field__error-message"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
+    createResourceButton: '[data-testid="list-table-block__create-resource-button"]',
+    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
     pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    cancelButton: '[data-testid="form-actions-cancel-button"]'
+    serviceName: '[data-testid="edge-service-form__name-field__input"]',
+    variablesField: '[data-testid="edge-service-form__variables-field"] .view-lines',
+    statusSwitch: '[data-testid="edge-service-form__status__active-field"] .p-inputswitch-slider',
+    mainSettingsTab: '[data-testid="edge-service-tabs__tab__main-settings"] a',
+    resoucesTab: '[data-testid="edge-service-tabs__tab__resources"] a',
+    pathField: '[data-testid="edge-service-drawer-form__path-field__input"]',
+    contentTypeField: '[data-testid="edge-service-drawer-form__content-field"] .view-lines',
+    typeDropdownTrigger:
+      '[data-testid="edge-service-drawer-form__type-field__dropdown"] > .p-dropdown-trigger',
+    typeDropdownOptions: (position) => `#contentType_${position}`
   },
   personalTokens: {
     createTokenButton: '[data-testid="create_Personal Token_button"]',

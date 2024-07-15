@@ -134,6 +134,7 @@
             icon="pi pi-plus"
             label="Resource"
             @click="openCreateServiceDrawer"
+            data-testid="list-table-block__create-resource-button"
           />
         </template>
       </ListTableBlock>
@@ -153,6 +154,7 @@
           icon="pi pi-plus"
           label="Resource"
           @click="openCreateServiceDrawer"
+          data-testid="list-table-block__create-resource-button"
         />
       </template>
       <template #illustration>
