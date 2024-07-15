@@ -139,7 +139,7 @@ describe('Edge Application', { tags: ['run',] }, () => {
     cy.get(selectors.edgeApplication.searchInput).type(originName)
     cy.get(selectors.edgeApplication.tableRowAddress).should('have.text', 'test2.com')
   })
-  it.only('should add an error response', () => {
+  it('should add an error response', () => {
     //edge application creation
     //arrange
     cy.get(selectors.edgeApplication.createButton).click()
@@ -168,7 +168,7 @@ describe('Edge Application', { tags: ['run',] }, () => {
     cy.get(selectors.edgeApplication.errorResponsePaths(1)).type('/test/')
     cy.get(selectors.edgeApplication.errorResponseCustomStatus(1)).type('200')
 
-    //add erro response 2
+    //add error response 2
     cy.get(selectors.edgeApplication.addErrorResponse).click()
     cy.get(selectors.edgeApplication.errorResponseStatusCodes(2)).click()
     cy.get(selectors.edgeApplication.errorResponseStatusCodes(2)).find('li').eq(1).click()
