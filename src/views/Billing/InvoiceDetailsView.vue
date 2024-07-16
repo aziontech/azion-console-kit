@@ -24,7 +24,7 @@
           <span class="font-medium text-color text-sm">MM/DD/2024 - MM/DD/2024</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-color-secondary text-sm">Products Charges</span>
+          <span class="text-color-secondary text-sm">Product Charges</span>
           <span class="text-color text-sm">
             <span class="text-color-secondary text-sm">$</span> 0.00</span
           >
