@@ -2,8 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 
-export const loadBillingCurrentInvoiceService = async () => {
-  const dateRange = getCurrentMonthStartEnd()
+export const loadInvoiceDataService = async (invoiceId) => {
   const payload = {
     query: `query getBillDetail {
       billDetail(
@@ -11,11 +10,8 @@ export const loadBillingCurrentInvoiceService = async () => {
           groupBy: [billId]
           orderBy: [productSlug_ASC, metricSlug_ASC]
           filter: {
-            periodFromRange: {
-              begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
-            }
-          }
-      ) {
+            billId: ${invoiceId}
+        }) {
           billId,
           billDetailId
           totalValue,
@@ -48,6 +44,7 @@ const adapt = (httpResponse) => {
   const parseInvoice = httpResponse.body.data?.billDetail.map((invoice) => {
     return {
       billId: invoice.billId,
+      billDetailId: invoice.billDetailId,
       total: invoice.totalValue,
       currency: invoice.currency,
       billingPeriod: `${formatPeriod(invoice.periodFrom)} - ${formatPeriod(invoice.periodTo)}`,
@@ -65,18 +62,4 @@ const adapt = (httpResponse) => {
 
 const formatPeriod = (period) => {
   return period.split('-').reverse().join('/')
-}
-
-const getCurrentMonthStartEnd = () => {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
-
-  const dateInitial = new Date(year, month, 1)
-  const dateFinal = new Date(year, month + 1, 0)
-
-  return {
-    dateInitial: dateInitial.toISOString().split('T')[0],
-    dateFinal: dateFinal.toISOString().split('T')[0]
-  }
 }
