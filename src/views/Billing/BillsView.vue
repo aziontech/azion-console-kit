@@ -10,11 +10,12 @@
             icon="pi pi-file"
             outlined
             label="Details"
+            @click="goToBillingDetails()"
           />
         </div>
         <div class="flex justify-between mt-4">
           <span class="text-color-secondary text-sm">Billing Period</span>
-          <span class="font-medium text-color text-sm">MM/DD/2024 - MM/DD/2024</span>
+          <span class="font-medium text-color text-sm">{{ currentInvoice.billingPeriod }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Products Charges</span>
@@ -22,13 +23,14 @@
             ><span class="text-color-secondary text-sm"
               ><span class="text-color-secondary text-sm">$</span></span
             >
-            5.00</span
+            {{ currentInvoice.productChanges }}</span
           >
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
           <span class="text-color text-sm">
-            <span class="text-color-secondary text-sm">$</span> 0.00</span
+            <span class="text-color-secondary text-sm">$</span>
+            {{ currentInvoice.servicePlan }}</span
           >
         </div>
       </div>
@@ -36,7 +38,10 @@
       <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Used for Payment</span>
-          <span class="text-color"> <span class="text-color-secondary text-sm">$</span> 5.00</span>
+          <span class="text-color">
+            <span class="text-color-secondary text-sm">$</span>
+            {{ currentInvoice.creditUsedForPayment }}</span
+          >
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm flex items-center gap-3">
@@ -44,7 +49,8 @@
             (Amount Payable)
           </span>
           <span class="font-medium text-2xl">
-            <span class="text-color-secondary text-sm font-medium">$</span> 0.00</span
+            <span class="text-color-secondary text-sm font-medium">$</span>
+            {{ currentInvoice.total }}</span
           >
         </div>
       </div>
@@ -142,6 +148,8 @@
 </template>
 
 <script setup>
+  import { onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -153,6 +161,7 @@
 
   import { ref, computed } from 'vue'
 
+  const router = useRouter()
   const hasContentToList = ref(true)
   const yourServicePlan = ref({})
   const servicePlan = ref('')
@@ -183,7 +192,17 @@
     loadContractServicePlan: {
       type: Function,
       required: true
+    },
+    loadBillingCurrentInvoiceService: {
+      type: Function,
+      required: true
     }
+  })
+
+  const currentInvoice = ref({})
+
+  onMounted(async () => {
+    await loaderCurrentInvoice()
   })
 
   const paymentsColumns = ref([
@@ -237,6 +256,17 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+
+  const loaderCurrentInvoice = async () => {
+    currentInvoice.value = await props.loadBillingCurrentInvoiceService()
+  }
+
+  const goToBillingDetails = () => {
+    router.push({
+      name: 'billing-invoice-details',
+      params: { billId: currentInvoice.value.billId }
+    })
   }
 
   const actionsRow = ref([
