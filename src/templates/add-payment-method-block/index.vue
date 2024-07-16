@@ -181,7 +181,7 @@
                     id="cardholder-name"
                     v-model="cardholderName"
                     class="p-component p-inputtext"
-                    placeholder="Morgana Johann"
+                    placeholder="Jhon Doe"
                   />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
@@ -208,7 +208,7 @@
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
-                    label="Security Code (CVC)"
+                    label="Security Code (CVC/CVV)"
                     :isRequired="true"
                   />
                   <div
@@ -219,7 +219,7 @@
               </div>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
                 <InlineMessage severity="info"
-                  >This is a sensitive data is handled by a PCI Compliant payment
+                  >Sensitive data is handled by a PCI-compliant payment
                   partner.</InlineMessage
                 >
               </div>
