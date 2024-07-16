@@ -218,7 +218,7 @@
     },
     {
       field: 'amount',
-      header: 'Transaction Amount'
+      header: 'Amount'
     },
     {
       field: 'status',

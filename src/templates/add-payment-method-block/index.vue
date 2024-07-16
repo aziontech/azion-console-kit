@@ -219,8 +219,7 @@
               </div>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
                 <InlineMessage severity="info"
-                  >Sensitive data is handled by a PCI-compliant payment
-                  partner.</InlineMessage
+                  >Sensitive data is handled by a PCI-compliant payment partner.</InlineMessage
                 >
               </div>
             </form>
