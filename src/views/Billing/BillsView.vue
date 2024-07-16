@@ -18,7 +18,7 @@
           <span class="font-medium text-color text-sm">{{ currentInvoice.billingPeriod }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-color-secondary text-sm">Products Charges</span>
+          <span class="text-color-secondary text-sm">Product Charges</span>
           <span class="text-color text-sm"
             ><span class="text-color-secondary text-sm"
               ><span class="text-color-secondary text-sm">$</span></span
@@ -60,7 +60,7 @@
     >
       <div class="p-3 md:p-6 flex flex-col gap-4">
         <div class="flex justify-between">
-          <span class="font-medium text-lg text-color">Your Service Plan</span>
+          <span class="font-medium text-lg text-color">Service Plan</span>
           <PrimeButton
             icon="pi pi-arrow-up-right"
             outlined
@@ -97,7 +97,7 @@
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Currency</span>
           <span class="font-medium text-color text-sm"
-            >Dollar USD (<span class="text-color-secondary text-sm">$</span>)</span
+            >USD (<span class="text-color-secondary text-sm">$</span>)</span
           >
         </div>
         <div class="flex justify-between">
@@ -111,11 +111,11 @@
 
       <div class="p-3 md:p-6 border-t surface-border flex flex-col gap-4">
         <p class="text-sm text-color-secondary">
-          Consumptions made up to the last day of the month will be included in this invoice. Change
+          This invoice includes all consumption up to the last day of the month. Change
           <span
             @click="goToPayment"
             class="text-[var(--text-color-link)] cursor-pointer"
-            >payment methods.</span
+            >payment method.</span
           >
         </p>
       </div>
@@ -132,12 +132,12 @@
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
-    emptyListMessage="No payment history found."
+    emptyListMessage="No payment activity found."
   />
   <EmptyResultsBlock
     v-else
-    title="No payment history has been added"
-    description="No payment history is available at the moment. Please check back later."
+    title="No payment activity has been recorded"
+    description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
     :documentationService="props.documentPaymentHistoryService"
   >
@@ -212,7 +212,7 @@
     },
     {
       field: 'invoiceNumber',
-      header: 'invoice ID',
+      header: 'Invoice ID',
       filterPath: 'invoiceNumber.content',
       sortField: 'invoiceNumber.content',
       type: 'component',
@@ -237,7 +237,7 @@
     },
     {
       field: 'amount',
-      header: 'Transactions Amount'
+      header: 'Amount'
     },
     {
       field: 'status',

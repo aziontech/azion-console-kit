@@ -26,7 +26,7 @@
       <div class="flex gap-4">
         <PrimeButton
           icon="pi pi-plus"
-          label="Add Credit"
+          label="Credit"
           @click="openCreateCreditDrawer"
           outlined
         />
@@ -34,7 +34,7 @@
           icon="pi pi-plus"
           severity="secondary"
           @click="openDrawerCreatePaymentMethod"
-          label="Add Payment Method"
+          label="Payment Method"
         />
       </div>
     </template>
@@ -125,7 +125,7 @@
     },
     {
       field: 'cardExpiration',
-      header: 'Expires in',
+      header: 'Expiration Date',
       sortField: 'expiringDateByOrder',
       filterPath: 'expiringDateSearch',
       type: 'component',

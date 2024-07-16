@@ -46,7 +46,7 @@
           <span class="font-medium text-color text-sm">{{ invoiceData.billingPeriod }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-color-secondary text-sm">Products Charges</span>
+          <span class="text-color-secondary text-sm">Product Charges</span>
           <span class="text-color text-sm">
             <span class="text-color-secondary text-sm">$</span>
             {{ invoiceData.productChanges }}</span
