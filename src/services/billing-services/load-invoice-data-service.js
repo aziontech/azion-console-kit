@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 
-export const loadBillingInvoiceDataService = async (invoiceId) => {
+export const loadInvoiceDataService = async (invoiceId) => {
   const payload = {
     query: `query getBillDetail {
       billDetail(

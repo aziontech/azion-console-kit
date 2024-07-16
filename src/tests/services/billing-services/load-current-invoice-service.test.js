@@ -16,7 +16,7 @@ const fixtures = {
           periodTo: '2024-07-31',
           invoiceNumber: 'USALLC-4697w052024',
           currency: 'BRL',
-          temporaryBill: true,
+          temporaryBill: true
         }
       ]
     }
@@ -29,7 +29,7 @@ const fixtures = {
     productChanges: '-',
     servicePlan: '-',
     total: '0.00',
-    temporaryBill: true,
+    temporaryBill: true
   },
   mockError: [{ message: 'Error' }]
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadBillingInvoiceDataService } from '@/services/billing-services'
+import { loadInvoiceDataService } from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
@@ -17,7 +17,7 @@ const fixtures = {
           periodTo: '2024-07-31',
           invoiceNumber: 'USALLC-4697w052024',
           currency: 'BRL',
-          temporaryBill: true,
+          temporaryBill: true
         }
       ]
     }
@@ -31,13 +31,13 @@ const fixtures = {
     productChanges: '-',
     servicePlan: '-',
     total: '0.00',
-    temporaryBill: true,
+    temporaryBill: true
   },
   mockError: [{ message: 'Error' }]
 }
 
 const makeSut = () => {
-  const sut = loadBillingInvoiceDataService
+  const sut = loadInvoiceDataService
 
   return {
     sut

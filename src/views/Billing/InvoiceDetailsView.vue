@@ -90,7 +90,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    loadBillingInvoiceDataService: {
+    loadInvoiceDataService: {
       type: Function,
       required: true
     },
@@ -106,7 +106,7 @@
   const invoiceData = ref({})
 
   onMounted(async () => {
-    invoiceData.value = await props.loadBillingInvoiceDataService(route.params.billId)
+    invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
   })
 
   const clipboard = (content) => {

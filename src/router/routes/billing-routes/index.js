@@ -46,7 +46,7 @@ export const billingRoutes = {
       name: 'billing-invoice-details',
       component: () => import('@/views/Billing/InvoiceDetailsView.vue'),
       props: {
-        loadBillingInvoiceDataService: BillingServices.loadBillingInvoiceDataService,
+        loadInvoiceDataService: BillingServices.loadInvoiceDataService,
         clipboardWrite
       }
     }
