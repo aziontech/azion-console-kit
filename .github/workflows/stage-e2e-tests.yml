@@ -55,14 +55,6 @@ jobs:
           path: cypress/videos
           retention-days: 1
 
-      - name: Upload test results in JSON format
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress_reports_json
-          path: ./cypress/reports/*.json
-          retention-days: 1
-
       - name: Notify test completion in Slack
         if: ${{ always() && github.event_name == 'schedule'}}
         uses: 8398a7/action-slack@v3
@@ -71,11 +63,4 @@ jobs:
           job_name: Run Cypress E2E Tests
           fields: job,took,workflow
         env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
-
-      - name: Notify failed tests in Slack
-        if: ${{ failure() && github.event_name == 'schedule'}}
-        env:
-          JSON_FILE_NAME: ./cypress/reports/index.json
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: node ./cypress/scripts/notify_failed_tests_slack.js ${{ env.JSON_FILE_NAME }} ${{ env.SLACK_WEBHOOK_URL }}

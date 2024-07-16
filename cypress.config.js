@@ -2,24 +2,10 @@
 import { defineConfig } from 'cypress'
 import codeCoverageTask from '@cypress/code-coverage/task'
 import registerCypressGrep from '@cypress/grep/src/plugin'
-import cypressMochawesomeReporter from 'cypress-mochawesome-reporter/plugin'
 import fs from 'fs'
 
 export default defineConfig({
   projectId: 'azion-console-kit',
-  reporter: 'cypress-mochawesome-reporter',
-  reporterOptions: {
-    reportDir: './cypress/reports',
-    overwrite: true,
-    html: false,
-    json: true,
-    charts: true,
-    embeddedScreenshots: true,
-    inlineAssets: true,
-    saveAllAttempts: false,
-    videoOnFailOnly: true,
-    saveJson: true
-  },
   e2e: {
     specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     defaultCommandTimeout: 60000,
@@ -27,7 +13,6 @@ export default defineConfig({
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
-      cypressMochawesomeReporter(on);
       registerCypressGrep(config)
       codeCoverageTask(on, config)
       on('after:spec', (spec, results) => {
