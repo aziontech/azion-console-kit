@@ -1,5 +1,7 @@
 <template>
-  <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
+  <div
+    class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border sticky top-14 z-10 bg-inherit"
+  >
     <h3 class="text-color text-lg font-medium">
       Azion AI
       <PrimeTag
