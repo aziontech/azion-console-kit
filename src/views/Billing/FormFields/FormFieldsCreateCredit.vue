@@ -121,7 +121,8 @@
         severity="info"
         class="text-sm"
       >
-      The credit balance will be included in the monthly invoices, along with all consumption up to the last day of the month. Change
+        The credit balance will be included in the monthly invoices, along with all consumption up
+        to the last day of the month. Change
         <PrimeButton
           label="payment method"
           link
