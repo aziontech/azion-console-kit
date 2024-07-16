@@ -15,21 +15,22 @@ const fixtures = {
           periodFrom: '2024-07-01',
           periodTo: '2024-07-31',
           invoiceNumber: 'USALLC-4697w052024',
-          currency: 'BRL'
+          currency: 'BRL',
+          temporaryBill: true
         }
       ]
     }
   },
-  formattedResponse: [
-    {
-      billingPeriod: '01/07/2024 - 31/07/2024',
-      creditUsedForPayment: 0,
-      currency: 'BRL',
-      productChanges: '-',
-      servicePlan: '-',
-      total: '0.00'
-    }
-  ],
+  formattedResponse: {
+    billId: 2707388,
+    billingPeriod: '01/07/2024 - 31/07/2024',
+    creditUsedForPayment: 0,
+    currency: 'BRL',
+    productChanges: '-',
+    servicePlan: '-',
+    total: '0.00',
+    temporaryBill: true
+  },
   mockError: [{ message: 'Error' }]
 }
 

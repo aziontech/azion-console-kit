@@ -1,5 +1,6 @@
 import * as BillingServices from '@/services/billing-services'
 import * as ContractServices from '@/services/contract-services'
+import { clipboardWrite } from '@/helpers/clipboard'
 
 import * as Helpers from '@/helpers'
 
@@ -27,7 +28,8 @@ export const billingRoutes = {
           documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
           loadYourServicePlanService: BillingServices.loadYourServicePlanService,
           openPlans: Helpers.openShowMorePlan,
-          loadContractServicePlan: ContractServices.loadContractServicePlan
+          loadContractServicePlan: ContractServices.loadContractServicePlan,
+          loadBillingCurrentInvoiceService: BillingServices.loadBillingCurrentInvoiceService
         }
       },
       meta: {
@@ -40,9 +42,13 @@ export const billingRoutes = {
       }
     },
     {
-      path: 'invoice-details',
+      path: 'invoice-details/:billId',
       name: 'billing-invoice-details',
-      component: () => import('@/views/Billing/InvoiceDetailsView.vue')
+      component: () => import('@/views/Billing/InvoiceDetailsView.vue'),
+      props: {
+        loadInvoiceDataService: BillingServices.loadInvoiceDataService,
+        clipboardWrite
+      }
     }
   ]
 }

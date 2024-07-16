@@ -62,7 +62,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCredit"
-    title="Add credit to your account"
+    title="Add Credit"
   >
     <template #formFields="{ disabledFields, closeDrawer }">
       <FormFieldsCreateCredit
@@ -76,7 +76,7 @@
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
         inDrawer
-        primaryActionLabel="Add credit"
+        primaryActionLabel="Add Credit"
         :loading="isSubmitting"
       />
     </template>
