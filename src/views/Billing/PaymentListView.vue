@@ -1,23 +1,11 @@
 <template>
-  <Drawer
-    ref="drawerRef"
-    :cardDefault="cardDefault"
-    :createService="props.addCreditService"
-  />
-
-  <CreatePaymentMethodBlock
-    :createService="props.createPaymentMethodService"
-    v-model:visible="showCreatePaymentMethodDrawer"
-    v-if="loadCreatePaymentMethodDrawer"
-    @onSuccess="reloadList"
-  />
   <ListTableBlock
     ref="listPaymentMethodsRef"
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
     :columns="paymentsColumns"
-    :listService="listPaymentMethodsServiceWithDecorator"
+    :listService="props.listPaymentMethodsService"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
@@ -27,13 +15,13 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Add Credit"
-          @click="openCreateCreditDrawer"
+          @click="drawersMethods.openDrawerAddCredit"
           outlined
         />
         <PrimeButton
           icon="pi pi-plus"
           severity="secondary"
-          @click="openDrawerCreatePaymentMethod"
+          @click="drawersMethods.openDrawerPaymentMethod"
           label="Add Payment Method"
         />
       </div>
@@ -57,24 +45,16 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { refDebounced } from '@vueuse/core'
-  import CreatePaymentMethodBlock from '@templates/add-payment-method-block'
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
-  import Drawer from './Drawer'
 
-  import { onMounted, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { ref, inject } from 'vue'
 
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const props = defineProps({
-    createPaymentMethodService: {
-      type: Function,
-      required: true
-    },
     listPaymentMethodsService: {
       type: Function,
       required: true
@@ -90,24 +70,12 @@
     documentPaymentMethodService: {
       type: Function,
       required: true
-    },
-    addCreditService: {
-      type: Function,
-      required: true
     }
   })
 
-  const drawerRef = ref('')
-  const route = useRoute()
-  const router = useRouter()
-  const cardDefault = ref({})
   const listPaymentMethodsRef = ref('')
-  const showCreatePaymentMethodDrawer = ref(false)
-  const debouncedDrawerAnimate = 300
-  const loadCreatePaymentMethodDrawer = refDebounced(
-    showCreatePaymentMethodDrawer,
-    debouncedDrawerAnimate
-  )
+
+  const drawersMethods = inject('drawersMethods')
 
   const paymentsColumns = ref([
     {
@@ -136,10 +104,6 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
-  }
-
-  const openDrawerCreatePaymentMethod = () => {
-    showCreatePaymentMethodDrawer.value = true
   }
 
   const showToast = (severity, detail) => {
@@ -180,17 +144,6 @@
     }
   ])
 
-  const listPaymentMethodsServiceWithDecorator = async () => {
-    const listPaymentMethods = await props.listPaymentMethodsService()
-    const [firstCard] = listPaymentMethods
-    cardDefault.value = firstCard
-    return listPaymentMethods
-  }
-
-  const openCreateCreditDrawer = () => {
-    if (cardDefault.value.isDefault) drawerRef.value.openCreateDrawer()
-  }
-
   const reloadList = () => {
     if (hasContentToList.value) {
       listPaymentMethodsRef.value.reload()
@@ -199,14 +152,7 @@
     hasContentToList.value = true
   }
 
-  const showPaymentMethod = () => {
-    if (route.query.paymentSession) {
-      openDrawerCreatePaymentMethod()
-      router.push({ query: {} })
-    }
-  }
-
-  onMounted(async () => {
-    showPaymentMethod()
+  defineExpose({
+    reloadList
   })
 </script>

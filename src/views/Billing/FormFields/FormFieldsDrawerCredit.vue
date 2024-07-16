@@ -125,7 +125,7 @@
         <PrimeButton
           label="Payment Method"
           link
-          class="p-0"
+          class="p-0 text-sm"
           @click="goToPaymentMethod"
         />
         .

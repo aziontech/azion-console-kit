@@ -3,7 +3,7 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import FormFieldsCreateCredit from '../FormFields/FormFieldsCreateCredit'
+  import FormFieldsDrawerCredit from '../FormFields/FormFieldsDrawerCredit'
   import ActionBarBlock from '@/templates/action-bar-block'
 
   defineOptions({
@@ -13,12 +13,12 @@
   const emit = defineEmits(['onSuccess'])
 
   const props = defineProps({
-    cardDefault: {
-      type: Object,
-      required: true
-    },
     createService: {
       type: Function,
+      required: true
+    },
+    cardDefault: {
+      type: Object,
       required: true
     }
   })
@@ -40,7 +40,7 @@
     showCreateCreditDrawer.value = false
   }
 
-  const openCreateDrawer = () => {
+  const openDrawer = async () => {
     showCreateCreditDrawer.value = true
   }
 
@@ -50,7 +50,7 @@
   }
 
   defineExpose({
-    openCreateDrawer
+    openDrawer
   })
 </script>
 
@@ -65,7 +65,7 @@
     title="Add credit to your account"
   >
     <template #formFields="{ disabledFields, closeDrawer }">
-      <FormFieldsCreateCredit
+      <FormFieldsDrawerCredit
         :cardDefault="props.cardDefault"
         :loading="disabledFields"
         :closeDrawer="closeDrawer"
