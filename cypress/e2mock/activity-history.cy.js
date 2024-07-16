@@ -1,5 +1,4 @@
 import selectors from '../support/selectors'
-import fixtures from '../fixtures/activity-history.json'
 
 
 describe('Activity History Spec', () => {
