@@ -251,7 +251,7 @@ describe('WAF spec', () => {
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
-  it.only('should create an allowed rule with "conditional request header" zone', () => {
+  it('should create an allowed rule with "conditional request header" zone', () => {
     // Arrange
     const fixtures = {
       ruleId: '10 - Validation of protocol compliance: invalid HEX encoding (null bytes)',
@@ -303,6 +303,55 @@ describe('WAF spec', () => {
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
+  it('should create an allowed rule with "file name" zone', () => {
+    // Arrange
+    const fixtures = {
+      ruleId: '12 - Validation of protocol compliance: invalid formatted URL',
+      description: 'Description',
+      path: '/',
+      matchZone: 'File Name (Multipart Body)',
+      status: 'Active'
+    }
+
+    // Create WAF
+    cy.get(selectors.wafs.createButton).click()
+    cy.get(selectors.wafs.nameInput).clear()
+    cy.get(selectors.wafs.nameInput).type(wafName)
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your waf rule has been created')
+    cy.wait('@saveRuleset')
+
+    // Create Allowed Rule
+    cy.get(selectors.wafs.allowedRulesTab).click()
+    cy.get(selectors.wafs.allowedRules.createButton).click()
+
+    // Act
+    cy.get(selectors.wafs.allowedRules.descriptionField).type(fixtures.description)
+    cy.get(selectors.wafs.allowedRules.pathField).type(fixtures.path)
+    cy.get(selectors.wafs.allowedRules.ruleIdDropdown).click()
+    cy.get(selectors.wafs.allowedRules.ruleIdOption(5)).click()
+
+    cy.get(selectors.wafs.allowedRules.matchZoneDropdown(0)).click()
+    cy.get(selectors.wafs.allowedRules.matchZoneOption(0, 3)).click()
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your waf rule allowed has been created')
+
+    cy.get(selectors.list.searchInput).type(fixtures.ruleId)
+    cy.get(selectors.wafs.seeMore('ruleId')).click()
+
+    cy.get(selectors.wafs.listRow('ruleId')).should('contain.text', fixtures.ruleId)
+    cy.get(selectors.wafs.listRow('description')).should('have.text', fixtures.description)
+    cy.get(selectors.wafs.listRow('path')).should('have.text', fixtures.path)
+    cy.get(selectors.wafs.listRow('matchZones')).should('have.text', fixtures.matchZone)
+    cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
+    cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
+
+    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.list.searchInput).type(wafName)
+  })
   afterEach(() => {
     // Delete the waf
     cy.deleteEntityFromLoadedList().then(() => {
