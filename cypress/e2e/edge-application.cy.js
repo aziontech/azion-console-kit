@@ -1,32 +1,37 @@
 import generateUniqueName from '../support/utils'
 import selectors from '../support/selectors'
 
-let edgeApplicationName
-const originName = generateUniqueName('origin')
-const rulesEngineName = generateUniqueName('RulesEng')
+let fixtures = {}
 
-describe('Edge Application', { tags: ['@dev',] }, () => {
+describe('Edge Application', { tags: ['@dev'] }, () => {
   beforeEach(() => {
-    edgeApplicationName = generateUniqueName('EdgeApp')
+    fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
     cy.login()
     cy.openProduct('Edge Application')
+
+    fixtures = {
+      edgeApplicationName: generateUniqueName('EdgeApp'),
+      originName: generateUniqueName('origin'),
+      rulesEngineName: generateUniqueName('RulesEng'),
+      cacheSettingName: generateUniqueName('cacheSetting')
+    }
   })
 
   it('Create and delete an edge application, and create a rule', () => {
     // Create an edge application
     cy.get(selectors.edgeApplication.createButton).click()
-    cy.get(selectors.edgeApplication.nameInput).type(edgeApplicationName, {delay: 0})
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName, { delay: 0 })
     cy.get(selectors.edgeApplication.addressInput).clear()
-    cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org', {delay: 0})
+    cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org', { delay: 0 })
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.cancelButton).click()
 
     // Verify the edge application was created
-    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName, {delay: 0})
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
     cy.get(selectors.edgeApplication.tableRowName)
       .should('be.visible')
-      .should('have.text', edgeApplicationName)
+      .should('have.text', fixtures.edgeApplicationName)
 
     // Navigate to Rules Engine Tab
     cy.get(selectors.edgeApplication.tableRowLastEditor).click()
@@ -34,21 +39,21 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
 
     // Create a rule
     cy.get(selectors.edgeApplication.addRuleButton).click()
-    cy.get(selectors.edgeApplication.ruleNameInput).type(rulesEngineName, {delay: 0})
+    cy.get(selectors.edgeApplication.ruleNameInput).type(fixtures.rulesEngineName, { delay: 0 })
     cy.get(selectors.edgeApplication.criteriaOperatorDropdown).click()
     cy.get(selectors.edgeApplication.criteriaOperator).click()
     cy.get(selectors.edgeApplication.criteriaInputValue).clear('/')
-    cy.get(selectors.edgeApplication.criteriaInputValue).type('/', {delay: 0})
+    cy.get(selectors.edgeApplication.criteriaInputValue).type('/', { delay: 0 })
     cy.get(selectors.edgeApplication.behaviorsDropdown).click()
     cy.get(selectors.edgeApplication.behaviors).click()
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get('.flex-column > .text-sm').should('be.visible')
 
     // Verify the rule was created
-    cy.get(selectors.edgeApplication.searchInput).type(rulesEngineName, {delay: 0})
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.rulesEngineName, { delay: 0 })
     cy.get(selectors.edgeApplication.ruleTable)
       .should('be.visible')
-      .should('have.text', rulesEngineName)
+      .should('have.text', fixtures.rulesEngineName)
   })
 
   it('should add an origin', () => {
@@ -57,15 +62,15 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeApplication.createButton).click()
 
     //act
-    cy.get(selectors.edgeApplication.nameInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.edgeApplication.addressInput).clear()
     cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org')
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.cancelButton).click()
 
     //assert
-    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('have.text', edgeApplicationName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', fixtures.edgeApplicationName)
 
     //add origin
     //arrange
@@ -74,18 +79,22 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeApplication.createOrigin).click()
 
     //act
-    cy.get(selectors.edgeApplication.nameInput).type(originName)
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.originName)
     cy.get(selectors.edgeApplication.originType).click()
-    cy.get(selectors.edgeApplication.originType).find('li').eq(0).should("have.text", 'Single Origin').click()
-    
+    cy.get(selectors.edgeApplication.originType)
+      .find('li')
+      .eq(0)
+      .should('have.text', 'Single Origin')
+      .click()
+
     cy.get(selectors.edgeApplication.originAddressInput).type('teste.com')
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.goBackButton).click()
     cy.get(selectors.edgeApplication.leavePageButton).click()
 
     //Assert
-    cy.get(selectors.edgeApplication.searchInput).type(originName)
-    cy.get(selectors.edgeApplication.tableRowName).should('have.text', originName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.originName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', fixtures.originName)
   })
 
   it('should edit an origin', () => {
@@ -94,15 +103,15 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeApplication.createButton).click()
 
     //act
-    cy.get(selectors.edgeApplication.nameInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.edgeApplication.addressInput).clear()
     cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org')
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.cancelButton).click()
 
     //assert
-    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('have.text', edgeApplicationName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', fixtures.edgeApplicationName)
 
     //add origin
     //arrange
@@ -111,18 +120,22 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeApplication.createOrigin).click()
 
     //act
-    cy.get(selectors.edgeApplication.nameInput).type(originName)
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.originName)
     cy.get(selectors.edgeApplication.originType).click()
-    cy.get(selectors.edgeApplication.originType).find('li').eq(0).should("have.text", 'Single Origin').click()
-    
+    cy.get(selectors.edgeApplication.originType)
+      .find('li')
+      .eq(0)
+      .should('have.text', 'Single Origin')
+      .click()
+
     cy.get(selectors.edgeApplication.originAddressInput).type('test.com')
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.goBackButton).click()
     cy.get(selectors.edgeApplication.leavePageButton).click()
 
     //Assert
-    cy.get(selectors.edgeApplication.searchInput).type(originName)
-    cy.get(selectors.edgeApplication.tableRowName).should('have.text', originName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.originName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', fixtures.originName)
 
     //edit origin
     //arrange
@@ -136,24 +149,25 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
 
     //assert
     cy.get(selectors.edgeApplication.searchInput).clear()
-    cy.get(selectors.edgeApplication.searchInput).type(originName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.originName)
     cy.get(selectors.edgeApplication.tableRowAddress).should('have.text', 'test2.com')
   })
+
   it('should add an error response', () => {
     //edge application creation
     //arrange
     cy.get(selectors.edgeApplication.createButton).click()
 
     //act
-    cy.get(selectors.edgeApplication.nameInput).type(edgeApplicationName)
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.edgeApplication.addressInput).clear()
     cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org')
     cy.get(selectors.edgeApplication.saveButton).click()
     cy.get(selectors.edgeApplication.cancelButton).click()
 
     //assert
-    cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('have.text', edgeApplicationName)
+    cy.get(selectors.edgeApplication.searchInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.edgeApplication.tableRowName).should('have.text', fixtures.edgeApplicationName)
 
     //add error response
     //arrange
@@ -187,9 +201,77 @@ describe('Edge Application', { tags: ['@dev',] }, () => {
     cy.verifyToast('success', 'Your Error Responses has been edited')
   })
 
+  it.only('should edit a cache setting', () => {
+    // Arrange
+    cy.intercept('GET', '/api/v3/edge_applications/*/cache_settings/*').as('loadCacheSetting')
+    // Create an edge application
+    cy.get(selectors.edgeApplication.createButton).click()
+    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName, { delay: 0 })
+    cy.get(selectors.edgeApplication.addressInput).clear()
+    cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org', { delay: 0 })
+    cy.get(selectors.edgeApplication.saveButton).click()
+    cy.get(selectors.edgeApplication.cancelButton).click()
+
+    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
+    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
+
+    // Act
+    // Create a cache setting
+    cy.get(selectors.edgeApplication.list.tabs('Cache Settings')).click()
+    cy.get(selectors.edgeApplication.cacheSettings.createButton).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Cache Settings successfully created')
+
+    cy.get(selectors.list.searchInput).type(fixtures.cacheSettingName)
+
+    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+      'have.text',
+      fixtures.cacheSettingName
+    )
+    cy.get(selectors.edgeApplication.list.tableRow('browserCache')).should(
+      'have.text',
+      'Honor Origin Cache Headers'
+    )
+    cy.get(selectors.edgeApplication.list.tableRow('cdnCache')).should(
+      'have.text',
+      'Honor Origin Cache Headers'
+    )
+
+    // Edit the cache setting
+    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
+    cy.wait('@loadCacheSetting')
+
+    cy.get(selectors.edgeApplication.cacheSettings.browserCacheSettingsRadio(1)).click()
+    cy.get(selectors.edgeApplication.cacheSettings.browserCacheSettingsMaxTtlInput).type('100')
+    cy.get(selectors.edgeApplication.cacheSettings.cacheByQueryStringRadio(3)).click()
+    cy.get(selectors.edgeApplication.cacheSettings.cacheByCookieRadio(3)).click()
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Cache Settings successfully edited')
+    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+      'have.text',
+      fixtures.cacheSettingName
+    )
+    cy.get(selectors.edgeApplication.list.tableRow('browserCache')).should(
+      'have.text',
+      'Override Cache Settings'
+    )
+    cy.get(selectors.edgeApplication.list.tableRow('cdnCache')).should(
+      'have.text',
+      'Honor Origin Cache Headers'
+    )
+  })
+
   afterEach(() => {
     // Delete the edge application
-    cy.deleteEntityFromList({ entityName: edgeApplicationName, productName: 'Edge Application' }).then(() => {
+    cy.deleteEntityFromList({
+      entityName: fixtures.edgeApplicationName,
+      productName: 'Edge Application'
+    }).then(() => {
       cy.verifyToast('Resource successfully deleted')
     })
   })
