@@ -113,7 +113,7 @@
           <Tag
             severity="secondary"
             icon="pi pi-refresh"
-            value="Last Updated - MM/DD/2023 02:32 PM"
+            value="Last Updated: MM/DD/2023 02:32 PM"
           />
         </template>
       </PageHeadingBlock>
