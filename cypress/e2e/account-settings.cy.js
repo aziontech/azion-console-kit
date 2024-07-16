@@ -15,7 +15,8 @@ const fixtures = {
   complement: 'Apt. 123'
 }
 
-describe('Account Settings spec', { tags: ['@dev',] }, () => {
+// @xfail (tooling defect issue): https://aziontech.atlassian.net/browse/UXE-4117
+describe('Account Settings spec', { tags: ['@dev', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Account Settings')
