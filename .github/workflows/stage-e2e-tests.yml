@@ -8,6 +8,8 @@ on:
 jobs:
   run-stage-e2e-tests:
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v3
 
@@ -56,11 +58,11 @@ jobs:
           retention-days: 1
 
       - name: Notify test completion in Slack
-        if: ${{ always() && github.event_name == 'schedule'}}
+        if: ${{ always() && github.event_name == 'schedule' && env.SLACK_WEBHOOK_URL != ''}}
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           job_name: Run Cypress E2E Tests
           fields: job,took,workflow
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
