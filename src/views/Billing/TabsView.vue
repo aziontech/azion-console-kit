@@ -25,7 +25,7 @@
       drawerPaymentMethodRef.value.openDrawer()
     },
     openDrawerAddCredit: () => {
-      drawerAddCreditRef.value.openDrawer()
+      if (cardDefault.value) drawerAddCreditRef.value.openDrawer()
     }
   })
 
@@ -70,6 +70,7 @@
   }
 
   const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
+  const isBillsTabActive = computed(() => activeTab.value === TABS_MAP.bills)
 
   const renderTabCurrentRouter = async () => {
     const { tab = TABS_MAP.bills } = route.params
@@ -126,6 +127,7 @@
       >
         <TabPanel header="Bills">
           <BillsView
+            v-if="isBillsTabActive"
             v-bind="props.billsServices"
             @changeTab="changeTab"
           />

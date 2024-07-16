@@ -16,9 +16,9 @@ const adapt = (httpResponse) => {
   const { body, statusCode } = httpResponse
   const results = body?.results || []
 
-  const responseCard = results.find((card) => card.is_default) || {}
+  const [responseCard] = results
 
-  const parseBilling = responseCard.id
+  const parseBilling = responseCard
     ? {
         id: responseCard.id,
         cardData: {
@@ -28,7 +28,7 @@ const adapt = (httpResponse) => {
           isDefault: responseCard.is_default
         }
       }
-    : {}
+    : null
 
   return {
     body: parseBilling,
