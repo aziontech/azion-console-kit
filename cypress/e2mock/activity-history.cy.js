@@ -12,12 +12,12 @@ describe('Activity History Spec', () => {
   it('should registry when a network list is created', function () {
     //act
     cy.get(selectors.activityHistory.searchInput).clear()
-    cy.get(selectors.activityHistory.searchInput).type(fixtures.data.activityHistoryEvents[0].title)
+    cy.get(selectors.activityHistory.searchInput).type('Network List NetworkListTest was created')
 
     //assert
     cy.get(selectors.activityHistory.timeLineEvent).should(
       'have.text',
-      fixtures.data.activityHistoryEvents[0].title
+      'Network List NetworkListTest was created'
     )
   })
 })
