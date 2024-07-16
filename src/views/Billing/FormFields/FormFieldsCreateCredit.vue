@@ -52,7 +52,7 @@
 <template>
   <FormHorizontal
     :isDrawer="true"
-    title="Amount"
+    title="Credit Amount"
   >
     <template #inputs>
       <div class="flex gap-6 max-sm:flex-col">
@@ -99,7 +99,7 @@
             for="field-card"
             class="text-color text-base font-medium leading-5 flex gap-1 align-items-center"
           >
-            Paying with
+            Payment method
           </label>
           <div class="p-inputgroup h-fit">
             <div class="p-inputgroup-addon">
@@ -113,7 +113,7 @@
             />
           </div>
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Default Payment Method
+            Default payment method selected.
           </small>
         </div>
       </div>
@@ -121,14 +121,13 @@
         severity="info"
         class="text-sm"
       >
-        Consumptions made up to the last day of the month will be included in this invoice. Change
+      The credit balance will be included in the monthly invoices, along with all consumption up to the last day of the month. Change
         <PrimeButton
-          label="Payment Method"
+          label="payment method"
           link
           class="p-0"
           @click="goToPaymentMethod"
-        />
-        .
+        />.
       </InlineMessage>
     </template>
   </FormHorizontal>
