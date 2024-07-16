@@ -5,7 +5,7 @@ let edgeApplicationName
 const originName = generateUniqueName('origin')
 const rulesEngineName = generateUniqueName('RulesEng')
 
-describe('Edge Application', { tags: ['run',] }, () => {
+describe('Edge Application', { tags: ['@dev',] }, () => {
   beforeEach(() => {
     edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
