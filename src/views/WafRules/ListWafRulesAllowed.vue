@@ -16,6 +16,7 @@
         icon="pi pi-plus"
         label="Allowed Rule"
         @click="openCreateDrawerWafAllowed"
+        data-testid="create_Allowed Rule_button"
       />
     </template>
   </ListTableBlock>
@@ -42,6 +43,7 @@
         icon="pi pi-plus"
         label="Allowed Rule"
         @click="openCreateDrawerWafAllowed"
+        data-testid="create_Allowed Rule_button"
       />
     </template>
     <template #illustration>

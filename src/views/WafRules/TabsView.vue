@@ -124,7 +124,12 @@
         class="w-full h-full"
         v-if="waf"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__main-settings' }
+          }"
+        >
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
             :editWafRulesService="props.wafServices.editWafRulesService"
@@ -134,8 +139,14 @@
             :isTab="true"
           />
         </TabPanel>
-        <TabPanel header="Tuning">
+        <TabPanel
+          header="Tuning"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__tuning' }
+          }"
+        >
           <ListWafRulesTuning
+            v-if="activeTab === mapTabs.tuning"
             :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
             :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
             :listCountriesService="props.wafTuning.listCountriesService"
@@ -146,7 +157,12 @@
             :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
           />
         </TabPanel>
-        <TabPanel header="Allowed Rules">
+        <TabPanel
+          header="Allowed Rules"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__allowed-rules' }
+          }"
+        >
           <ListWafRulesAllowed
             v-if="activeTab === mapTabs.allowed"
             :listWafRulesAllowedService="props.wafRulesAllowed.listWafRulesAllowedService"

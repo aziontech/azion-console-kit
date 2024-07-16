@@ -29,7 +29,7 @@ jobs:
           browser: chrome
           wait-on: "http://localhost:5173/"
           wait-on-timeout: 120
-          env: grepTags=run
+          env: grepTags=@dev
 
       - name: Check E2E Test Coverage
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20

@@ -18,7 +18,6 @@ const getConfig = () => {
         nycrcPath: '.nycrc'
       })
     ],
-    logLevel: 'warn',
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {

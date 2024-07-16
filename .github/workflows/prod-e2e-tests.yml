@@ -22,7 +22,7 @@ jobs:
         with:
           browser: chrome
           config-file: cypress.config.prod.js
-          env: environment=prod
+          env: environment=prod grepTags=-@xfail
 
       - name: Check E2E Test Coverage
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20

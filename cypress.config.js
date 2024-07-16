@@ -30,6 +30,7 @@ export default defineConfig({
     isCI: process.env.GITHUB_ACTIONS,
     CYPRESS_EMAIL: process.env.DEV_CYPRESS_EMAIL,
     CYPRESS_PASSWORD: process.env.DEV_CYPRESS_PASSWORD,
-    grepFilterSpecs: true
+    grepFilterSpecs: true,
+    grepOmitFiltered: true
   }
 })
