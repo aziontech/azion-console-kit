@@ -1,0 +1,29 @@
+export default {
+  breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
+  createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
+  searchInput: '[data-testid="data-table-search-input"]',
+  searchField: '[data-testid="data-table-search-input"]',
+  filteredRow: {
+    column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
+    nameColumn: (columnName = 'name') =>
+      `[data-testid="list-table-block__column__${columnName}__row"]`,
+    statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    empty: 'tr.p-datatable-emptymessage > td',
+    lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
+    lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'
+  },
+  actionsMenu: {
+    button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
+    deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
+  },
+  singleActionsMenu: {
+    button: '[data-testid="data-table-actions-column-body-action-button"]'
+  },
+  deleteDialog: {
+    confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
+    deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
+  },
+  toast: {
+    content: '.p-toast-message-content'
+  }
+}
