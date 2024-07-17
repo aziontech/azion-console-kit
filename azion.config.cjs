@@ -236,6 +236,19 @@ const backRules = [
       rewrite: '/graphql/',
       setCache: 'Cities - Cache'
     }
+  },
+  {
+    name: 'Route GraphQL Billing Queries to Manager',
+    description: 'Routes GraphQL Billing queries for Manager, changing the URI',
+    match: '^/graphql/billing',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      rewrite: '/billing/graphql'
+    }
   }
 ]
 
