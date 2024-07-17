@@ -25,9 +25,11 @@ jobs:
           env: environment=prod grepTags=-@xfail
 
       - name: Check E2E Test Coverage
+        if: ${{ always() }}
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
       - name: Remove lcov intermediate files
+        if: ${{ always() }}
         run: |
           rm -rf coverage/e2e/lcov-report
           zip -r coverage.zip coverage
