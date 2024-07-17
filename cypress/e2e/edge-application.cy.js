@@ -226,13 +226,13 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
   it('should edit a cache setting', () => {
     // Arrange
     cy.intercept('GET', '/api/v3/edge_applications/*/cache_settings/*').as('loadCacheSetting')
-    // Create an edge application
-    cy.get(selectors.edgeApplication.createButton).click()
-    cy.get(selectors.edgeApplication.nameInput).type(fixtures.edgeApplicationName, { delay: 0 })
-    cy.get(selectors.edgeApplication.addressInput).clear()
-    cy.get(selectors.edgeApplication.addressInput).type('httpbingo.org', { delay: 0 })
-    cy.get(selectors.edgeApplication.saveButton).click()
-    cy.get(selectors.edgeApplication.cancelButton).click()
+    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been created')
+    cy.get(selectors.form.actionsCancelButton).click()
 
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
     cy.get(selectors.edgeApplication.list.tableRow('name')).click()
