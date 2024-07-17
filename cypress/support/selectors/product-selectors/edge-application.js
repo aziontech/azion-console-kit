@@ -8,14 +8,16 @@ export default {
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
-    criteriaOperatorDropdown:
-      '[data-testid="rule-form-criteria-item-conditional-operator__dropdown"] > .p-dropdown-trigger',
-    criteriaOperator: 'li[aria-label="is equal"]',
-    criteriaInputValue:
-      '[data-testid="rule-form-criteria-item-conditional-input-field-text__input"]',
-    behaviorsDropdown:
-      '[data-testid="rule-form-behaviors-item-name__dropdown"] > .p-dropdown-trigger',
-    behaviors: '#behaviors\\[0\\]\\.name_4'
+    criteriaVariableSelect: (criteriaIdx, position) =>
+      `[data-testid="edge-application-rule-form__criteria-variable[${criteriaIdx}][${position}]__autocomplete"]`,
+    criteriaOperatorDropdown: (criteriaIdx, position) =>
+      `[data-testid="edge-application-rule-form__criteria-operator[${criteriaIdx}][${position}]__dropdown"] > .p-dropdown-trigger`,
+    criteriaOperatorOption: (option) => `li[aria-label="${option}"]`,
+    criteriaInputValue: (criteriaIdx, position) =>
+      `[data-testid="edge-application-rule-form__criteria-input-value[${criteriaIdx}][${position}]__input"]`,
+    behaviorsDropdown: (behaviorIdx) =>
+      `[data-testid="edge-application-rule-form__behaviors-item[${behaviorIdx}]__dropdown"] > .p-dropdown-trigger`,
+    behaviorsOption: (option) => `li[aria-label="${option}"]`
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',

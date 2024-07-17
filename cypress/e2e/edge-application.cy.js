@@ -18,21 +18,19 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     }
   })
 
-  it('should create a rule engine', () => {
+  it.only('should create a rule engine', () => {
     // Arrange
     // Create an edge application
     cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName, {
-      delay: 0
-    })
+    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org', { delay: 0 })
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been created')
     cy.get(selectors.form.actionsCancelButton).click()
 
     // Verify the edge application was created
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
+    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName
@@ -45,20 +43,18 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     // Act
     // Create a rule
     cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
-    cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName, {
-      delay: 0
-    })
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown).click()
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperator).click()
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue).clear()
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue).type('/', { delay: 0 })
-    cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown).click()
-    cy.get(selectors.edgeApplication.rulesEngine.behaviors).click()
+    cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your Rules Engine has been created.')
 
     // Assert
-    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName, { delay: 0 })
+    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
   })
 
@@ -231,7 +227,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     cy.verifyToast('success', 'Your edge application has been created')
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
+    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.list.filteredRow.column('name')).click()
 
     // Act
@@ -277,6 +273,47 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
       'have.text',
       'Honor Origin Cache Headers'
     )
+  })
+
+  it('should edit a rule engine', () => {
+    // Arrange
+    // Create an edge application
+    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    cy.verifyToast('success', 'Your edge application has been created')
+
+    cy.get(selectors.form.actionsCancelButton).click()
+    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
+    cy.get(selectors.list.filteredRow.column('name')).should(
+      'have.text',
+      fixtures.edgeApplicationName
+    )
+
+    // Navigate to Rules Engine Tab
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
+
+    // Act
+    // Create a rule
+    cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
+    cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your Rules Engine has been created.')
+
+    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
+
+    // Edit the rule
+    cy.get(selectors.list.filteredRow.column('name')).click()
   })
 
   afterEach(() => {
