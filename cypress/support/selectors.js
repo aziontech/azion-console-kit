@@ -7,6 +7,7 @@ const selectors = {
     searchInput: '[data-testid="data-table-search-input"]',
     searchField: '[data-testid="data-table-search-input"]',
     filteredRow: {
+      column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
       nameColumn: (columnName = 'name') =>
         `[data-testid="list-table-block__column__${columnName}__row"]`,
       statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',

@@ -1,4 +1,5 @@
 export default {
+  tabs: (tabName) => `[data-testid="edge-application-details-tab-panel__${tabName}__tab"] a`,
   mainSettings: {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
@@ -48,9 +49,5 @@ export default {
       `[data-testid="edge-application-cache-settings-form__cache-by-query-string-field__radio"][name="cacheByQueryString-radio-${position}"]`,
     cacheByCookieRadio: (position) =>
       `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio"][name="cacheByCookies-radio-${position}"]`
-  },
-  list: {
-    tableRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    tabs: (tabName) => `[data-testid="edge-application-details-tab-panel__${tabName}__tab"] a`
   }
 }

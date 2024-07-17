@@ -33,14 +33,14 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     // Verify the edge application was created
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName
     )
 
     // Navigate to Rules Engine Tab
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
-    cy.get(selectors.edgeApplication.list.tabs('Rules Engine')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
 
     // Act
     // Create a rule
@@ -59,10 +59,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     // Assert
     cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName, { delay: 0 })
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
-      'have.text',
-      fixtures.rulesEngineName
-    )
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
   })
 
   it('should add an origin', () => {
@@ -80,15 +77,15 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     //assert
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName
     )
 
     //add origin
     //arrange
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
-    cy.get(selectors.edgeApplication.list.tabs('Origins')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()
 
     //act
@@ -108,7 +105,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     //Assert
     cy.get(selectors.list.searchInput).type(fixtures.originName)
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should('have.text', fixtures.originName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
   })
 
   it('should edit an origin', () => {
@@ -126,15 +123,15 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     //assert
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName
     )
 
     //add origin
     //arrange
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
-    cy.get(selectors.edgeApplication.list.tabs('Origins')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()
 
     //act
@@ -154,11 +151,11 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     //Assert
     cy.get(selectors.list.searchInput).type(fixtures.originName)
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should('have.text', fixtures.originName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
 
     //edit origin
     //arrange
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
 
     //act
     cy.get(selectors.edgeApplication.origins.addressInput).clear()
@@ -170,7 +167,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     //assert
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(fixtures.originName)
-    cy.get(selectors.edgeApplication.list.tableRow('addresses')).should('have.text', 'test2.com')
+    cy.get(selectors.list.filteredRow.column('addresses')).should('have.text', 'test2.com')
   })
 
   it('should add an error response', () => {
@@ -188,15 +185,15 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     //assert
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName
     )
 
     //add error response
     //arrange
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
-    cy.get(selectors.edgeApplication.list.tabs('Error Responses')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.tabs('Error Responses')).click()
 
     //act
     //add error response 1
@@ -235,11 +232,11 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     cy.get(selectors.form.actionsCancelButton).click()
 
     cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName, { delay: 0 })
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
 
     // Act
     // Create a cache setting
-    cy.get(selectors.edgeApplication.list.tabs('Cache Settings')).click()
+    cy.get(selectors.edgeApplication.tabs('Cache Settings')).click()
     cy.get(selectors.edgeApplication.cacheSettings.createButton).click()
     cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
 
@@ -248,21 +245,18 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     cy.get(selectors.list.searchInput).type(fixtures.cacheSettingName)
 
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
-      'have.text',
-      fixtures.cacheSettingName
-    )
-    cy.get(selectors.edgeApplication.list.tableRow('browserCache')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheSettingName)
+    cy.get(selectors.list.filteredRow.column('browserCache')).should(
       'have.text',
       'Honor Origin Cache Headers'
     )
-    cy.get(selectors.edgeApplication.list.tableRow('cdnCache')).should(
+    cy.get(selectors.list.filteredRow.column('cdnCache')).should(
       'have.text',
       'Honor Origin Cache Headers'
     )
 
     // Edit the cache setting
-    cy.get(selectors.edgeApplication.list.tableRow('name')).click()
+    cy.get(selectors.list.filteredRow.column('name')).click()
     cy.wait('@loadCacheSetting')
 
     cy.get(selectors.edgeApplication.cacheSettings.browserCacheSettingsRadio(1)).click()
@@ -274,15 +268,12 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     // Assert
     cy.verifyToast('success', 'Cache Settings successfully edited')
-    cy.get(selectors.edgeApplication.list.tableRow('name')).should(
-      'have.text',
-      fixtures.cacheSettingName
-    )
-    cy.get(selectors.edgeApplication.list.tableRow('browserCache')).should(
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheSettingName)
+    cy.get(selectors.list.filteredRow.column('browserCache')).should(
       'have.text',
       'Override Cache Settings'
     )
-    cy.get(selectors.edgeApplication.list.tableRow('cdnCache')).should(
+    cy.get(selectors.list.filteredRow.column('cdnCache')).should(
       'have.text',
       'Honor Origin Cache Headers'
     )
