@@ -3,13 +3,15 @@ export default {
   mainSettings: {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
-    addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]'
+    addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    modulesSwitch: (moduleName) =>
+      `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
   },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     criteriaVariableSelect: (criteriaIdx, position) =>
-      `[data-testid="edge-application-rule-form__criteria-variable[${criteriaIdx}][${position}]__autocomplete"]`,
+      `[data-testid="edge-application-rule-form__criteria-variable[${criteriaIdx}][${position}]__autocomplete"] > .p-autocomplete-input`,
     criteriaOperatorDropdown: (criteriaIdx, position) =>
       `[data-testid="edge-application-rule-form__criteria-operator[${criteriaIdx}][${position}]__dropdown"] > .p-dropdown-trigger`,
     criteriaOperatorOption: (option) => `li[aria-label="${option}"]`,
@@ -17,7 +19,11 @@ export default {
       `[data-testid="edge-application-rule-form__criteria-input-value[${criteriaIdx}][${position}]__input"]`,
     behaviorsDropdown: (behaviorIdx) =>
       `[data-testid="edge-application-rule-form__behaviors-item[${behaviorIdx}]__dropdown"] > .p-dropdown-trigger`,
-    behaviorsOption: (option) => `li[aria-label="${option}"]`
+    behaviorsOption: (option) => `li[aria-label="${option}"]`,
+    criteriaConditionalButton: (type) =>
+      `[data-testid="rule-form-criteria-item-conditional-add-button"] button[aria-label="${type}"]`,
+    criteriaAddButton: '[data-testid="rule-form-criteria-add-button"]',
+    behaviorsAddButton: '[data-testid="rule-form-behaviors-add-button"]'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',
