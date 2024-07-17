@@ -23,7 +23,7 @@ describe('BillingServices', () => {
     await sut(paymentIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/v4/payments/credit_cards/${paymentIdMock}`,
+      url: `v4/payments/credit_cards/${paymentIdMock}`,
       method: 'DELETE'
     })
   })
