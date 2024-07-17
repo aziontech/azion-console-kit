@@ -260,6 +260,7 @@
           required
           placeholder="My cache setting"
           description="Give a unique and descriptive name to identify the setting."
+          data-testid="edge-application-cache-settings-form__name-field"
         />
       </div>
     </template>
@@ -276,6 +277,7 @@
         nameField="browserCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('browser')"
+        data-testid="edge-application-cache-settings-form__browser-cache-settings-field"
       />
 
       <div
@@ -301,6 +303,7 @@
               name: 'browserCacheSettingsMaximumTtl'
             }
           }"
+          data-testid="edge-application-cache-settings-form__browser-cache-settings-maximum-ttl-field__input"
         />
         <small
           v-if="browserCacheSettingsMaximumTtlError"
@@ -314,6 +317,7 @@
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('cdn')"
+        data-testid="edge-application-cache-settings-form__cdn-cache-settings-field"
       />
 
       <div class="flex flex-col sm:max-w-xs w-full gap-2">
@@ -331,6 +335,7 @@
           :max="MAX_VALUE_NUMBER_INPUT"
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
+          data-testid="edge-application-cache-settings-form__cdn-cache-settings-maximum-ttl-field__input"
         />
         <small class="text-color-secondary text-xs font-normal leading-5">
           Enable Application Accelerator in the Main Settings tab to use values lower than 60
@@ -355,6 +360,7 @@
           title="Tiered Cache"
           subtitle="Enable Tiered Cache if you want to reduce the traffic to your origin and increase
             performance and availability."
+          data-testid="edge-application-cache-settings-form__tiered-caching-enabled-field"
         />
       </div>
 
@@ -373,6 +379,7 @@
           placeholder="Select an Tiered Cache Region"
           :disabled="!l2CachingEnabled"
           description="Choose an Tiered Cache Region suitable for your application."
+          data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
         />
       </div>
     </template>
@@ -390,6 +397,7 @@
         auto
         :isCard="false"
         title="Active"
+        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
       />
 
       <FieldGroupCheckbox
@@ -397,6 +405,7 @@
         label="Layer"
         :options="layerFileOptimizationRadioOptions"
         :isCard="false"
+        data-testid="edge-application-cache-settings-form__slice-configuration-layer-field"
       />
       <div
         v-if="showSliceConfigurationRange"
@@ -419,6 +428,7 @@
             placeholder="1024 Kbps"
             type="number"
             disabled
+            data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
           />
         </span>
 
@@ -440,6 +450,7 @@
         nameField="cacheByQueryString"
         :isCard="false"
         :options="queryStringRadioOptions"
+        data-testid="edge-application-cache-settings-form__cache-by-query-string-field"
       />
 
       <div
@@ -453,6 +464,7 @@
           :value="queryStringFields"
           placeholder="name"
           description="Separate query fields using line breaks."
+          data-testid="edge-application-cache-settings-form__query-string-fields-field"
         />
       </div>
 
@@ -460,6 +472,7 @@
         label="Enable Settings"
         :isCard="false"
         :options="advancedCacheSwitchOptions"
+        data-testid="edge-application-cache-settings-form__advanced-cache-switch-field"
       />
 
       <FieldGroupRadio
@@ -467,6 +480,7 @@
         nameField="cacheByCookies"
         :isCard="false"
         :options="cookieRadioOptions"
+        data-testid="edge-application-cache-settings-form__cache-by-cookie-field"
       />
 
       <div
@@ -480,6 +494,7 @@
           :value="cookieNames"
           placeholder="cookie_name"
           description="Separate cookies using line breaks."
+          data-testid="edge-application-cache-settings-form__cookie-names-field"
         />
       </div>
 
@@ -488,6 +503,7 @@
         nameField="adaptiveDeliveryAction"
         :isCard="false"
         :options="adaptiveDeliveryRadioOptions"
+        data-testid="edge-application-cache-settings-form__adaptive-delivery-field"
       />
 
       <div
@@ -507,6 +523,7 @@
               placeholder="ID"
               :name="`deviceGroup[${index}].id`"
               :value="deviceGroup[index].value.id"
+              :data-testid="`edge-application-cache-settings-form__device-group-id[${index}]-field`"
             >
               <template #button>
                 <PrimeButton
@@ -515,6 +532,7 @@
                   size="small"
                   outlined
                   @click="removeDeviceGroup(index)"
+                  :data-testid="`edge-application-cache-settings-form__remove-device-group-id[${index}]__button`"
                 />
               </template>
             </FieldInputGroup>
@@ -526,6 +544,7 @@
             icon="pi pi-plus-circle"
             class="w-fit"
             @click="addDeviceGroup({ id: '' })"
+            data-testid="edge-application-cache-settings-form__add-device-group__button"
           />
         </div>
       </div>

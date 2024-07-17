@@ -7,18 +7,22 @@ on:
 
 jobs:
   run-stage-e2e-tests:
+    name: Run Stage E2E Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Run Cypress tests
+      - name: Run Cypress E2E Tests
         uses: cypress-io/github-action@v6
         env:
           STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
@@ -26,32 +30,37 @@ jobs:
         with:
           browser: chrome
           config-file: cypress.config.stage.js
-          env: environment=stage grepTags=-@xfail
+          env: environment=stage,grepTags=-@xfail
 
       - name: Check E2E Test Coverage
+        if: ${{ always() }}
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
-      - name: Remove lcov intermediate files
+      - name: Compress E2E Coverage Reports
+        if: ${{ always() }}
         run: |
           rm -rf coverage/e2e/lcov-report
           zip -r coverage.zip coverage
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload E2E Coverage Report Artifact
         if: ${{ always() }}
+        uses: actions/upload-artifact@v3
         with:
           name: coverage_e2e_report
           path: coverage.zip
           retention-days: 7
 
-      - uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+      - name: Upload Cypress Screenshots Artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_screenshots
           path: cypress/screenshots
           retention-days: 4
 
-      - uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+      - name: Upload Cypress Videos Artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_videos
           path: cypress/videos
@@ -62,7 +71,7 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          job_name: Run Cypress E2E Tests
+          job_name: Run Stage E2E Tests
           fields: job,took,workflow
         env:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}

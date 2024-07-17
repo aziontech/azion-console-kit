@@ -89,7 +89,7 @@
               v-if="yourServicePlan.cardBrand"
             >
               <cardFlagBlock :cardFlag="yourServicePlan.cardBrand" />
-              Final {{ yourServicePlan.cardLast4Digits }}
+              Ending in {{ yourServicePlan.cardLast4Digits }}
             </span>
             <span v-else>---</span>
           </span>
@@ -122,6 +122,13 @@
     </div>
   </div>
 
+  <NotificationPayment
+    v-if="user.disclaimer"
+    :clickAddCredit="drawersMethods.openDrawerAddCredit"
+    :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
+    :clickLinkPaymentMethod="goToPayment"
+  />
+
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
@@ -148,18 +155,18 @@
 </template>
 
 <script setup>
-  import { onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
+  import NotificationPayment from './Components/Notification-payment'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
   import { useAccountStore } from '@/stores/account'
 
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, inject } from 'vue'
 
   const router = useRouter()
   const hasContentToList = ref(true)
@@ -167,6 +174,8 @@
   const servicePlan = ref('')
   const emit = defineEmits(['changeTab'])
   const user = useAccountStore().accountData
+
+  const drawersMethods = inject('drawersMethods')
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -305,5 +314,7 @@
 
   const isTrail = computed(() => user.status === 'TRIAL')
 
-  getAllInfos()
+  onMounted(() => {
+    getAllInfos()
+  })
 </script>

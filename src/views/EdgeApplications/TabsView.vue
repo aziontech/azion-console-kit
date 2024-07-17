@@ -273,6 +273,9 @@
           :pt="{
             headerAction: {
               id: `tab_${index}`
+            },
+            root: {
+              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`
             }
           }"
           :key="index"

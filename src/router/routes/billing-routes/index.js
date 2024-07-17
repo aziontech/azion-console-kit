@@ -14,13 +14,14 @@ export const billingRoutes = {
       name: 'billing-tabs',
       component: () => import('@views/Billing/TabsView.vue'),
       props: {
+        loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
+        addCreditService: BillingServices.addCreditService,
+        createPaymentMethodService: BillingServices.createPaymentMethodService,
         paymentServices: {
           listPaymentMethodsService: BillingServices.listPaymentMethodsService,
           deletePaymentService: BillingServices.deletePaymentService,
           setAsDefaultPaymentService: BillingServices.setAsDefaultPaymentService,
-          createPaymentMethodService: BillingServices.createPaymentMethodService,
-          documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods,
-          addCreditService: BillingServices.addCreditService
+          documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods
         },
         billsServices: {
           listPaymentHistoryService: BillingServices.listPaymentHistoryService,

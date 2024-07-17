@@ -8,6 +8,7 @@ import { loadYourServicePlanService } from './load-your-service-plan-service'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { loadBillingCurrentInvoiceService } from './load-current-invoice-service'
 import { loadInvoiceDataService } from './load-invoice-data-service'
+import { loadPaymentMethodDefaultService } from './load-payment-method-default-service'
 
 export {
   listPaymentMethodsService,
@@ -19,5 +20,6 @@ export {
   loadYourServicePlanService,
   makeBillingBaseUrl,
   loadBillingCurrentInvoiceService,
-  loadInvoiceDataService
+  loadInvoiceDataService,
+  loadPaymentMethodDefaultService
 }
