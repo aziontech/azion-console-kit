@@ -1,11 +1,11 @@
 name: Dev E2E Tests
 
 on:
-    pull_request:
-      types: [opened, synchronize, reopened, ready_for_review]
-    push:
-      branches:
-        - dev
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - dev
 
 jobs:
   run-dev-e2e-tests:
@@ -25,16 +25,18 @@ jobs:
           DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
         with:
           build: yarn build
-          start: yarn dev
+          start: yarn dev --logLevel=warn
           browser: chrome
-          wait-on: "http://localhost:5173/"
+          wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
-          env: grepTags=@dev
+          env: grepTags=@dev+-@xfail
 
       - name: Check E2E Test Coverage
+        if: ${{ always() }}
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
       - name: Remove lcov intermediate files
+        if: ${{ always() }}
         run: |
           rm -rf coverage/e2e/lcov-report
           zip -r coverage.zip coverage

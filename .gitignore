@@ -15,6 +15,7 @@ coverage
 *.local
 
 /.nyc_output
+/.hypothesis
 /cypress/videos/
 /cypress/screenshots/
 

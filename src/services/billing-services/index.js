@@ -7,6 +7,7 @@ import { createPaymentMethodService } from './create-payment-method-service'
 import { loadYourServicePlanService } from './load-your-service-plan-service'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { loadBillingCurrentInvoiceService } from './load-current-invoice-service'
+import { loadInvoiceDataService } from './load-invoice-data-service'
 
 export {
   listPaymentMethodsService,
@@ -17,5 +18,6 @@ export {
   createPaymentMethodService,
   loadYourServicePlanService,
   makeBillingBaseUrl,
-  loadBillingCurrentInvoiceService
+  loadBillingCurrentInvoiceService,
+  loadInvoiceDataService
 }
