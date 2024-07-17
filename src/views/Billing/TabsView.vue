@@ -19,6 +19,7 @@
   const drawerAddCreditRef = ref(null)
   const drawerPaymentMethodRef = ref(null)
   const listPaymentMethodsRef = ref(null)
+  const viewBillsRef = ref(null)
 
   provide('drawersMethods', {
     openDrawerPaymentMethod: () => {
@@ -33,8 +34,8 @@
     loadPaymentMethodDefaultService: { type: Function, required: true },
     addCreditService: { type: Function, required: true },
     createPaymentMethodService: { type: Function, required: true },
-    paymentServices: { type: Object, required: true },
-    billsServices: { type: Object, required: true }
+    paymentServices: { type: Object, required: true, default: () => ({}) },
+    billsServices: { type: Object, required: true, default: () => ({}) }
   })
 
   const cardDefault = ref(null)
@@ -88,22 +89,16 @@
     cardDefault.value = await props.loadPaymentMethodDefaultService()
   }
 
+  const successAddCredit = async () => {
+    await viewBillsRef.value?.reloadList()
+  }
+
   onMounted(async () => {
     renderTabCurrentRouter()
     await loadCardDefault()
   })
 </script>
 <template>
-  <DrawerAddCredit
-    ref="drawerAddCreditRef"
-    :cardDefault="cardDefault"
-    :createService="props.addCreditService"
-  />
-  <DrawerPaymentMethod
-    ref="drawerPaymentMethodRef"
-    :createPaymentMethodService="props.createPaymentMethodService"
-    @onSuccess="loadListPaymentMethods"
-  />
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
@@ -120,6 +115,18 @@
       </PageHeadingBlock>
     </template>
     <template #content>
+      <DrawerAddCredit
+        ref="drawerAddCreditRef"
+        v-if="cardDefault"
+        :cardDefault="cardDefault"
+        :createService="props.addCreditService"
+        @onSuccess="successAddCredit"
+      />
+      <DrawerPaymentMethod
+        ref="drawerPaymentMethodRef"
+        :createPaymentMethodService="props.createPaymentMethodService"
+        @onSuccess="loadListPaymentMethods"
+      />
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -128,14 +135,15 @@
         <TabPanel header="Bills">
           <BillsView
             v-if="isBillsTabActive"
+            ref="viewBillsRef"
             v-bind="props.billsServices"
             @changeTab="changeTab"
           />
         </TabPanel>
         <TabPanel header="Payment Methods">
           <PaymentListView
-            ref="listPaymentMethodsRef"
             v-if="isPaymentTabActive"
+            ref="listPaymentMethodsRef"
             v-bind="props.paymentServices"
           />
         </TabPanel>
