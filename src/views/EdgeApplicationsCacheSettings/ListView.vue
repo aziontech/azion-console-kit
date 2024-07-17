@@ -133,6 +133,7 @@
         icon="pi pi-plus"
         label="Cache Setting"
         @click="openCreateDrawer"
+        data-testid="edge-application-cache-settings-list__create-cache-settings__button"
       />
     </template>
   </ListTableBlock>
@@ -152,6 +153,7 @@
         icon="pi pi-plus"
         label="Cache Setting"
         @click="openCreateDrawer"
+        data-testid="edge-application-cache-settings-list__create-cache-settings__button"
       />
     </template>
   </EmptyResultsBlock>
