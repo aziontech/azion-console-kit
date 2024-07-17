@@ -34,7 +34,7 @@ const adapt = (httpResponse) => {
   const parseBilling = httpResponse.body.data?.map((card) => {
     const typeCard = card.card_brand?.toLowerCase()
     const statusTag = STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged
-
+    const invoiceUrl = card.invoice_url ? `${managerUrl}${card.invoice_url}` : null
     return {
       amount: card.amount_with_currency,
       invoiceNumber: {
@@ -45,7 +45,7 @@ const adapt = (httpResponse) => {
         cardBrand: typeCard,
         value: `${typeCard} ${card.payment_method_details}`
       },
-      invoiceUrl: `${managerUrl}${card.invoice_url}`,
+      invoiceUrl,
       status: statusTag,
       paymentDate: formatDateToUS(card.payment_due)
     }

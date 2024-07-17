@@ -42,11 +42,7 @@ function extractPriceFromString(sentence) {
   const regex = /USD (\d+\.\d+)/
   const match = sentence.match(regex)
 
-  if (match && match[1]) {
-    return match[1]
-  } else {
-    return '0.00'
-  }
+  return match ? match[1] : '0.00'
 }
 
 const adapt = (httpResponse, disclaimer) => {

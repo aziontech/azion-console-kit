@@ -1,9 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
+import { makePaymentBaseUrl } from './make-payment-base-url'
 
 export const deletePaymentService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `v4/v4/payments/credit_cards/${id}`,
+    url: `${makePaymentBaseUrl()}/credit_cards/${id}`,
     method: 'DELETE'
   })
 

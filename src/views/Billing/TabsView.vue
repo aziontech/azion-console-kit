@@ -4,21 +4,40 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import Tag from 'primevue/tag'
-  import ListView from './PaymentListView.vue'
+  import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
+  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
+  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
 
-  import { ref, computed } from 'vue'
+  import { ref, computed, provide, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
+  const drawerAddCreditRef = ref(null)
+  const drawerPaymentMethodRef = ref(null)
+  const listPaymentMethodsRef = ref(null)
+
+  provide('drawersMethods', {
+    openDrawerPaymentMethod: () => {
+      drawerPaymentMethodRef.value.openDrawer()
+    },
+    openDrawerAddCredit: () => {
+      if (cardDefault.value) drawerAddCreditRef.value.openDrawer()
+    }
+  })
 
   const props = defineProps({
+    loadPaymentMethodDefaultService: { type: Function, required: true },
+    addCreditService: { type: Function, required: true },
+    createPaymentMethodService: { type: Function, required: true },
     paymentServices: { type: Object, required: true },
     billsServices: { type: Object, required: true }
   })
+
+  const cardDefault = ref(null)
 
   const TABS_MAP = {
     bills: 0,
@@ -51,6 +70,7 @@
   }
 
   const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
+  const isBillsTabActive = computed(() => activeTab.value === TABS_MAP.bills)
 
   const renderTabCurrentRouter = async () => {
     const { tab = TABS_MAP.bills } = route.params
@@ -58,9 +78,32 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
-  renderTabCurrentRouter()
+  const loadListPaymentMethods = async () => {
+    if (isPaymentTabActive.value) {
+      listPaymentMethodsRef.value?.reloadList()
+    }
+  }
+
+  const loadCardDefault = async () => {
+    cardDefault.value = await props.loadPaymentMethodDefaultService()
+  }
+
+  onMounted(async () => {
+    renderTabCurrentRouter()
+    await loadCardDefault()
+  })
 </script>
 <template>
+  <DrawerAddCredit
+    ref="drawerAddCreditRef"
+    :cardDefault="cardDefault"
+    :createService="props.addCreditService"
+  />
+  <DrawerPaymentMethod
+    ref="drawerPaymentMethodRef"
+    :createPaymentMethodService="props.createPaymentMethodService"
+    @onSuccess="loadListPaymentMethods"
+  />
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
@@ -71,7 +114,7 @@
           <Tag
             severity="secondary"
             icon="pi pi-refresh"
-            value="Last Updated - MM/DD/2023 02:32 PM"
+            value="Last Updated: MM/DD/2023 02:32 PM"
           />
         </template>
       </PageHeadingBlock>
@@ -84,15 +127,17 @@
       >
         <TabPanel header="Bills">
           <BillsView
+            v-if="isBillsTabActive"
             v-bind="props.billsServices"
             @changeTab="changeTab"
           />
         </TabPanel>
         <TabPanel header="Payment Methods">
-          <ListView
+          <PaymentListView
+            ref="listPaymentMethodsRef"
             v-if="isPaymentTabActive"
             v-bind="props.paymentServices"
-          ></ListView>
+          />
         </TabPanel>
       </TabView>
     </template>

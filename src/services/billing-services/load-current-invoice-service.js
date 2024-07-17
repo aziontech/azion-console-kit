@@ -11,9 +11,9 @@ export const loadBillingCurrentInvoiceService = async () => {
           groupBy: [billId]
           orderBy: [productSlug_ASC, metricSlug_ASC]
           filter: {
-              createdDateRange: {
-                  begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
-              }
+            periodFromRange: {
+              begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
+            }
           }
       ) {
           billId,
@@ -24,7 +24,8 @@ export const loadBillingCurrentInvoiceService = async () => {
           periodTo,
           invoiceNumber,
           totalValue,
-          currency
+          currency,
+          temporaryBill
       }
     }`
   }
@@ -46,16 +47,18 @@ export const loadBillingCurrentInvoiceService = async () => {
 const adapt = (httpResponse) => {
   const parseInvoice = httpResponse.body.data?.billDetail.map((invoice) => {
     return {
+      billId: invoice.billId,
       total: invoice.totalValue,
       currency: invoice.currency,
       billingPeriod: `${formatPeriod(invoice.periodFrom)} - ${formatPeriod(invoice.periodTo)}`,
       productChanges: '-',
       servicePlan: '-',
-      creditUsedForPayment: 0.0
+      creditUsedForPayment: 0.0,
+      temporaryBill: invoice.temporaryBill
     }
   })
   return {
-    body: parseInvoice || [],
+    body: parseInvoice?.length > 0 ? parseInvoice[0] : null,
     statusCode: httpResponse.statusCode
   }
 }
