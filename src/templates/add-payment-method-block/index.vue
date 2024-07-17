@@ -179,6 +179,7 @@
                   />
                   <input
                     id="cardholder-name"
+                    data-testid="payment-methods-form__card-holder-name__input"
                     v-model="cardholderName"
                     class="p-component p-inputtext"
                     placeholder="Morgana Johann"
@@ -191,6 +192,8 @@
                   />
                   <div
                     id="card-number-element"
+                    data-testid="payment-methods-form__card-number__input"
+                    data-cy="input-card-number"
                     class="stripe-input"
                   ></div>
                 </div>

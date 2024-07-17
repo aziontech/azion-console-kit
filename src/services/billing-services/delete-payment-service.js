@@ -17,7 +17,7 @@ export const deletePaymentService = async (id) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 202:
+    case 200:
       return 'Payment successfully deleted'
     case 400:
       throw new Errors.NotFoundError().message

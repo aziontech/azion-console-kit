@@ -55,6 +55,14 @@ const selectors = {
     menuItem: (menuAccountLabel) =>
       `li[aria-label="${menuAccountLabel}"] > .p-menuitem-content > .p-menuitem-link`
   },
+  billing: {
+    addPaymentMethod: '[data-testid="create_Payment Method_button"]',
+    cardHolderNameInput: '[data-testid="payment-methods-form__card-holder-name__input"]',
+    cardNumber: '#card-number-element iframe',
+    cardExpiry: '#card-expiry-element iframe',
+    cardCvc: '#card-cvc-element iframe',
+    saveButton: '[data-testid="form-actions-submit-button"]',
+  },
   activityHistory: {
     searchInput: '[data-testid="events-search-input"]',
     timeLineEvent: '[data-testid="events-timeline-event-name"]',

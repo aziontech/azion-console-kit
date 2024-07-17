@@ -32,6 +32,7 @@
         />
         <PrimeButton
           icon="pi pi-plus"
+          data-testid="create_Payment Method_button"
           severity="secondary"
           @click="openDrawerCreatePaymentMethod"
           label="Add Payment Method"
@@ -45,6 +46,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
+    @click="openDrawerCreatePaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
