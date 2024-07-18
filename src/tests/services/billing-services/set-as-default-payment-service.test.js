@@ -45,7 +45,7 @@ describe('BillingServices', () => {
 
     const data = await sut(paymentIdMock)
 
-    expect(data).toStrictEqual('Payment successfully set as default')
+    expect(data).toStrictEqual('Payment Method successfully set as default')
   })
 
   it('Should return an API error for an 400 response status', async () => {

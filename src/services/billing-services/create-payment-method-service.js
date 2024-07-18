@@ -45,7 +45,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your Credit Card has been added'
+        feedback: 'Your Payment Method has been added'
       }
     case 400:
       const apiError400 = extractApiError(httpResponse)
