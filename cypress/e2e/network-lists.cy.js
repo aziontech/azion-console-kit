@@ -47,7 +47,7 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.countriesMultiselect).click()
     cy.get(selectors.networkLists.countriesListOption(0)).click()
     cy.get(selectors.networkLists.countriesListOption(1)).click()
-    
+
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
     cy.get(selectors.networkLists.cancelButton).click()
@@ -121,7 +121,7 @@ describe('Network Lists spec', () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')
-    
+
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
@@ -143,7 +143,7 @@ describe('Network Lists spec', () => {
     cy.get(selectors.networkLists.countriesMultiselect).click()
     cy.get(selectors.networkLists.countriesListOption(0)).click()
     cy.get(selectors.networkLists.countriesListOption(1)).click()
-    
+
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
     cy.get(selectors.networkLists.cancelButton).click()
@@ -166,7 +166,7 @@ describe('Network Lists spec', () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')
-    
+
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
@@ -210,7 +210,7 @@ describe('Network Lists spec', () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')
-    
+
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
