@@ -21,15 +21,15 @@
           <span class="text-color-secondary text-sm">Product Charges</span>
           <span class="text-color text-sm"
             ><span class="text-color-secondary text-sm"
-              ><span class="text-color-secondary text-sm">$</span></span
-            >
+              ><span class="text-color-secondary text-sm"></span
+            ></span>
             {{ currentInvoice.productChanges }}</span
           >
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
           <span class="text-color text-sm">
-            <span class="text-color-secondary text-sm">$</span>
+            <span class="text-color-secondary text-sm"></span>
             {{ currentInvoice.servicePlan }}</span
           >
         </div>
