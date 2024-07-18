@@ -28,14 +28,11 @@
           :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
         >
           <AzionAiChatSuggestion
-            @click="handleSubmitSuggestion(0)"
-            text="How do I build an edge application?"
-            :iconSrc="suggestionIconMetrics"
-          />
-          <AzionAiChatSuggestion
-            @click="handleSubmitSuggestion(1)"
-            text="How do I protect my application?"
-            :icon-src="suggestionIconSecurity"
+            v-for="(suggestionOption, suggestionIndex) in suggestionsOptions"
+            :key="suggestionIndex"
+            @click="handleSubmitSuggestion(suggestionOption.prompt)"
+            :text="suggestionOption.title"
+            :iconSrc="calculateIconBySuggestionIndex(suggestionIndex)"
           />
         </div>
       </div>
@@ -50,10 +47,11 @@
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
   import { requestInterceptorService } from './services/request-interceptor-service'
+  import { loadPromptSuggestion } from './services/load-prompt-suggestions'
   import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
   import azionLogoProfile from '@/modules/azion-ai-chat/assets/azion-logo.svg?url'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, watchEffect } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   const { currentRoute } = useRouter()
@@ -289,15 +287,10 @@
       `,
     role: 'ai'
   })
+  const suggestionsOptions = ref([])
 
-  const handleSubmitSuggestion = (suggestionIndex) => {
-    const suggestionsOptions = [
-      `I want to build an edge application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`,
-      `I've already deployed an edge application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
-    ]
-
-    const suggestion = suggestionsOptions[suggestionIndex]
-    deepChatRef.value.submitUserMessage({ text: suggestion })
+  const handleSubmitSuggestion = (promptText) => {
+    deepChatRef.value.submitUserMessage({ text: promptText })
   }
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
@@ -305,4 +298,20 @@
   const getUserNameInfo = () => {
     accountName.value = account.name
   }
+
+  const calculateIconBySuggestionIndex = (index) => {
+    return index === 0 ? suggestionIconMetrics : suggestionIconSecurity
+  }
+
+  const loadPromptSuggestionWithRoleDecorator = (role) => {
+    suggestionsOptions.value = loadPromptSuggestion(role)
+  }
+
+  watchEffect(() => {
+    const {
+      account: { jobRole }
+    } = useAccountStore()
+
+    loadPromptSuggestionWithRoleDecorator(jobRole)
+  })
 </script>
