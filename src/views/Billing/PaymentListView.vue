@@ -122,6 +122,7 @@
     try {
       const feedback = await props.setAsDefaultPaymentService(payment.id)
       showToast('success', feedback)
+      reloadList()
     } catch (error) {
       showToast('error', error)
     }
@@ -139,6 +140,7 @@
     {
       label: 'Delete',
       type: 'delete',
+      icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
       service: props.deletePaymentService
     }

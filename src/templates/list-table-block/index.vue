@@ -76,13 +76,13 @@
             <div
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
-            ></div>
+            />
           </template>
           <template v-else>
             <component
               :is="col.component(extractFieldValue(rowData, col.field))"
               :data-testid="`list-table-block__column__${col.field}__row`"
-            ></component>
+            />
           </template>
         </template>
       </Column>
@@ -131,16 +131,19 @@
             </OverlayPanel>
           </div>
         </template>
-        <template #body="{ data: rowData }">
+        <template
+          #body="{ data: rowData }"
+          v-if="isRenderActions"
+        >
           <div
             class="flex justify-end"
-            v-if="!isRenderActions"
+            v-if="isRenderOneOption"
             data-testid="data-table-actions-column-body-action"
           >
             <PrimeButton
               size="small"
-              :icon="getActionIcon"
               outlined
+              v-bind="optionsOneAction(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
               data-testid="data-table-actions-column-body-action-button"
@@ -148,7 +151,7 @@
           </div>
           <div
             class="flex justify-end"
-            v-if="isRenderActions"
+            v-else
             data-testid="data-table-actions-column-body-actions"
           >
             <PrimeMenu
@@ -310,7 +313,8 @@
   })
 
   const MINIMUM_OF_ITEMS_PER_PAGE = 10
-
+  const isRenderActions = props.actions && props.actions.length > 0
+  const isRenderOneOption = props.actions && props.actions.length === 1
   const selectedId = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -346,6 +350,7 @@
     const createActionOption = (action) => {
       return {
         ...action,
+        disabled: action.disabled && action.disabled(rowData),
         command: () => {
           switch (action.type) {
             case 'dialog':
@@ -427,8 +432,16 @@
   }
 
   const executeCommand = (rowData) => {
-    const { command } = actionOptions(rowData)[0]
-    command()
+    const [firstAction] = actionOptions(rowData)
+    firstAction?.command()
+  }
+
+  const optionsOneAction = (rowData) => {
+    const [firstAction] = actionOptions(rowData)
+    return {
+      icon: firstAction?.icon,
+      disabled: firstAction?.disabled
+    }
   }
 
   const reload = () => {
@@ -458,14 +471,6 @@
 
   const showPagination = computed(() => {
     return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
-  })
-
-  const isRenderActions = computed(() => {
-    return props.actions && props.actions.length > 1
-  })
-
-  const getActionIcon = computed(() => {
-    return props.actions[0].icon
   })
 
   watch(data, (currentState) => {
