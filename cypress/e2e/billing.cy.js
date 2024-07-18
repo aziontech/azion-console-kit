@@ -10,7 +10,7 @@ describe('Payment Methods spec', () => {
     cy.wait('@getPaymentMethodsApi')
   })
 
-  it('should create an Payment Method', function () {
+  it('should create a Payment Method', function () {
     //Act
     cy.get(selectors.billing.addPaymentMethod).click()
     cy.get(selectors.billing.cardHolderNameInput).type(fixtures.cardHolderName)
@@ -37,7 +37,7 @@ describe('Payment Methods spec', () => {
     //assert
     cy.verifyToast('success', 'Your Payment Method has been added')
   })
-  it.only('should add credit', function () {
+  it('should add credits to account', function () {
     //Add payment method
     //Act
     cy.get(selectors.billing.addPaymentMethod).click()
