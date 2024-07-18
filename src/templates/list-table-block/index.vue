@@ -313,8 +313,8 @@
   })
 
   const MINIMUM_OF_ITEMS_PER_PAGE = 10
-  const isRenderActions = props.actions && props.actions.length > 0
-  const isRenderOneOption = props.actions && props.actions.length === 1
+  const isRenderActions = !!props.actions?.length
+  const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
