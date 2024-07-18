@@ -34,8 +34,8 @@
     loadPaymentMethodDefaultService: { type: Function, required: true },
     addCreditService: { type: Function, required: true },
     createPaymentMethodService: { type: Function, required: true },
-    paymentServices: { type: Object, required: true, default: () => ({}) },
-    billsServices: { type: Object, required: true, default: () => ({}) }
+    paymentServices: { type: Object, required: true },
+    billsServices: { type: Object, required: true }
   })
 
   const cardDefault = ref(null)
