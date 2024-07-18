@@ -157,6 +157,11 @@
               v-bind:model="actionOptions(rowData)"
               :popup="true"
               data-testid="data-table-actions-column-body-actions-menu"
+              :pt="{
+                menuitem: ({ context }) => ({
+                  'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
+                })
+              }"
             />
             <PrimeButton
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"

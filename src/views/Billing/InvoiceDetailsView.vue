@@ -1,0 +1,120 @@
+<template>
+  <div class="w-full flex flex-col-reverse sm:flex-row gap-6 mt-6">
+    <div
+      class="w-full sm:w-1/2 h-[25.00rem] border surface-border rounded-md flex flex-col justify-between"
+    >
+      list table
+    </div>
+    <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
+      <div class="p-3 md:p-6 flex flex-col gap-4">
+        <div class="flex justify-between">
+          <span class="font-medium text-lg text-color">Invoice Data</span>
+          <PrimeButton
+            icon="pi pi-download"
+            outlined
+            label="Export"
+            :disabled="invoiceData.temporaryBill"
+          />
+        </div>
+        <div
+          class="flex justify-between mt-4"
+          v-if="!invoiceData.temporaryBill"
+        >
+          <span class="text-color-secondary text-sm">Payment Data</span>
+          <span class="font-medium text-color text-sm">-</span>
+        </div>
+        <div
+          class="flex justify-between items-center"
+          v-if="!invoiceData.temporaryBill"
+        >
+          <span class="text-color-secondary text-sm">Invoice ID</span>
+          <div class="flex gap-3 items-center">
+            <span class="font-medium text-color text-sm">{{ invoiceData.billDetailId }}</span>
+            <PrimeButton
+              icon="pi pi-copy"
+              outlined
+              @click="clipboard(invoiceData.billDetailId)"
+            />
+          </div>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Payment Method</span>
+          <span class="font-medium text-color text-sm">Final 4242</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Billing Period</span>
+          <span class="font-medium text-color text-sm">{{ invoiceData.billingPeriod }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Product Charges</span>
+          <span class="text-color text-sm">
+            <span class="text-color-secondary text-sm">$</span>
+            {{ invoiceData.productChanges }}</span
+          >
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
+          <span class="text-color text-sm">
+            <span class="text-color-secondary text-sm">$</span> {{ invoiceData.servicePlan }}</span
+          >
+        </div>
+      </div>
+
+      <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm">Credit Used for Payment</span>
+          <span class="text-color">
+            <span class="text-color-secondary text-sm">$</span>
+            {{ invoiceData.creditUsedForPayment }}</span
+          >
+        </div>
+        <div class="flex justify-between">
+          <span class="text-color-secondary text-sm flex items-center gap-3">
+            <b class="font-medium text-2xl text-color"> Total </b>
+            (Amount Payable)
+          </span>
+          <span class="font-medium text-2xl">
+            <span class="text-color-secondary text-sm font-medium">$</span>
+            {{ invoiceData.total }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+  import { onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
+  import { useToast } from 'primevue/usetoast'
+
+  const props = defineProps({
+    loadInvoiceDataService: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const route = useRoute()
+  const toast = useToast()
+
+  const invoiceData = ref({})
+
+  onMounted(async () => {
+    invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
+  })
+
+  const clipboard = (content) => {
+    props.clipboardWrite(content)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Successfully copied!'
+    })
+  }
+</script>

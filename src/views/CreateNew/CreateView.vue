@@ -32,12 +32,16 @@
         v-if="!isLoading"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
-          <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
-            <img
-              class="rounded"
-              :src="solution.vendor.icon"
-              alt=""
-            />
+          <div
+            class="w-10 h-10 hidden rounded sm:flex border surface-border justify-center items-center overflow-hidden box-border"
+          >
+            <div class="bg-white flex h-full w-full rounded">
+              <img
+                class="object-contain"
+                :src="solution.vendor.icon"
+                alt=""
+              />
+            </div>
           </div>
           <div class="flex gap-3 items-center">
             <div class="flex gap-1 items-center">
@@ -110,12 +114,16 @@
         <template #header>
           <div class="w-full flex flex-col gap-2">
             <div class="flex gap-2 items-center">
-              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-                <img
-                  class="rounded"
-                  :src="solution.vendor.icon"
-                  alt=""
-                />
+              <div
+                class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+              >
+                <div class="bg-white flex h-full w-full rounded">
+                  <img
+                    class="object-contain"
+                    :src="solution.vendor.icon"
+                    alt=""
+                  />
+                </div>
               </div>
               <span class="text-xl font-medium">
                 {{ solution.name }}
@@ -183,12 +191,16 @@
           <div class="flex">
             <div class="w-full flex flex-col gap-2">
               <div class="flex gap-2 items-center">
-                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-                  <img
-                    class="rounded"
-                    :src="solution.vendor.icon"
-                    alt=""
-                  />
+                <div
+                  class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
+                >
+                  <div class="bg-white flex h-full w-full rounded">
+                    <img
+                      class="object-contain"
+                      :src="solution.vendor.icon"
+                      alt=""
+                    />
+                  </div>
                 </div>
                 <span class="text-xl font-medium">
                   {{ solution.name }}

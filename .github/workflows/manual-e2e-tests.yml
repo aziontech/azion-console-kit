@@ -2,13 +2,13 @@ name: Manual E2E Tests
 
 on:
   workflow_dispatch:
-      inputs:
-        specName:
-          description: 'Test file name (without .cy.js)'
-          required: true
-        environmentName:
-          description: 'Environment name (dev | stage | prod)'
-          required: true
+    inputs:
+      specName:
+        description: 'Test file name (e.g. cypress/e2e/waf.cy.js)'
+        required: true
+      environmentName:
+        description: 'Environment name (dev | stage | prod)'
+        required: true
 
 jobs:
   run-manual-e2e-tests:
@@ -33,11 +33,11 @@ jobs:
           PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
         with:
           build: yarn build
-          start: yarn dev
+          start: yarn dev --logLevel=warn
           browser: chrome
-          wait-on: "http://localhost:5173/"
+          wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
-          spec: cypress/e2e/${{ github.event.inputs.specName }}.cy.js
+          spec: ${{ github.event.inputs.specName }}
           config-file: cypress.config.${{ github.event.inputs.environmentName }}.js
           env: environment=${{ github.event.inputs.environmentName }}
 

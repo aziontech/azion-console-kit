@@ -121,6 +121,7 @@
             panel: { class: 'sm:!w-[500px]' },
             item: { class: 'whitespace-pre-line' }
           }"
+          data-testid="allowed-rules-form__rule-id-field"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
           Select the rule that matches the request to be allowed.
@@ -134,6 +135,7 @@
           placeholder="This rule was allowed because the path is being used in internal tests."
           description="Add a short description or comment to explain the reason this rule was allowed."
           :value="reason"
+          data-testid="allowed-rules-form__description-field"
         />
       </div>
     </template>
@@ -151,6 +153,7 @@
           :value="path"
           placeholder="/"
           description="Add a path to restrict the scope of a match zone."
+          data-testid="allowed-rules-form__path-field"
         />
       </div>
       <Divider
@@ -181,6 +184,7 @@
               aria-label="Trash"
               v-tooltip.bottom="{ value: 'Delete', showDelay: 200 }"
               @click="deleteMatchZone(index)"
+              :data-testid="`allowed-rules-form__delete-match-zone[${index}]__button`"
             />
           </div>
 
@@ -198,6 +202,7 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
+              :data-testid="`allowed-rules-form__match-zone[${index}]-field`"
             />
           </div>
           <div
@@ -215,6 +220,7 @@
                 :name="`matchZones[${index}].zone_input`"
                 :value="matchZones[index].zone_input"
                 description="Add a specific value that represents the match option or leave it blank to consider empty values."
+                :data-testid="`allowed-rules-form__zone[${index}]__header-field`"
               />
             </div>
           </div>
@@ -228,6 +234,7 @@
               :nameField="`matchZones[${index}].matches_on`"
               :isCard="false"
               :options="radioOptions"
+              :data-testid="`allowed-rules-form__zone[${index}]__matches-on-field`"
             />
           </div>
         </div>
@@ -243,6 +250,7 @@
           :disabled="matchZones?.length >= 9"
           outlined
           @click="addMatchZones"
+          data-testid="allowed-rules-form__add-match-zone__button"
         />
       </div>
     </template>
@@ -260,6 +268,7 @@
           :isCard="false"
           title="Active"
           subtitle="Activate this option to treat conditional fields as regular expressions in all match zones."
+          data-testid="allowed-rules-form__use-regex-field"
         />
       </div>
     </template>
@@ -276,6 +285,7 @@
           auto
           :isCard="false"
           title="Active"
+          data-testid="allowed-rules-form__status-field"
         />
       </div>
     </template>
