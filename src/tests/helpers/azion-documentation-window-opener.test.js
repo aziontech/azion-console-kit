@@ -133,7 +133,7 @@ describe('AzionDocumentationWindowOpener', () => {
     sut.openShowMorePlan()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      'https://www.azion.com/en/professional-services',
+      'https://www.azion.com/en/professional-services&id=#plans',
       '_blank'
     )
   })
