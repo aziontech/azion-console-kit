@@ -127,12 +127,14 @@
     :clickAddCredit="drawersMethods.openDrawerAddCredit"
     :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
     :clickLinkPaymentMethod="goToPayment"
+    :showBtnAddCredit="isCardDefault"
   />
 
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
     v-if="hasContentToList"
+    ref="listPaymentHistoryRef"
     isTabs
     :enableEditClick="false"
     :columns="paymentsColumns"
@@ -208,11 +210,9 @@
     }
   })
 
+  const isCardDefault = computed(() => !!yourServicePlan.value.cardLast4Digits)
   const currentInvoice = ref({})
-
-  onMounted(async () => {
-    await loaderCurrentInvoice()
-  })
+  const listPaymentHistoryRef = ref('')
 
   const paymentsColumns = ref([
     {
@@ -314,7 +314,20 @@
 
   const isTrail = computed(() => user.status === 'TRIAL')
 
-  onMounted(() => {
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listPaymentHistoryRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  onMounted(async () => {
     getAllInfos()
+    await loaderCurrentInvoice()
+  })
+
+  defineExpose({
+    reloadList
   })
 </script>

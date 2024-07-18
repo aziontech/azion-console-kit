@@ -767,9 +767,11 @@
 
             <template v-if="isWafBehavior(behaviorItemIndex)">
               <FieldDropdown
+                :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
                 :key="`${behaviorItem.key}-waf_id`"
                 :name="`behaviors[${behaviorItemIndex}].waf_id`"
                 :options="wafRulesOptions"
+                :filter="true"
                 placeholder="Select a waf rule"
                 optionLabel="name"
                 optionValue="id"
@@ -777,6 +779,7 @@
                 class="w-full mb-3"
               />
               <FieldDropdown
+                :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"
                 :key="`${behaviorItem.key}-mode`"
                 :name="`behaviors[${behaviorItemIndex}].mode`"
                 :options="[
