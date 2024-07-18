@@ -102,7 +102,7 @@
       type: Function,
       required: true
     },
-    listPaymentMethodsService: {
+    loadPaymentMethodDefaultService: {
       type: Function,
       required: true
     },
@@ -120,14 +120,8 @@
 
   onMounted(async () => {
     invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
-    await loadDefaultCreditCard()
+    cardDefault.value = await props.loadPaymentMethodDefaultService()
   })
-
-  const loadDefaultCreditCard = async () => {
-    const listPaymentMethods = await props.listPaymentMethodsService()
-    const [firstCard] = listPaymentMethods
-    cardDefault.value = firstCard
-  }
 
   const clipboard = (content) => {
     props.clipboardWrite(content)
