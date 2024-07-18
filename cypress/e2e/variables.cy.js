@@ -15,7 +15,7 @@ describe('Variables spec', () => {
 
   it('should create a variable', function () {
     // Arrange
-    cy.get(selectors.variables.createButton).click()
+    cy.get('.lalalala').click()
 
     // Act
     cy.get(selectors.variables.keyInput).type(variableKey)
