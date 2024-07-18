@@ -222,7 +222,7 @@ describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })
 
-  it.only('should create an Edge Firewall with a rules engine using a WAF', () => {
+  it('should create an Edge Firewall with a rules engine using a WAF', () => {
     createWAFCase()
     cy.wait(2000)
     cy.openProduct('Edge Firewall')
