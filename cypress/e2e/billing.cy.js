@@ -5,8 +5,8 @@ import fixtures from '../fixtures/billing.json'
 describe('Payment Methods spec', () => {
   beforeEach(() => {
     cy.login()
-    cy.visit('/billing/payment')
     cy.intercept('GET', '/api/v4/payments/*').as('getPaymentMethodsApi')
+    cy.visit('/billing/payment')
     cy.wait('@getPaymentMethodsApi')
   })
 
