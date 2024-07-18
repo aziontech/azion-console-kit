@@ -33,7 +33,7 @@ jobs:
           PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
         with:
           build: yarn build
-          start: yarn dev --logLevel=warn
+          start: yarn dev
           browser: chrome
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
