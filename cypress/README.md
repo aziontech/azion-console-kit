@@ -77,6 +77,8 @@ This section provides a getting started guide to start learning End-to-End (E2E)
 
 In this tutorial, you will learn how to create end-to-end (E2E) tests with Cypress, using the intuitive Cypress Studio. In 5 simple steps, you will write robust tests to guarantee the quality of your web application. Get ready to dominate Cypress!
 
+https://github.com/user-attachments/assets/03a0e525-d383-474d-bb88-ec79d559d0ef
+
 # E2E Test Development Standards
 
 This section covers best practices for developing robust, maintainable E2E tests. You will learn how to structure your tests efficiently, ensuring readability and maintainability, as well as receive tips for writing effective tests that cover the most important scenarios and are easily understandable.
