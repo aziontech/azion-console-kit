@@ -42,7 +42,16 @@
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Payment Method</span>
-              <span class="font-medium text-color text-sm">{{ cardDefault ?? '---' }}</span>
+              <span class="text-color-secondary text-sm">
+                <span
+                  v-if="cardDefault.cardData"
+                  class="flex gap-2"
+                >
+                  <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
+                  {{ cardDefault.cardData.cardNumber }}
+                </span>
+                <span v-else>---</span>
+              </span>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Billing Period</span>
@@ -96,6 +105,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
+  import cardFlagBlock from '@templates/card-flag-block'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -116,7 +126,7 @@
   const toast = useToast()
 
   const invoiceData = ref({})
-  const cardDefault = ref()
+  const cardDefault = ref({})
 
   onMounted(async () => {
     invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
