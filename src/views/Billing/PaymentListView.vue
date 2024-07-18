@@ -16,11 +16,12 @@
           icon="pi pi-plus"
           label="Credit"
           @click="drawersMethods.openDrawerAddCredit"
+          data-testid="payment-methods__add-credit__button"
           outlined
         />
         <PrimeButton
           icon="pi pi-plus"
-          data-testid="create_Payment Method_button"
+          data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
           @click="drawersMethods.openDrawerPaymentMethod"
           label="Payment Method"
