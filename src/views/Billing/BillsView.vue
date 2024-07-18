@@ -207,10 +207,12 @@
     loadBillingCurrentInvoiceService: {
       type: Function,
       required: true
+    },
+    cardDefault: {
+      type: Object
     }
   })
-
-  const isCardDefault = computed(() => !!yourServicePlan.value.cardLast4Digits)
+  const isCardDefault = computed(() => !!props.cardDefault)
   const currentInvoice = ref({})
   const listPaymentHistoryRef = ref('')
 
@@ -283,6 +285,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
+      disabled: (item) => !item.invoiceUrl,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
       }
