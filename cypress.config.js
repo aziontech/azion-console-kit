@@ -9,6 +9,7 @@ export default defineConfig({
   e2e: {
     specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     defaultCommandTimeout: 60000,
+    chromeWebSecurity: false,
     video: true,
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
