@@ -13,6 +13,7 @@
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
+  import { DomainsPrompts } from '@/modules/azion-ai-chat/contextual-prompts'
 
   const props = defineProps({
     digitalCertificates: {
@@ -98,10 +99,8 @@
       <PrimeButton
         outlined
         icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Need help?'"
-        v-prompt="
-          'Please assist me in creating a domain. Provide detailed instructions for each field in the domain creation form.'
-        "
+        v-tooltip.bottom="'Get Azion AI Help'"
+        v-prompt="DomainsPrompts.create.general"
       ></PrimeButton>
     </template>
     <template #inputs>
@@ -127,10 +126,8 @@
       <PrimeButton
         outlined
         icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Need help?'"
-        v-prompt="
-          'Please explain the use of the CNAME field and the CNAME Access Only option. Additionally, describe the differences between the digital certificate options.'
-        "
+        v-tooltip.bottom="'Get Azion AI Help'"
+        v-prompt="DomainsPrompts.create.settings"
       ></PrimeButton>
     </template>
     <template #inputs>
