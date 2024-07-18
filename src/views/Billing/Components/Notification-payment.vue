@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10 mt-4"
+    class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-6 lg:gap-10 mt-8"
   >
     <div class="flex gap-3 items-center">
       <div>
@@ -36,6 +36,7 @@
         label="Add Credit"
         @click="props.clickAddCredit"
         outlined
+        v-if="props.showBtnAddCredit"
       />
       <PrimeButton
         class="w-full min-w-max"
@@ -43,6 +44,7 @@
         severity="secondary"
         @click="props.clickAddPaymentMethod"
         label="Add Payment Method"
+        v-if="props.showBtnAddPaymentMethod"
       />
     </div>
   </div>
@@ -62,7 +64,15 @@
   const props = defineProps({
     clickAddCredit: Function,
     clickAddPaymentMethod: Function,
-    clickLinkPaymentMethod: Function
+    clickLinkPaymentMethod: Function,
+    showBtnAddCredit: {
+      type: Boolean,
+      default: true
+    },
+    showBtnAddPaymentMethod: {
+      type: Boolean,
+      default: true
+    }
   })
 
   const textDisclaimer = ref(user.disclaimer)

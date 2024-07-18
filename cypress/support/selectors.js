@@ -1,516 +1,62 @@
-import EDGE_APPLICATION from './selectors/edge-application.js'
+// Blocks
+import LIST_TABLE_BLOCK_SELECTORS from './selectors/block-selectors/list-table-block.js'
+import FORM_FIELDS_SELECTORS from './selectors/block-selectors/form-fields-block.js'
+import TOAST_BLOCK_SELECTORS from './selectors/block-selectors/toast-block.js'
+import MENU_SIDEBAR_SELECTORS from './selectors/block-selectors/menu-sidebar.js'
+import MENU_ACCOUNT_SELECTORS from './selectors/block-selectors/menu-account.js'
+import TEAMS_BLOCK_SELECTORS from './selectors/block-selectors/teams-block.js'
+
+// Views
+import LOGIN_VIEW_SELECTORS from './selectors/view-selectors/login.js'
+import ACTIVITY_HISTORY_VIEW_SELECTORS from './selectors/view-selectors/activity-history.js'
+import CREDENTIALS_VIEW_SELECTORS from './selectors/view-selectors/credentials.js'
+import YOUR_SETTINGS_VIEW_SELECTORS from './selectors/view-selectors/your-settings.js'
+import ACCOUNT_SETTINGS_VIEW_SELECTORS from './selectors/view-selectors/account-settings.js'
+import USERS_MANAGEMENT_VIEW_SELECTORS from './selectors/view-selectors/users-management.js'
+
+// Products
+import EDGE_APPLICATION_PRODUCT_SELECTORS from './selectors/product-selectors/edge-application.js'
+import NETWORK_LISTS_PRODUCT_SELECTORS from './selectors/product-selectors/network-lists.js'
+import VARIABLES_PRODUCT_SELECTORS from './selectors/product-selectors/variables-product.js'
+import WAF_PRODUCT_SELECTORS from './selectors/product-selectors/waf-product.js'
+import EDGE_FUNCTIONS_PRODUCT_SELECTORS from './selectors/product-selectors/edge-functions.js'
+import EDGE_FIREWALL_PRODUCT_SELECTORS from './selectors/product-selectors/edge-firewall.js'
+import EDGE_PULSE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-pulse.js'
+import EDGE_SERVICES_PRODUCT_SELECTORS from './selectors/product-selectors/edge-services.js'
+import PERSONAL_TOKENS_PRODUCT_SELECTORS from './selectors/product-selectors/personal-tokens.js'
+import DATA_STREAM_PRODUCT_SELECTORS from './selectors/product-selectors/data-stream.js'
+import EDGE_DNS_PRODUCT_SELECTORS from './selectors/product-selectors/edge-dns.js'
+import DOMAINS_PRODUCT_SELECTORS from './selectors/product-selectors/domains.js'
+import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selectors/digital-certificates.js'
+import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
 
 const selectors = {
-  list: {
-    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
-    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    searchField: '[data-testid="data-table-search-input"]',
-    filteredRow: {
-      column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-      nameColumn: (columnName = 'name') =>
-        `[data-testid="list-table-block__column__${columnName}__row"]`,
-      statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-      empty: 'tr.p-datatable-emptymessage > td',
-      lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
-      lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'
-    },
-    actionsMenu: {
-      button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-      deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
-    },
-    singleActionsMenu: {
-      button: '[data-testid="data-table-actions-column-body-action-button"]'
-    },
-    deleteDialog: {
-      confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
-      deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
-    },
-    toast: {
-      content: '.p-toast-message-content'
-    }
-  },
-  form: {
-    actionsSubmitButton: '[data-testid="form-actions-submit-button"]',
-    actionsCancelButton: '[data-testid="form-actions-cancel-button"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
-    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
-    goBackButton: '[data-testid="action-bar__go-back"]',
-    leavePageButton: '[data-testid="dialog-unsaved__leave-page"]'
-  },
-  toast: {
-    createSuccessMessage: ':nth-child(2) > .p-toast-message-content > .flex-column > .text-sm',
-    deleteSuccessMessage:
-      ':nth-child(3) > .p-toast-message-content > .flex-column > .flex > .text-color',
-    content: '.p-toast-message-content',
-    closeBtn: ':nth-child(2) >.p-toast-message-content .p-toast-icon-close'
-  },
-  login: {
-    emailInput: '[data-testid="signin-block__email-input"]',
-    nextButton: '[data-testid="signin-block__next-button"] > .p-button-label',
-    passwordInput: '[data-testid="signin-block__password-input"] > .p-inputtext',
-    signInButton: '[data-testid="signin-block__signin-button"] > .p-button-label'
-  },
-  menuSidebar: {
-    toggleButton: '[data-testid="sidebar-block__toggle-button"] > .p-button-icon',
-    menuItem: (productName) => `[data-testid="sidebar-block__menu-item__${productName}"]`
-  },
-  menuAccount: {
-    avatarIcon: '[data-testid="profile-block__avatar"]',
-    menuItem: (menuAccountLabel) =>
-      `li[aria-label="${menuAccountLabel}"] > .p-menuitem-content > .p-menuitem-link`
-  },
-  activityHistory: {
-    searchInput: '[data-testid="events-search-input"]',
-    timeLineEvent: '[data-testid="events-timeline-event-name"]'
-  },
-  edgeApplication: EDGE_APPLICATION,
-  credential: {
-    createCredentialBtn: '[data-testid="create_Credential_button"]',
-    nameInput: '[data-testid="credentials-create-form__name-field__input"]',
-    nameErrorText: '[data-testid="credentials-create-form__name-field__error-message"]',
-    descriptionField: '[data-testid="credentials-create-form__description-field__textarea"]',
-    tokenInput: '[data-testid="credentials-create-form__token-field__input"]',
-    tokenErrorText: '[data-testid="credentials-create-form__token-field__error-text"]',
-    tokenCopyButton: '[data-testid="credentials-create-form__token-field__copy-token-button"]',
-    statusSwitch: '[data-testid="credentials-create-form__status-field__switch"]'
-  },
-  yourSettings: {
-    emailInput: '[data-testid="your-settings-form__email__input"]',
-    emailError: '[data-testid="your-settings-form__email__error-message"]',
-    mobileCountryCodeOptions: '[data-testid="your-settings-form__country-code__dropdown"]',
-    countryCodeFilter: '.p-dropdown-filter',
-    countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
-    mobileInput: '[data-testid="your-settings-form__mobile__input"]',
-    mobileError: '[data-testid="your-settings-form__mobile__error-message"]',
-    firstNameInput: '[data-testid="your-settings-form__first-name__input"]',
-    firstNameError: '[data-testid="your-settings-form__first-name__error-message"]',
-    lastNameInput: '[data-testid="your-settings-form__last-name__input"]',
-    lastNameError: '[data-testid="your-settings-form__last-name__error-message"]',
-    timezoneOptions: '[data-testid="your-settings-form__timezone__dropdown"]',
-    language: '[data-testid="your-settings-form__language"]',
-    oldPasswordInput: '[data-testid="your-settings-form__old-password__input"]',
-    newPasswordInput: '[data-testid="your-settings-form__new-password__input"]',
-    confirmPasswordInput: '[data-testid="your-settings-form__confirm-password__input"]',
-    confirmPasswordError: '[data-testid="your-settings-form__confirm-password__error-message"]',
-    twoFactorToggle: '.p-inputswitch-slider'
-  },
-  networkLists: {
-    createButton: '[data-testid="create_Network List_button"] > .p-button-label',
-    nameInput: '[data-testid="network-list-form__name__input"]',
-    typeDropdown: '[data-testid="network-list-form__type__dropdown"]',
-    asnTextarea: '[data-testid="network-list-form__asn-list__textarea"]',
-    ipcidrTextarea: '[data-testid="network-list-form__ipcidr-list__textarea"]',
-    countriesMultiselect: '[data-testid="network-list-form__countries__multiselect"]',
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"]',
-    countriesListOption: (recordType) => `#countriesList_${recordType}`,
-    typeRow: '[data-testid="list-table-block__column__listType__row"]',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
-  },
-  variables: {
-    createButton: '[data-testid="create_Variable_button"]',
-    keyInput: '[data-testid="variables-form__key-field__input"]',
-    valueInput: '[data-testid="variables-form__value-field__input"]',
-    secretToggle: '[data-testid="variables-form__secret-field__switch"] > .p-inputswitch-slider',
-    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    showMore: '[data-testid="list-table-block__column__value__row"] .underline'
-  },
-  wafs: {
-    createButton: '[data-testid="create_WAF Rule_button"] > .p-button-label',
-    nameInput: '[data-testid="waf-rules-form__name-field__input"]',
-    threatTypeSwitch: (name) =>
-      `[data-testid="field-group-switch__switch-${name}__switch"] > .p-inputswitch-slider`,
-    dropdownTrigger: (name) =>
-      `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
-    dropdownOptions: (name, position) => `#${name}_${position}`,
-    breadcumbToList: '.p-breadcrumb-list li.p-menuitem:nth-child(3) .p-menuitem-link',
-    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    seeMore: (columnName) =>
-      `[data-testid="list-table-block__column__${columnName}__row"] .underline`,
-    mainSettingsTab: '[data-testid="waf-rules-tabs__tab__main-settings"] > a',
-    tuningTab: '[data-testid="waf-rules-tabs__tab__tuning"] > a',
-    allowedRulesTab: '[data-testid="waf-rules-tabs__tab__allowed-rules"] > a',
-    allowedRules: {
-      createButton: '[data-testid="create_Allowed Rule_button"]',
-      ruleIdDropdown: '[data-testid="allowed-rules-form__rule-id-field"] > .p-dropdown-trigger',
-      ruleIdOption: (ruleId) =>
-        `[data-testid="allowed-rules-form__rule-id-field"] #ruleid_${ruleId}`,
-      descriptionField: '[data-testid="allowed-rules-form__description-field__input"]',
-      pathField: '[data-testid="allowed-rules-form__path-field__input"]',
-      matchZoneDropdown: (zoneId) =>
-        `[data-testid="allowed-rules-form__match-zone[${zoneId}]-field"] > .p-dropdown-trigger`,
-      matchZoneOption: (zoneId, position) =>
-        `[data-testid="allowed-rules-form__match-zone[${zoneId}]-field"] #ruleid_${position}`,
-      headerField: (zoneId) =>
-        `[data-testid="allowed-rules-form__zone[${zoneId}]__header-field__input"]`,
-      matchesOnRadio: (zoneId, position) =>
-        `[data-testid="allowed-rules-form__zone[${zoneId}]__matches-on-field__radio"][name="matchZones[${zoneId}].matches_on-radio-${position}"]`,
-      deleteMatchZoneButton: (zoneId) =>
-        `[data-testid="allowed-rules-form__delete-match-zone[${zoneId}]__button"]`,
-      addZoneButton: '[data-testid="allowed-rules-form__add-match-zone__button"]',
-      regexSwitch:
-        '[data-testid="allowed-rules-form__use-regex-field__switch"] > .p-inputswitch-slider',
-      statusSwitch:
-        '[data-testid="allowed-rules-form__status-field__switch"] > .p-inputswitch-slider'
-    }
-  },
-  functions: {
-    createButton: '[data-testid="create_Edge Function_button"] > .p-button-label',
-    nameInput: '[data-testid="field-text__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"] > p',
-    languageRow: '[data-testid="list-table-block__column__language__row"] > p',
-    initiatorTypeRow: '[data-testid="list-table-block__column__initiatorType__row"]'
-  },
-  edgeFirewall: {
-    createButton: '[data-testid="create_Edge Firewall_button"] > .p-button-label',
-    nameInput: '[data-testid="edge-firewall-form__name-field__input"]',
-    edgeFunctionSwitch:
-      '[data-testid="field-group-switch__switch-edgeFunctionsEnabled__switch"] > .p-inputswitch-slider',
-    wafEnabledSwitch:
-      '[data-testid="field-group-switch__switch-wafEnabled__switch"] > .p-inputswitch-slider',
-    networkProtectionSwitch:
-      '[data-testid="field-group-switch__switch-networkProtectionEnabled__switch"] > .p-inputswitch-slider',
-    mainSettingsTab: '[data-testid="edge-firewall__main-settings-tab"] > .p-tabview-title',
-    functionsTab: '[data-testid="edge-firewall__functions-tab"] > .p-tabview-title',
-    rulesEngineTab: '[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title',
-    createFunctionInstanceButton:
-      '[data-testid="create_Function Instance_button"] > .p-button-label',
-    functionInstanceName: '[data-testid="field-text__input"]',
-    functionInstanceDropdown: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    functionInstanceDropdownFilter: '.p-dropdown-filter',
-    functionInstanceDropdownIcon:
-      '[data-testid="field-dropdown__dropdown"] > .p-dropdown-trigger > .p-icon',
-    functionInstanceDropdownFunction: '#edgeFunctionID_0',
-    functionInstanceSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    functionInstanceTableSearchInput: '[data-testid="data-table-search-input"]',
-    functionInstanceTableColumnName: '[data-testid="list-table-block__column__name__row"]',
-    functionInstanceTableColumnInstanced:
-      '[data-testid="list-table-block__column__functionInstanced__row"]',
-    createRuleButton: '[data-testid="create_Rules Engine_button"] > .p-button-label',
-    ruleNameInput: '[data-testid="edge-firewall-rule-form__name__input"]',
-    ruleDescriptionInput: '[data-testid="edge-firewall-rule-form__description__input"]',
-    ruleCriteriaVariableDropdown: '#criteria\\[0\\]\\[0\\]\\.variable > .p-dropdown-trigger',
-    ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
-    ruleCriteriaOperatorDropdown:
-      ':nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
-    ruleCriteriaInput: ':nth-child(3) > [data-testid="field-text__input"]',
-    ruleBehaviorDropdown:
-      ':nth-child(1) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
-    ruleBehaviorFunctionToRunDropdown:
-      '.gap-3 > :nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    ruleBehaviorFunctionToRun: '#behaviors\\[0\\]\\.functionId_0',
-    ruleSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    rulesTableSearchInput: '[data-testid="data-table-search-input"]',
-    rulesTableColumnName: '[data-testid="list-table-block__column__name__row"]',
-    rulesTableColumnDescriptionShowMore: '.underline',
-    rulesTableColumnDescription: '.whitespace-pre',
-
-    saveButton: '[data-testid="form-actions-submit-button"]',
-    cancelButton: '[data-testid="form-actions-cancel-button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"]',
-    activeRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-    actionButton:
-      '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-    deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-    deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-    confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
-  },
-  edgePulse: {
-    defaultTagCopyButton: '[data-testid="edge-pulse__default-tag-copy-button"] > .p-button-label',
-    preLoadingTab: '[data-testid="edge-pulse__pre-loading-tab"]',
-    preLoadingTagCopyButton:
-      '[data-testid="edge-pulse__pre-loading-tag-copy-button"] > .p-button-label'
-  },
-  edgeServices: {
-    createServiceButton: '[data-testid="create_Service_button"]',
-    createResourceButton: '[data-testid="list-table-block__create-resource-button"]',
-    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    serviceName: '[data-testid="edge-service-form__name-field__input"]',
-    variablesField: '[data-testid="edge-service-form__variables-field"] .view-lines',
-    status: '[data-testid="edge-service-form__status__active-field"] input',
-    statusSwitch: '[data-testid="edge-service-form__status__active-field"] .p-inputswitch-slider',
-    mainSettingsTab: '[data-testid="edge-service-tabs__tab__main-settings"] a',
-    resoucesTab: '[data-testid="edge-service-tabs__tab__resources"] a',
-    pathField: '[data-testid="edge-service-drawer-form__path-field__input"]',
-    contentTypeField: '[data-testid="edge-service-drawer-form__content-field"] .view-lines',
-    typeDropdownTrigger:
-      '[data-testid="edge-service-drawer-form__type-field__dropdown"] > .p-dropdown-trigger',
-    typeDropdownOptions: (position) => `#contentType_${position}`
-  },
-  personalTokens: {
-    createTokenButton: '[data-testid="create_Personal Token_button"]',
-    searchInput: '[data-testid="data-table-search-input"]',
-    filteredRecordNameColumn: '[data-testid="list-table-block__column__name__row"]',
-    filteredRecordMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-    filteredRecordDeleteButton: '.p-menuitem-content > .p-menuitem-link',
-    deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
-    tokenName: '[data-testid="personal-token-form__name-field__input"]',
-    submitButton: '[data-testid="form-actions-submit-button"]',
-    copyTokenDialogHeader: '[data-testid="copy-token-dialog__header"] > .p-dialog-header',
-    copyTokenButton: '[data-testid="copy-token-dialog__token-field__copy-token-button"]',
-    closeCopyDialogButton: '[data-testid="copy-token-dialog__dialog-footer__confirm-button"]'
-  },
-  accountSettings: {
-    accountName: '[data-testid="account-settings__account-name__input"]',
-    companyName: '[data-testid="account-settings__company-name__input"]',
-    companyId: '[data-testid="account-settings__company-id__input"]',
-    billingEmails: '[data-testid="account-settings__billing-emails__textarea"]',
-    postalCode: '[data-testid="account-settings__postal-code__input"]',
-    dropdownFilter: '.p-dropdown-filter',
-    country: '[data-testid="account-settings__country__dropdown"]',
-    countryDropdown: '[data-testid="account-settings__country__dropdown"] > .p-dropdown-trigger',
-    countryOption: (optionIdx) => `#country_${optionIdx}`,
-    region: '[data-testid="account-settings__region__dropdown"]',
-    regionDropdown: '[data-testid="account-settings__region__dropdown"] > .p-dropdown-trigger',
-    regionOption: (optionIdx) => `#region_${optionIdx}`,
-    city: '[data-testid="account-settings__city__dropdown"]',
-    cityDropdown: '[data-testid="account-settings__city__dropdown"] > .p-dropdown-trigger',
-    cityOption: (optionIdx) => `#city_${optionIdx}`,
-    address: '[data-testid="account-settings__address__input"]',
-    complement: '[data-testid="account-settings__complement__input"]',
-    socialLogin:
-      '[data-testid="account-settings__login-settings__switch-isSocialLoginEnabled__switch"] > .p-inputswitch-slider',
-    enforceMfa:
-      '[data-testid="account-settings__login-settings__switch-isEnabledMfaToAllUsers__switch"] > .p-inputswitch-slider',
-    submitButton: '[data-testid="form-actions-submit-button"] > .p-button-label'
-  },
-  dataStream: {
-    createButton: '[data-testid="create_Stream_button"]',
-    nameInput: '[data-testid="data-stream-form__general__name-field__input"]',
-    sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
-    templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
-    editorBody: '.view-lines',
-    connectorDropdown:
-      '[data-testid="data-stream-form__destination__connector-field__dropdown"] > .p-dropdown-trigger',
-    connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,
-    httpConnector: {
-      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
-      headersInput: '[data-testid="data-stream-form__destination__headers-field__input"]',
-      payloadInput: '[data-testid="data-stream-form__destination__payload-format-field__input"]',
-      separatorInput:
-        '[data-testid="data-stream-form__destination__payload-line-separator-field__input"]',
-      maxSizeInput:
-        '[data-testid="data-stream-form__destination__payload-max-size-field__input"] > .p-inputtext'
-    },
-    kafkaConnector: {
-      serverTextarea:
-        '[data-testid="data-stream-form__destination__bootstrap-servers-field__textarea"]',
-      topicInput: '[data-testid="data-stream-form__destination__kafka-topic-field__input"]',
-      useTlsSlider:
-        '[data-testid="data-stream-form__destination__use-tls-field"] > .p-inputswitch-slider'
-    },
-    s3Connector: {
-      urlInput: '[data-testid="data-stream-form__destination__url-field__input"]',
-      bucketInput: '[data-testid="data-stream-form__destination__bucket-field__input"]',
-      regionInput: '[data-testid="data-stream-form__destination__region-field__input"]',
-      accessKeyInput: '[data-testid="data-stream-form__destination__access-key-field__input"]',
-      secretKeyInput: '[data-testid="data-stream-form__destination__secret-key-field__input"]',
-      objectKeyPrefixInput:
-        '[data-testid="data-stream-form__destination__object-key-prefix-field__input"]'
-    },
-    bigQueryConnector: {
-      projectIdInput: '[data-testid="data-stream-form__destination__project-id-field__input"]',
-      datasetIdInput: '[data-testid="data-stream-form__destination__dataset-id-field__input"]',
-      tableIdInput: '[data-testid="data-stream-form__destination__table-id-field__input"]',
-      serviceAccountKeyInput:
-        '[data-testid="data-stream-form__destination__service-account-key-field__input"]'
-    },
-    elasticsearchConnector: {
-      urlInput: '[data-testid="data-stream-form__destination__elasticsearch-url-field__input"]',
-      apiKeyTextarea: '[data-testid="data-stream-form__destination__api-key-field__textarea"]'
-    },
-    splunkConnector: {
-      urlInput: '[data-testid="data-stream-form__destination__splunk-url-field__input"]',
-      apiKeyTextarea:
-        '[data-testid="data-stream-form__destination__splunk-api-key-field__textarea"]'
-    },
-    awsKinesisConnector: {
-      streamNameInput:
-        '[data-testid="data-stream-form__destination__kinesis-stream-name-field__input"]',
-      regionInput: '[data-testid="data-stream-form__destination__kinesis-region-field__input"]',
-      accessKeyInput:
-        '[data-testid="data-stream-form__destination__kinesis-access-key-field__input"]',
-      secretKeyInput:
-        '[data-testid="data-stream-form__destination__kinesis-secret-key-field__input"]'
-    },
-    datadogConnector: {
-      urlInput: '[data-testid="data-stream-form__destination__datadog-url-field__input"]',
-      apiKeyTextarea:
-        '[data-testid="data-stream-form__destination__datadog-api-key-field__textarea"]'
-    },
-    ibmQRadarConnector: {
-      urlInput: '[data-testid="data-stream-form__destination__qradar-url-field__input"]'
-    },
-    azureMonitorConnector: {
-      logTypeInput:
-        '[data-testid="data-stream-form__destination__azure-monitor-log-type-field__input"]',
-      sharedKeyInput:
-        '[data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"]',
-      timeGeneratedFieldInput:
-        '[data-testid="data-stream-form__destination__azure-monitor-generated-field__input"]',
-      workspaceIdInput:
-        '[data-testid="data-stream-form__destination__azure-monitor-workspace-id-field__input"]'
-    },
-    azureBlobStorageConnector: {
-      storageAccountInput:
-        '[data-testid="data-stream-form__destination__azure-blob-storage-storage-account-field__input"]',
-      containerNameInput:
-        '[data-testid="data-stream-form__destination__azure-blob-storage-container-name-field__input"]',
-      blobSasTokenInput:
-        '[data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field__input"]'
-    },
-    statusSlider: '[data-testid="data-stream-form__section__status"] input',
-    list: {
-      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
-    }
-  },
-  edgeDns: {
-    createButton: '[data-testid="create_Zone_button"] > .p-button-label',
-    nameInput: '[data-testid="edge-dns-form__name__input"]',
-    domainInput: '[data-testid="edge-dns-form__domain__input"]',
-    saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',
-    searchInput: '[data-testid="data-table-search-input"]',
-    nameRow: '[data-testid="list-table-block__column__name__row"]',
-    showMore: '.underline',
-    domainRow: '.whitespace-pre',
-    statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-    list: {
-      columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
-    },
-    records: {
-      tab: '[data-testid="edge-dns-edit-view__records__tab-panel"] > a',
-      createButton: '[data-testid="create_Record_button"]',
-      nameInput: '[data-testid="edge-dns-records-form__settings__name-field__input"]',
-      recordTypeDropdown:
-        '[data-testid="edge-dns-records-form__settings__record-type-field__dropdown"] > .p-dropdown-trigger',
-      recordTypeOption: (recordType) => `#selectedRecordType_${recordType}`,
-      ttlInput: '[data-testid="edge-dns-records-form__settings__ttl-field__input"]',
-      valueTextarea: '[data-testid="edge-dns-records-form__settings__value-field__textarea"]',
-      policyTypeDropdown:
-        '[data-testid="edge-dns-records-form__policy__policy-type-field__dropdown"] > .p-dropdown-trigger',
-      policyTypeOption: (policyType) => `#selectedPolicy_${policyType}`,
-      weightInput: '[data-testid="edge-dns-records-form__policy__weight-field__input"]',
-      descriptionTextarea:
-        '[data-testid="edge-dns-records-form__policy__description-field__textarea"]'
-    }
-  },
-  domains: {
-    createButton: '[data-testid="create_Domain_button"]',
-    nameInput: '[data-testid="domains-form__name-field__input"]',
-    edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
-    dropdownFilter: '.p-dropdown-filter',
-    edgeApplicationOption: '#edgeApplication_0',
-    cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
-    dialogTitle: '.p-dialog-header > .p-dialog-title',
-    domainField: '[data-testid="domains-dialog__domain-field__input"]',
-    copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
-    confirmButton: '[data-testid="domains-dialog__confirm__button"]',
-    pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
-    digitalCertificateFieldSelectedValue:
-      ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    digitalCertificateDropdown:
-      '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
-    letsEncryptDropdownOption: '#edgeCertificate_1',
-    editPageTitle: '[data-testid="page_title_Edit Domain"]',
-    enableMtlsSwitch:
-      '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
-    dropdownTrustedCA:
-      '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown"] > .p-dropdown-label',
-    trustedCAFirstDropdownOption: '#mtlsTrustedCertificate_0',
-    mtlsTrustedCAFieldSelectedValue:
-      ':nth-child(4) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    fieldTextInput: '[data-testid="field-text__input"]',
-    domainUri: '[data-testid="edit-domains-form__domain-field__input"]',
-    editFormCopyDomainButton: '[data-testid="edit-domains-form__domain-field__copy-button"]',
-    activeSwitchEditForm: '[data-testid="edit-domains-form__active-field__switch"]',
-    formActionsSubmitButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
-    dataTableSearchInput: '[data-testid="data-table-search-input"]',
-    listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',
-    listTableBlockColumnActiveRow:
-      '[data-testid="list-table-block__column__active__row"] > .p-tag-value'
-  },
-  digitalCertificates: {
-    createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
-    digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
-    breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
-    importTrustedCARadioOption:
-      '[inputvalue="trusted_ca_certificate"] > .p-card-body > .p-card-content > .p-4',
-    editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
-    trustedCATextArea: '[data-testid="trusted-certificates-form__certificate-field__textarea"]',
-    serverCertificateTextArea: '[data-testid="digital-certificate__certificate-field__textarea"]',
-    privateKeyTextArea: '[data-testid="digital-certificate__private-key-field__textarea"]',
-    generateCSRRadioOption: '[inputvalue="generateCSR"] > .p-card-body > .p-card-content > .p-4 > :nth-child(1) > .p-radiobutton > .p-radiobutton-box',
-    subjectNameInput: '[data-testid="digital-certificate__subject-name__input"]',
-    countryInput: '[data-testid="digital-certificate__country__input"]',
-    stateInput: '[data-testid="digital-certificate__state__input"]',
-    cityInput: '[data-testid="digital-certificate__city__input"]',
-    organizationInput: '[data-testid="digital-certificate__organization__input"]',
-    organizationUnitInput: '[data-testid="digital-certificate__organization-unit__input"]',
-    emailInput: '[data-testid="digital-certificate__email__input"]',
-    sanTextarea: '[data-testid="digital-certificate__san__textarea"]',
-    csrLabel: '[data-testid="digital-certificate__csr__label"]',
-    copyCsrButton: '[data-testid="digital-certificate__copy-csr__button"]',
-    copyCsrMessage: '[data-testid="digital-certificate__copy-csr__message"]'
-  },
-  purge: {
-    createButton: '[data-testid="create_Purge_button"]',
-    argumentsField: '[data-testid="purge__arguments-field__textarea"]'
-  },
-  usersManagement: {
-    createButton: '[data-testid="create_User_button"]',
-    firstNameInput: '[data-testid="users-form__first-name-field__input"]',
-    firstNameErrorMessage: '[data-testid="users-form__first-name-field__error-message"]',
-    lastNameInput: '[data-testid="users-form__last-name-field__input"]',
-    lastNameErrorMessage: '[data-testid="users-form__last-name-field__error-message"]',
-    emailInput: '[data-testid="users-form__email-field__input"]',
-    emailErrorMessage: '[data-testid="users-form__email-field__error-message"]',
-    phoneInput: '[data-testid="users-form__phone-field__input"]',
-    phoneErrorMessage: '[data-testid="users-form__phone-field__error-message"]',
-    languageDropdown: '[data-testid="users-form__language-field__dropdown"]',
-    timezoneDropdown: '[data-testid="users-form__timezone-field__dropdown"]',
-    timezoneFilter: '[data-testid="users-form__timezone-field__dropdown"] .p-dropdown-filter',
-    timezoneOption: (index) => `#timezone_${index}`,
-    teamDropdownTrigger:
-      '[data-testid="users-form__teams-field__multiselect"] .p-multiselect-trigger',
-    teamDropdownFilter: '[aria-owns="teams_list"].p-multiselect-filter',
-    teamOption: (index) => `#teams_${index}`,
-    selectedTeamTag: (optionNumber) =>
-      `[data-testid="users-form__teams-field__multiselect"] :nth-child(${optionNumber})`,
-    selectedTeamTagCloseBtn: (optionNumber) =>
-      `[data-testid="users-form__teams-field__multiselect"] :nth-child(${optionNumber}) .p-icon`,
-    selectedTeamErrorMessage: '[data-testid="users-form__teams-field__error-message"]',
-    switchSocialLogin: '[data-testid="users-form__mfa-field__switch-isAccountOwner"]',
-    switchMultiFactorAuth: '[data-testid="users-form__mfa-field__switch-twoFactorEnabled"]',
-    listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
-  },
-  teams: {
-    createTeamButton: '[data-testid="create_Team_button"]',
-    nameInput: '[data-testid="teams-permissions-form__name__field-text__input"]',
-    statusSwitch: '[data-testid="teams-permissions-form__form-fields__status"]',
-    sourceList: '.p-picklist-list.p-picklist-source-list',
-    targetList: '.p-picklist-list.p-picklist-target-list',
-    allPermissionsToTarget: '[aria-label="Move All to Target"] > .p-icon',
-    allPermissionsToSource: '[aria-label="Move All to Source"] > .p-icon',
-    singlePermissionToTarget: 'button[aria-label="Move to Target"]',
-    permission: (permissionName) =>
-      `[data-testid="teams-permissions-form__permissions-field__picklist__item-${permissionName}"]`,
-    listRow: (rowName) => `[data-testid="list-table-block__column__${rowName}__row"]`
-  }
+  list: LIST_TABLE_BLOCK_SELECTORS,
+  form: FORM_FIELDS_SELECTORS,
+  toast: TOAST_BLOCK_SELECTORS,
+  login: LOGIN_VIEW_SELECTORS,
+  menuSidebar: MENU_SIDEBAR_SELECTORS,
+  menuAccount: MENU_ACCOUNT_SELECTORS,
+  activityHistory: ACTIVITY_HISTORY_VIEW_SELECTORS,
+  edgeApplication: EDGE_APPLICATION_PRODUCT_SELECTORS,
+  credential: CREDENTIALS_VIEW_SELECTORS,
+  yourSettings: YOUR_SETTINGS_VIEW_SELECTORS,
+  networkLists: NETWORK_LISTS_PRODUCT_SELECTORS,
+  variables: VARIABLES_PRODUCT_SELECTORS,
+  wafs: WAF_PRODUCT_SELECTORS,
+  functions: EDGE_FUNCTIONS_PRODUCT_SELECTORS,
+  edgeFirewall: EDGE_FIREWALL_PRODUCT_SELECTORS,
+  edgePulse: EDGE_PULSE_PRODUCT_SELECTORS,
+  edgeServices: EDGE_SERVICES_PRODUCT_SELECTORS,
+  personalTokens: PERSONAL_TOKENS_PRODUCT_SELECTORS,
+  accountSettings: ACCOUNT_SETTINGS_VIEW_SELECTORS,
+  dataStream: DATA_STREAM_PRODUCT_SELECTORS,
+  edgeDns: EDGE_DNS_PRODUCT_SELECTORS,
+  domains: DOMAINS_PRODUCT_SELECTORS,
+  digitalCertificates: DIGITAL_CERTIFICATES_PRODUCT_SELECTORS,
+  purge: EDGE_PURGE_PRODUCT_SELECTORS,
+  usersManagement: USERS_MANAGEMENT_VIEW_SELECTORS,
+  teams: TEAMS_BLOCK_SELECTORS
 }
 
 export default selectors
