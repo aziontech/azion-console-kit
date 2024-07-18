@@ -4,14 +4,34 @@ import selectors from '../support/selectors'
 let firewallName = ''
 let functionInstanceName = ''
 let ruleName = ''
+let networkListName = ''
 
-describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
+const createASNNetworkListCase = () => {
+  cy.openProduct('Network Lists')
+
+  // Act
+  cy.get(selectors.networkLists.createButton).click()
+
+  cy.get(selectors.networkLists.nameInput).clear()
+  cy.get(selectors.networkLists.nameInput).type(networkListName)
+
+  cy.get(selectors.networkLists.typeDropdown).click()
+  cy.get(selectors.networkLists.typeDropdown).find('li').eq(0).should('have.text', 'ASN').click()
+
+  cy.get(selectors.networkLists.asnTextarea).click()
+  cy.get(selectors.networkLists.asnTextarea).type('9876{enter}6789{enter}')
+
+  cy.get(selectors.networkLists.saveButton).click()
+  cy.verifyToast('success', 'Your network list has been created')
+}
+
+describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
     functionInstanceName = generateUniqueName('EdgeFirewallFunctionInstance')
     ruleName = generateUniqueName('EdgeFirewallRule')
-    cy.openProduct('Edge Firewall')
+    networkListName = generateUniqueName('NetworkList')
   })
   afterEach(() => {
     // Delete the firewall
@@ -20,7 +40,9 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     })
   })
 
-  it('Create an Edge Firewall ', function () {
+  it('should create an Edge Firewall ', () => {
+    cy.openProduct('Edge Firewall')
+
     // Act
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
@@ -36,7 +58,9 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })
 
-  it('Create an Edge Firewall and run a function', function () {
+  it('should create an Edge Firewall and run a function', () => {
+    cy.openProduct('Edge Firewall')
+
     // Act - create Edge Firewall
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
@@ -45,15 +69,17 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
     cy.get(selectors.edgeFirewall.saveButton).click()
     cy.verifyToast('success', 'Your Edge Firewall has been created')
-  
-      // Act - create Edge Function instance
+
+    // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
     cy.get(selectors.edgeFirewall.functionInstanceName).type(functionInstanceName)
     cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
-    cy.get(selectors.edgeFirewall.functionInstanceDropdownFilter).clear()
-    cy.get(selectors.edgeFirewall.functionInstanceDropdownFilter).type('Edge Firewall Test Function - NAO DELETAR{enter}')
+    cy.get(selectors.edgeFirewall.criteriaDropdownValueFilter).clear()
+    cy.get(selectors.edgeFirewall.criteriaDropdownValueFilter).type(
+      'Edge Firewall Test Function - NAO DELETAR{enter}'
+    )
     cy.get(selectors.edgeFirewall.functionInstanceDropdownIcon).click()
     cy.get(selectors.edgeFirewall.functionInstanceDropdownFunction).click()
     cy.get(selectors.edgeFirewall.functionInstanceSubmit).click()
@@ -62,8 +88,14 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     // Assert - Find created function
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).clear()
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(functionInstanceName)
-    cy.get(selectors.edgeFirewall.functionInstanceTableColumnName).should('have.text', functionInstanceName)
-    cy.get(selectors.edgeFirewall.functionInstanceTableColumnInstanced).should('have.text', 'Edge Firewall Test Function - NAO DELETAR')
+    cy.get(selectors.edgeFirewall.functionInstanceTableColumnName).should(
+      'have.text',
+      functionInstanceName
+    )
+    cy.get(selectors.edgeFirewall.functionInstanceTableColumnInstanced).should(
+      'have.text',
+      'Edge Firewall Test Function - NAO DELETAR'
+    )
 
     // Act - Create a rule do run the function
     cy.get(selectors.edgeFirewall.rulesEngineTab).click()
@@ -90,7 +122,10 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
     cy.get(selectors.edgeFirewall.rulesTableColumnName).should('have.text', ruleName)
     cy.get(selectors.edgeFirewall.rulesTableColumnDescriptionShowMore).click()
-    cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should('have.text', 'My Rule Description')
+    cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should(
+      'have.text',
+      'My Rule Description'
+    )
 
     // Cleanup - Remove the created rule
     cy.deleteEntityFromLoadedList().then(() => {
@@ -112,5 +147,32 @@ describe('Edge Firewall spec', { tags: ['@dev',] }, () => {
     cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
+  })
+
+  it.only('should create an Edge Firewall with a rules engine using a Network List', () => {
+    createASNNetworkListCase()
+    cy.openProduct('Edge Firewall')
+
+    // Act - create Edge Firewall
+    cy.get(selectors.edgeFirewall.createButton).click()
+    cy.get(selectors.edgeFirewall.nameInput).clear()
+    cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.saveButton).click()
+    cy.verifyToast('success', 'Your Edge Firewall has been created')
+
+    // Act - Create a rule do run the function
+    cy.get(selectors.edgeFirewall.rulesEngineTab).click()
+    cy.get(selectors.edgeFirewall.createRuleButton).click()
+    cy.get(selectors.edgeFirewall.ruleNameInput).click()
+    cy.get(selectors.edgeFirewall.ruleNameInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.ruleDescriptionInput).clear()
+    cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
+    cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownNetworkLists).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaOperatorFirstOption).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
+    cy.get(selectors.edgeFirewall.criteriaDropdownValueFilter).clear()
+    cy.get(selectors.edgeFirewall.criteriaDropdownValueFilter).type(networkListName)
   })
 })

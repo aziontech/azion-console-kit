@@ -557,6 +557,7 @@
           <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col sm:flex-row">
             <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
               <FieldDropdownIcon
+                :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
                 :options="generateCriteriaVariableOptions()"
@@ -587,6 +588,7 @@
                 optionLabel="label"
                 optionValue="value"
                 class="w-full"
+                :data-testid="`edge-firewall-rules-form__operator[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].operator`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -614,6 +616,7 @@
               />
               <FieldDropdown
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
+                :data-testid="`edge-firewall-rules-form__network-list[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
                 :options="networkListOptions"
                 :loading="loadingNetworkList"

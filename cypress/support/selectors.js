@@ -187,7 +187,7 @@ const selectors = {
       '[data-testid="create_Function Instance_button"] > .p-button-label',
     functionInstanceName: '[data-testid="field-text__input"]',
     functionInstanceDropdown: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-    functionInstanceDropdownFilter: '.p-dropdown-filter',
+    criteriaDropdownValueFilter: '.p-dropdown-filter',
     functionInstanceDropdownIcon:
       '[data-testid="field-dropdown__dropdown"] > .p-dropdown-trigger > .p-icon',
     functionInstanceDropdownFunction: '#edgeFunctionID_0',
@@ -199,12 +199,16 @@ const selectors = {
     createRuleButton: '[data-testid="create_Rules Engine_button"] > .p-button-label',
     ruleNameInput: '[data-testid="edge-firewall-rule-form__name__input"]',
     ruleDescriptionInput: '[data-testid="edge-firewall-rule-form__description__input"]',
-    ruleCriteriaVariableDropdown: '#criteria\\[0\\]\\[0\\]\\.variable > .p-dropdown-trigger',
+    ruleCriteriaVariableDropdown:
+      '[data-testid="edge-firewall-rules-form__variable[0]"] > .p-dropdown-label',
+    ruleCriteriaVariableDropdownNetworkLists: '#criteria\\[0\\]\\[0\\]\\.variable_8',
     ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
     ruleCriteriaOperatorDropdown:
-      ':nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+      '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"] > .p-dropdown-label',
     ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
+    ruleCriteriaOperatorFirstOption: '#criteria\\[0\\]\\[0\\]\\.operator_0',
     ruleCriteriaInput: ':nth-child(3) > [data-testid="field-text__input"]',
+    ruleCriteriaNetworkListDropdown: '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"] > .p-dropdown-label',
     ruleBehaviorDropdown:
       ':nth-child(1) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
     ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
@@ -216,7 +220,6 @@ const selectors = {
     rulesTableColumnName: '[data-testid="list-table-block__column__name__row"]',
     rulesTableColumnDescriptionShowMore: '.underline',
     rulesTableColumnDescription: '.whitespace-pre',
-
     saveButton: '[data-testid="form-actions-submit-button"]',
     cancelButton: '[data-testid="form-actions-cancel-button"]',
     searchInput: '[data-testid="data-table-search-input"]',
