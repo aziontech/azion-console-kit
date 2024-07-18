@@ -746,7 +746,7 @@
           <div class="flex gap-2 mt-6 mb-8">
             <div class="w-full">
               <fieldAutoComplete
-                data-testid="rule-form-criteria-item-conditional-autocomplete-field-autocomplete"
+                :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
                 :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
                 :value="criteria[criteriaIndex].value[conditionalIndex].variable"
@@ -766,12 +766,12 @@
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
-              data-testid="rule-form-criteria-item-conditional-operator"
+              :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
             />
 
             <div class="flex flex-col w-full">
               <FieldText
-                data-testid="rule-form-criteria-item-conditional-input-field-text"
+                :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
                 v-if="
                   criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
                   criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
@@ -810,7 +810,6 @@
         <div
           v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
-          data-testid="rule-form-criteria-item-remove-button"
         >
           <Divider type="solid" />
           <PrimeButton
@@ -819,6 +818,7 @@
             size="small"
             outlined
             @click="removeCriteria(criteriaIndex + 1)"
+            :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
           />
         </div>
       </div>
@@ -847,7 +847,6 @@
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
-        data-testid="rule-form-behaviors-item"
       >
         <div class="flex items-center gap-2">
           <Divider
@@ -879,7 +878,7 @@
               optionDisabled="requires"
               :value="behaviors[behaviorIndex].value.name"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-              data-testid="rule-form-behaviors-item-name"
+              :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
             />
           </div>
 
@@ -893,7 +892,7 @@
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-run-function"
+                :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
@@ -905,7 +904,7 @@
                 optionValue="originId"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-set-origin"
+                :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
@@ -917,7 +916,7 @@
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-set-cache-policy"
+                :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
@@ -928,7 +927,7 @@
                   :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.captured_array"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-captured-array"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
                 />
                 <FieldText
                   placeholder="Subject"
@@ -936,7 +935,7 @@
                   :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.subject"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-subject"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
                 />
                 <FieldText
                   placeholder="Regex"
@@ -944,7 +943,7 @@
                   :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.regex"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-regex"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
                 />
               </div>
             </template>
@@ -953,7 +952,7 @@
                 :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-target"
+                :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
               />
             </template>
           </div>
