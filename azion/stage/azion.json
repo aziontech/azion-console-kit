@@ -63,6 +63,11 @@
       "origin-id": 139226,
       "origin-key": "90966025-1eac-436e-bac0-2bbd5bbc2654",
       "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 139219,
+      "origin-key": "16a10030-5451-481c-85e9-d56f8e120679",
+      "name": "console_kit_stage_single"
     }
   ],
   "rules-engine": {
@@ -142,6 +147,11 @@
         "id": 263041,
         "name": "Secure Headers",
         "phase": "response"
+      },
+      {
+        "id": 267300,
+        "name": "Route GraphQL Billing Queries to Manager Origin",
+        "phase": ""
       }
     ]
   },
