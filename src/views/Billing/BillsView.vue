@@ -19,19 +19,11 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Product Charges</span>
-          <span class="text-color text-sm"
-            ><span class="text-color-secondary text-sm"
-              ><span class="text-color-secondary text-sm">$</span></span
-            >
-            {{ currentInvoice.productChanges }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.productChanges }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-          <span class="text-color text-sm">
-            <span class="text-color-secondary text-sm">$</span>
-            {{ currentInvoice.servicePlan }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.servicePlan }}</span>
         </div>
       </div>
 
@@ -204,7 +196,7 @@
       type: Function,
       required: true
     },
-    loadBillingCurrentInvoiceService: {
+    loadCurrentInvoiceService: {
       type: Function,
       required: true
     },
@@ -270,7 +262,7 @@
   }
 
   const loaderCurrentInvoice = async () => {
-    currentInvoice.value = await props.loadBillingCurrentInvoiceService()
+    currentInvoice.value = await props.loadCurrentInvoiceService()
   }
 
   const goToBillingDetails = () => {

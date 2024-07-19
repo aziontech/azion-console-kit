@@ -1,8 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+import { formatDateToUSBilling } from '@/helpers/convert-date'
 
-export const loadBillingCurrentInvoiceService = async () => {
+export const loadCurrentInvoiceService = async () => {
   const dateRange = getCurrentMonthStartEnd()
   const payload = {
     query: `query getBillDetail {
@@ -50,9 +51,9 @@ const adapt = (httpResponse) => {
       billId: invoice.billId,
       total: invoice.totalValue,
       currency: invoice.currency,
-      billingPeriod: `${formatPeriod(invoice.periodFrom)} - ${formatPeriod(invoice.periodTo)}`,
-      productChanges: '-',
-      servicePlan: '-',
+      billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(invoice.periodTo)}`,
+      productChanges: '---',
+      servicePlan: '---',
       creditUsedForPayment: 0.0,
       temporaryBill: invoice.temporaryBill
     }
@@ -61,10 +62,6 @@ const adapt = (httpResponse) => {
     body: parseInvoice?.length > 0 ? parseInvoice[0] : null,
     statusCode: httpResponse.statusCode
   }
-}
-
-const formatPeriod = (period) => {
-  return period.split('-').reverse().join('/')
 }
 
 const getCurrentMonthStartEnd = () => {

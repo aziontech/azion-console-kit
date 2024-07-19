@@ -87,16 +87,20 @@
   }
 
   const loadCardDefault = async () => {
-    cardDefault.value = await props.loadPaymentMethodDefaultService()
+    try {
+      cardDefault.value = await props.loadPaymentMethodDefaultService()
+    } catch (error) {
+      cardDefault.value = null
+    }
   }
 
   const successAddCredit = async () => {
     await viewBillsRef.value?.reloadList()
   }
 
-  onMounted(async () => {
-    await loadCardDefault()
+  onMounted(() => {
     renderTabCurrentRouter()
+    loadCardDefault()
   })
 </script>
 <template>
