@@ -35,7 +35,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
-    @click="openDrawerCreatePaymentMethod"
+    @click-to-create="drawersMethods.openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
