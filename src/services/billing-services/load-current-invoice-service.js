@@ -3,7 +3,7 @@ import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
 
-export const loadBillingCurrentInvoiceService = async () => {
+export const loadCurrentInvoiceService = async () => {
   const dateRange = getCurrentMonthStartEnd()
   const payload = {
     query: `query getBillDetail {

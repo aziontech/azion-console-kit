@@ -30,7 +30,7 @@ export const billingRoutes = {
           loadYourServicePlanService: BillingServices.loadYourServicePlanService,
           openPlans: Helpers.openShowMorePlan,
           loadContractServicePlan: ContractServices.loadContractServicePlan,
-          loadBillingCurrentInvoiceService: BillingServices.loadBillingCurrentInvoiceService
+          loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService
         }
       },
       meta: {

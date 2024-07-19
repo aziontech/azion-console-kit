@@ -6,7 +6,7 @@ import { addCreditService } from './add-credit-service'
 import { createPaymentMethodService } from './create-payment-method-service'
 import { loadYourServicePlanService } from './load-your-service-plan-service'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-import { loadBillingCurrentInvoiceService } from './load-current-invoice-service'
+import { loadCurrentInvoiceService } from './load-current-invoice-service'
 import { loadInvoiceDataService } from './load-invoice-data-service'
 import { loadPaymentMethodDefaultService } from './load-payment-method-default-service'
 
@@ -19,7 +19,7 @@ export {
   createPaymentMethodService,
   loadYourServicePlanService,
   makeBillingBaseUrl,
-  loadBillingCurrentInvoiceService,
+  loadCurrentInvoiceService,
   loadInvoiceDataService,
   loadPaymentMethodDefaultService
 }

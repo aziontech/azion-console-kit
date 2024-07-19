@@ -59,17 +59,11 @@
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Products Charges</span>
-              <span class="text-color text-sm">
-                <span class="text-color-secondary text-sm"></span>
-                {{ invoiceData.productChanges }}</span
-              >
+              <span class="text-color text-sm"> {{ invoiceData.productChanges }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-              <span class="text-color text-sm">
-                <span class="text-color-secondary text-sm"></span>
-                {{ invoiceData.servicePlan }}</span
-              >
+              <span class="text-color text-sm"> {{ invoiceData.servicePlan }}</span>
             </div>
           </div>
 

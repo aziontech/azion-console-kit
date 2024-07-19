@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadBillingCurrentInvoiceService } from '@/services/billing-services'
+import { loadCurrentInvoiceService } from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
@@ -35,7 +35,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadBillingCurrentInvoiceService
+  const sut = loadCurrentInvoiceService
 
   return {
     sut
