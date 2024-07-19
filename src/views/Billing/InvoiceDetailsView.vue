@@ -5,9 +5,10 @@
       :value="data"
       rowGroupMode="subheader"
       groupRowsBy="region"
-      sortField="region"
-      :sortOrder="1"
       class="w-full sm:w-1/2 h-fit"
+      :pt="{
+        thead: { class: 'hidden' }
+      }"
     >
       <template #header>
         <span class="text-base font-medium">Service and Products Charges</span>
