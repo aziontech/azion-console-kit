@@ -8,10 +8,6 @@
       sortField="region"
       :sortOrder="1"
       class="w-full sm:w-1/2 h-fit"
-      :pt="{
-        rowGroupHeaderCell: { class: 'w-full flex justify-between' },
-        headerTitle: { class: '!bg-[yellow]' }
-      }"
     >
       <template #header>
         <span class="text-base font-medium">Service and Products Charges</span>
@@ -19,6 +15,9 @@
       <Column
         expander
         style="width: 0rem"
+        :pt="{
+          rowToggler: { class: '!border-none' }
+        }"
       />
       <Column
         field="service"
@@ -235,9 +234,3 @@
 
   const expandedRows = ref([])
 </script>
-
-<style>
-  td button {
-    border: none;
-  }
-</style>
