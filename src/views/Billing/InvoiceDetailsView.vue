@@ -15,7 +15,7 @@
       </template>
       <Column
         expander
-        style="width: 0px;"
+        style="width: 0px"
         :pt="{
           rowToggler: { class: '!border-none' }
         }"
@@ -44,7 +44,7 @@
             ></Column>
             <Column
               field="country"
-              style="width: 100%;"
+              style="width: 100%"
               header="Total Data Transfered (per GB)"
               :pt="{
                 bodyCell: { class: 'text-color-secondary text-sm' }
@@ -54,7 +54,7 @@
               field="quantity"
               header="40 GB"
               :pt="{
-                root: { class: 'pr-8' },
+                root: { class: 'pr-8' }
               }"
               bodyStyle="text-align:right"
             ></Column>
