@@ -47,4 +47,3 @@
     return askAzionAiChatStore.isOpen ? 'active-helper' : ''
   })
 </script>
-@/stores/azion-ai-chat-store

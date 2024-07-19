@@ -46,4 +46,3 @@
     return helpCenterStore.isOpen
   })
 </script>
-@/stores/azion-ai-chat-store
