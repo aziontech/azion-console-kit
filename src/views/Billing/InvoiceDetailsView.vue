@@ -15,7 +15,7 @@
       </template>
       <Column
         expander
-        style="width: 0rem"
+        style="width: 0px;"
         :pt="{
           rowToggler: { class: '!border-none' }
         }"
@@ -37,39 +37,30 @@
             :value="slotProps.data.orders"
             class="!border-none -mt-0.5 !text-sm text-color-secondary"
           >
-            <Column style="width: 4rem"></Column>
+            <Column
+              :pt="{
+                root: { class: 'pl-12' }
+              }"
+            ></Column>
             <Column
               field="country"
+              style="width: 100%;"
               header="Total Data Transfered (per GB)"
+              :pt="{
+                bodyCell: { class: 'text-color-secondary text-sm' }
+              }"
             ></Column>
             <Column
               field="quantity"
               header="40 GB"
-            ></Column>
-            <Column
-              field="price"
-              header="$ 520.00"
-              style="width: 5rem"
+              :pt="{
+                root: { class: 'pr-8' },
+              }"
               bodyStyle="text-align:right"
             ></Column>
-          </DataTable>
-          <DataTable
-            :value="slotProps.data.orders"
-            class="!border-none -mt-0.5 !text-sm text-color-secondary"
-          >
-            <Column style="width: 4rem"></Column>
-            <Column
-              field="country"
-              header="Total  Requests (per 10,000)"
-            ></Column>
-            <Column
-              field="quantity"
-              header="40 GB"
-            ></Column>
             <Column
               field="price"
               header="$ 520.00"
-              style="width: 5rem"
               bodyStyle="text-align:right"
             ></Column>
           </DataTable>
@@ -195,40 +186,40 @@
       service: 'Edge Application',
       money: '$ 145.00',
       orders: [
-        { country: 'United States', quantity: '10 GB', price: '$50.00' },
-        { country: 'Brazil', quantity: '5 GB', price: '$25.00' },
-        { country: 'Germany', quantity: '8 GB', price: '$40.00' },
-        { country: 'Japan', quantity: '6 GB', price: '$30.00' }
+        { country: 'United States', quantity: '10 GB', price: '$ 50.00' },
+        { country: 'Brazil', quantity: '5 GB', price: '$ 25.00' },
+        { country: 'Germany', quantity: '8 GB', price: '$ 40.00' },
+        { country: 'Japan', quantity: '6 GB', price: '$ 30.00' }
       ]
     },
     {
       service: 'Application Accelerator',
       money: '$ 315.00',
       orders: [
-        { country: 'United States', quantity: '20 GB', price: '$100.00' },
-        { country: 'Canada', quantity: '15 GB', price: '$75.00' },
-        { country: 'United Kingdom', quantity: '18 GB', price: '$90.00' },
-        { country: 'Australia', quantity: '10 GB', price: '$50.00' }
+        { country: 'United States', quantity: '20 GB', price: '$ 100.00' },
+        { country: 'Canada', quantity: '15 GB', price: '$ 75.00' },
+        { country: 'United Kingdom', quantity: '18 GB', price: '$ 90.00' },
+        { country: 'Australia', quantity: '10 GB', price: '$ 50.00' }
       ]
     },
     {
       service: 'Load Balancer',
       money: '$ 200.00',
       orders: [
-        { country: 'United States', quantity: '12 GB', price: '$60.00' },
-        { country: 'India', quantity: '8 GB', price: '$40.00' },
-        { country: 'France', quantity: '10 GB', price: '$50.00' },
-        { country: 'China', quantity: '10 GB', price: '$50.00' }
+        { country: 'United States', quantity: '12 GB', price: '$ 60.00' },
+        { country: 'India', quantity: '8 GB', price: '$ 40.00' },
+        { country: 'France', quantity: '10 GB', price: '$ 50.00' },
+        { country: 'China', quantity: '10 GB', price: '$ 50.00' }
       ]
     },
     {
       service: 'Image Processor',
       money: '$ 220.00',
       orders: [
-        { country: 'United States', quantity: '14 GB', price: '$70.00' },
-        { country: 'Italy', quantity: '9 GB', price: '$45.00' },
-        { country: 'Spain', quantity: '11 GB', price: '$55.00' },
-        { country: 'Mexico', quantity: '10 GB', price: '$50.00' }
+        { country: 'United States', quantity: '14 GB', price: '$ 70.00' },
+        { country: 'Italy', quantity: '9 GB', price: '$ 45.00' },
+        { country: 'Spain', quantity: '11 GB', price: '$ 55.00' },
+        { country: 'Mexico', quantity: '10 GB', price: '$ 50.00' }
       ]
     }
   ]
