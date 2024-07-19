@@ -48,7 +48,9 @@ const adapt = (httpResponse) => {
       billDetailId: invoice.billDetailId,
       total: invoice.totalValue,
       currency: invoice.currency,
-      billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(invoice.periodTo)}`,
+      billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
+        invoice.periodTo
+      )}`,
       productChanges: '---',
       servicePlan: '---',
       creditUsedForPayment: 0.0,

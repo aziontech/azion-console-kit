@@ -77,11 +77,11 @@
           <span class="text-color-secondary text-sm">Payment Method</span>
           <span class="font-medium text-color text-sm">
             <span
-              class="flex gap-2"
-              v-if="yourServicePlan.cardBrand"
+              class="flex gap-2 items-center"
+              v-if="props.cardDefault"
             >
-              <cardFlagBlock :cardFlag="yourServicePlan.cardBrand" />
-              Ending in {{ yourServicePlan.cardLast4Digits }}
+              <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
+              {{ cardDefault.cardData.cardNumber }}
             </span>
             <span v-else>---</span>
           </span>
