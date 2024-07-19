@@ -8,6 +8,9 @@ import * as Helpers from '@/helpers'
 export const billingRoutes = {
   path: '/billing',
   name: 'billing',
+  meta: {
+    routeForBlock: '/billing/payment'
+  },
   children: [
     {
       path: ':tab?',

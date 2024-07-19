@@ -46,20 +46,29 @@ function extractPriceFromString(sentence) {
 }
 
 const adapt = (httpResponse, disclaimer) => {
-  const [yourServicePlan] = httpResponse.body.data.payments
+  const {
+    body: { data },
+    statusCode
+  } = httpResponse
 
-  const parseYourServicePlan = {
-    paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
-    amount: yourServicePlan.amount,
-    currency: yourServicePlan.currency,
-    cardBrand: yourServicePlan.cardBrand.toLowerCase(),
-    cardLast4Digits: yourServicePlan.cardLast4Digits,
-    creditBalance: extractPriceFromString(disclaimer)
-  }
+  const payments = data?.payments || []
+
+  const [yourServicePlan] = payments
+
+  const parseYourServicePlan = yourServicePlan
+    ? {
+        paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
+        amount: yourServicePlan.amount,
+        currency: yourServicePlan.currency,
+        cardBrand: yourServicePlan.cardBrand.toLowerCase(),
+        cardLast4Digits: yourServicePlan.cardLast4Digits,
+        creditBalance: extractPriceFromString(disclaimer)
+      }
+    : null
 
   return {
     body: parseYourServicePlan,
-    statusCode: httpResponse.statusCode
+    statusCode
   }
 }
 

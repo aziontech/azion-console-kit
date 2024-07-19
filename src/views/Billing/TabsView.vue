@@ -95,8 +95,8 @@
   }
 
   onMounted(async () => {
-    await loadCardDefault()
     renderTabCurrentRouter()
+    await loadCardDefault()
   })
 </script>
 <template>
