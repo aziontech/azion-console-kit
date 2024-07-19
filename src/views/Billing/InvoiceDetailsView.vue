@@ -9,29 +9,69 @@
       :sortOrder="1"
       class="w-full sm:w-1/2 h-fit"
       :pt="{
-        rowGroupHeaderCell: { class: 'w-full flex justify-between'},
-        headerTitle: { class: '!bg-[yellow]'}
+        rowGroupHeaderCell: { class: 'w-full flex justify-between' },
+        headerTitle: { class: '!bg-[yellow]' }
       }"
     >
       <template #header>
         <span class="text-base font-medium ml-2">Edge Application</span>
       </template>
-      <Column expander style="width: 0rem" />
-      <Column field="service" header="" class="font-medium !text-base"></Column>
-      <Column field="money" header="" class="font-medium !text-sm" bodyStyle="text-align:right"></Column>
+      <Column
+        expander
+        style="width: 0rem"
+      />
+      <Column
+        field="service"
+        header=""
+        class="font-medium !text-base"
+      ></Column>
+      <Column
+        field="money"
+        header=""
+        class="font-medium !text-sm"
+        bodyStyle="text-align:right"
+      ></Column>
       <template #expansion="slotProps">
         <div class="-m-4">
-          <DataTable :value="slotProps.data.orders" class="!border-none -mt-0.5 !text-sm text-color-secondary">
-            <Column style="width: 4rem;"></Column>
-            <Column field="country" header="Total Data Transfered (per GB)"></Column>
-            <Column field="quantity" header="40 GB"></Column>
-            <Column field="price" header="$ 520.00" style="width: 5rem;" bodyStyle="text-align:right"></Column>
+          <DataTable
+            :value="slotProps.data.orders"
+            class="!border-none -mt-0.5 !text-sm text-color-secondary"
+          >
+            <Column style="width: 4rem"></Column>
+            <Column
+              field="country"
+              header="Total Data Transfered (per GB)"
+            ></Column>
+            <Column
+              field="quantity"
+              header="40 GB"
+            ></Column>
+            <Column
+              field="price"
+              header="$ 520.00"
+              style="width: 5rem"
+              bodyStyle="text-align:right"
+            ></Column>
           </DataTable>
-          <DataTable :value="slotProps.data.orders" class="!border-none -mt-0.5 !text-sm text-color-secondary">
-            <Column style="width: 4rem;"></Column>
-            <Column field="country" header="Total Data Transfered (per GB)"></Column>
-            <Column field="quantity" header="40 GB"></Column>
-            <Column field="price" header="$ 520.00" style="width: 5rem;" bodyStyle="text-align:right"></Column>
+          <DataTable
+            :value="slotProps.data.orders"
+            class="!border-none -mt-0.5 !text-sm text-color-secondary"
+          >
+            <Column style="width: 4rem"></Column>
+            <Column
+              field="country"
+              header="Total  Requests (per 10,000)"
+            ></Column>
+            <Column
+              field="quantity"
+              header="40 GB"
+            ></Column>
+            <Column
+              field="price"
+              header="$ 520.00"
+              style="width: 5rem"
+              bodyStyle="text-align:right"
+            ></Column>
           </DataTable>
         </div>
       </template>
@@ -47,11 +87,17 @@
             :disabled="invoiceData.temporaryBill"
           />
         </div>
-        <div class="flex justify-between mt-4" v-if="!invoiceData.temporaryBill">
+        <div
+          class="flex justify-between mt-4"
+          v-if="!invoiceData.temporaryBill"
+        >
           <span class="text-color-secondary text-sm">Payment Data</span>
           <span class="font-medium text-color text-sm">-</span>
         </div>
-        <div class="flex justify-between items-center" v-if="!invoiceData.temporaryBill">
+        <div
+          class="flex justify-between items-center"
+          v-if="!invoiceData.temporaryBill"
+        >
           <span class="text-color-secondary text-sm">Invoice ID</span>
           <div class="flex gap-3 items-center">
             <span class="font-medium text-color text-sm">{{ invoiceData.billDetailId }}</span>
@@ -108,93 +154,93 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import PrimeButton from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import { useToast } from 'primevue/usetoast'
+  import { onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
+  import PrimeButton from 'primevue/button'
+  import DataTable from 'primevue/datatable'
+  import Column from 'primevue/column'
+  import { useToast } from 'primevue/usetoast'
 
-const props = defineProps({
-  loadInvoiceDataService: {
-    type: Function,
-    required: true
-  },
-  clipboardWrite: {
-    type: Function,
-    required: true
-  }
-})
-
-const route = useRoute()
-const toast = useToast()
-
-const invoiceData = ref({})
-
-onMounted(async () => {
-  invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
-})
-
-const clipboard = (content) => {
-  props.clipboardWrite(content)
-  toast.add({
-    closable: true,
-    severity: 'success',
-    summary: 'Successfully copied!'
+  const props = defineProps({
+    loadInvoiceDataService: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
   })
-}
 
-const data = [
-  {
-    service: 'Edge Application',
-    money: '$ 145.00',
-    orders: [
-      { country: 'United States', quantity: '10 GB', price: '$50.00' },
-      { country: 'Brazil', quantity: '5 GB', price: '$25.00' },
-      { country: 'Germany', quantity: '8 GB', price: '$40.00' },
-      { country: 'Japan', quantity: '6 GB', price: '$30.00' },
-    ]
-  },
-  {
-    service: 'Application Accelerator',
-    money: '$ 315.00',
-    orders: [
-      { country: 'United States', quantity: '20 GB', price: '$100.00' },
-      { country: 'Canada', quantity: '15 GB', price: '$75.00' },
-      { country: 'United Kingdom', quantity: '18 GB', price: '$90.00' },
-      { country: 'Australia', quantity: '10 GB', price: '$50.00' },
-    ]
-  },
-  {
-    service: 'Load Balancer',
-    money: '$ 200.00',
-    orders: [
-      { country: 'United States', quantity: '12 GB', price: '$60.00' },
-      { country: 'India', quantity: '8 GB', price: '$40.00' },
-      { country: 'France', quantity: '10 GB', price: '$50.00' },
-      { country: 'China', quantity: '10 GB', price: '$50.00' },
-    ]
-  },
-  {
-    service: 'Image Processor',
-    money: '$ 220.00',
-    orders: [
-      { country: 'United States', quantity: '14 GB', price: '$70.00' },
-      { country: 'Italy', quantity: '9 GB', price: '$45.00' },
-      { country: 'Spain', quantity: '11 GB', price: '$55.00' },
-      { country: 'Mexico', quantity: '10 GB', price: '$50.00' },
-    ]
+  const route = useRoute()
+  const toast = useToast()
+
+  const invoiceData = ref({})
+
+  onMounted(async () => {
+    invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
+  })
+
+  const clipboard = (content) => {
+    props.clipboardWrite(content)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Successfully copied!'
+    })
   }
-];
 
-const expandedRows = ref([])
+  const data = [
+    {
+      service: 'Edge Application',
+      money: '$ 145.00',
+      orders: [
+        { country: 'United States', quantity: '10 GB', price: '$50.00' },
+        { country: 'Brazil', quantity: '5 GB', price: '$25.00' },
+        { country: 'Germany', quantity: '8 GB', price: '$40.00' },
+        { country: 'Japan', quantity: '6 GB', price: '$30.00' }
+      ]
+    },
+    {
+      service: 'Application Accelerator',
+      money: '$ 315.00',
+      orders: [
+        { country: 'United States', quantity: '20 GB', price: '$100.00' },
+        { country: 'Canada', quantity: '15 GB', price: '$75.00' },
+        { country: 'United Kingdom', quantity: '18 GB', price: '$90.00' },
+        { country: 'Australia', quantity: '10 GB', price: '$50.00' }
+      ]
+    },
+    {
+      service: 'Load Balancer',
+      money: '$ 200.00',
+      orders: [
+        { country: 'United States', quantity: '12 GB', price: '$60.00' },
+        { country: 'India', quantity: '8 GB', price: '$40.00' },
+        { country: 'France', quantity: '10 GB', price: '$50.00' },
+        { country: 'China', quantity: '10 GB', price: '$50.00' }
+      ]
+    },
+    {
+      service: 'Image Processor',
+      money: '$ 220.00',
+      orders: [
+        { country: 'United States', quantity: '14 GB', price: '$70.00' },
+        { country: 'Italy', quantity: '9 GB', price: '$45.00' },
+        { country: 'Spain', quantity: '11 GB', price: '$55.00' },
+        { country: 'Mexico', quantity: '10 GB', price: '$50.00' }
+      ]
+    }
+  ]
+
+  const expandedRows = ref([])
 </script>
 
 <style>
-td button {
-  border: none;
-}
-.p-rowgroup-header > td {
-  width: 100% !important;
-}
+  td button {
+    border: none;
+  }
+  .p-rowgroup-header > td {
+    width: 100% !important;
+  }
 </style>
