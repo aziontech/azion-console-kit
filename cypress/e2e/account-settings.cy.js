@@ -2,12 +2,6 @@
 import selectors from '../support/selectors'
 import generateUniqueName from '../support/utils'
 
-const waitMultipleTimes = (alias, times) => {
-  for (; times; times--) {
-    cy.wait(alias)
-  }
-}
-
 const fixtures = {
   companyName: 'Company Name',
   companyId: '00.000.000/0001-00',
@@ -16,16 +10,13 @@ const fixtures = {
   complement: 'Apt. 123'
 }
 
-// @xfail (tooling defect issue): https://aziontech.atlassian.net/browse/UXE-4117
 describe('Account Settings spec', { tags: ['@dev', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Account Settings')
 
     fixtures.companyName = generateUniqueName('companyName')
-
-    cy.intercept('graphql/cities/').as('citiesApi')
-    waitMultipleTimes('@citiesApi', 3)
+    cy.wait(3000)
   })
 
   it('should update account settings successfully', () => {
