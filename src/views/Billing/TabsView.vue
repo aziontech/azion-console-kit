@@ -83,6 +83,7 @@
     if (isPaymentTabActive.value) {
       listPaymentMethodsRef.value?.reloadList()
     }
+    await loadCardDefault()
   }
 
   const loadCardDefault = async () => {
@@ -141,6 +142,7 @@
             v-if="isBillsTabActive"
             ref="viewBillsRef"
             v-bind="props.billsServices"
+            :cardDefault="cardDefault"
             @changeTab="changeTab"
           />
         </TabPanel>
