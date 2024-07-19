@@ -37,6 +37,6 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     certificate: payload.certificate,
-    private_key: payload.privateKey
+    private_key: payload.privateKey === '' ? undefined : payload.privateKey
   }
 }

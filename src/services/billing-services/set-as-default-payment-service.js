@@ -33,7 +33,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Payment successfully set as default'
+      return 'Payment Method successfully set as default'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message

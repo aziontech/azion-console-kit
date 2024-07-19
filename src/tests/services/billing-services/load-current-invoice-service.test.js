@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadBillingCurrentInvoiceService } from '@/services/billing-services'
+import { loadCurrentInvoiceService } from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
@@ -23,11 +23,11 @@ const fixtures = {
   },
   formattedResponse: {
     billId: 2707388,
-    billingPeriod: '01/07/2024 - 31/07/2024',
+    billingPeriod: '07/01/2024 - 07/31/2024',
     creditUsedForPayment: 0,
     currency: 'BRL',
-    productChanges: '-',
-    servicePlan: '-',
+    productChanges: '---',
+    servicePlan: '---',
     total: '0.00',
     temporaryBill: true
   },
@@ -35,7 +35,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadBillingCurrentInvoiceService
+  const sut = loadCurrentInvoiceService
 
   return {
     sut

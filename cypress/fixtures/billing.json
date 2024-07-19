@@ -1,0 +1,7 @@
+{
+  "cardNumber": "4242424242424242",
+  "cardExpiry": "1234",
+  "cardCvc": "123",
+  "cardHolderName": "Teste da Silva",
+  "defaultCard": "Default NAO REMOVER"
+}

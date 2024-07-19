@@ -25,11 +25,11 @@ const fixtures = {
   formattedResponse: {
     billId: 2707388,
     billDetailId: 170072532,
-    billingPeriod: '01/07/2024 - 31/07/2024',
+    billingPeriod: '07/01/2024 - 07/31/2024',
     creditUsedForPayment: 0,
     currency: 'BRL',
-    productChanges: '-',
-    servicePlan: '-',
+    productChanges: '---',
+    servicePlan: '---',
     total: '0.00',
     temporaryBill: true
   },

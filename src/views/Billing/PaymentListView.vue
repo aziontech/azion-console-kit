@@ -16,10 +16,12 @@
           icon="pi pi-plus"
           label="Credit"
           @click="drawersMethods.openDrawerAddCredit"
+          data-testid="payment-methods__add-credit__button"
           outlined
         />
         <PrimeButton
           icon="pi pi-plus"
+          data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
           @click="drawersMethods.openDrawerPaymentMethod"
           label="Payment Method"
@@ -33,6 +35,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
+    @click="openDrawerCreatePaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -122,6 +125,7 @@
     try {
       const feedback = await props.setAsDefaultPaymentService(payment.id)
       showToast('success', feedback)
+      reloadList()
     } catch (error) {
       showToast('error', error)
     }
@@ -139,6 +143,7 @@
     {
       label: 'Delete',
       type: 'delete',
+      icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
       service: props.deletePaymentService
     }

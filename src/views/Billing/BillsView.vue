@@ -19,19 +19,11 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Product Charges</span>
-          <span class="text-color text-sm"
-            ><span class="text-color-secondary text-sm"
-              ><span class="text-color-secondary text-sm">$</span></span
-            >
-            {{ currentInvoice.productChanges }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.productChanges }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-          <span class="text-color text-sm">
-            <span class="text-color-secondary text-sm">$</span>
-            {{ currentInvoice.servicePlan }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.servicePlan }}</span>
         </div>
       </div>
 
@@ -85,11 +77,11 @@
           <span class="text-color-secondary text-sm">Payment Method</span>
           <span class="font-medium text-color text-sm">
             <span
-              class="flex gap-2"
-              v-if="yourServicePlan.cardBrand"
+              class="flex gap-2 items-center"
+              v-if="props.cardDefault"
             >
-              <cardFlagBlock :cardFlag="yourServicePlan.cardBrand" />
-              Ending in {{ yourServicePlan.cardLast4Digits }}
+              <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
+              {{ cardDefault.cardData.cardNumber }}
             </span>
             <span v-else>---</span>
           </span>
@@ -204,13 +196,15 @@
       type: Function,
       required: true
     },
-    loadBillingCurrentInvoiceService: {
+    loadCurrentInvoiceService: {
       type: Function,
       required: true
+    },
+    cardDefault: {
+      type: Object
     }
   })
-
-  const isCardDefault = computed(() => !!yourServicePlan.value.cardLast4Digits)
+  const isCardDefault = computed(() => !!props.cardDefault)
   const currentInvoice = ref({})
   const listPaymentHistoryRef = ref('')
 
@@ -268,7 +262,7 @@
   }
 
   const loaderCurrentInvoice = async () => {
-    currentInvoice.value = await props.loadBillingCurrentInvoiceService()
+    currentInvoice.value = await props.loadCurrentInvoiceService()
   }
 
   const goToBillingDetails = () => {
@@ -283,6 +277,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
+      disabled: (item) => !item.invoiceUrl,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
       }

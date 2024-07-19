@@ -29,8 +29,10 @@ import EDGE_DNS_PRODUCT_SELECTORS from './selectors/product-selectors/edge-dns.j
 import DOMAINS_PRODUCT_SELECTORS from './selectors/product-selectors/domains.js'
 import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selectors/digital-certificates.js'
 import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
+import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
 
 const selectors = {
+  billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
   form: FORM_FIELDS_SELECTORS,
   toast: TOAST_BLOCK_SELECTORS,

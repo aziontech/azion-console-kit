@@ -117,6 +117,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="digital-certificate__certificate-field"
           label="Certificate"
           placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
           name="certificate"
@@ -126,6 +127,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="digital-certificate__private-key-field"
           label="Private Key"
           placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
           name="privateKey"
@@ -143,6 +145,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__subject-name"
           label="Subject Name"
           required
           placeholder="example.com"
@@ -152,6 +155,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__country"
           label="Country/Region"
           required
           placeholder="BR"
@@ -161,6 +165,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__state"
           label="State/Province"
           required
           placeholder="São Paulo"
@@ -170,6 +175,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__city"
           label="City/Locality"
           required
           placeholder="São Paulo"
@@ -179,6 +185,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__organization"
           label="Organization"
           required
           placeholder="Company Name S.A."
@@ -188,6 +195,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__organization-unit"
           label="Organization Unit"
           required
           placeholder="IT Department"
@@ -197,6 +205,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="digital-certificate__email"
           label="Email"
           required
           placeholder="example@email.com"
@@ -217,6 +226,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          data-testid="digital-certificate__san"
           label="Subject Alternative Names (SAN)"
           required
           placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"

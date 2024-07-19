@@ -83,19 +83,24 @@
     if (isPaymentTabActive.value) {
       listPaymentMethodsRef.value?.reloadList()
     }
+    await loadCardDefault()
   }
 
   const loadCardDefault = async () => {
-    cardDefault.value = await props.loadPaymentMethodDefaultService()
+    try {
+      cardDefault.value = await props.loadPaymentMethodDefaultService()
+    } catch (error) {
+      cardDefault.value = null
+    }
   }
 
   const successAddCredit = async () => {
     await viewBillsRef.value?.reloadList()
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     renderTabCurrentRouter()
-    await loadCardDefault()
+    loadCardDefault()
   })
 </script>
 <template>
@@ -137,6 +142,7 @@
             v-if="isBillsTabActive"
             ref="viewBillsRef"
             v-bind="props.billsServices"
+            :cardDefault="cardDefault"
             @changeTab="changeTab"
           />
         </TabPanel>

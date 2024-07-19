@@ -52,8 +52,6 @@ const adapt = (httpResponse, disclaimer) => {
     paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
     amount: yourServicePlan.amount,
     currency: yourServicePlan.currency,
-    cardBrand: yourServicePlan.cardBrand.toLowerCase(),
-    cardLast4Digits: yourServicePlan.cardLast4Digits,
     creditBalance: extractPriceFromString(disclaimer)
   }
 
