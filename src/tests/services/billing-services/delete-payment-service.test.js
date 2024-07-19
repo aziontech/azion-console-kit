@@ -14,7 +14,7 @@ const makeSut = () => {
 describe('BillingServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202
+      statusCode: 200
     })
 
     const paymentIdMock = 1
@@ -30,14 +30,14 @@ describe('BillingServices', () => {
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202
+      statusCode: 200
     })
     const paymentIdMock = 2
     const { sut } = makeSut()
 
     const feedbackMessage = await sut(paymentIdMock)
 
-    expect(feedbackMessage).toBe('Payment successfully deleted')
+    expect(feedbackMessage).toBe('Payment Method successfully deleted!')
   })
 
   it.each([

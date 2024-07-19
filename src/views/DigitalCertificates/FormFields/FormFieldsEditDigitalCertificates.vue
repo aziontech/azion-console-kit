@@ -5,7 +5,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
 
   import { useField } from 'vee-validate'
-  import { ref, watch, computed } from 'vue'
+  import { ref, computed } from 'vue'
   import Divider from 'primevue/divider'
 
   const props = defineProps({
@@ -30,7 +30,7 @@
   const { value: csr } = useField('csr')
   const { value: certificateType } = useField('certificateType')
   const { value: managed } = useField('managed')
-  const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
+  const { value: privateKey } = useField('privateKey')
 
   async function copyCSRToclipboard() {
     await props.clipboardWrite(csr.value)
@@ -40,11 +40,6 @@
   const openDocumentation = async () => {
     props.documentationService()
   }
-
-  watch(privateKey, (privateKeyValue) => {
-    if (privateKeyValue === '') setPrivateKeyValue(undefined)
-  })
-
   const isCertificateType = computed(() => {
     return {
       edgeCertificate: !csr.value && certificateType.value === certificateTypes.EDGE_CERTIFICATE,
@@ -108,7 +103,6 @@
             placeholder="My digital certificate"
             :value="name"
           />
-          />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
@@ -120,6 +114,7 @@
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            data-testid="digital-certificate__csr"
             label="Certificate Signing Request (CSR)"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
             name="csr"
@@ -129,13 +124,18 @@
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <PrimeButton
+            data-testid="digital-certificate__copy-csr__button"
             class="max-sm:w-full"
             type="button"
             severity="secondary"
             label="Copy"
             @click="copyCSRToclipboard"
           />
-          <small v-if="csrCopied">Successfully copied!</small>
+          <small
+            data-testid="digital-certificate__copy-csr__message"
+            v-if="csrCopied"
+            >Successfully copied!</small
+          >
         </div>
       </template>
     </FormHorizontal>

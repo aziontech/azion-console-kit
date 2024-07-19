@@ -56,7 +56,7 @@ describe('DigitalCertificatesServices', () => {
     const result = await sut(fixtures.payload)
 
     expect(result).toEqual({
-      feedback: 'Your Credit Card has been added'
+      feedback: 'Your Payment Method has been added'
     })
   })
 

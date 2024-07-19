@@ -14,7 +14,8 @@ export default {
   },
   actionsMenu: {
     button: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-    deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]'
+    deleteButton: '[data-testid="data-table__actions-menu-item__Delete-button"]',
+    setDefaultButton: '[data-testid="data-table__actions-menu-item__Set as default-button"]'
   },
   singleActionsMenu: {
     button: '[data-testid="data-table-actions-column-body-action-button"]'

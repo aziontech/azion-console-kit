@@ -12,8 +12,8 @@ export default {
   rulesEngineTab: '[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title',
   createFunctionInstanceButton: '[data-testid="create_Function Instance_button"] > .p-button-label',
   functionInstanceName: '[data-testid="field-text__input"]',
-  functionInstanceDropdown: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-  functionInstanceDropdownFilter: '.p-dropdown-filter',
+  behaviorsDropdown: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+  dropdownValueFilter: '.p-dropdown-filter',
   functionInstanceDropdownIcon:
     '[data-testid="field-dropdown__dropdown"] > .p-dropdown-trigger > .p-icon',
   functionInstanceDropdownFunction: '#edgeFunctionID_0',
@@ -25,15 +25,28 @@ export default {
   createRuleButton: '[data-testid="create_Rules Engine_button"] > .p-button-label',
   ruleNameInput: '[data-testid="edge-firewall-rule-form__name__input"]',
   ruleDescriptionInput: '[data-testid="edge-firewall-rule-form__description__input"]',
-  ruleCriteriaVariableDropdown: '#criteria\\[0\\]\\[0\\]\\.variable > .p-dropdown-trigger',
+  ruleCriteriaVariableDropdown:
+    '[data-testid="edge-firewall-rules-form__variable[0]"] > .p-dropdown-label',
+  ruleCriteriaVariableDropdownNetworkLists: '#criteria\\[0\\]\\[0\\]\\.variable_8',
   ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
   ruleCriteriaOperatorDropdown:
-    ':nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"] > .p-dropdown-label',
   ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
+  ruleCriteriaOperatorFirstOption: '#criteria\\[0\\]\\[0\\]\\.operator_0',
+  ruleCriteriaValueFirstOption: '#criteria\\[0\\]\\[0\\]\\.argument_0',
   ruleCriteriaInput: ':nth-child(3) > [data-testid="field-text__input"]',
+  ruleCriteriaNetworkListDropdown:
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"] > .p-dropdown-label',
   ruleBehaviorDropdown:
     ':nth-child(1) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
+  ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
+  rulesWafDropdown:
+    '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
+  rulesWafFirstOption: '#behaviors\\[0\\]\\.waf_id_0',
+  rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
+  behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
+  rulesWafModeDropdown: '[data-testid="edge-firewall-rule-form__behaviors[0]__waf-mode__dropdown"] > .p-dropdown-label',
   ruleBehaviorFunctionToRunDropdown:
     '.gap-3 > :nth-child(2) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   ruleBehaviorFunctionToRun: '#behaviors\\[0\\]\\.functionId_0',
@@ -42,7 +55,6 @@ export default {
   rulesTableColumnName: '[data-testid="list-table-block__column__name__row"]',
   rulesTableColumnDescriptionShowMore: '.underline',
   rulesTableColumnDescription: '.whitespace-pre',
-
   saveButton: '[data-testid="form-actions-submit-button"]',
   cancelButton: '[data-testid="form-actions-cancel-button"]',
   searchInput: '[data-testid="data-table-search-input"]',

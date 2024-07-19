@@ -19,19 +19,11 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Product Charges</span>
-          <span class="text-color text-sm"
-            ><span class="text-color-secondary text-sm"
-              ><span class="text-color-secondary text-sm">$</span></span
-            >
-            {{ currentInvoice.productChanges }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.productChanges }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-          <span class="text-color text-sm">
-            <span class="text-color-secondary text-sm">$</span>
-            {{ currentInvoice.servicePlan }}</span
-          >
+          <span class="text-color text-sm"> {{ currentInvoice.servicePlan }}</span>
         </div>
       </div>
 
@@ -127,12 +119,14 @@
     :clickAddCredit="drawersMethods.openDrawerAddCredit"
     :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
     :clickLinkPaymentMethod="goToPayment"
+    :showBtnAddCredit="isCardDefault"
   />
 
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
     v-if="hasContentToList"
+    ref="listPaymentHistoryRef"
     isTabs
     :enableEditClick="false"
     :columns="paymentsColumns"
@@ -202,17 +196,17 @@
       type: Function,
       required: true
     },
-    loadBillingCurrentInvoiceService: {
+    loadCurrentInvoiceService: {
       type: Function,
       required: true
+    },
+    cardDefault: {
+      type: Object
     }
   })
-
+  const isCardDefault = computed(() => !!props.cardDefault)
   const currentInvoice = ref({})
-
-  onMounted(async () => {
-    await loaderCurrentInvoice()
-  })
+  const listPaymentHistoryRef = ref('')
 
   const paymentsColumns = ref([
     {
@@ -268,7 +262,7 @@
   }
 
   const loaderCurrentInvoice = async () => {
-    currentInvoice.value = await props.loadBillingCurrentInvoiceService()
+    currentInvoice.value = await props.loadCurrentInvoiceService()
   }
 
   const goToBillingDetails = () => {
@@ -283,6 +277,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
+      disabled: (item) => !item.invoiceUrl,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
       }
@@ -314,7 +309,20 @@
 
   const isTrail = computed(() => user.status === 'TRIAL')
 
-  onMounted(() => {
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listPaymentHistoryRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  onMounted(async () => {
     getAllInfos()
+    await loaderCurrentInvoice()
+  })
+
+  defineExpose({
+    reloadList
   })
 </script>

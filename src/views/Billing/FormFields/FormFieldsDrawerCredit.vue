@@ -71,6 +71,7 @@
             <InputNumber
               inputId="field-amount"
               v-model="amount"
+              data-testid="credit-form__amount__input"
               placeholder="99.99"
               :inputClass="errorMessage ? 'border-red-500' : ''"
               :max-fraction-digits="2"

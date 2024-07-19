@@ -16,7 +16,6 @@ describe('WAF spec', () => {
   it('should create a WAF ', function () {
     // Arrange
     cy.get(selectors.wafs.createButton).click()
-
     cy.get(selectors.wafs.nameInput).clear()
 
     // Act

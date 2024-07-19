@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+const STATUS_CLIENT_REVIEW_PAYMENT_REQUIRED = ['BLOCKED', 'DEFAULTING']
+
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
@@ -33,6 +35,9 @@ export const useAccountStore = defineStore({
     },
     userId(state) {
       return state.account?.user_id
+    },
+    isReviewPaymentRequired(state) {
+      return STATUS_CLIENT_REVIEW_PAYMENT_REQUIRED.includes(state.account?.status)
     }
   },
   actions: {
