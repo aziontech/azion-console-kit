@@ -14,7 +14,7 @@
       }"
     >
       <template #header>
-        <span class="text-base font-medium ml-2">Edge Application</span>
+        <span class="text-base font-medium">Service and Products Charges</span>
       </template>
       <Column
         expander
@@ -239,8 +239,5 @@
 <style>
   td button {
     border: none;
-  }
-  .p-rowgroup-header > td {
-    width: 100% !important;
   }
 </style>
