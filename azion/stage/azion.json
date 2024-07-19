@@ -151,7 +151,7 @@
       {
         "id": 267300,
         "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": ""
+        "phase": "request"
       }
     ]
   },
