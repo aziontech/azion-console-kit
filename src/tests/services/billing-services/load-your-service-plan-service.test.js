@@ -96,8 +96,6 @@ describe('BillingService', () => {
 
     expect(result).toEqual({
       amount: 0,
-      cardBrand: 'visa',
-      cardLast4Digits: '4123',
       creditBalance: '23.40',
       currency: 'USD',
       paymentDate: formatDateToUSBilling(firstDayOfMonth)
@@ -117,8 +115,6 @@ describe('BillingService', () => {
 
     expect(result).toEqual({
       amount: 0,
-      cardBrand: 'visa',
-      cardLast4Digits: '4123',
       creditBalance: '0.00',
       currency: 'USD',
       paymentDate: formatDateToUSBilling(firstDayOfMonth)

@@ -33,7 +33,7 @@ export const billingRoutes = {
           loadYourServicePlanService: BillingServices.loadYourServicePlanService,
           openPlans: Helpers.openShowMorePlan,
           loadContractServicePlan: ContractServices.loadContractServicePlan,
-          loadBillingCurrentInvoiceService: BillingServices.loadBillingCurrentInvoiceService
+          loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService
         }
       },
       meta: {
@@ -50,8 +50,20 @@ export const billingRoutes = {
       name: 'billing-invoice-details',
       component: () => import('@/views/Billing/InvoiceDetailsView.vue'),
       props: {
+        loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
         loadInvoiceDataService: BillingServices.loadInvoiceDataService,
         clipboardWrite
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Billing',
+            to: '/billing'
+          },
+          {
+            label: 'Invoice Details'
+          }
+        ]
       }
     }
   ]
