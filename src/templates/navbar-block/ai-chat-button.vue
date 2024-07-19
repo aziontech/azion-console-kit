@@ -23,6 +23,7 @@
   import { useHelpCenterStore } from '@/stores/help-center'
 
   import PrimeButton from 'primevue/button'
+  import router from '@/router'
 
   defineOptions({ name: 'ai-chat-button' })
 
@@ -32,8 +33,11 @@
   const SCREEN_BREAKPOINT_MD = 768
 
   const openAiChat = () => {
-    askAzionAiChatStore.toggle()
     helpCenterStore.close()
+    if (router.resolve({ name: 'azion-ai-chat' }).path === router.currentRoute.value.path) {
+      return
+    }
+    askAzionAiChatStore.toggle()
   }
 
   const currentLabel = computed(() => {

@@ -2,7 +2,7 @@
 export const azionAiRoutes = {
   path: '/azion-ai-chat',
   name: 'azion-ai-chat',
-  component: () => import('@modules/azion-ai-chat/index.vue'),
+  component: () => import('@views/AzionAI/AzionAiView.vue'),
   meta: {
     breadCrumbs: [
       {

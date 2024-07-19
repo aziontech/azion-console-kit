@@ -6,6 +6,14 @@
     <AzionAiChatHeader>
       <template #header-actions>
         <PrimeButton
+          icon="pi pi-external-link"
+          outlined
+          class="surface-border h-8 w-8"
+          aria-label="Open a chat in new tab"
+          v-tooltip.bottom="'Open a chat in new tab'"
+          @click="openChatInNewTab"
+        />
+        <PrimeButton
           icon="pi pi-pen-to-square"
           outlined
           class="surface-border h-8 w-8"
@@ -57,6 +65,14 @@
           </h2>
           <div class="gap-4 flex">
             <PrimeButton
+              icon="pi pi-external-link"
+              outlined
+              class="surface-border h-8 w-8"
+              aria-label="Open a chat in new tab"
+              v-tooltip.bottom="'Open a chat in new tab'"
+              @click="openChatInNewTab"
+            />
+            <PrimeButton
               icon="pi pi-pen-to-square"
               outlined
               class="surface-border h-8 w-8"
@@ -97,6 +113,8 @@
   import { computed, onMounted, onUnmounted, ref } from 'vue'
   import hljs from 'highlight.js'
   import { AZION_MESSAGE_TYPE } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
+  import { useRouter } from 'vue-router'
+  import { windowOpen } from '@/helpers'
 
   defineOptions({
     name: 'azion-ai-chat-root-block'
@@ -104,6 +122,7 @@
   const azionAiChatRef = ref(null)
   const azionAiChatMobileRef = ref(null)
   const renderCount = ref(1)
+  const router = useRouter()
   onMounted(() => {
     window.addEventListener('message', aiCustomPromptListenerHandler)
     addSupportToHljs()
@@ -143,5 +162,10 @@
         azionAiChatMobileRef?.value.deepChatRef.submitUserMessage({ text: event.data.prompt })
       }, 100)
     }
+  }
+
+  const openChatInNewTab = () => {
+    const url = `${window.location.origin}${router.resolve({ name: 'azion-ai-chat' }).path}`
+    windowOpen(url, '_blank')
   }
 </script>
