@@ -122,10 +122,26 @@
   const invoiceData = ref({})
   const cardDefault = ref({})
 
-  onMounted(async () => {
-    invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
-    cardDefault.value = await props.loadPaymentMethodDefaultService()
+  onMounted(() => {
+    loadInvoiceData()
+    loadCardDefault()
   })
+
+  const loadInvoiceData = async () => {
+    try {
+      invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
+    } catch (error) {
+      invoiceData.value = null
+    }
+  }
+
+  const loadCardDefault = async () => {
+    try {
+      cardDefault.value = await props.loadPaymentMethodDefaultService()
+    } catch (error) {
+      cardDefault.value = null
+    }
+  }
 
   const clipboard = (content) => {
     props.clipboardWrite(content)
