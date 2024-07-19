@@ -42,16 +42,18 @@
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Payment Method</span>
-              <span class="text-color-secondary text-sm">
-                <span
-                  v-if="cardDefault.cardData"
-                  class="flex gap-2"
-                >
-                  <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
-                  {{ cardDefault.cardData.cardNumber }}
-                </span>
-                <span v-else>---</span>
+              <span
+                v-if="cardDefault.cardData"
+                class="flex gap-2 text-color-secondary text-sm"
+              >
+                <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
+                {{ cardDefault.cardData.cardNumber }}
               </span>
+              <span
+                v-else
+                class="text-color-secondary text-sm"
+                >---</span
+              >
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Billing Period</span>
