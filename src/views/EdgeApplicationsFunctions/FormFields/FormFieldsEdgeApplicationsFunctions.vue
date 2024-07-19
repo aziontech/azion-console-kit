@@ -49,6 +49,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          data-testid="edge-application-function-instance-form__name-field"
           label="Name"
           required
           name="name"
@@ -68,6 +69,7 @@
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <FieldDropdown
+          data-testid="edge-application-function-instance-form__edge-function"
           label="Edge Function"
           required
           name="edgeFunctionID"

@@ -106,18 +106,18 @@
 
   const behaviorsRequestOptions = ref([
     {
-      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`,
+      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'capture_match_groups',
       requires: true
     },
@@ -125,62 +125,62 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`,
+      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'forward_cookies',
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
     {
-      label: `Optimize Images ${showLabelImageOptimization.value}`,
+      label: `Optimize Images ${showLabelImageOptimization.value}`.trim(),
       value: 'optimize_images',
       requires: true
     },
     {
-      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`,
+      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`.trim(),
       value: 'redirect_http_to_https',
       requires: true
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`,
+      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'rewrite_request',
       requires: true
     },
-    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true },
+    { label: `Run Function ${showLabelEdgeFunction.value}`.trim(), value: 'run_function', requires: true },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
     { label: 'Set Origin', value: 'set_origin', requires: false }
   ])
 
   const behaviorsResponseOptions = ref([
     {
-      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'set_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'filter_response_cookie',
       requires: true
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true }
+    { label: `Run Function ${showLabelEdgeFunction.value}`.trim(), value: 'run_function', requires: true }
   ])
 
   const behaviorsDefaultOptions = ref([
@@ -885,6 +885,7 @@
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
               <FieldDropdown
+                :filter="true"
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].target`"
                 :options="functionsInstanceOptions"
