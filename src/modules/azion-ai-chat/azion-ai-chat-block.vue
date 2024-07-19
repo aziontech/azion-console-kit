@@ -243,9 +243,7 @@
         #chat-view{
           font-size:16px;
         }
-        #chat-view #messages{
-          overscroll-behavior:none;
-        }
+        
         #messages p{
           tab-size: 4;
           font-feature-settings: normal;
