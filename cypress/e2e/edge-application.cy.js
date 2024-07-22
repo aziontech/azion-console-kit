@@ -421,7 +421,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     })
   })
 
-  it.only('should instantiate a function in a rules engine', () => {
+  it('should instantiate a function in a rules engine', () => {
     cy.intercept('/api/v3/edge_applications/*/functions_instances*').as('loadFunctionInstance')
     createFunctionCase()
     cy.openProduct('Edge Application')
