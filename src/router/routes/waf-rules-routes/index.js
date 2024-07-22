@@ -60,6 +60,7 @@ export const wafRulesRoutes = {
           optionsRuleIds: WafRulesService.optionsRuleIds
         },
         wafServices: {
+          updatedRedirect: 'list-waf-rules',
           editWafRulesService: WafRulesService.editWafRulesService,
           loadWafRulesService: WafRulesService.loadWafRulesService
         },
