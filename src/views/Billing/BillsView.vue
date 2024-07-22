@@ -128,12 +128,13 @@
     v-if="hasContentToList"
     ref="listPaymentHistoryRef"
     isTabs
-    :enableEditClick="false"
+    :enableEditClick="true"
     :columns="paymentsColumns"
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
+    :hasInvoiceUrl="true"
   />
   <EmptyResultsBlock
     v-else
