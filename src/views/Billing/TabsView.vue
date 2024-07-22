@@ -155,6 +155,7 @@
           <PaymentListView
             v-if="isPaymentTabActive"
             ref="listPaymentMethodsRef"
+            @update-credit-event="loadCardDefault"
             v-bind="props.paymentServices"
           />
         </TabPanel>
