@@ -260,6 +260,7 @@
           <ButtonPrimer
             outlined
             icon="pi pi-plus-circle"
+            v-if="headers.length < 5"
             iconPos="left"
             label="Header"
             size="small"
