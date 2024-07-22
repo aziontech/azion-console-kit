@@ -3,12 +3,18 @@ import selectors from '../support/selectors'
 
 let functionName = ''
 
-describe('Functions spec', { tags: ['@dev'] }, () => {
+describe('Edge Functions spec', { tags: ['@dev'] }, () => {
   beforeEach(() => {
     cy.login()
     functionName = generateUniqueName('Function')
     cy.openProduct('Edge Functions')
   })
+  afterEach(() => {
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Edge function successfully deleted')
+    })
+  })
+
   it('Create a function', function () {
     // Act
     cy.get(selectors.functions.createButton).click()
@@ -24,11 +30,5 @@ describe('Functions spec', { tags: ['@dev'] }, () => {
     cy.get(selectors.functions.nameRow).should('have.text', functionName)
     cy.get(selectors.functions.languageRow).should('have.text', 'JavaScript')
     cy.get(selectors.functions.initiatorTypeRow).should('have.text', 'edge_application')
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge function successfully deleted')
-    })
   })
 })

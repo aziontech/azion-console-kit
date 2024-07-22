@@ -153,7 +153,11 @@
       value: 'rewrite_request',
       requires: true
     },
-    { label: `Run Function ${showLabelEdgeFunction.value}`.trim(), value: 'run_function', requires: true },
+    {
+      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      value: 'run_function',
+      requires: true
+    },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
     { label: 'Set Origin', value: 'set_origin', requires: false }
   ])
@@ -180,7 +184,11 @@
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: `Run Function ${showLabelEdgeFunction.value}`.trim(), value: 'run_function', requires: true }
+    {
+      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      value: 'run_function',
+      requires: true
+    }
   ])
 
   const behaviorsDefaultOptions = ref([

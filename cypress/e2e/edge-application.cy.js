@@ -56,6 +56,15 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
       cacheSettingName: generateUniqueName('cacheSetting')
     }
   })
+  afterEach(() => {
+    // Delete the edge application
+    cy.deleteEntityFromList({
+      entityName: fixtures.edgeApplicationName,
+      productName: 'Edge Application'
+    }).then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
+  })
 
   it('should create a rule engine', () => {
     // Arrange
@@ -82,7 +91,7 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule engine successfully deleted')
+      cy.verifyToast('Rule Engine successfully deleted')
     })
   })
 
@@ -487,16 +496,6 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Rule Engine successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
     })
   })
 })
