@@ -140,7 +140,9 @@
     title="No payment activity has been recorded"
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
+    createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
+    @click-to-create="drawersMethods.openDrawerAddCredit"
   >
     <template #illustration>
       <Illustration />
