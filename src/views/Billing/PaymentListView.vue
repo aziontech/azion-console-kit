@@ -84,6 +84,7 @@
     {
       field: 'cardData',
       header: 'Card Number',
+      sortField: 'cardNumberSearch',
       filterPath: 'cardNumberSearch',
       type: 'component',
       component: (columnData) =>

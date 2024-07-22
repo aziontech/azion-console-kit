@@ -59,7 +59,7 @@ const adapt = (httpResponse) => {
       },
       expiringDateByOrder: convertStringToDate(cardDate),
       expiringDateSearch: cardDate,
-      cardNumberSearch: card.card_last_4_digits,
+      cardNumberSearch: `${typeCard} ${card.card_last_4_digits} ${statusCard}`,
       isDefault: card.is_default
     }
   })
