@@ -71,7 +71,7 @@
       query
     })
   }
-  TABS_MAP.bills
+  
   const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
   const isBillsTabActive = computed(() => activeTab.value === TABS_MAP.bills)
 
