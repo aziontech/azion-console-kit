@@ -262,7 +262,12 @@
 
   defineOptions({ name: 'list-table-block-new' })
 
-  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
+  const emit = defineEmits([
+    'on-load-data',
+    'on-before-go-to-add-page',
+    'on-before-go-to-edit',
+    'event-go-to-edit'
+  ])
 
   const props = defineProps({
     columns: {
@@ -309,9 +314,6 @@
     isTabs: {
       type: Boolean,
       default: false
-    },
-    hasInvoiceUrl: {
-      type: Boolean
     }
   })
 
@@ -427,36 +429,12 @@
 
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit')
-
+    emit('event-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
-      return
+    } else if (props.enableEditClick) {
+      router.push({ path: `${props.editPagePath}/${item.id}` })
     }
-
-    if (props.enableEditClick) {
-      handleEditNavigation(item)
-    }
-  }
-
-  const handleEditNavigation = (item) => {
-    if (props.hasInvoiceUrl) {
-      if (item.invoiceUrl && item.invoiceNumber) {
-        navigateToInvoiceDetails(item)
-      }
-    } else {
-      navigateToEditPage(item)
-    }
-  }
-
-  const navigateToInvoiceDetails = (item) => {
-    const invoiceNumber = item.invoiceNumber.content
-    const routeParams = { billId: invoiceNumber }
-    router.push({ name: 'billing-invoice-details', params: routeParams })
-  }
-
-  const navigateToEditPage = (item) => {
-    const routePath = item.id ? `${props.editPagePath}/${item.id}` : props.editPagePath
-    router.push({ path: routePath })
   }
 
   const executeCommand = (rowData) => {
