@@ -9,7 +9,7 @@
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
   import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
 
-  import { ref, computed, provide, onMounted, watch } from 'vue'
+  import { ref, computed, provide, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
@@ -71,7 +71,7 @@
       query
     })
   }
-  
+
   const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
   const isBillsTabActive = computed(() => activeTab.value === TABS_MAP.bills)
 
@@ -99,12 +99,6 @@
   const successAddCredit = async () => {
     await viewBillsRef.value?.reloadList()
   }
-
-  watch(isBillsTabActive, (newValue) => {
-    if (newValue) {
-      loadCardDefault()
-    }
-  })
 
   onMounted(() => {
     renderTabCurrentRouter()
@@ -161,6 +155,7 @@
           <PaymentListView
             v-if="isPaymentTabActive"
             ref="listPaymentMethodsRef"
+            @update-credit-event="loadCardDefault"
             v-bind="props.paymentServices"
           />
         </TabPanel>
