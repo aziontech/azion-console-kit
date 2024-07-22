@@ -13,8 +13,8 @@ export default async function beforeEachRoute(to, __, next) {
   const helpCenterStore = useHelpCenterStore()
   const isPrivateRoute = !to.meta.isPublic
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
-  const isNotBillingRoute = !to.fullPath.includes(billingRoutes.name)
-  const shouldRedirectToBilling = accountStore.isReviewPaymentRequired && isNotBillingRoute
+
+  const isNotBillingRoute = !to.fullPath.includes(billingRoutes.meta.routeForBlock)
 
   helpCenterStore.close()
 
@@ -59,6 +59,8 @@ export default async function beforeEachRoute(to, __, next) {
       return next('/login')
     }
   }
+
+  const shouldRedirectToBilling = accountStore.isReviewPaymentRequired && isNotBillingRoute
 
   if (accountStore.hasActiveUserId && isPrivateRoute && shouldRedirectToBilling) {
     return next({

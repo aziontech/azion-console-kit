@@ -12,6 +12,7 @@
   import { ref, computed, provide, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
 
   const route = useRoute()
   const router = useRouter()
@@ -20,6 +21,7 @@
   const drawerPaymentMethodRef = ref(null)
   const listPaymentMethodsRef = ref(null)
   const viewBillsRef = ref(null)
+  const accountBlocked = useAccountStore().isReviewPaymentRequired
 
   provide('drawersMethods', {
     openDrawerPaymentMethod: () => {
@@ -137,7 +139,10 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Bills">
+        <TabPanel
+          header="Bills"
+          :disabled="accountBlocked"
+        >
           <BillsView
             v-if="isBillsTabActive"
             ref="viewBillsRef"
