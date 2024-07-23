@@ -21,6 +21,7 @@
       <template #addButton>
         <PrimeButton
           icon="pi pi-plus"
+          data-testid="functions-instance__create-button"
           label="Function Instance"
           @click="openCreateFunctionDrawer"
         />
@@ -37,6 +38,7 @@
   >
     <template #default>
       <PrimeButton
+        data-testid="functions-instance__create-button"
         class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"

@@ -160,6 +160,7 @@
         icon="pi pi-plus"
         :disabled="!isCardDefault"
         @click="drawersMethods.openDrawerAddCredit"
+        outlined
       >
       </PrimeButton>
       <PrimeButton
