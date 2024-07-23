@@ -260,6 +260,7 @@
           <ButtonPrimer
             outlined
             icon="pi pi-plus-circle"
+            v-if="hasLessThanFive"
             iconPos="left"
             label="Header"
             size="small"
@@ -1132,6 +1133,11 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const MAX_HEADER_COUNT = 5
+  const hasLessThanFive = computed(() => {
+    return headers.value.length < MAX_HEADER_COUNT
+  })
 
   const placeholderLineSeparator = computed(() => {
     const text = '"\\n"'
