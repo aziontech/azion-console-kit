@@ -918,8 +918,8 @@
         <FieldNumber
           label="Payload Max Size"
           name="maxSize"
-          :min="1000000"
-          :max="2147483647"
+          :min="MIN_PAYLOAD_SIZE_IN_BYTES"
+          :max="MAX_PAYLOAD_SIZE_IN_BYTES"
           :value="maxSize"
           description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
           placeholder="1000000"
@@ -987,6 +987,9 @@
   })
 
   const route = useRoute()
+
+  const MAX_PAYLOAD_SIZE_IN_BYTES = ref(2147483647)
+  const MIN_PAYLOAD_SIZE_IN_BYTES = ref(1000000)
 
   // Variables
   const listDataSources = ref([
@@ -1194,7 +1197,7 @@
         // standard
         endpointUrl: '',
         headers: [{ value: '', deleted: false }],
-        maxSize: 1000000,
+        maxSize: MIN_PAYLOAD_SIZE_IN_BYTES.value,
         lineSeparator: '\\n',
         payloadFormat: '$dataset',
 
@@ -1271,7 +1274,7 @@
   const setDefaultValuesWhenChangeTheEndpointInEdit = (isFirstRender) => {
     if (route.name === 'edit-data-stream' && !isFirstRender) {
       if (endpoint.value === 'standard') {
-        maxSize.value = 1000000
+        maxSize.value = MIN_PAYLOAD_SIZE_IN_BYTES.value
         lineSeparator.value = '\\n'
         payloadFormat.value = '$dataset'
         headers.value = [{ value: '', deleted: false }]
