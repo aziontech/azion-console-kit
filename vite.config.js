@@ -8,7 +8,7 @@ import istanbul from 'vite-plugin-istanbul'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
-  const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-'
+  const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
 
   return {
     plugins: [

@@ -23,7 +23,14 @@ export default {
     criteriaConditionalButton: (type) =>
       `[data-testid="rule-form-criteria-item-conditional-add-button"] button[aria-label="${type}"]`,
     criteriaAddButton: '[data-testid="rule-form-criteria-add-button"]',
-    behaviorsAddButton: '[data-testid="rule-form-behaviors-add-button"]'
+    behaviorsAddButton: '[data-testid="rule-form-behaviors-add-button"]',
+    behaviorFunctionInstanceFilterInput:
+      '[data-testid="edge-application-rule-form__function-instance-item[0]__filter-input"]',
+    behaviorFunctionValue:
+      '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown"] > .p-dropdown-label',
+    firstBehaviorValueOption: '#behaviors\\[0\\]\\.target_0',
+    dropdownLoadingIcon:
+      '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',
@@ -57,5 +64,15 @@ export default {
       `[data-testid="edge-application-cache-settings-form__cache-by-query-string-field__radio"][name="cacheByQueryString-radio-${position}"]`,
     cacheByCookieRadio: (position) =>
       `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio"][name="cacheByCookies-radio-${position}"]`
+  },
+  functionsInstance: {
+    dropdownFilter: '.p-dropdown-filter',
+    firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
+    createButton: '[data-testid="functions-instance__create-button"]',
+    edgeFunctionsDropdown:
+      '[data-testid="edge-application-function-instance-form__edge-function__dropdown"]',
+    nameInput: '[data-testid="edge-application-function-instance-form__name-field__input"]',
+    firstFilteredNameRow: '[data-testid="list-table-block__column__name__row"] > p',
+    firstFilteredEdgeFunctionRow: '[data-testid="list-table-block__column__functionInstanced__row"]'
   }
 }

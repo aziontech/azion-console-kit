@@ -7,7 +7,6 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -18,6 +17,7 @@
     wafServices: { type: Object, required: true },
     wafRulesAllowed: { type: Object, required: true },
     wafTuning: { type: Object, required: true }
+    
   })
 
   const mapTabs = ref({
@@ -132,6 +132,7 @@
         >
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
+            :updatedRedirect="props.wafServices.updatedRedirect"
             :editWafRulesService="props.wafServices.editWafRulesService"
             :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
