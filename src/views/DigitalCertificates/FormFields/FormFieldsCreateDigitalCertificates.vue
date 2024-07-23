@@ -104,6 +104,7 @@
           nameField="certificateType"
           :isCard="true"
           :options="certificateTypeRadioOptions"
+          data-testid="digital-certificate-create-form__certificate-type"
         />
       </div>
     </template>

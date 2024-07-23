@@ -93,6 +93,23 @@
             sourceList: { class: ['h-80'] },
             targetList: { class: ['h-80'] }
           }"
+          :move-all-to-source-props="{
+            'data-testid':
+              'teams-permissions-form__permissions-field__picklist__move-all-to-source-btn'
+          }"
+          :move-all-to-target-props="{
+            'data-testid':
+              'teams-permissions-form__permissions-field__picklist__move-all-to-target-btn'
+          }"
+          :move-to-target-props="{
+            'data-testid': 'teams-permissions-form__permissions-field__picklist__move-to-target-btn'
+          }"
+          :move-to-source-props="{
+            'data-testid': 'teams-permissions-form__permissions-field__picklist__move-to-source-btn'
+          }"
+          source-selection="multiple"
+          target-selection="single"
+          listStyle="height: 400px"
           name="permissions"
           dataKey="id"
           breakpoint="1400px"

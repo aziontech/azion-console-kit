@@ -25,7 +25,7 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.digitalCertificates.breadcumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
-    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', digitalCertificateName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', digitalCertificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 
