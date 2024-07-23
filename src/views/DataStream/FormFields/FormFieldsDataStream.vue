@@ -918,6 +918,8 @@
         <FieldNumber
           label="Payload Max Size"
           name="maxSize"
+          :min="1000000"
+          :max="2147483647"
           :value="maxSize"
           description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
           placeholder="1000000"
