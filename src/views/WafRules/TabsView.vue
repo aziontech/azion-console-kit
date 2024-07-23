@@ -16,7 +16,7 @@
   const props = defineProps({
     wafServices: { type: Object, required: true },
     wafRulesAllowed: { type: Object, required: true },
-    wafTuning: { type: Object, required: true },
+    wafTuning: { type: Object, required: true }
     
   })
 
