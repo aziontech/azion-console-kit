@@ -147,7 +147,11 @@
     class="w-full"
     :pt="{
       filterInput: {
-        class: 'w-full'
+        class: 'w-full',
+        'data-testid': `${customTestId.dropdown}__filter`
+      },
+      trigger: {
+        'data-testid': `${customTestId.dropdown}__trigger`
       }
     }"
     :data-testid="customTestId.dropdown"

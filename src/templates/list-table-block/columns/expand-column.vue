@@ -10,6 +10,7 @@
       v-if="displayShowMore"
       @click.stop="toggleShowAll"
       class="underline cursor-pointer"
+      data-testid="table-column-expand-column__show-more__toggle"
     >
       {{ displayRemainingItems }}
     </li>
