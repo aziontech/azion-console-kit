@@ -90,22 +90,28 @@
           data-testid="teams-permissions-form__permissions-field__picklist"
           v-model="permissionsList"
           :pt="{
-            sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] }
+            sourceList: {
+              class: ['h-80'],
+              'data-testid': 'teams-permissions-form__permissions-field-picklist__source-list'
+            },
+            targetList: {
+              class: ['h-80'],
+              'data-testid': 'teams-permissions-form__permissions-field-picklist__target-list'
+            }
           }"
           :move-all-to-source-props="{
             'data-testid':
-              'teams-permissions-form__permissions-field__picklist__move-all-to-source-btn'
+              'teams-permissions-form__permissions-field-picklist__move-all-to-source-btn'
           }"
           :move-all-to-target-props="{
             'data-testid':
-              'teams-permissions-form__permissions-field__picklist__move-all-to-target-btn'
+              'teams-permissions-form__permissions-field-picklist__move-all-to-target-btn'
           }"
           :move-to-target-props="{
-            'data-testid': 'teams-permissions-form__permissions-field__picklist__move-to-target-btn'
+            'data-testid': 'teams-permissions-form__permissions-field-picklist__move-to-target-btn'
           }"
           :move-to-source-props="{
-            'data-testid': 'teams-permissions-form__permissions-field__picklist__move-to-source-btn'
+            'data-testid': 'teams-permissions-form__permissions-field-picklist__move-to-source-btn'
           }"
           source-selection="multiple"
           target-selection="single"
