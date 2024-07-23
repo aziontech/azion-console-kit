@@ -71,20 +71,14 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Plan Start Date</span>
-          <span
-            class="font-medium text-color text-sm"
-            v-if="props.cardDefault"
-          >
-            {{ yourServicePlan.paymentDate }}</span
-          >
-          <span v-else>---</span>
+          <span class="font-medium text-color text-sm"> {{ yourServicePlan.paymentDate }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Method</span>
           <span class="font-medium text-color text-sm">
             <span
-              class="flex gap-2 items-center"
               v-if="props.cardDefault"
+              class="flex gap-2 items-center"
             >
               <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
               {{ cardDefault.cardData.cardNumber }}
@@ -100,11 +94,10 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Balance</span>
-          <span v-if="props.cardDefault">
+          <span>
             <span class="text-color-secondary text-sm">$</span>
             {{ yourServicePlan.creditBalance }}
           </span>
-          <span v-else>---</span>
         </div>
       </div>
 
@@ -149,20 +142,11 @@
     :inTabs="true"
     createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
+    @click-to-create="drawersMethods.openDrawerAddCredit"
+    :disabledButton="!isCardDefault"
+    :addOutlinedStyleButton="true"
   >
-    <template #illustration>
-      <Illustration />
-    </template>
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        label="Add Credit"
-        icon="pi pi-plus"
-        :disabled="!isCardDefault"
-        @click="drawersMethods.openDrawerAddCredit"
-        outlined
-      >
-      </PrimeButton>
+    <template #extraActionsRight>
       <PrimeButton
         class="max-md:w-full w-fit"
         severity="secondary"
@@ -176,7 +160,6 @@
 
 <script setup>
   import { useRouter } from 'vue-router'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'

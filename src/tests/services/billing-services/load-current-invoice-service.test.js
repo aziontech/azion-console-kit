@@ -55,6 +55,18 @@ describe('BillingServices', () => {
     expect(result).toEqual(fixtures.formattedResponse)
   })
 
+  it('should return empty object when has no data as result', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { billDetail: [] }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual({})
+  })
+
   it.each([
     {
       statusCode: 403,

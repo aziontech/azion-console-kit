@@ -51,13 +51,26 @@ const adapt = (httpResponse, disclaimer) => {
     statusCode
   } = httpResponse
 
-  const payments = data?.payments || []
+  const payments = data?.payments.length
+    ? data?.payments
+    : [
+        {
+          paymentDate: '---',
+          amount: '---',
+          currency: '---'
+        }
+      ]
 
   const [yourServicePlan] = payments
 
+  const paymentDate =
+    yourServicePlan.paymentDate !== '---'
+      ? formatDateToUSBilling(yourServicePlan.paymentDate)
+      : yourServicePlan.paymentDate
+
   const parseYourServicePlan = yourServicePlan
     ? {
-        paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
+        paymentDate,
         amount: yourServicePlan.amount,
         currency: yourServicePlan.currency,
         creditBalance: extractPriceFromString(disclaimer)
