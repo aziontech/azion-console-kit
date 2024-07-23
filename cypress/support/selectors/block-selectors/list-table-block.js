@@ -1,5 +1,4 @@
 export default {
-  breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
   createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
   searchInput: '[data-testid="data-table-search-input"]',
   searchField: '[data-testid="data-table-search-input"]',

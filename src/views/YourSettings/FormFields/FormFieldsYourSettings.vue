@@ -219,7 +219,8 @@
               v-model="selectedCountryCallCode"
               :pt="{
                 filterInput: {
-                  class: 'w-full'
+                  class: 'w-full',
+                  'data-testid': 'your-settings-form__country-code-filter__input'
                 }
               }"
             >

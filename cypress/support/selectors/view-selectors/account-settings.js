@@ -4,7 +4,6 @@ export default {
   companyId: '[data-testid="account-settings__company-id__input"]',
   billingEmails: '[data-testid="account-settings__billing-emails__textarea"]',
   postalCode: '[data-testid="account-settings__postal-code__input"]',
-  dropdownFilter: '.p-dropdown-filter',
   country: '[data-testid="account-settings__country__dropdown"]',
   countryDropdown: '[data-testid="account-settings__country__dropdown"] > .p-dropdown-trigger',
   countryOption: (optionIdx) => `#country_${optionIdx}`,
