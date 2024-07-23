@@ -71,7 +71,13 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Plan Start Date</span>
-          <span class="font-medium text-color text-sm"> {{ yourServicePlan.paymentDate }}</span>
+          <span
+            class="font-medium text-color text-sm"
+            v-if="props.cardDefault"
+          >
+            {{ yourServicePlan.paymentDate }}</span
+          >
+          <span v-else>---</span>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Method</span>
@@ -94,10 +100,11 @@
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Balance</span>
-          <span
-            ><span class="text-color-secondary text-sm">$</span>
-            {{ yourServicePlan.creditBalance }}</span
-          >
+          <span v-if="props.cardDefault">
+            <span class="text-color-secondary text-sm">$</span>
+            {{ yourServicePlan.creditBalance }}
+          </span>
+          <span v-else>---</span>
         </div>
       </div>
 
@@ -142,10 +149,26 @@
     :inTabs="true"
     createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
-    @click-to-create="drawersMethods.openDrawerAddCredit"
   >
     <template #illustration>
       <Illustration />
+    </template>
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        label="Add Credit"
+        icon="pi pi-plus"
+        :disabled="!isCardDefault"
+        @click="drawersMethods.openDrawerAddCredit"
+      >
+      </PrimeButton>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Add Payment Method"
+        @click="goToPayment"
+      />
     </template>
   </EmptyResultsBlock>
 </template>
@@ -207,6 +230,7 @@
     }
   })
   const isCardDefault = computed(() => !!props.cardDefault)
+
   const currentInvoice = ref({})
   const listPaymentHistoryRef = ref('')
 

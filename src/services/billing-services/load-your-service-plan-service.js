@@ -46,6 +46,12 @@ function extractPriceFromString(sentence) {
 }
 
 const adapt = (httpResponse, disclaimer) => {
+  if (!httpResponse.body.data.payments.length) {
+    return {
+      body: {},
+      statusCode: httpResponse.statusCode
+    }
+  }
   const [yourServicePlan] = httpResponse.body.data.payments
 
   const parseYourServicePlan = {

@@ -61,7 +61,7 @@ const adapt = (httpResponse) => {
     }
   })
   return {
-    body: parseInvoice?.length > 0 ? parseInvoice[0] : null,
+    body: parseInvoice?.length > 0 ? parseInvoice[0] : {},
     statusCode: httpResponse.statusCode
   }
 }
