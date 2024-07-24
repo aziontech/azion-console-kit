@@ -53,17 +53,17 @@ export default {
       '[data-testid="edge-application-cache-settings-list__create-cache-settings__button"]',
     nameInput: '[data-testid="edge-application-cache-settings-form__name-field__input"]',
     browserCacheSettingsRadio: (position) =>
-      `[data-testid="edge-application-cache-settings-form__browser-cache-settings-field__radio"][name="browserCacheSettings-radio-${position}"]`,
+      `[data-testid="edge-application-cache-settings-form__browser-cache-settings-field__radio__browserCacheSettings-radio-${position}"]`,
     cdnCacheSettingsRadio: (position) =>
-      `[data-testid="edge-application-cache-settings-form__cdn-cache-settings-field__radio"][name="cdnCacheSettings-radio-${position}"]`,
+      `[data-testid="edge-application-cache-settings-form__cdn-cache-settings-field__radio__cdnCacheSettings-radio-${position}"]`,
     browserCacheSettingsMaxTtlInput:
       '[data-testid="edge-application-cache-settings-form__browser-cache-settings-maximum-ttl-field__input"]',
     cdnCacheSettingsMaxTtlInput:
       '[data-testid="edge-application-cache-settings-form__cdn-cache-settings-maximum-ttl-field__input"]',
     cacheByQueryStringRadio: (position) =>
-      `[data-testid="edge-application-cache-settings-form__cache-by-query-string-field__radio"][name="cacheByQueryString-radio-${position}"]`,
+      `[data-testid="edge-application-cache-settings-form__cache-by-query-string-field__radio__cacheByQueryString-radio-${position}"]`,
     cacheByCookieRadio: (position) =>
-      `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio"][name="cacheByCookies-radio-${position}"]`
+      `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio__cacheByCookies-radio-${position}"]`
   },
   functionsInstance: {
     dropdownFilter:
