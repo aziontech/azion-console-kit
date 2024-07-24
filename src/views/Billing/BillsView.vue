@@ -19,7 +19,7 @@
           <SkeletonBlock
             width="10rem"
             :isLoaded="isCurrentInvoiceLoaded"
-            wrapperClass="font-medium text-color text-sm"
+            class="font-medium text-color text-sm"
           >
             {{ currentInvoice.billingPeriod }}
           </SkeletonBlock>
@@ -28,7 +28,7 @@
           <span class="text-color-secondary text-sm">Product Charges</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
-            wrapperClass="text-color text-sm"
+            class="text-color text-sm"
           >
             {{ currentInvoice.productChanges }}
           </SkeletonBlock>
@@ -37,7 +37,7 @@
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
-            wrapperClass="text-color text-sm"
+            class="text-color text-sm"
           >
             {{ currentInvoice.servicePlan }}
           </SkeletonBlock>
@@ -49,7 +49,7 @@
           <span class="text-color-secondary text-sm">Credit Used for Payment</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
-            wrapperClass="text-color"
+            class="text-color"
           >
             <span class="text-color-secondary text-sm">$</span>
             {{ currentInvoice.creditUsedForPayment }}
@@ -64,7 +64,7 @@
             sizeHeight="medium"
             width="6rem"
             :isLoaded="isCurrentInvoiceLoaded"
-            wrapperClass="font-medium text-2xl"
+            class="font-medium text-2xl"
           >
             <span class="text-color text-sm font-medium">$</span>
             {{ currentInvoice.total }}
@@ -90,7 +90,7 @@
           sizeHeight="large"
           width="12rem"
           :isLoaded="!!servicePlan"
-          wrapperClass="flex items-center gap-4 mb-2"
+          class="flex items-center gap-4 mb-2"
         >
           <span class="font-medium text-3xl text-color">{{ servicePlan }} </span>
           <Tag
@@ -103,8 +103,8 @@
           <span class="text-color-secondary text-sm">Plan Start Date</span>
           <SkeletonBlock
             :isLoaded="isYourServicePlanLoaded"
-            wrapperClass="font-medium text-color text-sm"
-            element="span"
+            class="font-medium text-color text-sm"
+            elementType="span"
           >
             {{ yourServicePlan.paymentDate }}
           </SkeletonBlock>
@@ -112,15 +112,15 @@
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Method</span>
           <SkeletonBlock
-            wrapperClass="font-medium text-color text-sm"
+            class="font-medium text-color text-sm"
             width="8rem"
             sizeHeight="small"
-            :isLoaded="!!props.cardDefault"
-            element="span"
+            :isLoaded="defaultCardStatus.loaded"
+            elementType="span"
           >
             <span
               class="flex gap-2 items-center"
-              v-if="props.cardDefault"
+              v-if="defaultCardStatus.hasData"
             >
               <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
               {{ cardDefault.cardData.cardNumber }}
@@ -133,8 +133,8 @@
           <span class="text-color-secondary text-sm">Payment Currency</span>
           <SkeletonBlock
             :isLoaded="isYourServicePlanLoaded"
-            wrapperClass="font-medium text-color text-sm"
-            element="span"
+            class="font-medium text-color text-sm"
+            elementType="span"
           >
             {{ yourServicePlan.currency }} (<span class="text-color-secondary text-sm">$</span>)
           </SkeletonBlock>
@@ -144,8 +144,8 @@
           <span class="text-color-secondary text-sm">Credit Balance</span>
           <SkeletonBlock
             :isLoaded="isYourServicePlanLoaded"
-            wrapperClass="font-medium text-color text-sm"
-            element="span"
+            class="font-medium text-color text-sm"
+            elementType="span"
           >
             <span class="text-color-secondary text-sm">$</span>
             {{ yourServicePlan.creditBalance }}
@@ -159,8 +159,9 @@
           <span
             @click="goToPayment"
             class="text-[var(--text-color-link)] cursor-pointer"
-            >payment method.</span
           >
+            payment method.
+          </span>
         </p>
       </div>
     </div>
@@ -171,7 +172,7 @@
     :clickAddCredit="drawersMethods.openDrawerAddCredit"
     :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
     :clickLinkPaymentMethod="goToPayment"
-    :showBtnAddCredit="isCardDefault"
+    :showBtnAddCredit="defaultCardStatus.hasData"
   />
 
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
@@ -259,8 +260,13 @@
       type: Object
     }
   })
-  const isCardDefault = computed(() => !!props.cardDefault)
+
   const currentInvoice = ref({})
+
+  const defaultCardStatus = computed(() => ({
+    loaded: props.cardDefault.loader,
+    hasData: props.cardDefault.cardData
+  }))
 
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
