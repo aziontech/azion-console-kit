@@ -75,8 +75,8 @@
   })
 
   const radioTestId = (name, nameField, index) => {
-    const rest = name ?? `${nameField}-radio-${index}`
-    return `${customTestId.value.radio}__${rest}`
+    const remainder = name ?? `${nameField}-radio-${index}`
+    return `${customTestId.value.radio}__${remainder}`
   }
 </script>
 
