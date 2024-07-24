@@ -25,7 +25,7 @@ export default {
     criteriaAddButton: '[data-testid="rule-form-criteria-add-button"]',
     behaviorsAddButton: '[data-testid="rule-form-behaviors-add-button"]',
     behaviorFunctionInstanceFilterInput:
-      '[data-testid="edge-application-rule-form__function-instance-item[0]__filter-input"]',
+      '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown-filter-input"]',
     behaviorFunctionValue:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown"] > .p-dropdown-label',
     firstBehaviorValueOption: '#behaviors\\[0\\]\\.target_0',
