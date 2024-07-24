@@ -3,41 +3,73 @@ import selectors from '../support/selectors'
 
 let fixtures = {}
 
+/**
+ * Creates a new edge function.
+ */
+const createFunctionCase = () => {
+  cy.openProduct('Edge Functions')
+
+  // Act
+  cy.get(selectors.functions.createButton).click()
+  cy.get(selectors.functions.nameInput).clear()
+  cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
+  cy.get(selectors.functions.saveButton).click()
+  cy.verifyToast('success', 'Your edge function has been created')
+}
+
+/**
+ * Creates a new edge application with basic settings.
+ */
+const createEdgeApplicationCase = () => {
+  // Act
+  cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.get(selectors.form.actionsSubmitButton).click()
+  cy.verifyToast('success', 'Your edge application has been created')
+  cy.get(selectors.form.actionsCancelButton).click()
+
+  // Assert - Verify the edge application was created
+  cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
+  cy.get(selectors.list.filteredRow.column('name')).should(
+    'have.text',
+    fixtures.edgeApplicationName
+  )
+
+  // Act - Navigate to the created edge application
+  cy.get(selectors.list.filteredRow.column('name')).click()
+}
+
 describe('Edge Application', { tags: ['@dev'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
     cy.login()
-    cy.openProduct('Edge Application')
 
     fixtures = {
+      functionName: generateUniqueName('EdgeFunction'),
+      functionInstanceName: generateUniqueName('FunctionsInstance'),
       edgeApplicationName: generateUniqueName('EdgeApp'),
       originName: generateUniqueName('origin'),
       rulesEngineName: generateUniqueName('RulesEng'),
       cacheSettingName: generateUniqueName('cacheSetting')
     }
   })
+  afterEach(() => {
+    // Delete the edge application
+    cy.deleteEntityFromList({
+      entityName: fixtures.edgeApplicationName,
+      productName: 'Edge Application'
+    }).then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
+  })
 
   it('should create a rule engine', () => {
     // Arrange
-    // Create an edge application
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
-    // Verify the edge application was created
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.list.filteredRow.column('name')).should(
-      'have.text',
-      fixtures.edgeApplicationName
-    )
-
-    // Navigate to Rules Engine Tab
-    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
     cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
 
     // Act
@@ -56,31 +88,18 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     // Assert
     cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
+
+    // Cleanup - Remove the rule engine
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Rule Engine successfully deleted')
+    })
   })
 
   it('should add an origin', () => {
     //edge application creation
-    //arrange
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
 
-    //act
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
-    //assert
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.list.filteredRow.column('name')).should(
-      'have.text',
-      fixtures.edgeApplicationName
-    )
-
-    //add origin
-    //arrange
-    cy.get(selectors.list.filteredRow.column('name')).click()
     cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()
 
@@ -106,27 +125,10 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
 
   it('should edit an origin', () => {
     //edge application creation
-    //arrange
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-
-    //act
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
-    //assert
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.list.filteredRow.column('name')).should(
-      'have.text',
-      fixtures.edgeApplicationName
-    )
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
 
     //add origin
-    //arrange
-    cy.get(selectors.list.filteredRow.column('name')).click()
     cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()
 
@@ -167,28 +169,9 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
   })
 
   it('should add an error response', () => {
-    //edge application creation
     //arrange
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-
-    //act
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
-    //assert
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.list.filteredRow.column('name')).should(
-      'have.text',
-      fixtures.edgeApplicationName
-    )
-
-    //add error response
-    //arrange
-    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
     cy.get(selectors.edgeApplication.tabs('Error Responses')).click()
 
     //act
@@ -219,16 +202,8 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
   it('should edit a cache setting', () => {
     // Arrange
     cy.intercept('GET', '/api/v3/edge_applications/*/cache_settings/*').as('loadCacheSetting')
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
-    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
 
     // Act
     // Create a cache setting
@@ -278,12 +253,8 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
   it('should edit a rule engine', () => {
     // Arrange
     // Create an edge application
-    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
-    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
-    cy.get(selectors.form.actionsSubmitButton).click()
-
-    cy.verifyToast('success', 'Your edge application has been created')
+    cy.openProduct('Edge Application')
+    createEdgeApplicationCase()
 
     cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAccelerator')).click()
     cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('deviceDetection')).click()
@@ -357,13 +328,174 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     cy.verifyToast('success', 'Your Rules Engine has been edited')
   })
 
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
+  it('should create a function instance', () => {
+    createFunctionCase()
+    cy.openProduct('Edge Application')
+
+    // Act - Create an edge application
+    createEdgeApplicationCase()
+
+    // Act - create a function instance
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
+    cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
+    cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Your Function has been created')
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(fixtures.functionInstanceName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
+      'have.text',
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredEdgeFunctionRow).should(
+      'have.text',
+      fixtures.functionName
+    )
+
+    // Cleanup - Remove the instance
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Function successfully deleted')
+    })
+  })
+
+  it('should edit a function instance', () => {
+    createFunctionCase()
+    cy.openProduct('Edge Application')
+
+    createEdgeApplicationCase()
+
+    // Act - create a function instance
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
+    cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
+    cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert - Verify the instance was created
+    cy.verifyToast('success', 'Your Function has been created')
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(fixtures.functionInstanceName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
+      'have.text',
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredEdgeFunctionRow).should(
+      'have.text',
+      fixtures.functionName
+    )
+
+    // Act - Edit the instance
+    const editedFunctionInstanceName = `${fixtures.functionInstanceName}-edit`
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).should(
+      'have.value',
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(editedFunctionInstanceName)
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert - Verify the instance was edited
+    cy.verifyToast('success', 'Your Function has been updated')
+    cy.get(selectors.form.goBackButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
+      'have.text',
+      editedFunctionInstanceName
+    )
+
+    // Cleanup - Remove the instance
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Function successfully deleted')
+    })
+  })
+
+  it('should instantiate a function in a rules engine', () => {
+    cy.intercept('/api/v3/edge_applications/*/functions_instances*').as('loadFunctionInstance')
+    createFunctionCase()
+    cy.openProduct('Edge Application')
+
+    createEdgeApplicationCase()
+
+    // Act - create a function instance
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
+    cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
+    cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
+    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert - Verify the instance was created
+    cy.verifyToast('success', 'Your Function has been created')
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type(fixtures.functionInstanceName)
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
+      'have.text',
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredEdgeFunctionRow).should(
+      'have.text',
+      fixtures.functionName
+    )
+
+    // Act - Create a rule engine
+    cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
+    cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
+
+    // Act - Select the function instance
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Run Function')).click()
+    cy.wait('@loadFunctionInstance')
+    cy.get(selectors.edgeApplication.rulesEngine.dropdownLoadingIcon).should('not.exist')
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorFunctionValue).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorFunctionInstanceFilterInput).clear()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorFunctionInstanceFilterInput).type(
+      fixtures.functionInstanceName
+    )
+    cy.get(selectors.edgeApplication.rulesEngine.firstBehaviorValueOption).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert - Rules engine was created
+    cy.verifyToast('success', 'Your Rules Engine has been created.')
+    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
+
+    // Cleanup - Remove the rule engine
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Rule Engine successfully deleted')
     })
   })
 })

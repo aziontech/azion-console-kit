@@ -35,7 +35,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
-    @click="openDrawerCreatePaymentMethod"
+    @click-to-create="drawersMethods.openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -53,7 +53,7 @@
   import { useToast } from 'primevue/usetoast'
 
   import { ref, inject } from 'vue'
-
+  const emit = defineEmits(['update-credit-event'])
   const hasContentToList = ref(true)
   const toast = useToast()
 
@@ -84,6 +84,7 @@
     {
       field: 'cardData',
       header: 'Card Number',
+      sortField: 'cardNumberSearch',
       filterPath: 'cardNumberSearch',
       type: 'component',
       component: (columnData) =>
@@ -125,6 +126,7 @@
     try {
       const feedback = await props.setAsDefaultPaymentService(payment.id)
       showToast('success', feedback)
+      emit('update-credit-event')
       reloadList()
     } catch (error) {
       showToast('error', error)

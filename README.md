@@ -58,7 +58,7 @@ By default, Azion Console Kit uses the **STAGE** stack to connect with Azion API
 To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
 
 ```bash
-VITE_ENVIRONMENT='PRODUCTION'
+export VITE_ENVIRONMENT='production'
 ```
 
 ## Running on the Edge 🚀

@@ -182,7 +182,7 @@
                     data-testid="payment-methods-form__card-holder-name__input"
                     v-model="cardholderName"
                     class="p-component p-inputtext"
-                    placeholder="Jhon Doe"
+                    placeholder="John Doe"
                   />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
