@@ -28,27 +28,7 @@ jobs:
           STAGE_CYPRESS_EMAIL: ${{ secrets.STAGE_CYPRESS_EMAIL }}
           STAGE_CYPRESS_PASSWORD: ${{ secrets.STAGE_CYPRESS_PASSWORD }}
         with:
-          browser: chrome
-          config-file: cypress.config.stage.js
-          env: environment=stage,grepTags=-@xfail
-
-      - name: Check E2E Test Coverage
-        if: ${{ always() }}
-        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-
-      - name: Compress E2E Coverage Reports
-        if: ${{ always() }}
-        run: |
-          rm -rf coverage/e2e/lcov-report
-          zip -r coverage.zip coverage
-
-      - name: Upload E2E Coverage Report Artifact
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_e2e_report
-          path: coverage.zip
-          retention-days: 7
+          command: yarn run test:e2e:run:stage
 
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}

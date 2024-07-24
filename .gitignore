@@ -43,3 +43,5 @@ cypress.env.*
 
 src/views/Playground/PlaygroundView.vue
 /cypress/downloads
+/runner-results
+multi-reporter-config.json
