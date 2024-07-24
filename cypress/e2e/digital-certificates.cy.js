@@ -22,7 +22,7 @@ describe('Digital Certificates spec', () => {
     // Assert
     cy.verifyToast('success', 'Your digital certificate has been created!')
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
-    cy.get(selectors.digitalCertificates.breadcumbReturnToList).click()
+    cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', digitalCertificateName)

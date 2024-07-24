@@ -6,7 +6,7 @@ export default {
   dropdownTrigger: (name) =>
     `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
   dropdownOptions: (name, position) => `#${name}_${position}`,
-  breadcumbToList: '[data-testid="page-heading-block__breadcrumb__WAF Rules"]',
+  breadcrumbToList: '[data-testid="page-heading-block__breadcrumb__WAF Rules"]',
   listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
   seeMore: (columnName) =>
     `[data-testid="list-table-block__column__${columnName}__row"] .underline`,

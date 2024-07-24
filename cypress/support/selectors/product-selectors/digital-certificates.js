@@ -1,7 +1,7 @@
 export default {
   createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
   digitalCertificateName: '[data-testid="digital-certificate__name-field__input"]',
-  breadcumbReturnToList: '[data-testid="page-heading-block__breadcrumb__Digital Certificates"]',
+  breadcrumbReturnToList: '[data-testid="page-heading-block__breadcrumb__Digital Certificates"]',
   importTrustedCARadioOption:
     '[data-testid="digital-certificate-create-form__certificate-type__radio__certificateType-radio-2"]',
   editPageTitle: '[data-testid="page_title_Edit Digital Certificate"]',
