@@ -24,7 +24,7 @@
       type: String,
       default: '3rem'
     },
-    tag: {
+    elementType: {
       type: String,
       default: 'div',
       validator: (value) => ['div', 'span'].includes(value)
@@ -48,7 +48,7 @@
   const height = mapSize[props.sizeHeight] || props.height
 
   const component = computed(() => {
-    return props.isLoaded ? props.tag : Skeleton
+    return props.isLoaded ? props.elementType : Skeleton
   })
 
   const skeletonProps = { width: props.width, height }
