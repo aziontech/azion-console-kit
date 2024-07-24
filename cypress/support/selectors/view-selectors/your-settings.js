@@ -2,7 +2,7 @@ export default {
   emailInput: '[data-testid="your-settings-form__email__input"]',
   emailError: '[data-testid="your-settings-form__email__error-message"]',
   mobileCountryCodeOptions: '[data-testid="your-settings-form__country-code__dropdown"]',
-  countryCodeFilter: '[data-testid="your-settings-form__country-code-filter__input"]',
+  countryCodeFilter: '[data-testid="your-settings-form__country-code__filter-input"]',
   countryCodeOption: (countryCode) => `#countryCallCode_${countryCode}`,
   mobileInput: '[data-testid="your-settings-form__mobile__input"]',
   mobileError: '[data-testid="your-settings-form__mobile__error-message"]',

@@ -220,7 +220,7 @@
               :pt="{
                 filterInput: {
                   class: 'w-full',
-                  'data-testid': 'your-settings-form__country-code-filter__input'
+                  'data-testid': 'your-settings-form__country-code__filter-input'
                 }
               }"
             >

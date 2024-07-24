@@ -38,7 +38,7 @@
       type: Function,
       required: true
     },
-    updatedRedirect: { type: String, required: true},
+    updatedRedirect: { type: String, required: true },
     waf: { type: Object },
     showActionBar: {
       type: Boolean,

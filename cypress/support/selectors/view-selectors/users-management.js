@@ -12,8 +12,8 @@ export default {
   timezoneDropdown: '[data-testid="users-form__timezone-field__dropdown"]',
   timezoneFilter: '[data-testid="users-form__timezone-field__dropdown"] .p-dropdown-filter',
   timezoneOption: (index) => `#timezone_${index}`,
-  teamDropdownTrigger: '[data-testid="users-form__teams-field__multiselect__trigger"]',
-  teamDropdownFilter: '[data-testid="users-form__teams-field__multiselect__filter"]',
+  teamDropdownTrigger: '[data-testid="users-form__teams-field__multiselect-trigger"]',
+  teamDropdownFilter: '[data-testid="users-form__teams-field__multiselect-filter"]',
   teamOption: (index) => `#teams_${index}`,
   selectedTeamTag: (optionNumber) =>
     `[data-testid="users-form__teams-field__multiselect"] :nth-child(${optionNumber})`,
