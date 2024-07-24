@@ -262,12 +262,7 @@
 
   defineOptions({ name: 'list-table-block-new' })
 
-  const emit = defineEmits([
-    'on-load-data',
-    'on-before-go-to-add-page',
-    'on-before-go-to-edit',
-    'event-go-to-edit'
-  ])
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
     columns: {
@@ -428,8 +423,7 @@
   }
 
   const editItemSelected = ({ data: item }) => {
-    emit('on-before-go-to-edit')
-    emit('event-go-to-edit', item)
+    emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
     } else if (props.enableEditClick) {

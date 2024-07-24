@@ -132,7 +132,7 @@
     :columns="paymentsColumns"
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
-    @event-go-to-edit="goToEnvoiceDetails"
+    @on-before-go-to-edit="goToEnvoiceDetails"
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
   />
