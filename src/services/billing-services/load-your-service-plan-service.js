@@ -60,14 +60,12 @@ const adapt = (httpResponse, disclaimer) => {
 
   const yourServicePlan = data?.payments[0] || defaultPayment
 
-  const parseYourServicePlan = yourServicePlan
-    ? {
-        paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
-        amount: yourServicePlan.amount,
-        currency: yourServicePlan.currency,
-        creditBalance: extractPriceFromString(disclaimer)
-      }
-    : null
+  const parseYourServicePlan = {
+    paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
+    amount: yourServicePlan.amount,
+    currency: yourServicePlan.currency,
+    creditBalance: extractPriceFromString(disclaimer)
+  }
 
   return {
     body: parseYourServicePlan,
