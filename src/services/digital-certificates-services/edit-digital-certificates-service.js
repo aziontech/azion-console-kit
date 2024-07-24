@@ -14,20 +14,35 @@ export const editDigitalCertificateService = async (payload) => {
 }
 
 /**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
+ * @param {Object} body - The response body.
  * @returns {string} The result message based on the status code.
  */
-const extractApiError = (httpResponse) => {
-  return httpResponse.body.error[0]
-}
+const extractApiError = (body) => {
+  let apiError = ''
+  const keys = Object.keys(body)
 
+  for (const keyError of keys) {
+    if (Array.isArray(body[keyError])) {
+      const errorValue = body[keyError][0]
+      if (typeof errorValue === 'string') {
+        apiError = errorValue
+        break
+      }
+      if (typeof errorValue === 'object') {
+        apiError = errorValue.message[0]
+        break
+      }
+    }
+  }
+
+  return apiError
+}
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return 'Your digital certificate has been updated!'
     case 400:
-      throw new Error(extractApiError(httpResponse)).message
+      throw new Error(extractApiError(httpResponse.body)).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
