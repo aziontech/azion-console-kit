@@ -17,12 +17,12 @@ describe('EdgeServiceServices', () => {
     })
     const mockId = 12387555
     const { sut } = makeSut()
-    const version = 'v3'
+
     await sut(mockId)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `${version}/edge_services/${mockId}`
+      url: `v4/orchestrator/edge_services/${mockId}`
     })
   })
 

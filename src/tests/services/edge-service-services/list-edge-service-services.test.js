@@ -48,11 +48,10 @@ describe('EdgeServiceServices', () => {
       body: { results: [] }
     })
     const { sut } = makeSut()
-    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_services?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `v4/orchestrator/edge_services?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })

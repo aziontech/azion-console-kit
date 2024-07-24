@@ -32,11 +32,11 @@ describe('EdgeServiceServices', () => {
     })
     const dnsIdMock = 76789
     const { sut } = makeSut()
-    const version = 'v3'
+
     await sut({ id: dnsIdMock })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_services/${dnsIdMock}?with_vars=true`,
+      url: `v4/orchestrator/edge_services/${dnsIdMock}?with_vars=true`,
       method: 'GET'
     })
   })

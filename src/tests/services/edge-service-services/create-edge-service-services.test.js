@@ -26,12 +26,11 @@ describe('EdgeServiceServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
     await sut(fixtures.edgeServiceMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `${version}/edge_services`,
+      url: `v4/orchestrator/edge_services`,
       body: {
         active: false,
         name: 'X Edge Service',
@@ -52,12 +51,12 @@ describe('EdgeServiceServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+
     await sut({ ...fixtures.edgeServiceMock, code: '' })
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `${version}/edge_services`,
+      url: `v4/orchestrator/edge_services`,
       body: {
         active: false,
         name: 'X Edge Service',
