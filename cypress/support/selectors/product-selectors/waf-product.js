@@ -26,7 +26,7 @@ export default {
     headerField: (zoneId) =>
       `[data-testid="allowed-rules-form__zone[${zoneId}]__header-field__input"]`,
     matchesOnRadio: (zoneId, position) =>
-      `[data-testid="allowed-rules-form__zone[${zoneId}]__matches-on-field__radio"][name="matchZones[${zoneId}].matches_on-radio-${position}"]`,
+      `[data-testid="allowed-rules-form__zone[${zoneId}]__matches-on-field__radio__matchZones[${zoneId}].matches_on-radio-${position}"]`,
     deleteMatchZoneButton: (zoneId) =>
       `[data-testid="allowed-rules-form__delete-match-zone[${zoneId}]__button"]`,
     addZoneButton: '[data-testid="allowed-rules-form__add-match-zone__button"]',
