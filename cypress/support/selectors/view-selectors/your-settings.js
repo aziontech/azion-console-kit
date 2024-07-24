@@ -10,7 +10,7 @@ export default {
   firstNameError: '[data-testid="your-settings-form__first-name__error-message"]',
   lastNameInput: '[data-testid="your-settings-form__last-name__input"]',
   lastNameError: '[data-testid="your-settings-form__last-name__error-message"]',
-  timezoneFilter: '[data-testid="your-settings-form__timezone__dropdown__filter"]',
+  timezoneFilter: '[data-testid="your-settings-form__timezone__dropdown__filter-input"]',
   timezoneOptions: '[data-testid="your-settings-form__timezone__dropdown"]',
   language: '[data-testid="your-settings-form__language"]',
   oldPasswordInput: '[data-testid="your-settings-form__old-password__input"]',

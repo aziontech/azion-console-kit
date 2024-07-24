@@ -116,7 +116,7 @@
       description: `${id}__description`,
       error: `${id}__error-message`,
       filterInput: `${id}__filter-input`,
-      trigger: `${id}__trigger`
+      trigger: `${id}__trigger`,
       loadingIcon: `${id}__loading-icon`
     }
   })

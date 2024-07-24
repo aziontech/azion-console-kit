@@ -15,7 +15,7 @@ export default {
   behaviorsDropdown:
     '[data-testid="edge-firewall-functions-form__behaviors-dropdown__dropdown"] > .p-dropdown-trigger',
   functionInstancDropdownFilter:
-    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown__filter"]',
+    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown__filter-input"]',
   functionInstanceDropdown:
     '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown__trigger"]',
   functionInstanceDropdownFunction: '#edgeFunctionID_0',

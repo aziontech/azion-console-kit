@@ -3,9 +3,9 @@ export default {
   nameInput: '[data-testid="domains-form__name-field__input"]',
   edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
   edgeApplicationDropdownFilter:
-    '[data-testid="domains-form__edge-application-field__dropdown__filter"]',
+    '[data-testid="domains-form__edge-application-field__dropdown__filter-input"]',
   mtlsTrustedCADropdownFilter:
-    '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown__filter"]',
+    '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown__filter-input"]',
   edgeApplicationOption: '#edgeApplication_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
   dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
