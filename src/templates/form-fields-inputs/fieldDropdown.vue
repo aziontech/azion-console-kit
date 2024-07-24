@@ -115,8 +115,8 @@
       value: `${id}__value`,
       description: `${id}__description`,
       error: `${id}__error-message`,
-      filterInput: `${id}__filter-input`,
-      trigger: `${id}__trigger`,
+      filterInput: `${id}__dropdown-filter-input`,
+      trigger: `${id}__dropdown-trigger`,
       loadingIcon: `${id}__loading-icon`
     }
   })

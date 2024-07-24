@@ -12,12 +12,11 @@ export default {
   rulesEngineTab: '[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title',
   createFunctionInstanceButton: '[data-testid="create_Function Instance_button"] > .p-button-label',
   functionInstanceName: '[data-testid="edge-firewall-functions-form__name-field__input"]',
-  behaviorsDropdown:
-    '[data-testid="edge-firewall-functions-form__behaviors-dropdown__dropdown"] > .p-dropdown-trigger',
+  behaviorsDropdown: '[data-testid="edge-firewall-functions-form__behaviors-dropdown-trigger"]',
   functionInstancDropdownFilter:
-    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown__filter-input"]',
+    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown-filter-input"]',
   functionInstanceDropdown:
-    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown__trigger"]',
+    '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown-trigger"]',
   functionInstanceDropdownFunction: '#edgeFunctionID_0',
   functionInstanceSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
   functionInstanceTableSearchInput: '[data-testid="data-table-search-input"]',
@@ -50,7 +49,7 @@ export default {
   rulesWafModeDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf-mode__dropdown"] > .p-dropdown-label',
   ruleBehaviorFunctionToRunDropdown:
-    '[data-testid="edge-firewall-rule-form__behaviors[0]-function__dropdown__trigger"]',
+    '[data-testid="edge-firewall-rule-form__behaviors[0]-function__dropdown-trigger"]',
   ruleBehaviorFunctionToRun: '#behaviors\\[0\\]\\.functionId_0',
   ruleSubmit: '[data-testid="form-actions-submit-button"] > .p-button-label',
   rulesTableSearchInput: '[data-testid="data-table-search-input"]',
