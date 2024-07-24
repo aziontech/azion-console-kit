@@ -59,6 +59,7 @@ describe('BillingService', () => {
     const payload = {
       query: `query getBillDetail {
         payments: paymentsClientDebt(
+              limit: 1,
               filter: {
                   paymentDateRange: {
                       begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"

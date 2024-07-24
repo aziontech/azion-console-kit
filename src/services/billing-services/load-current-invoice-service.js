@@ -8,6 +8,7 @@ export const loadCurrentInvoiceService = async () => {
   const payload = {
     query: `query getBillDetail {
       billDetail(
+          limit: 1,
           aggregate: { sum: value }
           groupBy: [billId]
           orderBy: [productSlug_ASC, metricSlug_ASC]
