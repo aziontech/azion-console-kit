@@ -84,7 +84,7 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.digitalCertificates.copyCsrMessage).should('have.text', 'Successfully copied!')
   })
 
-  it.only('should import a server certificate', function () {
+  it('should import a server certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
