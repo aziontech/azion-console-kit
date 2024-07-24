@@ -15,9 +15,9 @@ describe('Real-time Purge spec', () => {
     domainName = generateUniqueName('domain')
     edgeAppName = generateUniqueName('edgeApp')
     cy.openProduct('Edge Application')
-    cy.get(selectors.edgeApplication.createButton).click()
-    cy.get(selectors.edgeApplication.nameInput).type(edgeAppName)
-    cy.get(selectors.edgeApplication.addressInput).type(`${edgeAppName}.edge.app`)
+    cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+    cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -31,7 +31,7 @@ describe('Real-time Purge spec', () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.dropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
     cy.get(selectors.domains.cnamesField).type(`${domainName}.domain.app`)
 
