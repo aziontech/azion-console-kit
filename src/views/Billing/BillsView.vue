@@ -10,40 +10,65 @@
             icon="pi pi-file"
             outlined
             label="Details"
+            :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
           />
         </div>
         <div class="flex justify-between mt-4">
           <span class="text-color-secondary text-sm">Billing Period</span>
-          <span class="font-medium text-color text-sm">{{ currentInvoice.billingPeriod }}</span>
+          <SkeletonBlock
+            width="10rem"
+            :isLoaded="isCurrentInvoiceLoaded"
+            wrapperClass="font-medium text-color text-sm"
+          >
+            {{ currentInvoice.billingPeriod }}
+          </SkeletonBlock>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Product Charges</span>
-          <span class="text-color text-sm"> {{ currentInvoice.productChanges }}</span>
+          <SkeletonBlock
+            :isLoaded="isCurrentInvoiceLoaded"
+            wrapperClass="text-color text-sm"
+          >
+            {{ currentInvoice.productChanges }}
+          </SkeletonBlock>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-          <span class="text-color text-sm"> {{ currentInvoice.servicePlan }}</span>
+          <SkeletonBlock
+            :isLoaded="isCurrentInvoiceLoaded"
+            wrapperClass="text-color text-sm"
+          >
+            {{ currentInvoice.servicePlan }}
+          </SkeletonBlock>
         </div>
       </div>
 
       <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Used for Payment</span>
-          <span class="text-color">
-            <span class="text-color-secondary text-sm">$</span>
-            {{ currentInvoice.creditUsedForPayment }}</span
+          <SkeletonBlock
+            :isLoaded="isCurrentInvoiceLoaded"
+            wrapperClass="text-color"
           >
+            <span class="text-color-secondary text-sm">$</span>
+            {{ currentInvoice.creditUsedForPayment }}
+          </SkeletonBlock>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm flex items-center gap-3">
             <b class="font-medium text-2xl text-color"> Total </b>
             (Amount Payable)
           </span>
-          <span class="font-medium text-2xl">
-            <span class="text-color-secondary text-sm font-medium">$</span>
-            {{ currentInvoice.total }}</span
+          <SkeletonBlock
+            sizeHeight="medium"
+            width="6rem"
+            :isLoaded="isCurrentInvoiceLoaded"
+            wrapperClass="font-medium text-2xl"
           >
+            <span class="text-color text-sm font-medium">$</span>
+            {{ currentInvoice.total }}
+          </SkeletonBlock>
         </div>
       </div>
     </div>
@@ -61,21 +86,38 @@
             @click="showOtherPlans"
           />
         </div>
-        <div class="flex items-center gap-4 mb-2">
-          <span class="font-medium text-3xl text-color">{{ servicePlan }} Plan</span>
+        <SkeletonBlock
+          sizeHeight="large"
+          width="12rem"
+          :isLoaded="!!servicePlan"
+          wrapperClass="flex items-center gap-4 mb-2"
+        >
+          <span class="font-medium text-3xl text-color">{{ servicePlan }} </span>
           <Tag
             v-if="isTrail"
             severity="secondary"
             value="Free Trial"
           />
-        </div>
+        </SkeletonBlock>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Plan Start Date</span>
-          <span class="font-medium text-color text-sm"> {{ yourServicePlan.paymentDate }}</span>
+          <SkeletonBlock
+            :isLoaded="isYourServicePlanLoaded"
+            wrapperClass="font-medium text-color text-sm"
+            element="span"
+          >
+            {{ yourServicePlan.paymentDate }}
+          </SkeletonBlock>
         </div>
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Method</span>
-          <span class="font-medium text-color text-sm">
+          <SkeletonBlock
+            wrapperClass="font-medium text-color text-sm"
+            width="8rem"
+            sizeHeight="small"
+            :isLoaded="!!props.cardDefault"
+            element="span"
+          >
             <span
               class="flex gap-2 items-center"
               v-if="props.cardDefault"
@@ -84,20 +126,30 @@
               {{ cardDefault.cardData.cardNumber }}
             </span>
             <span v-else>---</span>
-          </span>
+          </SkeletonBlock>
         </div>
+
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Payment Currency</span>
-          <span class="font-medium text-color text-sm"
-            >USD (<span class="text-color-secondary text-sm">$</span>)</span
+          <SkeletonBlock
+            :isLoaded="isYourServicePlanLoaded"
+            wrapperClass="font-medium text-color text-sm"
+            element="span"
           >
+            {{ yourServicePlan.currency }} (<span class="text-color-secondary text-sm">$</span>)
+          </SkeletonBlock>
         </div>
+
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Balance</span>
-          <span
-            ><span class="text-color-secondary text-sm">$</span>
-            {{ yourServicePlan.creditBalance }}</span
+          <SkeletonBlock
+            :isLoaded="isYourServicePlanLoaded"
+            wrapperClass="font-medium text-color text-sm"
+            element="span"
           >
+            <span class="text-color-secondary text-sm">$</span>
+            {{ yourServicePlan.creditBalance }}
+          </SkeletonBlock>
         </div>
       </div>
 
@@ -152,6 +204,7 @@
 
 <script setup>
   import { useRouter } from 'vue-router'
+  import SkeletonBlock from '@/templates/skeleton-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -167,7 +220,7 @@
   const router = useRouter()
   const hasContentToList = ref(true)
   const yourServicePlan = ref({})
-  const servicePlan = ref('')
+  const servicePlan = ref(null)
   const emit = defineEmits(['changeTab'])
   const user = useAccountStore().accountData
 
@@ -208,6 +261,9 @@
   })
   const isCardDefault = computed(() => !!props.cardDefault)
   const currentInvoice = ref({})
+
+  const isCurrentInvoiceLoaded = ref(true)
+  const isYourServicePlanLoaded = ref(true)
   const listPaymentHistoryRef = ref('')
 
   const paymentsColumns = ref([
@@ -264,10 +320,17 @@
   }
 
   const loaderCurrentInvoice = async () => {
-    currentInvoice.value = await props.loadCurrentInvoiceService()
+    isCurrentInvoiceLoaded.value = false
+    try {
+      currentInvoice.value = await props.loadCurrentInvoiceService()
+    } finally {
+      isCurrentInvoiceLoaded.value = true
+    }
   }
 
   const goToBillingDetails = () => {
+    if (!currentInvoice.value?.billId) return
+
     router.push({
       name: 'billing-invoice-details',
       params: { billId: currentInvoice.value.billId }
@@ -291,14 +354,19 @@
   }
 
   const getYourServicePlan = async () => {
-    yourServicePlan.value = await props.loadYourServicePlanService(user.disclaimer)
+    isYourServicePlanLoaded.value = false
+    try {
+      yourServicePlan.value = await props.loadYourServicePlanService(user.disclaimer)
+    } finally {
+      isYourServicePlanLoaded.value = true
+    }
   }
 
   const getLoadContractService = async () => {
     const { yourServicePlan } = await props.loadContractServicePlan({
       clientId: user.client_id
     })
-    servicePlan.value = yourServicePlan
+    servicePlan.value = `${yourServicePlan} Plan`
   }
 
   const goToPayment = () => {
