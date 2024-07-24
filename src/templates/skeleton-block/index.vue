@@ -10,6 +10,7 @@
 <script setup>
   import { computed } from 'vue'
   import Skeleton from 'primevue/skeleton'
+
   defineOptions({
     name: 'skeleton-block'
   })
@@ -23,13 +24,10 @@
       type: String,
       default: '3rem'
     },
-    wrapperClass: {
+    tag: {
       type: String,
-      default: ''
-    },
-    element: {
-      type: String,
-      default: 'div'
+      default: 'div',
+      validator: (value) => ['div', 'span'].includes(value)
     },
     sizeHeight: {
       type: String,
@@ -50,10 +48,8 @@
   const height = mapSize[props.sizeHeight] || props.height
 
   const component = computed(() => {
-    return props.isLoaded ? props.element : Skeleton
+    return props.isLoaded ? props.tag : Skeleton
   })
 
-  const skeletonProps = computed(() => {
-    return props.isLoaded ? { class: props.wrapperClass } : { width: props.width, height }
-  })
+  const skeletonProps = { width: props.width, height }
 </script>
