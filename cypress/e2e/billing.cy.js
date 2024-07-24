@@ -1,6 +1,6 @@
 import selectors from '../support/selectors'
 import fixtures from '../fixtures/billing.json'
-import generateUniqueName from '../support/utils'
+import { generateUniqueNameWithLetters } from '../support/utils'
 
 let cardHolderName
 
@@ -10,7 +10,7 @@ describe('Payment Methods spec', () => {
     cy.intercept('GET', '/api/v4/payments/*').as('getPaymentMethodsApi')
     cy.visit('/billing/payment')
 
-    cardHolderName = generateUniqueName('CardHolderName')
+    cardHolderName = generateUniqueNameWithLetters('CardHolderName')
 
     cy.wait('@getPaymentMethodsApi')
   })
