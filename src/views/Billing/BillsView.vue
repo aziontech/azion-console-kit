@@ -297,7 +297,7 @@
   }
 
   const goToEnvoiceDetails = (item) => {
-    if (item.invoiceUrl && item.invoiceNumber) {
+    if (item.invoiceNumber.content) {
       const invoiceNumber = item.invoiceNumber.content
       const routeParams = { billId: invoiceNumber }
       navigateMethod('billing-invoice-details', routeParams)
