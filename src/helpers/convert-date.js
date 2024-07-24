@@ -47,6 +47,7 @@ const formatDateToUS = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUSBilling = (value) => {
+  if (value === '---') return '---'
   const [year, month, day] = value.split('-')
 
   const date = new Date(year, month - 1, day)

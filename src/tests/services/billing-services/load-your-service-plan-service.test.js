@@ -102,7 +102,7 @@ describe('BillingService', () => {
     })
   })
 
-  it('should return 0.00 and "---" when it do not find a value in the disclaimer and has no payments data', async () => {
+  it('should replace with correct placeholder on empty payment data', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { payments: [] } }

@@ -142,11 +142,17 @@
     :inTabs="true"
     createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
-    @click-to-create="drawersMethods.openDrawerAddCredit"
-    :disabledButton="!isCardDefault"
-    :addOutlinedStyleButton="true"
   >
-    <template #extraActionsRight>
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        label="Add Credit"
+        icon="pi pi-plus"
+        :disabled="!isCardDefault"
+        @click="drawersMethods.openDrawerAddCredit"
+        outlined
+      >
+      </PrimeButton>
       <PrimeButton
         class="max-md:w-full w-fit"
         severity="secondary"

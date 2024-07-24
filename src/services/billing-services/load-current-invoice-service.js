@@ -46,23 +46,34 @@ export const loadCurrentInvoiceService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const parseInvoice = httpResponse.body.data?.billDetail.map((invoice) => {
-    return {
-      billId: invoice.billId,
-      total: invoice.totalValue,
-      currency: invoice.currency,
-      billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
-        invoice.periodTo
-      )}`,
-      productChanges: '---',
-      servicePlan: '---',
-      creditUsedForPayment: 0.0,
-      temporaryBill: invoice.temporaryBill
-    }
-  })
+  const {
+    body: {
+      data: { billDetail }
+    },
+    statusCode
+  } = httpResponse
+
+  const invoice = billDetail.length > 0 ? billDetail[0] : {}
+
+  const parseInvoice = {
+    billId: invoice.billId || '---',
+    total: invoice.totalValue || '---',
+    currency: invoice.currency || '---',
+    billingPeriod:
+      invoice.periodFrom && invoice.periodTo
+        ? `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
+            invoice.periodTo
+          )}`
+        : '---',
+    productChanges: '---',
+    servicePlan: '---',
+    creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
+    temporaryBill: invoice.temporaryBill || '---'
+  }
+
   return {
-    body: parseInvoice?.length ? parseInvoice[0] : {},
-    statusCode: httpResponse.statusCode
+    body: parseInvoice,
+    statusCode
   }
 }
 

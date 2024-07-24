@@ -2,7 +2,6 @@
   import Illustration from '@/assets/svg/illustration-layers'
   defineOptions({ name: 'empty-results-block' })
   import PrimeButton from 'primevue/button'
-  import { computed } from 'vue'
 
   import { useRouter } from 'vue-router'
 
@@ -17,15 +16,11 @@
     createPagePath: { type: String, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
-    noBorder: { type: Boolean, required: false },
-    disabledButton: { type: Boolean, required: false },
-    addOutlinedStyleButton: { type: Boolean, required: false }
+    noBorder: { type: Boolean, required: false }
   })
   function openDocumentation() {
     props.documentationService()
   }
-  const buttonSeverity = computed(() => (props.addOutlinedStyleButton ? null : 'secondary'))
-
   function navigateToCreatePage() {
     emit('click-to-create')
     if (props.createPagePath) {
@@ -61,13 +56,11 @@
             <PrimeButton
               v-if="props.createButtonLabel"
               class="max-md:w-full w-fit"
-              :severity="buttonSeverity"
+              severity="secondary"
               icon="pi pi-plus"
               :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"
               @click="navigateToCreatePage"
-              :disabled="disabledButton"
-              :outlined="addOutlinedStyleButton"
             />
           </slot>
           <slot name="extraActionsRight"></slot>
