@@ -66,7 +66,8 @@ export default {
       `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio"][name="cacheByCookies-radio-${position}"]`
   },
   functionsInstance: {
-    dropdownFilter: '.p-dropdown-filter',
+    dropdownFilter:
+      '[data-testid="edge-application-function-instance-form__edge-function__dropdown-filter-input"]',
     firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
     createButton: '[data-testid="functions-instance__create-button"]',
     edgeFunctionsDropdown:
