@@ -113,7 +113,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="emit('onSuccess')"
-    title="Create Service"
+    title="Bind Service"
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
