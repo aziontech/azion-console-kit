@@ -12,7 +12,8 @@ export default {
   rulesEngineTab: '[data-testid="edge-firewall__rules-engine-tab"] > .p-tabview-title',
   createFunctionInstanceButton: '[data-testid="create_Function Instance_button"] > .p-button-label',
   functionInstanceName: '[data-testid="edge-firewall-functions-form__name-field__input"]',
-  behaviorsDropdown: '[data-testid="edge-firewall-functions-form__behaviors-dropdown-trigger"]',
+  behaviorsDropdown:
+    '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown-trigger"]',
   functionInstancDropdownFilter:
     '[data-testid="edge-firewall-functions-form__edge-function-dropdown__dropdown-filter-input"]',
   functionInstanceDropdown:
@@ -30,19 +31,22 @@ export default {
     '[data-testid="edge-firewall-rules-form__variable[0]"] > .p-dropdown-label',
   ruleCriteriaVariableDropdownNetworkLists: '#criteria\\[0\\]\\[0\\]\\.variable_8',
   ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
-  ruleCriteriaOperatorDropdown:
-    '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"] > .p-dropdown-label',
+  ruleCriteriaOperatorDropdown: '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"]',
   ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',
   ruleCriteriaOperatorFirstOption: '#criteria\\[0\\]\\[0\\]\\.operator_0',
   ruleCriteriaValueFirstOption: '#criteria\\[0\\]\\[0\\]\\.argument_0',
   ruleCriteriaInput: '[data-testid="edge-firewall-rules-form__argument[0][0]__input"]',
   ruleCriteriaNetworkListDropdown:
-    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"] > .p-dropdown-label',
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-trigger"]',
+  ruleCriteriaNetworkListFilter:
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-filter-input"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
   rulesWafDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
+  rulesWafDropdownFilter:
+    '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown-filter-input"]',
   rulesWafFirstOption: '#behaviors\\[0\\]\\.waf_id_0',
   rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
   behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
