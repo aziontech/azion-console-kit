@@ -79,4 +79,12 @@ describe('convertDate', () => {
 
     expect(actualDateString).toEqual(expectedDateString)
   })
+
+  it('Should return "---" when it is invalid date value', () => {
+    const dateString = '---'
+    const expectedDateString = '---'
+    const actualDateString = formatDateToUSBilling(dateString)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
 })

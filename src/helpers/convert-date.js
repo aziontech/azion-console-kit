@@ -40,6 +40,14 @@ const formatDateToUS = (value) => {
   }).format(date)
 }
 
+const isDateStringValid = (dateString) => {
+  // Attempt to create a Date instance from the input string
+  const date = new Date(dateString)
+
+  // Check if the date is valid and the input string was successfully converted to a date
+  return !isNaN(date.getTime())
+}
+
 /**
  * Converts a given date to MM/DD/YYYY format.
  *
@@ -47,7 +55,8 @@ const formatDateToUS = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUSBilling = (value) => {
-  if (value === '---') return '---'
+  if (!isDateStringValid(value)) return '---'
+
   const [year, month, day] = value.split('-')
 
   const date = new Date(year, month - 1, day)
