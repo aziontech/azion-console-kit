@@ -185,6 +185,7 @@
     :columns="paymentsColumns"
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
+    @on-before-go-to-edit="goToEnvoiceDetails"
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
   />
@@ -335,11 +336,14 @@
   }
 
   const goToBillingDetails = () => {
-    if (!currentInvoice.value?.billId) return
+    const params = { billId: currentInvoice.value.billId }
+    navigateMethod('billing-invoice-details', params)
+  }
 
+  const navigateMethod = (name, params) => {
     router.push({
-      name: 'billing-invoice-details',
-      params: { billId: currentInvoice.value.billId }
+      name,
+      params
     })
   }
 
@@ -357,6 +361,14 @@
 
   const showOtherPlans = () => {
     props.openPlans()
+  }
+
+  const goToEnvoiceDetails = (item) => {
+    if (item.invoiceNumber.content) {
+      const invoiceNumber = item.invoiceNumber.content
+      const routeParams = { billId: invoiceNumber }
+      navigateMethod('billing-invoice-details', routeParams)
+    }
   }
 
   const getYourServicePlan = async () => {

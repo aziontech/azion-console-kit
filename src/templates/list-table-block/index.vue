@@ -423,7 +423,7 @@
   }
 
   const editItemSelected = ({ data: item }) => {
-    emit('on-before-go-to-edit')
+    emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
     } else if (props.enableEditClick) {
