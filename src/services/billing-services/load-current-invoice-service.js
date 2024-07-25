@@ -55,9 +55,9 @@ const adapt = (httpResponse) => {
   } = httpResponse
 
   const invoice = billDetail.length > 0 ? billDetail[0] : {}
-  let billingPeriod = '---'
+  let emptyDefaultValue = '---'
   if (invoice.periodFrom && invoice.periodTo) {
-    billingPeriod = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
+    emptyDefaultValue = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
       invoice.periodTo
     )}`
   }
@@ -66,7 +66,7 @@ const adapt = (httpResponse) => {
     billId: invoice.billId || '---',
     total: invoice.totalValue || '---',
     currency: invoice.currency || '---',
-    billingPeriod,
+    billingPeriod: emptyDefaultValue,
     productChanges: '---',
     servicePlan: '---',
     creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
