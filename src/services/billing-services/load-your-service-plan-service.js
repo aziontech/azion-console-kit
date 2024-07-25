@@ -8,6 +8,7 @@ export const loadYourServicePlanService = async (disclaimer = '') => {
   const payload = {
     query: `query getBillDetail {
         payments: paymentsClientDebt(
+              limit: 1,
               filter: {
                   paymentDateRange: {
                       begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
@@ -51,18 +52,22 @@ const adapt = (httpResponse, disclaimer) => {
     statusCode
   } = httpResponse
 
-  const payments = data?.payments || []
+  const emptyDefaultValue = '---'
 
-  const [yourServicePlan] = payments
+  const defaultPayment = {
+    paymentDate: emptyDefaultValue,
+    amount: emptyDefaultValue,
+    currency: emptyDefaultValue
+  }
 
-  const parseYourServicePlan = yourServicePlan
-    ? {
-        paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
-        amount: yourServicePlan.amount,
-        currency: yourServicePlan.currency,
-        creditBalance: extractPriceFromString(disclaimer)
-      }
-    : null
+  const yourServicePlan = data?.payments[0] || defaultPayment
+
+  const parseYourServicePlan = {
+    paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
+    amount: yourServicePlan.amount,
+    currency: yourServicePlan.currency,
+    creditBalance: extractPriceFromString(disclaimer)
+  }
 
   return {
     body: parseYourServicePlan,

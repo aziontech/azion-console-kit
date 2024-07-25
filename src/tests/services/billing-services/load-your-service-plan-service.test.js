@@ -59,6 +59,7 @@ describe('BillingService', () => {
     const payload = {
       query: `query getBillDetail {
         payments: paymentsClientDebt(
+              limit: 1,
               filter: {
                   paymentDateRange: {
                       begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
@@ -102,22 +103,20 @@ describe('BillingService', () => {
     })
   })
 
-  it('should return 0.00 when it do not find a value in the disclaimer ', async () => {
-    const { firstDayOfMonth } = getFirstDayCurrentDate()
-
+  it('should replace with correct placeholder on empty payment data', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { payments: [fixtures.paymentMock] } }
+      body: { data: { payments: [] } }
     })
 
     const { sut } = makeSut()
     const result = await sut(fixtures.disclaimerZero)
 
     expect(result).toEqual({
-      amount: 0,
+      amount: '---',
       creditBalance: '0.00',
-      currency: 'USD',
-      paymentDate: formatDateToUSBilling(firstDayOfMonth)
+      currency: '---',
+      paymentDate: '---'
     })
   })
 })

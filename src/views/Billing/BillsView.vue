@@ -196,10 +196,24 @@
     :inTabs="true"
     createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
-    @click-to-create="drawersMethods.openDrawerAddCredit"
   >
-    <template #illustration>
-      <Illustration />
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        label="Add Credit"
+        icon="pi pi-plus"
+        :disabled="!isCardDefault"
+        @click="drawersMethods.openDrawerAddCredit"
+        outlined
+      >
+      </PrimeButton>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Add Payment Method"
+        @click="goToPayment"
+      />
     </template>
   </EmptyResultsBlock>
 </template>
@@ -207,7 +221,6 @@
 <script setup>
   import { useRouter } from 'vue-router'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
