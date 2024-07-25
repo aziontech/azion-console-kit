@@ -13,16 +13,16 @@ const fixtures = {
   edgeServiceMock: {
     id: 1239875,
     name: 'Edge Service A',
-    active: true,
+    is_active: true,
     last_editor: 'az editor',
-    updated_at: new Date(2023, 10, 10)
+    last_modified: new Date(2023, 10, 10)
   },
   disabledEdgeServiceMock: {
     id: 927376237,
     name: 'Edge Service B',
-    active: false,
+    is_active: false,
     last_editor: 'az editor 2',
-    updated_at: new Date(2023, 10, 11)
+    last_modified: new Date(2023, 10, 11)
   }
 }
 
@@ -51,7 +51,7 @@ describe('EdgeServiceServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/orchestrator/edge_services?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `v4/orchestrator/edge_services?page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -61,7 +61,7 @@ describe('EdgeServiceServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { services: [fixtures.edgeServiceMock, fixtures.disabledEdgeServiceMock] }
+      body: { results: [fixtures.edgeServiceMock, fixtures.disabledEdgeServiceMock] }
     })
     const { sut } = makeSut()
 

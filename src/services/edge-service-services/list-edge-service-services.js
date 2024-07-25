@@ -32,19 +32,20 @@ const parseStatusData = (status) => {
 }
 
 const adapt = (httpResponse) => {
-  const parsedEdgeServices = httpResponse.body.services?.map((edgeService) => {
-    return {
-      id: edgeService.id,
-      name: edgeService.name,
-      labelActive: parseStatusData(edgeService.active),
-      active: edgeService.active,
-      lastEditor: edgeService.last_editor,
-      lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-        new Date(edgeService.updated_at)
-      ),
-      lastModifiedDate: edgeService.updated_at
-    }
-  })
+  const parsedEdgeServices =
+    httpResponse.body.results?.map((edgeService) => {
+      return {
+        id: edgeService.id,
+        name: edgeService.name,
+        labelActive: parseStatusData(edgeService.is_active),
+        active: edgeService.is_active,
+        lastEditor: edgeService.last_editor,
+        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          new Date(edgeService.last_modified)
+        ),
+        lastModifiedDate: edgeService.last_modified
+      }
+    }) || []
 
   return {
     body: parsedEdgeServices,
@@ -52,10 +53,8 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+const makeSearchParams = ({ page, pageSize }) => {
   const searchParams = new URLSearchParams()
-  searchParams.set('order_by', orderBy)
-  searchParams.set('sort', sort)
   searchParams.set('page', page)
   searchParams.set('page_size', pageSize)
 
