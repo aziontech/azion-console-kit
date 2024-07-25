@@ -52,10 +52,12 @@ const adapt = (httpResponse, disclaimer) => {
     statusCode
   } = httpResponse
 
+  const emptyDefaultValue = '---'
+
   const defaultPayment = {
-    paymentDate: '---',
-    amount: '---',
-    currency: '---'
+    paymentDate: emptyDefaultValue,
+    amount: emptyDefaultValue,
+    currency: emptyDefaultValue
   }
 
   const yourServicePlan = data?.payments[0] || defaultPayment

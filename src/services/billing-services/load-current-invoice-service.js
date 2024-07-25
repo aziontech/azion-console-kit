@@ -64,14 +64,14 @@ const adapt = (httpResponse) => {
   }
 
   const parseInvoice = {
-    billId: invoice.billId || '---',
-    total: invoice.totalValue || '---',
-    currency: invoice.currency || '---',
+    billId: invoice.billId || emptyDefaultValue,
+    total: invoice.totalValue || emptyDefaultValue,
+    currency: invoice.currency || emptyDefaultValue,
     billingPeriod,
-    productChanges: '---',
-    servicePlan: '---',
+    productChanges: emptyDefaultValue,
+    servicePlan: emptyDefaultValue,
     creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
-    temporaryBill: invoice.temporaryBill || '---'
+    temporaryBill: invoice.temporaryBill || emptyDefaultValue
   }
 
   return {
