@@ -55,17 +55,18 @@ const adapt = (httpResponse) => {
   } = httpResponse
 
   const invoice = billDetail.length > 0 ? billDetail[0] : {}
+  let billingPeriod = '---'
+  if (invoice.periodFrom && invoice.periodTo) {
+    billingPeriod = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
+      invoice.periodTo
+    )}`
+  }
 
   const parseInvoice = {
     billId: invoice.billId || '---',
     total: invoice.totalValue || '---',
     currency: invoice.currency || '---',
-    billingPeriod:
-      invoice.periodFrom && invoice.periodTo
-        ? `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
-            invoice.periodTo
-          )}`
-        : '---',
+    billingPeriod,
     productChanges: '---',
     servicePlan: '---',
     creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
