@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   edgeServiceMock: {
     name: 'X Edge Service',
-    code: 'port=8080',
+    code: 'port=8080\ngreeting=Hello',
     active: false
   }
 }
@@ -22,7 +22,7 @@ describe('EdgeServiceServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
-      body: { id: '123' }
+      body: { data: { id: '123' } }
     })
 
     const { sut } = makeSut()
@@ -32,12 +32,14 @@ describe('EdgeServiceServices', () => {
       method: 'POST',
       url: `v4/orchestrator/edge_services`,
       body: {
-        active: false,
+        is_active: false,
         name: 'X Edge Service',
-        variables: [
+        modules: [
           {
-            name: 'port',
-            value: '8080'
+            port: '8080'
+          },
+          {
+            greeting: 'Hello'
           }
         ]
       }
@@ -47,7 +49,7 @@ describe('EdgeServiceServices', () => {
   it('should call API with correct params but the code parameter is empty', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
-      body: { id: '123' }
+      body: { data: { id: '123' } }
     })
 
     const { sut } = makeSut()
@@ -58,9 +60,9 @@ describe('EdgeServiceServices', () => {
       method: 'POST',
       url: `v4/orchestrator/edge_services`,
       body: {
-        active: false,
+        is_active: false,
         name: 'X Edge Service',
-        variables: []
+        modules: []
       }
     })
   })
@@ -68,7 +70,7 @@ describe('EdgeServiceServices', () => {
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
-      body: { id: '123' }
+      body: { data: { id: '123' } }
     })
 
     const { sut } = makeSut()
@@ -78,19 +80,17 @@ describe('EdgeServiceServices', () => {
     expect(feedback).toBe('Your Edge Service has been created')
   })
 
-  it('Should return an API error to an invalid edge service name', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('should return a feedback message on server accept the processing creation', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 422,
-      body: {
-        errors: [apiErrorMock]
-      }
+      statusCode: 202,
+      body: { data: { id: '123123123' } }
     })
+
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.edgeServiceMock)
+    const { feedback } = await sut(fixtures.edgeServiceMock)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+    expect(feedback).toBe('Your Edge Service is processing and will be available shortly')
   })
 
   it.each([
@@ -109,6 +109,14 @@ describe('EdgeServiceServices', () => {
     {
       statusCode: 404,
       expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 406,
+      expectedError: new Errors.NotAcceptableError().message
+    },
+    {
+      statusCode: 429,
+      expectedError: new Errors.ToManyRequestsError().message
     },
     {
       statusCode: 500,

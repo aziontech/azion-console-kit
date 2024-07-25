@@ -19,25 +19,39 @@ export const createEdgeServiceServices = async (payload) => {
   return parseHttpResponse(httpResponse)
 }
 
-const parseCodeToVariables = (code) => {
-  if (!code) return []
-  const lines = code.trim().split(/\r?\n/)
+/**
+ * Parses a string of variables in the format `NAME=VALUE\nNAME=VALUE\n...`
+ * into an array of objects with the format `{ key:value }`.
+ *
+ * @param {string} variablesToParse
+ * @returns {Array<Object>} - An array of variables.
+ * @example
+ * parseCodeToVariables('VAR1=val1\nVAR2=val2');
+ * // Returns:
+ * // [
+ * //   {VAR1: 'val1'},
+ * //   {VAR2: 'val2'}
+ * // ]
+ */
+const parseCodeToVariables = (variablesToParse) => {
+  if (!variablesToParse) return []
+  const edgeServiceVariables = variablesToParse.trim().split(/\r?\n/)
 
-  const mapped = lines.map((line) => {
-    const [name, ...rest] = line.split('=')
-    const value = rest.join('=')
-    return { name: name.trim(), value: value.trim() }
+  const parsedEdgeServiceVariables = edgeServiceVariables.map((edgeServiceVariable) => {
+    const [edgeServiceVariableName, ...edgeServiceVariableValue] = edgeServiceVariable.split('=')
+    const value = edgeServiceVariableValue.join('')
+    const key = edgeServiceVariableName.trim()
+    return { [key]: value.trim() }
   })
-
-  return mapped
+  return parsedEdgeServiceVariables
 }
 
 const adapt = (payload) => {
   const { active, name, code } = payload
   return {
-    active,
+    is_active: active,
     name,
-    variables: parseCodeToVariables(code)
+    modules: parseCodeToVariables(code)
   }
 }
 
@@ -45,7 +59,7 @@ const adapt = (payload) => {
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {string} The result message based on the status code.
+ * @returns {{feedback: string, urlToEditView: string}} - The success response.
  * @throws {Error} If there is an error with the response.
  */
 const parseHttpResponse = (httpResponse) => {
@@ -53,7 +67,12 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Service has been created',
-        urlToEditView: `/edge-services/edit/${httpResponse.body.id}`
+        urlToEditView: `/edge-services/edit/${httpResponse.body.data.id}`
+      }
+    case 202:
+      return {
+        feedback: 'Your Edge Service is processing and will be available shortly',
+        urlToEditView: `/edge-services/edit/${httpResponse.body.data.id}`
       }
     case 400:
       throw new Errors.NotFoundError().message
@@ -63,34 +82,13 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.PermissionError().message
     case 404:
       throw new Errors.NotFoundError().message
-    case 422:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
+    case 406:
+      throw new Errors.NotAcceptableError().message
+    case 429:
+      throw new Errors.ToManyRequestsError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
       throw new Errors.UnexpectedError().message
   }
-}
-
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const nameCantBeEmptyError = extractErrorKey(httpResponse.body, 'errors')
-
-  const errorMessages = [nameCantBeEmptyError]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage
 }
