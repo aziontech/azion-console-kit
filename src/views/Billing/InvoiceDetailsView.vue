@@ -5,9 +5,72 @@
     </template>
     <template #content>
       <div class="w-full flex flex-col-reverse sm:flex-row gap-6">
-        <div class="w-full sm:w-1/2 h-[25.00rem] border surface-border rounded-md flex flex-col">
-          Service and Products Charges
-        </div>
+        <DataTable
+          v-model:expandedRows="expandedRows"
+          :value="data"
+          rowGroupMode="subheader"
+          groupRowsBy="region"
+          class="w-full sm:w-1/2 h-fit"
+          :pt="{
+            thead: { class: 'hidden' },
+            rowexpansioncell: 'p-0'
+          }"
+        >
+          <template #header>
+            <span class="text-base font-medium">Service and Products Charges</span>
+          </template>
+          <Column
+            expander
+            class="w-0"
+            :pt="{
+              rowToggler: { class: 'border-none' }
+            }"
+          />
+          <Column
+            field="service"
+            header=""
+            class="font-medium !text-base"
+          ></Column>
+          <Column
+            field="value"
+            header=""
+            class="font-medium !text-sm"
+            bodyStyle="text-align:right"
+          ></Column>
+          <template #expansion="slotProps">
+            <div class="p-0 m-0">
+              <DataTable
+                v-for="(expansionColuns, index) in slotProps.data.descriptions"
+                :key="index"
+                :value="expansionColuns.data"
+                class="border-none -mt-0.5 !text-sm text-color-secondary rounded-none"
+              >
+                <Column :pt="{ root: { class: 'pl-12' } }"></Column>
+                <Column
+                  field="country"
+                  :header="expansionColuns.service"
+                  class="w-full pt-4 pb-4"
+                  :pt="{
+                    bodyCell: { class: 'text-color-secondary text-sm' }
+                  }"
+                ></Column>
+                <Column
+                  field="quantity"
+                  :header="expansionColuns.quantity"
+                  :pt="{
+                    root: { class: 'pr-8' }
+                  }"
+                  bodyStyle="text-align:right"
+                ></Column>
+                <Column
+                  field="price"
+                  :header="expansionColuns.price"
+                  bodyStyle="text-align:right"
+                ></Column>
+              </DataTable>
+            </div>
+          </template>
+        </DataTable>
         <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
           <div class="p-3 md:p-6 flex flex-col gap-4">
             <div class="flex justify-between">
@@ -102,6 +165,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
+  import DataTable from 'primevue/datatable'
+  import Column from 'primevue/column'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -109,6 +174,10 @@
       required: true
     },
     loadPaymentMethodDefaultService: {
+      type: Function,
+      required: true
+    },
+    listServiceAndProductsChangesService: {
       type: Function,
       required: true
     },
@@ -123,8 +192,11 @@
 
   const invoiceData = ref({})
   const cardDefault = ref({})
+  const data = ref([])
+  const expandedRows = ref([])
 
   onMounted(() => {
+    listServiceAndProductsChanges()
     loadInvoiceData()
     loadCardDefault()
   })
@@ -134,6 +206,14 @@
       invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
     } catch (error) {
       invoiceData.value = null
+    }
+  }
+
+  const listServiceAndProductsChanges = async () => {
+    try {
+      data.value = await props.listServiceAndProductsChangesService(route.params.billId)
+    } catch (error) {
+      data.value = []
     }
   }
 
