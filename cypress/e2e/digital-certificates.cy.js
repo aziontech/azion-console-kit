@@ -22,10 +22,10 @@ describe('Digital Certificates spec', () => {
     // Assert
     cy.verifyToast('success', 'Your digital certificate has been created!')
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
-    cy.get(selectors.digitalCertificates.breadcumbReturnToList).click()
+    cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(digitalCertificateName)
-    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', digitalCertificateName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', digitalCertificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 
@@ -84,7 +84,7 @@ describe('Digital Certificates spec', () => {
     cy.get(selectors.digitalCertificates.copyCsrMessage).should('have.text', 'Successfully copied!')
   })
 
-  it.only('should import a server certificate', function () {
+  it('should import a server certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()

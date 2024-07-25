@@ -81,7 +81,7 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
     cy.get(selectors.edgeServices.listRow('contentType')).should('have.text', 'Shell Script')
     cy.get(selectors.edgeServices.listRow('trigger')).should('have.text', 'Install')
 
-    cy.get(selectors.list.breadcumbReturnToList).click()
+    cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
     //service
     cy.get(selectors.list.searchInput).type(fixtures.edgeServiceName)
     cy.get(selectors.edgeServices.listRow('name')).should('have.text', fixtures.edgeServiceName)
@@ -116,7 +116,7 @@ describe('Edge Services spec', { tags: ['run'] }, () => {
     cy.get(selectors.edgeServices.listRow('trigger')).should('be.empty')
 
     // Prepare for cleanup
-    cy.get(selectors.list.breadcumbReturnToList).click()
+    cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).type(fixtures.edgeServiceName)
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
   })

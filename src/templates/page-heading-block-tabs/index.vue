@@ -5,7 +5,10 @@
       :model="generateBreadCrumbs"
       class="-ml-1.5"
       :pt="{
-        label: { class: 'whitespace-nowrap' }
+        label: { class: 'whitespace-nowrap' },
+        menuItem: ({ props }) => ({
+          'data-testid': `page-heading-block-tabs__breadcrumb__${props.item.label}`
+        })
       }"
     />
     <div class="flex flex-wrap w-full py-4 items-end justify-between">

@@ -162,6 +162,8 @@ Example:
 3. `Classes` (when the element has a specific style)
 4. `HTML Elements` (only when other selectors are not applicable)
 
+**Note:** Extra information about selectors interactions with Cypress and PrimeVue is [available here](/docs/E2E_SELECTORS.md).
+
 ## Using `e2mock` to Mock Components
 
 ### Use Cases

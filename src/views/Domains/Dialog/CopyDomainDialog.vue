@@ -5,6 +5,11 @@
     visible
     class="max-w-2xl"
     header="Domain has been created"
+    :pt="{
+      headerTitle: {
+        'data-testid': 'domains-view__copy-domain-dialog__header-title'
+      }
+    }"
   >
     <div class="flex flex-col gap-3.5">
       <InlineMessage severity="info">

@@ -5,7 +5,10 @@
       :model="breadcrumbs.items"
       class="-ml-1.5 overflow-auto w-full"
       :pt="{
-        label: { class: 'whitespace-nowrap' }
+        label: { class: 'whitespace-nowrap' },
+        menuItem: ({ props }) => ({
+          'data-testid': `page-heading-block__breadcrumb__${props.item.label}`
+        })
       }"
     />
     <div

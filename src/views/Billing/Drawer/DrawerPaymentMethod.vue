@@ -2,7 +2,7 @@
   import CreatePaymentMethodBlock from '@templates/add-payment-method-block'
   import { refDebounced } from '@vueuse/core'
   import { onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({
     name: 'payment-method-drawer'
@@ -19,6 +19,7 @@
 
   const showCreatePaymentMethodDrawer = ref(false)
   const route = useRoute()
+  const router = useRouter()
   const debouncedDrawerAnimate = 300
 
   const showCreateDrawer = refDebounced(showCreatePaymentMethodDrawer, debouncedDrawerAnimate)
@@ -39,6 +40,7 @@
   const showPaymentMethod = () => {
     if (route.query.paymentSession) {
       openDrawer()
+      router.push({ query: {} })
     }
   }
 

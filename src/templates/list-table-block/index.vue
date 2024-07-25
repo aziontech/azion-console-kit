@@ -183,11 +183,13 @@
           name="noRecordsFound"
           data-testid="data-table-empty-content"
         >
-          <div
-            class="my-4 flex flex-col gap-3 justify-center items-start"
-            data-testid="list-table-block__empty-message"
-          >
-            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <p
+              class="text-md font-normal text-secondary"
+              data-testid="list-table-block__empty-message__text"
+            >
+              {{ emptyListMessage }}
+            </p>
           </div>
         </slot>
       </template>
@@ -423,7 +425,7 @@
   }
 
   const editItemSelected = ({ data: item }) => {
-    emit('on-before-go-to-edit')
+    emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
     } else if (props.enableEditClick) {

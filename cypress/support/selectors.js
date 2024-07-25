@@ -1,7 +1,6 @@
 // Blocks
 import LIST_TABLE_BLOCK_SELECTORS from './selectors/block-selectors/list-table-block.js'
 import FORM_FIELDS_SELECTORS from './selectors/block-selectors/form-fields-block.js'
-import TOAST_BLOCK_SELECTORS from './selectors/block-selectors/toast-block.js'
 import MENU_SIDEBAR_SELECTORS from './selectors/block-selectors/menu-sidebar.js'
 import MENU_ACCOUNT_SELECTORS from './selectors/block-selectors/menu-account.js'
 import TEAMS_BLOCK_SELECTORS from './selectors/block-selectors/teams-block.js'
@@ -35,7 +34,6 @@ const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
   form: FORM_FIELDS_SELECTORS,
-  toast: TOAST_BLOCK_SELECTORS,
   login: LOGIN_VIEW_SELECTORS,
   menuSidebar: MENU_SIDEBAR_SELECTORS,
   menuAccount: MENU_ACCOUNT_SELECTORS,

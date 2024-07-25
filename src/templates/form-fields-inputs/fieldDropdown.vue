@@ -115,7 +115,8 @@
       value: `${id}__value`,
       description: `${id}__description`,
       error: `${id}__error-message`,
-      filterInput: `${id}__filter-input`,
+      filterInput: `${id}__dropdown-filter-input`,
+      trigger: `${id}__dropdown-trigger`,
       loadingIcon: `${id}__loading-icon`
     }
   })
@@ -151,6 +152,9 @@
       filterInput: {
         class: 'w-full',
         'data-testid': customTestId.filterInput
+      },
+      trigger: {
+        'data-testid': customTestId.trigger
       },
       loadingIcon: {
         'data-testid': customTestId.loadingIcon

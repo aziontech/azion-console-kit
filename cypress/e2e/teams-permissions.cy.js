@@ -40,7 +40,7 @@ describe('Teams Permissions', () => {
     cy.get(selectors.teams.listRow('name')).should('have.text', teamsPermissionsName)
     cy.get(selectors.teams.listRow('permissions')).should(
       'have.text',
-      'View Content Delivery SettingsEdit Content Delivery SettingsShow more (46)'
+      'View Content Delivery SettingsEdit Content Delivery SettingsShow more (47)'
     )
     cy.get(selectors.teams.listRow('status')).should('have.text', 'Active')
   })

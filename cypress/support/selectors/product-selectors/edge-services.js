@@ -1,4 +1,5 @@
 export default {
+  breadcrumbReturnToList: '[data-testid="page-heading-block__breadcrumb__Edge Services"]',
   createServiceButton: '[data-testid="create_Service_button"]',
   createResourceButton: '[data-testid="list-table-block__create-resource-button"]',
   listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,

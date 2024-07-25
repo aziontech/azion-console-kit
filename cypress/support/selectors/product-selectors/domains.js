@@ -2,10 +2,13 @@ export default {
   createButton: '[data-testid="create_Domain_button"]',
   nameInput: '[data-testid="domains-form__name-field__input"]',
   edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
-  dropdownFilter: '.p-dropdown-filter',
+  edgeApplicationDropdownFilter:
+    '[data-testid="domains-form__edge-application-field__dropdown-filter-input"]',
+  mtlsTrustedCADropdownFilter:
+    '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown-filter-input"]',
   edgeApplicationOption: '#edgeApplication_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
-  dialogTitle: '.p-dialog-header > .p-dialog-title',
+  dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
   copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
   confirmButton: '[data-testid="domains-dialog__confirm__button"]',
