@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex flex-col">
-        <h4 class="text-lg font-bold">Your free trial credit balance is running low</h4>
+        <h4 class="text-lg font-bold">The Free Trial credit balance is running low</h4>
         <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl text-sm">
           <slot
             name="textNotification"

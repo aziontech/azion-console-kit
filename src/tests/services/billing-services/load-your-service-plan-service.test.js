@@ -28,11 +28,11 @@ const fixtures = {
     paymentDate: '2024-07-01'
   },
   disclaimerTwentyThree:
-    "Welcome to your trial period. You have USD 23.40 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
+    "Welcome to the Free Trial period. The credit of USD 23.40 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
   disclaimerZero:
-    "Welcome to your trial period. You have USD  to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
+    "Welcome to the Free Trial period. The credit of USD is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
   disclaimerDefault:
-    "Welcome to your trial period. You have USD 300.00 to use in 71 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>."
+    "Welcome to the Free Trial period. The credit of USD 300.00 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>."
 }
 
 const makeSut = () => {
