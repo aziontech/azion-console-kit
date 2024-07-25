@@ -28,7 +28,7 @@
       drawerPaymentMethodRef.value.openDrawer()
     },
     openDrawerAddCredit: () => {
-      if (cardDefault.value) drawerAddCreditRef.value.openDrawer()
+      if (cardDefault.value.cardData) drawerAddCreditRef.value.openDrawer()
     }
   })
 
@@ -40,7 +40,9 @@
     billsServices: { type: Object, required: true }
   })
 
-  const cardDefault = ref(null)
+  const cardDefault = ref({
+    loader: false
+  })
 
   const TABS_MAP = {
     bills: 0,
@@ -72,8 +74,10 @@
     })
   }
 
-  const isPaymentTabActive = computed(() => activeTab.value === TABS_MAP.payment)
-  const isBillsTabActive = computed(() => activeTab.value === TABS_MAP.bills)
+  const isActiveTab = computed(() => ({
+    payment: activeTab.value === TABS_MAP.payment,
+    bills: activeTab.value === TABS_MAP.bills
+  }))
 
   const renderTabCurrentRouter = async () => {
     const { tab = TABS_MAP.bills } = route.params
@@ -81,18 +85,23 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
-  const loadListPaymentMethods = async () => {
-    if (isPaymentTabActive.value) {
+  const loadListPaymentMethods = () => {
+    if (isActiveTab.value.payment) {
       listPaymentMethodsRef.value?.reloadList()
     }
-    await loadCardDefault()
+
+    loadCardDefault()
   }
 
   const loadCardDefault = async () => {
+    cardDefault.value.isLoader = false
     try {
       cardDefault.value = await props.loadPaymentMethodDefaultService()
-    } catch (error) {
-      cardDefault.value = null
+    } finally {
+      cardDefault.value = {
+        ...cardDefault.value,
+        loader: true
+      }
     }
   }
 
@@ -124,7 +133,7 @@
     <template #content>
       <DrawerAddCredit
         ref="drawerAddCreditRef"
-        v-if="cardDefault"
+        v-if="cardDefault.cardData"
         :cardDefault="cardDefault"
         :createService="props.addCreditService"
         @onSuccess="successAddCredit"
@@ -144,7 +153,7 @@
           :disabled="accountBlocked"
         >
           <BillsView
-            v-if="isBillsTabActive"
+            v-if="isActiveTab.bills"
             ref="viewBillsRef"
             v-bind="props.billsServices"
             :cardDefault="cardDefault"
@@ -153,7 +162,7 @@
         </TabPanel>
         <TabPanel header="Payment Methods">
           <PaymentListView
-            v-if="isPaymentTabActive"
+            v-if="isActiveTab.payment"
             ref="listPaymentMethodsRef"
             @update-credit-event="loadCardDefault"
             v-bind="props.paymentServices"
