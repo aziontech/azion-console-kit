@@ -7,37 +7,37 @@ const fixtures = {
     data: {
       products: [
         {
-          productSlug: "edge_application",
-          metricSlug: "requests",
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
           accounted: 0,
           value: 5.23,
-          currency: "BRL"
-        },
+          currency: 'BRL'
+        }
       ],
       product_detail: [
         {
-          productSlug: "edge_application",
-          metricSlug: "requests",
-          regionName: "Brazil",
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
+          regionName: 'Brazil',
           accounted: 776472,
           value: 4.97,
-          currency: "BRL"
-        },
+          currency: 'BRL'
+        }
       ],
       products_accounted: [
         {
-          productSlug: "edge_application",
-          metricSlug: "requests",
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
           accounted: 848506
-        },
+        }
       ],
       product_detail_accounted: [
         {
-          productSlug: "edge_application",
-          metricSlug: "requests",
-          regionName: "Brazil",
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
+          regionName: 'Brazil',
           accounted: 776472
-        },
+        }
       ]
     }
   },
@@ -60,9 +60,9 @@ const fixtures = {
                 price: 4.97,
                 slug: 'requests'
               }
-            ],
+            ]
           }
-        ],
+        ]
       }
     ]
   },

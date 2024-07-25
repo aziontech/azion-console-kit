@@ -80,7 +80,8 @@ export const listServiceAndProductsChangesService = async (billID) => {
 }
 
 const adapt = (httpResponse) => {
-  const { products, product_detail, products_accounted, product_detail_accounted } = httpResponse.body.data
+  const { products, product_detail, products_accounted, product_detail_accounted } =
+    httpResponse.body.data
   const statusCode = httpResponse.statusCode
   const data = []
 
@@ -96,8 +97,8 @@ const adapt = (httpResponse) => {
     }
   })
 
-  data.forEach(el => {
-    el.descriptions.forEach(desc => {
+  data.forEach((el) => {
+    el.descriptions.forEach((desc) => {
       product_detail.forEach((prodDetail, pos) => {
         if (desc.slug === prodDetail.metricSlug) {
           desc.data.push(createProductDetailData(prodDetail, product_detail_accounted[pos]))
@@ -116,13 +117,15 @@ const createProductData = (product, accounted) => ({
   service: replaceProductName(product.productSlug),
   value: product.value,
   slug: product.productSlug,
-  descriptions: [{
-    service: replaceMetricSlug(product.metricSlug),
-    slug: product.metricSlug,
-    quantity: accounted.accounted,
-    price: product.value,
-    data: []
-  }]
+  descriptions: [
+    {
+      service: replaceMetricSlug(product.metricSlug),
+      slug: product.metricSlug,
+      quantity: accounted.accounted,
+      price: product.value,
+      data: []
+    }
+  ]
 })
 
 const updateProductData = (productData, product, accounted) => {
@@ -171,7 +174,7 @@ const replaceProductName = (product) => {
     support_enterprise: 'Support Enterprise',
     support_mission_critical: 'Support Mission Critical',
     waf: 'WAF',
-    tiered_cache: 'Tiered Cache',
+    tiered_cache: 'Tiered Cache'
   }
 
   return products[product] ?? product
