@@ -30,7 +30,7 @@ const fixtures = {
   disclaimerTwentyThree:
     "Welcome to the Free Trial period. The credit of USD 23.40 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
   disclaimerZero:
-    "Welcome to the Free Trial period. The credit of USD  is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
+    "Welcome to the Free Trial period. The credit of USD is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
   disclaimerDefault:
     "Welcome to the Free Trial period. The credit of USD 300.00 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>."
 }
