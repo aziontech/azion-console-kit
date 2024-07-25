@@ -41,11 +41,8 @@ const formatDateToUS = (value) => {
 }
 
 const isDateStringValid = (dateString) => {
-  // Attempt to create a Date instance from the input string
-  const date = new Date(dateString)
-
-  // Check if the date is valid and the input string was successfully converted to a date
-  return !isNaN(date.getTime())
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  return dateRegex.test(dateString)
 }
 
 /**
