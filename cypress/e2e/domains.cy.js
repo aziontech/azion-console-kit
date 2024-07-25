@@ -34,9 +34,9 @@ const createEdgeApplicationCase = () => {
   // Arrange
   edgeAppName = generateUniqueName('edgeApp')
   cy.openProduct('Edge Application')
-  cy.get(selectors.edgeApplication.createButton).click()
-  cy.get(selectors.edgeApplication.nameInput).type(edgeAppName)
-  cy.get(selectors.edgeApplication.addressInput).type(`${edgeAppName}.edge.app`)
+  cy.get(selectors.edgeApplication.mainSettings.createButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
   // Act
   cy.get(selectors.form.actionsSubmitButton).click()
@@ -60,9 +60,9 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.dropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.domain.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -87,9 +87,9 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.dropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.domain.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.letsEncryptDropdownOption).click()
 
@@ -115,13 +115,13 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.dropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.domain.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
     cy.get(selectors.domains.enableMtlsSwitch).click()
     cy.get(selectors.domains.dropdownTrustedCA).click()
-    cy.get(selectors.domains.dropdownFilter).clear()
-    cy.get(selectors.domains.dropdownFilter).type(digitalCertificateName)
+    cy.get(selectors.domains.mtlsTrustedCADropdownFilter).clear()
+    cy.get(selectors.domains.mtlsTrustedCADropdownFilter).type(digitalCertificateName)
     cy.get(selectors.domains.trustedCAFirstDropdownOption).click()
 
     // Act
@@ -148,9 +148,9 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.dropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -171,7 +171,7 @@ describe('Domains spec', () => {
     cy.get(selectors.domains.fieldTextInput).clear()
     cy.get(selectors.domains.fieldTextInput).type(`${domainName}-edit`)
     cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.domain.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.edge.app`)
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
     cy.get(selectors.domains.activeSwitchEditForm).click()

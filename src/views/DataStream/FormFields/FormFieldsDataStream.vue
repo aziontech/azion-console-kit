@@ -117,6 +117,18 @@
           :showSourceControls="false"
           :showTargetControls="false"
           data-testid="data-stream-form__domains__domains-field"
+          :move-all-to-source-props="{
+            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-source-btn'
+          }"
+          :move-all-to-target-props="{
+            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-target-btn'
+          }"
+          :move-to-target-props="{
+            'data-testid': 'data-stream-form__domains-field-picklist__move-to-target-btn'
+          }"
+          :move-to-source-props="{
+            'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
+          }"
         >
           <template #sourceheader>Available Domains</template>
           <template #targetheader>Chosen Domains</template>

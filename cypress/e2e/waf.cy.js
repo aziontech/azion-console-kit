@@ -25,7 +25,7 @@ describe('WAF spec', () => {
     cy.verifyToast('success', 'Your waf rule has been created')
 
     cy.wait('@saveRuleset')
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
 
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(wafName)
@@ -57,7 +57,7 @@ describe('WAF spec', () => {
     cy.verifyToast('success', 'Your waf rule has been created')
 
     cy.wait('@saveRuleset')
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
     cy.get(selectors.list.searchInput).type(wafName)
@@ -91,7 +91,7 @@ describe('WAF spec', () => {
     cy.verifyToast('success', 'Your waf rule has been updated')
 
     cy.wait('@saveRuleset')
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
     cy.get(selectors.list.searchInput).type(wafName)
@@ -144,7 +144,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
@@ -194,7 +194,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
@@ -246,7 +246,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
@@ -298,7 +298,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
@@ -348,7 +348,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 
@@ -398,7 +398,7 @@ describe('WAF spec', () => {
     cy.get(selectors.wafs.listRow('status')).should('have.text', fixtures.status)
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
-    cy.get(selectors.wafs.breadcumbToList).click()
+    cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(wafName)
   })
 

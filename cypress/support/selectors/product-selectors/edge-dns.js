@@ -6,8 +6,8 @@ export default {
   cancelButton: '[data-testid="form-actions-cancel-button"] > .p-button-label',
   searchInput: '[data-testid="data-table-search-input"]',
   nameRow: '[data-testid="list-table-block__column__name__row"]',
-  showMore: '.underline',
-  domainRow: '.whitespace-pre',
+  showMore: '[data-testid="table-column-expand-text-column__show-more__toggle"]',
+  domainRow: '[data-testid="table-column-expand-text-column__value"]',
   statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
   list: {
     columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`

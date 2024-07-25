@@ -602,6 +602,7 @@
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :data-testid="`edge-firewall-rules-form__argument[${criteriaIndex}][${criteriaInnerRowIndex}]`"
               />
               <FieldDropdown
                 v-if="showSSLStatusDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
@@ -733,6 +734,7 @@
         <div class="flex gap-3 mt-6 mb-8 max-sm:flex-wrap">
           <div class="w-1/2 max-sm:w-full">
             <FieldDropdown
+              :data-testid="`edge-firewall-rules-form__behaviors[${behaviorItemIndex}]-dropdown`"
               :enableWorkaroundLabelToDisabledOptions="true"
               :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
@@ -754,6 +756,7 @@
           <div class="w-1/2 max-sm:w-full">
             <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
               <FieldDropdown
+                :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
                 :options="props.edgeFirewallFunctionsOptions"

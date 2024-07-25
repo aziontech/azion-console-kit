@@ -344,7 +344,17 @@
           Teams
         </label>
         <MultiSelect
-          data-testid="users-form__teams-field__multiselect"
+          :pt="{
+            root: {
+              'data-testid': 'users-form__teams-field__multiselect'
+            },
+            trigger: {
+              'data-testid': 'users-form__teams-field__multiselect-trigger'
+            },
+            filterInput: {
+              'data-testid': 'users-form__teams-field__multiselect-filter'
+            }
+          }"
           display="chip"
           filter
           autoFilterFocus

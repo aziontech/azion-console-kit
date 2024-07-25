@@ -3,7 +3,6 @@ export default {
   searchInput: '[data-testid="data-table-search-input"]',
   filteredRecordNameColumn: '[data-testid="list-table-block__column__name__row"]',
   filteredRecordMenuButton: '[data-testid="data-table-actions-column-body-actions-menu-button"]',
-  filteredRecordDeleteButton: '.p-menuitem-content > .p-menuitem-link',
   deleteDialogConfirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
   tokenName: '[data-testid="personal-token-form__name-field__input"]',
   submitButton: '[data-testid="form-actions-submit-button"]',

@@ -17,7 +17,6 @@
     wafServices: { type: Object, required: true },
     wafRulesAllowed: { type: Object, required: true },
     wafTuning: { type: Object, required: true }
-    
   })
 
   const mapTabs = ref({
