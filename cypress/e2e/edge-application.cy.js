@@ -41,7 +41,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev', ] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login

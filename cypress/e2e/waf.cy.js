@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 let wafName
 
-describe('WAF spec', { tags: ['@xfail'] }, () => {
+describe('WAF spec', { tags: [] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('WAF Rules')

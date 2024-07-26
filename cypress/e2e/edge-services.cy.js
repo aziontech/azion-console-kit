@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 let fixtures = {}
 
-describe('Edge Services spec', { tags: ['@xfail'] }, () => {
+describe('Edge Services spec', { tags: [] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')

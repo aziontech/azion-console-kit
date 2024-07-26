@@ -6,7 +6,7 @@ const fixtures = {
   region: [{ citySet: [{ name: 'Fayzabad', geonameId: 1142170 }] }]
 }
 
-describe('Your Settings spec',  { tags: ['@xfail'] }, () => {
+describe('Your Settings spec',  { tags: [] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/account', { fixture: 'account-settings.json' }).as(

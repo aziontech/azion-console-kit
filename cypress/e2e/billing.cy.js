@@ -2,7 +2,7 @@ import selectors from '../support/selectors'
 import fixtures from '../fixtures/billing.json'
 
 
-describe('Payment Methods spec',  { tags: ['@xfail'] }, () => {
+describe('Payment Methods spec',  { tags: [] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/payments/*').as('getPaymentMethodsApi')
