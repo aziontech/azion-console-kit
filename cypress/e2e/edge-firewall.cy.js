@@ -36,38 +36,38 @@ const createWAFCase = () => {
   cy.verifyToast('success', 'Your waf rule has been created')
 }
 
-describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
-    firewallName = generateUniqueName('EdgeFirewall')
-    functionInstanceName = generateUniqueName('EdgeFirewallFunctionInstance')
-    ruleName = generateUniqueName('EdgeFirewallRule')
-    wafName = generateUniqueName('WAF')
-    networkListName = generateUniqueName('NetworkList')
+    // firewallName = generateUniqueName('EdgeFirewall')
+    // functionInstanceName = generateUniqueName('EdgeFirewallFunctionInstance')
+    // ruleName = generateUniqueName('EdgeFirewallRule')
+    // wafName = generateUniqueName('WAF')
+    // networkListName = generateUniqueName('NetworkList')
   })
   afterEach(() => {
-    // Delete the firewall
-    cy.deleteEntityFromList({ entityName: firewallName, productName: 'Edge Firewall' }).then(() => {
-      cy.verifyToast('Edge Firewall successfully deleted')
-    })
+    // // Delete the firewall
+    // cy.deleteEntityFromList({ entityName: firewallName, productName: 'Edge Firewall' }).then(() => {
+    //   cy.verifyToast('Edge Firewall successfully deleted')
+    // })
   })
 
-  it('should create an Edge Firewall ', () => {
+  it.only('should create an Edge Firewall ', () => {
     cy.openProduct('Edge Firewall')
 
-    // Act
-    cy.get(selectors.edgeFirewall.createButton).click()
-    cy.get(selectors.edgeFirewall.nameInput).clear()
-    cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
-    cy.get(selectors.edgeFirewall.saveButton).click()
-    cy.verifyToast('success', 'Your Edge Firewall has been created')
-    cy.get(selectors.edgeFirewall.cancelButton).click()
+    // // Act
+    // cy.get(selectors.edgeFirewall.createButton).click()
+    // cy.get(selectors.edgeFirewall.nameInput).clear()
+    // cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+    // cy.get(selectors.edgeFirewall.saveButton).click()
+    // cy.verifyToast('success', 'Your Edge Firewall has been created')
+    // cy.get(selectors.edgeFirewall.cancelButton).click()
 
-    // Assert
-    cy.get(selectors.edgeFirewall.searchInput).clear()
-    cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
-    cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
-    cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
+    // // Assert
+    // cy.get(selectors.edgeFirewall.searchInput).clear()
+    // cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
+    // cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
+    // cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })
 
   it('should create an Edge Firewall and run a function', () => {

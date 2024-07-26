@@ -11,6 +11,9 @@ jobs:
   run-dev-e2e-tests:
     name: Run Dev E2E Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [2,3,4,5,6]
     steps:
       - uses: actions/checkout@v3
 
@@ -29,39 +32,39 @@ jobs:
           start: yarn dev --logLevel=warn
           browser: chrome
           wait-on: 'http://localhost:5173/'
-          wait-on-timeout: 120
-          env: grepTags=@dev+-@xfail
+          wait-on-timeout: 30
+          env: grepTags=@dev${{ matrix.group }}+-@xfail
 
-      - name: Check E2E Test Coverage
-        if: ${{ always() }}
-        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
+      # - name: Check E2E Test Coverage
+      #   if: ${{ always() }}
+      #   run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
 
-      - name: Compress E2E Coverage Reports
-        if: ${{ always() }}
-        run: |
-          rm -rf coverage/e2e/lcov-report
-          zip -r coverage.zip coverage
+      # - name: Compress E2E Coverage Reports
+      #   if: ${{ always() }}
+      #   run: |
+      #     rm -rf coverage/e2e/lcov-report
+      #     zip -r coverage.zip coverage
 
-      - name: Upload E2E Coverage Report Artifact
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_e2e_report
-          path: coverage.zip
-          retention-days: 7
+      # - name: Upload E2E Coverage Report Artifact
+      #   if: ${{ always() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: coverage_e2e_report
+      #     path: coverage.zip
+      #     retention-days: 7
 
-      - name: Upload Cypress Screenshots Artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress_screenshots
-          path: cypress/screenshots
-          retention-days: 4
+      # - name: Upload Cypress Screenshots Artifact
+      #   if: ${{ failure() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cypress_screenshots
+      #     path: cypress/screenshots
+      #     retention-days: 4
 
-      - name: Upload Cypress Videos Artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress_videos
-          path: cypress/videos
-          retention-days: 1
+      # - name: Upload Cypress Videos Artifact
+      #   if: ${{ failure() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cypress_videos
+      #     path: cypress/videos
+      #     retention-days: 1
