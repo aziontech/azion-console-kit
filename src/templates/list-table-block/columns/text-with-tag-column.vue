@@ -1,5 +1,5 @@
 <template>
-  <div class="gap-2 flex items-center">
+  <div class="gap-3 flex items-center">
     <p>{{ text }}</p>
     <PrimeTag
       v-bind="tagProps"
