@@ -123,7 +123,7 @@
       >
         <template #default>
           <Tag
-            severity="secondary"
+            severity="info"
             icon="pi pi-refresh"
             value="Last Updated: MM/DD/2023 02:32 PM"
           />
