@@ -76,11 +76,11 @@ jobs:
       
       - name: Coverage file
         run: |
-          echo "########################""
+          echo "########################"
           pwd
-          echo "########################""
+          echo "########################"
           cat ./nyc_output/out.json
-          echo "########################""
+          echo "########################"
 
       - name: Text Report
         run: |
