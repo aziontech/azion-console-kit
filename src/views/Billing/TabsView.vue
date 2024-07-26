@@ -153,7 +153,7 @@
           :disabled="accountBlocked"
           :pt="{
             headerAction: {
-              'data-testid': 'billing__bills-tab'
+              'data-testid': 'billing__bills-tab__button'
             }
           }"
         >
@@ -169,7 +169,7 @@
           header="Payment Methods"
           :pt="{
             headerAction: {
-              'data-testid': 'billing__payment-methods-tab'
+              'data-testid': 'billing__payment-methods-tab__button'
             }
           }"
         >
