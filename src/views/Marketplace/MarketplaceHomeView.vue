@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-  import { computed, onBeforeMount, ref } from 'vue'
+  import { computed, onBeforeMount, ref, watch } from 'vue'
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
@@ -127,6 +127,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const selectedCategory = ref({ name: 'All', code: 'all' })
+  const currentCategory = ref({ name: 'All', code: 'all' })
   const categories = ref([])
   const $toast = useToast()
   const loading = ref(false)
@@ -177,9 +178,19 @@
     return props.listSolutionsService(payload)
   }
 
-  const changeCategory = async () => {
-    const code = selectedCategory.value.code
-    const category = code === 'all' ? undefined : code
+  watch(selectedCategory, (newValue) => {
+    if (newValue) {
+      currentCategory.value = newValue
+    }
+  })
+
+  const changeCategory = async ({ value }) => {
+    if (value === null) {
+      selectedCategory.value = currentCategory.value
+      return
+    }
+
+    const category = selectedCategory.value.code
 
     try {
       loading.value = true
@@ -213,7 +224,7 @@
     }
 
     try {
-      selectedCategory.value = {}
+      selectedCategory.value = { code: '', name: '' }
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }
