@@ -1,4 +1,4 @@
-import selectors from '../support/selectors'
+import selectors from '../../support/selectors'
 
 describe('Your Settings spec', () => {
   beforeEach(() => {

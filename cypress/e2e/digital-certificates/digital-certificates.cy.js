@@ -1,6 +1,6 @@
-import generateUniqueName from '../support/utils'
-import selectors from '../support/selectors'
-import fixtures from '../fixtures/digital-certificates'
+import generateUniqueName from '../../support/utils'
+import selectors from '../../support/selectors'
+import fixtures from '../../fixtures/digital-certificates'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 

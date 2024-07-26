@@ -4,5 +4,9 @@
     "lib": ["es5", "dom"],
     "types": ["cypress"]
   },
-  "include": ["./**/*", "../support/**/*"]
+  "include": [
+    "./**/*",
+    "../support/**/*",
+    "cypress/e2e/account/**/*"
+  ]
 }

@@ -1,6 +1,6 @@
-import selectors from '../support/selectors'
+import selectors from '../../support/selectors'
 import fixtures from '../fixtures/billing.json'
-import { generateUniqueNameWithLetters } from '../support/utils'
+import { generateUniqueNameWithLetters } from '../../support/utils'
 
 let cardHolderName
 

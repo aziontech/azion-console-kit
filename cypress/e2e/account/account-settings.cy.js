@@ -1,6 +1,6 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
-import selectors from '../support/selectors'
-import generateUniqueName from '../support/utils'
+import selectors from '../../support/selectors'
+import generateUniqueName from '../../support/utils'
 
 const fixtures = {
   companyName: 'Company Name',

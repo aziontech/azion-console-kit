@@ -1,5 +1,5 @@
-import selectors from '../support/selectors'
-import generateUniqueName from '../support/utils'
+import selectors from '../../support/selectors'
+import generateUniqueName from '../../support/utils'
 
 let domainName
 let edgeAppName

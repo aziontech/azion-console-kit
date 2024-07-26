@@ -1,4 +1,4 @@
-import selectors from '../support/selectors'
+import selectors from '../../support/selectors'
 
 const fixtures = {
   preLoadingTag: `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`,

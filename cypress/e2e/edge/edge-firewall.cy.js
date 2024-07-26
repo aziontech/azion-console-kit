@@ -1,6 +1,6 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
-import generateUniqueName from '../support/utils'
-import selectors from '../support/selectors'
+import generateUniqueName from '../../support/utils'
+import selectors from '../../support/selectors'
 
 let firewallName, functionInstanceName, ruleName, networkListName, wafName
 

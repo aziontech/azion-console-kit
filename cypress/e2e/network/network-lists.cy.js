@@ -1,5 +1,5 @@
-import generateUniqueName from '../support/utils'
-import selectors from '../support/selectors'
+import generateUniqueName from '../../support/utils'
+import selectors from '../../support/selectors'
 
 let networkListName
 

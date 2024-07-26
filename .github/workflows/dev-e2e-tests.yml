@@ -11,6 +11,9 @@ jobs:
   run-dev-e2e-tests:
     name: Run Dev E2E Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [account, billing, digital-certificates, domains, edge, network, purge, teams, users, variables, waf]
     steps:
       - uses: actions/checkout@v3
 
@@ -28,6 +31,7 @@ jobs:
           build: yarn build
           start: yarn dev --logLevel=warn
           browser: chrome
+          spec: cypress/e2e/${{ matrix.group }}/**/*
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           env: grepTags=@dev+-@xfail

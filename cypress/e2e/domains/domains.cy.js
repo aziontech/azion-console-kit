@@ -1,6 +1,6 @@
-import selectors from '../support/selectors'
-import generateUniqueName from '../support/utils'
-import fixtures from '../fixtures/digital-certificates'
+import selectors from '../../support/selectors'
+import generateUniqueName from '../../support/utils'
+import fixtures from '../../fixtures/digital-certificates'
 
 let domainName
 let edgeAppName
