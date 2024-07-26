@@ -52,6 +52,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:    
+      - name: Checkout Code  # You likely need the code for NYC config
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x' # Or your desired version
+
+      - name: Install Dependencies (Including NYC)
+        run: npm install --global nyc  # Install NYC globally for easier access
+
       - name: Download All Coverage Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -60,6 +71,23 @@ jobs:
       - name: List files
         run: |
           find ./ | grep -v "node_modules"
+          mkdir ./nyc_output
+          npx nyc merge ./coverage_report/coverage_reportx/*.json ./nyc_output/out.json
+      
+      - name: Text Report
+        run: |
+          npx nyc report --reporter=text-summary
+
+      - name: HTML report
+        run: |
+          npx nyc report --reporter=html --report-dir=./coverage/e2e
+      
+      - name: List files
+        run: |
+          find ./ | grep -v "node_modules"
+
+
+
 
       # - name: Check E2E Test Coverage
       #   if: ${{ always() }}
