@@ -29,6 +29,7 @@ import DOMAINS_PRODUCT_SELECTORS from './selectors/product-selectors/domains.js'
 import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selectors/digital-certificates.js'
 import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
 import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
+import CREDENTIALS_HANDSON from './selectors/product-selectors/credentials-handson.js'
 
 const selectors = {
   billing: BILLING_SELECTORS,
@@ -56,7 +57,8 @@ const selectors = {
   digitalCertificates: DIGITAL_CERTIFICATES_PRODUCT_SELECTORS,
   purge: EDGE_PURGE_PRODUCT_SELECTORS,
   usersManagement: USERS_MANAGEMENT_VIEW_SELECTORS,
-  teams: TEAMS_BLOCK_SELECTORS
+  teams: TEAMS_BLOCK_SELECTORS,
+  ...CREDENTIALS_HANDSON
 }
 
 export default selectors

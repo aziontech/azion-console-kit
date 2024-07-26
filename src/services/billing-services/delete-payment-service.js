@@ -21,6 +21,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Payment Method successfully deleted!'
     case 400:
+      if (httpResponse.body?.detail) throw new Error(httpResponse.body.detail).message
       throw new Errors.NotFoundError().message
     case 401:
       throw new Errors.InvalidApiTokenError().message
