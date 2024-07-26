@@ -57,42 +57,42 @@ describe('Edge Application', { tags: ['@dev2'] }, () => {
     }
   })
   afterEach(() => {
-    // // Delete the edge application
-    // cy.deleteEntityFromList({
-    //   entityName: fixtures.edgeApplicationName,
-    //   productName: 'Edge Application'
-    // }).then(() => {
-    //   cy.verifyToast('Resource successfully deleted')
-    // })
+    // Delete the edge application
+    cy.deleteEntityFromList({
+      entityName: fixtures.edgeApplicationName,
+      productName: 'Edge Application'
+    }).then(() => {
+      cy.verifyToast('Resource successfully deleted')
+    })
   })
 
-  it.only('should create a rule engine', () => {
+  it('should create a rule engine', () => {
     // Arrange
     cy.openProduct('Edge Application')
-    // createEdgeApplicationCase()
-    // cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
+    createEdgeApplicationCase()
+    cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
 
-    // // Act
-    // // Create a rule
-    // cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
-    // cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
-    // cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
-    // cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
-    // cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
-    // cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
-    // cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
-    // cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
-    // cy.get(selectors.form.actionsSubmitButton).click()
-    // cy.verifyToast('success', 'Your Rules Engine has been created.')
+    // Act
+    // Create a rule
+    cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
+    cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
+    cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your Rules Engine has been created.')
 
-    // // Assert
-    // cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
-    // cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
+    // Assert
+    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
 
-    // // Cleanup - Remove the rule engine
-    // cy.deleteEntityFromLoadedList().then(() => {
-    //   cy.verifyToast('Rule Engine successfully deleted')
-    // })
+    // Cleanup - Remove the rule engine
+    cy.deleteEntityFromLoadedList().then(() => {
+      cy.verifyToast('Rule Engine successfully deleted')
+    })
   })
 
   it('should add an origin', () => {
