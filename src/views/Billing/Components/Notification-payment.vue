@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex flex-col">
-        <h4 class="text-lg font-bold">The Free Trial credit balance is running low</h4>
+        <h4 class="text-lg font-bold">The Free Trial credit balance is running</h4>
         <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl text-sm">
           <slot
             name="textNotification"
@@ -33,18 +33,18 @@
       <PrimeButton
         class="w-full min-w-max"
         icon="pi pi-plus"
-        label="Add Credit"
+        label="Credit"
         @click="props.clickAddCredit"
         outlined
-        v-if="props.showBtnAddCredit"
+        :disabled="props.disabledBtnAddCredit"
       />
       <PrimeButton
         class="w-full min-w-max"
         icon="pi pi-plus"
         severity="secondary"
         @click="props.clickAddPaymentMethod"
-        label="Add Payment Method"
-        v-if="props.showBtnAddPaymentMethod"
+        label="Payment Method"
+        :disabled="props.disabledBtnAddPaymentMethod"
       />
     </div>
   </div>
@@ -65,13 +65,13 @@
     clickAddCredit: Function,
     clickAddPaymentMethod: Function,
     clickLinkPaymentMethod: Function,
-    showBtnAddCredit: {
+    disabledBtnAddCredit: {
       type: Boolean,
-      default: true
+      default: false
     },
-    showBtnAddPaymentMethod: {
+    disabledBtnAddPaymentMethod: {
       type: Boolean,
-      default: true
+      default: false
     }
   })
 
