@@ -16,10 +16,12 @@ export const listPaymentHistoryService = async () => {
 const STATUS_AS_TAG = {
   Paid: {
     content: 'Paid',
+    icon: 'pi pi-check-circle',
     severity: 'success'
   },
   Pending: {
     content: 'Pending',
+    icon: 'pi pi-calendar',
     severity: 'danger'
   },
   NotCharged: {
