@@ -12,6 +12,9 @@ const fixture = {
     privateKey:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
   },
+  nameErrorMock: {
+    detail: 'The field name needs to be unique. There is already another certificate with this name in your account.'
+  },
   errorMock: {
     error: ['Error Message']
   }
@@ -54,6 +57,18 @@ describe('DigitalCertificatesServices', () => {
     const feedbackMessage = sut(fixture.payloadMock)
 
     expect(feedbackMessage).resolves.toBe('Your digital certificate has been updated!')
+  })
+
+  it('should parse correctly the feedback message when the error is a string inside an object', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: fixture.nameErrorMock
+    })
+    const { sut } = makeSut()
+
+    const response = sut(fixture.payloadMock)
+
+    expect(response).rejects.toThrow(fixture.nameErrorMock.detail)
   })
 
   it.each([
