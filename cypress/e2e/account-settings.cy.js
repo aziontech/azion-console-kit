@@ -10,7 +10,7 @@ const fixtures = {
   complement: 'Apt. 123'
 }
 
-describe('Account Settings spec', { tags: ['@dev', ] }, () => {
+describe('Account Settings spec', { tags: ['@dev'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Account Settings')
