@@ -36,8 +36,30 @@ jobs:
           env: grepTags=@dev${{ matrix.group }}+-@xfail
 
       - name: List files
-        run: find ./ | grep -v "node_modules"
+        run: |
+          find ./ | grep -v "node_modules"
+          mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_reportx
+          path: |
+              .nyc_output/*
+          retention-days: 1
+
+  download_and_merge:
+    needs: run-dev-e2e-tests
+    runs-on: ubuntu-latest
+
+    steps:    
+      - name: Download All Coverage Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: coverage_report
+
+      - name: List files
+        run: |
+          find ./ | grep -v "node_modules"
 
       # - name: Check E2E Test Coverage
       #   if: ${{ always() }}
