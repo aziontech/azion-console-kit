@@ -72,7 +72,7 @@ jobs:
         run: |
           find ./ | grep -v "node_modules"
           mkdir ./nyc_output
-          npx nyc merge ./coverage_report/coverage_reportx/*.json ./nyc_output/out.json
+          npx nyc merge ./coverage_report/coverage_reportx ./nyc_output/out.json
       
       - name: Text Report
         run: |
