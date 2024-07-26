@@ -94,6 +94,9 @@ jobs:
         run: |
           find ./ | grep -v "node_modules"
 
+      - name: Generate lcov.info Report 
+        run: npx nyc report --reporter=lcovonly --report-dir=./coverage/e2e
+
       - name: Check E2E Test Coverage
         if: ${{ always() }}
         run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
