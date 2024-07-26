@@ -74,6 +74,14 @@ jobs:
           mkdir ./nyc_output
           npx nyc merge ./coverage_report/coverage_reportx ./nyc_output/out.json
       
+      - name: Coverage file
+        run: |
+          echo "########################""
+          pwd
+          echo "########################""
+          cat ./nyc_output/out.json
+          echo "########################""
+
       - name: Text Report
         run: |
           npx nyc report --reporter=text-summary
