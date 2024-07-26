@@ -35,6 +35,10 @@ jobs:
           wait-on-timeout: 30
           env: grepTags=@dev${{ matrix.group }}+-@xfail
 
+      - name: List files
+        run: find ./ | grep -v "node_modules"
+
+
       # - name: Check E2E Test Coverage
       #   if: ${{ always() }}
       #   run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
