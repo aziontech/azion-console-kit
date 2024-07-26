@@ -7,16 +7,16 @@
   "include": [
     "./**/*",
     "../support/**/*",
-    "cypress/e2e/account/**/*",
-    "cypress/e2e/billing/**/*",
-    "cypress/e2e/digital-certificates/**/*",
-    "cypress/e2e/domains/**/*",
-    "cypress/e2e/edge/**/*",
-    "cypress/e2e/network/**/*",
-    "cypress/e2e/purge/**/*",
-    "cypress/e2e/teams/**/*",
-    "cypress/e2e/users/**/*",
-    "cypress/e2e/variables/**/*",
-    "cypress/e2e/waf/**/*"
+    "./account/**/*",
+    "./billing/**/*",
+    "./digital-certificates/**/*",
+    "./domains/**/*",
+    "./edge/**/*",
+    "./network/**/*",
+    "./purge/**/*",
+    "./teams/**/*",
+    "./users/**/*",
+    "./variables/**/*",
+    "./waf/**/*"
   ]
 }
