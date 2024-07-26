@@ -15,6 +15,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Credit"
+          size="small"
           @click="drawersMethods.openDrawerAddCredit"
           data-testid="payment-methods__add-credit__button"
           outlined
@@ -23,6 +24,7 @@
           icon="pi pi-plus"
           data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
+          size="small"
           @click="drawersMethods.openDrawerPaymentMethod"
           label="Payment Method"
         />

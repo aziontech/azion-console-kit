@@ -9,6 +9,7 @@
           <PrimeButton
             icon="pi pi-file"
             outlined
+            size="small"
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
@@ -55,7 +56,7 @@
             {{ currentInvoice.creditUsedForPayment }}
           </SkeletonBlock>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between items-center">
           <span class="text-color-secondary text-sm flex items-center gap-3">
             <b class="font-medium text-2xl text-color"> Total </b>
             (Amount Payable)
@@ -64,10 +65,12 @@
             sizeHeight="medium"
             width="6rem"
             :isLoaded="isCurrentInvoiceLoaded"
-            class="font-medium text-2xl"
+            class="font-medium flex items-center gap-1"
           >
-            <span class="text-color text-sm font-medium">$</span>
-            {{ currentInvoice.total }}
+            <span class="text-sm">$</span>
+            <span class="text-2xl">
+              {{ currentInvoice.total }}
+            </span>
           </SkeletonBlock>
         </div>
       </div>
@@ -82,6 +85,7 @@
             icon="pi pi-arrow-up-right"
             outlined
             iconPos="right"
+            size="small"
             label="Show Other Plans"
             @click="showOtherPlans"
           />
@@ -172,7 +176,7 @@
     :clickAddCredit="drawersMethods.openDrawerAddCredit"
     :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
     :clickLinkPaymentMethod="goToPayment"
-    :showBtnAddCredit="defaultCardStatus.hasData"
+    :disabledBtnAddCredit="!defaultCardStatus.hasData"
   />
 
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
@@ -200,9 +204,9 @@
     <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
-        label="Add Credit"
+        label="Credit"
         icon="pi pi-plus"
-        :disabled="!isCardDefault"
+        :disabled="!defaultCardStatus.hasData"
         @click="drawersMethods.openDrawerAddCredit"
         outlined
       >
@@ -211,8 +215,8 @@
         class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"
-        label="Add Payment Method"
-        @click="goToPayment"
+        label="Payment Method"
+        @click="drawersMethods.openDrawerPaymentMethod"
       />
     </template>
   </EmptyResultsBlock>
@@ -279,7 +283,7 @@
 
   const defaultCardStatus = computed(() => ({
     loaded: props.cardDefault.loader,
-    hasData: props.cardDefault.cardData
+    hasData: !!props.cardDefault.cardData
   }))
 
   const isCurrentInvoiceLoaded = ref(true)
