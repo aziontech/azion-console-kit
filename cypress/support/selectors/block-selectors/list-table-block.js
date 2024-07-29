@@ -1,14 +1,11 @@
 export default {
-  breadcumbReturnToList: ':nth-child(3) > .p-menuitem-link',
   createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
   searchInput: '[data-testid="data-table-search-input"]',
   searchField: '[data-testid="data-table-search-input"]',
   filteredRow: {
     column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    nameColumn: (columnName = 'name') =>
-      `[data-testid="list-table-block__column__${columnName}__row"]`,
     statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
-    empty: 'tr.p-datatable-emptymessage > td',
+    empty: '[data-testid="list-table-block__empty-message__text"]',
     lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
     lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'
   },
@@ -23,8 +20,5 @@ export default {
   deleteDialog: {
     confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
     deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
-  },
-  toast: {
-    content: '.p-toast-message-content'
   }
 }

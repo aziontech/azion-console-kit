@@ -73,6 +73,11 @@
       error: `${id}__error-message`
     }
   })
+
+  const radioTestId = (name, nameField, index) => {
+    const remainder = name ?? `${nameField}-radio-${index}`
+    return `${customTestId.value.radio}__${remainder}`
+  }
 </script>
 
 <template>
@@ -100,7 +105,7 @@
           :isCard="props.isCard"
           v-bind="item"
           @onRadioChange="emit('onRadioChange', item.inputValue)"
-          :data-testid="customTestId.radio"
+          :data-testid="radioTestId(item.name, props.nameField, index)"
         >
           <template #footer>
             <slot

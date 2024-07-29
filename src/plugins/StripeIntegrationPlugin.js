@@ -7,7 +7,14 @@ export default {
   install: (Vue, options) => {
     const environment = getEnvironment()
 
-    const stripeClient = makeStripeClient(environment)
+    let stripeClient
+    try {
+      stripeClient = makeStripeClient(environment)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return
+    }
 
     const app = Vue
     app.config.globalProperties.$stripe = stripeClient

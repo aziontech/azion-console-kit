@@ -10,10 +10,5 @@ export default {
   searchInput: '[data-testid="data-table-search-input"]',
   nameRow: '[data-testid="list-table-block__column__name__row"]',
   countriesListOption: (recordType) => `#countriesList_${recordType}`,
-  typeRow: '[data-testid="list-table-block__column__listType__row"]',
-  actionButton:
-    '[data-testid="data-table-actions-column-body-actions-menu-button"] > .p-button-icon',
-  deleteButton: '.p-menuitem-content > .p-menuitem-link > .p-menuitem-text',
-  deleteInput: '[data-testid="delete-dialog-confirmation-input-field"]',
-  confirmDeleteButton: '[data-testid="delete-dialog-footer-delete-button"] > .p-button-label'
+  typeRow: '[data-testid="list-table-block__column__listType__row"]'
 }

@@ -1,12 +1,16 @@
 <template>
   <ul class="flex flex-col gap-1">
-    <li class="whitespace-pre">
+    <li
+      class="whitespace-pre"
+      data-testid="table-column-expand-text-column__value"
+    >
       {{ textToShow }}
     </li>
     <li
       v-if="displayShowMore"
       @click.stop="showAll"
       class="underline cursor-pointer"
+      data-testid="table-column-expand-text-column__show-more__toggle"
     >
       {{ displayRemainingItems }}
     </li>

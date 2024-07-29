@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { makeStripeClient } from '@/plugins/factories/stripe-integration-factory'
 
 const makeSut = () => {
   return {
     sut: makeStripeClient
   }
+}
+
+const fixtures = {
+  stripeToken: 'token_test_1234556'
 }
 
 describe('StripteIntegrationFactory', () => {
@@ -23,10 +27,18 @@ describe('StripteIntegrationFactory', () => {
   })
 
   it('should create analytics with correct configuration', () => {
+    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', fixtures.stripeToken)
     const { sut } = makeSut()
 
     const stripeClient = sut('development')
 
     expect(stripeClient).toBeTruthy()
+  })
+
+  it('should return a error on missing stripe token', () => {
+    vi.unstubAllEnvs()
+    const { sut } = makeSut()
+
+    expect(() => sut('development')).toThrowError('Stripe token is missing, cannot load Stripe')
   })
 })

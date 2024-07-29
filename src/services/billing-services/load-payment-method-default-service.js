@@ -28,7 +28,7 @@ const adapt = (httpResponse) => {
           isDefault: responseCard.is_default
         }
       }
-    : null
+    : {}
 
   return {
     body: parseBilling,

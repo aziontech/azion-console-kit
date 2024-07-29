@@ -23,7 +23,9 @@
   }
   function navigateToCreatePage() {
     emit('click-to-create')
-    router.push(props.createPagePath)
+    if (props.createPagePath) {
+      router.push(props.createPagePath)
+    }
   }
 </script>
 

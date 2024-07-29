@@ -4,7 +4,6 @@
   import LabelBlock from '@/templates/label-block'
   import { useField } from 'vee-validate'
   import InlineMessage from 'primevue/inlinemessage'
-  import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import { ref } from 'vue'
   import cardFlagBlock from '@templates/card-flag-block'
@@ -124,12 +123,12 @@
       >
         The credit balance will be included in the monthly invoices, along with all consumption up
         to the last day of the month. Change
-        <PrimeButton
-          label="payment method"
-          link
-          class="p-0 text-sm"
+        <span
           @click="goToPaymentMethod"
-        />.
+          class="text-[var(--text-color-link)] cursor-pointer"
+        >
+          payment method.
+        </span>
       </InlineMessage>
     </template>
   </FormHorizontal>

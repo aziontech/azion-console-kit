@@ -6,7 +6,7 @@ export default {
   dropdownTrigger: (name) =>
     `[data-testid="waf-rules-form__${name}-field__dropdown"] .p-dropdown-trigger`,
   dropdownOptions: (name, position) => `#${name}_${position}`,
-  breadcumbToList: '.p-breadcrumb-list li.p-menuitem:nth-child(3) .p-menuitem-link',
+  breadcrumbToList: '[data-testid="page-heading-block__breadcrumb__WAF Rules"]',
   listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
   seeMore: (columnName) =>
     `[data-testid="list-table-block__column__${columnName}__row"] .underline`,
@@ -26,7 +26,7 @@ export default {
     headerField: (zoneId) =>
       `[data-testid="allowed-rules-form__zone[${zoneId}]__header-field__input"]`,
     matchesOnRadio: (zoneId, position) =>
-      `[data-testid="allowed-rules-form__zone[${zoneId}]__matches-on-field__radio"][name="matchZones[${zoneId}].matches_on-radio-${position}"]`,
+      `[data-testid="allowed-rules-form__zone[${zoneId}]__matches-on-field__radio__matchZones[${zoneId}].matches_on-radio-${position}"]`,
     deleteMatchZoneButton: (zoneId) =>
       `[data-testid="allowed-rules-form__delete-match-zone[${zoneId}]__button"]`,
     addZoneButton: '[data-testid="allowed-rules-form__add-match-zone__button"]',

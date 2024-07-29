@@ -87,12 +87,12 @@ describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
     cy.get(selectors.edgeFirewall.functionInstanceName).type(functionInstanceName)
-    cy.get(selectors.edgeFirewall.behaviorsDropdown).click()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).clear()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).type(
+    cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
+    cy.get(selectors.edgeFirewall.functionInstancDropdownFilter).clear()
+    cy.get(selectors.edgeFirewall.functionInstancDropdownFilter).type(
       'Edge Firewall Test Function - NAO DELETAR{enter}'
     )
-    cy.get(selectors.edgeFirewall.functionInstanceDropdownIcon).click()
+    cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
     cy.get(selectors.edgeFirewall.functionInstanceDropdownFunction).click()
     cy.get(selectors.edgeFirewall.functionInstanceSubmit).click()
     cy.verifyToast('success', 'Your Function has been created')
@@ -187,8 +187,8 @@ describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorFirstOption).click()
     cy.wait(1000)
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).clear()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).type(networkListName)
+    cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).clear()
+    cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).type(networkListName)
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaValueFirstOption).click()
 
@@ -255,8 +255,8 @@ describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.behaviorsWafOption).click()
     cy.get(selectors.edgeFirewall.rulesWafDropdown).click()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).clear()
-    cy.get(selectors.edgeFirewall.dropdownValueFilter).type(wafName)
+    cy.get(selectors.edgeFirewall.rulesWafDropdownFilter).clear()
+    cy.get(selectors.edgeFirewall.rulesWafDropdownFilter).type(wafName)
     cy.get(selectors.edgeFirewall.rulesWafFirstOption).click()
     cy.get(selectors.edgeFirewall.rulesWafModeDropdown).click()
     cy.get(selectors.edgeFirewall.rulesWafFirstModeOption).click()
