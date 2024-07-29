@@ -369,7 +369,7 @@
       const [{ status, reason, value }] = await props.createWafRulesAllowedTuningService({
         attackEvents,
         wafId: wafRuleId.value,
-        reason: reasonAttack
+        description: reasonAttack
       })
       if (status === 'rejected') {
         showToast(reason, 'error')

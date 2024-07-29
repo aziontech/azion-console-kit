@@ -289,6 +289,10 @@
       type: String,
       default: () => ''
     },
+    dataFilted: {
+      type: Array,
+      default: () => []
+    },
     listService: {
       required: true,
       type: Function
@@ -479,4 +483,9 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
+
+  watch(
+    () => props.dataFilted,
+    (newValue) => (data.value = newValue)
+  )
 </script>
