@@ -708,7 +708,7 @@
         nameField="phase"
         isCard
         :options="phasesRadioOptions"
-        data-testid="rule-form-phase-radio"
+        data-testid="edge-application-rule-form__phase__radio-group"
         :disabled="isEditDrawer"
       />
     </template>
