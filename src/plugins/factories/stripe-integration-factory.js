@@ -2,13 +2,13 @@ import { loadStripe } from '@stripe/stripe-js'
 
 const environment = {
   development: {
-    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
+    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN
   },
   stage: {
-    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
+    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN
   },
   production: {
-    stripeToken: 'pk_test_geJ5k5eFT1SbHQYGoVRyG1Jy00izFirDs4'
+    stripeToken: import.meta.env.VITE_PROD_STRIPE_TOKEN
   }
 }
 
