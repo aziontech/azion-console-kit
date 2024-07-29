@@ -34,7 +34,8 @@ const fixture = {
     sans: ['SAN1', 'SAN2', 'SAN3']
   },
   nameErrorMock: {
-    detail: 'The field name needs to be unique. There is already another certificate with this name in your account.'
+    detail:
+      'The field name needs to be unique. There is already another certificate with this name in your account.'
   },
   errorMock: {
     error: ['Error Message']
