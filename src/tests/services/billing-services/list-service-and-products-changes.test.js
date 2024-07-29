@@ -8,35 +8,133 @@ const fixtures = {
       products: [
         {
           productSlug: 'edge_application',
-          metricSlug: 'requests',
-          accounted: 0,
-          value: 5.23,
+          value: 6.75,
+          currency: 'BRL'
+        },
+        {
+          productSlug: 'data_stream',
+          value: 0,
           currency: 'BRL'
         }
       ],
-      product_detail: [
+      productMetricsValue: [
         {
           productSlug: 'edge_application',
           metricSlug: 'requests',
-          regionName: 'Brazil',
-          accounted: 776472,
-          value: 4.97,
-          currency: 'BRL'
+          value: 5.23
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          value: 1.52
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_data_streamed',
+          value: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_requests',
+          value: 0
         }
       ],
-      products_accounted: [
+      productMetricsAccounted: [
         {
           productSlug: 'edge_application',
           metricSlug: 'requests',
           accounted: 848506
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          accounted: 1.726767336
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_data_streamed',
+          accounted: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_requests',
+          accounted: 0
         }
       ],
-      product_detail_accounted: [
+      productMetricsRegionValue: [
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
+          regionName: 'Brazil',
+          value: 4.97
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
+          regionName: 'Canada',
+          value: 0
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          regionName: 'Brazil',
+          value: 1.46
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          regionName: 'Canada',
+          value: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_data_streamed',
+          regionName: 'Brazil',
+          value: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_requests',
+          regionName: 'Brazil',
+          value: 0
+        }
+      ],
+      productMetricsRegionAccounted: [
         {
           productSlug: 'edge_application',
           metricSlug: 'requests',
           regionName: 'Brazil',
           accounted: 776472
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'requests',
+          regionName: 'Canada',
+          accounted: 0
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          regionName: 'Brazil',
+          accounted: 1.539394378
+        },
+        {
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred',
+          regionName: 'Canada',
+          accounted: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_data_streamed',
+          regionName: 'Brazil',
+          accounted: 0
+        },
+        {
+          productSlug: 'data_stream',
+          metricSlug: 'data_stream_requests',
+          regionName: 'Brazil',
+          accounted: 0
         }
       ]
     }
@@ -45,8 +143,9 @@ const fixtures = {
     data: [
       {
         service: 'Edge Application',
-        value: 5.23,
+        value: 6.75,
         slug: 'edge_application',
+        currency: 'BRL',
         descriptions: [
           {
             service: 'Total Requests (per 10,000)',
@@ -59,6 +158,63 @@ const fixtures = {
                 quantity: 776472,
                 price: 4.97,
                 slug: 'requests'
+              },
+              { country: 'Canada', quantity: 0, price: 0, slug: 'requests' }
+            ]
+          },
+          {
+            service: 'Total Data Transfered (per GB)',
+            slug: 'data_transferred',
+            quantity: 1.726767336,
+            price: 1.52,
+            data: [
+              {
+                country: 'Brazil',
+                quantity: 1.539394378,
+                price: 1.46,
+                slug: 'data_transferred'
+              },
+              {
+                country: 'Canada',
+                quantity: 0,
+                price: 0,
+                slug: 'data_transferred'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        service: 'Data Stream',
+        value: 0,
+        slug: 'data_stream',
+        currency: 'BRL',
+        descriptions: [
+          {
+            service: 'Data Streamed (GB)',
+            slug: 'data_stream_data_streamed',
+            quantity: 0,
+            price: 0,
+            data: [
+              {
+                country: 'Brazil',
+                quantity: 0,
+                price: 0,
+                slug: 'data_stream_data_streamed'
+              }
+            ]
+          },
+          {
+            service: 'Total Requests (per 10,000)',
+            slug: 'data_stream_requests',
+            quantity: 0,
+            price: 0,
+            data: [
+              {
+                country: 'Brazil',
+                quantity: 0,
+                price: 0,
+                slug: 'data_stream_requests'
               }
             ]
           }
@@ -88,5 +244,24 @@ describe('BillingServices', () => {
     const result = await sut()
 
     expect(result).toEqual(fixtures.formattedResponse.data)
+  })
+
+  it('should return an error if the request fails', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockRejectedValueOnce(fixtures.mockError)
+    const { sut } = makeSut()
+
+    await expect(sut()).rejects.toEqual(fixtures.mockError)
+  })
+
+  it('should return empty array if no products are found', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { data: { products: [] } }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual([])
   })
 })

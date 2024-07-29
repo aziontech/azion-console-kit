@@ -50,7 +50,6 @@ export const listServiceAndProductsChangesService = async (billID) => {
         regionName
         value: sum
       }
-     
       productMetricsRegionAccounted: billDetail(
         aggregate: { sum: accounted }
         groupBy: [productSlug, metricSlug, regionName]
@@ -154,30 +153,35 @@ const METRIC_SLUGS = {
 }
 
 const mapRegionMetrics = (metric, regionMetricsGrouped) => {
-  return regionMetricsGrouped
-    .filter(
-      (regionMetric) =>
-        regionMetric.productSlug === metric.productSlug &&
-        regionMetric.metricSlug === metric.metricSlug
-    )
-    .map((regionMetric) => ({
-      country: regionMetric.regionName,
-      quantity: regionMetric.accounted,
-      price: regionMetric.value,
-      slug: regionMetric.metricSlug
-    }))
+  return regionMetricsGrouped.reduce((list, regionMetric) => {
+    if (
+      regionMetric.productSlug === metric.productSlug &&
+      regionMetric.metricSlug === metric.metricSlug
+    ) {
+      list.push({
+        country: regionMetric.regionName,
+        quantity: regionMetric.accounted,
+        price: regionMetric.value,
+        slug: regionMetric.metricSlug
+      })
+    }
+    return list
+  }, [])
 }
 
 const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
-  return metricsGrouped
-    .filter((metric) => metric.productSlug === product.productSlug)
-    .map((metric) => ({
-      service: METRIC_SLUGS[metric.metricSlug],
-      slug: metric.metricSlug,
-      quantity: metric.accounted,
-      price: metric.value,
-      data: mapRegionMetrics(metric, regionMetricsGrouped)
-    }))
+  return metricsGrouped.reduce((list, metric) => {
+    if (metric.productSlug === product.productSlug) {
+      list.push({
+        service: METRIC_SLUGS[metric.metricSlug],
+        slug: metric.metricSlug,
+        quantity: metric.accounted,
+        price: metric.value,
+        data: mapRegionMetrics(metric, regionMetricsGrouped)
+      })
+    }
+    return list
+  }, [])
 }
 
 const mapProducts = (products, metricsGrouped, regionMetricsGrouped) => {
