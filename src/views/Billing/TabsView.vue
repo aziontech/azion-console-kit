@@ -151,6 +151,11 @@
         <TabPanel
           header="Bills"
           :disabled="accountBlocked"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__bills-tab__button'
+            }
+          }"
         >
           <BillsView
             v-if="isActiveTab.bills"
@@ -160,7 +165,14 @@
             @changeTab="changeTab"
           />
         </TabPanel>
-        <TabPanel header="Payment Methods">
+        <TabPanel
+          header="Payment Methods"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__payment-methods-tab__button'
+            }
+          }"
+        >
           <PaymentListView
             v-if="isActiveTab.payment"
             ref="listPaymentMethodsRef"
