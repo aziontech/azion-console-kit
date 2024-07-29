@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { makeStripeClient } from '@/plugins/factories/stripe-integration-factory'
 
 const makeSut = () => {
@@ -24,6 +24,7 @@ describe('StripteIntegrationFactory', () => {
 
   it('should create analytics with correct configuration', () => {
     const { sut } = makeSut()
+    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', 'token_test_123321')
 
     const stripeClient = sut('development')
 
