@@ -2,13 +2,13 @@ import { loadStripe } from '@stripe/stripe-js'
 
 const environment = {
   development: {
-    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN
+    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN || ''
   },
   stage: {
-    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN
+    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN || ''
   },
   production: {
-    stripeToken: import.meta.env.VITE_PROD_STRIPE_TOKEN
+    stripeToken: import.meta.env.VITE_PROD_STRIPE_TOKEN || ''
   }
 }
 

@@ -52,7 +52,8 @@ const fixture = {
     certificate_type: 'SSL/TLS'
   },
   nameErrorMock: {
-    detail: 'The field name needs to be unique. There is already another certificate with this name in your account.'
+    detail:
+      'The field name needs to be unique. There is already another certificate with this name in your account.'
   },
   errorMock: {
     error: ['Error Message']
