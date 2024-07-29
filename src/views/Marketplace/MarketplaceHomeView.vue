@@ -48,6 +48,7 @@
                 :options="categoriesList"
                 @change="changeCategory"
                 option-label="name"
+                :optionDisabled="disabledOption"
                 class="w-full md:w-14rem border-none sm:min-w-[12rem]"
                 :pt="{
                   list: { class: 'p-0' }
@@ -116,7 +117,7 @@
 </template>
 
 <script setup>
-  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { computed, onBeforeMount, ref } from 'vue'
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
@@ -127,7 +128,6 @@
   import { useToast } from 'primevue/usetoast'
 
   const selectedCategory = ref({ name: 'All', code: 'all' })
-  const currentCategory = ref({ name: 'All', code: 'all' })
   const categories = ref([])
   const $toast = useToast()
   const loading = ref(false)
@@ -178,18 +178,14 @@
     return props.listSolutionsService(payload)
   }
 
-  watch(selectedCategory, (newValue) => {
-    if (newValue) {
-      currentCategory.value = newValue
+  const disabledOption = ({ code }) => {
+    if (code === selectedCategory.value.code) {
+      return true
     }
-  })
+    return false
+  }
 
-  const changeCategory = async ({ value }) => {
-    if (value === null) {
-      selectedCategory.value = currentCategory.value
-      return
-    }
-
+  const changeCategory = async () => {
     const category = selectedCategory.value.code
 
     try {
