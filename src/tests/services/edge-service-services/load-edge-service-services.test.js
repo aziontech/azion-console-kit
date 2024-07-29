@@ -5,14 +5,12 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   mock: {
     id: 76789,
-    active: true,
-    variables: [
-      {
-        name: 'port',
-        value: '123'
-      }
-    ],
-    name: 'My Edge Service'
+    name: 'My Edge Service',
+    is_active: true,
+    modules: {
+      port: 123,
+      greeting: 'Hello'
+    }
   }
 }
 
@@ -28,7 +26,7 @@ describe('EdgeServiceServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [] }
+      body: { data: [] }
     })
     const dnsIdMock = 76789
     const { sut } = makeSut()
@@ -36,7 +34,7 @@ describe('EdgeServiceServices', () => {
     await sut({ id: dnsIdMock })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/orchestrator/edge_services/${dnsIdMock}?with_vars=true`,
+      url: `v4/orchestrator/edge_services/${dnsIdMock}?fields=id%2Cname%2Cis_active%2Cmodules`,
       method: 'GET'
     })
   })
@@ -45,14 +43,15 @@ describe('EdgeServiceServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        name: fixtures.mock.name,
-        active: fixtures.mock.active,
-        variables: [
-          {
-            name: 'port',
-            value: '123'
+        data: {
+          id: fixtures.mock.id,
+          name: fixtures.mock.name,
+          is_active: fixtures.mock.is_active,
+          modules: {
+            port: 123,
+            greeting: 'Hello'
           }
-        ]
+        }
       }
     })
     const { sut } = makeSut()
@@ -60,9 +59,10 @@ describe('EdgeServiceServices', () => {
     const result = await sut({ id: fixtures.mock.id })
 
     expect(result).toEqual({
+      id: fixtures.mock.id,
       name: fixtures.mock.name,
-      active: fixtures.mock.active,
-      code: 'port=123'
+      active: fixtures.mock.is_active,
+      code: `port=123\ngreeting=Hello`
     })
   })
 })

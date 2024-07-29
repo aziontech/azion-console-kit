@@ -3,7 +3,7 @@ import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
 
 export const loadEdgeServiceServices = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeServiceBaseUrl()}/${id}?with_vars=true`,
+    url: `${makeEdgeServiceBaseUrl()}/${id}?${makeSearchParams()}`,
     method: 'GET'
   })
 
@@ -11,17 +11,44 @@ export const loadEdgeServiceServices = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
-const convertVariablesToString = (variables) => {
-  return variables ? variables.map(({ name, value }) => `${name}=${value}`).join('\n') : ''
+const makeSearchParams = () => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('fields', 'id,name,is_active,modules')
+  return searchParams
+}
+
+/**
+ * Converts an object of variables into a key-value pair string, separated by newlines.
+ *
+ * @param {Object} variables - An object containing key-value pairs.
+ * @return {string} A string representation of the key-value pairs, separated by newlines.
+ * @example
+ * const variables = {
+ *   key1: 'value1',
+ *   key2: 'value2',
+ *   key3: 'value3'
+ * };
+ * const result = convertToKeyValuePairText(variables);
+ * console.log(result);
+ * // key1=value1
+ * // key2=value2
+ * // key3=value3
+ */
+function convertToKeyValuePairText(variables) {
+  if (!variables) return ''
+
+  return Object.entries(variables)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')
 }
 
 const adapt = (httpResponse) => {
-  const { id, name, active, variables } = httpResponse.body
+  const { id, name, is_active, modules } = httpResponse.body.data
   const parsedBody = {
     id,
     name,
-    active,
-    code: convertVariablesToString(variables)
+    active: is_active,
+    code: convertToKeyValuePairText(modules)
   }
 
   return {
