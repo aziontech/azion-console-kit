@@ -6,18 +6,18 @@ const getStripeTokenFromEnv = (envVar) => {
 
 const environment = {
   development: {
-    stripeToken: getStripeTokenFromEnv('VITE_DEV_STRIPE_TOKEN')
+    stripeToken: () => getStripeTokenFromEnv('VITE_DEV_STRIPE_TOKEN')
   },
   stage: {
-    stripeToken: getStripeTokenFromEnv('VITE_STAGE_STRIPE_TOKEN')
+    stripeToken: () => getStripeTokenFromEnv('VITE_STAGE_STRIPE_TOKEN')
   },
   production: {
-    stripeToken: getStripeTokenFromEnv('VITE_PROD_STRIPE_TOKEN')
+    stripeToken: () => getStripeTokenFromEnv('VITE_PROD_STRIPE_TOKEN')
   }
 }
 
 function getStripeToken(env) {
-  return environment[env].stripeToken
+  return environment[env].stripeToken()
 }
 
 export function makeStripeClient(environment) {
@@ -31,7 +31,7 @@ export function makeStripeClient(environment) {
 
   const stripeToken = getStripeToken(environment)
   if (!stripeToken) {
-    throw Error('Stripe token is null, cannot load Stripe')
+    throw Error('Stripe token is missing, cannot load Stripe')
   }
   const stripePromise = loadStripe(stripeToken)
 

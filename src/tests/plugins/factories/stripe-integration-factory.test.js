@@ -7,6 +7,10 @@ const makeSut = () => {
   }
 }
 
+const fixtures = {
+  stripeToken: 'token_test_1234556'
+}
+
 describe('StripteIntegrationFactory', () => {
   it('should return an error whe no environment is provided', () => {
     const { sut } = makeSut()
@@ -23,8 +27,8 @@ describe('StripteIntegrationFactory', () => {
   })
 
   it('should create analytics with correct configuration', () => {
+    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', fixtures.stripeToken)
     const { sut } = makeSut()
-    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', 'token_test_123321')
 
     const stripeClient = sut('development')
 
