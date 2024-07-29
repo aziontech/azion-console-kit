@@ -45,7 +45,7 @@
     :dataFilted="dataFiltedComputed"
     @on-select-data="selectedItems"
     :cleanSelectData="cleanSelectData"
-    :showselectionMode="true"
+    :showSelectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     isTabs

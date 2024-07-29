@@ -12,13 +12,13 @@
       removableSort
       :value="data"
       dataKey="id"
-      selectionMode="single"
       @row-click="editItemSelected"
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
+      v-model:selection="selectedItems"
       :loading="isLoading"
       data-testid="data-table"
     >
@@ -61,6 +61,12 @@
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
       />
+
+      <Column
+        v-if="showSelectionMode"
+        selectionMode="multiple"
+        headerStyle="width: 3rem"
+      ></Column>
 
       <Column
         sortable
@@ -315,6 +321,14 @@
     isTabs: {
       type: Boolean,
       default: false
+    },
+    showSelectionMode: {
+      type: Boolean,
+      default: false
+    },
+    cleanSelectData: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -334,7 +348,7 @@
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
-  const selectedItems = ref([])
+  const selectedItems = ref()
 
   onMounted(() => {
     loadData({ page: 1 })
