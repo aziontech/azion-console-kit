@@ -709,6 +709,7 @@
         isCard
         :options="phasesRadioOptions"
         data-testid="rule-form-phase-radio"
+        :disabled="isEditDrawer"
       />
     </template>
   </FormHorizontal>
