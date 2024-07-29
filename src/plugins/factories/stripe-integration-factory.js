@@ -1,6 +1,6 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-const getStripeTokenFromEnv = (envVar) => import.meta.env[envVar] || null;
+const getStripeTokenFromEnv = (envVar) => import.meta.env[envVar] || null
 
 const environment = {
   development: {
