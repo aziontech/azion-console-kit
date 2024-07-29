@@ -334,6 +334,7 @@
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
+  const selectedItems = ref([])
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -487,5 +488,23 @@
   watch(
     () => props.dataFilted,
     (newValue) => (data.value = newValue)
+  )
+
+  watch(selectedItems, (selectedData) => {
+    emit('on-select-data', selectedData)
+  })
+
+  watch(
+    () => props.dataFilted,
+    (newValue) => (data.value = newValue)
+  )
+
+  watch(
+    () => props.cleanSelectData,
+    (value) => {
+      if (value) {
+        selectedItems.value = []
+      }
+    }
   )
 </script>
