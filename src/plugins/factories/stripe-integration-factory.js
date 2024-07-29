@@ -19,7 +19,7 @@ export function makeStripeClient(environment) {
 
   const stripeToken = import.meta.env[enviromentStripeToken]
   if (!stripeToken) {
-    throw Error('Stripe token is missing, cannot load Stripe')
+    throw Error('Stripe token is missing, cannot load Stripe. View readme for more info.')
   }
   const stripePromise = loadStripe(stripeToken)
 

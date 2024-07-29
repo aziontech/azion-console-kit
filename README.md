@@ -54,7 +54,7 @@ echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 
 ### Setting the API environment (STAGE/PRODUCTION)
 
-By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs. 
+By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs.
 To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
 
 ```bash
@@ -90,6 +90,27 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
    💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
 
 After a few seconds, access your project on the domain provided by the CLI.
+
+## Using Stripe Keys with Environment Variables
+This project utilizes Stripe for payment processing, and it requires environment-specific API keys for proper configuration. To set up your environment with the correct Stripe keys, follow these instructions:
+
+Environment Variables
+You need to set the following environment variables in your .env file or environment configuration:
+
+* `VITE_DEV_STRIPE_TOKEN`: This is your Stripe API key for the development environment. It's typically used for local testing during development.
+
+* `VITE_STAGE_STRIPE_TOKEN`: This is your Stripe API key for the staging environment. It's typically used for testing purposes before deploying to production.
+
+* `VITE_PROD_STRIPE_TOKEN`: This is your Stripe API key for the production environment. It should only be used in your live application where real transactions occur.
+
+#### Example `.env` File
+Create a `.env` file at the root of your project and add the following lines, replacing the placeholder keys with your actual Stripe API keys:
+
+```bash
+VITE_DEV_STRIPE_TOKEN=pk_test_yourDevApiKeyHere
+VITE_STAGE_STRIPE_TOKEN=pk_test_yourStageApiKeyHere
+VITE_PROD_STRIPE_TOKEN=pk_live_yourProductionApiKeyHere
+```
 
 ## Features 🧩
 
