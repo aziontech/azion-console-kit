@@ -34,4 +34,11 @@ describe('StripteIntegrationFactory', () => {
 
     expect(stripeClient).toBeTruthy()
   })
+
+  it('should return a error on missing stripe token', () => {
+    vi.unstubAllEnvs()
+    const { sut } = makeSut()
+
+    expect(() => sut('development')).toThrowError('Stripe token is missing, cannot load Stripe')
+  })
 })
