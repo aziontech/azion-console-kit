@@ -32,8 +32,7 @@ const extractApiError = (body) => {
         apiError = errorValue.message[0]
         break
       }
-    }
-    else {
+    } else {
       apiError = body[keyError]
       break
     }
