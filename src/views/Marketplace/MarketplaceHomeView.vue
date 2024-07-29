@@ -178,12 +178,7 @@
     return props.listSolutionsService(payload)
   }
 
-  const disabledOption = ({ code }) => {
-    if (code === selectedCategory.value.code) {
-      return true
-    }
-    return false
-  }
+  const disabledOption = ({ code }) => code === selectedCategory.value?.code
 
   const changeCategory = async () => {
     const category = selectedCategory.value.code
