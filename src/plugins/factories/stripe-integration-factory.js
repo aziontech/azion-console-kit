@@ -1,14 +1,16 @@
 import { loadStripe } from '@stripe/stripe-js'
 
+const getStripeTokenFromEnv = (envVar) => import.meta.env[envVar] || null;
+
 const environment = {
   development: {
-    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN || ''
+    stripeToken: getStripeTokenFromEnv('VITE_DEV_STRIPE_TOKEN')
   },
   stage: {
-    stripeToken: import.meta.env.VITE_STAGE_STRIPE_TOKEN || ''
+    stripeToken: getStripeTokenFromEnv('VITE_STAGE_STRIPE_TOKEN')
   },
   production: {
-    stripeToken: import.meta.env.VITE_PROD_STRIPE_TOKEN || ''
+    stripeToken: getStripeTokenFromEnv('VITE_PROD_STRIPE_TOKEN')
   }
 }
 
@@ -26,6 +28,9 @@ export function makeStripeClient(environment) {
   }
 
   const stripeToken = getStripeToken(environment)
+  if (!stripeToken) {
+    throw Error('Stripe token is null, cannot load Stripe')
+  }
   const stripePromise = loadStripe(stripeToken)
 
   return stripePromise
