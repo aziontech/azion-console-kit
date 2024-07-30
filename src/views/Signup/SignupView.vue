@@ -1,13 +1,13 @@
 <template>
   <div>
-    <section class="flex max-lg:flex-col">
+    <section class="flex flex-col md:flex-row p-3 md:p-6 2xl:p-10 gap-10 md:gap-20 2xl:gap-40 justify-center">
       <div
-        class="w-auto 2xl:w-full flex flex-col items-center justify-center p-6 lg:p-20 max-md:px-3 max-md:pt-4 max-md:pb-8"
+        class="flex flex-col items-center justify-center"
       >
         <form-signup-block v-bind="props" />
       </div>
       <div
-        class="w-full flex flex-col items-center justify-center p-20 lg:p-10 max-md:px-3 max-md:pt-4 max-md:pb-8"
+        class="flex flex-col items-center justify-center"
       >
         <div>
           <client-testimonials-block />
