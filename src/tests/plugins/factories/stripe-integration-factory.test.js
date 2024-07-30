@@ -27,7 +27,9 @@ describe('StripteIntegrationFactory', () => {
   })
 
   it('should create analytics with correct configuration', () => {
+    vi.unstubAllEnvs()
     vi.stubEnv('VITE_DEV_STRIPE_TOKEN', fixtures.stripeToken)
+
     const { sut } = makeSut()
 
     const stripeClient = sut('development')
@@ -37,8 +39,12 @@ describe('StripteIntegrationFactory', () => {
 
   it('should return a error on missing stripe token', () => {
     vi.unstubAllEnvs()
+    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', '')
+
     const { sut } = makeSut()
 
-    expect(() => sut('development')).toThrowError('Stripe token is missing, cannot load Stripe')
+    expect(() => sut('development')).toThrowError(
+      'Stripe token is missing, cannot load Stripe. View readme for more info.'
+    )
   })
 })
