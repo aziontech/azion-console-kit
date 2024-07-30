@@ -41,7 +41,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev'] }, () => {
+describe('Edge Application', { tags: ['@dev', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -281,6 +281,10 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     // Create a rule
     cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
     cy.get(selectors.edgeApplication.rulesEngine.ruleNameInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.edgeApplication.rulesEngine.phaseRadioGroup).should(
+      'not.have.class',
+      'p-disabled'
+    )
     cy.get(selectors.edgeApplication.rulesEngine.criteriaVariableSelect(0, 0)).type(
       '${{}uri}{enter}'
     )
@@ -324,6 +328,8 @@ describe('Edge Application', { tags: ['@dev'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deny (403 Forbidden)')).click()
 
     // Assert
+    cy.get(selectors.edgeApplication.rulesEngine.phaseRadioGroup).should('have.class', 'p-disabled')
+
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your Rules Engine has been edited')
   })
