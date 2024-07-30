@@ -5,9 +5,7 @@
     </template>
     <template #content>
       <div class="w-full flex flex-col-reverse sm:flex-row gap-6">
-        <div class="w-full sm:w-1/2 h-[25.00rem] border surface-border rounded-md flex flex-col">
-          Service and Products Charges
-        </div>
+        <TableServicesProducts :listProduct="listServiceProducts" />
         <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
           <div class="p-3 md:p-6 flex flex-col gap-4">
             <div class="flex justify-between">
@@ -105,6 +103,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
+  import TableServicesProducts from './components/table-services-products'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -112,6 +111,10 @@
       required: true
     },
     loadPaymentMethodDefaultService: {
+      type: Function,
+      required: true
+    },
+    listServiceAndProductsChangesService: {
       type: Function,
       required: true
     },
@@ -126,8 +129,10 @@
 
   const invoiceData = ref({})
   const cardDefault = ref({})
+  const listServiceProducts = ref([])
 
   onMounted(() => {
+    listServiceAndProductsChanges()
     loadInvoiceData()
     loadCardDefault()
   })
@@ -135,15 +140,25 @@
   const loadInvoiceData = async () => {
     try {
       invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
-    } catch (error) {
+    } catch {
       invoiceData.value = null
+    }
+  }
+
+  const listServiceAndProductsChanges = async () => {
+    try {
+      listServiceProducts.value = await props.listServiceAndProductsChangesService(
+        route.params.billId
+      )
+    } catch {
+      listServiceProducts.value = []
     }
   }
 
   const loadCardDefault = async () => {
     try {
       cardDefault.value = await props.loadPaymentMethodDefaultService()
-    } catch (error) {
+    } catch {
       cardDefault.value = null
     }
   }

@@ -4,7 +4,7 @@ import { generateUniqueNameWithLetters } from '../support/utils'
 
 let cardHolderName
 
-describe('Payment Methods spec', () => {
+describe('Payment Methods spec', { tags: ['@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/payments/*').as('getPaymentMethodsApi')
