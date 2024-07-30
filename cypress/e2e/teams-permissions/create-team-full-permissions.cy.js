@@ -1,4 +1,3 @@
-// cypress/integration/teams-permissions/create-team-full-permissions.spec.js
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
 

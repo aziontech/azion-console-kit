@@ -1,4 +1,3 @@
-// cypress/integration/users-management/create-user-with-team.spec.js
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
 
