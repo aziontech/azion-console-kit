@@ -42,9 +42,8 @@
     pageTitleDelete="WAF rules tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
-    :dataFilted="dataFiltedComputed"
+    :dataFiltered="dataFiltedComputed"
     @on-select-data="selectedItems"
-    :cleanSelectData="cleanSelectData"
     :showSelectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
@@ -172,7 +171,6 @@
   const selectedEvents = ref([])
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
-  const cleanSelectData = ref(null)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
@@ -328,8 +326,6 @@
 
   const selectedItems = (events) => {
     selectedEvents.value = events
-
-    cleanSelectData.value = null
   }
 
   const openDialog = () => {
@@ -337,7 +333,6 @@
   }
 
   const cancelAllowed = () => {
-    cleanSelectData.value = true
     selectedEvents.value = []
   }
 
@@ -380,7 +375,6 @@
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
-      cleanSelectData.value = true
       showDetailsOfAttack.value = false
     } catch (error) {
       showToast(error, 'error')

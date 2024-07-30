@@ -66,7 +66,7 @@
         v-if="showSelectionMode"
         selectionMode="multiple"
         headerStyle="width: 3rem"
-      ></Column>
+      />
 
       <Column
         sortable
@@ -295,7 +295,7 @@
       type: String,
       default: () => ''
     },
-    dataFilted: {
+    dataFiltered: {
       type: Array,
       default: () => []
     },
@@ -323,12 +323,7 @@
       default: false
     },
     showSelectionMode: {
-      type: Boolean,
-      default: false
-    },
-    cleanSelectData: {
-      type: Boolean,
-      default: false
+      type: Boolean
     }
   })
 
@@ -499,26 +494,12 @@
     emit('on-load-data', !!hasData)
   })
 
-  watch(
-    () => props.dataFilted,
-    (newValue) => (data.value = newValue)
-  )
-
   watch(selectedItems, (selectedData) => {
     emit('on-select-data', selectedData)
   })
 
   watch(
-    () => props.dataFilted,
+    () => props.dataFiltered,
     (newValue) => (data.value = newValue)
-  )
-
-  watch(
-    () => props.cleanSelectData,
-    (value) => {
-      if (value) {
-        selectedItems.value = []
-      }
-    }
   )
 </script>
