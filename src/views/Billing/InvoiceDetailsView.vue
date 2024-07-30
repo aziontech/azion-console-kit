@@ -137,7 +137,7 @@
   const loadInvoiceData = async () => {
     try {
       invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
-    } catch (error) {
+    } catch {
       invoiceData.value = null
     }
   }
@@ -147,7 +147,7 @@
       listServiceProducts.value = await props.listServiceAndProductsChangesService(
         route.params.billId
       )
-    } catch (error) {
+    } catch {
       listServiceProducts.value = []
     }
   }
@@ -155,7 +155,7 @@
   const loadCardDefault = async () => {
     try {
       cardDefault.value = await props.loadPaymentMethodDefaultService()
-    } catch (error) {
+    } catch {
       cardDefault.value = null
     }
   }

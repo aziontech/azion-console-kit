@@ -22,15 +22,13 @@
     />
     <Column
       field="service"
-      header=""
       class="font-medium !text-base"
-    ></Column>
+    />
     <Column
       field="value"
-      header=""
       class="font-medium !text-sm"
       bodyStyle="text-align:right"
-    ></Column>
+    />
     <template #expansion="slotProps">
       <div class="p-0 m-0">
         <DataTable
@@ -39,7 +37,7 @@
           :value="expansionColuns.data"
           class="border-none -mt-0.5 !text-sm text-color-secondary rounded-none"
         >
-          <Column :pt="{ root: { class: 'pl-12' } }"></Column>
+          <Column :pt="{ root: { class: 'pl-12' } }" />
           <Column
             field="country"
             :header="expansionColuns.service"
@@ -47,7 +45,7 @@
             :pt="{
               bodyCell: { class: 'text-color-secondary text-sm' }
             }"
-          ></Column>
+          />
           <Column
             field="quantity"
             :header="expansionColuns.quantity"
@@ -55,12 +53,12 @@
               root: { class: 'pr-8' }
             }"
             bodyStyle="text-align:right"
-          ></Column>
+          />
           <Column
             field="price"
             :header="expansionColuns.price"
             bodyStyle="text-align:right"
-          ></Column>
+          />
         </DataTable>
       </div>
     </template>
