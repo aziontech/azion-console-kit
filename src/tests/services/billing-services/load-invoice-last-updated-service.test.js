@@ -8,7 +8,7 @@ const fixtures = {
     data: {
       products: [
         {
-          last_updated: '2024-07-01',
+          last_updated: '2024-07-01'
         }
       ]
     }

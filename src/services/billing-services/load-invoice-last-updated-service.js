@@ -1,20 +1,16 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-import { formatDateToUSBilling, getCurrentMonthStartEnd } from '@/helpers/convert-date'
+import { formatDateToUSBilling } from '@/helpers/convert-date'
 
 export const loadInvoiceLastUpdatedService = async () => {
-  const dateRange = getCurrentMonthStartEnd()
   const payload = {
     query: `
     query getBillDetail {
       products: billDetail(
-        groupBy: [createdDate]
-        filter: {
-          periodFromRange: {
-            begin: "${dateRange.dateInitial}", end: "${dateRange.dateFinal}"
-          }
-        }
+        groupBy: [createdDate],
+        orderBy: [createdDate_DESC],
+        limit: 1
       ) {
         last_updated: createdDate
       }
@@ -36,11 +32,13 @@ export const loadInvoiceLastUpdatedService = async () => {
 }
 
 const adapt = (httpResponse) => {
-
   const { body, statusCode } = httpResponse
 
+  const data = body.data?.products[0] || []
+  const dataUpdated = formatDateToUSBilling(data.last_updated)
+
   return {
-    body: `Last Updated: ${formatDateToUSBilling(body?.data?.products[0].last_updated)}` ?? [],
+    body: dataUpdated ? `Last Updated: ${dataUpdated}` : '---',
     statusCode
   }
 }
