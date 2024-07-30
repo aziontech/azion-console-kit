@@ -70,7 +70,7 @@
     })
   }
 
-  const deleteServicesWithDecorator = async (id) => {
+  const unbindServicesWithDecorator = async (id) => {
     return await props.deleteServiceEdgeNodeService({
       edgeNodeId: props.edgeNodeId,
       id
@@ -87,10 +87,11 @@
 
   const actions = [
     {
-      type: 'delete',
-      title: 'service',
+      type: 'unbind',
+      title: 'edge service',
+      parent: 'edge node',
       icon: 'pi pi-trash',
-      service: deleteServicesWithDecorator
+      service: unbindServicesWithDecorator
     }
   ]
 </script>
