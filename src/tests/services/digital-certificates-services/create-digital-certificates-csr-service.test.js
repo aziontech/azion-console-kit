@@ -33,6 +33,10 @@ const fixture = {
     private_key_type: 'rsa_2048',
     sans: ['SAN1', 'SAN2', 'SAN3']
   },
+  nameErrorMock: {
+    detail:
+      'The field name needs to be unique. There is already another certificate with this name in your account.'
+  },
   errorMock: {
     error: ['Error Message']
   }
@@ -66,6 +70,18 @@ describe('DigitalCertificatesServices', () => {
       url: `${version}/digital_certificates/csr`,
       body: fixture.requestBodyMock
     })
+  })
+
+  it('should parse correctly the feedback message when the error is a string inside an object', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: fixture.nameErrorMock
+    })
+    const { sut } = makeSut()
+
+    const response = sut(fixture.csrCertificateMock)
+
+    expect(response).rejects.toThrow(fixture.nameErrorMock.detail)
   })
 
   it.each([

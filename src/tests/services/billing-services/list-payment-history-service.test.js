@@ -74,6 +74,7 @@ describe('BillingServices', () => {
         )}/account/6/invoice?billing_month=2024-06`,
         status: {
           content: 'Paid',
+          icon: 'pi pi-check-circle',
           severity: 'success'
         },
         paymentDate: '07/01/2024'

@@ -8,6 +8,7 @@ export const loadCurrentInvoiceService = async () => {
   const payload = {
     query: `query getBillDetail {
       billDetail(
+          limit: 1,
           aggregate: { sum: value }
           groupBy: [billId]
           orderBy: [productSlug_ASC, metricSlug_ASC]
@@ -46,23 +47,36 @@ export const loadCurrentInvoiceService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const parseInvoice = httpResponse.body.data?.billDetail.map((invoice) => {
-    return {
-      billId: invoice.billId,
-      total: invoice.totalValue,
-      currency: invoice.currency,
-      billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
-        invoice.periodTo
-      )}`,
-      productChanges: '---',
-      servicePlan: '---',
-      creditUsedForPayment: 0.0,
-      temporaryBill: invoice.temporaryBill
-    }
-  })
+  const {
+    body: {
+      data: { billDetail }
+    },
+    statusCode
+  } = httpResponse
+
+  const invoice = billDetail.length > 0 ? billDetail[0] : {}
+  const emptyDefaultValue = '---'
+  let billingPeriod = emptyDefaultValue
+  if (invoice.periodFrom && invoice.periodTo) {
+    billingPeriod = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
+      invoice.periodTo
+    )}`
+  }
+
+  const parseInvoice = {
+    billId: invoice.billId || emptyDefaultValue,
+    total: invoice.totalValue || emptyDefaultValue,
+    currency: invoice.currency || emptyDefaultValue,
+    billingPeriod,
+    productChanges: emptyDefaultValue,
+    servicePlan: emptyDefaultValue,
+    creditUsedForPayment: invoice.creditUsedForPayment || 0.0,
+    temporaryBill: invoice.temporaryBill || emptyDefaultValue
+  }
+
   return {
-    body: parseInvoice?.length > 0 ? parseInvoice[0] : null,
-    statusCode: httpResponse.statusCode
+    body: parseInvoice,
+    statusCode
   }
 }
 

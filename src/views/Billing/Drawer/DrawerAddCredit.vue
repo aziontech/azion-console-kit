@@ -33,7 +33,7 @@
   })
 
   const validationSchema = yup.object({
-    amount: yup.number().required()
+    amount: yup.number().required().label('Amount')
   })
 
   const closeCreateDrawer = () => {

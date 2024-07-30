@@ -13,6 +13,7 @@
               <PrimeButton
                 icon="pi pi-download"
                 outlined
+                size="small"
                 label="Export"
                 :disabled="invoiceData.temporaryBill"
               />
@@ -42,7 +43,7 @@
               <span class="text-color-secondary text-sm">Payment Method</span>
               <span
                 v-if="cardDefault.cardData"
-                class="flex gap-2 text-color-secondary text-sm"
+                class="flex gap-2 text-color font-medium text-sm"
               >
                 <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
                 {{ cardDefault.cardData.cardNumber }}
@@ -80,10 +81,12 @@
                 <b class="font-medium text-2xl text-color"> Total </b>
                 (Amount Payable)
               </span>
-              <span class="font-medium text-2xl">
-                <span class="text-color-secondary text-sm font-medium">$</span>
-                {{ invoiceData.total }}</span
-              >
+              <span class="font-medium flex items-center gap-1">
+                <span class="text-sm">$</span>
+                <span class="text-2xl">
+                  {{ invoiceData.total }}
+                </span>
+              </span>
             </div>
           </div>
         </div>

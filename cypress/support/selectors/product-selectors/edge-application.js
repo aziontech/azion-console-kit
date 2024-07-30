@@ -30,7 +30,8 @@ export default {
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown"] > .p-dropdown-label',
     firstBehaviorValueOption: '#behaviors\\[0\\]\\.target_0',
     dropdownLoadingIcon:
-      '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]'
+      '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
+    phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',
