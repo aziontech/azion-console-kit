@@ -259,7 +259,6 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
-  import UnbindDialog from './dialog/unbind-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
 
@@ -373,23 +372,6 @@
                   onClose: (opt) => opt.data.updated && reload()
                 }
                 openDialog(DeleteDialog, bodyDelete)
-              }
-              break
-            case 'unbind':
-              {
-                const bodyUnbind = {
-                  data: {
-                    title: action.title,
-                    parent: action.parent,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    unbindingService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
-                }
-                openDialog(UnbindDialog, bodyUnbind)
               }
               break
             case 'action':

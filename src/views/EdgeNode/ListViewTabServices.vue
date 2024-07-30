@@ -6,6 +6,7 @@
   import DrawerService from '@/views/EdgeNode/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
 
   defineOptions({ name: 'list-edge-node-resources-tab' })
 
@@ -87,11 +88,21 @@
 
   const actions = [
     {
-      type: 'unbind',
-      title: 'edge service',
-      parent: 'edge node',
+      type: 'dialog',
       icon: 'pi pi-trash',
-      service: unbindServicesWithDecorator
+      label: 'Unbind',
+      dialog: {
+        component: UnbindDialog,
+        body: (item) => ({
+          data: {
+            title: 'edge service',
+            parent: 'edge node',
+            selectedID: item.id,
+            service: unbindServicesWithDecorator
+          },
+          onClose: (opt) => opt.data.updated && reloadServicesList()
+        })
+      }
     }
   ]
 </script>

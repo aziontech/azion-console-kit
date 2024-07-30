@@ -82,7 +82,7 @@
         label="Unbind"
         icon-pos="right"
         @click="removeItem()"
-        :icon="getLoadingIcon"
+        :loading="loading"
         :disabled="isDisabled"
         data-testid="unbind-dialog__footer__unbind-button"
       />
@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-  import { computed, ref, watch, inject } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import { useField, useForm } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
@@ -100,17 +100,21 @@
   import InputText from 'primevue/inputtext'
   import Message from 'primevue/message'
 
-  const emit = defineEmits(['successfullyUnbound'])
+  defineOptions({ name: 'dialog-unbind' })
 
   const toast = useToast()
   const dialogRef = inject('dialogRef')
 
   const data = dialogRef.value.data
   const loading = ref(false)
-  const canUnbind = ref(false)
 
   const validationSchema = yup.object({
-    confirmation: yup.string().equals(['unbind'], '').required('This is a required field')
+    confirmation: yup
+      .string()
+      .required('This is a required field')
+      .test('equals', '', (val) => {
+        return val === 'unbind'
+      })
   })
 
   const { errors, meta, resetForm } = useForm({
@@ -123,13 +127,12 @@
   const { value: confirmation } = useField('confirmation')
 
   const removeItem = async () => {
-    if (!canUnbind.value || !meta.value.valid) return
+    if (!meta.value.valid) return
 
     loading.value = true
     try {
-      const feedback = await data.unbindingService(data.selectedID, data.selectedItemData)
+      const feedback = await data.service(data.selectedID)
       showToast('success', feedback ?? 'Unbound successfully!')
-      emit('successfullyUnbound')
       resetForm()
       dialogRef.value.close({ updated: true })
     } catch (error) {
@@ -153,32 +156,7 @@
     dialogRef.value.close({ updated: false })
   }
 
-  const getLoadingIcon = computed(() => {
-    return loading.value ? 'pi pi-spin pi-spinner' : ''
-  })
-
   const isDisabled = computed(() => {
     return !meta.value.valid || loading.value
   })
-
-  watch(
-    () => data,
-    (value) => {
-      if (value) {
-        canUnbind.value = false
-        resetForm()
-      }
-    },
-    { deep: true }
-  )
-
-  watch(
-    () => confirmation.value,
-    (value) => {
-      if (value) {
-        canUnbind.value = true
-      }
-    },
-    { deep: true }
-  )
 </script>
