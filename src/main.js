@@ -4,8 +4,10 @@
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/main.css'
-import '@aziontech/azion-theme/src/azion-dark/theme.scss'
-import '@aziontech/azion-theme/src/azion-light/theme.scss'
+// import 'azion-theme/src/azion-dark/theme.scss'
+// import 'azion-theme/src/azion-light/theme.scss'
+import 'azion-theme/dark'
+import 'azion-theme/light'
 import '@assets/icons/azionicons.scss'
 import '@assets/c3.scss'
 /**
