@@ -80,6 +80,11 @@
   resolved "https://registry.yarnpkg.com/@analytics/type-utils/-/type-utils-0.6.2.tgz#60d706603a98a95681d4b1e9726c703fdd541a9e"
   integrity sha512-TD+xbmsBLyYy/IxFimW/YL/9L2IEnM7/EoV9Aeh56U64Ify8o27HJcKjo38XY9Tcn0uOq1AX3thkKgvtWvwFQg==
 
+"@aziontech/azion-theme@^1.2.17":
+  version "1.2.17"
+  resolved "https://npm.pkg.github.com/download/@aziontech/azion-theme/1.2.17/87c0af6f4ff37cbba00b57577f3153e1535e47e7#87c0af6f4ff37cbba00b57577f3153e1535e47e7"
+  integrity sha512-QNGXcyXmQr28nUsU/JHw03+FpII8dQW1QZvSxWTH0LqLaseKSm3/smB8A43uxxIipXjmMta+f6pEhuY/39yPUg==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.22.13":
   version "7.22.13"
   resolved "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.22.13.tgz"
