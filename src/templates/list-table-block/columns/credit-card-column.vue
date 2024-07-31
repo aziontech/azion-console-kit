@@ -1,6 +1,9 @@
 <template>
   <div class="flex items-center gap-3">
-    <cardFlagBlock :cardFlag="props.cardBrand" />
+    <cardFlagBlock
+      v-if="props.cardBrand"
+      :cardFlag="props.cardBrand"
+    />
     {{ props.cardNumber || '-' }}
     <PrimeTag
       severity="info"
@@ -19,12 +22,10 @@
       type: String
     },
     cardBrand: {
-      type: String,
-      required: true
+      type: String
     },
     status: {
-      type: String,
-      required: false
+      type: String
     }
   })
 </script>

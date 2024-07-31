@@ -114,7 +114,10 @@
       dropdown: `${id}__dropdown`,
       value: `${id}__value`,
       description: `${id}__description`,
-      error: `${id}__error-message`
+      error: `${id}__error-message`,
+      filterInput: `${id}__dropdown-filter-input`,
+      trigger: `${id}__dropdown-trigger`,
+      loadingIcon: `${id}__loading-icon`
     }
   })
 </script>
@@ -147,7 +150,14 @@
     class="w-full"
     :pt="{
       filterInput: {
-        class: 'w-full'
+        class: 'w-full',
+        'data-testid': customTestId.filterInput
+      },
+      trigger: {
+        'data-testid': customTestId.trigger
+      },
+      loadingIcon: {
+        'data-testid': customTestId.loadingIcon
       }
     }"
     :data-testid="customTestId.dropdown"

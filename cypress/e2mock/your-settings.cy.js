@@ -43,8 +43,8 @@ describe('Your Settings spec', () => {
     cy.get(selectors.yourSettings.lastNameInput).type('Cy')
 
     cy.get(selectors.yourSettings.timezoneOptions).click()
-    cy.get(selectors.yourSettings.countryCodeFilter).clear()
-    cy.get(selectors.yourSettings.countryCodeFilter).type('são')
+    cy.get(selectors.yourSettings.timezoneFilter).clear()
+    cy.get(selectors.yourSettings.timezoneFilter).type('são')
     cy.get('#timezone_0').click()
 
     cy.get(selectors.yourSettings.emailInput).type('testuser@cy.com')

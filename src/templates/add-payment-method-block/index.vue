@@ -179,9 +179,10 @@
                   />
                   <input
                     id="cardholder-name"
+                    data-testid="payment-methods-form__card-holder-name__input"
                     v-model="cardholderName"
                     class="p-component p-inputtext"
-                    placeholder="Morgana Johann"
+                    placeholder="John Doe"
                   />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
@@ -191,8 +192,10 @@
                   />
                   <div
                     id="card-number-element"
+                    data-testid="payment-methods-form__card-number__input"
+                    data-cy="input-card-number"
                     class="stripe-input"
-                  ></div>
+                  />
                 </div>
               </div>
               <div class="flex flex-wrap gap-6">
@@ -204,23 +207,24 @@
                   <div
                     id="card-expiry-element"
                     class="stripe-input"
-                  ></div>
+                    data-testid="payment-methods-form__card-expiry__input"
+                  />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
-                    label="Security Code (CVC)"
+                    label="Security Code (CVC/CVV)"
                     :isRequired="true"
                   />
                   <div
                     id="card-cvc-element"
                     class="stripe-input"
-                  ></div>
+                    data-testid="payment-methods-form__card-cvc__input"
+                  />
                 </div>
               </div>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
                 <InlineMessage severity="info"
-                  >This is a sensitive data is handled by a PCI Compliant payment
-                  partner.</InlineMessage
+                  >Sensitive data is handled by a PCI-compliant payment partner.</InlineMessage
                 >
               </div>
             </form>

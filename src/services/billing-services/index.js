@@ -4,8 +4,13 @@ import { deletePaymentService } from './delete-payment-service'
 import { setAsDefaultPaymentService } from './set-as-default-payment-service'
 import { addCreditService } from './add-credit-service'
 import { createPaymentMethodService } from './create-payment-method-service'
+import { loadYourServicePlanService } from './load-your-service-plan-service'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-import { loadBillingCurrentInvoiceService } from './load-current-invoice-service'
+import { loadCurrentInvoiceService } from './load-current-invoice-service'
+import { loadInvoiceDataService } from './load-invoice-data-service'
+import { loadPaymentMethodDefaultService } from './load-payment-method-default-service'
+import { listServiceAndProductsChangesService } from './list-service-and-products-changes'
+import { loadInvoiceLastUpdatedService } from './load-invoice-last-updated-service'
 
 export {
   listPaymentMethodsService,
@@ -14,6 +19,11 @@ export {
   setAsDefaultPaymentService,
   addCreditService,
   createPaymentMethodService,
+  loadYourServicePlanService,
   makeBillingBaseUrl,
-  loadBillingCurrentInvoiceService
+  loadCurrentInvoiceService,
+  loadInvoiceDataService,
+  loadPaymentMethodDefaultService,
+  listServiceAndProductsChangesService,
+  loadInvoiceLastUpdatedService
 }

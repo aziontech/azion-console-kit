@@ -9,6 +9,7 @@ export default defineConfig({
   e2e: {
     specPattern: 'cypress/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     defaultCommandTimeout: 60000,
+    chromeWebSecurity: false,
     video: true,
     experimentalStudio: true,
     experimentalRunAllSpecs: true,
@@ -30,6 +31,7 @@ export default defineConfig({
     isCI: process.env.GITHUB_ACTIONS,
     CYPRESS_EMAIL: process.env.DEV_CYPRESS_EMAIL,
     CYPRESS_PASSWORD: process.env.DEV_CYPRESS_PASSWORD,
-    grepFilterSpecs: true
+    grepFilterSpecs: true,
+    grepOmitFiltered: true
   }
 })

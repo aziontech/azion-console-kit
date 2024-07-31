@@ -11,13 +11,15 @@
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">
         <div class="flex gap-3.5 flex-col">
           <div
-            class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-white"
+            class="w-10 h-10 rounded surface-border border flex justify-center items-center overflow-hidden box-border"
           >
-            <img
-              class="rounded"
-              :src="solution.vendor.icon"
-              :alt="solution.vendor.name"
-            />
+            <div class="bg-white flex h-full w-full rounded">
+              <img
+                class="object-contain"
+                :src="solution.vendor.icon"
+                :alt="solution.vendor.name"
+              />
+            </div>
           </div>
           <div class="flex flex-col">
             <span class="line-clamp-1 h-5 text-color text-sm font-medium">

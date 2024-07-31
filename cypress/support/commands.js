@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-/* eslint-disable no-console */
 import selectors from '../support/selectors'
 
 import 'cypress-real-events'
@@ -11,22 +10,27 @@ import 'cypress-real-events'
  * @param {string} password - The user's password.
  */
 const login = (email, password) => {
-  cy.session(email, () => {
-    cy.visit('/login')
-    cy.get(selectors.login.emailInput).type(email)
-    cy.get(selectors.login.nextButton).click()
-    cy.get(selectors.login.passwordInput).type(password, { log: false })
-    cy.get(selectors.login.signInButton).click()
-    cy.location('pathname').should('eq', '/')
-  })
+  cy.session(
+    email,
+    () => {
+      cy.visit('/login')
+      cy.get(selectors.login.emailInput).type(email)
+      cy.get(selectors.login.nextButton).click()
+      cy.get(selectors.login.passwordInput).type(password, { log: false })
+      cy.get(selectors.login.signInButton).click()
+      cy.location('pathname').should('eq', '/')
+    },
+    { cacheAcrossSpecs: true }
+  )
 
   cy.visit('/')
 }
 
 // Disable test failure for all uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
-  console.log('Uncaught exception in test:', runnable.title)
-  console.error('Uncaught exception:', err)
+  cy.log(`Uncaught exception in test: | ${runnable.title}`)
+  cy.log(`Uncaught exception: | ${err}`)
+
   return false
 })
 
@@ -244,7 +248,7 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
   cy.openProduct(productName)
   cy.get(selectors.list.searchInput).clear()
   cy.get(selectors.list.searchInput).type(entityName)
-  cy.get(selectors.list.filteredRow.nameColumn(columnName))
+  cy.get(selectors.list.filteredRow.column(columnName))
     .should('be.visible')
     .should('contain', entityName)
 

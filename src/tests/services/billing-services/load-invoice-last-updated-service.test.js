@@ -1,40 +1,24 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadBillingCurrentInvoiceService } from '@/services/billing-services'
+import { loadInvoiceLastUpdatedService } from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   mockResponse: {
     data: {
-      billDetail: [
+      products: [
         {
-          billId: 2707388,
-          billDetailId: 170072532,
-          totalValue: "0.00",
-          createdDate: "2024-07-01",
-          periodFrom: "2024-07-01",
-          periodTo: "2024-07-31",
-          invoiceNumber: "USALLC-4697w052024",
-          currency: "BRL"
+          last_updated: '2024-07-01'
         }
       ]
     }
   },
-  formattedResponse: [
-    {
-      billingPeriod: '01/07/2024 - 31/07/2024',
-      creditUsedForPayment: 0,
-      currency: 'BRL',
-      productChanges: '-',
-      servicePlan: '-',
-      total: '0.00'
-    }
-  ],
+  formattedResponse: 'Last Updated: 07/01/2024',
   mockError: [{ message: 'Error' }]
 }
 
 const makeSut = () => {
-  const sut = loadBillingCurrentInvoiceService
+  const sut = loadInvoiceLastUpdatedService
 
   return {
     sut
@@ -82,7 +66,7 @@ describe('BillingServices', () => {
       })
       const { sut } = makeSut()
 
-      const request = sut()
+      const request = sut(fixtures.invoiceId)
 
       await expect(request).rejects.toBe(expectedError)
     }

@@ -1,9 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
+import { makePaymentBaseUrl } from './make-payment-base-url'
 
 export const deletePaymentService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `v4/v4/payments/credit_cards/${id}`,
+    url: `${makePaymentBaseUrl()}/credit_cards/${id}`,
     method: 'DELETE'
   })
 
@@ -17,9 +18,10 @@ export const deletePaymentService = async (id) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 202:
-      return 'Payment successfully deleted'
+    case 200:
+      return 'Payment Method successfully deleted!'
     case 400:
+      if (httpResponse.body?.detail) throw new Error(httpResponse.body.detail).message
       throw new Errors.NotFoundError().message
     case 401:
       throw new Errors.InvalidApiTokenError().message

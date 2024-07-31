@@ -3,7 +3,8 @@ import {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateToUS,
-  formatDateMonthAndYear
+  formatDateMonthAndYear,
+  formatDateToUSBilling
 } from '@/helpers/convert-date'
 
 describe('convertDate', () => {
@@ -69,5 +70,24 @@ describe('convertDate', () => {
     const actualDateString = formatDateMonthAndYear(month, year)
 
     expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('Formats the date from "YYYY-MM-DD" to this date "MM/DD/YYYY', () => {
+    const dateString = '2024-07-01'
+    const expectedDateString = '07/01/2024'
+    const actualDateString = formatDateToUSBilling(dateString)
+
+    expect(actualDateString).toEqual(expectedDateString)
+  })
+
+  it('Should return "---" when it is invalid date value', () => {
+    const dateString = '123'
+    const secondDateStringToCheck = '2022/01.1'
+    const expectedDateString = '---'
+    const actualDateString = formatDateToUSBilling(dateString)
+    const actualDateStringSecondCheck = formatDateToUSBilling(secondDateStringToCheck)
+
+    expect(actualDateString).toEqual(expectedDateString)
+    expect(actualDateStringSecondCheck).toEqual(expectedDateString)
   })
 })

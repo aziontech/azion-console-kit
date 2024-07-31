@@ -9,7 +9,8 @@ import {
   openAzionBlog,
   openAzionDiscord,
   openAzionGithub,
-  openAzionX
+  openAzionX,
+  openShowMorePlan
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
@@ -61,5 +62,6 @@ export {
   windowOpen,
   getVulcanPresets,
   goToClassicInterface,
-  formatDateToUS
+  formatDateToUS,
+  openShowMorePlan
 }

@@ -26,14 +26,15 @@ const getTagProps = (card) => {
 }
 
 const adapt = (httpResponse) => {
-  if (!httpResponse.body.results) {
+  const { body, statusCode } = httpResponse
+  if (!body.results || !body.results.length) {
     return {
       body: [],
-      statusCode: httpResponse.statusCode
+      statusCode: statusCode
     }
   }
 
-  const responseDataSorted = httpResponse.body.results.sort(
+  const responseDataSorted = body.results.sort(
     (currentCard, nextCard) => nextCard.is_default - currentCard.is_default
   )
 
@@ -58,13 +59,13 @@ const adapt = (httpResponse) => {
       },
       expiringDateByOrder: convertStringToDate(cardDate),
       expiringDateSearch: cardDate,
-      cardNumberSearch: card.card_last_4_digits,
+      cardNumberSearch: `${typeCard} ${card.card_last_4_digits} ${statusCard}`,
       isDefault: card.is_default
     }
   })
 
   return {
     body: parseBilling,
-    statusCode: httpResponse.statusCode
+    statusCode: statusCode
   }
 }

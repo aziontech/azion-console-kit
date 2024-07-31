@@ -56,6 +56,7 @@
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :class="{ 'border-red-500 border': codeError }"
           :options="editorOptions"
+          data-testid="edge-service-form__variables-field"
         />
         <small
           v-if="codeError"
@@ -79,6 +80,7 @@
         auto
         :isCard="false"
         title="Active"
+        data-testid="edge-service-form__status__active-field"
       />
     </template>
   </FormHorizontal>

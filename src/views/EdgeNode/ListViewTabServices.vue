@@ -6,6 +6,7 @@
   import DrawerService from '@/views/EdgeNode/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
 
   defineOptions({ name: 'list-edge-node-resources-tab' })
 
@@ -70,7 +71,7 @@
     })
   }
 
-  const deleteServicesWithDecorator = async (id) => {
+  const unbindServicesWithDecorator = async (id) => {
     return await props.deleteServiceEdgeNodeService({
       edgeNodeId: props.edgeNodeId,
       id
@@ -87,10 +88,21 @@
 
   const actions = [
     {
-      type: 'delete',
-      title: 'service',
+      type: 'dialog',
       icon: 'pi pi-trash',
-      service: deleteServicesWithDecorator
+      label: 'Unbind',
+      dialog: {
+        component: UnbindDialog,
+        body: (item) => ({
+          data: {
+            title: 'edge service',
+            parent: 'edge node',
+            selectedID: item.id,
+            service: unbindServicesWithDecorator
+          },
+          onClose: (opt) => opt.data.updated && reloadServicesList()
+        })
+      }
     }
   ]
 </script>

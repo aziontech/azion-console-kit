@@ -3,7 +3,7 @@ import selectors from '../support/selectors'
 
 const credentialName = generateUniqueName('Credential')
 
-describe('Credentials', { tags: ['run',] }, () => {
+describe('Credentials', { tags: ['@dev'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Credentials')
@@ -31,7 +31,7 @@ describe('Credentials', { tags: ['run',] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.form.actionsCancelButton).click()
     cy.get(selectors.list.searchInput).type(credentialName)
-    cy.get(selectors.list.filteredRow.nameColumn()).should('have.text', credentialName)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', credentialName)
     cy.get(selectors.list.filteredRow.lastModifiedColumn).should('not.be.empty')
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Active')
   })

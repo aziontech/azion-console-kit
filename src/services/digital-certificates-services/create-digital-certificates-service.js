@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 import * as Errors from '@/services/axios/errors'
-import { errorMsg } from './msg-error'
 
 export const createDigitalCertificatesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -13,6 +12,34 @@ export const createDigitalCertificatesService = async (payload) => {
   return parseHttpResponse(httpResponse)
 }
 
+/**
+ * @param {Object} body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (body) => {
+  let apiError = ''
+  const keys = Object.keys(body)
+
+  for (const keyError of keys) {
+    if (Array.isArray(body[keyError])) {
+      const errorValue = body[keyError][0]
+      if (typeof errorValue === 'string') {
+        apiError = errorValue
+        break
+      }
+      if (typeof errorValue === 'object') {
+        apiError = errorValue.message[0]
+        break
+      }
+    } else {
+      apiError = body[keyError]
+      break
+    }
+  }
+
+  return apiError
+}
+
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
@@ -21,7 +48,7 @@ const parseHttpResponse = (httpResponse) => {
         urlToEditView: `/digital-certificates/edit/${httpResponse.body.results.id}`
       }
     case 400:
-      throw new Error(errorMsg(httpResponse.body))
+      throw new Error(extractApiError(httpResponse.body)).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

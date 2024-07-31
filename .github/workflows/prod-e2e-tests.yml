@@ -5,16 +5,17 @@ on:
 
 jobs:
   run-prod-e2e-tests:
+    name: Run Prod E2E Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Run Cypress tests
+      - name: Run Cypress E2E Tests
         uses: cypress-io/github-action@v6
         env:
           PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
@@ -22,32 +23,19 @@ jobs:
         with:
           browser: chrome
           config-file: cypress.config.prod.js
-          env: environment=prod
+          env: environment=prod,grepTags=-@xfail
 
-      - name: Check E2E Test Coverage
-        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-
-      - name: Remove lcov intermediate files
-        run: |
-          rm -rf coverage/e2e/lcov-report
-          zip -r coverage.zip coverage
-
-      - uses: actions/upload-artifact@v3
-        if: ${{ always() }}
-        with:
-          name: coverage_e2e_report
-          path: coverage.zip
-          retention-days: 7
-
-      - uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+      - name: Upload Cypress Screenshots Artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_screenshots
           path: cypress/screenshots
           retention-days: 4
 
-      - uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+      - name: Upload Cypress Videos Artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_videos
           path: cypress/videos

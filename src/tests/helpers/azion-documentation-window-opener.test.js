@@ -1,28 +1,11 @@
-import {
-  openSearchResult,
-  openDocumentationProducts,
-  openDocumentation,
-  openAPIDocumentation,
-  openAzionSite,
-  openAzionBlog,
-  openAzionDiscord,
-  openAzionGithub,
-  openAzionX,
-  AZION_API_DOCUMENTATION,
-  AZION_DOCUMENTATION,
-  AZION_DOCUMENTATION_PRODUCTS,
-  AZION_SEARCH_RESULT,
-  AZION_CONTACT_SUPPORT,
-  openContactSupport,
-  openGoogleAuthenticatorAppDocumentation,
-  GOOGLE_AUTHENTICATOR_DOCUMENTATION,
-  AZION_SITE,
-  AZION_BLOG,
-  AZION_DISCORD,
-  AZION_GITHUB,
-  AZION_X
-} from '@/helpers/azion-documentation-window-opener'
+import * as WindowOpenerHelpers from '@/helpers/azion-documentation-window-opener'
 import { afterAll, describe, expect, it, vi } from 'vitest'
+
+const makeSut = () => {
+  return {
+    sut: WindowOpenerHelpers
+  }
+}
 
 vi.stubGlobal('window', {
   open: (url) => url
@@ -34,89 +17,124 @@ describe('AzionDocumentationWindowOpener', () => {
   })
 
   it('should open a new window with search result link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
     const searchTermMock = 'azion-product'
 
-    openSearchResult(searchTermMock)
+    sut.openSearchResult(searchTermMock)
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      `${AZION_SEARCH_RESULT}/?q=${searchTermMock}&filter=doc`
+      `https://www.azion.com/en/search-result/?q=${searchTermMock}&filter=doc`
     )
   })
 
   it('should open a new window with documentation products link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
     const path = 'guides/build/build-application'
 
-    openDocumentationProducts(path)
+    sut.openDocumentationProducts(path)
 
-    expect(openWindowSpy).toHaveBeenCalledWith(`${AZION_DOCUMENTATION_PRODUCTS}/${path}`, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/documentation/products/${path}`,
+      '_blank'
+    )
   })
 
   it('should open a new window with documentation link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openDocumentation()
+    sut.openDocumentation()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_DOCUMENTATION, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://www.azion.com/en/documentation', '_blank')
   })
 
   it('should open a new window with API documentation link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAPIDocumentation()
+    sut.openAPIDocumentation()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_API_DOCUMENTATION, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://api.azion.com/', '_blank')
   })
 
   it('should open a new window with Contact Support link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openContactSupport()
+    sut.openContactSupport()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_CONTACT_SUPPORT, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://tickets.azion.com/en/support/home',
+      '_blank'
+    )
   })
 
   it('should open a new window with Google Authenticator documentation link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openGoogleAuthenticatorAppDocumentation()
+    sut.openGoogleAuthenticatorAppDocumentation()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(GOOGLE_AUTHENTICATOR_DOCUMENTATION, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://support.google.com/accounts/answer/1066447',
+      '_blank'
+    )
   })
   it('should open a new window with Azion site link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAzionSite()
+    sut.openAzionSite()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_SITE, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://www.azion.com/', '_blank')
   })
   it('should open a new window with Azion blog link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAzionBlog()
+    sut.openAzionBlog()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_BLOG, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://www.azion.com/en/blog/', '_blank')
   })
   it('should open a new window with Azion Discord link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAzionDiscord()
+    sut.openAzionDiscord()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_DISCORD, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://discord.com/invite/Yp9N7RMVZy', '_blank')
   })
   it('should open a new window with Azion GitHub link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAzionGithub()
+    sut.openAzionGithub()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_GITHUB, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://github.com/aziontech/azion-platform-kit',
+      '_blank'
+    )
   })
   it('should open a new window with Azion X link', () => {
+    const { sut } = makeSut()
     const openWindowSpy = vi.spyOn(window, 'open')
 
-    openAzionX()
+    sut.openAzionX()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(AZION_X, '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith('https://x.com/aziontech', '_blank')
+  })
+
+  it('should open a new window with Azion Plans link', () => {
+    const { sut } = makeSut()
+    const openWindowSpy = vi.spyOn(window, 'open')
+
+    sut.openShowMorePlan()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://www.azion.com/en/professional-services&id=#plans',
+      '_blank'
+    )
   })
 })

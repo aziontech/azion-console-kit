@@ -7,7 +7,6 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -124,9 +123,15 @@
         class="w-full h-full"
         v-if="waf"
       >
-        <TabPanel header="Main Settings">
+        <TabPanel
+          header="Main Settings"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__main-settings' }
+          }"
+        >
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
+            :updatedRedirect="props.wafServices.updatedRedirect"
             :editWafRulesService="props.wafServices.editWafRulesService"
             :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
@@ -134,8 +139,14 @@
             :isTab="true"
           />
         </TabPanel>
-        <TabPanel header="Tuning">
+        <TabPanel
+          header="Tuning"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__tuning' }
+          }"
+        >
           <ListWafRulesTuning
+            v-if="activeTab === mapTabs.tuning"
             :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
             :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
             :listCountriesService="props.wafTuning.listCountriesService"
@@ -146,7 +157,12 @@
             :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
           />
         </TabPanel>
-        <TabPanel header="Allowed Rules">
+        <TabPanel
+          header="Allowed Rules"
+          :pt="{
+            root: { 'data-testid': 'waf-rules-tabs__tab__allowed-rules' }
+          }"
+        >
           <ListWafRulesAllowed
             v-if="activeTab === mapTabs.allowed"
             :listWafRulesAllowedService="props.wafRulesAllowed.listWafRulesAllowedService"

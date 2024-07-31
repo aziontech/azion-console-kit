@@ -270,8 +270,17 @@
       >
         <TabPanel
           v-for="(tab, index) in filteredTabs"
+          :pt="{
+            headerAction: {
+              id: `tab_${index}`
+            },
+            root: {
+              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`
+            }
+          }"
           :key="index"
           :header="tab.header"
+          :id="tab.header"
           data-testid="edge-application-details-tab-panel"
         >
           <component

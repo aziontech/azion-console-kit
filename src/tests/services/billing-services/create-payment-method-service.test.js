@@ -16,7 +16,7 @@ const fixtures = {
     stripe_token: 'pk_test',
     card_id: 'card_test',
     card_brand: 'visa',
-    card_holder: 'Jhon Doe',
+    card_holder: 'John Doe',
     card_last_4_digits: '4242',
     card_expiration_month: '2',
     card_expiration_year: '2028'
@@ -56,7 +56,7 @@ describe('DigitalCertificatesServices', () => {
     const result = await sut(fixtures.payload)
 
     expect(result).toEqual({
-      feedback: 'Your Credit Card has been added'
+      feedback: 'Your Payment Method has been added'
     })
   })
 

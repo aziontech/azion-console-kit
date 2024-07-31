@@ -1,23 +1,11 @@
 <template>
-  <Drawer
-    ref="drawerRef"
-    :cardDefault="cardDefault"
-    :createService="props.addCreditService"
-  />
-
-  <CreatePaymentMethodBlock
-    :createService="props.createPaymentMethodService"
-    v-model:visible="showCreatePaymentMethodDrawer"
-    v-if="loadCreatePaymentMethodDrawer"
-    @onSuccess="reloadList"
-  />
   <ListTableBlock
     ref="listPaymentMethodsRef"
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
     :columns="paymentsColumns"
-    :listService="listPaymentMethodsServiceWithDecorator"
+    :listService="props.listPaymentMethodsService"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
@@ -26,15 +14,19 @@
       <div class="flex gap-4">
         <PrimeButton
           icon="pi pi-plus"
-          label="Add Credit"
-          @click="openCreateCreditDrawer"
+          label="Credit"
+          size="small"
+          @click="drawersMethods.openDrawerAddCredit"
+          data-testid="payment-methods__add-credit__button"
           outlined
         />
         <PrimeButton
           icon="pi pi-plus"
+          data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
-          @click="openDrawerCreatePaymentMethod"
-          label="Add Payment Method"
+          size="small"
+          @click="drawersMethods.openDrawerPaymentMethod"
+          label="Payment Method"
         />
       </div>
     </template>
@@ -45,6 +37,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
+    @click-to-create="drawersMethods.openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -57,24 +50,16 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { refDebounced } from '@vueuse/core'
-  import CreatePaymentMethodBlock from '@templates/add-payment-method-block'
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
-  import Drawer from './Drawer'
 
-  import { onMounted, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-
+  import { ref, inject } from 'vue'
+  const emit = defineEmits(['update-credit-event'])
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const props = defineProps({
-    createPaymentMethodService: {
-      type: Function,
-      required: true
-    },
     listPaymentMethodsService: {
       type: Function,
       required: true
@@ -90,29 +75,18 @@
     documentPaymentMethodService: {
       type: Function,
       required: true
-    },
-    addCreditService: {
-      type: Function,
-      required: true
     }
   })
 
-  const drawerRef = ref('')
-  const route = useRoute()
-  const router = useRouter()
-  const cardDefault = ref({})
   const listPaymentMethodsRef = ref('')
-  const showCreatePaymentMethodDrawer = ref(false)
-  const debouncedDrawerAnimate = 300
-  const loadCreatePaymentMethodDrawer = refDebounced(
-    showCreatePaymentMethodDrawer,
-    debouncedDrawerAnimate
-  )
+
+  const drawersMethods = inject('drawersMethods')
 
   const paymentsColumns = ref([
     {
       field: 'cardData',
       header: 'Card Number',
+      sortField: 'cardNumberSearch',
       filterPath: 'cardNumberSearch',
       type: 'component',
       component: (columnData) =>
@@ -125,7 +99,7 @@
     },
     {
       field: 'cardExpiration',
-      header: 'Expires in',
+      header: 'Expiration Date',
       sortField: 'expiringDateByOrder',
       filterPath: 'expiringDateSearch',
       type: 'component',
@@ -136,10 +110,6 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
-  }
-
-  const openDrawerCreatePaymentMethod = () => {
-    showCreatePaymentMethodDrawer.value = true
   }
 
   const showToast = (severity, detail) => {
@@ -158,6 +128,8 @@
     try {
       const feedback = await props.setAsDefaultPaymentService(payment.id)
       showToast('success', feedback)
+      emit('update-credit-event')
+      reloadList()
     } catch (error) {
       showToast('error', error)
     }
@@ -175,21 +147,11 @@
     {
       label: 'Delete',
       type: 'delete',
+      icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
       service: props.deletePaymentService
     }
   ])
-
-  const listPaymentMethodsServiceWithDecorator = async () => {
-    const listPaymentMethods = await props.listPaymentMethodsService()
-    const [firstCard] = listPaymentMethods
-    cardDefault.value = firstCard
-    return listPaymentMethods
-  }
-
-  const openCreateCreditDrawer = () => {
-    if (cardDefault.value.isDefault) drawerRef.value.openCreateDrawer()
-  }
 
   const reloadList = () => {
     if (hasContentToList.value) {
@@ -199,14 +161,7 @@
     hasContentToList.value = true
   }
 
-  const showPaymentMethod = () => {
-    if (route.query.paymentSession) {
-      openDrawerCreatePaymentMethod()
-      router.push({ query: {} })
-    }
-  }
-
-  onMounted(async () => {
-    showPaymentMethod()
+  defineExpose({
+    reloadList
   })
 </script>

@@ -40,6 +40,35 @@ const formatDateToUS = (value) => {
   }).format(date)
 }
 
+const isDateStringValid = (dateString) => {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  return dateRegex.test(dateString)
+}
+
+/**
+ * Converts a given date to MM/DD/YYYY format.
+ *
+ * @param {Date | string | number} value - The date to be formatted. Can be a Date object, a timestamp, or a string that the Date constructor can parse.
+ * @returns {string} The formatted date in MM/DD/YYYY format.
+ */
+const formatDateToUSBilling = (value) => {
+  if (!isDateStringValid(value)) return '---'
+
+  const [year, month, day] = value.split('-')
+
+  const date = new Date(year, month - 1, day)
+
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date')
+  }
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
 /**
  * Convert separate month and year values and add them together
  *
@@ -103,4 +132,25 @@ const convertDateToLocalTimezone = (date, utcOffset) => {
   return formatToEndOfDayIsoDate(userRealDate)
 }
 
-export { convertValueToDate, convertDateToLocalTimezone, formatDateMonthAndYear, formatDateToUS }
+const getCurrentMonthStartEnd = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+
+  const dateInitial = new Date(year, month, 1)
+  const dateFinal = new Date(year, month + 1, 0)
+
+  return {
+    dateInitial: dateInitial.toISOString().split('T')[0],
+    dateFinal: dateFinal.toISOString().split('T')[0]
+  }
+}
+
+export {
+  convertValueToDate,
+  convertDateToLocalTimezone,
+  formatDateMonthAndYear,
+  formatDateToUS,
+  formatDateToUSBilling,
+  getCurrentMonthStartEnd
+}

@@ -59,7 +59,8 @@ describe.concurrent('ContractServices', () => {
     })
 
     expect(response).toEqual({
-      isDeveloperSupportPlan: false
+      isDeveloperSupportPlan: false,
+      yourServicePlan: 'Developer'
     })
   })
 
@@ -80,7 +81,8 @@ describe.concurrent('ContractServices', () => {
     })
 
     expect(response).toEqual({
-      isDeveloperSupportPlan: true
+      isDeveloperSupportPlan: true,
+      yourServicePlan: 'Developer'
     })
   })
 

@@ -33,6 +33,7 @@ jobs:
       - name: Build & Deploy
         run: azion deploy --auto --config-dir azion/production
         env:
+          VITE_STRIPE_TOKEN_PROD: ${{ secrets.PROD_STRIPE_TOKEN }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
           NODE_ENV: production
           VITE_ENVIRONMENT: production

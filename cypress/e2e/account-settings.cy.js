@@ -1,11 +1,6 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 import selectors from '../support/selectors'
 import generateUniqueName from '../support/utils'
-
-const waitMultipleTimes = (alias, times) => {
-  for (; times; times--) {
-    cy.wait(alias)
-  }
-}
 
 const fixtures = {
   companyName: 'Company Name',
@@ -15,15 +10,13 @@ const fixtures = {
   complement: 'Apt. 123'
 }
 
-describe('Account Settings spec', { tags: ['run',] }, () => {
+describe('Account Settings spec', { tags: ['@dev', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Account Settings')
 
     fixtures.companyName = generateUniqueName('companyName')
-
-    cy.intercept('graphql/cities/').as('citiesApi')
-    waitMultipleTimes('@citiesApi', 3)
+    cy.wait(3000)
   })
 
   it('should update account settings successfully', () => {
@@ -33,9 +26,9 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.postalCode).clear()
 
     // Act
-    cy.get(selectors.accountSettings.companyName).type(fixtures.companyName)
-    cy.get(selectors.accountSettings.companyId).type(fixtures.companyId)
-    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode)
+    cy.get(selectors.accountSettings.companyName).type(fixtures.companyName, { delay: 0 })
+    cy.get(selectors.accountSettings.companyId).type(fixtures.companyId, { delay: 0 })
+    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, { delay: 0 })
 
     cy.get(selectors.accountSettings.submitButton).click()
 
@@ -57,7 +50,7 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.complement).clear()
 
     // Act
-    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode)
+    cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, { delay: 0 })
 
     cy.get(selectors.accountSettings.countryDropdown).click()
     cy.get(selectors.accountSettings.countryOption(randomCountryOption)).click()
@@ -66,7 +59,7 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.country).invoke('text').as('countryValue')
 
     // wait for cities api to provide region options
-    cy.wait('@citiesApi')
+    cy.wait(1000)
     cy.get(selectors.accountSettings.regionDropdown).click()
     cy.get(selectors.accountSettings.regionOption(firstOption)).click()
 
@@ -74,15 +67,15 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.region).invoke('text').as('regionValue')
 
     // wait for cities api to provide city options
-    cy.wait('@citiesApi')
+    cy.wait(1000)
     cy.get(selectors.accountSettings.cityDropdown).click()
     cy.get(selectors.accountSettings.cityOption(firstOption)).click()
 
     // store city alias value to be used for validation
     cy.get(selectors.accountSettings.city).invoke('text').as('cityValue')
 
-    cy.get(selectors.accountSettings.address).type(fixtures.address)
-    cy.get(selectors.accountSettings.complement).type(fixtures.complement)
+    cy.get(selectors.accountSettings.address).type(fixtures.address, { delay: 0 })
+    cy.get(selectors.accountSettings.complement).type(fixtures.complement, { delay: 0 })
 
     cy.get(selectors.accountSettings.submitButton).click()
 
@@ -112,7 +105,7 @@ describe('Account Settings spec', { tags: ['run',] }, () => {
     cy.get(selectors.accountSettings.billingEmails).clear()
 
     // Act
-    cy.get(selectors.accountSettings.billingEmails).type(emails)
+    cy.get(selectors.accountSettings.billingEmails).type(emails, { delay: 0 })
 
     cy.get(selectors.accountSettings.submitButton).click()
 

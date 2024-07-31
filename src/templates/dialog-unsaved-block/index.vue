@@ -137,6 +137,7 @@
         <PrimeButton
           severity="primary"
           label="Leave page"
+          data-testid="dialog-unsaved__leave-page"
           outlined
           @click="onLeavePage"
         />

@@ -106,18 +106,18 @@
 
   const behaviorsRequestOptions = ref([
     {
-      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`,
+      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'capture_match_groups',
       requires: true
     },
@@ -125,62 +125,70 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`,
+      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'forward_cookies',
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
     {
-      label: `Optimize Images ${showLabelImageOptimization.value}`,
+      label: `Optimize Images ${showLabelImageOptimization.value}`.trim(),
       value: 'optimize_images',
       requires: true
     },
     {
-      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`,
+      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`.trim(),
       value: 'redirect_http_to_https',
       requires: true
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`,
+      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'rewrite_request',
       requires: true
     },
-    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true },
+    {
+      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      value: 'run_function',
+      requires: true
+    },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
     { label: 'Set Origin', value: 'set_origin', requires: false }
   ])
 
   const behaviorsResponseOptions = ref([
     {
-      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'set_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
       value: 'filter_response_cookie',
       requires: true
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true }
+    {
+      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      value: 'run_function',
+      requires: true
+    }
   ])
 
   const behaviorsDefaultOptions = ref([
@@ -700,7 +708,8 @@
         nameField="phase"
         isCard
         :options="phasesRadioOptions"
-        data-testid="rule-form-phase-radio"
+        data-testid="edge-application-rule-form__phase__radio-group"
+        :disabled="isEditDrawer"
       />
     </template>
   </FormHorizontal>
@@ -746,7 +755,7 @@
           <div class="flex gap-2 mt-6 mb-8">
             <div class="w-full">
               <fieldAutoComplete
-                data-testid="rule-form-criteria-item-conditional-autocomplete-field-autocomplete"
+                :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
                 :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
                 :value="criteria[criteriaIndex].value[conditionalIndex].variable"
@@ -766,12 +775,12 @@
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
-              data-testid="rule-form-criteria-item-conditional-operator"
+              :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
             />
 
             <div class="flex flex-col w-full">
               <FieldText
-                data-testid="rule-form-criteria-item-conditional-input-field-text"
+                :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
                 v-if="
                   criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
                   criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
@@ -810,7 +819,6 @@
         <div
           v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
-          data-testid="rule-form-criteria-item-remove-button"
         >
           <Divider type="solid" />
           <PrimeButton
@@ -819,6 +827,7 @@
             size="small"
             outlined
             @click="removeCriteria(criteriaIndex + 1)"
+            :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
           />
         </div>
       </div>
@@ -847,7 +856,6 @@
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
-        data-testid="rule-form-behaviors-item"
       >
         <div class="flex items-center gap-2">
           <Divider
@@ -879,13 +887,14 @@
               optionDisabled="requires"
               :value="behaviors[behaviorIndex].value.name"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-              data-testid="rule-form-behaviors-item-name"
+              :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
             />
           </div>
 
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
               <FieldDropdown
+                :filter="true"
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].target`"
                 :options="functionsInstanceOptions"
@@ -893,7 +902,7 @@
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-run-function"
+                :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
@@ -905,7 +914,7 @@
                 optionValue="originId"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-set-origin"
+                :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
@@ -917,7 +926,7 @@
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-set-cache-policy"
+                :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
@@ -928,7 +937,7 @@
                   :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.captured_array"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-captured-array"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
                 />
                 <FieldText
                   placeholder="Subject"
@@ -936,7 +945,7 @@
                   :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.subject"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-subject"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
                 />
                 <FieldText
                   placeholder="Regex"
@@ -944,7 +953,7 @@
                   :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.regex"
-                  data-testid="rule-form-behaviors-item-capture-match-groups-regex"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
                 />
               </div>
             </template>
@@ -953,7 +962,7 @@
                 :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
-                data-testid="rule-form-behaviors-item-target"
+                :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
               />
             </template>
           </div>

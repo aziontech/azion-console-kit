@@ -144,6 +144,7 @@
           placeholder="My origin"
           name="name"
           :value="name"
+          data-testid="form-horizontal-general-name"
           description="Give a unique and descriptive name to identify the origin."
         />
       </div>
@@ -201,6 +202,7 @@
           optionLabel="label"
           :value="originType"
           inputId="originType"
+          data-testid="origin-form__origin-type"
           :optionDisabled="(option) => option.disabled"
           :description="descriptionOriginType"
         />
@@ -239,6 +241,7 @@
           placeholder="example.com"
           name="addresses[0].address"
           :value="addresses[0].value.address"
+          data-testid="origin-form__address"
           description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
       </div>
