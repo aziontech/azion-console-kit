@@ -97,7 +97,7 @@ This project utilizes Stripe for payment processing, and it requires environment
 Environment Variables
 You need to set the following environment variables in your .env file or environment configuration:
 
-* `VITE_DEV_STRIPE_TOKEN`: This is your Stripe API key for the development environment. It's typically used for local testing during development.
+* `VITE_STRIPE_TOKEN_DEV`: This is your Stripe API key for the development environment. It's typically used for local testing during development.
 
 * `VITE_STRIPE_TOKEN_STAGE`: This is your Stripe API key for the staging environment. It's typically used for testing purposes before deploying to production.
 
@@ -107,7 +107,7 @@ You need to set the following environment variables in your .env file or environ
 Create a `.env` file at the root of your project and add the following lines, replacing the placeholder keys with your actual Stripe API keys:
 
 ```bash
-VITE_DEV_STRIPE_TOKEN=pk_test_yourDevApiKeyHere
+VITE_STRIPE_TOKEN_DEV=pk_test_yourDevApiKeyHere
 VITE_STRIPE_TOKEN_STAGE=pk_test_yourStageApiKeyHere
 VITE_STRIPE_TOKEN_PROD=pk_live_yourProductionApiKeyHere
 ```
