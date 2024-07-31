@@ -181,7 +181,8 @@
   const disabledOption = ({ code }) => code === selectedCategory.value?.code
 
   const changeCategory = async () => {
-    const category = selectedCategory.value.code
+    const { code } = selectedCategory.value
+    const category = code === 'all' ? undefined : code
 
     try {
       loading.value = true
