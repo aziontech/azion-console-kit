@@ -58,6 +58,11 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: coverage_unit_report
+    - name: debug
+      run: |
+        pwd
+        find ./
+          
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@v2.3.0
       env:
