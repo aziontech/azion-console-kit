@@ -18,47 +18,48 @@ Before you begin, ensure that you have the following:
 - [Node.js](https://nodejs.org/) version 18 or later
 - [Yarn](https://yarnpkg.com/) package manager
 
- If you are not a JS developer and don't want to install yarn and node, you can use Docker:
+If you are not a JS developer and don't want to install yarn and node, you can use Docker:
+
 ```bash
 alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
 ```
-
 
 ### Setup
 
 1. Clone the repository and navigate to the root folder.
 
-    ```bash
-    git clone git@github.com:aziontech/azion-console-kit.git
-    cd azion-console-kit
-    ```
+   ```bash
+   git clone git@github.com:aziontech/azion-console-kit.git
+   cd azion-console-kit
+   ```
 
 2. Install dependencies and start the project:
 
-    ```bash
-     $ yarn install
-     $ yarn dev --host
-    ```
+   ```bash
+    $ yarn install
+    $ yarn dev --host
+   ```
 
 The console becomes available at [http://localhost:5173](http://localhost:5173).
 
 ## Configuration 💻
 
-### Skipping login with a personal token
-
-To avoid login screen, you can create a personal token via [Azion Console](https://console.azion.com/) and save it in a `.env.development` file:
-
-```bash
-echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
-```
-
 ### Setting the API environment (STAGE/PRODUCTION)
 
 By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs.
-To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
+To point your application to the **PRODUCTION** stack, add the following command in the `.env` file:
+
+```js
+VITE_ENVIRONMENT = 'production'
+// or to use Azion stage APIs
+VITE_ENVIRONMENT = 'stage'
+```
 
 ```bash
+# another option if you do not want to use .env file
 export VITE_ENVIRONMENT='production'
+# or to use Azion stage APIs
+export VITE_ENVIRONMENT='stage'
 ```
 
 ## Running on the Edge 🚀
@@ -67,43 +68,45 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
 
 1. [Download the Azion CLI here](https://www.azion.com/en/documentation/products/azion-cli/overview/) and configure your personal token:
 
-    ```bash
-    azion -t ${PERSONAL_TOKEN}
-    ```
+   ```bash
+   azion -t ${PERSONAL_TOKEN}
+   ```
 
 2. Link project to an Azion edge application.
 
-    ```bash
-    azion link
-    ```
+   ```bash
+   azion link
+   ```
 
    Choose the Vue preset.
 
 3. Publish your project to create the application's domain:
 
-    ```bash
-    azion deploy
-    ```
+   ```bash
+   azion deploy
+   ```
 
-    > This step is responsible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
+   > This step is responsible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
 
    💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
 
 After a few seconds, access your project on the domain provided by the CLI.
 
 ## Using Stripe Keys with Environment Variables
+
 This project utilizes Stripe for payment processing, and it requires environment-specific API keys for proper configuration. To set up your environment with the correct Stripe keys, follow these instructions:
 
 Environment Variables
 You need to set the following environment variables in your .env file or environment configuration:
 
-* `VITE_DEV_STRIPE_TOKEN`: This is your Stripe API key for the development environment. It's typically used for local testing during development.
+- `VITE_DEV_STRIPE_TOKEN`: This is your Stripe API key for the development environment. It's typically used for local testing during development.
 
-* `VITE_STRIPE_TOKEN_STAGE`: This is your Stripe API key for the staging environment. It's typically used for testing purposes before deploying to production.
+- `VITE_STRIPE_TOKEN_STAGE`: This is your Stripe API key for the staging environment. It's typically used for testing purposes before deploying to production.
 
-* `VITE_STRIPE_TOKEN_PROD`: This is your Stripe API key for the production environment. It should only be used in your live application where real transactions occur.
+- `VITE_STRIPE_TOKEN_PROD`: This is your Stripe API key for the production environment. It should only be used in your live application where real transactions occur.
 
 #### Example `.env` File
+
 Create a `.env` file at the root of your project and add the following lines, replacing the placeholder keys with your actual Stripe API keys:
 
 ```bash
