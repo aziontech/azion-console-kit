@@ -43,7 +43,7 @@
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
     :dataFiltered="dataFiltedComputed"
-    @on-select-data="selectedItems"
+    v-model:selectedItensData="selectedEvents"
     :showSelectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
@@ -322,10 +322,6 @@
     domainNames.value = domainsOptions.value.options
       .filter((domain) => selectedFilter.value.domains.includes(domain.id))
       .map((domain) => domain.name)
-  }
-
-  const selectedItems = (events) => {
-    selectedEvents.value = events
   }
 
   const openDialog = () => {

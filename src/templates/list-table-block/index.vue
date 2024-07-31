@@ -270,7 +270,12 @@
 
   defineOptions({ name: 'list-table-block-new' })
 
-  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
+  const emit = defineEmits([
+    'on-load-data',
+    'on-before-go-to-add-page',
+    'on-before-go-to-edit',
+    'update:selectedItensData'
+  ])
 
   const props = defineProps({
     columns: {
@@ -324,6 +329,10 @@
     },
     showSelectionMode: {
       type: Boolean
+    },
+    selectedItensData: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -343,7 +352,15 @@
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
-  const selectedItems = ref()
+
+  const selectedItems = computed({
+    get: () => {
+      return props.selectedItensData
+    },
+    set: (value) => {
+      emit('update:selectedItensData', value)
+    }
+  })
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -492,10 +509,6 @@
   watch(data, (currentState) => {
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
-  })
-
-  watch(selectedItems, (selectedData) => {
-    emit('on-select-data', selectedData)
   })
 
   watch(
