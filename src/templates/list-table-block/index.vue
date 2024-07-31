@@ -300,10 +300,6 @@
       type: String,
       default: () => ''
     },
-    dataFiltered: {
-      type: Array,
-      default: () => []
-    },
     listService: {
       required: true,
       type: Function
@@ -420,13 +416,13 @@
     return actions
   }
 
-  const loadData = async ({ page }) => {
+  const loadData = async ({ page, ...query }) => {
     if (props.listService) {
       try {
         isLoading.value = true
         const response = props.isGraphql
           ? await props.listService()
-          : await props.listService({ page })
+          : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
         toast.add({
@@ -477,8 +473,8 @@
     }
   }
 
-  const reload = () => {
-    loadData({ page: 1 })
+  const reload = (query = {}) => {
+    loadData({ page: 1, ...query })
   }
 
   defineExpose({ reload })
@@ -510,9 +506,4 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
-
-  watch(
-    () => props.dataFiltered,
-    (newValue) => (data.value = newValue)
-  )
 </script>

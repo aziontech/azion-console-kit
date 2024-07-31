@@ -40,9 +40,10 @@
   <ListTableBlock
     v-show="showListTable"
     pageTitleDelete="WAF rules tuning"
+    :listService="props.listWafRulesTuningService"
+    ref="listServiceWafTunningRef"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
-    :dataFiltered="dataFiltedComputed"
     v-model:selectedItensData="selectedEvents"
     :showSelectionMode="true"
     :editInDrawer="openMoreDetails"
@@ -162,7 +163,6 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const dataFilted = ref([])
   const selectedFilter = ref({
     domains: [],
     network: {},
@@ -179,6 +179,7 @@
   const domainNames = ref('')
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
+  const listServiceWafTunningRef = ref('')
 
   const valueDomains = computed({
     get: () => {
@@ -202,7 +203,6 @@
     }
   })
 
-  const dataFiltedComputed = computed(() => dataFilted.value)
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
   )
@@ -403,8 +403,7 @@
       filter
     }
 
-    const response = await props.listWafRulesTuningService({ ...queryFields })
-    dataFilted.value = response
+    listServiceWafTunningRef.value.reload(queryFields)
   }
 
   const handleListWafRulesTuningAttacksService = async (path = '') => {

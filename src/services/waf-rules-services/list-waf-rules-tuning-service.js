@@ -2,6 +2,13 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
 export const listWafRulesTuningService = async ({ wafId, domains, network, hourRange, filter }) => {
+  if (!wafId) {
+    return parseHttpResponse({
+      body: [],
+      statusCode: 200
+    })
+  }
+
   const { countries, ipsList } = middleware(filter)
   const searchParams = makeSearchParams({ domains, network, countries, ipsList, hourRange })
   let httpResponse = await AxiosHttpClientAdapter.request({
