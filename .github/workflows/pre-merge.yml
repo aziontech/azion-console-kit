@@ -32,15 +32,20 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run: yarn test:unit:headless
+        run: yarn test:unit:coverage
+
+      - name: Show files
+        run: |
+          pwd
+          find ./
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v3
         with:
           name: coverage_unit_report
           path: |
-            coverage/lcov.info
-            coverage/sonar-report.xml
+            coverage/unit/lcov.info
+            coverage/unit/sonar-report.xml
           retention-days: 1
 
   sonarcloud:
