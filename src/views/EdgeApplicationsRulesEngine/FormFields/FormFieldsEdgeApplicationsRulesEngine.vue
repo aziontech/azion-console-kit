@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/return-in-computed-property -->
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
