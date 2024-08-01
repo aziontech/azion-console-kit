@@ -149,6 +149,7 @@
 
   const initialPhase = ref('request')
   const openDrawerCreate = (selectedPhase = 'request') => {
+    initialValues.value.phase = selectedPhase
     initialPhase.value = selectedPhase
     showCreateRulesEngineDrawer.value = true
   }
@@ -157,6 +158,7 @@
     if (rule.id) {
       selectedRulesEngineToEdit.value = rule
       showEditRulesEngineDrawer.value = true
+      initialPhase.value = rule.phase.content.toLocaleLowerCase()
     }
   }
 
@@ -246,6 +248,7 @@
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        :initialPhase="initialPhase"
         data-testid="rules-engine-edit-drawer-form-fields"
         :errors="errors"
       />

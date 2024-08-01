@@ -142,8 +142,7 @@
       required: true
     },
     initialPhase: {
-      type: String,
-      default: 'default'
+      type: String
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -153,8 +152,6 @@
       type: Object
     }
   })
-
-  const checkPhaseIsDefaultValue = ref(null)
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
@@ -172,6 +169,8 @@
       edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
     }
   })
+
+  const isDefaultPhase = computed(() => props.initialPhase === 'default')
 
   const behaviorsRequestOptions = ref([
     {
@@ -520,12 +519,6 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const handlePhaseOnMount = () => {
-    phase.value = props.initialPhase || phase.value
-
-    checkPhaseIsDefaultValue.value = phase.value === 'default'
-  }
-
   const handleBehaviorsOnMount = () => {
     updateBehaviorsOptionsRequires()
 
@@ -548,7 +541,6 @@
     handleCriteriaOnMount()
     processBehaviorsAtEdit()
     callOptionsServicesAtEdit()
-    handlePhaseOnMount()
   })
 </script>
 
@@ -565,8 +557,8 @@
           label="Name"
           required
           name="name"
-          :readonly="checkPhaseIsDefaultValue"
-          :disabled="checkPhaseIsDefaultValue"
+          :readonly="isDefaultPhase"
+          :disabled="isDefaultPhase"
           placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
@@ -591,7 +583,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
-    v-if="!checkPhaseIsDefaultValue"
+    v-if="!isDefaultPhase"
     data-testid="rule-form-phase"
   >
     <template #inputs>
@@ -662,7 +654,7 @@
                 :suggestions="variableItems"
                 :onComplete="searchVariableOption"
                 icon="pi pi-search"
-                :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
+                :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
                 completeOnFocus
               />
             </div>
@@ -674,7 +666,7 @@
               class="h-fit"
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
-              :disabled="checkPhaseIsDefaultValue"
+              :disabled="isDefaultPhase"
               :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
             />
 
@@ -687,7 +679,7 @@
                 "
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
                 :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
-                :disabled="checkPhaseIsDefaultValue"
+                :disabled="isDefaultPhase"
               />
             </div>
           </div>
@@ -695,7 +687,7 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
           data-testid="rule-form-criteria-item-conditional-add-button"
         >
           <PrimeButton
@@ -717,7 +709,7 @@
         </div>
 
         <div
-          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
@@ -731,7 +723,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue">
+      <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
