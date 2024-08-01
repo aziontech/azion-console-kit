@@ -15,61 +15,7 @@
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
 
-  const props = defineProps({
-    isApplicationAcceleratorEnabled: {
-      type: Boolean,
-      required: true
-    },
-    isDeliveryProtocolHttps: {
-      type: Boolean,
-      required: true
-    },
-    isImageOptimizationEnabled: {
-      required: true,
-      type: Boolean
-    },
-    listEdgeApplicationFunctionsService: {
-      type: Function,
-      required: true
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
-    },
-    listOriginsService: {
-      required: true,
-      type: Function
-    },
-    edgeApplicationId: {
-      type: String,
-      required: true
-    },
-    initialPhase: {
-      type: String,
-      validator: (val) => ['reques', 'respons', 'default'].includes(val)
-    },
-    selectedRulesEngineToEdit: {
-      type: Object,
-      required: false,
-      default: () => {}
-    },
-    hideApplicationAcceleratorInDescription: {
-      type: Boolean
-    },
-    isEdgeFunctionEnabled: {
-      type: Boolean
-    },
-    errors: {
-      type: Object
-    }
-  })
-
-  const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
-  const checkPhaseIsDefaultValue = ref()
-
-  const toast = useToast()
-  const criteriaOperatorOptions = ref([
+  const CRITERIA_OPERATOR_OPTIONS = [
     { label: 'is equal', value: 'is_equal' },
     { label: 'is not equal', value: 'is_not_equal' },
     { label: 'starts with', value: 'starts_with' },
@@ -78,7 +24,141 @@
     { label: 'does not match', value: 'does_not_match' },
     { label: 'exists', value: 'exists' },
     { label: 'does not exist', value: 'does_not_exist' }
-  ])
+  ]
+
+  const BEHAVIORS_DEFAULT_OPTIONS = [
+    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
+    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
+    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
+    { label: 'Set Origin', value: 'set_origin', requires: false },
+    { label: 'Run Function', value: 'run_function', requires: false },
+    { label: 'No Content (204)', value: 'no_content', requires: false }
+  ]
+
+  const DEFAULT_OPERATOR = {
+    variable: '${uri}',
+    operator: 'is_equal',
+    conditional: 'if',
+    input_value: ''
+  }
+
+  const DEFAULT_BEHAVIOR = {
+    name: `deliver`,
+    target: {}
+  }
+
+  const DISABLE_ADD_BEHAVIOR_OPTIONS = [
+    'deliver',
+    'redirect_to_301',
+    'redirect_to_302',
+    'deny',
+    'no_content'
+  ]
+
+  const DISABLE_TARGET_OPTIONS = [
+    'deliver',
+    'enable_gzip',
+    'bypass_cache_phase',
+    'deny',
+    'forward_cookies',
+    'no_content',
+    'optimize_images',
+    'redirect_http_to_https'
+  ]
+
+  const VARIABLE_AUTOCOMPLETE_OPTIONS = [
+    '${arg_}',
+    '${args}',
+    '${cookie_}',
+    '${da_}',
+    '${device_group}',
+    '${domain}',
+    '${geoip_city_continent_code}',
+    '${geoip_city_country_code}',
+    '${geoip_city_country_name}',
+    '${geoip_city}',
+    '${geoip_continent_code}',
+    '${geoip_country_code}',
+    '${geoip_country_name}',
+    '${geoip_region_name}',
+    '${geoip_region}',
+    '${host}',
+    '${http_}',
+    '${remote_addr}',
+    '${remote_port}',
+    '${remote_user}',
+    '${request_body}',
+    '${request_method}',
+    '${request_uri}',
+    '${request}',
+    '${scheme}',
+    '${server_port}',
+    '${uri}'
+  ]
+
+  const PHASE_OPTIONS = [
+    {
+      title: 'Request Phase',
+      inputValue: 'request',
+      subtitle: 'Configure the requests made to the edge.'
+    },
+    {
+      title: 'Response Phase',
+      inputValue: 'response',
+      subtitle: 'Configure the responses delivered to end-users.'
+    }
+  ]
+
+  const props = defineProps({
+    listEdgeApplicationFunctionsService: {
+      type: Function,
+      required: true
+    },
+    listCacheSettingsService: {
+      type: Function,
+      required: true
+    },
+    listOriginsService: {
+      type: Function,
+      required: true
+    },
+    isApplicationAcceleratorEnabled: {
+      type: Boolean
+    },
+    isDeliveryProtocolHttps: {
+      type: Boolean
+    },
+    isImageOptimizationEnabled: {
+      type: Boolean
+    },
+    hideApplicationAcceleratorInDescription: {
+      type: Boolean
+    },
+    isEdgeFunctionEnabled: {
+      type: Boolean
+    },
+    edgeApplicationId: {
+      type: String,
+      required: true
+    },
+    initialPhase: {
+      type: String,
+      default: 'default'
+    },
+    selectedRulesEngineToEdit: {
+      type: Object,
+      default: () => {}
+    },
+    errors: {
+      type: Object
+    }
+  })
+
+  const checkPhaseIsDefaultValue = ref(null)
+
+  const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
+
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
 
   const behaviorsLabelsTags = computed(() => {
     const empty = ''
@@ -180,15 +260,6 @@
     }
   ])
 
-  const behaviorsDefaultOptions = ref([
-    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
-    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
-    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false },
-    { label: 'Run Function', value: 'run_function', requires: false },
-    { label: 'No Content (204)', value: 'no_content', requires: false }
-  ])
-
   const { value: name } = useField('name')
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const {
@@ -199,18 +270,6 @@
   } = useFieldArray('behaviors')
   const { value: phase } = useField('phase')
   const { value: description } = useField('description')
-
-  const DEFAULT_OPERATOR = {
-    variable: '${uri}',
-    operator: 'is_equal',
-    conditional: 'if',
-    input_value: ''
-  }
-
-  const DEFAULT_BEHAVIOR = {
-    name: `deliver`,
-    target: {}
-  }
 
   const removeConditional = (criteriaIndex, conditionalIndex) => {
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
@@ -238,7 +297,7 @@
     request: () => behaviorsRequestOptions.value,
     default: () => {
       if (behaviors.value.length === 1) {
-        return behaviorsDefaultOptions.value
+        return BEHAVIORS_DEFAULT_OPTIONS
       }
       return behaviorsRequestOptions.value
     },
@@ -323,53 +382,24 @@
 
   const disableAddBehaviorButtonComputed = computed(() => {
     const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
+
     const disableAddBehaviorButton = true
-    const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
-    if (behaviorHasNotBeenLoaded) {
-      return disableAddBehaviorButton
-    }
-    if (behaviors.value.length === 0) {
-      return disableAddBehaviorButton
-    }
-    if (behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS) {
-      return disableAddBehaviorButton
-    }
+
+    const isBehaviorsListEmpty = !behaviors.value || !behaviors.value?.length
+    if (isBehaviorsListEmpty) return disableAddBehaviorButton
+
+    const excededMaximumNumberOfBehaviors = behaviors.value?.length >= MAXIMUM_NUMBER_OF_BEHAVIORS
+    if (excededMaximumNumberOfBehaviors) return disableAddBehaviorButton
 
     const lastBehavior = behaviors.value[behaviors.value.length - 1]
-    const isLastBehaviorEmpty = !lastBehavior.value.name
-    if (isLastBehaviorEmpty) {
-      return disableAddBehaviorButton
-    }
-    const optionsThatDisableAddBehaviors = [
-      'deliver',
-      'redirect_to_301',
-      'redirect_to_302',
-      'deny',
-      'no_content'
-    ]
 
-    return optionsThatDisableAddBehaviors.includes(lastBehavior.value.name)
+    const isLastBehaviorEmpty = !lastBehavior.value.name
+    if (isLastBehaviorEmpty) return disableAddBehaviorButton
+
+    return DISABLE_ADD_BEHAVIOR_OPTIONS.includes(lastBehavior.value.name)
   })
 
   const changeBehaviorType = (behaviorName, index) => {
-    const disableTargetOptions = [
-      'deliver',
-      'enable_gzip',
-      'bypass_cache_phase',
-      'deny',
-      'forward_cookies',
-      'no_content',
-      'optimize_images',
-      'redirect_http_to_https'
-    ]
-    const disableAddBehaviorButtonOptions = [
-      'deliver',
-      'redirect_to_301',
-      'redirect_to_302',
-      'deny',
-      'no_content'
-    ]
-
     let targetValue = behaviors.value[index].value.target
     if (!isEditDrawer.value) targetValue = ''
     if (targetValue && typeof targetValue == 'object' && Object.keys(targetValue).length === 0) {
@@ -396,8 +426,8 @@
         break
       }
       default: {
-        const isBehaviorTargetFieldEnabled = !disableTargetOptions.includes(behaviorName)
-        const isAddBehaviorButtonEnabled = !disableAddBehaviorButtonOptions.includes(behaviorName)
+        const isBehaviorTargetFieldEnabled = !DISABLE_TARGET_OPTIONS.includes(behaviorName)
+        const isAddBehaviorButtonEnabled = !DISABLE_ADD_BEHAVIOR_OPTIONS.includes(behaviorName)
 
         setShowBehaviorTargetField(isBehaviorTargetFieldEnabled, index)
 
@@ -407,6 +437,8 @@
       }
     }
   }
+
+  const toast = useToast()
 
   const callOptionsServicesAtEdit = async () => {
     if (isEditDrawer.value) {
@@ -463,42 +495,10 @@
     }
   }
 
-  const variableAutocompleteOptions = ref([
-    '${arg_}',
-    '${args}',
-    '${cookie_}',
-    '${da_}',
-    '${device_group}',
-    '${domain}',
-    '${geoip_city_continent_code}',
-    '${geoip_city_country_code}',
-    '${geoip_city_country_name}',
-    '${geoip_city}',
-    '${geoip_continent_code}',
-    '${geoip_country_code}',
-    '${geoip_country_name}',
-    '${geoip_region_name}',
-    '${geoip_region}',
-    '${host}',
-    '${http_}',
-    '${remote_addr}',
-    '${remote_port}',
-    '${remote_user}',
-    '${request_body}',
-    '${request_method}',
-    '${request_uri}',
-    '${request}',
-    '${scheme}',
-    '${server_port}',
-    '${uri}'
-  ])
-
   const variableItems = ref([])
 
   const searchVariableOption = (event) => {
-    variableItems.value = variableAutocompleteOptions.value.filter((item) =>
-      item.includes(event.query)
-    )
+    variableItems.value = VARIABLE_AUTOCOMPLETE_OPTIONS.filter((item) => item.includes(event.query))
   }
 
   const getBehaviorLabel = (behaviorItem) => {
@@ -506,7 +506,8 @@
   }
 
   const isNotFirstCriteria = (index) => {
-    return criteria.value.length > 1 && index < criteria.value.length - 1
+    const totalCriteria = criteria.value.length
+    return totalCriteria > 1 && index < totalCriteria - 1
   }
 
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
@@ -519,32 +520,10 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const phasesRadioOptions = ref([])
-
-  const setPhaseRadioOptions = () => {
-    if (!checkPhaseIsDefaultValue.value) {
-      phasesRadioOptions.value = [
-        {
-          title: 'Request Phase',
-          inputValue: 'request',
-          subtitle: 'Configure the requests made to the edge.'
-        },
-        {
-          title: 'Response Phase',
-          inputValue: 'response',
-          subtitle: 'Configure the responses delivered to end-users.'
-        }
-      ]
-    } else {
-      phasesRadioOptions.value = []
-    }
-  }
-
   const handlePhaseOnMount = () => {
     phase.value = props.initialPhase || phase.value
 
     checkPhaseIsDefaultValue.value = phase.value === 'default'
-    setPhaseRadioOptions()
   }
 
   const handleBehaviorsOnMount = () => {
@@ -628,7 +607,7 @@
       <FieldGroupRadio
         nameField="phase"
         isCard
-        :options="phasesRadioOptions"
+        :options="PHASE_OPTIONS"
         data-testid="edge-application-rule-form__phase__radio-group"
         :disabled="isEditDrawer"
       />
@@ -689,7 +668,7 @@
             </div>
 
             <FieldDropdown
-              :options="criteriaOperatorOptions"
+              :options="CRITERIA_OPERATOR_OPTIONS"
               optionLabel="label"
               optionValue="value"
               class="h-fit"
