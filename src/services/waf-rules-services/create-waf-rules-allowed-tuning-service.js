@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, reason }) => {
+export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, description }) => {
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     let matchZones = {
       zone: attack.matchZone,
@@ -20,7 +20,7 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
     const payload = {
       rule_id: attack.ruleId,
       match_zones: [matchZones],
-      reason
+      description
     }
 
     const httpResponse = await AxiosHttpClientAdapter.request({
