@@ -1,19 +1,19 @@
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import { useToast } from 'primevue/usetoast'
   import { useField, useFieldArray } from 'vee-validate'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import fieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import PrimeButton from 'primevue/button'
-  import InlineMessage from 'primevue/inlinemessage'
-  import Divider from 'primevue/divider'
+  import { computed, ref, onMounted } from 'vue'
 
+  import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
-  import { computed, ref, onMounted } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import Divider from 'primevue/divider'
+  import InlineMessage from 'primevue/inlinemessage'
+  import PrimeButton from 'primevue/button'
 
   const props = defineProps({
     isApplicationAcceleratorEnabled: {
@@ -675,7 +675,7 @@
 
           <div class="flex gap-2 mt-6 mb-8">
             <div class="w-full">
-              <fieldAutoComplete
+              <FieldAutoComplete
                 :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
                 :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
