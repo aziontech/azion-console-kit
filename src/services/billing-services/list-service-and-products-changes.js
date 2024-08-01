@@ -4,13 +4,18 @@ import { makeBillingBaseUrl } from './make-billing-base-url'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
-    query getBillDetail($billID: ID!) {
-  		products: billDetail(
+    query getBillDetail($billID: ID!, $invoiceId: String!) {
+  	  products: billDetail(
         aggregate: { sum: value }
         groupBy: [productSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         value: sum
@@ -21,7 +26,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -32,7 +42,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -43,7 +58,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug, regionName]
         orderBy: [productSlug_ASC, metricSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -55,7 +75,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug, regionName]
         orderBy: [productSlug_ASC, metricSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -67,7 +92,8 @@ export const listServiceAndProductsChangesService = async (billID) => {
   const graphQLPayload = {
     query: BILL_DETAIL_QUERY,
     variables: {
-      billID
+      billID,
+      invoiceId: billID
     }
   }
 
