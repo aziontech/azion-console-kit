@@ -33,12 +33,10 @@
       required: true
     },
     isApplicationAcceleratorEnabled: {
-      type: Boolean,
-      required: true
+      type: Boolean
     },
     isDeliveryProtocolHttps: {
-      type: Boolean,
-      required: true
+      type: Boolean
     },
     listEdgeApplicationFunctionsService: {
       type: Function,
@@ -56,7 +54,6 @@
       type: Boolean
     },
     isImageOptimizationEnabled: {
-      required: true,
       type: Boolean
     },
     isEdgeFunctionEnabled: {
