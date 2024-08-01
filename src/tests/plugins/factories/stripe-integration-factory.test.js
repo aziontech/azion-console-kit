@@ -28,7 +28,7 @@ describe('StripteIntegrationFactory', () => {
 
   it('should create analytics with correct configuration', () => {
     vi.unstubAllEnvs()
-    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', fixtures.stripeToken)
+    vi.stubEnv('VITE_STRIPE_TOKEN_DEV', fixtures.stripeToken)
 
     const { sut } = makeSut()
 
@@ -39,7 +39,7 @@ describe('StripteIntegrationFactory', () => {
 
   it('should return a error on missing stripe token', () => {
     vi.unstubAllEnvs()
-    vi.stubEnv('VITE_DEV_STRIPE_TOKEN', '')
+    vi.stubEnv('VITE_STRIPE_TOKEN_DEV', '')
 
     const { sut } = makeSut()
 

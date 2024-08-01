@@ -2,7 +2,7 @@ import { loadStripe } from '@stripe/stripe-js'
 
 export function makeStripeClient(environment) {
   const stripeEnvVarName = {
-    development: 'VITE_DEV_STRIPE_TOKEN',
+    development: 'VITE_STRIPE_TOKEN_DEV',
     stage: 'VITE_STRIPE_TOKEN_STAGE',
     production: 'VITE_STRIPE_TOKEN_PROD'
   }
