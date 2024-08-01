@@ -47,7 +47,7 @@
     },
     initialPhase: {
       type: String,
-      default: 'default'
+      validator: (val) => ['reques', 'respons', 'default'].includes(val)
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -81,43 +81,33 @@
     { label: 'does not exist', value: 'does_not_exist' }
   ])
 
-  const showLabelApplicationAccelerator = computed(() => {
-    if (props.hideApplicationAcceleratorInDescription) return ''
+  const behaviorsLabelsTags = computed(() => {
+    const empty = ''
 
-    return ' - Requires Application Accelerator'
-  })
-
-  const showLabelHttps = computed(() => {
-    if (props.isDeliveryProtocolHttps) {
-      return ''
+    return {
+      applicationAccelerator: !props.hideApplicationAcceleratorInDescription
+        ? ' - Requires Application Accelerator'
+        : empty,
+      https: !props.isDeliveryProtocolHttps ? ' - Requires Delivery Protocol with HTTPS' : empty,
+      imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
+      edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
     }
-
-    return '- Requires Delivery Protocol with HTTPS'
-  })
-
-  const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimizationEnabled) return ''
-    return ' - Requires Image Processor'
-  })
-
-  const showLabelEdgeFunction = computed(() => {
-    return props.isEdgeFunctionEnabled ? '' : '- Requires Edge Functions'
   })
 
   const behaviorsRequestOptions = ref([
     {
-      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Add Request Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Bypass Cache' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Capture Match Groups' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'capture_match_groups',
       requires: true
     },
@@ -125,36 +115,36 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Filter Request Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Forward Cookies' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'forward_cookies',
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
     {
-      label: `Optimize Images ${showLabelImageOptimization.value}`.trim(),
+      label: 'Optimize Images' + behaviorsLabelsTags.value.imageOptimization,
       value: 'optimize_images',
       requires: true
     },
     {
-      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`.trim(),
+      label: 'Redirect HTTP to HTTPS' + behaviorsLabelsTags.value.https,
       value: 'redirect_http_to_https',
       requires: true
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Rewrite Request' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'rewrite_request',
       requires: true
     },
     {
-      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      label: 'Run Function' + behaviorsLabelsTags.value.edgeFunction,
       value: 'run_function',
       requires: true
     },
@@ -164,20 +154,20 @@
 
   const behaviorsResponseOptions = ref([
     {
-      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Add Response Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'set_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Capture Match Groups' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`.trim(),
+      label: 'Filter Response Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
       value: 'filter_response_cookie',
       requires: true
     },
@@ -185,7 +175,7 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: `Run Function ${showLabelEdgeFunction.value}`.trim(),
+      label: 'Run Function' + behaviorsLabelsTags.value.edgeFunction,
       value: 'run_function',
       requires: true
     }
@@ -223,42 +213,23 @@
     target: {}
   }
 
-  /**
-   * Remove a specific conditional from the criteria array.
-   * @param {number} criteriaIndex - The index of the criteria from which the conditional will be removed.
-   * @param {number} conditionalIndex - The index of the conditional to be removed.
-   */
   const removeConditional = (criteriaIndex, conditionalIndex) => {
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
   }
 
-  /**
-   * Adds a conditional AND/OR operator to the criteria at the specified index.
-   * @param {number} index - The index of the criteria to add the operator to.
-   * @param {("and"|"or")} operator - The operator to add to the criteria at the specified index.
-   */
   const addNewConditional = ({ index, operator }) => {
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
-  /**
-   * Adds a new criteria with a default IF operator.
-   */
   const addNewCriteria = () => {
     pushCriteria([DEFAULT_OPERATOR])
   }
 
-  /**
-   * Sets the default behavior options for the last behavior in the behaviors array.
-   */
   const setDefaultBehaviorOptions = () => {
     const lastIndex = behaviors.value.length - 1
     changeBehaviorType(DEFAULT_BEHAVIOR.name, lastIndex)
   }
 
-  /**
-   * Adds a new behavior with the default behavior to the behaviors array and sets its options.
-   */
   const addNewBehavior = () => {
     pushBehavior({ ...DEFAULT_BEHAVIOR })
     setDefaultBehaviorOptions()
@@ -279,14 +250,6 @@
     return behaviorsOptionsMap[phase.value]() || []
   })
 
-  /**
-   * Updates the 'requires' property of behavior options based on component props.
-   * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
-   * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isApplicationAcceleratorEnabled' prop.
-   * @param {Array} options - The behavior options to update.
-   * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
-   */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
       redirect_http_to_https: !props.isDeliveryProtocolHttps,
@@ -304,11 +267,6 @@
     })
   }
 
-  /**
-   * Updates the 'requires' property of all behavior options that have 'requires' as true by default,
-   * based on the component props.
-   * It applies the 'updateOptionRequires' function to both request and response behavior options.
-   */
   const updateBehaviorsOptionsRequires = () => {
     behaviorsRequestOptions.value = updateOptionRequires(behaviorsRequestOptions.value)
     behaviorsResponseOptions.value = updateOptionRequires(behaviorsResponseOptions.value)
@@ -316,9 +274,6 @@
   const functionsInstanceOptions = ref(null)
   const loadingFunctionsInstance = ref(false)
 
-  /**
-   * Fetches the list of function instance options and updates the 'functionsInstanceOptions' ref.
-   */
   const listFunctionsInstanceOptions = async () => {
     try {
       loadingFunctionsInstance.value = true
@@ -333,9 +288,6 @@
   const originsOptions = ref(null)
   const loadingOrigins = ref(false)
 
-  /**
-   * Fetches the list of origin options and updates the 'originsOptions' ref.
-   */
   const listOriginsOptions = async () => {
     try {
       loadingOrigins.value = true
@@ -348,9 +300,6 @@
   const cacheSettingsOptions = ref(null)
   const loadingCacheSettings = ref(false)
 
-  /**
-   * Fetches the list of cache settings options and updates the 'cacheSettingsOptions' ref.
-   */
   const listCacheSettingsOptions = async () => {
     try {
       loadingCacheSettings.value = true
@@ -362,19 +311,10 @@
     }
   }
 
-  /**
-   * Updates the 'showTargetField' property of the behavior at the specified index.
-   * @param {boolean} isShow - Whether to show the target field.
-   * @param {number} index - The index of the behavior to update.
-   */
   const setShowBehaviorTargetField = (isShow, index) => {
     behaviors.value[index].showTargetField = isShow
   }
 
-  /**
-   * Removes behaviors from the behaviors array starting from the specified index.
-   * @param {number} startIndex - The index to start removing behaviors from.
-   */
   const removeBehaviorsFromIndex = (startIndex) => {
     const endIndex = behaviors.value.length - 1
     for (let index = endIndex; index > startIndex; index--) {
@@ -412,11 +352,6 @@
     return optionsThatDisableAddBehaviors.includes(lastBehavior.value.name)
   })
 
-  /**
-   * Changes the type of the behavior at the specified index and updates related properties.
-   * @param {string} behaviorName - The new type of the behavior.
-   * @param {number} index - The index of the behavior to change.
-   */
   const changeBehaviorType = (behaviorName, index) => {
     const disableTargetOptions = [
       'deliver',
@@ -454,13 +389,14 @@
       case 'set_origin':
         listOriginsOptions()
         break
-      case 'capture_match_groups':
+      case 'capture_match_groups': {
         let matchGroupsFields = { captured_array: '', subject: '', regex: '' }
         if (isEditDrawer.value) matchGroupsFields = behaviors.value[index].value.target
 
         updateBehavior(index, { name: behaviorName, target: matchGroupsFields })
         break
-      default:
+      }
+      default: {
         const isBehaviorTargetFieldEnabled = !disableTargetOptions.includes(behaviorName)
         const isAddBehaviorButtonEnabled = !disableAddBehaviorButtonOptions.includes(behaviorName)
 
@@ -469,12 +405,10 @@
         if (!isAddBehaviorButtonEnabled) {
           removeBehaviorsFromIndex(index)
         }
+      }
     }
   }
 
-  /**
-   * Calls the appropriate services to fetch options for the behaviors of the selected rules engine to edit.
-   */
   const callOptionsServicesAtEdit = async () => {
     if (isEditDrawer.value) {
       const behaviorsLength = props.selectedRulesEngineToEdit.behaviors.length
@@ -494,11 +428,6 @@
     }
   }
 
-  /**
-   * Handles fetching options for a behavior based on its type.
-   * @param {Object} behavior - The behavior to handle.
-   * @param {number} index - The index of the behavior in the behaviors array.
-   */
   const handleBehaviorOptions = async (behavior, index) => {
     switch (behavior.name) {
       case 'run_function':
@@ -567,33 +496,16 @@
 
   const variableItems = ref([])
 
-  /**
-   * Filters the variable autocomplete options based on the user's query.
-   * @param {Object} event - The event object containing the user's query.
-   * @param {string} event.query - The user's query.
-   */
   const searchVariableOption = (event) => {
     variableItems.value = variableAutocompleteOptions.value.filter((item) =>
       item.includes(event.query)
     )
   }
 
-  /**
-   * Gets the label for the behavior item.
-   * @param {Object} behaviorItem - The behavior item.
-   * @param {Boolean} behaviorItem.isFirst - The behavior boolean isFirst.
-   * @returns {string} The label for the behavior item.
-   */
   const getBehaviorLabel = (behaviorItem) => {
     return behaviorItem.isFirst ? 'Then' : 'And'
   }
 
-  /**
-/**
-* Checks if a criterion can be deleted.
-* @param {number} index - The index of the criterion.
-* @returns {boolean} True if the criterion can be deleted, false otherwise.
-*/
   const isNotFirstCriteria = (index) => {
     return criteria.value.length > 1 && index < criteria.value.length - 1
   }
@@ -629,26 +541,36 @@
     }
   }
 
-  onMounted(async () => {
-    updateBehaviorsOptionsRequires()
-
-    if (props.isApplicationAcceleratorEnabled) {
-      if (criteria.value[0] && !isEditDrawer.value) {
-        criteria.value[0].value[0].variable = ''
-      }
-    }
-    if (behaviors.value[0]) {
-      changeBehaviorType(behaviors.value[0].value.name, 0)
-    }
-    if (props.initialPhase) {
-      phase.value = props.initialPhase
-    }
-
-    callOptionsServicesAtEdit()
-    await processBehaviorsAtEdit()
+  const handlePhaseOnMount = () => {
+    phase.value = props.initialPhase || phase.value
 
     checkPhaseIsDefaultValue.value = phase.value === 'default'
     setPhaseRadioOptions()
+  }
+
+  const handleBehaviorsOnMount = () => {
+    updateBehaviorsOptionsRequires()
+
+    if (behaviors.value[0]) {
+      changeBehaviorType(behaviors.value[0].value.name, 0)
+    }
+  }
+
+  const handleCriteriaOnMount = () => {
+    const shouldResetFirstCriteriaAtCreationWithApplicationAcceleratorEnabled =
+      props.isApplicationAcceleratorEnabled && criteria.value[0] && !isEditDrawer.value
+
+    if (shouldResetFirstCriteriaAtCreationWithApplicationAcceleratorEnabled) {
+      criteria.value[0].value[0].variable = ''
+    }
+  }
+
+  onMounted(() => {
+    handleBehaviorsOnMount()
+    handleCriteriaOnMount()
+    processBehaviorsAtEdit()
+    callOptionsServicesAtEdit()
+    handlePhaseOnMount()
   })
 </script>
 
