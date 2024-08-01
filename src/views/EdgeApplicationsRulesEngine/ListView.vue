@@ -1,5 +1,4 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
@@ -75,7 +74,16 @@
     }
   })
 
+  const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
+  const listRulesEngineRef = ref(null)
+
+  const phaseOptions = ref(['Request phase', 'Response phase'])
+  const selectedPhase = ref('Request phase')
+  const parsePhase = {
+    'Request phase': 'request',
+    'Response phase': 'response'
+  }
 
   const getColumns = computed(() => {
     return [
@@ -119,12 +127,6 @@
     hasContentToList.value = event
   }
 
-  const phaseOptions = ref(['Request phase', 'Response phase'])
-  const selectedPhase = ref('Request phase')
-  const parsePhase = {
-    'Request phase': 'request',
-    'Response phase': 'response'
-  }
   const listRulesEngineWithDecorator = async () => {
     return props.listRulesEngineService({
       id: props.edgeApplicationId,
@@ -147,11 +149,6 @@
     return props.reorderRulesEngine(tableData, props.edgeApplicationId)
   }
 
-  const listRulesEngineRef = ref(null)
-  watch(selectedPhase, () => {
-    listRulesEngineRef.value.reload()
-  })
-
   const reloadList = () => {
     if (hasContentToList.value) {
       listRulesEngineRef.value.reload()
@@ -159,8 +156,6 @@
     }
     hasContentToList.value = true
   }
-
-  const drawerRulesEngineRef = ref('')
 
   const openCreateRulesEngineDrawerByPhase = () => {
     parsePhase[selectedPhase.value]
@@ -188,6 +183,10 @@
       service: deleteRulesEngineWithDecorator
     }
   ]
+
+  watch(selectedPhase, () => {
+    listRulesEngineRef.value.reload()
+  })
 </script>
 
 <template>
@@ -210,6 +209,7 @@
     data-testid="rules-engine-drawer"
   />
   <ListTableBlock
+    v-if="hasContentToList"
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
@@ -220,7 +220,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
-    emptyListMessage="No rules have been created."
+    emptyListMessage="No rules found."
     :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
     data-testid="rules-engine-list"
     :actions="actions"
@@ -245,31 +245,26 @@
         />
       </div>
     </template>
-
-    <template #noRecordsFound>
-      <EmptyResultsBlock
-        :title="titleEmptyState"
-        :description="descriptionEmptyState"
-        :createButtonLabel="selectedPhase"
-        :documentationService="documentationService"
-        :inTabs="true"
-        :noBorder="true"
-        data-testid="rules-engine-empty-results"
-      >
-        <template #default>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            @click="openCreateRulesEngineDrawerByPhase"
-            severity="secondary"
-            icon="pi pi-plus"
-            label="Rule"
-            data-testid="rules-engine-empty-results-create-button"
-          />
-        </template>
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
   </ListTableBlock>
+  <EmptyResultsBlock
+    v-else
+    :title="titleEmptyState"
+    :description="descriptionEmptyState"
+    :createButtonLabel="selectedPhase"
+    :documentationService="documentationService"
+    :inTabs="true"
+    :noBorder="true"
+    data-testid="rules-engine-empty-results"
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        @click="openCreateRulesEngineDrawerByPhase"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Rule"
+        data-testid="rules-engine-empty-results-create-button"
+      />
+    </template>
+  </EmptyResultsBlock>
 </template>
