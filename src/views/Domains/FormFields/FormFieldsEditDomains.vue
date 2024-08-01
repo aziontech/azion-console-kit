@@ -19,13 +19,17 @@
       type: Array,
       required: true
     },
-    edgeApps: {
+    edgeApplicationsData: {
       type: Array,
       required: true
     },
     hasDomainName: {
       type: Boolean,
       required: false,
+      default: false
+    },
+    loadingEdgeApplications: {
+      type: Boolean,
       default: false
     }
   })
@@ -52,7 +56,7 @@
   })
 
   const edgeApplicationOptions = computed(() => {
-    return props.edgeApps.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
+    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
   })
 
   const edgeCertificatesOptions = computed(() => {
@@ -89,6 +93,10 @@
       inputValue: 'permissive'
     }
   ])
+
+  const isLoadingEdgeApplications = computed(() => {
+    return props.loadingEdgeApplications
+  })
 </script>
 
 <template>
@@ -163,8 +171,8 @@
           required
           name="edgeApplication"
           :options="edgeApplicationOptions"
-          :loading="!edgeApplicationOptions.length"
-          :disabled="!edgeApplicationOptions.length"
+          :loading="isLoadingEdgeApplications"
+          :disabled="isLoadingEdgeApplications"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"

@@ -25,7 +25,7 @@ const fixtures = {
     cardBrand: 'Visa',
     cardLast4Digits: '4123',
     currency: 'USD',
-    paymentDate: '2024-07-01'
+    paymentDate: getFirstDayCurrentDate().firstDayOfMonth
   },
   disclaimerTwentyThree:
     "Welcome to the Free Trial period. The credit of USD 23.40 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
@@ -84,7 +84,7 @@ describe('BillingService', () => {
       graphQLApi
     )
   })
-  it('should return 23.40 value in the disclaimer ', async () => {
+  it('should return 23.40 value in the disclaimer', async () => {
     const { firstDayOfMonth } = getFirstDayCurrentDate()
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
