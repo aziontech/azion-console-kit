@@ -64,7 +64,7 @@ describe('WafRulesServices', () => {
         match_zones: [
           {
             matches_on: 'value',
-            zone: 'conditional_query_string',
+            zone: 'query_string',
             zone_input: 'arg'
           }
         ]
