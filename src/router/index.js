@@ -39,6 +39,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import redirectToManager from './hooks/redirectToManager'
+import billingGuard from './hooks/billingGuard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,8 +83,11 @@ const router = createRouter({
   ].concat(errorRoutes)
 })
 
-router.beforeEach(beforeEachRoute)
-router.beforeEach(redirectToManager)
+router.beforeEach(async (to, from, next) => {
+  await beforeEachRoute(to, from, next)
+  await billingGuard(to, from, next)
+  redirectToManager(to, from, next)
+})
 router.afterEach(afterEachRouteGuard)
 
 export default router
