@@ -437,27 +437,6 @@
     }
   }
 
-  const toast = useToast()
-
-  const callOptionsServicesAtEdit = async () => {
-    if (isEditDrawer.value) {
-      const behaviorsLength = props.selectedRulesEngineToEdit.behaviors.length
-
-      for (let index = 0; index < behaviorsLength; index++) {
-        const behavior = props.selectedRulesEngineToEdit.behaviors[index]
-        try {
-          await handleBehaviorOptions(behavior, index)
-        } catch (error) {
-          toast.add({
-            closable: true,
-            severity: 'error',
-            summary: `Error loading ${behavior.name}.`
-          })
-        }
-      }
-    }
-  }
-
   const handleBehaviorOptions = async (behavior, index) => {
     switch (behavior.name) {
       case 'run_function':
@@ -473,25 +452,30 @@
     updateBehavior(index, { name: behavior.name, target: behavior.target })
   }
 
+  const toast = useToast()
+
   const processBehaviorsAtEdit = async () => {
+    let index = 0
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    const areBehaviorsReady = (index) => behaviors && behaviors.value[index]
+    const areBehaviorsReady = (idx) => behaviors && behaviors.value[idx]
 
-    const processBehavior = (behavior, index) => {
-      changeBehaviorType(behavior.name, index)
+    while (!areBehaviorsReady(index)) {
+      await delay(100)
     }
 
-    if (isEditDrawer.value) {
-      let index = 0
-
-      while (!areBehaviorsReady(index)) {
-        await delay(100)
+    props.selectedRulesEngineToEdit.behaviors.forEach(async (behavior, index) => {
+      try {
+        changeBehaviorType(behavior.name, index)
+        await handleBehaviorOptions(behavior, index)
+      } catch (error) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: `Error loading ${behavior.name}.`
+        })
       }
-      props.selectedRulesEngineToEdit.behaviors.forEach((behavior, index) => {
-        processBehavior(behavior, index)
-      })
-    }
+    })
   }
 
   const variableItems = ref([])
@@ -519,19 +503,21 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const updateBehaviorsList = () => {
+  const updateBehaviorsList = async () => {
     updateBehaviorsOptionsRequires()
 
     const [firstBehavior] = behaviors.value
     if (firstBehavior) {
       changeBehaviorType(firstBehavior.value.name, 0)
     }
+
+    if (isEditDrawer.value) {
+      await processBehaviorsAtEdit()
+    }
   }
 
   onMounted(() => {
     updateBehaviorsList()
-    processBehaviorsAtEdit()
-    callOptionsServicesAtEdit()
   })
 </script>
 
