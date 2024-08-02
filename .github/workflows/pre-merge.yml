@@ -33,11 +33,6 @@ jobs:
       - name: Run tests
         run: yarn test:unit:coverage
 
-      - name: Show files
-        run: |
-          pwd
-          find ./
-
       - name: Upload coverage reports
         uses: actions/upload-artifact@v3
         with:
@@ -56,12 +51,8 @@ jobs:
         fetch-depth: 0
     - uses: actions/download-artifact@v3
       with:
-        name: coverage_unit_report
-    - name: debug
-      run: |
-        pwd
-        find ./
-          
+        name: coverage_unit_report          
+        
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@v2.3.0
       env:

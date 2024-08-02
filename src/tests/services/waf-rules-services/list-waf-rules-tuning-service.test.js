@@ -78,4 +78,15 @@ describe('WafRulesService', () => {
       }
     ])
   })
+  it('should return empty data when the values in the parameter are not passed in ', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [] }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result).toEqual([])
+  })
 })

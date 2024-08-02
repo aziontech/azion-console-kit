@@ -12,13 +12,13 @@
       removableSort
       :value="data"
       dataKey="id"
-      selectionMode="single"
       @row-click="editItemSelected"
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
+      v-model:selection="selectedItems"
       :loading="isLoading"
       data-testid="data-table"
     >
@@ -60,6 +60,12 @@
         rowReorder
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
+      />
+
+      <Column
+        v-if="showSelectionMode"
+        selectionMode="multiple"
+        headerStyle="width: 3rem"
       />
 
       <Column
@@ -264,7 +270,12 @@
 
   defineOptions({ name: 'list-table-block-new' })
 
-  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
+  const emit = defineEmits([
+    'on-load-data',
+    'on-before-go-to-add-page',
+    'on-before-go-to-edit',
+    'update:selectedItensData'
+  ])
 
   const props = defineProps({
     columns: {
@@ -311,6 +322,13 @@
     isTabs: {
       type: Boolean,
       default: false
+    },
+    showSelectionMode: {
+      type: Boolean
+    },
+    selectedItensData: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -330,6 +348,15 @@
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
+
+  const selectedItems = computed({
+    get: () => {
+      return props.selectedItensData
+    },
+    set: (value) => {
+      emit('update:selectedItensData', value)
+    }
+  })
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -389,13 +416,13 @@
     return actions
   }
 
-  const loadData = async ({ page }) => {
+  const loadData = async ({ page, ...query }) => {
     if (props.listService) {
       try {
         isLoading.value = true
         const response = props.isGraphql
           ? await props.listService()
-          : await props.listService({ page })
+          : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
         toast.add({
@@ -446,8 +473,8 @@
     }
   }
 
-  const reload = () => {
-    loadData({ page: 1 })
+  const reload = (query = {}) => {
+    loadData({ page: 1, ...query })
   }
 
   defineExpose({ reload })

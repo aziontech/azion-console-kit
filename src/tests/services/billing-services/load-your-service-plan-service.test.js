@@ -4,6 +4,17 @@ import { describe, expect, it, vi } from 'vitest'
 import graphQLApi from '@/services/axios/makeGraphQl'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
 
+function getCurrentDate() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+const currentDate = getCurrentDate()
+
 const getFirstDayCurrentDate = () => {
   const currentDate = new Date()
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
@@ -25,7 +36,7 @@ const fixtures = {
     cardBrand: 'Visa',
     cardLast4Digits: '4123',
     currency: 'USD',
-    paymentDate: '2024-07-01'
+    paymentDate: currentDate
   },
   disclaimerTwentyThree:
     "Welcome to the Free Trial period. The credit of USD 23.40 is available for use over the next 71 days. To use Azion with no service interruptions at the end of the trial, add a <a href='/billing-subscriptions/payment-methods/add' target='_top'>payment method</a>.",
