@@ -150,11 +150,7 @@
   }
 
   const reloadList = () => {
-    if (hasContentToList.value) {
-      listRulesEngineRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listRulesEngineRef.value.reload()
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
@@ -183,10 +179,6 @@
       service: deleteRulesEngineWithDecorator
     }
   ]
-
-  const reloadListOnPhaseChange = () => {
-    listRulesEngineRef.value.reload()
-  }
 </script>
 
 <template>
@@ -209,7 +201,6 @@
     data-testid="rules-engine-drawer"
   />
   <ListTableBlock
-    v-if="hasContentToList"
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
@@ -233,7 +224,7 @@
       >
         <SelectButton
           v-model="selectedPhase"
-          @change="reloadListOnPhaseChange"
+          @change="reloadList"
           :options="PHASE_OPTIONS"
           :unselectable="true"
           data-testid="rules-engine-select-phase"
@@ -246,26 +237,29 @@
         />
       </div>
     </template>
-  </ListTableBlock>
-  <EmptyResultsBlock
-    v-else
-    :title="titleEmptyState"
-    :description="descriptionEmptyState"
-    :createButtonLabel="selectedPhase"
-    :documentationService="documentationService"
-    :inTabs="true"
-    :noBorder="true"
-    data-testid="rules-engine-empty-results"
-  >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        @click="openCreateRulesEngineDrawerByPhase"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Rule"
-        data-testid="rules-engine-empty-results-create-button"
-      />
+
+    <template #noRecordsFound>
+      <EmptyResultsBlock
+        v-if="!hasContentToList"
+        :title="titleEmptyState"
+        :description="descriptionEmptyState"
+        :createButtonLabel="selectedPhase"
+        :documentationService="documentationService"
+        :inTabs="true"
+        :noBorder="true"
+        data-testid="rules-engine-empty-results"
+      >
+        <template #default>
+          <PrimeButton
+            class="max-md:w-full w-fit"
+            @click="openCreateRulesEngineDrawerByPhase"
+            severity="secondary"
+            icon="pi pi-plus"
+            label="Rule"
+            data-testid="rules-engine-empty-results-create-button"
+          />
+        </template>
+      </EmptyResultsBlock>
     </template>
-  </EmptyResultsBlock>
+  </ListTableBlock>
 </template>
