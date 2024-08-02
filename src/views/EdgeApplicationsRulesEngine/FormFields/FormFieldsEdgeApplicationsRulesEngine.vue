@@ -519,26 +519,17 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const handleBehaviorsOnMount = () => {
+  const updateBehaviorsList = () => {
     updateBehaviorsOptionsRequires()
 
-    if (behaviors.value[0]) {
-      changeBehaviorType(behaviors.value[0].value.name, 0)
-    }
-  }
-
-  const handleCriteriaOnMount = () => {
-    const shouldResetFirstCriteriaAtCreationWithApplicationAcceleratorEnabled =
-      props.isApplicationAcceleratorEnabled && criteria.value[0] && !isEditDrawer.value
-
-    if (shouldResetFirstCriteriaAtCreationWithApplicationAcceleratorEnabled) {
-      criteria.value[0].value[0].variable = ''
+    const [firstBehavior] = behaviors.value
+    if (firstBehavior) {
+      changeBehaviorType(firstBehavior.value.name, 0)
     }
   }
 
   onMounted(() => {
-    handleBehaviorsOnMount()
-    handleCriteriaOnMount()
+    updateBehaviorsList()
     processBehaviorsAtEdit()
     callOptionsServicesAtEdit()
   })

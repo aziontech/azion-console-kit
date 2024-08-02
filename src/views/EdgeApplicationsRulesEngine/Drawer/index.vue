@@ -79,7 +79,7 @@
     criteria: [
       [
         {
-          variable: '${uri}',
+          variable: '',
           operator: 'is_equal',
           conditional: 'if',
           input_value: ''
