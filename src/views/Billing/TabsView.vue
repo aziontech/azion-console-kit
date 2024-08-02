@@ -8,6 +8,7 @@
   import BillsView from '@/views/Billing/BillsView.vue'
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
   import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
+  import SkeletonBlock from '@/templates/skeleton-block'
 
   import { ref, computed, provide, onMounted } from 'vue'
 
@@ -43,6 +44,8 @@
   const cardDefault = ref({
     loader: false
   })
+  const invoiceLastUpdated = ref('')
+  const loadingLastUpdated = ref(false)
 
   const TABS_MAP = {
     bills: 0,
@@ -105,6 +108,15 @@
     }
   }
 
+  const loadInvoiceLastUpdated = async () => {
+    try {
+      loadingLastUpdated.value = true
+      invoiceLastUpdated.value = await props.billsServices.loadInvoiceLastUpdatedService()
+    } finally {
+      loadingLastUpdated.value = false
+    }
+  }
+
   const successAddCredit = async () => {
     await viewBillsRef.value?.reloadList()
   }
@@ -112,6 +124,7 @@
   onMounted(() => {
     renderTabCurrentRouter()
     loadCardDefault()
+    loadInvoiceLastUpdated()
   })
 </script>
 <template>
@@ -122,11 +135,16 @@
         :isRightAlignment="true"
       >
         <template #default>
-          <Tag
-            severity="info"
-            icon="pi pi-refresh"
-            value="Last Updated: MM/DD/2023 02:32 PM"
-          />
+          <SkeletonBlock
+            width="10rem"
+            :isLoaded="!loadingLastUpdated"
+          >
+            <Tag
+              severity="info"
+              icon="pi pi-refresh"
+              :value="invoiceLastUpdated"
+            />
+          </SkeletonBlock>
         </template>
       </PageHeadingBlock>
     </template>
@@ -151,6 +169,11 @@
         <TabPanel
           header="Bills"
           :disabled="accountBlocked"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__bills-tab__button'
+            }
+          }"
         >
           <BillsView
             v-if="isActiveTab.bills"
@@ -160,7 +183,14 @@
             @changeTab="changeTab"
           />
         </TabPanel>
-        <TabPanel header="Payment Methods">
+        <TabPanel
+          header="Payment Methods"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__payment-methods-tab__button'
+            }
+          }"
+        >
           <PaymentListView
             v-if="isActiveTab.payment"
             ref="listPaymentMethodsRef"

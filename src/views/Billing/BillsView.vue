@@ -228,7 +228,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
-  import NotificationPayment from './Components/Notification-payment'
+  import NotificationPayment from './components/notification-payment'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'

@@ -1,8 +1,6 @@
 name: Stage E2E Tests
 
 on:
-  schedule:
-    - cron: '0 9,15,21 * * 1-5' # Runs at 6:00, 12:00, and 18:00 in UTC-3 
   workflow_dispatch:
 
 jobs:
@@ -32,24 +30,6 @@ jobs:
           config-file: cypress.config.stage.js
           env: environment=stage,grepTags=-@xfail
 
-      - name: Check E2E Test Coverage
-        if: ${{ always() }}
-        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-
-      - name: Compress E2E Coverage Reports
-        if: ${{ always() }}
-        run: |
-          rm -rf coverage/e2e/lcov-report
-          zip -r coverage.zip coverage
-
-      - name: Upload E2E Coverage Report Artifact
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_e2e_report
-          path: coverage.zip
-          retention-days: 7
-
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -65,13 +45,3 @@ jobs:
           name: cypress_videos
           path: cypress/videos
           retention-days: 1
-
-      - name: Notify test completion in Slack
-        if: ${{ always() && github.event_name == 'schedule' && env.SLACK_WEBHOOK_URL != ''}}
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          job_name: Run Stage E2E Tests
-          fields: job,took,workflow
-        env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
