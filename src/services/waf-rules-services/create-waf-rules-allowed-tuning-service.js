@@ -9,14 +9,17 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
     'conditional_request_header',
     'file_name',
     'path',
-    'query_string',
-    'raw_body',
-    'request_body',
-    'request_header'
+    'raw_body'
   ]
 
-  function checkAndReturnDefault(str) {
-    return MAP_MATCH_ZONES.includes(str) ? str : 'conditional_request_header'
+  function checkAndReturnDefault(zone) {
+    const defaultZone = 'conditional_request_header'
+    for (const matchZone of MAP_MATCH_ZONES) {
+      if (matchZone.includes(zone)) {
+        return matchZone
+      }
+    }
+    return defaultZone
   }
 
   const requestsAllowedRules = attackEvents.map(async (attack) => {
