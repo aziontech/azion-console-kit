@@ -4,7 +4,6 @@ import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 import { useHelpCenterStore } from '@/stores/help-center'
 import { useLoadingStore } from '@/stores/loading'
-import { billingRoutes } from '@/router/routes/billing-routes'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export default async function beforeEachRoute(to, __, next) {
@@ -13,8 +12,6 @@ export default async function beforeEachRoute(to, __, next) {
   const helpCenterStore = useHelpCenterStore()
   const isPrivateRoute = !to.meta.isPublic
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
-
-  const isNotBillingRoute = !to.fullPath.includes(billingRoutes.meta.routeForBlock)
 
   helpCenterStore.close()
 
@@ -58,15 +55,6 @@ export default async function beforeEachRoute(to, __, next) {
     } catch {
       return next('/login')
     }
-  }
-
-  const shouldRedirectToBilling = accountStore.isReviewPaymentRequired && isNotBillingRoute
-
-  if (accountStore.hasActiveUserId && isPrivateRoute && shouldRedirectToBilling) {
-    return next({
-      path: '/billing/payment',
-      query: { paymentSession: 'true' }
-    })
   }
 
   return next()
