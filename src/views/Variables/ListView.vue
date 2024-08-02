@@ -6,11 +6,13 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
+        @on-before-go-to-edit="checkIfIsEditable"
         :listService="listVariablesService"
         :columns="getColumns"
         addButtonLabel="Variable"
         createPagePath="variables/create"
         editPagePath="variables/edit"
+        ref="refListTable"
         @on-load-data="handleLoadData"
         emptyListMessage="No variables found."
         :actions="actions"
@@ -33,6 +35,7 @@
 
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { onBeforeRouteLeave } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
@@ -61,6 +64,8 @@
     }
   })
 
+  const enableRedirect = ref(true)
+  const refListTable = ref()
   const hasContentToList = ref(true)
   const actions = [
     {
@@ -110,5 +115,17 @@
         header: 'Last Update'
       }
     ]
+  })
+
+  const checkIfIsEditable = (item) => {
+    enableRedirect.value = item.value.isSecret ? false : true
+  }
+
+  onBeforeRouteLeave((to, from, next) => {
+    if (enableRedirect.value) {
+      return next()
+    }
+    enableRedirect.value = true
+    return next(false)
   })
 </script>
