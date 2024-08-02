@@ -419,7 +419,9 @@
         break
       case 'capture_match_groups': {
         let matchGroupsFields = { captured_array: '', subject: '', regex: '' }
-        if (isEditDrawer.value) matchGroupsFields = behaviors.value[index].value.target
+        if (isEditDrawer.value) {
+          matchGroupsFields = behaviors.value[index].value.target
+        }
 
         updateBehavior(index, { name: behaviorName, target: matchGroupsFields })
         break
@@ -630,7 +632,7 @@
                 :value="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 :onComplete="searchVariableOption"
-                icon="pi pi-search"
+                icon="pi pi-dollar"
                 :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
                 completeOnFocus
               />
