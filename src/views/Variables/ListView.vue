@@ -118,7 +118,7 @@
   })
 
   const checkIfIsEditable = (item) => {
-    enableRedirect.value = item.value.isSecret ? false : true
+    enableRedirect.value = !item.value.isSecret
   }
 
   onBeforeRouteLeave((to, from, next) => {
