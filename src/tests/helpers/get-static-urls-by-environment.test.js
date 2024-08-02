@@ -1,8 +1,6 @@
 import { getStaticUrlsByEnvironment } from '@/helpers'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const url = window.location.origin
-
 const makeSut = () => {
   const sut = getStaticUrlsByEnvironment
 

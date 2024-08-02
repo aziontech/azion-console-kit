@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 
-
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
@@ -8,7 +7,14 @@ export const useAccountStore = defineStore({
   },
   state: () => ({
     account: {},
-    identifySignUpProvider: ''
+    identifySignUpProvider: '',
+    accountStatuses: {
+      BLOCKED: 'BLOCKED',
+      DEFAULTING: 'DEFAULTING',
+      TRIAL: 'TRIAL',
+      ONLINE: 'ONLINE',
+      REGULAR: 'REGULAR'
+    }
   }),
   getters: {
     accountData(state) {
@@ -37,6 +43,22 @@ export const useAccountStore = defineStore({
     },
     accountStatus(state) {
       return state.account?.status
+    },
+    redirectToExternalBillingNeeded(state) {
+      return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
+    },
+    billingAccessPermitted(state) {
+      return [
+        state.accountStatuses.BLOCKED,
+        state.accountStatuses.DEFAULTING,
+        state.accountStatuses.TRIAL,
+        state.accountStatuses.ONLINE
+      ].includes(state.account?.status)
+    },
+    paymentReviewPending(state) {
+      return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
+        state.account?.status
+      )
     }
   },
   actions: {
