@@ -400,9 +400,9 @@
 
   const changeBehaviorType = (behaviorName, index) => {
     let targetValue = behaviors.value[index].value.target
-    if (!isEditDrawer.value) targetValue = ''
+    if (!isEditDrawer.value) targetValue = {}
     if (targetValue && typeof targetValue == 'object' && Object.keys(targetValue).length === 0) {
-      targetValue = ''
+      targetValue = {}
     }
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
@@ -829,12 +829,14 @@
               </div>
             </template>
             <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
-              <FieldText
-                :name="`behaviors[${behaviorIndex}].target`"
-                :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.target"
-                :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
-              />
+              <div class="[&>input]:w-full">
+                <FieldText
+                  :name="`behaviors[${behaviorIndex}].target`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[behaviorIndex].value.target"
+                  :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
+                />
+              </div>
             </template>
           </div>
         </div>
