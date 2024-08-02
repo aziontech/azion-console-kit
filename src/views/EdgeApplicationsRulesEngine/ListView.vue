@@ -5,7 +5,7 @@
   import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -74,11 +74,11 @@
     }
   })
 
+  const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
 
-  const phaseOptions = ref(['Request phase', 'Response phase'])
   const selectedPhase = ref('Request phase')
   const parsePhase = {
     'Request phase': 'request',
@@ -184,9 +184,9 @@
     }
   ]
 
-  watch(selectedPhase, () => {
+  const reloadListOnPhaseChange = () => {
     listRulesEngineRef.value.reload()
-  })
+  }
 </script>
 
 <template>
@@ -233,7 +233,8 @@
       >
         <SelectButton
           v-model="selectedPhase"
-          :options="phaseOptions"
+          @change="reloadListOnPhaseChange"
+          :options="PHASE_OPTIONS"
           :unselectable="true"
           data-testid="rules-engine-select-phase"
         />
