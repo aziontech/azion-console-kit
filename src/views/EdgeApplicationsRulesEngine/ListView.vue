@@ -75,16 +75,14 @@
   })
 
   const PHASE_OPTIONS = ['Request phase', 'Response phase']
-  const drawerRulesEngineRef = ref('')
-  const hasContentToList = ref(true)
-  const listRulesEngineRef = ref(null)
-
-  const selectedPhase = ref('Request phase')
-  const parsePhase = {
+  const PARSE_PHASE = {
     'Request phase': 'request',
     'Response phase': 'response'
   }
-
+  const drawerRulesEngineRef = ref('')
+  const hasContentToList = ref(true)
+  const listRulesEngineRef = ref(null)
+  const selectedPhase = ref('Request phase')
   const getColumns = computed(() => {
     return [
       {
@@ -130,7 +128,7 @@
   const listRulesEngineWithDecorator = async () => {
     return props.listRulesEngineService({
       id: props.edgeApplicationId,
-      phase: parsePhase[selectedPhase.value]
+      phase: PARSE_PHASE[selectedPhase.value]
     })
   }
 
@@ -154,8 +152,8 @@
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
-    parsePhase[selectedPhase.value]
-    drawerRulesEngineRef.value.openDrawerCreate(parsePhase[selectedPhase.value])
+    PARSE_PHASE[selectedPhase.value]
+    drawerRulesEngineRef.value.openDrawerCreate(PARSE_PHASE[selectedPhase.value])
   }
 
   const openEditRulesEngineDrawer = (item) => {
