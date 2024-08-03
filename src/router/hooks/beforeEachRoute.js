@@ -14,8 +14,8 @@ export default async function beforeEachRoute(to, from, next) {
 
   await logoutGuard(to, next)
   loadingGuard(to)
-  themeGuard()
   await accountGuard(to, next)
+  themeGuard()
   billingGuard(to, next)
 
   return next()
