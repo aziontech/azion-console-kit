@@ -143,41 +143,41 @@ const fixtures = {
     data: [
       {
         service: 'Edge Application',
-        value: 6.75,
+        value: 'BRL 6.75',
         slug: 'edge_application',
         currency: 'BRL',
         descriptions: [
           {
             service: 'Total Requests (per 10,000)',
             slug: 'requests',
-            quantity: 848506,
-            price: 5.23,
+            quantity: '848,506',
+            price: 'BRL 5.23',
             data: [
               {
                 country: 'Brazil',
-                quantity: 776472,
-                price: 4.97,
+                quantity: '776,472',
+                price: 'BRL 4.97',
                 slug: 'requests'
               },
-              { country: 'Canada', quantity: 0, price: 0, slug: 'requests' }
+              { country: 'Canada', quantity: '0', price: 'BRL 0.00', slug: 'requests' }
             ]
           },
           {
             service: 'Total Data Transfered (per GB)',
             slug: 'data_transferred',
-            quantity: 1.726767336,
-            price: 1.52,
+            quantity: '1.727 GB',
+            price: 'BRL 1.52',
             data: [
               {
                 country: 'Brazil',
-                quantity: 1.539394378,
-                price: 1.46,
+                quantity: '1.539 GB',
+                price: 'BRL 1.46',
                 slug: 'data_transferred'
               },
               {
                 country: 'Canada',
-                quantity: 0,
-                price: 0,
+                quantity: '0 GB',
+                price: 'BRL 0.00',
                 slug: 'data_transferred'
               }
             ]
@@ -186,20 +186,20 @@ const fixtures = {
       },
       {
         service: 'Data Stream',
-        value: 0,
+        value: 'BRL 0.00',
         slug: 'data_stream',
         currency: 'BRL',
         descriptions: [
           {
             service: 'Data Streamed (GB)',
             slug: 'data_stream_data_streamed',
-            quantity: 0,
-            price: 0,
+            quantity: '0 GB',
+            price: 'BRL 0.00',
             data: [
               {
                 country: 'Brazil',
-                quantity: 0,
-                price: 0,
+                quantity: '0 GB',
+                price: 'BRL 0.00',
                 slug: 'data_stream_data_streamed'
               }
             ]
@@ -207,13 +207,13 @@ const fixtures = {
           {
             service: 'Total Requests (per 10,000)',
             slug: 'data_stream_requests',
-            quantity: 0,
-            price: 0,
+            quantity: '0',
+            price: 'BRL 0.00',
             data: [
               {
                 country: 'Brazil',
-                quantity: 0,
-                price: 0,
+                quantity: '0',
+                price: 'BRL 0.00',
                 slug: 'data_stream_requests'
               }
             ]
