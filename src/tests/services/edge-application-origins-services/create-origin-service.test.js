@@ -84,7 +84,7 @@ const scenarios = [
       ...fixtures.requestPayloadMock,
       originType: 'object_storage',
       bucketName: 'my-bucket',
-      prefix: 'test'
+      prefix: '/test'
     },
     adaptedPayload: {
       name: 'New Origin',
