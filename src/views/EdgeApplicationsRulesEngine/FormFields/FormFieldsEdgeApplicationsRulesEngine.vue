@@ -384,10 +384,10 @@
 
     const disableAddBehaviorButton = true
 
-    const isBehaviorsListEmpty = !behaviors.value || !behaviors.value?.length
+    const isBehaviorsListEmpty = !behaviors.value?.length
     if (isBehaviorsListEmpty) return disableAddBehaviorButton
 
-    const excededMaximumNumberOfBehaviors = behaviors.value?.length >= MAXIMUM_NUMBER_OF_BEHAVIORS
+    const excededMaximumNumberOfBehaviors = behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS
     if (excededMaximumNumberOfBehaviors) return disableAddBehaviorButton
 
     const lastBehavior = behaviors.value[behaviors.value.length - 1]
