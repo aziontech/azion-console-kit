@@ -5,7 +5,10 @@
     </template>
     <template #content>
       <div class="w-full flex flex-col-reverse sm:flex-row gap-6">
-        <TableServicesProducts :listProduct="listServiceProducts" />
+        <TableServicesProducts
+          :listProduct="listServiceProducts"
+          :withColumnPrice="hasNotStatusRegular"
+        />
         <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
           <div class="p-3 md:p-6 flex flex-col gap-4">
             <div class="flex justify-between">
@@ -104,6 +107,7 @@
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
+  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -118,6 +122,10 @@
       type: Function,
       required: true
     },
+    listServiceAndProductsAccountChangesService: {
+      type: Function,
+      required: true
+    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -126,6 +134,7 @@
 
   const route = useRoute()
   const toast = useToast()
+  const { hasNotStatusRegular } = useAccountStore()
 
   const invoiceData = ref({})
   const cardDefault = ref({})
@@ -141,15 +150,17 @@
     try {
       invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
     } catch {
-      invoiceData.value = null
+      invoiceData.value = {}
     }
   }
 
   const listServiceAndProductsChanges = async () => {
     try {
-      listServiceProducts.value = await props.listServiceAndProductsChangesService(
-        route.params.billId
-      )
+      const service = hasNotStatusRegular
+        ? props.listServiceAndProductsChangesService
+        : props.listServiceAndProductsAccountChangesService
+
+      listServiceProducts.value = await service(route.params.billId, hasNotStatusRegular)
     } catch {
       listServiceProducts.value = []
     }
