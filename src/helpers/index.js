@@ -29,6 +29,7 @@ import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
 import { goToClassicInterface } from './go-to-classic-interface'
 import { removeHtmlTagFromText } from './remove-html-tag-from-text'
+import { mapProductMetrics, groupBy } from './billing-utils'
 
 export {
   InviteSession,
@@ -63,5 +64,7 @@ export {
   getVulcanPresets,
   goToClassicInterface,
   formatDateToUS,
-  openShowMorePlan
+  openShowMorePlan,
+  mapProductMetrics,
+  groupBy
 }
