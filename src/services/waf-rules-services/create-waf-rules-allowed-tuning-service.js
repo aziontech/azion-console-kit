@@ -3,23 +3,19 @@ import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
 export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, description }) => {
-  const MAP_MATCH_ZONES = [
-    'conditional_query_string',
-    'conditional_request_body',
-    'conditional_request_header',
-    'file_name',
-    'path',
-    'raw_body'
-  ]
+  const MAP_MATCH_ZONES = {
+    query_string: 'conditional_query_string',
+    request_body: 'conditional_request_body',
+    request_header: 'conditional_request_header',
+    body: 'conditional_request_body',
+    file_name: 'file_name',
+    path: 'path',
+    raw_body: 'raw_body'
+  }
 
   function checkAndReturnDefault(zone) {
     const defaultZone = 'conditional_request_header'
-    for (const matchZone of MAP_MATCH_ZONES) {
-      if (matchZone.includes(zone)) {
-        return matchZone
-      }
-    }
-    return defaultZone
+    return MAP_MATCH_ZONES[zone] || defaultZone
   }
 
   const requestsAllowedRules = attackEvents.map(async (attack) => {
