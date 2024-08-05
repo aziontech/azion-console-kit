@@ -23,6 +23,9 @@ export const useAccountStore = defineStore({
     hasActiveUserId(state) {
       return !!state.account?.id
     },
+    hasNotStatusRegular(state) {
+      return state.account?.status !== 'REGULAR'
+    },
     shouldAvoidCalculateServicePlan(state) {
       return !!state.account?.isDeveloperSupportPlan
     },
