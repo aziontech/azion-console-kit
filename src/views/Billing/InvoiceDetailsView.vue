@@ -24,7 +24,7 @@
                 :isLoaded="isInvoiceDataLoaded"
                 class="font-medium text-color text-sm"
               >
-                <span class="">---</span>
+                <span>---</span>
               </SkeletonBlock>
             </div>
             <div

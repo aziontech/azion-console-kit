@@ -18,8 +18,7 @@ export const loadInvoiceDataService = async (invoiceId) => {
         }
       ) {
           billId,
-          billDetailId
-          totalValue,
+          billDetailId,
           createdDate,
           periodFrom,
           periodTo,

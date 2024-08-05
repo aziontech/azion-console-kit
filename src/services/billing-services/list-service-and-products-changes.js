@@ -174,8 +174,8 @@ const METRIC_SLUGS = {
   plan_business: { title: 'Plan Business' },
   plan_enterprise: { title: 'Plan Enterprise' },
   plan_missioncritical: { title: 'Plan Mission critical' },
-  support_enterprise: { title: 'Total Days' },
-  support_mission_critical: { title: 'Total Days' },
+  support_enterprise: { title: 'Total Days', unit: 'Days' },
+  support_mission_critical: { title: 'Total Days', unit: 'Days' },
   data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
 }
 

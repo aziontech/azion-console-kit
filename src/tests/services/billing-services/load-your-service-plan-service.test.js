@@ -50,13 +50,13 @@ describe('BillingService', () => {
     const payload = {
       query: `query getBillDetail {
         payments: paymentsClientDebt(
-              limit: 1,
-              filter: {
-                  paymentDateRange: {
-                      begin: "2024-01-01", end: "2024-01-31"
-                  },
+          limit: 1,
+          filter: {
+            paymentDateRange: {
+                begin: "2024-01-01", end: "2024-01-31"
             },
-          orderBy: [paymentDate_ASC]
+        },
+        orderBy: [paymentDate_ASC]
         )	{
           paymentDate
           amount
