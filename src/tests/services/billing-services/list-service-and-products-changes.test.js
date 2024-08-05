@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { listServiceAndProductsChangesService } from '@/services/billing-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { formatCurrencyString } from '@/helpers'
 
 const fixtures = {
   mockResponse: {
@@ -143,7 +144,7 @@ const fixtures = {
     data: [
       {
         service: 'Edge Application',
-        value: 'BRL 6.75',
+        value: formatCurrencyString('BRL', 6.75),
         slug: 'edge_application',
         currency: 'BRL',
         descriptions: [
@@ -151,33 +152,38 @@ const fixtures = {
             service: 'Total Requests (per 10,000)',
             slug: 'requests',
             quantity: '848,506',
-            price: 'BRL 5.23',
+            price: formatCurrencyString('BRL', 5.23),
             data: [
               {
                 country: 'Brazil',
                 quantity: '776,472',
-                price: 'BRL 4.97',
+                price: formatCurrencyString('BRL', 4.97),
                 slug: 'requests'
               },
-              { country: 'Canada', quantity: '0', price: 'BRL 0.00', slug: 'requests' }
+              {
+                country: 'Canada',
+                quantity: '0',
+                price: formatCurrencyString('BRL', 0.0),
+                slug: 'requests'
+              }
             ]
           },
           {
             service: 'Total Data Transfered (per GB)',
             slug: 'data_transferred',
             quantity: '1.727 GB',
-            price: 'BRL 1.52',
+            price: formatCurrencyString('BRL', 1.52),
             data: [
               {
                 country: 'Brazil',
                 quantity: '1.539 GB',
-                price: 'BRL 1.46',
+                price: formatCurrencyString('BRL', 1.46),
                 slug: 'data_transferred'
               },
               {
                 country: 'Canada',
                 quantity: '0 GB',
-                price: 'BRL 0.00',
+                price: formatCurrencyString('BRL', 0.0),
                 slug: 'data_transferred'
               }
             ]
@@ -186,7 +192,7 @@ const fixtures = {
       },
       {
         service: 'Data Stream',
-        value: 'BRL 0.00',
+        value: formatCurrencyString('BRL', 0.0),
         slug: 'data_stream',
         currency: 'BRL',
         descriptions: [
@@ -194,12 +200,12 @@ const fixtures = {
             service: 'Data Streamed (GB)',
             slug: 'data_stream_data_streamed',
             quantity: '0 GB',
-            price: 'BRL 0.00',
+            price: formatCurrencyString('BRL', 0.0),
             data: [
               {
                 country: 'Brazil',
                 quantity: '0 GB',
-                price: 'BRL 0.00',
+                price: formatCurrencyString('BRL', 0.0),
                 slug: 'data_stream_data_streamed'
               }
             ]
@@ -208,12 +214,12 @@ const fixtures = {
             service: 'Total Requests (per 10,000)',
             slug: 'data_stream_requests',
             quantity: '0',
-            price: 'BRL 0.00',
+            price: formatCurrencyString('BRL', 0.0),
             data: [
               {
                 country: 'Brazil',
                 quantity: '0',
-                price: 'BRL 0.00',
+                price: formatCurrencyString('BRL', 0.0),
                 slug: 'data_stream_requests'
               }
             ]
