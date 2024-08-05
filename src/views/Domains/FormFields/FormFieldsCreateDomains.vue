@@ -28,8 +28,7 @@
       default: false
     },
     loadingEdgeApplications: {
-      type: Boolean,
-      default: false
+      type: Boolean
     }
   })
 
