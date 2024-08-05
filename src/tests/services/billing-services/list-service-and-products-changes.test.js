@@ -143,7 +143,7 @@ const fixtures = {
     data: [
       {
         service: 'Edge Application',
-        value: 6.75,
+        price: 6.75,
         slug: 'edge_application',
         currency: 'BRL',
         descriptions: [
@@ -186,7 +186,7 @@ const fixtures = {
       },
       {
         service: 'Data Stream',
-        value: 0,
+        price: 0,
         slug: 'data_stream',
         currency: 'BRL',
         descriptions: [
