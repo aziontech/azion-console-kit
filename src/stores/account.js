@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
 
-const STATUS_CLIENT_REVIEW_PAYMENT_REQUIRED = ['BLOCKED', 'DEFAULTING']
-
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
@@ -9,7 +7,14 @@ export const useAccountStore = defineStore({
   },
   state: () => ({
     account: {},
-    identifySignUpProvider: ''
+    identifySignUpProvider: '',
+    accountStatuses: {
+      BLOCKED: 'BLOCKED',
+      DEFAULTING: 'DEFAULTING',
+      TRIAL: 'TRIAL',
+      ONLINE: 'ONLINE',
+      REGULAR: 'REGULAR'
+    }
   }),
   getters: {
     accountData(state) {
@@ -36,8 +41,24 @@ export const useAccountStore = defineStore({
     userId(state) {
       return state.account?.user_id
     },
-    isReviewPaymentRequired(state) {
-      return STATUS_CLIENT_REVIEW_PAYMENT_REQUIRED.includes(state.account?.status)
+    accountStatus(state) {
+      return state.account?.status
+    },
+    redirectToExternalBillingNeeded(state) {
+      return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
+    },
+    billingAccessPermitted(state) {
+      return [
+        state.accountStatuses.BLOCKED,
+        state.accountStatuses.DEFAULTING,
+        state.accountStatuses.TRIAL,
+        state.accountStatuses.ONLINE
+      ].includes(state.account?.status)
+    },
+    paymentReviewPending(state) {
+      return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
+        state.account?.status
+      )
     }
   },
   actions: {

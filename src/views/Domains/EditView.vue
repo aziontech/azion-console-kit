@@ -15,10 +15,11 @@
         <template #form>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApps="edgeApps"
+            :edgeApplicationsData="edgeApplicationsData"
             :domainName="domainName"
             :hasDomainName="true"
             @copyDomainName="copyDomainName"
+            :loadingEdgeApplications="loadingEdgeApplications"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -93,12 +94,13 @@
       .track()
   }
 
-  const edgeApps = ref([])
+  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
+  const loadingEdgeApplications = ref(true)
 
   const requestEdgeApplications = async () => {
-    edgeApps.value = await props.listEdgeApplicationsService({})
+    edgeApplicationsData.value = await props.listEdgeApplicationsService({})
   }
 
   const requestDigitalCertificates = async () => {
@@ -130,6 +132,8 @@
       await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
+    } finally {
+      loadingEdgeApplications.value = false
     }
   })
 
