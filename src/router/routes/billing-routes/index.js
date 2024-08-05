@@ -20,6 +20,7 @@ export const billingRoutes = {
         loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
         addCreditService: BillingServices.addCreditService,
         createPaymentMethodService: BillingServices.createPaymentMethodService,
+        loadInvoiceLastUpdatedService: BillingServices.loadInvoiceLastUpdatedService,
         paymentServices: {
           listPaymentMethodsService: BillingServices.listPaymentMethodsService,
           deletePaymentService: BillingServices.deletePaymentService,
@@ -33,8 +34,7 @@ export const billingRoutes = {
           loadYourServicePlanService: BillingServices.loadYourServicePlanService,
           openPlans: Helpers.openShowMorePlan,
           loadContractServicePlan: ContractServices.loadContractServicePlan,
-          loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService,
-          loadInvoiceLastUpdatedService: BillingServices.loadInvoiceLastUpdatedService
+          loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService
         }
       },
       meta: {
@@ -54,6 +54,8 @@ export const billingRoutes = {
         loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
         loadInvoiceDataService: BillingServices.loadInvoiceDataService,
         listServiceAndProductsChangesService: BillingServices.listServiceAndProductsChangesService,
+        listServiceAndProductsAccountChangesService:
+          BillingServices.listServiceAndProductsAccountChangesService,
         clipboardWrite
       },
       meta: {

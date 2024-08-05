@@ -36,6 +36,7 @@
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
     addCreditService: { type: Function, required: true },
+    loadInvoiceLastUpdatedService: { type: Function, required: true },
     createPaymentMethodService: { type: Function, required: true },
     paymentServices: { type: Object, required: true },
     billsServices: { type: Object, required: true }
@@ -111,7 +112,7 @@
   const loadInvoiceLastUpdated = async () => {
     try {
       loadingLastUpdated.value = true
-      invoiceLastUpdated.value = await props.billsServices.loadInvoiceLastUpdatedService()
+      invoiceLastUpdated.value = await props.loadInvoiceLastUpdatedService()
     } finally {
       loadingLastUpdated.value = false
     }
