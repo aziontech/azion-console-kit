@@ -22,7 +22,7 @@
   const drawerPaymentMethodRef = ref(null)
   const listPaymentMethodsRef = ref(null)
   const viewBillsRef = ref(null)
-  const accountBlocked = useAccountStore().isReviewPaymentRequired
+  const accountBlocked = useAccountStore().paymentReviewPending
 
   provide('drawersMethods', {
     openDrawerPaymentMethod: () => {
