@@ -165,7 +165,7 @@
     :editInDrawer="openEditDrawer"
     :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
-    emptyListMessage="No rules have been created."
+    emptyListMessage="No rules found."
     addButtonLabel="Rules Engine"
     :actions="actions"
     isTabs
