@@ -249,6 +249,19 @@ const backRules = [
       },
       rewrite: '/billing/graphql'
     }
+  },
+  {
+    name: 'Route GraphQL Accounting Queries to Manager Origin',
+    description: 'Routes GraphQL Accounting queries to the Manager, updating the URI accordingly',
+    match: '^/graphql/accounting',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      rewrite: '/accounting/graphql'
+    }
   }
 ]
 
