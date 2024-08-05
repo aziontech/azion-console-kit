@@ -291,7 +291,6 @@
 </template>
 
 <script setup>
-  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
@@ -309,8 +308,6 @@
   const { currentTheme } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
-  const billingUrl = getStaticUrlsByEnvironment('billing')
-
   const profile = ref(null)
   const showProfile = ref(false)
   const profileMenuDefault = [
@@ -324,9 +321,7 @@
     },
     {
       label: 'Billing & Subscriptions',
-      command: () => {
-        window.open(billingUrl, '_blank')
-      }
+      to: '/billing'
     },
     {
       label: 'Credentials',
