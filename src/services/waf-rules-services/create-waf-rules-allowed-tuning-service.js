@@ -3,9 +3,24 @@ import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
 export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, description }) => {
+  const MAP_MATCH_ZONES = {
+    query_string: 'conditional_query_string',
+    request_body: 'conditional_request_body',
+    request_header: 'conditional_request_header',
+    body: 'conditional_request_body',
+    file_name: 'file_name',
+    path: 'path',
+    raw_body: 'raw_body'
+  }
+
+  function checkAndReturnDefault(zone) {
+    const defaultZone = 'conditional_request_header'
+    return MAP_MATCH_ZONES[zone] || defaultZone
+  }
+
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     let matchZones = {
-      zone: attack.matchZone,
+      zone: checkAndReturnDefault(attack.matchZone),
       matches_on: attack.matchesOn
     }
 
@@ -13,7 +28,7 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
       const isPathZone = matchZones.zone === 'path'
 
       matchZones.zone_input = attack.matchValue
-      matchZones.zone = isPathZone ? 'path' : `conditional_${matchZones.zone}`
+      matchZones.zone = checkAndReturnDefault(matchZones.zone)
       matchZones.zone_input = isPathZone ? null : matchZones.zone_input
     }
 
