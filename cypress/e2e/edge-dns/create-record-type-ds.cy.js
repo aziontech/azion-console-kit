@@ -10,7 +10,7 @@ describe('Edge DNS spec', () => {
     cy.openProduct('Edge DNS')
   })
 
-  it('Create a record of type DS', { tags: ['@dev3'] }, () => {
+  it('Create a record of type DS', { tags: ['@dev5'] }, () => {
     // Arrange
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 

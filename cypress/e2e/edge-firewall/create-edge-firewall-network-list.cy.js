@@ -23,7 +23,7 @@ const createASNNetworkListCase = () => {
   cy.verifyToast('success', 'Your network list has been created')
 }
 
-describe('Edge Firewall spec', { tags: ['@dev4'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')

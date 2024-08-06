@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let functionName = ''
 
-describe('Edge Functions spec', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Functions spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     functionName = generateUniqueName('Function')
