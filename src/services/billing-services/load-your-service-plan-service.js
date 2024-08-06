@@ -8,13 +8,13 @@ export const loadYourServicePlanService = async (disclaimer = '') => {
   const payload = {
     query: `query getBillDetail {
         payments: paymentsClientDebt(
-              limit: 1,
-              filter: {
-                  paymentDateRange: {
-                      begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
-                  },
+          limit: 1,
+          filter: {
+            paymentDateRange: {
+                begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
             },
-          orderBy: [paymentDate_ASC]
+        },
+        orderBy: [paymentDate_ASC]
         )	{
           paymentDate
           amount

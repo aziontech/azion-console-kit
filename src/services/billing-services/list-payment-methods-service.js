@@ -27,7 +27,8 @@ const getTagProps = (card) => {
 
 const adapt = (httpResponse) => {
   const { body, statusCode } = httpResponse
-  if (!body.results || !body.results.length) {
+
+  if (!body.results?.length) {
     return {
       body: [],
       statusCode: statusCode

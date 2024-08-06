@@ -34,6 +34,6 @@ jobs:
         run: azion deploy --auto --debug --config-dir azion/stage
         env:
           VITE_STRIPE_TOKEN_STAGE: ${{ secrets.STAGE_STRIPE_TOKEN }}
-          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
           NODE_ENV: stage
           VITE_ENVIRONMENT: stage
