@@ -39,6 +39,15 @@ const fixtures = {
     bucketName: 'my-bucket',
     prefix: '/test'
   },
+  emptyPrefixOrigin: {
+    id: '0000000-00000000-00a0a00s0as0-000000',
+    edgeApplicationId: 123,
+    name: 'New Origin',
+    originProtocolPolicy: 'http',
+    originType: 'object_storage',
+    bucketName: 'my-bucket',
+    prefix: ''
+  },
   addressesMock: [
     {
       address: 'httpbin.org',
@@ -108,6 +117,27 @@ describe('EdgeApplicationOriginsServices', () => {
         name: fixtures.originTypeObjectStorage.name,
         bucket: fixtures.originTypeObjectStorage.bucketName,
         prefix: fixtures.originTypeObjectStorage.prefix
+      }
+    })
+  })
+  it('should adapt prefix to / when the field is empty', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+
+    await sut(fixtures.emptyPrefixOrigin)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/edge_applications/${fixtures.emptyPrefixOrigin.edgeApplicationId}/origins/${fixtures.emptyPrefixOrigin.id}`,
+      method: 'PATCH',
+      body: {
+        origin_type: fixtures.emptyPrefixOrigin.originType,
+        name: fixtures.emptyPrefixOrigin.name,
+        bucket: fixtures.emptyPrefixOrigin.bucketName,
+        prefix: '/'
       }
     })
   })
