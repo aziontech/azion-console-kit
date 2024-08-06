@@ -15,7 +15,7 @@ const fixtures = {
 <${'/'}script>`
 }
 
-describe('Edge Pulse spec', { tags: ['@dev', '@xfail'] }, () => {
+describe('Edge Pulse spec', { tags: ['@dev4', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Pulse')

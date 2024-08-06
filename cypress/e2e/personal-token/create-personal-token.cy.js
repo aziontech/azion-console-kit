@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 const personalTokenName = generateUniqueName('Personal Token')
 
-describe('Personal Token spec', { tags: ['@xfail'] }, () => {
+describe('Personal Token spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Personal Token')

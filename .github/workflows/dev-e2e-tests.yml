@@ -13,27 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group:
-          - account-settings
-          - billing
-          - credentials
-          - data-stream
-          - digital-certificates
-          - domains
-          - edge-application
-          - edge-dns
-          - edge-firewall
-          - edge-functions
-          - edge-pulse
-          - edge-services
-          - network-lists
-          - personal-token
-          - purge
-          - teams-permissions
-          - users-management
-          - variables
-          - waf
-          - your-settings
+        group: [2,3,4,5,6]
     steps:
       - uses: actions/checkout@v3
 
@@ -53,8 +33,7 @@ jobs:
           browser: chrome
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
-          spec: cypress/e2e/${{ matrix.group }}/*.cy.js
-          #env: grepTags=@dev+-@xfail
+          env: grepTags=@dev${{ matrix.group }}+-@xfail
 
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
@@ -70,6 +49,13 @@ jobs:
         with:
           name: cypress_videos_${{ matrix.group }}
           path: cypress/videos
+          retention-days: 1
+
+      - name: Upload Coverage Report Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_report_${{ matrix.group }}
+          path: .nyc_output/*
           retention-days: 1
 
   download_and_merge:

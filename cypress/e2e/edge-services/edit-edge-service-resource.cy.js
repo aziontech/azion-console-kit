@@ -3,7 +3,7 @@ import generateUniqueName from '../../support/utils'
 
 let fixtures = {}
 
-describe('Edge Services spec', { tags: ['run'] }, () => {
+describe('Edge Services spec', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')

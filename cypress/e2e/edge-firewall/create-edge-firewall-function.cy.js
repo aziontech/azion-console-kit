@@ -4,7 +4,7 @@ import selectors from '../../support/selectors'
 
 let firewallName, functionInstanceName, ruleName
 
-describe('Edge Firewall spec', { tags: ['@dev'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
