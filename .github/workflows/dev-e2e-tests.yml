@@ -35,6 +35,9 @@ jobs:
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
 
+      - name: Move Coverage Files
+        run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
+
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -55,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage_report_${{ matrix.group }}
-          path: .nyc_output/*
+          path: .nyc_output/out_${{ matrix.group }}.json
           retention-days: 1
 
   download_and_merge:
@@ -78,7 +81,7 @@ jobs:
       - name: Download All Coverage Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: 'coverage_report_${{ matrix.group }}'
+          name: coverage_report_
           path: coverage_report
 
       - name: Merge Coverage Reports
@@ -113,6 +116,6 @@ jobs:
       - name: Upload Compressed E2E Coverage Report Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: coverage_e2e_report
+          name: coverage_e2e_report_zip
           path: coverage.zip
           retention-days: 7
