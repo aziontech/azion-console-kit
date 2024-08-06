@@ -177,7 +177,7 @@
     icon="pi pi-plus"
     label="Filter"
     type="button"
-    class="flex justify-center items-center md:rounded-[6px_0px_0px_6px] min-w-max md:h-12"
+    class="flex justify-center items-center md:rounded-[6px_0px_0px_6px] min-w-max md:h-[2.313rem]"
     severity="secondary"
     badgeClass="!text-xl"
     :disabled="disabled"
