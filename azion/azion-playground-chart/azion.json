@@ -1,0 +1,167 @@
+{
+  "name": "azion-playground",
+  "bucket": "playground-20240730154742",
+  "preset": "vue",
+  "mode": "deliver",
+  "env": "production",
+  "prefix": "20240730154729",
+  "not-first-run": true,
+  "function": {
+    "id": 27265,
+    "name": "__DEFAULT__",
+    "file": ".edge/worker.js",
+    "args": "azion/azion-playground-chart/args.json",
+    "instance-id": 26312,
+    "instance-name": "__DEFAULT__",
+    "cache-id": 0
+  },
+  "application": {
+    "id": 1722361581,
+    "name": "__DEFAULT__"
+  },
+  "domain": {
+    "id": 1722362730,
+    "name": "azion-playground",
+    "domain_name": "eqi7vsouaf.map.azionedge.net",
+    "url": "https://eqi7vsouaf.map.azionedge.net"
+  },
+  "rt-purge": {
+    "purge_on_publish": true
+  },
+  "origin": [
+    {
+      "origin-id": 142650,
+      "origin-key": "b1da8285-05ba-4a27-a6d9-c8ede2780c23",
+      "name": "origin-storage-default"
+    },
+    {
+      "origin-id": 142651,
+      "origin-key": "dd073e35-a1d9-4e11-8ec7-79f8972fae68",
+      "name": "origin-manager"
+    },
+    {
+      "origin-id": 142652,
+      "origin-key": "41cc7879-b662-46f7-a4d5-3c3dc79e717b",
+      "name": "origin-vcs"
+    },
+    {
+      "origin-id": 142653,
+      "origin-key": "fcb386cd-0c0b-4cb4-bc70-6129d84ff141",
+      "name": "origin-cities"
+    },
+    {
+      "origin-id": 142654,
+      "origin-key": "945cb513-50f5-4ac7-9d29-ca47c91daed4",
+      "name": "origin-sso"
+    },
+    {
+      "origin-id": 142655,
+      "origin-key": "a0707e8f-8719-4064-ac92-6343ff780b43",
+      "name": "origin-api"
+    },
+    {
+      "origin-id": 142656,
+      "origin-key": "e1d0700d-f092-4861-a955-7b1821d571e3",
+      "name": "origin-script-runner"
+    }
+  ],
+  "rules-engine": {
+    "created": false,
+    "rules": [
+      {
+        "id": 269564,
+        "name": "Apply Common Configuration for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 269565,
+        "name": "Set Storage Origin for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 269566,
+        "name": "Deliver Static Assets from Storage",
+        "phase": "request"
+      },
+      {
+        "id": 269567,
+        "name": "Redirect All Non-Asset Requests to to index.html",
+        "phase": "request"
+      },
+      {
+        "id": 269568,
+        "name": "Route API Default Requests to API Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269569,
+        "name": "Route Specific API Services to Marketplace Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269570,
+        "name": "Route Specific API Services to Template Engine Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269571,
+        "name": "Route Specific API Services to Script Runner Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269572,
+        "name": "Route Version Control System API to VCS Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269573,
+        "name": "Route User Authentication and Account Management to SSO Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269574,
+        "name": "Route GraphQL City Queries to Cities Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269575,
+        "name": "Route GraphQL Billing Queries to Manager Origin",
+        "phase": "request"
+      },
+      {
+        "id": 269576,
+        "name": "Rewrite _azrt Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 269577,
+        "name": "Rewrite azsid Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 269578,
+        "name": "Rewrite _azat Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 269580,
+        "name": "Secure Headers",
+        "phase": "response"
+      }
+    ]
+  },
+  "cache-settings": [
+    {
+      "id": 160977,
+      "name": "Statics - Cache"
+    },
+    {
+      "id": 160978,
+      "name": "Marketplace - Cache"
+    },
+    {
+      "id": 160979,
+      "name": "Cities - Cache"
+    }
+  ]
+}

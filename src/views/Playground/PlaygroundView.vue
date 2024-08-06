@@ -1,3 +1,7 @@
 <template>
-  <h1>Playground</h1>
+  <GranularityByCountry />
 </template>
+
+<script setup>
+  import GranularityByCountry from './GranularityByCountry.vue'
+</script>
