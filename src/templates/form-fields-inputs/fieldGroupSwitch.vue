@@ -74,7 +74,7 @@
 <template>
   <div :class="['flex flex-col gap-2', classStateRoot]">
     <label
-      class="text-color text-sm font-medium leading-5"
+      class="text-color text-base font-medium leading-5"
       :data-testid="customTestId('label')"
     >
       {{ props.label }}
