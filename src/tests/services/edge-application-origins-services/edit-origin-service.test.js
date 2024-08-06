@@ -30,6 +30,15 @@ const fixtures = {
     connectionTimeout: 60,
     timeoutBetweenBytes: 35
   },
+  originTypeObjectStorage: {
+    id: '0000000-00000000-00a0a00s0as0-000000',
+    edgeApplicationId: 123,
+    name: 'New Origin',
+    originProtocolPolicy: 'http',
+    originType: 'object_storage',
+    bucketName: 'my-bucket',
+    prefix: '/test'
+  },
   addressesMock: [
     {
       address: 'httpbin.org',
@@ -77,6 +86,28 @@ describe('EdgeApplicationOriginsServices', () => {
         hmac_secret_key: fixtures.originMock.hmacSecretKey,
         connection_timeout: fixtures.originMock.connectionTimeout,
         timeout_between_bytes: fixtures.originMock.timeoutBetweenBytes
+      }
+    })
+  })
+
+  it('should call API with correct params when origin type is object storage', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+
+    await sut(fixtures.originTypeObjectStorage)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/edge_applications/${fixtures.originTypeObjectStorage.edgeApplicationId}/origins/${fixtures.originTypeObjectStorage.id}`,
+      method: 'PATCH',
+      body: {
+        origin_type: fixtures.originTypeObjectStorage.originType,
+        name: fixtures.originTypeObjectStorage.name,
+        bucket: fixtures.originTypeObjectStorage.bucketName,
+        prefix: fixtures.originTypeObjectStorage.prefix
       }
     })
   })
