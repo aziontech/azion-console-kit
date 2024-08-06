@@ -81,7 +81,6 @@ jobs:
       - name: Download All Coverage Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: coverage_report_
           path: coverage_report
 
       - name: Merge Coverage Reports
