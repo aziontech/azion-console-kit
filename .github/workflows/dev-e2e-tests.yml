@@ -78,7 +78,7 @@ jobs:
       - name: Download All Coverage Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: coverage_report_${{ matrix.group }}
+          name: 'coverage_report_${{ matrix.group }}'
           path: coverage_report
 
       - name: Merge Coverage Reports
