@@ -48,6 +48,7 @@
                 :options="categoriesList"
                 @change="changeCategory"
                 option-label="name"
+                :optionDisabled="disabledOption"
                 class="w-full md:w-14rem border-none sm:min-w-[12rem]"
                 :pt="{
                   list: { class: 'p-0' }
@@ -177,8 +178,10 @@
     return props.listSolutionsService(payload)
   }
 
+  const disabledOption = ({ code }) => code === selectedCategory.value?.code
+
   const changeCategory = async () => {
-    const code = selectedCategory.value.code
+    const { code } = selectedCategory.value
     const category = code === 'all' ? undefined : code
 
     try {
@@ -213,7 +216,7 @@
     }
 
     try {
-      selectedCategory.value = {}
+      selectedCategory.value = { code: '', name: '' }
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }

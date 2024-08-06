@@ -137,6 +137,18 @@
           }"
           :showSourceControls="false"
           :showTargetControls="false"
+          :move-all-to-source-props="{
+            'data-testid': 'edge-firewall-form__domain-picklist__move-all-to-source-btn'
+          }"
+          :move-all-to-target-props="{
+            'data-testid': 'edge-firewall-form__domain-picklist__move-all-to-target-btn'
+          }"
+          :move-to-target-props="{
+            'data-testid': 'edge-firewall-form__domain-picklist__move-to-target-btn'
+          }"
+          :move-to-source-props="{
+            'data-testid': 'edge-firewall-form__domain-picklist__move-to-source-btn'
+          }"
         >
           <template #sourceheader>Available</template>
           <template #targetheader>Selected</template>

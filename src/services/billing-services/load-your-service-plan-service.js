@@ -8,12 +8,13 @@ export const loadYourServicePlanService = async (disclaimer = '') => {
   const payload = {
     query: `query getBillDetail {
         payments: paymentsClientDebt(
-              filter: {
-                  paymentDateRange: {
-                      begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
-                  },
+          limit: 1,
+          filter: {
+            paymentDateRange: {
+                begin: "${firstDayOfMonth}", end: "${lastDayOfMonth}"
             },
-          orderBy: [paymentDate_ASC]
+        },
+        orderBy: [paymentDate_ASC]
         )	{
           paymentDate
           amount
@@ -46,20 +47,31 @@ function extractPriceFromString(sentence) {
 }
 
 const adapt = (httpResponse, disclaimer) => {
-  const [yourServicePlan] = httpResponse.body.data.payments
+  const {
+    body: { data },
+    statusCode
+  } = httpResponse
+
+  const emptyDefaultValue = '---'
+
+  const defaultPayment = {
+    paymentDate: emptyDefaultValue,
+    amount: emptyDefaultValue,
+    currency: emptyDefaultValue
+  }
+
+  const yourServicePlan = data?.payments[0] || defaultPayment
 
   const parseYourServicePlan = {
     paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
     amount: yourServicePlan.amount,
     currency: yourServicePlan.currency,
-    cardBrand: yourServicePlan.cardBrand.toLowerCase(),
-    cardLast4Digits: yourServicePlan.cardLast4Digits,
     creditBalance: extractPriceFromString(disclaimer)
   }
 
   return {
     body: parseYourServicePlan,
-    statusCode: httpResponse.statusCode
+    statusCode
   }
 }
 

@@ -40,12 +40,12 @@
   <ListTableBlock
     v-show="showListTable"
     pageTitleDelete="WAF rules tuning"
+    :listService="props.listWafRulesTuningService"
+    ref="listServiceWafTunningRef"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
-    :dataFilted="dataFiltedComputed"
-    @on-select-data="selectedItems"
-    :cleanSelectData="cleanSelectData"
-    :showselectionMode="true"
+    v-model:selectedItensData="selectedEvents"
+    :showSelectionMode="true"
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     isTabs
@@ -163,7 +163,6 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const dataFilted = ref([])
   const selectedFilter = ref({
     domains: [],
     network: {},
@@ -172,7 +171,6 @@
   const selectedEvents = ref([])
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
-  const cleanSelectData = ref(null)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
@@ -181,6 +179,7 @@
   const domainNames = ref('')
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
+  const listServiceWafTunningRef = ref('')
 
   const valueDomains = computed({
     get: () => {
@@ -204,7 +203,6 @@
     }
   })
 
-  const dataFiltedComputed = computed(() => dataFilted.value)
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
   )
@@ -326,18 +324,11 @@
       .map((domain) => domain.name)
   }
 
-  const selectedItems = (events) => {
-    selectedEvents.value = events
-
-    cleanSelectData.value = null
-  }
-
   const openDialog = () => {
     showDialogAllowRule.value = true
   }
 
   const cancelAllowed = () => {
-    cleanSelectData.value = true
     selectedEvents.value = []
   }
 
@@ -369,7 +360,7 @@
       const [{ status, reason, value }] = await props.createWafRulesAllowedTuningService({
         attackEvents,
         wafId: wafRuleId.value,
-        reason: reasonAttack
+        description: reasonAttack
       })
       if (status === 'rejected') {
         showToast(reason, 'error')
@@ -380,7 +371,6 @@
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
-      cleanSelectData.value = true
       showDetailsOfAttack.value = false
     } catch (error) {
       showToast(error, 'error')
@@ -413,8 +403,7 @@
       filter
     }
 
-    const response = await props.listWafRulesTuningService({ ...queryFields })
-    dataFilted.value = response
+    listServiceWafTunningRef.value.reload(queryFields)
   }
 
   const handleListWafRulesTuningAttacksService = async (path = '') => {

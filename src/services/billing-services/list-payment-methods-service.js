@@ -27,7 +27,8 @@ const getTagProps = (card) => {
 
 const adapt = (httpResponse) => {
   const { body, statusCode } = httpResponse
-  if (!body.results || !body.results.length) {
+
+  if (!body.results?.length) {
     return {
       body: [],
       statusCode: statusCode
@@ -59,7 +60,7 @@ const adapt = (httpResponse) => {
       },
       expiringDateByOrder: convertStringToDate(cardDate),
       expiringDateSearch: cardDate,
-      cardNumberSearch: card.card_last_4_digits,
+      cardNumberSearch: `${typeCard} ${card.card_last_4_digits} ${statusCard}`,
       isDefault: card.is_default
     }
   })

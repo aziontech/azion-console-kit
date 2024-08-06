@@ -16,7 +16,8 @@
         <template #form>
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApps="edgeApps"
+            :edgeApplicationsData="edgeApplicationsData"
+            :loadingEdgeApplications="loadingEdgeApplications"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -74,9 +75,10 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const edgeApps = ref([])
+  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
+  const loadingEdgeApplications = ref(true)
 
   const handleResponse = (value) => {
     domainName.value = value?.domainName
@@ -139,7 +141,7 @@
   }
 
   const requestEdgeApplications = async () => {
-    edgeApps.value = await props.listEdgeApplicationsService({})
+    edgeApplicationsData.value = await props.listEdgeApplicationsService({})
   }
 
   const requestDigitalCertificates = async () => {
@@ -165,6 +167,8 @@
       await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
+    } finally {
+      loadingEdgeApplications.value = false
     }
   })
 

@@ -182,7 +182,7 @@
                     data-testid="payment-methods-form__card-holder-name__input"
                     v-model="cardholderName"
                     class="p-component p-inputtext"
-                    placeholder="Jhon Doe"
+                    placeholder="John Doe"
                   />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
@@ -195,7 +195,7 @@
                     data-testid="payment-methods-form__card-number__input"
                     data-cy="input-card-number"
                     class="stripe-input"
-                  ></div>
+                  />
                 </div>
               </div>
               <div class="flex flex-wrap gap-6">
@@ -207,7 +207,8 @@
                   <div
                     id="card-expiry-element"
                     class="stripe-input"
-                  ></div>
+                    data-testid="payment-methods-form__card-expiry__input"
+                  />
                 </div>
                 <div class="flex flex-col sm:max-w-xs w-full gap-2">
                   <LabelBlock
@@ -217,7 +218,8 @@
                   <div
                     id="card-cvc-element"
                     class="stripe-input"
-                  ></div>
+                    data-testid="payment-methods-form__card-cvc__input"
+                  />
                 </div>
               </div>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">

@@ -4,7 +4,7 @@ import { createWafRulesAllowedTuningService } from '@/services/waf-rules-service
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  reason: 'Allowed Rules created to allow the attack',
+  description: 'Allowed Rules created to allow the attack',
   wafRulesMock: [
     {
       hitCount: 3,
@@ -53,18 +53,18 @@ describe('WafRulesServices', () => {
       body: bodyRequest
     })
     const { sut } = makeSut()
-    await sut({ attackEvents: bodyRequest, wafId: 10, reason: fixtures.reason })
+    await sut({ attackEvents: bodyRequest, wafId: 10, description: fixtures.description })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: 'v4/edge/wafs/10/allowed_rules',
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,
-        reason: fixtures.reason,
+        description: fixtures.description,
         match_zones: [
           {
             matches_on: 'value',
-            zone: 'conditional_query_string',
+            zone: 'conditional_request_header',
             zone_input: 'arg'
           }
         ]
@@ -80,7 +80,11 @@ describe('WafRulesServices', () => {
     })
     const { sut } = makeSut()
 
-    const data = await sut({ attackEvents: bodyRequest, wafId: 10, reason: fixtures.reason })
+    const data = await sut({
+      attackEvents: bodyRequest,
+      wafId: 10,
+      description: fixtures.description
+    })
 
     const expectedReturn = [
       {
@@ -165,7 +169,11 @@ describe('WafRulesServices', () => {
       })
       const { sut } = makeSut()
 
-      const responses = await sut({ attackEvents: bodyRequest, id: 10, reason: fixtures.reason })
+      const responses = await sut({
+        attackEvents: bodyRequest,
+        id: 10,
+        description: fixtures.description
+      })
 
       responses.forEach(({ reason, status }) => {
         if (status === 'rejected') {

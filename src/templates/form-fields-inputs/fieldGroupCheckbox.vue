@@ -55,7 +55,7 @@
 
 <template>
   <div :class="['flex flex-col gap-2', classStateRoot]">
-    <label class="text-color text-sm font-medium leading-5">
+    <label class="text-color text-base font-medium leading-5">
       {{ props.label }}
     </label>
     <div

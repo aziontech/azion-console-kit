@@ -123,7 +123,7 @@
           <div class="my-4 flex flex-col gap-3 justify-center items-start">
             <p
               class="text-md font-normal text-secondary"
-              data-testid="table-block-with-lazy-and-dropdown-filter__empty-message"
+              data-testid="list-table-block__empty-message__text"
             >
               {{ emptyListMessage }}
             </p>

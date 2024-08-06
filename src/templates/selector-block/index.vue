@@ -14,17 +14,14 @@
           <slot name="selector" />
         </div>
         <div :class="styleClass">
-          <div class="flex gap-3 items-center font-medium">
+          <div class="flex gap-3 text-base items-center font-medium">
             <span
               v-if="!props.isCard"
-              class="text-color text-sm font-medium leading-5"
+              class="text-color font-medium leading-5"
             >
               {{ props.title }}
             </span>
-            <span
-              v-else
-              class="text-base"
-            >
+            <span v-else>
               {{ props.title }}
             </span>
           </div>

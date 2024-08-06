@@ -3,7 +3,7 @@ export default {
   nameInput: '[data-testid="data-stream-form__general__name-field__input"]',
   sourceDropdown: '[data-testid="data-stream-form__data-settings__data-source-field__dropdown"]',
   templateDropdown: '[data-testid="data-stream-form__data-settings__template-field__dropdown"]',
-  editorBody: '.view-lines',
+  editorBody: '[data-testid="data-stream-form__data-settings__data-set-field"] .view-lines',
   connectorDropdown:
     '[data-testid="data-stream-form__destination__connector-field__dropdown"] > .p-dropdown-trigger',
   connectorOption: (optionIdx) => `#endpoint_${optionIdx}`,

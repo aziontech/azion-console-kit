@@ -42,6 +42,7 @@
           class="flex h-9"
           v-bind="props.action"
           @click="redirectToRoute(item.to)"
+          @click.middle="windowOpen(item.to)"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
         >
           <span v-bind="props.icon" />

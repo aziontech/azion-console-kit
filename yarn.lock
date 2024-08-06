@@ -2158,6 +2158,11 @@ axios@^1.6.2:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
+azion-theme@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.4.0.tgz#722b9b5288c73d9351b1266f4ecfc1d4ba261cc1"
+  integrity sha512-9zFeWkWbDsVeRNYMIDBGuxim7y/f1/nCbwcZI20CsRc7Tw92wM5ebNq/+V+gChGLVHw6pmKKQYhWq27eRE5xyw==
+
 balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"

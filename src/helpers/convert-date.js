@@ -40,6 +40,11 @@ const formatDateToUS = (value) => {
   }).format(date)
 }
 
+const isDateStringValid = (dateString) => {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  return dateRegex.test(dateString)
+}
+
 /**
  * Converts a given date to MM/DD/YYYY format.
  *
@@ -47,6 +52,8 @@ const formatDateToUS = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUSBilling = (value) => {
+  if (!isDateStringValid(value)) return '---'
+
   const [year, month, day] = value.split('-')
 
   const date = new Date(year, month - 1, day)
@@ -125,10 +132,25 @@ const convertDateToLocalTimezone = (date, utcOffset) => {
   return formatToEndOfDayIsoDate(userRealDate)
 }
 
+const getCurrentMonthStartEnd = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+
+  const dateInitial = new Date(year, month, 1)
+  const dateFinal = new Date(year, month + 1, 0)
+
+  return {
+    dateInitial: dateInitial.toISOString().split('T')[0],
+    dateFinal: dateFinal.toISOString().split('T')[0]
+  }
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateMonthAndYear,
   formatDateToUS,
-  formatDateToUSBilling
+  formatDateToUSBilling,
+  getCurrentMonthStartEnd
 }

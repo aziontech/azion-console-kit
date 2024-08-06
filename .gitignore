@@ -43,3 +43,6 @@ cypress.env.*
 
 src/views/Playground/PlaygroundView.vue
 /cypress/downloads
+#Paths added by Azion CLI
+.edge/
+.vulcan

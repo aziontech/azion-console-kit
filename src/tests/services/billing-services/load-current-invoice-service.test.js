@@ -55,6 +55,27 @@ describe('BillingServices', () => {
     expect(result).toEqual(fixtures.formattedResponse)
   })
 
+  it('should return correct response for empty data', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { data: { billDetail: [] } }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual({
+      billId: '---',
+      billingPeriod: '---',
+      creditUsedForPayment: 0,
+      currency: '---',
+      productChanges: '---',
+      servicePlan: '---',
+      temporaryBill: '---',
+      total: '---'
+    })
+  })
+
   it.each([
     {
       statusCode: 403,
@@ -78,14 +99,14 @@ describe('BillingServices', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
         body: {
-          errors: [{ message: 'Error' }]
+          data: { billDetail: [] }
         }
       })
       const { sut } = makeSut()
 
       const request = sut()
 
-      await expect(request).rejects.toBe(expectedError)
+      expect(request).rejects.toBe(expectedError)
     }
   )
 })

@@ -73,12 +73,17 @@
       error: `${id}__error-message`
     }
   })
+
+  const radioTestId = (name, nameField, index) => {
+    const remainder = name ?? `${nameField}-radio-${index}`
+    return `${customTestId.value.radio}__${remainder}`
+  }
 </script>
 
 <template>
   <div :class="['flex flex-col gap-2', classStateRoot]">
     <label
-      class="text-color text-sm font-medium leading-5"
+      class="text-color text-base font-medium leading-5"
       :data-testid="customTestId.label"
     >
       {{ props.label }}
@@ -100,7 +105,7 @@
           :isCard="props.isCard"
           v-bind="item"
           @onRadioChange="emit('onRadioChange', item.inputValue)"
-          :data-testid="customTestId.radio"
+          :data-testid="radioTestId(item.name, props.nameField, index)"
         >
           <template #footer>
             <slot

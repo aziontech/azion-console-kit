@@ -1,5 +1,4 @@
 <script setup>
-  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
@@ -58,8 +57,7 @@
   }
 
   const navigateToPayment = () => {
-    const billingUrl = getStaticUrlsByEnvironment('billing')
-    window.open(billingUrl, '_blank')
+    router.push({ name: 'billing' })
   }
 
   const navigateToRealTimeMetrics = () => {
