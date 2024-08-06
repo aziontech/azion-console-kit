@@ -54,7 +54,7 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           spec: cypress/e2e/${{ matrix.group }}/*.cy.js
-          env: grepTags=@dev+-@xfail
+          #env: grepTags=@dev+-@xfail
 
       - name: Upload Cypress Screenshots Artifact
         if: ${{ failure() }}
