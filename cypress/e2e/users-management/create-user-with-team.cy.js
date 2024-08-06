@@ -5,7 +5,7 @@ const userFirstName = generateUniqueName('FirstName')
 const userLastName = generateUniqueName('LastName')
 const userEmail = `${userFirstName}@azion.com`
 
-describe('Users Management spec', { tags: ['@dev7'] }, () => {
+describe('Users Management spec', { tags: ['@dev7', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Users Management')

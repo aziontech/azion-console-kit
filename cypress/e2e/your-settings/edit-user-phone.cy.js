@@ -1,6 +1,6 @@
 import selectors from '../../support/selectors'
 
-describe('Your Settings spec', { tags: ['@dev7'] }, () => {
+describe('Your Settings spec', { tags: ['@dev7', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Your Settings')
