@@ -24,6 +24,22 @@
     granularity: {
       component: defineAsyncComponent(() => import('./maps/GranularityByCountry.vue')),
       title: 'Granularity By Country'
+    },
+    barChart: {
+      component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
+      title: 'Bar Chart'
+    },
+    stackedBarChart: {
+      component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
+      title: 'Stacked Bar Chart'
+    },
+    pieChart: {
+      component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
+      title: 'Pie Chart'
+    },
+    donutChart: {
+      component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
+      title: 'Donut Chart'
     }
   }
 </script>
