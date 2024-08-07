@@ -84,13 +84,28 @@ const scenarios = [
       ...fixtures.requestPayloadMock,
       originType: 'object_storage',
       bucketName: 'my-bucket',
-      prefix: 'test'
+      prefix: '/test'
     },
     adaptedPayload: {
       name: 'New Origin',
       origin_type: 'object_storage',
       bucket: 'my-bucket',
       prefix: '/test'
+    }
+  },
+  {
+    label: 'should adapt prefix to / when the field is empty',
+    payload: {
+      ...fixtures.requestPayloadMock,
+      originType: 'object_storage',
+      bucketName: 'my-bucket',
+      prefix: ''
+    },
+    adaptedPayload: {
+      name: 'New Origin',
+      origin_type: 'object_storage',
+      bucket: 'my-bucket',
+      prefix: '/'
     }
   }
 ]
