@@ -1,9 +1,9 @@
 import { Analytics } from 'analytics'
 import segmentPlugin from '@analytics/segment'
 const environment = {
-  development: 'STAGE_SEGMENT_TOKEN',
-  stage: 'STAGE_SEGMENT_TOKEN',
-  production: 'PROD_SEGMENT_TOKEN'
+  development: 'VITE_STAGE_SEGMENT_TOKEN',
+  stage: 'VITE_STAGE_SEGMENT_TOKEN',
+  production: 'VITE_PROD_SEGMENT_TOKEN'
 }
 
 function getSegmentToken(env) {

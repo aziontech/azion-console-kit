@@ -117,8 +117,8 @@ Create a `.env` file at the root of your project and add the following lines, re
 VITE_STRIPE_TOKEN_DEV=pk_test_yourDevApiKeyHere
 VITE_STRIPE_TOKEN_STAGE=pk_test_yourStageApiKeyHere
 VITE_STRIPE_TOKEN_PROD=pk_live_yourProductionApiKeyHere
-VITE_STAGE_SEGMENT_TOKEN=pk_test_yourStageTokenHere
-VITE_PROD_SEGMENT_TOKEN=pk_test_yourProdTokenHere
+VITE_STAGE_SEGMENT_TOKEN=yourStageTokenHere
+VITE_PROD_SEGMENT_TOKEN=yourProdTokenHere
 ```
 
 ## Features 🧩
