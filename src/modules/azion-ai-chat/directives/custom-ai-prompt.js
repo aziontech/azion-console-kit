@@ -1,4 +1,4 @@
-const TARGET_ORIGIN = '*'
+const TARGET_ORIGIN = window.location.origin
 export const AZION_MESSAGE_TYPE = 'azion-ai'
 
 /**
