@@ -1,11 +1,10 @@
 <template>
   <div class="flex flex-col gap-2 justify-center items-center">
-    <h1 class="font-extrabold text-xl">Granularidade por Países</h1>
     <div
       id="map"
-      class="map w-ful h-96"
-    ></div>
-    <div id="markers"></div>
+      class="map h-96"
+    />
+    <div id="markers" />
   </div>
 </template>
 
@@ -15,7 +14,7 @@
   import { OSM } from 'ol/source.js'
   import { onMounted, ref } from 'vue'
   import { fromLonLat } from 'ol/proj.js'
-  import { coordinates } from './coordinates'
+  import { coordinates } from './constants/coordinates'
 
   const map = ref(null)
 
