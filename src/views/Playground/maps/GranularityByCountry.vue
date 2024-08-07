@@ -1,7 +1,7 @@
 <template>
   <div
     id="map"
-    class="map h-96"
+    class="w-full h-96"
   />
   <div id="markers" />
 </template>
@@ -60,48 +60,29 @@
 </script>
 
 <style>
-  .map {
-    width: 100%;
-    height: 900px;
-  }
-
   .popup {
     background: #f3652b;
     border: 1px solid #f3652b;
-    transition:
-      background-color 0.2s,
-      color 0.2s,
-      border-color 0.2s,
-      box-shadow 0.2s;
     width: 12px;
     height: 12px;
     border-radius: 12px;
+    animation: pulse 2s infinite;
   }
 
-  .popup::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    background-color: rgba(103, 103, 103, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: expand 2s infinite;
-  }
-
-  @keyframes expand {
-    0%,
-    100% {
-      width: 20px;
-      height: 20px;
-      opacity: 1.5;
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 rgba(100, 100, 100, 0.7);
     }
-    50% {
-      width: 100px;
-      height: 100px;
-      opacity: 1;
+
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(100, 100, 100, 0);
+    }
+
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 rgba(100, 100, 100, 0);
     }
   }
 </style>

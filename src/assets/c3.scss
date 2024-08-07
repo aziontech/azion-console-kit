@@ -270,15 +270,15 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-max {
-  fill: #777;
+  fill: var(--text-color-secondary);
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-min {
-  fill: #777;
+  fill: var(--text-color-secondary);
 }
 
 .c3-chart-arc .c3-gauge-value {
-  fill: #000;
+fill: var(--text-color);
 }
 
 .c3-chart-arc.c3-target g path {
