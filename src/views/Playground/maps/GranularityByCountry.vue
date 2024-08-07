@@ -60,6 +60,11 @@
 </script>
 
 <style>
+  .azion-dark {
+    .ol-layer canvas {
+      filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
+    }
+  }
   .popup {
     background: #f3652b;
     border: 1px solid #f3652b;
@@ -72,17 +77,17 @@
   @keyframes pulse {
     0% {
       transform: scale(0.95);
-      box-shadow: 0 0 rgba(100, 100, 100, 0.7);
+      box-shadow: 0 0 rgba(150, 150, 150, 0.7);
     }
 
     70% {
       transform: scale(1);
-      box-shadow: 0 0 0 10px rgba(100, 100, 100, 0);
+      box-shadow: 0 0 0 10px rgba(150, 150, 150, 0);
     }
 
     100% {
       transform: scale(0.95);
-      box-shadow: 0 0 rgba(100, 100, 100, 0);
+      box-shadow: 0 0 rgba(150, 150, 150, 0);
     }
   }
 </style>
