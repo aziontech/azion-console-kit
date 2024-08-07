@@ -1,3 +1,3 @@
 export const makeAzionAiBaseUrl = () => {
-  return 'http://localhost:8080'
+  return 'api/v4/ai_api'
 }

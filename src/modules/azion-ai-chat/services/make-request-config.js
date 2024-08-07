@@ -4,6 +4,6 @@ import { makeAzionAiBaseUrl } from './make-azion-ai-base-url'
  */
 export const makeRequestConfig = () => {
   return {
-    url: `${makeAzionAiBaseUrl()}/chat-stream`
+    url: `${makeAzionAiBaseUrl()}/chat_stream`
   }
 }

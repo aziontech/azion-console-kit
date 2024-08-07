@@ -13,6 +13,6 @@ describe('makeRequestConfig', () => {
 
     const result = sut()
 
-    expect(result).toEqual({ url: 'http://localhost:8080/chat-stream' })
+    expect(result).toEqual({ url: 'api/v4/ai_api/chat_stream' })
   })
 })
