@@ -29,6 +29,10 @@
       component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
       title: 'Bar Chart'
     },
+    rotatedBarChart: {
+      component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
+      title: 'Ordered Bar Chart'
+    },
     stackedBarChart: {
       component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
       title: 'Stacked Bar Chart'
@@ -44,6 +48,10 @@
     gaugeChart: {
       component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
       title: 'Gauge Chart'
+    },
+    areaChart: {
+      component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
+      title: 'Area Chart'
     }
   }
 </script>

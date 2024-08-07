@@ -65,6 +65,32 @@ export const BAR_CHART_DATA = {
   ...COLOR_PATTERNS
 }
 
+export const ROTATED_BAR_CHART_DATA = {
+  data: {
+    x: 'x',
+    xFormat: '%Y',
+    columns: [
+      ['x', '2010', '2011', '2012', '2013', '2014', '2015'],
+      ['Values', 130, 200, 100, 160, 150, 125]
+    ],
+    types: {
+      Values: 'bar'
+    },
+    color: function (color, data) {
+      return COLOR_PATTERNS.color.pattern[data.index]
+    }
+  },
+  bar: {
+    width: {
+      ratio: 0.65
+    }
+  },
+  axis: {
+    ...AXIS_FORMATTING.axis,
+    rotated: true
+  }
+}
+
 export const STACKED_BAR_CHART_DATA = {
   data: {
     x: 'x',
@@ -126,6 +152,24 @@ export const GAUGE_CHART_DATA = {
   data: {
     columns: [['Netherlands', 91.4]],
     type: 'gauge'
+  },
+  ...COLOR_PATTERNS
+}
+
+export const AREA_CHART_DATA = {
+  data: {
+    columns: [
+      ['Netherlands', 300, 350, 300, 50, 80, 100],
+      ['Nigeria', 130, 100, 40, 100, 150, 150],
+      ['France', 13, 40, 140, 20, 50, 50],
+      ['Brazil', 30, 400, 200, 250, 150, 90]
+    ],
+    types: {
+      Netherlands: 'area',
+      Nigeria: 'area',
+      France: 'area',
+      Brazil: 'area'
+    }
   },
   ...COLOR_PATTERNS
 }
