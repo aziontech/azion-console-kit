@@ -212,7 +212,7 @@
 </script>
 
 <template>
-  <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row h-[2.313rem]">
+  <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
     <advancedFilter
       :disabled="disabledFilter"
       :fieldsInFilter="optionsFields"
