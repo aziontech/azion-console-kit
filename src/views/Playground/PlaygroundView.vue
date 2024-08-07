@@ -8,8 +8,11 @@
         <template #title>
           {{ value.title }}
         </template>
+
         <template #content>
-          <component :is="value.component" />
+          <div class="h-96 flex items-center">
+            <component :is="value.component" />
+          </div>
         </template>
       </Card>
     </template>

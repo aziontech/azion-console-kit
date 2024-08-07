@@ -6,16 +6,6 @@ const AXIS_FORMATTING = {
       type: 'timeseries',
       tick: {
         format: '%Y'
-      },
-      label: {
-        text: 'Years',
-        position: 'outer-center'
-      }
-    },
-    y: {
-      label: {
-        text: 'Amount',
-        position: 'outer-middle'
       }
     }
   }
@@ -88,6 +78,9 @@ export const ROTATED_BAR_CHART_DATA = {
   axis: {
     ...AXIS_FORMATTING.axis,
     rotated: true
+  },
+  legend: {
+    hide: true
   }
 }
 

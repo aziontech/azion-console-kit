@@ -1,11 +1,9 @@
 <template>
-  <div class="flex flex-col gap-2 justify-center items-center">
-    <div
-      id="map"
-      class="map h-96"
-    />
-    <div id="markers" />
-  </div>
+  <div
+    id="map"
+    class="map h-96"
+  />
+  <div id="markers" />
 </template>
 
 <script setup>
