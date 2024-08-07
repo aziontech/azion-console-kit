@@ -27,4 +27,3 @@
     }
   }
 </script>
-./maps/GranularityByCountry.vue
