@@ -94,7 +94,7 @@
     hmacAccessKey: '',
     hmacSecretKey: '',
     bucketName: null,
-    prefix: null
+    prefix: ''
   })
 
   const createFormDrawer = ref('')
