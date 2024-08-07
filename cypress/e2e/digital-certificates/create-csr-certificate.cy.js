@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
-describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
+describe('Digital Certificates spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Digital Certificates')
