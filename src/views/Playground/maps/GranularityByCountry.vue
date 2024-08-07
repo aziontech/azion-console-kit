@@ -27,7 +27,8 @@
       view: new View({
         center: fromLonLat([-49.470977003699666, -13.471216164769693]),
         zoom: 2
-      })
+      }),
+      controls: []
     })
 
     generateGeoJsonBrazil()
@@ -59,7 +60,7 @@
   }
 </script>
 
-<style>
+<style lang="scss">
   .azion-dark {
     .ol-layer canvas {
       filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
