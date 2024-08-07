@@ -1,5 +1,4 @@
 import { SignUpTracker, SignInTracker, CreateTracker, ProductTracker } from './trackers'
-import { getEnvironment } from '@/helpers'
 
 /**
  * @typedef {Object} TrackerEvent
@@ -16,6 +15,8 @@ export class AnalyticsTrackerAdapter {
   #events = []
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
+  /** @type {String} */
+  #token = false
   #traits = {}
 
   /** @type {SignUpTracker} */
@@ -30,8 +31,10 @@ export class AnalyticsTrackerAdapter {
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
    * @param {import('analytics').AnalyticsInstance} analyticsClient - The client for tracking.
+   * @param {string} token
    */
-  constructor(analyticsClient) {
+  constructor(analyticsClient, token) {
+    this.#token = token
     this.#analyticsClient = analyticsClient
 
     this.#signUpTracker = new SignUpTracker(this)
@@ -49,28 +52,15 @@ export class AnalyticsTrackerAdapter {
     this.#events.push(event)
   }
 
-  #validateTokenSegment() {
-    const env = getEnvironment()
-
-    const environment = {
-      production: 'VITE_PROD_SEGMENT_TOKEN'
-    }
-
-    const segmentToken = environment[env] || 'VITE_STAGE_SEGMENT_TOKEN'
-    const hasTokenSegment = import.meta.env[segmentToken]
-
-    if (!hasTokenSegment) {
-      // eslint-disable-next-line no-console
-      console.warn('Segment token is missing')
-      return
-    }
+  #validateToken() {
+    if (!this.#token) return false
+    return true
   }
-
   /**
    * call this method to run each stored tracker event
    */
   async track() {
-    this.#validateTokenSegment()
+    if (!this.#validateToken()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
       props.application = 'console-kit'
