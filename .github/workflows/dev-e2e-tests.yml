@@ -17,12 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js Environment
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Run Cypress E2E Tests
+      - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         env:
           DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
@@ -38,7 +38,7 @@ jobs:
       - name: Move Coverage Files
         run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
 
-      - name: Upload Cypress Screenshots Artifact
+      - name: Upload Cypress Screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
@@ -46,7 +46,7 @@ jobs:
           path: cypress/screenshots
           retention-days: 4
 
-      - name: Upload Cypress Videos Artifact
+      - name: Upload Cypress Videos
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
@@ -54,11 +54,11 @@ jobs:
           path: cypress/videos
           retention-days: 1
 
-      - name: Upload Coverage Report Artifact
+      - name: Upload Coverage Files
         uses: actions/upload-artifact@v3
         with:
           name: coverage_report_${{ matrix.group }}
-          path: .nyc_output/out_${{ matrix.group }}.json
+          path: .nyc_output/*
           retention-days: 1
 
   download_and_merge:
@@ -70,23 +70,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js Environment
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install Dependencies (Including NYC)
+      - name: Install Dependencies
         run: npm install --global nyc
 
-      - name: Download All Coverage Artifacts
+      - name: Download Coverage Artifacts
         uses: actions/download-artifact@v3
         with:
           path: coverage_report
 
       - name: Merge Coverage Reports
-        run: |
-          mkdir -p .nyc_output
-          npx nyc merge coverage_report .nyc_output/out.json
+        run: npx nyc merge ./coverage_report .nyc_output/out.json
 
       - name: Generate Text Coverage Report
         run: npx nyc report --reporter=text-summary
@@ -94,27 +92,21 @@ jobs:
       - name: Generate HTML Coverage Report
         run: npx nyc report --reporter=html --report-dir=./coverage/e2e
 
-      - name: Generate lcov.info Report 
+      - name: Generate LCOV Report
         run: npx nyc report --reporter=lcovonly --report-dir=./coverage/e2e
 
-      - name: Upload E2E Coverage Report Artifact
+      - name: Check E2E Test Coverage
+        if: ${{ always() }}
+        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
+
+      - name: Compress Coverage Reports
+        if: ${{ always() }}
+        run: zip -r coverage.zip coverage
+
+      - name: Upload Coverage Report Artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
           name: coverage_e2e_report
-          path: coverage/e2e
-          retention-days: 7
-
-      - name: Check E2E Test Coverage
-        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-
-      - name: Compress E2E Coverage Reports
-        run: |
-          rm -rf coverage/e2e/lcov-report
-          zip -r coverage.zip coverage
-
-      - name: Upload Compressed E2E Coverage Report Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_e2e_report_zip
           path: coverage.zip
           retention-days: 7
