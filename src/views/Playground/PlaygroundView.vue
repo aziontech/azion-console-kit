@@ -40,6 +40,10 @@
     donutChart: {
       component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
       title: 'Donut Chart'
+    },
+    gaugeChart: {
+      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
+      title: 'Gauge Chart'
     }
   }
 </script>

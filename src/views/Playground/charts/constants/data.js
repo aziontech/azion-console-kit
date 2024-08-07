@@ -121,3 +121,11 @@ export const DONUT_CHART_DATA = {
   },
   ...COLOR_PATTERNS
 }
+
+export const GAUGE_CHART_DATA = {
+  data: {
+    columns: [['Netherlands', 91.4]],
+    type: 'gauge'
+  },
+  ...COLOR_PATTERNS
+}
