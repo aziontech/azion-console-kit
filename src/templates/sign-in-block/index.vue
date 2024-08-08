@@ -31,9 +31,6 @@
               id="email"
               placeholder="example@email.com"
               type="email"
-              :pt="{
-                root: { autofocus: true }
-              }"
               @vue:mounted="({ el }) => autofocusInput(el)"
               @keydown.enter="checkLoginMethod"
               class="w-full"
