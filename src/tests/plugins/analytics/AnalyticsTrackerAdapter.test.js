@@ -5,7 +5,7 @@ const fixtures = {
   application: 'console-kit'
 }
 
-const makeSut = (segmentToken = 'VITE_STAGE_SEGMENT_TOKEN') => {
+const makeSut = (segmentToken = 'VITE_SEGMENT_TOKEN') => {
   const analyticsClientSpy = {
     track: vi.fn(),
     identify: vi.fn()
