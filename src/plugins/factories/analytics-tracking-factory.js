@@ -1,14 +1,5 @@
 import { Analytics } from 'analytics'
 import segmentPlugin from '@analytics/segment'
-const environment = {
-  development: 'VITE_STAGE_SEGMENT_TOKEN',
-  stage: 'VITE_STAGE_SEGMENT_TOKEN',
-  production: 'VITE_PROD_SEGMENT_TOKEN'
-}
-
-function getSegmentToken(env) {
-  return environment[env]
-}
 
 /**
  * Initialize analytics module.
@@ -24,7 +15,7 @@ export function makeAnalyticsClient(environment) {
     throw Error('Provide an valid environment to select correct tracking token')
   }
 
-  const segmentToken = getSegmentToken(environment)
+  const segmentToken = 'VITE_SEGMENT_TOKEN'
 
   const plugins = [segmentPlugin({ writeKey: segmentToken })]
 
