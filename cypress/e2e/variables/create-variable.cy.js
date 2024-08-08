@@ -27,6 +27,7 @@ describe('Variables spec', () => {
     // Assert
     cy.get(selectors.list.searchInput).type(variableKey)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
+    cy.get(selectors.variables.listRow('value')).find('button').should('be.visible')
   })
 
   afterEach(() => {

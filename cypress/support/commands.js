@@ -16,6 +16,10 @@ const login = (email, password) => {
       cy.visit('/login')
       cy.get(selectors.login.emailInput).type(email)
       cy.get(selectors.login.nextButton).click()
+
+      // Assert - password input should have autofocus
+      cy.get(selectors.login.passwordInput).should('be.focused')
+
       cy.get(selectors.login.passwordInput).type(password, { log: false })
       cy.get(selectors.login.signInButton).click()
       cy.location('pathname').should('eq', '/')
