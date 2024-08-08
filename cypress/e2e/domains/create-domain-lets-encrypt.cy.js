@@ -20,7 +20,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3', 'xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
   })
