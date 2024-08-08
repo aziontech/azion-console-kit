@@ -464,7 +464,12 @@
     try {
       loadingNetworkList.value = true
       const result = await props.listNetworkListService()
-      networkListOptions.value = result
+      networkListOptions.value = result.map((item) => {
+        return {
+          ...item,
+          id: item.id.toString()
+        }
+      })
     } catch (error) {
       toast.add({
         closable: true,
