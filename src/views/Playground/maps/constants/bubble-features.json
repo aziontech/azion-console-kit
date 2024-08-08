@@ -186,6 +186,42 @@
         "type": "Point",
         "coordinates": [-46.6333, -23.5505]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Brasilia, Brasil",
+        "size": 500000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-47.9292, -15.7801]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Salvador, Brasil",
+        "size": 400000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,255,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,255,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-38.5267, -12.9714]
+      }
     }
   ]
 }
