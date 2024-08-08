@@ -16,7 +16,7 @@ export class AnalyticsTrackerAdapter {
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
   /** @type {String} */
-  #token = false
+  #token = ''
   #traits = {}
 
   /** @type {SignUpTracker} */
