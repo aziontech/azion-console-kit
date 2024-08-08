@@ -105,8 +105,6 @@ You need to set the following environment variables in your .env file or environ
 
 * `VITE_STRIPE_TOKEN_PROD`: This is your Stripe API key for the production environment. It should only be used in your live application where real transactions occur.
 
-
-
 #### Example `.env` File
 
 Create a `.env` file at the root of your project and add the following lines, replacing the placeholder keys with your actual Stripe API keys:
@@ -115,26 +113,6 @@ Create a `.env` file at the root of your project and add the following lines, re
 VITE_STRIPE_TOKEN_DEV=pk_test_yourDevApiKeyHere
 VITE_STRIPE_TOKEN_STAGE=pk_test_yourStageApiKeyHere
 VITE_STRIPE_TOKEN_PROD=pk_live_yourProductionApiKeyHere
-```
-
-## Using Segment Keys with Environment Variables
-
-This project utilizes Segment for tracking user interactions and events, and it requires environment-specific API tokens for proper configuration. To set up your environment with the correct Segment tokens, follow these instructions:
-
-Environment Variables
-You need to set the following environment variables in your .env file or environment configuration:
-
-* `VITE_STAGE_SEGMENT_TOKEN`: This is your Segment token for the staging environment. It is used to authenticate API requests in the staging environment to track and analyze user interactions and events.
-
-* `VITE_PROD_SEGMENT_TOKEN`: This is your Segment token for the production environment. It is used to authenticate API requests in the production environment to track and analyze user interactions and events once your application is live and operating in a production environment.
-
-#### Example `.env` File
-
-At the root of your project, you can set environment variables directly in a `.env` file. Include the following lines, replacing the placeholder keys with your actual Segment API keys:
- 
-```bash
-VITE_STAGE_SEGMENT_TOKEN=yourStageTokenHere
-VITE_PROD_SEGMENT_TOKEN=yourProdTokenHere
 ```
 
 ## Features 🧩
