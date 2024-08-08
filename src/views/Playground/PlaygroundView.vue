@@ -28,6 +28,10 @@
       component: defineAsyncComponent(() => import('./maps/GranularityByCountry.vue')),
       title: 'Granularity By Country'
     },
+    bubbleMap: {
+      component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
+      title: 'Bubble Map'
+    },
     barChart: {
       component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
       title: 'Bar Chart'

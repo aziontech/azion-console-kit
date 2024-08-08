@@ -1,0 +1,191 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "EPSG:3857"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rio de Janeiro, Brasil",
+        "size": 500000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.1729, -22.9068]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nova York, EUA",
+        "size": 700000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.006, 40.7128]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Tóquio, Japão",
+        "size": 800000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,255,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,255,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.6917, 35.6895]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Londres, Reino Unido",
+        "size": 600000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,255,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,255,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.1276, 51.5074]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Paris, França",
+        "size": 550000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3522, 48.8566]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cidade do Cabo, África do Sul",
+        "size": 450000,
+        "style": {
+          "stroke": {
+            "color": "rgba(0,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(0,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.4241, -33.9249]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sydney, Austrália",
+        "size": 500000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [151.2093, -33.8688]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Moscou, Rússia",
+        "size": 650000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.6173, 55.7558]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cairo, Egito",
+        "size": 400000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,0,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,0,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [31.2357, 30.0444]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "São Paulo, Brasil",
+        "size": 300000,
+        "style": {
+          "stroke": {
+            "color": "rgba(255,0,255,0.2)",
+            "width": 2
+          },
+          "fill": "rgba(255,0,255,0.2)"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-46.6333, -23.5505]
+      }
+    }
+  ]
+}
