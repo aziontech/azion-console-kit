@@ -31,7 +31,10 @@
               id="email"
               placeholder="example@email.com"
               type="email"
-              ref="emailInputRef"
+              :pt="{
+                root: { autofocus: true }
+              }"
+              @vue:mounted="({ el }) => autofocusInput(el)"
               @keydown.enter="checkLoginMethod"
               class="w-full"
               :class="{ 'p-invalid': errors.email }"
@@ -113,7 +116,7 @@
               toggleMask
               v-model="password"
               id="password"
-              ref="passwordInputRef"
+              @vue:mounted="({ el }) => autofocusInput(el)"
               class="w-full"
               :class="{ 'p-invalid': hasRequestErrorMessage }"
               @keydown.enter="validateAndSubmit"
@@ -167,7 +170,7 @@
   import Password from 'primevue/password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
-  import { ref, inject, onMounted, nextTick } from 'vue'
+  import { ref, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Divider from 'primevue/divider'
   import * as yup from 'yup'
@@ -221,22 +224,6 @@
         detail: errorMessage
       })
     }
-  }
-
-  const passwordInputRef = ref(null)
-  const emailInputRef = ref(null)
-
-  const focusOnPasswordInput = () => {
-    nextTick(() => {
-      const inputElement = passwordInputRef.value.$el.querySelector('input')
-      if (inputElement) inputElement.focus()
-    })
-  }
-
-  const focusOnEmailInput = () => {
-    nextTick(() => {
-      emailInputRef.value.$el.focus()
-    })
   }
 
   onMounted(() => {
@@ -335,7 +322,6 @@
       isProccedButtonLoading.value = false
       showPassword.value = true
       resetField()
-      focusOnPasswordInput()
     }, 500)
   }
 
@@ -343,6 +329,10 @@
     hasRequestErrorMessage.value = false
     showPassword.value = false
     resetField()
-    focusOnEmailInput()
+  }
+
+  const autofocusInput = (inputEl) => {
+    const inputElement = inputEl.querySelector('input') || inputEl
+    inputElement.focus()
   }
 </script>
