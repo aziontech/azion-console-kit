@@ -15,7 +15,7 @@ export function makeAnalyticsClient(environment) {
     throw Error('Provide an valid environment to select correct tracking token')
   }
 
-  const segmentToken = 'VITE_SEGMENT_TOKEN'
+  const segmentToken = import.meta.env['VITE_SEGMENT_TOKEN']
 
   const plugins = [segmentPlugin({ writeKey: segmentToken })]
 
