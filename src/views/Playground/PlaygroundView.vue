@@ -28,6 +28,10 @@
       component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
       title: 'Geolocation Map'
     },
+    granularityMap: {
+      component: defineAsyncComponent(() => import('./maps/GranularityMap.vue')),
+      title: 'Granularity by Country'
+    },
     bubbleMap: {
       component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
       title: 'Bubble Map'
