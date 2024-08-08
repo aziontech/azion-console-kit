@@ -23,46 +23,50 @@
   import { defineAsyncComponent } from 'vue'
   import Card from 'primevue/card'
 
-  const content = {
-    granularity: {
+  const content = [
+    {
       component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
       title: 'Geolocation Map'
     },
-    granularityMap: {
+    {
+      component: defineAsyncComponent(() => import('./maps/HeatmapMap.vue')),
+      title: 'Heatmap Map'
+    },
+    {
       component: defineAsyncComponent(() => import('./maps/GranularityMap.vue')),
       title: 'Granularity by Country'
     },
-    bubbleMap: {
+    {
       component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
       title: 'Bubble Map'
     },
-    barChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
       title: 'Bar Chart'
     },
-    rotatedBarChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
       title: 'Ordered Bar Chart'
     },
-    stackedBarChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
       title: 'Stacked Bar Chart'
     },
-    pieChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
       title: 'Pie Chart'
     },
-    donutChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
       title: 'Donut Chart'
     },
-    gaugeChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
       title: 'Gauge Chart'
     },
-    areaChart: {
+    {
       component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
       title: 'Area Chart'
     }
-  }
+  ]
 </script>
