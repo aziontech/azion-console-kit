@@ -22,7 +22,10 @@
       :loading="isLoading"
       data-testid="data-table"
     >
-      <template #header>
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
         <div
           class="flex flex-wrap justify-between gap-2 w-full"
           data-testid="data-table-header"
@@ -209,7 +212,10 @@
       }"
       data-testid="data-table-skeleton"
     >
-      <template #header>
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
         <div
           class="flex flex-wrap justify-between gap-2 w-full"
           data-testid="data-table-skeleton-header"
@@ -278,6 +284,9 @@
   ])
 
   const props = defineProps({
+    hiddenHeader: {
+      type: Boolean
+    },
     columns: {
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
