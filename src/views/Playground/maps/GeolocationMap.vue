@@ -1,6 +1,6 @@
 <template>
   <div
-    id="map"
+    id="geolocation-map"
     class="w-full h-96"
   />
   <div id="markers" />
@@ -14,16 +14,16 @@
   import { fromLonLat } from 'ol/proj.js'
   import { coordinates } from './constants/coordinates'
 
-  const map = ref(null)
+  const geolocationMap = ref(null)
 
   onMounted(() => {
-    map.value = new Map({
+    geolocationMap.value = new Map({
       layers: [
         new TileLayer({
           source: new OSM()
         })
       ],
-      target: 'map',
+      target: 'geolocation-map',
       view: new View({
         center: fromLonLat([-49.470977003699666, -13.471216164769693]),
         zoom: 2
@@ -56,7 +56,7 @@
       stopEvent: false
     })
 
-    map.value.addOverlay(marker)
+    geolocationMap.value.addOverlay(marker)
   }
 </script>
 

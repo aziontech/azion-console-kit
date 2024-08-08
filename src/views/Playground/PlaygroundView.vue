@@ -25,8 +25,8 @@
 
   const content = {
     granularity: {
-      component: defineAsyncComponent(() => import('./maps/GranularityByCountry.vue')),
-      title: 'Granularity By Country'
+      component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
+      title: 'Geolocation Map'
     },
     bubbleMap: {
       component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
