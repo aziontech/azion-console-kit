@@ -17,9 +17,8 @@
   import { fromLonLat } from 'ol/proj.js'
   import * as bubbleFeatures from './constants/bubble-features.json'
 
-  const vectorSource = new VectorSource({})
   const vectorLayer = new VectorLayer({
-    source: vectorSource
+    source: new VectorSource({})
   })
 
   const bubbleMap = ref(null)
@@ -49,7 +48,7 @@
         })
       )
 
-      vectorSource.addFeature(newFeat)
+      vectorLayer.getSource().addFeature(newFeat)
     })
   }
 

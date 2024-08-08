@@ -19,9 +19,8 @@
 
   import * as granularityFeatures from './constants/granularity-features.json'
 
-  const vectorSource = new VectorSource({})
   const vectorLayer = new VectorLayer({
-    source: vectorSource
+    source: new VectorSource({})
   })
 
   const granularityMap = ref(null)
@@ -53,7 +52,7 @@
         })
       )
 
-      vectorSource.addFeature(newFeat)
+      vectorLayer.getSource().addFeature(newFeat)
     })
   }
 
