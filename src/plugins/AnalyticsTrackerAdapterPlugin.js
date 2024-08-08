@@ -7,7 +7,11 @@ export default {
   install: (Vue, options) => {
     const segmentToken = makeSegmentToken()
 
-    const analyticsClient = makeAnalyticsClient(segmentToken)
+    let analyticsClient = undefined
+
+    if (segmentToken) {
+      analyticsClient = makeAnalyticsClient(segmentToken)
+    }
 
     const app = Vue
     const trackerInstance = new AnalyticsTrackerAdapter(analyticsClient, segmentToken)

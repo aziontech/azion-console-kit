@@ -52,14 +52,14 @@ export class AnalyticsTrackerAdapter {
     this.#events.push(event)
   }
 
-  #validateToken() {
+  #hasToken() {
     return !!this.#token
   }
   /**
    * call this method to run each stored tracker event
    */
   async track() {
-    if (!this.#validateToken()) return
+    if (!this.#hasToken()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
       props.application = 'console-kit'
