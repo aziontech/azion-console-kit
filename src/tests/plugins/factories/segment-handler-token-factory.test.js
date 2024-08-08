@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
-import { segmentHandlerToken } from '@/plugins/factories/segment-handler-token-factory'
+import { makeSegmentToken } from '@/plugins/factories/segment-handler-token-factory'
 
-describe('segmentHandlerToken', () => {
+describe('makeSegmentToken', () => {
   it('should return the production token if environment is production', () => {
     const originalEnv = import.meta.env
-    import.meta.env = { VITE_PROD_SEGMENT_TOKEN: 'prod_token_value' }
+    import.meta.env = { VITE_SEGMENT_TOKEN: 'prod_token_value' }
 
-    const result = segmentHandlerToken('production')
+    const result = makeSegmentToken()
 
     expect(result).toBe('prod_token_value')
 
@@ -15,9 +15,9 @@ describe('segmentHandlerToken', () => {
 
   it('should return the stage token if environment is not production', () => {
     const originalEnv = import.meta.env
-    import.meta.env = { VITE_STAGE_SEGMENT_TOKEN: 'stage_token_value' }
+    import.meta.env = { VITE_SEGMENT_TOKEN: 'stage_token_value' }
 
-    const result = segmentHandlerToken('development')
+    const result = makeSegmentToken()
 
     expect(result).toBe('stage_token_value')
 
@@ -30,7 +30,7 @@ describe('segmentHandlerToken', () => {
     const originalEnv = import.meta.env
     import.meta.env = {}
 
-    const result = segmentHandlerToken('production')
+    const result = makeSegmentToken()
 
     expect(warnMock).toHaveBeenCalledWith('Segment token is missing')
     expect(result).toBe('')

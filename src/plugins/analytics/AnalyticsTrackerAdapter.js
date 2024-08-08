@@ -53,8 +53,7 @@ export class AnalyticsTrackerAdapter {
   }
 
   #validateToken() {
-    if (!this.#token) return false
-    return true
+    return !!this.#token
   }
   /**
    * call this method to run each stored tracker event

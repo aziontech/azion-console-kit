@@ -35,6 +35,6 @@ jobs:
         env:
           VITE_STRIPE_TOKEN_STAGE: ${{ secrets.STAGE_STRIPE_TOKEN }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
-          VITE_STAGE_SEGMENT_TOKEN: ${{ secrets.STAGE_SEGMENT_TOKEN }}
+          VITE_SEGMENT_TOKEN: ${{ secrets.STAGE_SEGMENT_TOKEN }}
           NODE_ENV: stage
           VITE_ENVIRONMENT: stage

@@ -1,14 +1,14 @@
 import { getEnvironment } from '@/helpers'
 import { makeAnalyticsClient } from './factories/analytics-tracking-factory'
 import { AnalyticsTrackerAdapter } from './analytics/AnalyticsTrackerAdapter'
-import { segmentHandlerToken } from './factories/segment-handler-token-factory'
+import { makeSegmentToken } from './factories/segment-handler-token-factory'
 /**@type {import('vue').Plugin} */
 export default {
   // eslint-disable-next-line no-unused-vars
   install: (Vue, options) => {
     const environment = getEnvironment()
 
-    const segmentToken = segmentHandlerToken(environment)
+    const segmentToken = makeSegmentToken()
 
     const analyticsClient = makeAnalyticsClient(environment)
 

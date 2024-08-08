@@ -1,11 +1,5 @@
-function segmentHandlerToken(environment) {
-  const secretVariable = {
-    production: 'VITE_PROD_SEGMENT_TOKEN'
-  }
-
-  const token = secretVariable[environment] || 'VITE_STAGE_SEGMENT_TOKEN'
-
-  const segmentToken = import.meta.env[token]
+function makeSegmentToken() {
+  const segmentToken = import.meta.env['VITE_SEGMENT_TOKEN']
 
   if (!segmentToken) {
     // eslint-disable-next-line no-console
@@ -16,4 +10,4 @@ function segmentHandlerToken(environment) {
   return segmentToken
 }
 
-export { segmentHandlerToken }
+export { makeSegmentToken }
