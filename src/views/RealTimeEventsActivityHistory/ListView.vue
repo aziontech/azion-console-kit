@@ -130,6 +130,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     :csvMapper="handleExport"
+    exportFileName="activity-history-logs"
   />
 
   <EmptyResultsBlock

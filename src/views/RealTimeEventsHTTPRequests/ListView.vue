@@ -132,6 +132,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="http-requests-logs"
     :csvMapper="handleExport"
   />
 

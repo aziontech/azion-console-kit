@@ -20,6 +20,7 @@
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
+      :exportFilename="exportFileName"
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
@@ -345,6 +346,9 @@
     },
     csvMapper: {
       type: Function
+    },
+    exportFileName: {
+      type: String
     }
   })
 

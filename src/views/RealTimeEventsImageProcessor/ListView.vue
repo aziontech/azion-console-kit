@@ -138,6 +138,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="image-processor-logs"
     :csvMapper="handleExport"
   />
 
