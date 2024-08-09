@@ -10,7 +10,7 @@
         </template>
 
         <template #content>
-          <div class="h-96 flex items-center">
+          <div class="h-96 flex items-center relative">
             <component :is="value.component" />
           </div>
         </template>
