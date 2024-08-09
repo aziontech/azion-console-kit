@@ -76,3 +76,9 @@
     })
   }
 </script>
+
+<style lang="scss">
+  .azion-dark #granularity-map .ol-layer canvas {
+    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
+  }
+</style>

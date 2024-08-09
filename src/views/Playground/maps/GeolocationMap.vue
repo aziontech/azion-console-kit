@@ -61,11 +61,10 @@
 </script>
 
 <style lang="scss">
-  .azion-dark {
-    .ol-layer canvas {
-      filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
-    }
+  .azion-dark #geolocation-map .ol-layer canvas {
+    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
+
   .popup {
     background: #f3652b;
     border: 1px solid #f3652b;
