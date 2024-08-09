@@ -12,13 +12,11 @@
       "properties": {
         "name": "Rio de Janeiro, Brasil",
         "size": 500000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -30,13 +28,11 @@
       "properties": {
         "name": "Nova York, EUA",
         "size": 700000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -48,13 +44,11 @@
       "properties": {
         "name": "Tóquio, Japão",
         "size": 800000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,255,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,255,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,255,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,255,0,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -66,13 +60,11 @@
       "properties": {
         "name": "Londres, Reino Unido",
         "size": 600000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,255,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,255,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,255,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,255,0,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -84,13 +76,11 @@
       "properties": {
         "name": "Paris, França",
         "size": 550000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -102,13 +92,11 @@
       "properties": {
         "name": "Cidade do Cabo, África do Sul",
         "size": 450000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -120,13 +108,11 @@
       "properties": {
         "name": "Sydney, Austrália",
         "size": 500000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -138,13 +124,11 @@
       "properties": {
         "name": "Moscou, Rússia",
         "size": 650000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,0,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -156,13 +140,11 @@
       "properties": {
         "name": "Cairo, Egito",
         "size": 400000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,0,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -174,13 +156,11 @@
       "properties": {
         "name": "São Paulo, Brasil",
         "size": 300000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,255,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,255,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,255,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,255,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -192,13 +172,11 @@
       "properties": {
         "name": "Brasilia, Brasil",
         "size": 500000,
-        "style": {
-          "stroke": {
-            "color": "rgba(255,0,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(255,0,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(255,0,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(255,0,0,0.2)" }
       },
       "geometry": {
         "type": "Point",
@@ -210,13 +188,11 @@
       "properties": {
         "name": "Salvador, Brasil",
         "size": 400000,
-        "style": {
-          "stroke": {
-            "color": "rgba(0,255,0,0.2)",
-            "width": 2
-          },
-          "fill": "rgba(0,255,0,0.2)"
-        }
+        "stroke": {
+          "color": "rgba(0,255,0,0.2)",
+          "width": 2
+        },
+        "fill": { "color": "rgba(0,255,0,0.2)" }
       },
       "geometry": {
         "type": "Point",

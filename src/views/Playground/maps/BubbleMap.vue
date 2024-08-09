@@ -32,7 +32,7 @@
     bubbleFeatures.features.forEach((feature) => {
       const {
         geometry: { coordinates },
-        properties: { size, style }
+        properties: { size, stroke, fill }
       } = feature
 
       const newFeat = new Feature(new Circle(fromLonLat(coordinates), size))
@@ -40,10 +40,10 @@
       newFeat.setStyle(
         new Style({
           stroke: new Stroke({
-            ...style.stroke
+            ...stroke
           }),
           fill: new Fill({
-            color: style.fill
+            ...fill
           })
         })
       )
