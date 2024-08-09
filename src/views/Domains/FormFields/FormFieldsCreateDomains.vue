@@ -9,9 +9,11 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import PrimeButton from 'primevue/button'
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
+  import { DomainsPrompts } from '@/modules/azion-ai-chat/contextual-prompts'
 
   const props = defineProps({
     digitalCertificates: {
@@ -96,9 +98,18 @@
 
 <template>
   <form-horizontal
-    title="General"
-    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    description=" Create a domain with Azion to launch an edge application and set up security with digital
+      certificates."
   >
+    <template #title>
+      General
+      <PrimeButton
+        outlined
+        icon="ai ai-ask-azion"
+        v-tooltip.bottom="'Get Azion AI Help'"
+        v-prompt="DomainsPrompts.create.general"
+      ></PrimeButton>
+    </template>
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -115,9 +126,17 @@
   </form-horizontal>
 
   <form-horizontal
-    title="Settings"
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
+    <template #title>
+      Settings
+      <PrimeButton
+        outlined
+        icon="ai ai-ask-azion"
+        v-tooltip.bottom="'Get Azion AI Help'"
+        v-prompt="DomainsPrompts.create.settings"
+      ></PrimeButton>
+    </template>
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown

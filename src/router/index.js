@@ -1,5 +1,6 @@
 import { accountRoutes } from '@routes/account-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
+import { azionAiRoutes } from '@routes/azion-ai-routes'
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
 import { credentialsRoutes } from '@routes/credentials-routes'
@@ -78,7 +79,8 @@ const router = createRouter({
     realTimeEventsRoutes,
     githubRoutes,
     billingRoutes,
-    importGithubRoutes
+    importGithubRoutes,
+    azionAiRoutes
   ].concat(errorRoutes)
 })
 

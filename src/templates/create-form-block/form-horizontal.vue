@@ -5,7 +5,12 @@
   >
     <!-- title and description -->
     <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]">
-      <div class="text-color text-xl font-medium">{{ props.title }}</div>
+      <div class="text-color text-xl font-medium flex gap-2 items-center">
+        <slot name="title">
+          {{ props.title }}
+        </slot>
+      </div>
+
       <div
         class="text-color-secondary text-sm font-normal flex flex-col gap-2"
         style="white-space: pre-line"
