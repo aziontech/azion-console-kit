@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadTeamPermissionService } from '@/services/team-permission'
+import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -54,4 +55,48 @@ describe('TeamPermissionService', () => {
       permissions: fixtures.teamPermissionMock.data.permissions
     })
   })
+
+  it('should throw when request fails with statusCode 403', async () => {
+    const apiErrorMock = {
+      error: 'api error message'
+    }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 403,
+      body: apiErrorMock
+    })
+
+    const { sut } = makeSut()
+
+    const apiErrorResponse = sut(fixtures.teamPermissionMock)
+
+    expect(apiErrorResponse).rejects.toBe('error: api error message')
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.teamPermissionMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })
