@@ -33,7 +33,8 @@
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
-  watch(currentTheme, (theme) => themeSelect({ theme }))
+  const root = document.querySelector(':root')
+  watch(currentTheme, (theme) => themeSelect({ HTMLElement: root, theme }))
   watch(account, () => {
     updateTrackingTraits()
   })
