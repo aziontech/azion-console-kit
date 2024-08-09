@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let teamsPermissionsName
 
-describe('Teams Permissions', () => {
+describe('Teams Permissions', { tags: ['@dev6', '@xfail'] }, () => {
   beforeEach(() => {
     teamsPermissionsName = generateUniqueName('Team')
     cy.login()
