@@ -6,7 +6,7 @@
     >
       <Card class="p-3 md:p-6 col-span-12 lg:col-span-6">
         <template #title>
-          {{ value.title }}
+          <span class="text-base font-medium">{{ value.title }}</span>
         </template>
 
         <template #content>
