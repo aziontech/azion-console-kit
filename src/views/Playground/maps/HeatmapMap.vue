@@ -65,6 +65,10 @@
 </script>
 
 <style lang="scss">
+  #heatmap-map .ol-viewport {
+    border-radius: 0.25rem;
+  }
+
   .azion-dark #heatmap-map .ol-layer canvas {
     filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
