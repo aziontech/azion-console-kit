@@ -6,13 +6,23 @@
     >
       <Card class="p-3 md:p-6 col-span-12 lg:col-span-6">
         <template #title>
-          <span class="text-base font-medium">{{ value.title }}</span>
+          <div class="flex flex-col gap-3">
+            <span class="text-base font-medium">{{ value.title }}</span>
+            <span class="text-color-secondary text-sm font-normal">{{ value.description }}</span>
+          </div>
         </template>
 
         <template #content>
-          <div class="h-96 flex items-center relative">
+          <div
+            class="h-96 flex items-center relative"
+            v-if="showContent"
+          >
             <component :is="value.component" />
           </div>
+          <Skeleton
+            v-else
+            class="h-96 w-full"
+          />
         </template>
       </Card>
     </template>
@@ -20,53 +30,95 @@
 </template>
 
 <script setup>
-  import { defineAsyncComponent } from 'vue'
+  import { defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue'
   import Card from 'primevue/card'
+  import Skeleton from 'primevue/skeleton'
+
+  const showContent = ref(true)
+  const reRenderChart = () => {
+    // This works around an issue with C3 charts on window resizing
+    const timeout = 100
+
+    showContent.value = false
+    setTimeout(() => {
+      showContent.value = true
+    }, timeout)
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', reRenderChart)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', reRenderChart)
+  })
 
   const content = [
     {
       component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
-      title: 'Geolocation Map'
+      title: 'Geolocation Map',
+      description:
+        'Displays data points on a map based on geographic coordinates. Useful for visualizing user locations or event distributions.'
     },
     {
       component: defineAsyncComponent(() => import('./maps/HeatmapMap.vue')),
-      title: 'Heatmap Map'
+      title: 'Heatmap Map',
+      description:
+        'Shows data density across a map, highlighting areas of high activity or concentration. Ideal for analyzing patterns and hotspots.'
     },
     {
       component: defineAsyncComponent(() => import('./maps/GranularityMap.vue')),
-      title: 'Granularity by Country'
+      title: 'Granularity by Country',
+      description:
+        'Represents data aggregated by country, allowing for comparison and analysis on a national scale. Useful for global trends and country-level insights.'
     },
     {
       component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
-      title: 'Bubble Map'
+      title: 'Bubble Map',
+      description:
+        'Displays data points with varying sizes based on value, positioned on a map. Great for visualizing the impact or volume of data by location.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
-      title: 'Bar Chart'
+      title: 'Bar Chart',
+      description:
+        'Displays data using rectangular bars, with length representing value. Useful for comparing quantities across different categories.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
-      title: 'Ordered Bar Chart'
+      title: 'Ordered Bar Chart',
+      description:
+        'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
-      title: 'Stacked Bar Chart'
+      title: 'Stacked Bar Chart',
+      description:
+        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
-      title: 'Pie Chart'
+      title: 'Pie Chart',
+      description:
+        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
-      title: 'Donut Chart'
+      title: 'Donut Chart',
+      description:
+        'A variation of a pie chart with a central hole. It provides a similar view but can also display additional data in the center.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart'
+      title: 'Gauge Chart',
+      description:
+        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
-      title: 'Area Chart'
+      title: 'Area Chart',
+      description:
+        'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.'
     }
   ]
 </script>
