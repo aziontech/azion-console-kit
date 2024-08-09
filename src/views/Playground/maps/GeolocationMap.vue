@@ -71,10 +71,9 @@
 
   .popup {
     background: #f3652b;
-    border: 1px solid #f3652b;
-    width: 12px;
-    height: 12px;
-    border-radius: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     animation: pulse 2s infinite;
   }
 
@@ -86,7 +85,7 @@
 
     70% {
       transform: scale(1);
-      box-shadow: 0 0 0 10px rgba(150, 150, 150, 0);
+      box-shadow: 0 0 0 8px rgba(150, 150, 150, 0);
     }
 
     100% {
