@@ -385,7 +385,7 @@
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
   const exportFunctionMapper = (rowData) => {
-    if (!hasExportToCsvMapper) {
+    if (!hasExportToCsvMapper.value) {
       return
     }
     return props.csvMapper(rowData)
