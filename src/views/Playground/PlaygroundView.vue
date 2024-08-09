@@ -1,14 +1,14 @@
 <template>
   <div class="w-full h-full grid grid-cols-12 gap-4 p-8">
     <template
-      v-for="value in content"
-      :key="value.title"
+      v-for="chart in CHARTS"
+      :key="chart.title"
     >
       <Card class="p-3 md:p-6 col-span-12 lg:col-span-6">
         <template #title>
           <div class="flex flex-col gap-3">
-            <span class="text-base font-medium">{{ value.title }}</span>
-            <span class="text-color-secondary text-sm font-normal">{{ value.description }}</span>
+            <span class="text-base font-medium">{{ chart.title }}</span>
+            <span class="text-color-secondary text-sm font-normal">{{ chart.description }}</span>
           </div>
         </template>
 
@@ -17,7 +17,7 @@
             class="h-96 flex items-center relative"
             v-if="showContent"
           >
-            <component :is="value.component" />
+            <component :is="chart.component" />
           </div>
           <Skeleton
             v-else
@@ -53,7 +53,7 @@
     window.removeEventListener('resize', reRenderChart)
   })
 
-  const content = [
+  const CHARTS = [
     {
       component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
       title: 'Geolocation Map',
