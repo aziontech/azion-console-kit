@@ -108,6 +108,14 @@
     ]
   })
 
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      jobName: rowData.data.content,
+      endpointType: rowData.data.content
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
+
   const goToCreateDataStream = () => {
     router.push({ name: 'create-data-stream' })
   }
@@ -136,6 +144,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock

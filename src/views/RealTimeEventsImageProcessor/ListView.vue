@@ -100,6 +100,13 @@
     ]
   })
 
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      requestUri: rowData.data.value
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
+
   const goToEdgeApplication = () => {
     router.push({ name: 'list-edge-applications' })
   }
@@ -131,6 +138,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock

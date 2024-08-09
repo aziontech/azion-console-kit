@@ -5,6 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
+      ref="dataTableRef"
       class="overflow-clip rounded-md"
       v-if="!isLoading"
       @rowReorder="onRowReorder"
@@ -19,6 +20,7 @@
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
+      :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
     >
@@ -39,6 +41,17 @@
               placeholder="Search"
             />
           </span>
+
+          <PrimeButton
+            v-if="hasExportToCsvMapper"
+            @click="handleExport"
+            outlined
+            class="max-sm:w-full ml-auto"
+            icon="pi pi-download"
+            :data-testid="`export_button`"
+            v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+          />
+
           <slot
             name="addButton"
             data-testid="data-table-add-button"
@@ -329,6 +342,9 @@
     selectedItensData: {
       type: Array,
       default: () => []
+    },
+    csvMapper: {
+      type: Function
     }
   })
 
@@ -336,6 +352,7 @@
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
+  const dataTableRef = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -344,6 +361,7 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
+  const hasExportToCsvMapper = ref(!!props.csvMapper)
 
   const dialog = useDialog()
   const router = useRouter()
@@ -363,6 +381,19 @@
     selectedColumns.value = props.columns
   })
 
+  /**
+   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
+   */
+  const exportFunctionMapper = (rowData) => {
+    if (!hasExportToCsvMapper) {
+      return
+    }
+    return props.csvMapper(rowData)
+  }
+
+  const handleExport = () => {
+    dataTableRef.value.exportCSV()
+  }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }

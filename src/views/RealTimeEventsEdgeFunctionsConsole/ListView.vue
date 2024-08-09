@@ -115,6 +115,15 @@
     ]
   })
 
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      lineSource: rowData.data.content,
+      level: rowData.data.content,
+      line: rowData.data.value
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
+
   const goToEdgeFunction = () => {
     router.push({ name: 'list-edge-functions' })
   }
@@ -145,6 +154,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock

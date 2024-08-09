@@ -94,6 +94,13 @@
       }
     ]
   })
+
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      title: rowData.data.text
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
 </script>
 
 <template>
@@ -115,13 +122,14 @@
   </div>
   <ListTableBlock
     v-if="hasContentToList && filterDate.tsRangeBegin"
+    isTabs
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
-    isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock

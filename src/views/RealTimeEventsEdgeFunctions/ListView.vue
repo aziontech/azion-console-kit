@@ -99,6 +99,13 @@
     ]
   })
 
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      edgeFunctionsList: rowData.data.value
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
+
   const goToCreateEdgeFunction = () => {
     router.push({ name: 'create-edge-functions' })
   }
@@ -129,6 +136,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock

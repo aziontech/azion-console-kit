@@ -106,6 +106,13 @@
       }
     ]
   })
+
+  const handleExport = (rowData) => {
+    const rowDataMapper = {
+      upstreamCacheStatus: rowData.data.content
+    }
+    return rowDataMapper[rowData.field] || rowData.data
+  }
 </script>
 
 <template>
@@ -134,6 +141,7 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    :csvMapper="handleExport"
   />
 
   <EmptyResultsBlock
