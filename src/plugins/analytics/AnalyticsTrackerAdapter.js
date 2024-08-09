@@ -15,8 +15,8 @@ export class AnalyticsTrackerAdapter {
   #events = []
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
-  /** @type {String} */
-  #token = ''
+  /** @type {Boolean} */
+  #hasAnalyticsClient = false
   #traits = {}
 
   /** @type {SignUpTracker} */
@@ -31,10 +31,9 @@ export class AnalyticsTrackerAdapter {
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
    * @param {import('analytics').AnalyticsInstance} analyticsClient - The client for tracking.
-   * @param {string} token
    */
-  constructor(analyticsClient, token) {
-    this.#token = token
+  constructor(analyticsClient) {
+    this.#hasAnalyticsClient = !!analyticsClient
     this.#analyticsClient = analyticsClient
 
     this.#signUpTracker = new SignUpTracker(this)
@@ -52,14 +51,14 @@ export class AnalyticsTrackerAdapter {
     this.#events.push(event)
   }
 
-  #hasToken() {
-    return !!this.#token
+  #hasAnalytics() {
+    return this.#hasAnalyticsClient
   }
   /**
    * call this method to run each stored tracker event
    */
   async track() {
-    if (!this.#hasToken()) return
+    if (!this.#hasAnalytics()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
       props.application = 'console-kit'
@@ -76,9 +75,8 @@ export class AnalyticsTrackerAdapter {
    * @return {Promise<void>}
    */
   async identify(id) {
-    if (!id) {
-      return
-    }
+    if (!id || !this.#hasAnalytics()) return
+
     await this.#analyticsClient.identify(id, this.#traits)
   }
 
@@ -87,6 +85,7 @@ export class AnalyticsTrackerAdapter {
    * @param {Object} traitsToAssign - traits that should be sended with all tracking calls
    */
   assignGroupTraits(traitsToAssign) {
+    if (!this.#hasAnalytics()) return
     if (!traitsToAssign) {
       throw new Error('Invalid traits provided')
     }

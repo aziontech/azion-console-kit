@@ -4,7 +4,7 @@ function makeSegmentToken() {
   if (!segmentToken) {
     // eslint-disable-next-line no-console
     console.warn('Segment token is missing')
-    return ''
+    return
   }
 
   return segmentToken

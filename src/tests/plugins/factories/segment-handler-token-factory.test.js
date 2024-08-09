@@ -33,7 +33,7 @@ describe('makeSegmentToken', () => {
     const result = makeSegmentToken()
 
     expect(warnMock).toHaveBeenCalledWith('Segment token is missing')
-    expect(result).toBe('')
+    expect(result).toBeUndefined()
 
     warnMock.mockRestore()
     import.meta.env = originalEnv

@@ -14,7 +14,7 @@ export default {
     }
 
     const app = Vue
-    const trackerInstance = new AnalyticsTrackerAdapter(analyticsClient, segmentToken)
+    const trackerInstance = new AnalyticsTrackerAdapter(analyticsClient)
     app.config.globalProperties.$tracker = trackerInstance
 
     app.provide('tracker', trackerInstance)

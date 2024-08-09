@@ -5,13 +5,12 @@ const fixtures = {
   application: 'console-kit'
 }
 
-const makeSut = (segmentToken = 'VITE_SEGMENT_TOKEN') => {
+const makeSut = () => {
   const analyticsClientSpy = {
     track: vi.fn(),
     identify: vi.fn()
   }
-
-  const sut = new AnalyticsTrackerAdapter(analyticsClientSpy, segmentToken)
+  const sut = new AnalyticsTrackerAdapter(analyticsClientSpy)
 
   return {
     sut,
@@ -26,25 +25,6 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.identify(mockId)
 
     expect(analyticsClientSpy.identify).toHaveBeenCalledWith(mockId, {})
-  })
-
-  it('should not run the track if the token has no value', () => {
-    const { sut, analyticsClientSpy } = makeSut('')
-    const productNameMock = 'Azion Product Name'
-
-    sut.product.clickToCreate({
-      productName: productNameMock
-    })
-    sut.product.clickToCreate({
-      productName: productNameMock
-    })
-    sut.product.clickToCreate({
-      productName: productNameMock
-    })
-
-    sut.track()
-
-    expect(analyticsClientSpy.track).not.toHaveBeenCalled()
   })
 
   it('should not call identify when no identification is provided', () => {
