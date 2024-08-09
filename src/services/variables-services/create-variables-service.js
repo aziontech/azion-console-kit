@@ -9,22 +9,25 @@ export const createVariablesService = async (payload) => {
     body: payload
   })
 
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(httpResponse, payload)
 }
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} payload - The request sent payload.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
  * @returns {string} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-const parseHttpResponse = (httpResponse) => {
+const parseHttpResponse = (httpResponse, payload) => {
   switch (httpResponse.statusCode) {
     case 201:
+      const editUrl = `/variables/edit/${httpResponse.body.uuid}`
+      const listUrl = '/variables'
       return {
         feedback: 'Your variable has been created',
-        urlToEditView: `/variables/edit/${httpResponse.body.uuid}`
+        urlToEditView: payload.secret ? listUrl : editUrl
       }
     case 400:
       const apiError = extractApiError(httpResponse)
