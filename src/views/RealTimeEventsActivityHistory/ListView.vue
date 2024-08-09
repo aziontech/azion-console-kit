@@ -94,13 +94,9 @@
       }
     ]
   })
-
-  const handleExport = (rowData) => {
-    const rowDataMapper = {
-      title: rowData.data.text
-    }
-    return rowDataMapper[rowData.field] || rowData.data
-  }
+  const customColumnMapper = (rowData) => ({
+    title: rowData.data.text
+  })
 </script>
 
 <template>
@@ -129,7 +125,7 @@
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
-    :csvMapper="handleExport"
+    :csvMapper="customColumnMapper"
     exportFileName="activity-history-logs"
   />
 

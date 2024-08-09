@@ -107,12 +107,9 @@
     ]
   })
 
-  const handleExport = (rowData) => {
-    const rowDataMapper = {
-      upstreamCacheStatus: rowData.data.content
-    }
-    return rowDataMapper[rowData.field] || rowData.data
-  }
+  const customColumnMapper = (rowData) => ({
+    upstreamCacheStatus: rowData.data.content
+  })
 </script>
 
 <template>
@@ -142,7 +139,7 @@
     emptyListMessage="No logs have been found for this period."
     isTabs
     exportFileName="tiered-cache-logs"
-    :csvMapper="handleExport"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock

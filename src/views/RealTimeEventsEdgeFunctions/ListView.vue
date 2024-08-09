@@ -99,12 +99,9 @@
     ]
   })
 
-  const handleExport = (rowData) => {
-    const rowDataMapper = {
-      edgeFunctionsList: rowData.data.value
-    }
-    return rowDataMapper[rowData.field] || rowData.data
-  }
+  const customColumnMapper = (rowData) => ({
+    edgeFunctionsList: rowData.data.value
+  })
 
   const goToCreateEdgeFunction = () => {
     router.push({ name: 'create-edge-functions' })
@@ -137,7 +134,7 @@
     emptyListMessage="No logs have been found for this period."
     isTabs
     exportFileName="edge-functions-logs"
-    :csvMapper="handleExport"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock

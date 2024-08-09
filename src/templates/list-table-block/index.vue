@@ -45,7 +45,7 @@
 
           <PrimeButton
             v-if="hasExportToCsvMapper"
-            @click="handleExport"
+            @click="handleExportTableDataToCSV"
             outlined
             class="max-sm:w-full ml-auto"
             icon="pi pi-download"
@@ -281,6 +281,7 @@
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { getCsvCellContentFromRowData } from '@/helpers'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -392,10 +393,11 @@
     if (!hasExportToCsvMapper.value) {
       return
     }
-    return props.csvMapper(rowData)
+    const columnMapper = props.csvMapper(rowData)
+    return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 
-  const handleExport = () => {
+  const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
   }
   const toggleColumnSelector = (event) => {

@@ -100,12 +100,9 @@
     ]
   })
 
-  const handleExport = (rowData) => {
-    const rowDataMapper = {
-      requestUri: rowData.data.value
-    }
-    return rowDataMapper[rowData.field] || rowData.data
-  }
+  const customColumnMapper = (rowData) => ({
+    requestUri: rowData.data.value
+  })
 
   const goToEdgeApplication = () => {
     router.push({ name: 'list-edge-applications' })
@@ -139,7 +136,7 @@
     emptyListMessage="No logs have been found for this period."
     isTabs
     exportFileName="image-processor-logs"
-    :csvMapper="handleExport"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock

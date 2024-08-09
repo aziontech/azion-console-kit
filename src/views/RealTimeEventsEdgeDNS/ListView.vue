@@ -102,12 +102,10 @@
       }
     ]
   })
-  const handleExport = (rowData) => {
-    const rowDataMapper = {
-      level: rowData.data.content
-    }
-    return rowDataMapper[rowData.field] || rowData.data
-  }
+
+  const customColumnMapper = (rowData) => ({
+    level: rowData.data.content
+  })
 
   const goToCreateEdgeDNS = () => {
     router.push({ name: 'create-edge-dns' })
@@ -138,7 +136,7 @@
     emptyListMessage="No logs have been found for this period."
     isTabs
     exportFileName="edge-dns-logs"
-    :csvMapper="handleExport"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock
