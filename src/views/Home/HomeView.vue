@@ -298,7 +298,7 @@
           <!-- Product -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openProductDocumentation"
           >
             <div class="text-lg font-medium">Product Documentation</div>
@@ -309,7 +309,7 @@
           <!-- API -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openAPIDocumentation"
           >
             <div class="text-lg font-medium">API Documentation</div>
@@ -320,7 +320,7 @@
           <!-- Contact -->
           <button
             type="button"
-            class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+            class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openContactSupport"
           >
             <div class="text-lg font-medium">Contact Support</div>
