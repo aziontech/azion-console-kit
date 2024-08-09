@@ -1,6 +1,6 @@
 export const themeSelect = ({ theme }) => {
   let selectedTheme = theme
-  if (theme === 'system') {
+  if (!theme || theme === 'system') {
     selectedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
