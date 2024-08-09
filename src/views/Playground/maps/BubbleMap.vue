@@ -7,8 +7,8 @@
 
 <script setup>
   import { onMounted, ref } from 'vue'
+  import GeoJSON from 'ol/format/GeoJSON.js'
   import Circle from 'ol/geom/Circle.js'
-  import Feature from 'ol/Feature.js'
   import Map from 'ol/Map.js'
   import View from 'ol/View.js'
   import { Fill, Stroke, Style } from 'ol/style.js'
@@ -28,28 +28,34 @@
     displayBubbles()
   })
 
-  const displayBubbles = () => {
-    bubbleFeatures.features.forEach((feature) => {
-      const {
-        geometry: { coordinates },
-        properties: { size, stroke, fill }
-      } = feature
+  const styleFeatures = () => {
+    const features = new GeoJSON().readFeatures(bubbleFeatures, {
+      featureProjection: 'EPSG:3857'
+    })
 
-      const newFeat = new Feature(new Circle(fromLonLat(coordinates), size))
-
-      newFeat.setStyle(
-        new Style({
-          stroke: new Stroke({
-            ...stroke
-          }),
-          fill: new Fill({
-            ...fill
-          })
-        })
+    features.forEach((feature) => {
+      feature.setGeometry(
+        new Circle(fromLonLat(feature.getGeometry().getCoordinates()), feature.get('size'))
       )
 
-      vectorLayer.getSource().addFeature(newFeat)
+      const featureStyle = new Style({
+        fill: new Fill({
+          ...feature.get('fill')
+        }),
+        stroke: new Stroke({
+          ...feature.get('stroke')
+        })
+      })
+
+      feature.setStyle(featureStyle)
     })
+
+    return features
+  }
+
+  const displayBubbles = () => {
+    const features = styleFeatures()
+    vectorLayer.getSource().addFeatures(features)
   }
 
   const initMap = () => {
