@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, afterAll } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { makeSegmentToken } from '@/plugins/factories/segment-handler-token-factory'
 
-afterAll(() => {
+afterEach(() => {
   vi.unstubAllEnvs()
   vi.unstubAllGlobals()
 })
