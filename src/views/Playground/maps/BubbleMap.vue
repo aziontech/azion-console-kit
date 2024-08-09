@@ -29,9 +29,7 @@
   })
 
   const styleFeatures = () => {
-    const features = new GeoJSON().readFeatures(bubbleFeatures, {
-      featureProjection: 'EPSG:3857'
-    })
+    const features = new GeoJSON().readFeatures(bubbleFeatures)
 
     features.forEach((feature) => {
       feature.setGeometry(

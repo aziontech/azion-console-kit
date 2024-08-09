@@ -9,8 +9,8 @@
   import { onMounted, ref } from 'vue'
   import Map from 'ol/Map.js'
   import View from 'ol/View.js'
-  import Feature from 'ol/Feature.js'
   import Point from 'ol/geom/Point.js'
+  import GeoJSON from 'ol/format/GeoJSON.js'
   import { Fill, Style, RegularShape as Square } from 'ol/style.js'
   import { OSM, Vector as VectorSource } from 'ol/source.js'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
@@ -30,30 +30,32 @@
     displayGranularities()
   })
 
-  const displayGranularities = () => {
-    granularityFeatures.features.forEach((feature) => {
-      const {
-        properties: { coordinates, size },
-        style: { fill }
-      } = feature
+  const styleFeatures = () => {
+    const features = new GeoJSON().readFeatures(granularityFeatures)
 
-      const newFeat = new Feature(new Point(fromLonLat(coordinates)))
+    features.forEach((feature) => {
+      feature.setGeometry(new Point(fromLonLat(feature.getGeometry().getCoordinates())))
 
-      newFeat.setStyle(
-        new Style({
-          image: new Square({
-            fill: new Fill({
-              color: fill
-            }),
-            points: 4,
-            radius: size,
-            angle: Math.PI / 4
-          })
+      const featureStyle = new Style({
+        image: new Square({
+          fill: new Fill({
+            ...feature.get('fill')
+          }),
+          points: feature.get('points'),
+          radius: feature.get('size'),
+          angle: Math.PI / feature.get('angle')
         })
-      )
+      })
 
-      vectorLayer.getSource().addFeature(newFeat)
+      feature.setStyle(featureStyle)
     })
+
+    return features
+  }
+
+  const displayGranularities = () => {
+    const features = styleFeatures()
+    vectorLayer.getSource().addFeatures(features)
   }
 
   const initMap = () => {
