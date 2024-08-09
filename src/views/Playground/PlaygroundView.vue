@@ -1,10 +1,10 @@
 <template>
-  <div class="w-full h-full grid grid-cols-2 gap-4 p-8">
+  <div class="w-full h-full grid grid-cols-12 gap-4 p-8">
     <template
       v-for="value in content"
       :key="value.title"
     >
-      <Card class="p-4">
+      <Card class="p-3 md:p-6 col-span-12 lg:col-span-6">
         <template #title>
           {{ value.title }}
         </template>
