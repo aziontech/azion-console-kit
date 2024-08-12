@@ -2,7 +2,7 @@ const TARGET_ORIGIN = window.location.origin
 export const AZION_MESSAGE_TYPE = 'azion-ai'
 
 /**
- * Sends a message to the Azion AI.
+ * Sends a message to the Copilot.
  *
  * @return {void} No return value.
  */
@@ -16,7 +16,7 @@ const sendMessageToAzionAI = (contextualPrompt) => {
 
 /**
  * @type {DirectiveOptions}
- * @example <p v-prompt="'Hi, I want to create a custom domain'">Get Azion AI Help here</p>
+ * @example <p v-prompt="'Hi, I want to create a custom domain'">Get Copilot Help here</p>
  */
 export const customAiPrompt = {
   /**

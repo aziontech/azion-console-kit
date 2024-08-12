@@ -3,7 +3,7 @@
     class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border sticky top-14 z-10 bg-inherit"
   >
     <h3 class="text-color text-lg font-medium">
-      Azion AI
+      Copilot
       <PrimeTag
         class="ml-2"
         value="Experimental"
@@ -27,6 +27,6 @@
   })
 
   const experimentalMessageWarning = ref(
-    'Azion AI is in the experimental stage and may generate inaccurate or misleading information. Always validate its answers.'
+    'Copilot is in the experimental stage and may generate inaccurate or misleading information. Always validate its answers.'
   )
 </script>

@@ -40,7 +40,7 @@
     <Sidebar
       :visible="isChatAiOpen"
       position="bottom"
-      headerContent="Azion AI"
+      headerContent="Copilot"
       :show-close-icon="false"
       :pt="{
         root: { class: '!h-[100%] md:hidden flex' },
@@ -52,13 +52,13 @@
       <template #header>
         <div class="flex items-center justify-between">
           <h2 class="flex items-center gap-2">
-            Azion AI
+            Copilot
 
             <PrimeTag
               class="ml-2"
               value="Experimental"
               v-tooltip.bottom="
-                'Azion AI is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
+                'Copilot is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
               "
               severity="info"
             />
@@ -165,7 +165,7 @@
   }
 
   const openChatInNewTab = () => {
-    const url = `${window.location.origin}${router.resolve({ name: 'azion-ai-chat' }).path}`
+    const url = `${window.location.origin}${router.resolve({ name: 'copilot' }).path}`
     windowOpen(url, '_blank')
   }
 </script>

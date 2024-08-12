@@ -192,7 +192,7 @@
       }
     },
     placeholder: {
-      text: 'Ask Azion AI for help',
+      text: 'Ask Copilot for help',
       style: { color: 'var(--text-color)' }
     },
     characterLimit: 300

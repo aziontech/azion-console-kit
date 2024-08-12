@@ -13,7 +13,7 @@
     icon="ai ai-ask-azion"
     size="small"
     class="text-white border-header"
-    v-tooltip.bottom="{ value: 'Azion AI', showDelay: 200 }"
+    v-tooltip.bottom="{ value: 'Copilot', showDelay: 200 }"
   />
 </template>
 
@@ -34,7 +34,7 @@
 
   const openAiChat = () => {
     helpCenterStore.close()
-    if (router.resolve({ name: 'azion-ai-chat' }).path === router.currentRoute.value.path) {
+    if (router.resolve({ name: 'copilot' }).path === router.currentRoute.value.path) {
       return
     }
     askAzionAiChatStore.toggle()
@@ -42,7 +42,7 @@
 
   const currentLabel = computed(() => {
     if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Azion AI'
+      return 'Copilot'
     }
     return ''
   })

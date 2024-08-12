@@ -1,13 +1,13 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const azionAiRoutes = {
-  path: '/azion-ai-chat',
-  name: 'azion-ai-chat',
+  path: '/copilot',
+  name: 'copilot',
   component: () => import('@views/AzionAI/AzionAiView.vue'),
   meta: {
     breadCrumbs: [
       {
-        label: 'Azion AI',
-        to: '/azion-ai-chat'
+        label: 'Copilot',
+        to: '/copilot'
       }
     ]
   }

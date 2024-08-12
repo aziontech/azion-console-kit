@@ -106,7 +106,7 @@
       <PrimeButton
         outlined
         icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Get Azion AI Help'"
+        v-tooltip.bottom="'Get Copilot Help'"
         v-prompt="DomainsPrompts.create.general"
       ></PrimeButton>
     </template>
@@ -133,7 +133,7 @@
       <PrimeButton
         outlined
         icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Get Azion AI Help'"
+        v-tooltip.bottom="'Get Copilot Help'"
         v-prompt="DomainsPrompts.create.settings"
       ></PrimeButton>
     </template>

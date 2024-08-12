@@ -15,7 +15,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Azion AI">
+      <PageHeadingBlock pageTitle="Copilot">
         <template #default>
           <PrimeButton
             severity="primary"
@@ -30,7 +30,7 @@
       <InlineMessage
         class="w-fit mb-8"
         severity="info"
-        >Azion AI is in experimental mode and can give you some wrong answers. Please, always
+        >Copilot is in experimental mode and can give you some wrong answers. Please, always
         validate your answers.
       </InlineMessage>
       <AzionAiChatFullSizeBlock ref="azionAiChat" />
