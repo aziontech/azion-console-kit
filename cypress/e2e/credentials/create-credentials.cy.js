@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 const credentialName = generateUniqueName('Credential')
 
-describe('Credentials spec', { tags: ['@dev'] }, () => {
+describe('Credentials spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Credentials')
