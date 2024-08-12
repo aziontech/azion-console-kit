@@ -19,6 +19,7 @@
   import { Style, Fill, Stroke } from 'ol/style.js'
   import * as heatmapFeatures from './constants/heatmap-features.json'
   import LegendBlock from './components/legend-block.vue'
+  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
 
   const vectorLayer = new VectorLayer({
     source: new VectorSource({})
@@ -28,8 +29,15 @@
 
   onMounted(() => {
     initMap()
+    setBaseLayers()
     displayHeatmap()
   })
+
+  const setBaseLayers = () => {
+    setOceanFeature(vectorLayer)
+    setLandFeature(vectorLayer)
+    setLakeFeature(vectorLayer)
+  }
 
   const displayHeatmap = () => {
     const features = new GeoJSON().readFeatures(heatmapFeatures, {
@@ -94,9 +102,5 @@
 <style lang="scss">
   #heatmap-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .azion-dark #heatmap-map .ol-layer canvas {
-    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
 </style>

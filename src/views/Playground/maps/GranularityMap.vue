@@ -22,6 +22,7 @@
   import { DragPan } from 'ol/interaction'
   import * as granularityFeatures from './constants/granularity-features.json'
   import LegendBlock from './components/legend-block.vue'
+  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
 
   const vectorLayer = new VectorLayer({
     source: new VectorSource({})
@@ -31,8 +32,15 @@
 
   onMounted(() => {
     initMap()
+    setBaseLayers()
     displayGranularities()
   })
+
+  const setBaseLayers = () => {
+    setOceanFeature(vectorLayer)
+    setLandFeature(vectorLayer)
+    setLakeFeature(vectorLayer)
+  }
 
   const styleFeatures = () => {
     const features = new GeoJSON().readFeatures(granularityFeatures)
@@ -106,9 +114,5 @@
 <style lang="scss">
   #granularity-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .azion-dark #granularity-map .ol-layer canvas {
-    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
 </style>

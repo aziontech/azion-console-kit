@@ -21,6 +21,7 @@
   import { fromLonLat } from 'ol/proj.js'
   import * as bubbleFeatures from './constants/bubble-features.json'
   import LegendBlock from './components/legend-block.vue'
+  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
 
   const vectorLayer = new VectorLayer({
     source: new VectorSource({})
@@ -30,8 +31,15 @@
 
   onMounted(() => {
     initMap()
+    setBaseLayers()
     displayBubbles()
   })
+
+  const setBaseLayers = () => {
+    setOceanFeature(vectorLayer)
+    setLandFeature(vectorLayer)
+    setLakeFeature(vectorLayer)
+  }
 
   const styleFeatures = () => {
     const features = new GeoJSON().readFeatures(bubbleFeatures)
@@ -104,9 +112,5 @@
 <style lang="scss">
   #bubble-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .azion-dark #bubble-map .ol-layer canvas {
-    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
 </style>

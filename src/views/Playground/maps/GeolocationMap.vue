@@ -8,20 +8,32 @@
 
 <script setup>
   import { Map, Overlay, View } from 'ol/index.js'
-  import { Tile as TileLayer } from 'ol/layer.js'
-  import { OSM } from 'ol/source.js'
+  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
+  import { OSM, Vector as VectorSource } from 'ol/source.js'
   import { onMounted, ref } from 'vue'
   import { fromLonLat } from 'ol/proj.js'
   import { coordinates } from './constants/coordinates'
+  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
+
+  const vectorLayer = new VectorLayer({
+    source: new VectorSource({})
+  })
 
   const geolocationMap = ref(null)
 
   onMounted(() => {
+    initMap()
+    setBaseLayers()
+    generateGeoJsonBrazil()
+  })
+
+  const initMap = () => {
     geolocationMap.value = new Map({
       layers: [
         new TileLayer({
           source: new OSM()
-        })
+        }),
+        vectorLayer
       ],
       target: 'geolocation-map',
       view: new View({
@@ -30,9 +42,13 @@
       }),
       controls: []
     })
+  }
 
-    generateGeoJsonBrazil()
-  })
+  const setBaseLayers = () => {
+    setOceanFeature(vectorLayer)
+    setLandFeature(vectorLayer)
+    setLakeFeature(vectorLayer)
+  }
 
   const generateGeoJsonBrazil = () => {
     coordinates.forEach((coordinate, index) => {
@@ -63,10 +79,6 @@
 <style lang="scss">
   #geolocation-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .azion-dark #geolocation-map .ol-layer canvas {
-    filter: invert(100%) hue-rotate(180deg) saturate(0.75) contrast(1);
   }
 
   .popup {
