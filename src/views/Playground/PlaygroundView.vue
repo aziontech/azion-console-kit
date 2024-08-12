@@ -11,10 +11,9 @@
             <span class="text-color-secondary text-sm font-normal">{{ chart.description }}</span>
           </div>
         </template>
-
         <template #content>
           <div
-            class="h-96 flex items-center relative"
+            class="mt-auto h-96 flex items-center relative"
             v-if="showContent"
           >
             <component :is="chart.component" />

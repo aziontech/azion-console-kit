@@ -3,6 +3,10 @@
     id="bubble-map"
     class="w-full h-96"
   />
+  <LegendBlock
+    :title="legendProps.title"
+    :captions="legendProps.caption"
+  />
 </template>
 
 <script setup>
@@ -16,6 +20,7 @@
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
   import * as bubbleFeatures from './constants/bubble-features.json'
+  import LegendBlock from './components/legend-block.vue'
 
   const vectorLayer = new VectorLayer({
     source: new VectorSource({})
@@ -71,6 +76,28 @@
       }),
       controls: []
     })
+  }
+
+  const legendProps = {
+    title: 'Total accesses:',
+    caption: [
+      {
+        label: '100.000 accesses',
+        bullet: 'bg-red-500 border-red-500'
+      },
+      {
+        label: '10.000 accesses',
+        bullet: 'bg-orange-500 border-orange-500'
+      },
+      {
+        label: '1.000 accesses',
+        bullet: 'bg-yellow-500 border-yellow-500'
+      },
+      {
+        label: '< 100 accesses',
+        bullet: 'bg-green-500 border-green-500'
+      }
+    ]
   }
 </script>
 
