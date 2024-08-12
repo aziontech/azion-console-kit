@@ -10,29 +10,27 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
-  import GeoJSON from 'ol/format/GeoJSON.js'
-  import Circle from 'ol/geom/Circle.js'
+  import { onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+  import * as bubbleFeatures from './constants/bubble-features.json'
+  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
+
   import Map from 'ol/Map.js'
   import View from 'ol/View.js'
-  import { Fill, Stroke, Style } from 'ol/style.js'
+  import GeoJSON from 'ol/format/GeoJSON.js'
+  import Circle from 'ol/geom/Circle.js'
   import { OSM, Vector as VectorSource } from 'ol/source.js'
   import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
-  import * as bubbleFeatures from './constants/bubble-features.json'
+
   import LegendBlock from './components/legend-block.vue'
-  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
 
   const vectorLayer = new VectorLayer({
     source: new VectorSource({})
   })
 
   const bubbleMap = ref(null)
-  const baseFeatures = ref({
-    ocean: null,
-    land: null,
-    lake: null
-  })
 
   onMounted(() => {
     initMap()
@@ -41,17 +39,9 @@
   })
 
   const setBaseLayers = () => {
-    baseFeatures.value.ocean = setOceanFeature()
-    baseFeatures.value.land = setLandFeature()
-    baseFeatures.value.lake = setLakeFeature()
-
     vectorLayer
       .getSource()
-      .addFeatures([
-        ...baseFeatures.value.ocean,
-        ...baseFeatures.value.land,
-        ...baseFeatures.value.lake
-      ])
+      .addFeatures([...setOceanFeature(), ...setLandFeature(), ...setLakeFeature()])
   }
 
   const styleFeatures = () => {
@@ -61,17 +51,7 @@
       feature.setGeometry(
         new Circle(fromLonLat(feature.getGeometry().getCoordinates()), feature.get('size'))
       )
-
-      const featureStyle = new Style({
-        fill: new Fill({
-          ...feature.get('fill')
-        }),
-        stroke: new Stroke({
-          ...feature.get('stroke')
-        })
-      })
-
-      feature.setStyle(featureStyle)
+      setFeatureStyle(feature)
     })
 
     return features
@@ -120,6 +100,16 @@
       }
     ]
   }
+
+  const { currentTheme } = storeToRefs(useAccountStore())
+  watch(currentTheme, () => {
+    vectorLayer
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        setFeatureStyle(feature)
+      })
+  })
 </script>
 
 <style lang="scss">

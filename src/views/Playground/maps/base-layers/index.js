@@ -1,48 +1,69 @@
 import GeoJSON from 'ol/format/GeoJSON.js'
 import { Style, Fill, Stroke } from 'ol/style.js'
+import { useAccountStore } from '@/stores/account'
+import { storeToRefs } from 'pinia'
 
 import * as lakesLayer from './lakes'
 import * as landsLayer from './land'
 import * as oceansLayer from './ocean'
 
-const setFeatureData = (jsonData, style) => {
+const getCurrentTheme = () => {
+  const accountStore = useAccountStore()
+  const { currentTheme } = storeToRefs(accountStore)
+
+  if (currentTheme.value === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+
+  return currentTheme.value
+}
+const setFeatureData = (jsonData) => {
+  const currentTheme = getCurrentTheme()
+
   const features = new GeoJSON().readFeatures(jsonData, {
     featureProjection: 'EPSG:3857'
   })
 
   features.forEach((feature) => {
-    const featureStyle = new Style({
-      fill: new Fill({
-        color: style.fill
-      }),
-      stroke: new Stroke({
-        color: style.stroke.color,
-        width: style.stroke.width
-      })
-    })
-    feature.setStyle(featureStyle)
+    setFeatureStyle(feature, currentTheme)
   })
 
   return features
 }
 
+export const setFeatureStyle = (feature) => {
+  if (!feature.get('style')) {
+    return
+  }
+
+  const currentTheme = getCurrentTheme()
+
+  const featureStyle = new Style({
+    fill: new Fill({
+      ...feature.get('style')[currentTheme]?.fill
+    }),
+    stroke: new Stroke({
+      ...feature.get('style')[currentTheme]?.stroke
+    })
+  })
+
+  feature.setStyle(featureStyle)
+}
+
 export const setOceanFeature = () => {
-  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0)' } }
-  const oceanFeatures = setFeatureData(oceansLayer, style)
+  const oceanFeatures = setFeatureData(oceansLayer)
 
   return oceanFeatures
 }
 
 export const setLandFeature = () => {
-  const style = { fill: 'rgba(0,0,0,0.3)', stroke: { color: 'rgba(0,0,0,0.1)', width: 1 } }
-  const landFeatures = setFeatureData(landsLayer, style)
+  const landFeatures = setFeatureData(landsLayer)
 
   return landFeatures
 }
 
 export const setLakeFeature = () => {
-  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0)' } }
-  const lakesFeatures = setFeatureData(lakesLayer, style)
+  const lakesFeatures = setFeatureData(lakesLayer)
 
   return lakesFeatures
 }
