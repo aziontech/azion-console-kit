@@ -12,7 +12,7 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   'software-developer': [
     {
       title: 'What frameworks are supported by Azion?',
-      prompt: `I'm a developer looking for the supported frameworks for building edge applications on Azion. I want to understand how to start using these frameworks to streamline my development process.`
+      prompt: `I'm a developer looking for the supported frameworks for building Edge Applications on Azion. I want to understand how to start using these frameworks to streamline my development process.`
     },
     {
       title: 'How can I write an edge function?',
@@ -23,7 +23,7 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   'security-specialist': [
     {
       title: 'How do I configure a WAF?',
-      prompt: `I'm a Security Specialist looking to improve the security policies for my edge applications. I need to use a WAF to do so. How can I set up a WAF Rule Set on Azion step-by-step, and what configurations should I take into account?`
+      prompt: `I'm a Security Specialist looking to improve the security policies for my Edge Applications. I need to use a WAF to do so. How can I set up a WAF Rule Set on Azion step-by-step, and what configurations should I take into account?`
     },
     {
       title: 'How do I protect my site against bots?',
@@ -43,7 +43,7 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   'data-engineer': [
     {
       title: 'How do I monitor my application activity?',
-      prompt: `I've already deployed an edge application to the edge. Now I want to test if it's working and monitor the traffic activity. How can I do that using Azion tools and products?`
+      prompt: `I've already deployed an Edge Application to the edge. Now I want to test if it's working and monitor the traffic activity. How can I do that using Azion tools and products?`
     },
     {
       title: 'How do I create a Data Stream?',
@@ -52,12 +52,12 @@ export const INITIAL_PROMPTS_SUGGESTIONS = {
   ],
   other: [
     {
-      title: 'How do I build an edge application?',
-      prompt: `I want to build an edge application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
+      title: 'How to build an Edge Application',
+      prompt: `I want to build an Edge Application using Azion Console. Explain the main steps covering the process of configuring and deploying it.`
     },
     {
-      title: 'How do I protect my application?',
-      prompt: `I've already deployed an edge application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
+      title: 'How to protect an application',
+      prompt: `I've already deployed an Edge Application to the edge. Now I want to configure some security policies and a WAF to protect it. How can I do that using Azion tools and products?`
     }
   ]
 }
