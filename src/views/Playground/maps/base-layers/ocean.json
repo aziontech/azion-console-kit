@@ -3,7 +3,24 @@
   "features": [
     {
       "type": "Feature",
-      "properties": { "scalerank": 0, "featurecla": "Ocean", "min_zoom": 0.0 },
+      "properties": {
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -66,7 +83,24 @@
     },
     {
       "type": "Feature",
-      "properties": { "scalerank": 0, "featurecla": "Ocean", "min_zoom": 0.0 },
+      "properties": {
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [

@@ -4,13 +4,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rBaikal",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Baikal",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -62,13 +72,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rWinnipeg",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Winnipeg",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -93,13 +113,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Great\rSlave Lake",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Great Slave Lake",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -137,13 +167,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
         "name": "L. Ontario",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -173,13 +213,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
         "name": "L. Erie",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -211,13 +261,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
         "name": "Lake Superior",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -261,13 +321,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rVictoria",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Victoria",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -299,13 +369,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rLadoga",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Ladoga",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -333,13 +413,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rBalkhash",
-        "name_alt": "Balqash Köli",
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Balkhash",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -378,13 +468,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rTanganyika",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Tanganyika",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -419,13 +519,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
         "name": "Lake Malawi",
-        "name_alt": "Lake Nyasa",
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -458,13 +568,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Aral\rSea",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Aral Sea",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -501,13 +621,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Vänern",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -534,13 +664,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Lake Okeechobee",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -559,13 +699,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
-        "name": "Lago de\rNicaragua",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "name": "Lago de Nicaragua",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -586,13 +736,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Lake Tana",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -613,13 +773,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Lago Titicaca",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -649,13 +819,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
-        "name": "Lake\rWinnipegosis",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "name": "Lake Winnipegosis",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -688,13 +868,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
-        "name": "Lake\rOnega",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "name": "Lake Onega",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -731,13 +921,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Great Salt Lake",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -760,13 +960,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
-        "name": "Great\rBear Lake",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "name": "Great Bear Lake",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -804,13 +1014,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
         "name": "Lake Athabasca",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -832,13 +1052,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 1,
-        "featurecla": "Lake",
-        "name": "Reindeer\rLake",
-        "name_alt": null,
-        "admin": null,
-        "min_zoom": 1.7,
-        "min_label": 3.6
+        "name": "Reindeer Lake",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -866,13 +1096,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rHuron",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Huron",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
@@ -917,13 +1157,23 @@
     {
       "type": "Feature",
       "properties": {
-        "scalerank": 0,
-        "featurecla": "Lake",
-        "name": "Lake\rMichigan",
-        "name_alt": null,
-        "admin": "admin-0",
-        "min_zoom": 1.0,
-        "min_label": 3.0
+        "name": "Lake Michigan",
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(0,0,0,0.85)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 0
+            },
+            "fill": { "color": "rgba(255,255,255,1)" }
+          }
+        }
       },
       "geometry": {
         "type": "Polygon",
