@@ -110,6 +110,12 @@
     ]
   })
 
+  const customColumnMapper = (rowData) => ({
+    lineSource: rowData.data.content,
+    level: rowData.data.content,
+    line: rowData.data.value
+  })
+
   defineExpose({
     reloadListTable
   })
@@ -128,9 +134,14 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="edge-functions-console-logs"
+    :csvMapper="customColumnMapper"
   >
-    <template #header>
-      <slot />
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
+      />
     </template>
   </ListTableBlock>
 </template>

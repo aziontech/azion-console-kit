@@ -132,8 +132,6 @@
   }
   reportObservable.subscribe(updateReportData)
 
-  /* ---- */
-
   const showContent = computed(() => {
     return groupData.value && filterData.value
   })

@@ -10,6 +10,10 @@
     filterData: {
       type: Object,
       default: () => ({})
+    },
+    downloadCSV: {
+      type: Function,
+      required: true
     }
   })
 
@@ -66,6 +70,7 @@
           class="p-4"
           icon="pi pi-download"
           v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+          @click="downloadCSV"
         />
       </div>
     </div>

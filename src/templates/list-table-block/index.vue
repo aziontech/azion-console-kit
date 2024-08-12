@@ -5,6 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
+      ref="dataTableRef"
       class="overflow-clip rounded-md"
       v-if="!isLoading"
       @rowReorder="onRowReorder"
@@ -19,6 +20,8 @@
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
+      :exportFilename="exportFileName"
+      :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
     >
@@ -26,7 +29,10 @@
         #header
         v-if="!props.hiddenHeader"
       >
-        <slot name="header">
+        <slot
+          name="header"
+          :exportTableCSV="handleExportTableDataToCSV"
+        >
           <div
             class="flex flex-wrap justify-between gap-2 w-full"
             data-testid="data-table-header"
@@ -43,6 +49,17 @@
                 placeholder="Search"
               />
             </span>
+
+            <PrimeButton
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full ml-auto"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+            />
+
             <slot
               name="addButton"
               data-testid="data-table-add-button"
@@ -277,6 +294,7 @@
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { getCsvCellContentFromRowData } from '@/helpers'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -342,6 +360,12 @@
     selectedItensData: {
       type: Array,
       default: () => []
+    },
+    csvMapper: {
+      type: Function
+    },
+    exportFileName: {
+      type: String
     }
   })
 
@@ -349,6 +373,7 @@
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
+  const dataTableRef = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -357,6 +382,7 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
+  const hasExportToCsvMapper = ref(!!props.csvMapper)
 
   const dialog = useDialog()
   const router = useRouter()
@@ -376,6 +402,20 @@
     selectedColumns.value = props.columns
   })
 
+  /**
+   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
+   */
+  const exportFunctionMapper = (rowData) => {
+    if (!hasExportToCsvMapper.value) {
+      return
+    }
+    const columnMapper = props.csvMapper(rowData)
+    return getCsvCellContentFromRowData({ columnMapper, rowData })
+  }
+
+  const handleExportTableDataToCSV = () => {
+    dataTableRef.value.exportCSV()
+  }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }

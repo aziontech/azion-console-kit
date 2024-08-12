@@ -27,7 +27,13 @@
               v-model:filterData="filterData"
               v-if="tabActive(tab.table)"
             >
-              <ContentFilterBlock v-model:filterData="filterData" />
+              <template #header="{ downloadCSV }">
+                <ContentFilterBlock
+                  v-model:filterData="filterData"
+                  :downloadCSV="downloadCSV"
+                  @updatedFilter="reload"
+                />
+              </template>
             </component>
           </TabPanel>
         </template>
@@ -93,7 +99,6 @@
   const route = useRoute()
   const router = useRouter()
   const tabSelectIndex = ref(0)
-
   const filterData = ref({
     tsRange: {},
     fields: []
@@ -227,6 +232,11 @@
     }
 
     selectedTab(tabPanels[0])
+  }
+
+  const reload = () => {
+    // eslint-disable-next-line no-console
+    console.log('reload')
   }
 
   onMounted(() => {

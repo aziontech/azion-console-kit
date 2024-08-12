@@ -95,6 +95,10 @@
     ]
   })
 
+  const customColumnMapper = (rowData) => ({
+    requestUri: rowData.data.value
+  })
+
   defineExpose({
     reloadListTable
   })
@@ -113,9 +117,14 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="image-processor-logs"
+    :csvMapper="customColumnMapper"
   >
-    <template #header>
-      <slot />
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
+      />
     </template>
   </ListTableBlock>
 </template>

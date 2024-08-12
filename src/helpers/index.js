@@ -30,6 +30,7 @@ import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
 import { goToClassicInterface } from './go-to-classic-interface'
 import { removeHtmlTagFromText } from './remove-html-tag-from-text'
+import { getCsvCellContentFromRowData } from './get-csv-cell-content-from-row-data'
 
 export {
   InviteSession,
@@ -66,5 +67,6 @@ export {
   formatDateToUS,
   formatCurrencyString,
   formatUnitValue,
-  openShowMorePlan
+  openShowMorePlan,
+  getCsvCellContentFromRowData
 }

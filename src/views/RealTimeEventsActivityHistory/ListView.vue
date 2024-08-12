@@ -93,6 +93,10 @@
     ]
   })
 
+  const customColumnMapper = (rowData) => ({
+    title: rowData.data.text
+  })
+
   defineExpose({
     reloadListTable
   })
@@ -104,16 +108,21 @@
     :loadService="props.loadActivityHistory"
   />
   <ListTableBlock
+    isTabs
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
-    isTabs
+    :csvMapper="customColumnMapper"
+    exportFileName="activity-history-logs"
   >
-    <template #header>
-      <slot />
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
+      />
     </template>
   </ListTableBlock>
 </template>
