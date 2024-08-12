@@ -29,6 +29,11 @@
   })
 
   const granularityMap = ref(null)
+  const baseFeatures = ref({
+    ocean: null,
+    land: null,
+    lake: null
+  })
 
   onMounted(() => {
     initMap()
@@ -37,9 +42,17 @@
   })
 
   const setBaseLayers = () => {
-    setOceanFeature(vectorLayer)
-    setLandFeature(vectorLayer)
-    setLakeFeature(vectorLayer)
+    baseFeatures.value.ocean = setOceanFeature()
+    baseFeatures.value.land = setLandFeature()
+    baseFeatures.value.lake = setLakeFeature()
+
+    vectorLayer
+      .getSource()
+      .addFeatures([
+        ...baseFeatures.value.ocean,
+        ...baseFeatures.value.land,
+        ...baseFeatures.value.lake
+      ])
   }
 
   const styleFeatures = () => {

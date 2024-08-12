@@ -2,8 +2,8 @@ import GeoJSON from 'ol/format/GeoJSON.js'
 import { Style, Fill, Stroke } from 'ol/style.js'
 
 import * as lakesLayer from './lakes'
-import * as landLayer from './land'
-import * as oceanLayer from './ocean'
+import * as landsLayer from './land'
+import * as oceansLayer from './ocean'
 
 const setFeatureData = (jsonData, style) => {
   const features = new GeoJSON().readFeatures(jsonData, {
@@ -26,23 +26,23 @@ const setFeatureData = (jsonData, style) => {
   return features
 }
 
-export const setOceanFeature = (vector) => {
-  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0.5)', width: 1 } }
-  const oceanFeatures = setFeatureData(oceanLayer, style)
+export const setOceanFeature = () => {
+  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0)' } }
+  const oceanFeatures = setFeatureData(oceansLayer, style)
 
-  vector.getSource().addFeatures(oceanFeatures)
+  return oceanFeatures
 }
 
-export const setLandFeature = (vector) => {
+export const setLandFeature = () => {
   const style = { fill: 'rgba(0,0,0,0.3)', stroke: { color: 'rgba(0,0,0,0.1)', width: 1 } }
-  const landFeatures = setFeatureData(landLayer, style)
+  const landFeatures = setFeatureData(landsLayer, style)
 
-  vector.getSource().addFeatures(landFeatures)
+  return landFeatures
 }
 
-export const setLakeFeature = (vector) => {
-  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0.5)', width: 1 } }
+export const setLakeFeature = () => {
+  const style = { fill: 'rgba(0,0,0,0.85)', stroke: { color: 'rgba(0,0,0,0)' } }
   const lakesFeatures = setFeatureData(lakesLayer, style)
 
-  vector.getSource().addFeatures(lakesFeatures)
+  return lakesFeatures
 }
