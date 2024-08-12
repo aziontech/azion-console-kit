@@ -16,8 +16,8 @@ const setFeatureData = (jsonData, style) => {
         color: style.fill
       }),
       stroke: new Stroke({
-        color: style?.stroke?.color,
-        width: style?.stroke?.width
+        color: style.stroke.color,
+        width: style.stroke.width
       })
     })
     feature.setStyle(featureStyle)
