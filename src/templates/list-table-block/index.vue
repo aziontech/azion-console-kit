@@ -26,36 +26,38 @@
         #header
         v-if="!props.hiddenHeader"
       >
-        <div
-          class="flex flex-wrap justify-between gap-2 w-full"
-          data-testid="data-table-header"
-        >
-          <span
-            class="flex flex-row p-input-icon-left items-center max-sm:w-full"
-            data-testid="data-table-search"
+        <slot name="header">
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-header"
           >
-            <i class="pi pi-search" />
-            <InputText
-              class="h-8 w-full md:min-w-[320px]"
-              v-model.trim="filters.global.value"
-              data-testid="data-table-search-input"
-              placeholder="Search"
-            />
-          </span>
-          <slot
-            name="addButton"
-            data-testid="data-table-add-button"
-          >
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :data-testid="`create_${addButtonLabel}_button`"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-            />
-          </slot>
-        </div>
+            <span
+              class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+              data-testid="data-table-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="h-8 w-full md:min-w-[320px]"
+                v-model.trim="filters.global.value"
+                data-testid="data-table-search-input"
+                placeholder="Search"
+              />
+            </span>
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :data-testid="`create_${addButtonLabel}_button`"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+              />
+            </slot>
+          </div>
+        </slot>
       </template>
 
       <Column
@@ -216,31 +218,33 @@
         #header
         v-if="!props.hiddenHeader"
       >
-        <div
-          class="flex flex-wrap justify-between gap-2 w-full"
-          data-testid="data-table-skeleton-header"
-        >
-          <span
-            class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
-            data-testid="data-table-skeleton-search"
+        <slot name="header">
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-skeleton-header"
           >
-            <i class="pi pi-search" />
-            <InputText
-              class="w-full h-8 md:min-w-[320px]"
-              v-model="filters.global.value"
-              placeholder="Search"
-              data-testid="data-table-skeleton-search-input"
+            <span
+              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
+              data-testid="data-table-skeleton-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full h-8 md:min-w-[320px]"
+                v-model="filters.global.value"
+                placeholder="Search"
+                data-testid="data-table-skeleton-search-input"
+              />
+            </span>
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+              data-testid="data-table-skeleton-add-button"
             />
-          </span>
-          <PrimeButton
-            class="max-sm:w-full"
-            @click="navigateToAddPage"
-            icon="pi pi-plus"
-            :label="addButtonLabel"
-            v-if="addButtonLabel"
-            data-testid="data-table-skeleton-add-button"
-          />
-        </div>
+          </div>
+        </slot>
       </template>
       <Column
         sortable

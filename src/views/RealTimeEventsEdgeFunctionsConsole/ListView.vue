@@ -1,12 +1,8 @@
 <script setup>
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
-  import { useRouter } from 'vue-router'
   const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
@@ -38,7 +34,6 @@
   })
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
-  const router = useRouter()
   const drawerRef = ref('')
 
   const openDetailDrawer = ({ configurationId, ts, source, line, originalId }) => {
@@ -56,7 +51,7 @@
     hasContentToList.value = event
   }
 
-  const reloadList = () => {
+  const reloadListTable = () => {
     if (hasContentToList.value) {
       listTableBlockRef.value.reload()
       return
@@ -115,9 +110,9 @@
     ]
   })
 
-  const goToEdgeFunction = () => {
-    router.push({ name: 'list-edge-functions' })
-  }
+  defineExpose({
+    reloadListTable
+  })
 </script>
 
 <template>
@@ -125,19 +120,7 @@
     ref="drawerRef"
     :loadService="props.loadEdgeFunctionsConsole"
   />
-  <div class="flex flex-col gap-8 my-4">
-    <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">
-        Logs of events from edge applications using Edge Runtime returned by Cells Console.
-      </p>
-    </div>
-    <IntervalFilterBlock
-      v-model:filterDate="filterDate"
-      @applyTSRange="reloadList"
-    />
-  </div>
   <ListTableBlock
-    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
@@ -145,22 +128,9 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
-  />
-
-  <EmptyResultsBlock
-    v-else
-    title="No logs have been found for this period."
-    description="There are no logs for the selected time range. Use the filter to change time range and variables, or use edge functions to generate activity. Logs are displayed once there are incoming requests and traffic."
-    :documentationService="documentationService"
-    :inTabs="true"
   >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        label="Edge Functions"
-        @click="goToEdgeFunction"
-      />
+    <template #header>
+      <slot />
     </template>
-  </EmptyResultsBlock>
+  </ListTableBlock>
 </template>

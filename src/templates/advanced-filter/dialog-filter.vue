@@ -177,7 +177,7 @@
     icon="pi pi-plus"
     label="Filter"
     type="button"
-    class="flex justify-center items-center md:rounded-[6px_0px_0px_6px] md:h-[2.313rem]"
+    class="min-w-fit md:rounded-[6px_0px_0px_6px]"
     severity="secondary"
     badgeClass="!text-xl"
     size="small"
@@ -235,7 +235,7 @@
         </span>
         <div
           class="flex sm:w-full max-sm:flex-col"
-          :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
+          :class="filterSelected ? 'gap-6' : 'md:pr-6'"
           data-testid="filter-fields-container"
         >
           <div
@@ -319,12 +319,12 @@
         </div>
       </div>
       <Divider
-        v-if="filterSelected?.label"
+        v-if="operatorSelected"
         data-testid="filter-divider"
       />
       <div
         class="px-8 py-5 flex flex-col"
-        v-if="filterSelected?.label"
+        v-if="operatorSelected"
         data-testid="filter-value-container"
       >
         <div
@@ -335,6 +335,7 @@
           <InlineMessage
             class="p-2"
             severity="info"
+            v-if="filterSelected?.description"
             data-testid="filter-value-description"
           >
             {{ filterSelected?.description }}
@@ -447,7 +448,7 @@
           </span>
           <div
             class="flex sm:w-full max-sm:flex-col"
-            :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
+            :class="filterSelected ? 'gap-6' : 'md:pr-6'"
             data-testid="filter-sidebar-fields-container"
           >
             <div
@@ -531,12 +532,12 @@
           </div>
         </div>
         <Divider
-          v-if="filterSelected?.label"
+          v-if="operatorSelected"
           data-testid="filter-sidebar-divider"
         />
         <div
           class="px-3 py-5 flex flex-col"
-          v-if="filterSelected?.label"
+          v-if="operatorSelected"
           data-testid="filter-sidebar-value-container"
         >
           <div
@@ -547,6 +548,7 @@
             <InlineMessage
               class="p-2"
               severity="info"
+              v-if="filterSelected?.description"
               data-testid="filter-sidebar-value-description"
             >
               {{ filterSelected?.description }}
