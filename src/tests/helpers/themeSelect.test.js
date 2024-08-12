@@ -1,13 +1,15 @@
 import { themeSelect } from '@/helpers/theme-select'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const makeSut = ({ matchesSystemThemeDark, initialTheme }) => {
+const makeSut = ({ matchesSystemThemeDark }) => {
   const sut = themeSelect
+
   vi.spyOn(window, 'matchMedia').mockReturnValueOnce({
     matches: matchesSystemThemeDark
   })
+
   const rootElementMock = document.createElement('div')
-  rootElementMock.classList.add(`azion-${initialTheme}`)
+  rootElementMock.classList.add(`azion-light`)
   vi.spyOn(document, 'querySelector').mockReturnValueOnce(rootElementMock)
 
   return {
@@ -24,51 +26,57 @@ describe('themeSelect', () => {
   it.each([
     {
       useSystemInDarkMode: true,
-      initialTheme: 'light',
-      result: 'dark'
+      result: 'azion-dark'
     },
     {
       useSystemInDarkMode: false,
-      initialTheme: 'light',
-      result: 'light'
+      result: 'azion-light'
     }
   ])(
     'should define theme as $result when system theme is $useSystemInDarkMode for dark mode',
-    ({ useSystemInDarkMode, initialTheme, result }) => {
-      const { sut, rootElementMock } = makeSut({
-        matchesSystemThemeDark: useSystemInDarkMode,
-        initialTheme: initialTheme
+    ({ useSystemInDarkMode, result }) => {
+      const { rootElementMock, sut } = makeSut({
+        matchesSystemThemeDark: useSystemInDarkMode
       })
+
       vi.spyOn(document, 'querySelector').mockReturnValue(rootElementMock)
 
-      sut({ theme: 'system' })
+      sut({ HTMLElement: rootElementMock, theme: 'system' })
 
-      expect(rootElementMock.className).toBe(`azion-${result}`)
+      expect(rootElementMock.className).toBe(result)
     }
   )
 
   it.each([
     {
+      matchesSystemThemeDark: true,
       selectedTheme: 'dark',
-      initialTheme: 'light',
-      result: 'dark'
+      result: 'azion-dark'
     },
     {
+      matchesSystemThemeDark: true,
       selectedTheme: 'light',
-      initialTheme: 'dark',
-      result: 'light'
+      result: 'azion-light'
+    },
+    {
+      matchesSystemThemeDark: false,
+      selectedTheme: undefined,
+      result: 'azion-light'
+    },
+    {
+      matchesSystemThemeDark: true,
+      selectedTheme: undefined,
+      result: 'azion-dark'
     }
   ])(
-    `should change application theme to $selectedTheme`,
-    ({ selectedTheme, initialTheme, result }) => {
+    `should change application theme when $selectedTheme to $result`,
+    ({ selectedTheme, matchesSystemThemeDark, result }) => {
       const { sut, rootElementMock } = makeSut({
-        matchesSystemThemeDark: false,
-        initialTheme
+        matchesSystemThemeDark
       })
+      sut({ HTMLElement: rootElementMock, theme: selectedTheme })
 
-      sut({ theme: selectedTheme })
-
-      expect(rootElementMock.className).toBe(`azion-${result}`)
+      expect(rootElementMock.className).toBe(result)
     }
   )
 })
