@@ -94,6 +94,10 @@
     ]
   })
 
+  const customColumnMapper = (rowData) => ({
+    tsFormat: rowData.data
+  })
+
   const goToCreateEdgeApplication = () => {
     router.push({ name: 'create-edge-application', query: { origin: 'realTimeEvents' } })
   }
@@ -128,6 +132,8 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="http-requests-logs"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock
