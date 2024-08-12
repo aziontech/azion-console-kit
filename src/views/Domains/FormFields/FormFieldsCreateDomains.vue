@@ -9,7 +9,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import PrimeButton from 'primevue/button'
+  import GetHelp from '@modules/azion-ai-chat/azion-ai-get-help.vue'
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
@@ -103,12 +103,7 @@
   >
     <template #title>
       General
-      <PrimeButton
-        outlined
-        icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Get Copilot Help'"
-        v-prompt="DomainsPrompts.create.general"
-      ></PrimeButton>
+      <GetHelp :prompt="DomainsPrompts.create.general" />
     </template>
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -130,12 +125,7 @@
   >
     <template #title>
       Settings
-      <PrimeButton
-        outlined
-        icon="ai ai-ask-azion"
-        v-tooltip.bottom="'Get Copilot Help'"
-        v-prompt="DomainsPrompts.create.settings"
-      ></PrimeButton>
+      <GetHelp :prompt="DomainsPrompts.create.settings" />
     </template>
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
