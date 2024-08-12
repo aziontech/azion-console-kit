@@ -5,6 +5,5 @@ export const themeSelect = ({ HTMLElement, theme }) => {
   }
 
   const currentApplicationTheme = selectedTheme === 'light' ? 'dark' : 'light'
-
   HTMLElement.classList.replace(`azion-${currentApplicationTheme}`, `azion-${selectedTheme}`)
 }
