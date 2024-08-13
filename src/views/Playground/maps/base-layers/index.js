@@ -1,5 +1,6 @@
 import GeoJSON from 'ol/format/GeoJSON.js'
-import { Style, Fill, Stroke } from 'ol/style.js'
+import { Style, Fill, Stroke, RegularShape as Square } from 'ol/style.js'
+
 import { useAccountStore } from '@/stores/account'
 import { storeToRefs } from 'pinia'
 
@@ -17,26 +18,28 @@ const getCurrentTheme = () => {
 
   return currentTheme.value
 }
-const setFeatureData = (jsonData) => {
-  const currentTheme = getCurrentTheme()
 
+const setFeatureData = (jsonData) => {
   const features = new GeoJSON().readFeatures(jsonData, {
     featureProjection: 'EPSG:3857'
   })
 
   features.forEach((feature) => {
-    setFeatureStyle(feature, currentTheme)
+    setFeatureStyle(feature)
   })
 
   return features
 }
 
 export const setFeatureStyle = (feature) => {
-  if (!feature.get('style')) {
+  const currentTheme = getCurrentTheme()
+
+  if (
+    !feature.get('style')?.[currentTheme]?.fill ||
+    !feature.get('style')?.[currentTheme]?.stroke
+  ) {
     return
   }
-
-  const currentTheme = getCurrentTheme()
 
   const featureStyle = new Style({
     fill: new Fill({
@@ -44,6 +47,27 @@ export const setFeatureStyle = (feature) => {
     }),
     stroke: new Stroke({
       ...feature.get('style')[currentTheme]?.stroke
+    })
+  })
+
+  feature.setStyle(featureStyle)
+}
+
+export const setGranularityFeatureStyle = (feature) => {
+  const currentTheme = getCurrentTheme()
+
+  if (!feature.get('style')?.[currentTheme]?.fill) {
+    return
+  }
+
+  const featureStyle = new Style({
+    image: new Square({
+      fill: new Fill({
+        ...feature.get('style')[currentTheme]?.fill
+      }),
+      points: feature.get('points') || 4,
+      radius: feature.get('size') || 10,
+      angle: Math.PI / feature.get('angle') || Math.PI / 4
     })
   })
 

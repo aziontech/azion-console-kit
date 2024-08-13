@@ -20,55 +20,44 @@
   import View from 'ol/View.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
   import Circle from 'ol/geom/Circle.js'
-  import { OSM, Vector as VectorSource } from 'ol/source.js'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
+  import { Vector as VectorSource } from 'ol/source.js'
+  import { Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
 
   import LegendBlock from './components/legend-block.vue'
-
-  const vectorLayer = new VectorLayer({
-    source: new VectorSource({})
-  })
 
   const bubbleMap = ref(null)
 
   onMounted(() => {
     initMap()
-    setBaseLayers()
-    displayBubbles()
   })
 
-  const setBaseLayers = () => {
-    vectorLayer
-      .getSource()
-      .addFeatures([...setOceanFeature(), ...setLandFeature(), ...setLakeFeature()])
-  }
+  const generateBubbles = () => {
+    const bubbles = new GeoJSON().readFeatures(bubbleFeatures)
 
-  const styleFeatures = () => {
-    const features = new GeoJSON().readFeatures(bubbleFeatures)
-
-    features.forEach((feature) => {
-      feature.setGeometry(
-        new Circle(fromLonLat(feature.getGeometry().getCoordinates()), feature.get('size'))
+    bubbles.forEach((bubble) => {
+      bubble.setGeometry(
+        new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubble.get('size'))
       )
-      setFeatureStyle(feature)
+      setFeatureStyle(bubble)
     })
 
-    return features
-  }
-
-  const displayBubbles = () => {
-    const features = styleFeatures()
-    vectorLayer.getSource().addFeatures(features)
+    return bubbles
   }
 
   const initMap = () => {
     bubbleMap.value = new Map({
       layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        vectorLayer
+        new VectorLayer({
+          source: new VectorSource({
+            features: [
+              ...setOceanFeature(),
+              ...setLandFeature(),
+              ...setLakeFeature(),
+              ...generateBubbles()
+            ]
+          })
+        })
       ],
       target: 'bubble-map',
       view: new View({
@@ -103,7 +92,8 @@
 
   const { currentTheme } = storeToRefs(useAccountStore())
   watch(currentTheme, () => {
-    vectorLayer
+    bubbleMap.value
+      .getAllLayers()[0]
       .getSource()
       .getFeatures()
       .forEach((feature) => {

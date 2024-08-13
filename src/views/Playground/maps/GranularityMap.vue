@@ -10,86 +10,60 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+  import * as granularityFeatures from './constants/granularity-features.json'
+  import {
+    setOceanFeature,
+    setLandFeature,
+    setLakeFeature,
+    setFeatureStyle,
+    setGranularityFeatureStyle
+  } from './base-layers'
+
   import Map from 'ol/Map.js'
   import View from 'ol/View.js'
-  import Point from 'ol/geom/Point.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
-  import { Fill, Style, RegularShape as Square } from 'ol/style.js'
-  import { OSM, Vector as VectorSource } from 'ol/source.js'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
+  import Point from 'ol/geom/Point.js'
+  import { Vector as VectorSource } from 'ol/source.js'
+  import { Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
   import { DragPan } from 'ol/interaction'
-  import * as granularityFeatures from './constants/granularity-features.json'
-  import LegendBlock from './components/legend-block.vue'
-  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
 
-  const vectorLayer = new VectorLayer({
-    source: new VectorSource({})
-  })
+  import LegendBlock from './components/legend-block.vue'
 
   const granularityMap = ref(null)
-  const baseFeatures = ref({
-    ocean: null,
-    land: null,
-    lake: null
-  })
 
   onMounted(() => {
     initMap()
-    setBaseLayers()
-    displayGranularities()
   })
 
-  const setBaseLayers = () => {
-    baseFeatures.value.ocean = setOceanFeature()
-    baseFeatures.value.land = setLandFeature()
-    baseFeatures.value.lake = setLakeFeature()
+  const generateGranularity = () => {
+    const granularity = new GeoJSON().readFeatures(granularityFeatures)
 
-    vectorLayer
-      .getSource()
-      .addFeatures([
-        ...baseFeatures.value.ocean,
-        ...baseFeatures.value.land,
-        ...baseFeatures.value.lake
-      ])
-  }
+    granularity.forEach((granularity) => {
+      granularity.setGeometry(new Point(fromLonLat(granularity.getGeometry().getCoordinates())))
 
-  const styleFeatures = () => {
-    const features = new GeoJSON().readFeatures(granularityFeatures)
-
-    features.forEach((feature) => {
-      feature.setGeometry(new Point(fromLonLat(feature.getGeometry().getCoordinates())))
-
-      const featureStyle = new Style({
-        image: new Square({
-          fill: new Fill({
-            ...feature.get('fill')
-          }),
-          points: feature.get('points'),
-          radius: feature.get('size'),
-          angle: Math.PI / feature.get('angle')
-        })
-      })
-
-      feature.setStyle(featureStyle)
+      setGranularityFeatureStyle(granularity)
     })
 
-    return features
-  }
-
-  const displayGranularities = () => {
-    const features = styleFeatures()
-    vectorLayer.getSource().addFeatures(features)
+    return granularity
   }
 
   const initMap = () => {
     granularityMap.value = new Map({
       layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        vectorLayer
+        new VectorLayer({
+          source: new VectorSource({
+            features: [
+              ...setOceanFeature(),
+              ...setLandFeature(),
+              ...setLakeFeature(),
+              ...generateGranularity()
+            ]
+          })
+        })
       ],
       target: 'granularity-map',
       view: new View({
@@ -122,6 +96,22 @@
       }
     ]
   }
+
+  const { currentTheme } = storeToRefs(useAccountStore())
+  watch(currentTheme, () => {
+    granularityMap.value
+      .getAllLayers()[0]
+      .getSource()
+      .getFeatures()
+      .forEach((feature, idx) => {
+        if (idx === 3) {
+          // granularity feature index
+          setGranularityFeatureStyle(feature)
+        } else {
+          setFeatureStyle(feature)
+        }
+      })
+  })
 </script>
 
 <style lang="scss">

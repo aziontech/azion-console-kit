@@ -10,75 +10,51 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+  import * as heatmapFeatures from './constants/heatmap-features.json'
+  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
+
   import GeoJSON from 'ol/format/GeoJSON.js'
   import Map from 'ol/Map.js'
   import View from 'ol/View.js'
-  import { OSM, Vector as VectorSource } from 'ol/source.js'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
-  import { Style, Fill, Stroke } from 'ol/style.js'
-  import * as heatmapFeatures from './constants/heatmap-features.json'
-  import LegendBlock from './components/legend-block.vue'
-  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
+  import { Vector as VectorSource } from 'ol/source.js'
+  import { Vector as VectorLayer } from 'ol/layer.js'
 
-  const vectorLayer = new VectorLayer({
-    source: new VectorSource({})
-  })
+  import LegendBlock from './components/legend-block.vue'
 
   const heatmapMap = ref(null)
-  const baseFeatures = ref({
-    ocean: null,
-    land: null,
-    lake: null
-  })
 
   onMounted(() => {
     initMap()
-    setBaseLayers()
-    displayHeatmap()
   })
 
-  const setBaseLayers = () => {
-    baseFeatures.value.ocean = setOceanFeature()
-    baseFeatures.value.land = setLandFeature()
-    baseFeatures.value.lake = setLakeFeature()
-
-    vectorLayer
-      .getSource()
-      .addFeatures([
-        ...baseFeatures.value.ocean,
-        ...baseFeatures.value.land,
-        ...baseFeatures.value.lake
-      ])
-  }
-
-  const displayHeatmap = () => {
-    const features = new GeoJSON().readFeatures(heatmapFeatures, {
+  const generateAreas = () => {
+    const areas = new GeoJSON().readFeatures(heatmapFeatures, {
       featureProjection: 'EPSG:3857'
     })
 
-    features.forEach((feature) => {
-      const featureStyle = new Style({
-        fill: new Fill({
-          ...feature.get('fill')
-        }),
-        stroke: new Stroke({
-          ...feature.get('stroke')
-        })
-      })
-      feature.setStyle(featureStyle)
+    areas.forEach((area) => {
+      setFeatureStyle(area)
     })
 
-    vectorLayer.getSource().addFeatures(features)
+    return areas
   }
 
   const initMap = () => {
     heatmapMap.value = new Map({
       layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        vectorLayer
+        new VectorLayer({
+          source: new VectorSource({
+            features: [
+              ...setOceanFeature(),
+              ...setLandFeature(),
+              ...setLakeFeature(),
+              ...generateAreas()
+            ]
+          })
+        })
       ],
       target: 'heatmap-map',
       view: new View({
@@ -110,6 +86,17 @@
       }
     ]
   }
+
+  const { currentTheme } = storeToRefs(useAccountStore())
+  watch(currentTheme, () => {
+    heatmapMap.value
+      .getAllLayers()[0]
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        setFeatureStyle(feature)
+      })
+  })
 </script>
 
 <style lang="scss">

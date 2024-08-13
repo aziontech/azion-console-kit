@@ -7,66 +7,28 @@
 </template>
 
 <script setup>
-  import { Map, Overlay, View } from 'ol/index.js'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js'
-  import { OSM, Vector as VectorSource } from 'ol/source.js'
-  import { onMounted, ref } from 'vue'
-  import { fromLonLat } from 'ol/proj.js'
-  import { coordinates } from './constants/coordinates'
-  import { setOceanFeature, setLandFeature, setLakeFeature } from './base-layers'
+  import { onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
+  import * as geolocationFeatures from './constants/geolocation-features.json'
 
-  const vectorLayer = new VectorLayer({
-    source: new VectorSource({})
-  })
+  import { Map, Overlay, View } from 'ol/index.js'
+  import { Vector as VectorLayer } from 'ol/layer.js'
+  import { Vector as VectorSource } from 'ol/source.js'
+  import { fromLonLat } from 'ol/proj.js'
 
   const geolocationMap = ref(null)
-  const baseFeatures = ref({
-    ocean: null,
-    land: null,
-    lake: null
-  })
 
   onMounted(() => {
     initMap()
-    setBaseLayers()
     generateGeoJsonBrazil()
   })
 
-  const initMap = () => {
-    geolocationMap.value = new Map({
-      layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        vectorLayer
-      ],
-      target: 'geolocation-map',
-      view: new View({
-        center: fromLonLat([-49.470977003699666, -13.471216164769693]),
-        zoom: 2
-      }),
-      controls: []
-    })
-  }
-
-  const setBaseLayers = () => {
-    baseFeatures.value.ocean = setOceanFeature()
-    baseFeatures.value.land = setLandFeature()
-    baseFeatures.value.lake = setLakeFeature()
-
-    vectorLayer
-      .getSource()
-      .addFeatures([
-        ...baseFeatures.value.ocean,
-        ...baseFeatures.value.land,
-        ...baseFeatures.value.lake
-      ])
-  }
-
   const generateGeoJsonBrazil = () => {
-    coordinates.forEach((coordinate, index) => {
+    geolocationFeatures.features.forEach((location, index) => {
       createMarker(index)
-      createOverlay(coordinate, index)
+      createOverlay(location.geometry.coordinates, index)
     })
   }
 
@@ -87,6 +49,35 @@
 
     geolocationMap.value.addOverlay(marker)
   }
+
+  const initMap = () => {
+    geolocationMap.value = new Map({
+      layers: [
+        new VectorLayer({
+          source: new VectorSource({
+            features: [...setOceanFeature(), ...setLandFeature(), ...setLakeFeature()]
+          })
+        })
+      ],
+      target: 'geolocation-map',
+      view: new View({
+        center: fromLonLat([-49.470977003699666, -13.471216164769693]),
+        zoom: 2
+      }),
+      controls: []
+    })
+  }
+
+  const { currentTheme } = storeToRefs(useAccountStore())
+  watch(currentTheme, () => {
+    geolocationMap.value
+      .getAllLayers()[0]
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        setFeatureStyle(feature)
+      })
+  })
 </script>
 
 <style lang="scss">
