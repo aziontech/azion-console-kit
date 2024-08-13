@@ -34,7 +34,7 @@
 
   const createMarker = (position) => {
     const div = document.createElement('div')
-    div.className = 'popup'
+    div.className = 'w-2 h-2 rounded-full bg-orange-bullet animate-locationPulse'
     div.id = `marker-${position}`
     document.getElementById('markers').appendChild(div)
   }
@@ -83,30 +83,5 @@
 <style lang="scss">
   #geolocation-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .popup {
-    background: #f3652b;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(0.95);
-      box-shadow: 0 0 rgba(150, 150, 150, 0.7);
-    }
-
-    70% {
-      transform: scale(1);
-      box-shadow: 0 0 0 8px rgba(150, 150, 150, 0);
-    }
-
-    100% {
-      transform: scale(0.95);
-      box-shadow: 0 0 rgba(150, 150, 150, 0);
-    }
   }
 </style>

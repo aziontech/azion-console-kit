@@ -50,7 +50,8 @@ export default {
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
-        slideDown: 'slideDown 220ms ease-in-out'
+        slideDown: 'slideDown 220ms ease-in-out',
+        locationPulse: 'locationPulse 2s infinite'
       },
       keyframes: {
         fadeIn: {
@@ -64,6 +65,20 @@ export default {
         slideDown: {
           '0%': { height: '0' },
           '100%': { height: 'auto' }
+        },
+        locationPulse: {
+          '0%': {
+            transform: 'scale(0.95)',
+            'box-shadow': '0 0 rgba(150, 150, 150, 0.7)'
+          },
+          '70%': {
+            transform: 'scale(1)',
+            'box-shadow': '0 0 0 8px rgba(150, 150, 150, 0)'
+          },
+          '100%': {
+            transform: 'scale(0.95)',
+            'box-shadow': '0 0 rgba(150, 150, 150, 0)'
+          }
         }
       }
     }
