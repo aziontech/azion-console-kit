@@ -14,6 +14,7 @@
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
+      rowHover
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
