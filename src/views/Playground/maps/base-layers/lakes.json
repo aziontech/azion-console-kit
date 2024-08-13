@@ -8,17 +8,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -76,17 +76,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -117,17 +117,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -171,17 +171,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -217,17 +217,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -265,17 +265,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -325,17 +325,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -373,17 +373,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -417,17 +417,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -472,17 +472,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -523,17 +523,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -572,17 +572,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -625,17 +625,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -668,17 +668,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -703,17 +703,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -740,17 +740,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -777,17 +777,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -823,17 +823,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -872,17 +872,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -925,17 +925,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -964,17 +964,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -1018,17 +1018,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -1056,17 +1056,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -1100,17 +1100,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
@@ -1161,17 +1161,17 @@
         "style": {
           "dark": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#3e3e3e",
+              "width": 1
             },
-            "fill": { "color": "rgba(0,0,0,0.85)" }
+            "fill": { "color": "#171717" }
           },
           "light": {
             "stroke": {
-              "color": "rgba(0,0,0,0)",
-              "width": 0
+              "color": "#b5b5b5",
+              "width": 1
             },
-            "fill": { "color": "rgba(255,255,255,1)" }
+            "fill": { "color": "#ffffff" }
           }
         }
       },
