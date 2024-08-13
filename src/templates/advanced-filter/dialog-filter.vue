@@ -582,12 +582,14 @@
             class="max-md:min-w-max"
             severity="primary"
             outlined
+            size="small"
             data-testid="filter-sidebar-cancel-button"
           />
           <ButtonPrime
             type="button"
             class="max-md:w-full"
             label="Apply"
+            size="small"
             severity="secondary"
             @click="onSubmit"
             :disabled="disabledSubmit"
