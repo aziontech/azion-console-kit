@@ -12,6 +12,7 @@
       scrollable
       removableSort
       :value="data"
+      selectionMode="single"
       dataKey="id"
       @row-click="editItemSelected"
       rowHover
