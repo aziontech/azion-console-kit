@@ -464,12 +464,7 @@
     try {
       loadingNetworkList.value = true
       const result = await props.listNetworkListService()
-      networkListOptions.value = result.map((item) => {
-        return {
-          ...item,
-          id: item.id.toString()
-        }
-      })
+      networkListOptions.value = result
     } catch (error) {
       toast.add({
         closable: true,
@@ -628,7 +623,7 @@
                 :loading="loadingNetworkList"
                 placeholder="Select a Network"
                 optionLabel="name"
-                optionValue="id"
+                optionValue="stringId"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
                 :filter="true"
