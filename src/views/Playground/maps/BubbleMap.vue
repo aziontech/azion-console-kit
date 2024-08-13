@@ -16,8 +16,7 @@
   import * as bubbleFeatures from './constants/bubble-features.json'
   import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
 
-  import Map from 'ol/Map.js'
-  import View from 'ol/View.js'
+  import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
   import Circle from 'ol/geom/Circle.js'
   import { Vector as VectorSource } from 'ol/source.js'

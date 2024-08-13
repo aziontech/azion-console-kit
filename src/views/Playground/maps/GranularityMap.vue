@@ -22,8 +22,7 @@
     setGranularityFeatureStyle
   } from './base-layers'
 
-  import Map from 'ol/Map.js'
-  import View from 'ol/View.js'
+  import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
   import Point from 'ol/geom/Point.js'
   import { Vector as VectorSource } from 'ol/source.js'

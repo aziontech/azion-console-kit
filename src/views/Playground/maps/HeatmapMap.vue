@@ -16,9 +16,8 @@
   import * as heatmapFeatures from './constants/heatmap-features.json'
   import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
 
+  import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
-  import Map from 'ol/Map.js'
-  import View from 'ol/View.js'
   import { Vector as VectorSource } from 'ol/source.js'
   import { Vector as VectorLayer } from 'ol/layer.js'
 
