@@ -6,10 +6,21 @@
       "id": "CHN",
       "properties": {
         "name": "China",
-        "fill": { "color": "rgba(0,155,155,0.5)" },
-        "stroke": {
-          "color": "rgba(0,155,155,0.5)",
-          "width": 2
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
         }
       },
       "geometry": {
@@ -271,10 +282,21 @@
       "id": "RUS",
       "properties": {
         "name": "Russia",
-        "fill": { "color": "rgba(255,0,255,0.5)" },
-        "stroke": {
-          "color": "rgba(255,0,255,0.5)",
-          "width": 2
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
         }
       },
       "geometry": {
@@ -939,10 +961,21 @@
       "id": "BRA",
       "properties": {
         "name": "Brazil",
-        "fill": { "color": "rgba(255,0,0,0.5)" },
-        "stroke": {
-          "color": "rgba(255,0,0,0.5)",
-          "width": 2
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
         }
       },
       "geometry": {
@@ -1161,10 +1194,21 @@
       "id": "ARG",
       "properties": {
         "name": "Argentina",
-        "fill": { "color": "rgba(0,255,0,0.5)" },
-        "stroke": {
-          "color": "rgba(0,255,0,0.5)",
-          "width": 2
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
         }
       },
       "geometry": {
@@ -1307,10 +1351,21 @@
       "id": "USA",
       "properties": {
         "name": "United States of America",
-        "fill": { "color": "rgba(0,0,255,0.5)" },
-        "stroke": {
-          "color": "rgba(0,0,255,0.5)",
-          "width": 2
+        "style": {
+          "dark": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {
+              "color": "rgba(0,0,255,0.2)",
+              "width": 2
+            },
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
         }
       },
       "geometry": {

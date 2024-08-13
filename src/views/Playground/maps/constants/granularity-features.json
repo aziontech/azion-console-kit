@@ -10,8 +10,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -24,8 +32,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.3)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -38,8 +54,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.2)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -52,8 +76,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.8)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -66,8 +98,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -80,8 +120,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.1)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -94,8 +142,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -108,8 +164,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.3)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -122,8 +186,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.2)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -136,8 +208,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.8)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -150,8 +230,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -164,8 +252,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(0,255,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -178,8 +274,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,165,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 20,
         "points": 4,
         "angle": 4
@@ -192,8 +296,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,165,0,0.5)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 20,
         "points": 4,
         "angle": 4
@@ -206,8 +318,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.7)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 20,
         "points": 4,
         "angle": 4
@@ -220,8 +340,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,165,0,1)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
@@ -234,8 +362,16 @@
     {
       "type": "Feature",
       "properties": {
-        "fill": { "color": "rgba(255,0,0,0.8)" },
-        "stroke": {},
+        "style": {
+          "dark": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          },
+          "light": {
+            "stroke": {},
+            "fill": { "color": "rgba(0,0,255,0.2)" }
+          }
+        },
         "size": 10,
         "points": 4,
         "angle": 4
