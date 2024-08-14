@@ -1,6 +1,6 @@
 <template>
   <div
-    id="granularity-map"
+    id="bubble-map"
     class="w-full h-96"
   />
   <LegendBlock
@@ -13,45 +13,52 @@
   import { onMounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import * as granularityFeatures from './constants/granularity-features.json'
-  import {
-    setOceanFeature,
-    setLandFeature,
-    setLakeFeature,
-    setFeatureStyle,
-    setGranularityFeatureStyle
-  } from './base-layers'
+  import * as bubbleFeatures from './constants/bubble-features.json'
+  import * as heatmapFeatures from './constants/heatmap-features.json'
+  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
 
   import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
-  import Point from 'ol/geom/Point.js'
+  import Circle from 'ol/geom/Circle.js'
   import { Vector as VectorSource } from 'ol/source.js'
   import { Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
-  import { DragPan } from 'ol/interaction'
 
   import LegendBlock from './components/legend-block.vue'
 
-  const granularityMap = ref(null)
+  const map = ref(null)
 
   onMounted(() => {
     initMap()
   })
 
-  const generateGranularity = () => {
-    const granularity = new GeoJSON().readFeatures(granularityFeatures)
+  const generateBubbles = () => {
+    const bubbles = new GeoJSON().readFeatures(bubbleFeatures)
 
-    granularity.forEach((granularity) => {
-      granularity.setGeometry(new Point(fromLonLat(granularity.getGeometry().getCoordinates())))
-
-      setGranularityFeatureStyle(granularity)
+    bubbles.forEach((bubble) => {
+      bubble.setGeometry(
+        new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubble.get('size'))
+      )
+      setFeatureStyle(bubble)
     })
 
-    return granularity
+    return bubbles
+  }
+
+  const generateAreas = () => {
+    const areas = new GeoJSON().readFeatures(heatmapFeatures, {
+      featureProjection: 'EPSG:3857'
+    })
+
+    areas.forEach((area) => {
+      setFeatureStyle(area)
+    })
+
+    return areas
   }
 
   const initMap = () => {
-    granularityMap.value = new Map({
+    map.value = new Map({
       layers: [
         new VectorLayer({
           source: new VectorSource({
@@ -59,18 +66,18 @@
               ...setOceanFeature(),
               ...setLandFeature(),
               ...setLakeFeature(),
-              ...generateGranularity()
+              ...generateBubbles(),
+              ...generateAreas()
             ]
           })
         })
       ],
-      target: 'granularity-map',
+      target: 'bubble-map',
       view: new View({
-        center: fromLonLat([-46.6333, -23.5505]),
-        zoom: 4
+        center: [0, 0],
+        zoom: 2
       }),
-      controls: [],
-      interactions: [new DragPan()]
+      controls: []
     })
   }
 
@@ -98,23 +105,18 @@
 
   const { currentTheme } = storeToRefs(useAccountStore())
   watch(currentTheme, () => {
-    granularityMap.value
+    map.value
       .getAllLayers()[0]
       .getSource()
       .getFeatures()
-      .forEach((feature, idx) => {
-        if (idx === 3) {
-          // granularity feature index
-          setGranularityFeatureStyle(feature)
-        } else {
-          setFeatureStyle(feature)
-        }
+      .forEach((feature) => {
+        setFeatureStyle(feature)
       })
   })
 </script>
 
 <style lang="scss">
-  #granularity-map .ol-viewport {
+  #bubble-map .ol-viewport {
     border-radius: 0.25rem;
   }
 </style>

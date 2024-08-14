@@ -22,12 +22,20 @@ export default {
         'orange-base': '#F3652B'
       },
       backgroundColor: {
-        'orange-bullet': '#F3652B'
+        'orange-bullet': '#F3652B',
+        'scale-red': '#ff7c75',
+        'scale-orange': '#fa9e64',
+        'scale-yellow': '#f0ca5b',
+        'scale-green': '#6bd690'
       },
       borderColor: {
         header: '#3e3e3e',
         'header-hover': '#F3652B',
-        'radio-card-active': '#F3652B'
+        'radio-card-active': '#F3652B',
+        'scale-red': '#ff7c75',
+        'scale-orange': '#fa9e64',
+        'scale-yellow': '#f0ca5b',
+        'scale-green': '#6bd690'
       },
       textColor: {
         header: '#b5b5b5',

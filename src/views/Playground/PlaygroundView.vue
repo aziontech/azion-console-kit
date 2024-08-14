@@ -54,28 +54,10 @@
 
   const CHARTS = [
     {
-      component: defineAsyncComponent(() => import('./maps/GeolocationMap.vue')),
-      title: 'Geolocation Map',
+      component: defineAsyncComponent(() => import('./maps/MapChart.vue')),
+      title: 'Map',
       description:
-        'Displays data points on a map based on geographic coordinates. Useful for visualizing user locations or event distributions.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./maps/HeatmapMap.vue')),
-      title: 'Heatmap Map',
-      description:
-        'Shows data density across a map, highlighting areas of high activity or concentration. Ideal for analyzing patterns and hotspots.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./maps/GranularityMap.vue')),
-      title: 'Granularity by Country',
-      description:
-        'Represents data aggregated by country, allowing for comparison and analysis on a national scale. Useful for global trends and country-level insights.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./maps/BubbleMap.vue')),
-      title: 'Bubble Map',
-      description:
-        'Displays data points with varying sizes based on value, positioned on a map. Great for visualizing the impact or volume of data by location.'
+        'Highlights areas of high activity while also showing the volume of data by location. Ideal for analyzing patterns, hotspots, and the significance of data points across a region.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
@@ -88,6 +70,12 @@
       title: 'Ordered Bar Chart',
       description:
         'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.'
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
+      title: 'Stacked Line Chart',
+      description:
+        'Lines are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
     },
     {
       component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),

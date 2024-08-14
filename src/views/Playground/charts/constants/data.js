@@ -112,6 +112,29 @@ export const STACKED_BAR_CHART_DATA = {
   ...COLOR_PATTERNS
 }
 
+export const STACKED_LINE_CHART_DATA = {
+  data: {
+    x: 'x',
+    xFormat: '%Y',
+    columns: [
+      ['x', '2010', '2011', '2012', '2013', '2014', '2015'],
+      ['Netherlands', -30, 200, 200, 400, -150, 250],
+      ['Nigeria', 130, 100, -100, 200, -150, 50],
+      ['France', -230, 200, 200, -300, 250, 250],
+      ['Brazil', -10, 250, 230, 300, -150, 150]
+    ],
+    type: 'line',
+    groups: [['Netherlands', 'Nigeria', 'France', 'Brazil']]
+  },
+  grid: {
+    y: {
+      lines: [{ value: 0 }]
+    }
+  },
+  ...AXIS_FORMATTING,
+  ...COLOR_PATTERNS
+}
+
 export const PIE_CHART_DATA = {
   data: {
     columns: [
@@ -143,10 +166,20 @@ export const DONUT_CHART_DATA = {
 
 export const GAUGE_CHART_DATA = {
   data: {
-    columns: [['Netherlands', 91.4]],
+    columns: [['Netherlands', 11.4]],
     type: 'gauge'
   },
-  ...COLOR_PATTERNS
+  color: {
+    pattern: [
+      'var(--scale-red)',
+      'var(--scale-orange)',
+      'var(--scale-yellow)',
+      'var(--scale-green)'
+    ],
+    threshold: {
+      values: [30, 60, 90]
+    }
+  }
 }
 
 export const AREA_CHART_DATA = {
