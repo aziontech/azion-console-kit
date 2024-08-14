@@ -285,7 +285,7 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 }
 
 .c3-chart-arc .c3-gauge-value {
-fill: var(--text-color);
+  fill: var(--text-color);
 }
 
 .c3-chart-arc.c3-target g path {
