@@ -26,26 +26,30 @@
 
   import LegendBlock from './components/legend-block.vue'
 
+  import { BUBBLES_DATA, HEATMAP_DATA } from './constants/data'
+  import { bubblesHandler, heatmapHandler } from './utils/features-handler'
+
   const map = ref(null)
 
   onMounted(() => {
     initMap()
   })
 
-  const regionsVariations = ['Rio de Janeiro', 'Moscow', 'China', 'Brazil']
-
   const generateBubbles = () => {
     const bubbles = new GeoJSON().readFeatures(regions)
 
     bubbles.forEach((bubble) => {
-      bubble.setGeometry(
-        new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubble.get('size'))
-      )
-      if (regionsVariations.includes(bubble.get('name'))) {
-        setFeatureStyle(bubble, 'positive-regular-low')
-      } else {
-        setFeatureStyle(bubble, 'positive-regular-medium-high')
+      const bubbleData = bubblesHandler(bubble.get('name'), BUBBLES_DATA)
+
+      if (!bubbleData) {
+        return
       }
+
+      bubble.setGeometry(
+        new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubbleData.size)
+      )
+
+      setFeatureStyle(bubble, bubbleData.variation)
     })
 
     return bubbles
@@ -57,11 +61,13 @@
     })
 
     areas.forEach((area) => {
-      if (regionsVariations.includes(area.get('name'))) {
-        setFeatureStyle(area, 'negative-regular-low')
-      } else {
-        setFeatureStyle(area, 'negative-regular-medium-high')
+      const areaData = heatmapHandler(area.get('name'), HEATMAP_DATA)
+
+      if (!areaData) {
+        return
       }
+
+      setFeatureStyle(area, areaData.variation)
     })
 
     return areas

@@ -39,67 +39,35 @@ const COLORS = {
 }
 
 export const VARIATIONS = {
-  'positive-regular-high': {
-    light: COLORS.light.green,
-    dark: COLORS.dark.green
-  },
-  'positive-regular-medium-high': {
-    light: COLORS.light.yellow,
-    dark: COLORS.dark.yellow
-  },
-  'positive-regular-medium-low': {
-    light: COLORS.light.orange,
-    dark: COLORS.dark.orange
-  },
-  'positive-regular-low': {
+  'regular-high': {
     light: COLORS.light.red,
     dark: COLORS.dark.red
   },
-  'positive-inverse-high': {
-    light: COLORS.light.red,
-    dark: COLORS.dark.red
-  },
-  'positive-inverse-medium-high': {
+  'regular-medium-high': {
     light: COLORS.light.orange,
     dark: COLORS.dark.orange
   },
-  'positive-inverse-medium-low': {
+  'regular-medium-low': {
     light: COLORS.light.yellow,
     dark: COLORS.dark.yellow
   },
-  'positive-inverse-low': {
+  'regular-low': {
     light: COLORS.light.green,
     dark: COLORS.dark.green
   },
-  'negative-regular-high': {
-    light: COLORS.light.red,
-    dark: COLORS.dark.red
+  'inverse-high': {
+    light: COLORS.light.green,
+    dark: COLORS.dark.green
   },
-  'negative-regular-medium-high': {
+  'inverse-medium-high': {
+    light: COLORS.light.yellow,
+    dark: COLORS.dark.yellow
+  },
+  'inverse-medium-low': {
     light: COLORS.light.orange,
     dark: COLORS.dark.orange
   },
-  'negative-regular-medium-low': {
-    light: COLORS.light.yellow,
-    dark: COLORS.dark.yellow
-  },
-  'negative-regular-low': {
-    light: COLORS.light.green,
-    dark: COLORS.dark.green
-  },
-  'negative-inverse-high': {
-    light: COLORS.light.green,
-    dark: COLORS.dark.green
-  },
-  'negative-inverse-medium-high': {
-    light: COLORS.light.yellow,
-    dark: COLORS.dark.yellow
-  },
-  'negative-inverse-medium-low': {
-    light: COLORS.light.orange,
-    dark: COLORS.dark.orange
-  },
-  'negative-inverse-low': {
+  'inverse-low': {
     light: COLORS.light.red,
     dark: COLORS.dark.red
   }

@@ -4,8 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Rio de Janeiro",
-        "size": 500000
+        "name": "Rio de Janeiro"
       },
       "geometry": {
         "type": "Point",
@@ -15,8 +14,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "New York",
-        "size": 700000
+        "name": "New York"
       },
       "geometry": {
         "type": "Point",
@@ -26,8 +24,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Tokio",
-        "size": 800000
+        "name": "Tokio"
       },
       "geometry": {
         "type": "Point",
@@ -37,8 +34,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "London",
-        "size": 600000
+        "name": "London"
       },
       "geometry": {
         "type": "Point",
@@ -48,8 +44,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Paris",
-        "size": 550000
+        "name": "Paris"
       },
       "geometry": {
         "type": "Point",
@@ -59,8 +54,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Cape Town",
-        "size": 450000
+        "name": "Cape Town"
       },
       "geometry": {
         "type": "Point",
@@ -70,8 +64,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Sydney",
-        "size": 500000
+        "name": "Sydney"
       },
       "geometry": {
         "type": "Point",
@@ -81,8 +74,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Moscow",
-        "size": 650000
+        "name": "Moscow"
       },
       "geometry": {
         "type": "Point",
@@ -92,8 +84,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Cairo",
-        "size": 400000
+        "name": "Cairo"
       },
       "geometry": {
         "type": "Point",
@@ -103,8 +94,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Sao Paulo",
-        "size": 300000
+        "name": "Sao Paulo"
       },
       "geometry": {
         "type": "Point",
@@ -114,8 +104,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Brasilia",
-        "size": 500000
+        "name": "Brasilia"
       },
       "geometry": {
         "type": "Point",
@@ -125,8 +114,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Salvador",
-        "size": 400000
+        "name": "Salvador"
       },
       "geometry": {
         "type": "Point",
