@@ -4,6 +4,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Baikal",
         "style": {
           "dark": {
@@ -72,6 +73,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Winnipeg",
         "style": {
           "dark": {
@@ -113,6 +115,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Great Slave Lake",
         "style": {
           "dark": {
@@ -167,6 +170,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "L. Ontario",
         "style": {
           "dark": {
@@ -213,6 +217,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "L. Erie",
         "style": {
           "dark": {
@@ -261,6 +266,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Superior",
         "style": {
           "dark": {
@@ -321,6 +327,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Victoria",
         "style": {
           "dark": {
@@ -369,6 +376,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Ladoga",
         "style": {
           "dark": {
@@ -413,6 +421,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Balkhash",
         "style": {
           "dark": {
@@ -468,6 +477,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Tanganyika",
         "style": {
           "dark": {
@@ -519,6 +529,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Malawi",
         "style": {
           "dark": {
@@ -568,6 +579,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Aral Sea",
         "style": {
           "dark": {
@@ -621,6 +633,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Vänern",
         "style": {
           "dark": {
@@ -664,6 +677,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Okeechobee",
         "style": {
           "dark": {
@@ -699,6 +713,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lago de Nicaragua",
         "style": {
           "dark": {
@@ -736,6 +751,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Tana",
         "style": {
           "dark": {
@@ -773,6 +789,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lago Titicaca",
         "style": {
           "dark": {
@@ -819,6 +836,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Winnipegosis",
         "style": {
           "dark": {
@@ -868,6 +886,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Onega",
         "style": {
           "dark": {
@@ -921,6 +940,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Great Salt Lake",
         "style": {
           "dark": {
@@ -960,6 +980,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Great Bear Lake",
         "style": {
           "dark": {
@@ -1014,6 +1035,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Athabasca",
         "style": {
           "dark": {
@@ -1052,6 +1074,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Reindeer Lake",
         "style": {
           "dark": {
@@ -1096,6 +1119,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Huron",
         "style": {
           "dark": {
@@ -1157,6 +1181,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lake Michigan",
         "style": {
           "dark": {

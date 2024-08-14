@@ -4,6 +4,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Afghanistan",
         "style": {
           "dark": {
@@ -102,6 +103,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Angola",
         "style": {
           "dark": {
@@ -212,6 +214,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Albania",
         "style": {
           "dark": {
@@ -265,6 +268,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "United Arab Emirates",
         "style": {
           "dark": {
@@ -316,6 +320,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Argentina",
         "style": {
           "dark": {
@@ -472,6 +477,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Armenia",
         "style": {
           "dark": {
@@ -521,6 +527,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Antarctica",
         "style": {
           "dark": {
@@ -1241,6 +1248,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Fr. S. Antarctic Lands",
         "style": {
           "dark": {
@@ -1279,6 +1287,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Australia",
         "style": {
           "dark": {
@@ -1555,6 +1564,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Austria",
         "style": {
           "dark": {
@@ -1621,6 +1631,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Azerbaijan",
         "style": {
           "dark": {
@@ -1700,6 +1711,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Burundi",
         "style": {
           "dark": {
@@ -1742,6 +1754,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Belgium",
         "style": {
           "dark": {
@@ -1788,6 +1801,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Benin",
         "style": {
           "dark": {
@@ -1842,6 +1856,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Burkina Faso",
         "style": {
           "dark": {
@@ -1910,6 +1925,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bangladesh",
         "style": {
           "dark": {
@@ -1975,6 +1991,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bulgaria",
         "style": {
           "dark": {
@@ -2032,6 +2049,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bahamas",
         "style": {
           "dark": {
@@ -2092,6 +2110,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bosnia and Herz.",
         "style": {
           "dark": {
@@ -2144,6 +2163,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Belarus",
         "style": {
           "dark": {
@@ -2218,6 +2238,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Belize",
         "style": {
           "dark": {
@@ -2267,6 +2288,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bolivia",
         "style": {
           "dark": {
@@ -2356,6 +2378,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Brazil",
         "style": {
           "dark": {
@@ -2588,6 +2611,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Brunei",
         "style": {
           "dark": {
@@ -2625,6 +2649,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Bhutan",
         "style": {
           "dark": {
@@ -2667,6 +2692,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Botswana",
         "style": {
           "dark": {
@@ -2736,6 +2762,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Central African Rep.",
         "style": {
           "dark": {
@@ -2827,6 +2854,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Canada",
         "style": {
           "dark": {
@@ -3768,6 +3796,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Switzerland",
         "style": {
           "dark": {
@@ -3821,6 +3850,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Chile",
         "style": {
           "dark": {
@@ -3970,6 +4000,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "China",
         "style": {
           "dark": {
@@ -4245,6 +4276,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Côte d'Ivoire",
         "style": {
           "dark": {
@@ -4320,6 +4352,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Cameroon",
         "style": {
           "dark": {
@@ -4410,6 +4443,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Dem. Rep. Congo",
         "style": {
           "dark": {
@@ -4563,6 +4597,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Congo",
         "style": {
           "dark": {
@@ -4641,6 +4676,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Colombia",
         "style": {
           "dark": {
@@ -4770,6 +4806,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Costa Rica",
         "style": {
           "dark": {
@@ -4835,6 +4872,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Cuba",
         "style": {
           "dark": {
@@ -4906,6 +4944,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "N. Cyprus",
         "style": {
           "dark": {
@@ -4951,6 +4990,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Cyprus",
         "style": {
           "dark": {
@@ -4995,6 +5035,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Czechia",
         "style": {
           "dark": {
@@ -5059,6 +5100,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Germany",
         "style": {
           "dark": {
@@ -5146,6 +5188,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Djibouti",
         "style": {
           "dark": {
@@ -5190,6 +5233,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Denmark",
         "style": {
           "dark": {
@@ -5249,6 +5293,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Dominican Rep.",
         "style": {
           "dark": {
@@ -5304,6 +5349,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Algeria",
         "style": {
           "dark": {
@@ -5395,6 +5441,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Ecuador",
         "style": {
           "dark": {
@@ -5457,6 +5504,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Egypt",
         "style": {
           "dark": {
@@ -5530,6 +5578,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Eritrea",
         "style": {
           "dark": {
@@ -5587,6 +5636,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Spain",
         "style": {
           "dark": {
@@ -5667,6 +5717,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Estonia",
         "style": {
           "dark": {
@@ -5715,6 +5766,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Ethiopia",
         "style": {
           "dark": {
@@ -5803,6 +5855,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Finland",
         "style": {
           "dark": {
@@ -5872,6 +5925,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Fiji",
         "style": {
           "dark": {
@@ -5933,6 +5987,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Falkland Is.",
         "style": {
           "dark": {
@@ -5972,6 +6027,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "France",
         "style": {
           "dark": {
@@ -6085,6 +6141,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Gabon",
         "style": {
           "dark": {
@@ -6145,6 +6202,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "United Kingdom",
         "style": {
           "dark": {
@@ -6236,6 +6294,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Georgia",
         "style": {
           "dark": {
@@ -6289,6 +6348,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Ghana",
         "style": {
           "dark": {
@@ -6343,6 +6403,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Guinea",
         "style": {
           "dark": {
@@ -6442,6 +6503,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Gambia",
         "style": {
           "dark": {
@@ -6487,6 +6549,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Guinea-Bissau",
         "style": {
           "dark": {
@@ -6535,6 +6598,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Eq. Guinea",
         "style": {
           "dark": {
@@ -6571,6 +6635,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Greece",
         "style": {
           "dark": {
@@ -6660,6 +6725,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Greenland",
         "style": {
           "dark": {
@@ -6821,6 +6887,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Guatemala",
         "style": {
           "dark": {
@@ -6885,6 +6952,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Guyana",
         "style": {
           "dark": {
@@ -6954,6 +7022,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Honduras",
         "style": {
           "dark": {
@@ -7040,6 +7109,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Croatia",
         "style": {
           "dark": {
@@ -7112,6 +7182,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Haiti",
         "style": {
           "dark": {
@@ -7162,6 +7233,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Hungary",
         "style": {
           "dark": {
@@ -7223,6 +7295,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Indonesia",
         "style": {
           "dark": {
@@ -7552,6 +7625,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "India",
         "style": {
           "dark": {
@@ -7717,6 +7791,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Ireland",
         "style": {
           "dark": {
@@ -7759,6 +7834,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Iran",
         "style": {
           "dark": {
@@ -7864,6 +7940,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Iraq",
         "style": {
           "dark": {
@@ -7923,6 +8000,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Iceland",
         "style": {
           "dark": {
@@ -7972,6 +8050,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Israel",
         "style": {
           "dark": {
@@ -8027,6 +8106,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Italy",
         "style": {
           "dark": {
@@ -8153,6 +8233,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Jamaica",
         "style": {
           "dark": {
@@ -8193,6 +8274,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Jordan",
         "style": {
           "dark": {
@@ -8241,6 +8323,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Japan",
         "style": {
           "dark": {
@@ -8345,6 +8428,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Kazakhstan",
         "style": {
           "dark": {
@@ -8486,6 +8570,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Kenya",
         "style": {
           "dark": {
@@ -8552,6 +8637,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Kyrgyzstan",
         "style": {
           "dark": {
@@ -8616,6 +8702,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Cambodia",
         "style": {
           "dark": {
@@ -8662,6 +8749,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "South Korea",
         "style": {
           "dark": {
@@ -8710,6 +8798,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Kosovo",
         "style": {
           "dark": {
@@ -8760,6 +8849,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Kuwait",
         "style": {
           "dark": {
@@ -8798,6 +8888,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Laos",
         "style": {
           "dark": {
@@ -8864,6 +8955,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lebanon",
         "style": {
           "dark": {
@@ -8904,6 +8996,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Liberia",
         "style": {
           "dark": {
@@ -8960,6 +9053,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Libya",
         "style": {
           "dark": {
@@ -9045,6 +9139,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Sri Lanka",
         "style": {
           "dark": {
@@ -9084,6 +9179,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lesotho",
         "style": {
           "dark": {
@@ -9125,6 +9221,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Lithuania",
         "style": {
           "dark": {
@@ -9173,6 +9270,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Luxembourg",
         "style": {
           "dark": {
@@ -9209,6 +9307,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Latvia",
         "style": {
           "dark": {
@@ -9260,6 +9359,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Morocco",
         "style": {
           "dark": {
@@ -9352,6 +9452,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Moldova",
         "style": {
           "dark": {
@@ -9408,6 +9509,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Madagascar",
         "style": {
           "dark": {
@@ -9486,6 +9588,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Mexico",
         "style": {
           "dark": {
@@ -9685,6 +9788,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Macedonia",
         "style": {
           "dark": {
@@ -9732,6 +9836,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Mali",
         "style": {
           "dark": {
@@ -9837,6 +9942,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Myanmar",
         "style": {
           "dark": {
@@ -9936,6 +10042,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Montenegro",
         "style": {
           "dark": {
@@ -9983,6 +10090,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Mongolia",
         "style": {
           "dark": {
@@ -10087,6 +10195,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Mozambique",
         "style": {
           "dark": {
@@ -10195,6 +10304,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Mauritania",
         "style": {
           "dark": {
@@ -10263,6 +10373,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Malawi",
         "style": {
           "dark": {
@@ -10320,6 +10431,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Malaysia",
         "style": {
           "dark": {
@@ -10417,6 +10529,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Namibia",
         "style": {
           "dark": {
@@ -10490,6 +10603,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "New Caledonia",
         "style": {
           "dark": {
@@ -10532,6 +10646,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Niger",
         "style": {
           "dark": {
@@ -10619,6 +10734,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Nigeria",
         "style": {
           "dark": {
@@ -10706,6 +10822,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Nicaragua",
         "style": {
           "dark": {
@@ -10787,6 +10904,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Netherlands",
         "style": {
           "dark": {
@@ -10831,6 +10949,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Norway",
         "style": {
           "dark": {
@@ -10962,6 +11081,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Nepal",
         "style": {
           "dark": {
@@ -11014,6 +11134,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "New Zealand",
         "style": {
           "dark": {
@@ -11115,6 +11236,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Oman",
         "style": {
           "dark": {
@@ -11197,6 +11319,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Pakistan",
         "style": {
           "dark": {
@@ -11292,6 +11415,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Panama",
         "style": {
           "dark": {
@@ -11373,6 +11497,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Peru",
         "style": {
           "dark": {
@@ -11478,6 +11603,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Philippines",
         "style": {
           "dark": {
@@ -11643,6 +11769,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Papua New Guinea",
         "style": {
           "dark": {
@@ -11767,6 +11894,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Poland",
         "style": {
           "dark": {
@@ -11841,6 +11969,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Puerto Rico",
         "style": {
           "dark": {
@@ -11879,6 +12008,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "North Korea",
         "style": {
           "dark": {
@@ -11962,6 +12092,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Portugal",
         "style": {
           "dark": {
@@ -12024,6 +12155,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Paraguay",
         "style": {
           "dark": {
@@ -12086,6 +12218,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Palestine",
         "style": {
           "dark": {
@@ -12124,6 +12257,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Qatar",
         "style": {
           "dark": {
@@ -12162,6 +12296,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Romania",
         "style": {
           "dark": {
@@ -12235,6 +12370,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Russia",
         "style": {
           "dark": {
@@ -12943,6 +13079,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Rwanda",
         "style": {
           "dark": {
@@ -12986,6 +13123,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "W. Sahara",
         "style": {
           "dark": {
@@ -13043,6 +13181,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Saudi Arabia",
         "style": {
           "dark": {
@@ -13148,6 +13287,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Sudan",
         "style": {
           "dark": {
@@ -13258,6 +13398,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "S. Sudan",
         "style": {
           "dark": {
@@ -13350,6 +13491,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Senegal",
         "style": {
           "dark": {
@@ -13423,6 +13565,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Solomon Is.",
         "style": {
           "dark": {
@@ -13507,6 +13650,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Sierra Leone",
         "style": {
           "dark": {
@@ -13558,6 +13702,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "El Salvador",
         "style": {
           "dark": {
@@ -13607,6 +13752,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Somaliland",
         "style": {
           "dark": {
@@ -13662,6 +13808,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Somalia",
         "style": {
           "dark": {
@@ -13728,6 +13875,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Serbia",
         "style": {
           "dark": {
@@ -13805,6 +13953,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Suriname",
         "style": {
           "dark": {
@@ -13860,6 +14009,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Slovakia",
         "style": {
           "dark": {
@@ -13922,6 +14072,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Slovenia",
         "style": {
           "dark": {
@@ -13969,6 +14120,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Sweden",
         "style": {
           "dark": {
@@ -14038,6 +14190,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Swaziland",
         "style": {
           "dark": {
@@ -14078,6 +14231,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Syria",
         "style": {
           "dark": {
@@ -14134,6 +14288,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Chad",
         "style": {
           "dark": {
@@ -14221,6 +14376,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Togo",
         "style": {
           "dark": {
@@ -14269,6 +14425,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Thailand",
         "style": {
           "dark": {
@@ -14362,6 +14519,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Tajikistan",
         "style": {
           "dark": {
@@ -14432,6 +14590,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Turkmenistan",
         "style": {
           "dark": {
@@ -14515,6 +14674,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Timor-Leste",
         "style": {
           "dark": {
@@ -14555,6 +14715,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Trinidad and Tobago",
         "style": {
           "dark": {
@@ -14592,6 +14753,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Tunisia",
         "style": {
           "dark": {
@@ -14652,6 +14814,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Turkey",
         "style": {
           "dark": {
@@ -14755,6 +14918,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Taiwan",
         "style": {
           "dark": {
@@ -14793,6 +14957,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Tanzania",
         "style": {
           "dark": {
@@ -14874,6 +15039,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Uganda",
         "style": {
           "dark": {
@@ -14931,6 +15097,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Ukraine",
         "style": {
           "dark": {
@@ -15053,6 +15220,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Uruguay",
         "style": {
           "dark": {
@@ -15103,6 +15271,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "United States of America",
         "style": {
           "dark": {
@@ -15617,6 +15786,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Uzbekistan",
         "style": {
           "dark": {
@@ -15700,6 +15870,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Venezuela",
         "style": {
           "dark": {
@@ -15821,6 +15992,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Vietnam",
         "style": {
           "dark": {
@@ -15894,6 +16066,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Vanuatu",
         "style": {
           "dark": {
@@ -15941,6 +16114,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Yemen",
         "style": {
           "dark": {
@@ -16014,6 +16188,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "South Africa",
         "style": {
           "dark": {
@@ -16139,6 +16314,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Zambia",
         "style": {
           "dark": {
@@ -16229,6 +16405,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "name": "Zimbabwe",
         "style": {
           "dark": {

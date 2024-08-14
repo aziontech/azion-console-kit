@@ -3,25 +3,8 @@
   "features": [
     {
       "type": "Feature",
-      "id": "CHN",
       "properties": {
-        "name": "China",
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          }
-        }
+        "name": "China"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -279,25 +262,8 @@
     },
     {
       "type": "Feature",
-      "id": "RUS",
       "properties": {
-        "name": "Russia",
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          }
-        }
+        "name": "Russia"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -958,25 +924,8 @@
 
     {
       "type": "Feature",
-      "id": "BRA",
       "properties": {
-        "name": "Brazil",
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          }
-        }
+        "name": "Brazil"
       },
       "geometry": {
         "type": "Polygon",
@@ -1191,25 +1140,8 @@
     },
     {
       "type": "Feature",
-      "id": "ARG",
       "properties": {
-        "name": "Argentina",
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          }
-        }
+        "name": "Argentina"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1348,25 +1280,8 @@
     },
     {
       "type": "Feature",
-      "id": "USA",
       "properties": {
-        "name": "United States of America",
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#6bd690",
-              "width": 2
-            },
-            "fill": { "color": "#6bd69080" }
-          }
-        }
+        "name": "United States of America"
       },
       "geometry": {
         "type": "MultiPolygon",

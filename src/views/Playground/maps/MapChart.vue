@@ -1,6 +1,6 @@
 <template>
   <div
-    id="bubble-map"
+    id="general-map"
     class="w-full h-96"
   />
   <LegendBlock
@@ -13,9 +13,9 @@
   import { onMounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import * as bubbleFeatures from './constants/bubble-features.json'
-  import * as heatmapFeatures from './constants/heatmap-features.json'
-  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './base-layers'
+  import * as regions from './json/regions.json'
+  import * as countries from './json/countries.json'
+  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './utils'
 
   import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
@@ -32,26 +32,36 @@
     initMap()
   })
 
+  const regionsVariations = ['Rio de Janeiro', 'Moscow', 'China', 'Brazil']
+
   const generateBubbles = () => {
-    const bubbles = new GeoJSON().readFeatures(bubbleFeatures)
+    const bubbles = new GeoJSON().readFeatures(regions)
 
     bubbles.forEach((bubble) => {
       bubble.setGeometry(
         new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubble.get('size'))
       )
-      setFeatureStyle(bubble)
+      if (regionsVariations.includes(bubble.get('name'))) {
+        setFeatureStyle(bubble, 'positive-regular-low')
+      } else {
+        setFeatureStyle(bubble, 'positive-regular-medium-high')
+      }
     })
 
     return bubbles
   }
 
   const generateAreas = () => {
-    const areas = new GeoJSON().readFeatures(heatmapFeatures, {
+    const areas = new GeoJSON().readFeatures(countries, {
       featureProjection: 'EPSG:3857'
     })
 
     areas.forEach((area) => {
-      setFeatureStyle(area)
+      if (regionsVariations.includes(area.get('name'))) {
+        setFeatureStyle(area, 'negative-regular-low')
+      } else {
+        setFeatureStyle(area, 'negative-regular-medium-high')
+      }
     })
 
     return areas
@@ -72,7 +82,7 @@
           })
         })
       ],
-      target: 'bubble-map',
+      target: 'general-map',
       view: new View({
         center: [0, 0],
         zoom: 2
@@ -110,13 +120,16 @@
       .getSource()
       .getFeatures()
       .forEach((feature) => {
-        setFeatureStyle(feature)
+        if (feature.get('base')) {
+          setFeatureStyle(feature)
+        }
       })
   })
 </script>
 
 <style lang="scss">
-  #bubble-map .ol-viewport {
+  #general-map .ol-viewport {
     border-radius: 0.25rem;
   }
 </style>
+./json

@@ -4,6 +4,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "style": {
           "dark": {
             "stroke": {
@@ -84,6 +85,7 @@
     {
       "type": "Feature",
       "properties": {
+        "base": true,
         "style": {
           "dark": {
             "stroke": {
