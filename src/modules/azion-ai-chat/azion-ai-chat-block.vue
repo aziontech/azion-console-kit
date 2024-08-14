@@ -175,7 +175,7 @@
       container: {
         width: '100%',
         height: 'auto',
-        padding: '16px',
+        padding: '5.5px 8px',
         fontSize: '14px',
         boxSizing: 'border-box',
         border: '1px solid var(--surface-400)',
@@ -208,8 +208,8 @@
           objectFit: 'cover',
           width: '32px',
           height: '32px',
-          bottom: '30px',
-          right: '36px',
+          bottom: '20px',
+          right: '26px',
           margin: '0'
         }
       }
