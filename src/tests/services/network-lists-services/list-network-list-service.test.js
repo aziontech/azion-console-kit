@@ -65,6 +65,7 @@ describe('NetworkListsServices', () => {
     expect(result).toEqual([
       {
         id: fixtures.networkMock.id,
+        stringId: fixtures.networkMock.id.toString(),
         name: fixtures.networkMock.name,
         lastEditor: fixtures.networkMock.last_editor,
         listType: 'IP/CIDR',
