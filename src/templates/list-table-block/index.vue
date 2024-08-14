@@ -12,7 +12,6 @@
       scrollable
       removableSort
       :value="data"
-      selectionMode="single"
       dataKey="id"
       @row-click="editItemSelected"
       rowHover
@@ -91,6 +90,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        class="hover:cursor-pointer"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
