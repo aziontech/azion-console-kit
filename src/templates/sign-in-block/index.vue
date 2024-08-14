@@ -31,7 +31,7 @@
               id="email"
               placeholder="example@email.com"
               type="email"
-              autofocus
+              @vue:mounted="({ el }) => autofocusInput(el)"
               @keydown.enter="checkLoginMethod"
               class="w-full"
               :class="{ 'p-invalid': errors.email }"
@@ -113,6 +113,7 @@
               toggleMask
               v-model="password"
               id="password"
+              @vue:mounted="({ el }) => autofocusInput(el)"
               class="w-full"
               :class="{ 'p-invalid': hasRequestErrorMessage }"
               @keydown.enter="validateAndSubmit"
@@ -325,5 +326,10 @@
     hasRequestErrorMessage.value = false
     showPassword.value = false
     resetField()
+  }
+
+  const autofocusInput = (inputEl) => {
+    const inputElement = inputEl.querySelector('input') || inputEl
+    inputElement.focus()
   }
 </script>

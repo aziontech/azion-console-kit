@@ -2,6 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import InlineMessage from 'primevue/inlinemessage'
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-variables' })
@@ -40,15 +41,23 @@
           data-testid="variables-form__value-field"
         />
       </div>
-      <div class="flex gap-3 items-center">
-        <FieldSwitchBlock
-          nameField="secret"
-          name="secret"
-          auto
-          :isCard="false"
-          title="Secret"
-          data-testid="variables-form__secret-field"
-        />
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex items-center">
+          <FieldSwitchBlock
+            nameField="secret"
+            name="secret"
+            auto
+            :isCard="false"
+            title="Secret"
+            data-testid="variables-form__secret-field"
+          />
+        </div>
+        <InlineMessage
+          severity="info"
+          class="w-fit"
+        >
+          Once a variable is saved as a secret, its behavior cannot be edited.
+        </InlineMessage>
       </div>
     </template>
   </FormHorizontal>

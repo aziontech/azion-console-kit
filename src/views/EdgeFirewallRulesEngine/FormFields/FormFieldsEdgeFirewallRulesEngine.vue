@@ -623,7 +623,7 @@
                 :loading="loadingNetworkList"
                 placeholder="Select a Network"
                 optionLabel="name"
-                optionValue="id"
+                optionValue="stringId"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
                 :filter="true"

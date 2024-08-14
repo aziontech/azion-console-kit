@@ -32,42 +32,28 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run: yarn test:unit:headless
+        run: yarn test:unit:coverage
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v3
         with:
           name: coverage_unit_report
           path: |
-            coverage/lcov.info
-            coverage/sonar-report.xml
+            coverage/unit/lcov.info
+            coverage/unit/sonar-report.xml
           retention-days: 1
 
-  # sonarqube-analysis:
-  #   name: SonarQube Analysis
-  #   if: ${{ github.actor != 'dependabot[bot]' }}
-  #   needs: [run-tests]
-  #   runs-on: [self-hosted, sonarqube, stage]
-  #   timeout-minutes: 5
-  #   container:
-  #     image: ubuntu:22.04
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: Download coverage reports
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: coverage_unit_report
-
-  #     - name: Fix code coverage paths - lcov.info
-  #       run: |
-  #         sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
-  #         sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' sonar-report.xml
-
-  #     - name: SonarQube Scan
-  #       uses: sonarsource/sonarqube-scan-action@master
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  sonarcloud:
+    needs: [run-tests]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - uses: actions/download-artifact@v3
+      with:
+        name: coverage_unit_report          
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@v2.3.0
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}

@@ -25,10 +25,12 @@ import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 import { convertValueToDate, convertDateToLocalTimezone, formatDateToUS } from './convert-date'
+import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
 import { goToClassicInterface } from './go-to-classic-interface'
 import { removeHtmlTagFromText } from './remove-html-tag-from-text'
+import { getCsvCellContentFromRowData } from './get-csv-cell-content-from-row-data'
 
 export {
   InviteSession,
@@ -63,5 +65,8 @@ export {
   getVulcanPresets,
   goToClassicInterface,
   formatDateToUS,
-  openShowMorePlan
+  formatCurrencyString,
+  formatUnitValue,
+  openShowMorePlan,
+  getCsvCellContentFromRowData
 }

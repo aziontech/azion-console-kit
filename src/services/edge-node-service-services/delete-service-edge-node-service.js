@@ -14,7 +14,7 @@ export const deleteServiceEdgeNodeService = async ({ edgeNodeId, id }) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 204:
-      return 'Service on Edge Node successfully deleted'
+      return 'Service successfully unbound'
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

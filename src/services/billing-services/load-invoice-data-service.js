@@ -5,17 +5,20 @@ import { formatDateToUSBilling } from '@/helpers/convert-date'
 
 export const loadInvoiceDataService = async (invoiceId) => {
   const payload = {
-    query: `query getBillDetail {
+    query: `query getBillDetail($billID: ID!, $invoiceId: String!) {
       billDetail(
-          aggregate: { sum: value }
-          groupBy: [billId]
-          orderBy: [productSlug_ASC, metricSlug_ASC]
-          filter: {
-            billId: ${invoiceId}
-        }) {
+        aggregate: { sum: value }
+        groupBy: [billId]
+        orderBy: [productSlug_ASC, metricSlug_ASC]
+        filter: {
+          or: [
+            { billId: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
+      ) {
           billId,
-          billDetailId
-          totalValue,
+          billDetailId,
           createdDate,
           periodFrom,
           periodTo,
@@ -24,7 +27,11 @@ export const loadInvoiceDataService = async (invoiceId) => {
           currency,
           temporaryBill
       }
-    }`
+    }`,
+    variables: {
+      billID: invoiceId,
+      invoiceId
+    }
   }
 
   let httpResponse = await AxiosHttpClientAdapter.request(

@@ -99,6 +99,10 @@
     ]
   })
 
+  const customColumnMapper = (rowData) => ({
+    edgeFunctionsList: rowData.data.value
+  })
+
   const goToCreateEdgeFunction = () => {
     router.push({ name: 'create-edge-functions' })
   }
@@ -129,6 +133,8 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="edge-functions-logs"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock

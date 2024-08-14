@@ -24,8 +24,8 @@ jobs:
 
       - name: Download Azion CLI
         run: |
-          wget https://github.com/aziontech/azion/releases/download/1.34.1/azion_1.34.1_linux_amd64.apk
-          apk add --allow-untrusted azion_1.34.1_linux_amd64.apk
+          wget https://github.com/aziontech/azion/releases/download/1.34.2/azion_1.34.2_linux_amd64.apk
+          apk add --allow-untrusted azion_1.34.2_linux_amd64.apk
 
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
@@ -34,6 +34,7 @@ jobs:
         run: azion deploy --auto --debug --config-dir azion/stage
         env:
           VITE_STRIPE_TOKEN_STAGE: ${{ secrets.STAGE_STRIPE_TOKEN }}
-          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
+          VITE_SEGMENT_TOKEN: ${{ secrets.STAGE_SEGMENT_TOKEN }}
           NODE_ENV: stage
           VITE_ENVIRONMENT: stage
