@@ -13,8 +13,8 @@
   import { onMounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import * as regions from './json/regions.json'
-  import * as countries from './json/countries.json'
+  import * as bubblesFeatures from './json/bubbles.json'
+  import * as heatmapFeatures from './json/heatmap.json'
   import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './utils'
 
   import { Map, View } from 'ol/index.js'
@@ -35,7 +35,7 @@
   const regionsVariations = ['Rio de Janeiro', 'Moscow', 'China', 'Brazil']
 
   const generateBubbles = () => {
-    const bubbles = new GeoJSON().readFeatures(regions)
+    const bubbles = new GeoJSON().readFeatures(bubblesFeatures)
 
     bubbles.forEach((bubble) => {
       bubble.setGeometry(
@@ -52,7 +52,7 @@
   }
 
   const generateAreas = () => {
-    const areas = new GeoJSON().readFeatures(countries, {
+    const areas = new GeoJSON().readFeatures(heatmapFeatures, {
       featureProjection: 'EPSG:3857'
     })
 
