@@ -94,6 +94,9 @@
       }
     ]
   })
+  const customColumnMapper = (rowData) => ({
+    title: rowData.data.text
+  })
 </script>
 
 <template>
@@ -115,13 +118,15 @@
   </div>
   <ListTableBlock
     v-if="hasContentToList && filterDate.tsRangeBegin"
+    isTabs
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
-    isTabs
+    :csvMapper="customColumnMapper"
+    exportFileName="activity-history-logs"
   />
 
   <EmptyResultsBlock

@@ -106,6 +106,10 @@
       }
     ]
   })
+
+  const customColumnMapper = (rowData) => ({
+    upstreamCacheStatus: rowData.data.content
+  })
 </script>
 
 <template>
@@ -134,6 +138,8 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
+    exportFileName="tiered-cache-logs"
+    :csvMapper="customColumnMapper"
   />
 
   <EmptyResultsBlock
