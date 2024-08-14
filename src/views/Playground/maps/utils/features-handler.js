@@ -29,7 +29,8 @@ export const bubblesHandler = (name, data) => {
 
   return {
     variation: rangeVariations(featureData.value, featureData.rangeVariation),
-    size: featureData.value * BUBBLE_SIZE
+    size: featureData.value * BUBBLE_SIZE,
+    value: featureData.value
   }
 }
 
@@ -41,6 +42,7 @@ export const heatmapHandler = (name, data) => {
   }
 
   return {
-    variation: rangeVariations(featureData.value, featureData.rangeVariation)
+    variation: rangeVariations(featureData.value, featureData.rangeVariation),
+    value: featureData.value
   }
 }
