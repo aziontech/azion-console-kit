@@ -4,7 +4,7 @@
       :class="`flag flag-${code} h-4 w-6`"
       aria-hidden="true"
     />
-    <span class="text-base">{{ country }}</span>
+    <span>{{ country }}</span>
   </div>
 </template>
 
