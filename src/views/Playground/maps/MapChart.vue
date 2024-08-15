@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
+  import { onMounted, onUnmounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as regions from './json/regions.json'
@@ -36,6 +36,11 @@
 
   onMounted(() => {
     initMap()
+    map.value.getTargetElement().addEventListener('pointerleave', hideTooltip)
+  })
+
+  onUnmounted(() => {
+    map.value.getTargetElement().removeEventListener('pointerleave', hideTooltip)
   })
 
   const generateBubbles = () => {
@@ -118,10 +123,6 @@
       const pixel = map.value.getEventPixel(event.originalEvent)
 
       displayHeatmapTooltip(pixel)
-    })
-
-    map.value.on('pointerleave', () => {
-      hideTooltip()
     })
   }
 
