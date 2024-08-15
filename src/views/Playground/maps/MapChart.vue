@@ -1,7 +1,8 @@
 <template>
   <div
     id="general-map"
-    class="w-full h-96"
+    class="w-full h-96 [&>.ol-viewport]:rounded"
+    ref="mapTemplateRef"
   />
   <MapTooltipBlock :data="tooltipProps" />
   <MapLegendBlock
@@ -12,6 +13,7 @@
 
 <script setup>
   import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import { onClickOutside } from '@vueuse/core'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as regions from './json/regions.json'
@@ -31,6 +33,7 @@
   import { BUBBLES_DATA, HEATMAP_DATA } from './constants/data'
   import { bubblesHandler, heatmapHandler } from './utils/features-handler'
 
+  const mapTemplateRef = ref(null)
   const map = ref(null)
   const tooltipProps = ref({})
 
@@ -42,6 +45,8 @@
   onUnmounted(() => {
     map.value.getTargetElement().removeEventListener('pointerleave', hideTooltip)
   })
+
+  onClickOutside(mapTemplateRef, () => hideTooltip())
 
   const generateBubbles = () => {
     const bubbles = new GeoJSON().readFeatures(regions)
@@ -115,22 +120,30 @@
     })
 
     map.value.on('pointermove', (event) => {
-      if (event.dragging) {
-        tooltipProps.value = {}
-        return
-      }
-
-      const pixel = map.value.getEventPixel(event.originalEvent)
-
-      displayHeatmapTooltip(pixel)
+      handleTooltipByEvent(event)
     })
+
+    map.value.on('singleclick', (event) => {
+      handleTooltipByEvent(event)
+    })
+  }
+
+  const handleTooltipByEvent = (event) => {
+    if (event.dragging) {
+      tooltipProps.value = {}
+      return
+    }
+
+    const pixel = map.value.getEventPixel(event.originalEvent)
+
+    displayTooltip(pixel)
   }
 
   const hideTooltip = () => {
     tooltipProps.value = {}
   }
 
-  const displayHeatmapTooltip = (pixel) => {
+  const displayTooltip = (pixel) => {
     const feature = map.value.forEachFeatureAtPixel(pixel, (feature) => feature)
 
     if (feature && feature.get('kind')) {
@@ -151,19 +164,19 @@
     caption: [
       {
         label: '100.000 accesses',
-        bullet: 'bg-red-500 border-red-500'
+        bullet: 'bg-scale-red border-scale-red'
       },
       {
         label: '10.000 accesses',
-        bullet: 'bg-orange-500 border-orange-500'
+        bullet: 'bg-scale-orange border-scale-orange'
       },
       {
         label: '1.000 accesses',
-        bullet: 'bg-yellow-500 border-yellow-500'
+        bullet: 'bg-scale-yellow border-scale-yellow'
       },
       {
         label: '< 100 accesses',
-        bullet: 'bg-green-500 border-green-500'
+        bullet: 'bg-scale-green border-scale-green'
       }
     ]
   }
@@ -181,9 +194,3 @@
       })
   })
 </script>
-
-<style lang="scss">
-  #general-map .ol-viewport {
-    border-radius: 0.25rem;
-  }
-</style>

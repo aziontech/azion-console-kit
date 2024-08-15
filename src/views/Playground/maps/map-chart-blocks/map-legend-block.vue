@@ -1,6 +1,6 @@
 <template>
   <div
-    id="legend-block"
+    id="map-legend-block"
     class="w-44 h-32 absolute bottom-3 right-3 surface-card rounded border surface-border px-4 py-3 flex flex-col gap-2 text-color"
   >
     <p class="text-sm font-medium">{{ title }}</p>
@@ -33,11 +33,11 @@
 </script>
 
 <style lang="scss">
-  .azion-dark #legend-block {
+  .azion-dark #map-legend-block {
     background-color: rgba(#171717, 0.85);
   }
 
-  #legend-block {
+  #map-legend-block {
     background-color: rgba(#ffffff, 0.85);
   }
 </style>
