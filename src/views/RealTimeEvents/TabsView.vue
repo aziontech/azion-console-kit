@@ -24,6 +24,7 @@
             <component
               :is="tab.component"
               v-bind="tab.props"
+              ref="viewRef"
               v-model:filterData="filterData"
               v-if="tabActive(tab.table)"
             >
@@ -31,7 +32,6 @@
                 <ContentFilterBlock
                   v-model:filterData="filterData"
                   :downloadCSV="downloadCSV"
-                  @updatedFilter="reload"
                 />
               </template>
             </component>
@@ -103,6 +103,7 @@
     tsRange: {},
     fields: []
   })
+  const viewRef = ref(null)
 
   const mapTabs = {
     httpRequests: {
@@ -232,11 +233,6 @@
     }
 
     selectedTab(tabPanels[0])
-  }
-
-  const reload = () => {
-    // eslint-disable-next-line no-console
-    console.log('reload')
   }
 
   onMounted(() => {

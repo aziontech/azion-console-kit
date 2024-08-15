@@ -42,7 +42,8 @@
 
   const filterOverPanel = ref(null)
   const buttonOverPanel = ref(null)
-
+  const filterClass = computed(() => (filterSelected.value ? 'gap-6' : 'md:pr-6'))
+  const hasDescriptionFilter = computed(() => filterSelected.value?.description)
   const options = computed(() => {
     return props.filtersOptions.map(
       ({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
@@ -235,7 +236,7 @@
         </span>
         <div
           class="flex sm:w-full max-sm:flex-col"
-          :class="filterSelected ? 'gap-6' : 'md:pr-6'"
+          :class="filterClass"
           data-testid="filter-fields-container"
         >
           <div
@@ -335,7 +336,7 @@
           <InlineMessage
             class="p-2"
             severity="info"
-            v-if="filterSelected?.description"
+            v-if="hasDescriptionFilter"
             data-testid="filter-value-description"
           >
             {{ filterSelected?.description }}
@@ -548,7 +549,7 @@
             <InlineMessage
               class="p-2"
               severity="info"
-              v-if="filterSelected?.description"
+              v-if="hasDescriptionFilter"
               data-testid="filter-sidebar-value-description"
             >
               {{ filterSelected?.description }}
