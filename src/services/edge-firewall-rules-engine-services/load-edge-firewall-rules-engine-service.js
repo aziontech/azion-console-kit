@@ -12,6 +12,29 @@ export const loadEdgeFirewallRulesEngineService = async ({ id, edgeFirewallId })
 }
 
 /**
+ * Parse each criteria based on its type
+ * @param {Array} criterias
+ * @returns {Array}
+ */
+const parseCriterias = (criterias) => {
+  const parsedCriterias = criterias.map((criteriaGroup) => {
+    return criteriaGroup.map((criteria) => {
+      switch (criteria.variable) {
+        case 'network':
+          return {
+            ...criteria,
+            argument: criteria.argument.toString()
+          }
+        default:
+          return criteria
+      }
+    })
+  })
+
+  return parsedCriterias
+}
+
+/**
  * Parse each behavior based on its type
  * @param {Array} behaviors
  * @returns {Array}
@@ -63,7 +86,7 @@ const adapt = (httpResponse) => {
     name: ruleEngine.name,
     description: ruleEngine.description,
     active: ruleEngine.is_active,
-    criteria: ruleEngine.criteria,
+    criteria: parseCriterias(ruleEngine.criteria),
     behaviors: parseBehaviors(ruleEngine.behaviors)
   }
   return {
