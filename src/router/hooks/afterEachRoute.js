@@ -9,8 +9,8 @@ export default function afterEachRoute(to, from, failure) {
   const { hasActiveUserId } = useAccountStore()
   loadingStore.finishLoading()
 
+  if (failure) return
   if (!hasActiveUserId) return
-
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   tracker.product
