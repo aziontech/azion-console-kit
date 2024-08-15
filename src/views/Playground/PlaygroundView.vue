@@ -13,7 +13,7 @@
         </template>
         <template #content>
           <div
-            class="mt-auto h-96 flex items-center relative"
+            class="mt-auto h-96 min-h-96 flex items-center relative"
             v-if="showContent"
           >
             <component :is="chart.component" />
@@ -106,6 +106,12 @@
       title: 'Area Chart',
       description:
         'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.'
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
+      title: 'List Chart',
+      description:
+        'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information'
     }
   ]
 </script>

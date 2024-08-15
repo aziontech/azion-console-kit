@@ -199,3 +199,88 @@ export const AREA_CHART_DATA = {
   },
   ...COLOR_PATTERNS
 }
+
+export const COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA = {
+  data: [
+    {
+      id: 1,
+      order: '#1',
+      country: { country: 'Italy', code: 'it' },
+      ipsRange: '192.168.0.0/24',
+      blockedRequests: '120000 KB',
+      blockedBandwidth: '512000 KB'
+    },
+    {
+      id: 2,
+      order: '#2',
+      country: { country: 'Brazil', code: 'br' },
+      ipsRange: '172.16.0.0/16',
+      blockedRequests: '120000 KB',
+      blockedBandwidth: '512000 KB'
+    },
+    {
+      id: 3,
+      order: '#3',
+      country: { country: 'United States', code: 'us' },
+      ipsRange: '10.0.0.0/8',
+      blockedRequests: '120000 KB',
+      blockedBandwidth: '512000 KB'
+    },
+    {
+      id: 4,
+      order: '#4',
+      country: { country: 'Canada', code: 'ca' },
+      ipsRange: '192.168.1.0/24',
+      blockedRequests: '100000 KB',
+      blockedBandwidth: '480000 KB'
+    },
+    {
+      id: 5,
+      order: '#5',
+      country: { country: 'France', code: 'fr' },
+      ipsRange: '10.1.0.0/16',
+      blockedRequests: '150000 KB',
+      blockedBandwidth: '750000 KB'
+    },
+    {
+      id: 6,
+      order: '#6',
+      country: { country: 'Germany', code: 'de' },
+      ipsRange: '172.16.1.0/24',
+      blockedRequests: '120000 KB',
+      blockedBandwidth: '512000 KB'
+    },
+    {
+      id: 7,
+      order: '#7',
+      country: { country: 'Poland', code: 'pl' },
+      ipsRange: '192.168.2.0/24',
+      blockedRequests: '100000 KB',
+      blockedBandwidth: '480000 KB'
+    },
+    {
+      id: 8,
+      order: '#8',
+      country: { country: 'Spain', code: 'es' },
+      ipsRange: '10.2.0.0/16',
+      blockedRequests: '150000 KB',
+      blockedBandwidth: '750000 KB'
+    },
+    {
+      id: 9,
+      order: '#9',
+      country: { country: 'United Kingdom', code: 'gb' },
+      ipsRange: '172.16.2.0/24',
+      blockedRequests: '120000 KB',
+      blockedBandwidth: '512000 KB'
+    },
+    {
+      id: 10,
+      order: '#10',
+      country: { country: 'Japan', code: 'jp' },
+      ipsRange: '192.168.3.0/24',
+      blockedRequests: '100000 KB',
+      blockedBandwidth: '480000 KB'
+    }
+  ]
+}
