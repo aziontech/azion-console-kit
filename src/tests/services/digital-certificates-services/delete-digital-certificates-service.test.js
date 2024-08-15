@@ -78,4 +78,21 @@ describe('DigitalCertificatesServices', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
+
+  it('should throw when try to delete a digital certificate that is being used', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 409,
+      body: {
+        detail: `Digital Certificate can't be deleted because it is being used.`
+      }
+    })
+    const stubId = '123'
+    const { sut } = makeSut()
+
+    const response = sut(stubId)
+
+    expect(response).rejects.toBe(
+      `Digital Certificate can't be deleted because it is being used.`
+    )
+  })
 })
