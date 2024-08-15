@@ -1,4 +1,4 @@
-export const HEATMAP_DATA = [
+export const MOCK_HEATMAP_DATA = [
   {
     countryName: 'China',
     value: 4559,
@@ -26,7 +26,7 @@ export const HEATMAP_DATA = [
   }
 ]
 
-export const BUBBLES_DATA = [
+export const MOCK_BUBBLES_DATA = [
   {
     regionName: 'Rio de Janeiro',
     value: 32559,

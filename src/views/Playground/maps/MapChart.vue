@@ -18,7 +18,9 @@
   import { storeToRefs } from 'pinia'
   import * as regions from './json/regions.json'
   import * as countries from './json/countries.json'
-  import { setOceanFeature, setLandFeature, setLakeFeature, setFeatureStyle } from './utils'
+  import { setOceanFeature, setLandFeature, setLakeFeature } from './utils/common-features-handler'
+  import { setFeatureStyle } from './utils/features-styler'
+  import { bubblesHandler, heatmapHandler } from './utils/features-handler'
 
   import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
@@ -30,8 +32,7 @@
   import MapLegendBlock from './map-chart-blocks/map-legend-block.vue'
   import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
-  import { BUBBLES_DATA, HEATMAP_DATA } from './constants/data'
-  import { bubblesHandler, heatmapHandler } from './utils/features-handler'
+  import { MOCK_BUBBLES_DATA, MOCK_HEATMAP_DATA } from './constants/data'
 
   const mapTemplateRef = ref(null)
   const map = ref(null)
@@ -52,7 +53,7 @@
     const bubbles = new GeoJSON().readFeatures(regions)
 
     bubbles.forEach((bubble) => {
-      const bubbleData = bubblesHandler(bubble.get('name'), BUBBLES_DATA)
+      const bubbleData = bubblesHandler(bubble.get('name'), MOCK_BUBBLES_DATA)
 
       if (!bubbleData) {
         return
@@ -79,7 +80,7 @@
     })
 
     areas.forEach((area) => {
-      const areaData = heatmapHandler(area.get('name'), HEATMAP_DATA)
+      const areaData = heatmapHandler(area.get('name'), MOCK_HEATMAP_DATA)
 
       if (!areaData) {
         return
