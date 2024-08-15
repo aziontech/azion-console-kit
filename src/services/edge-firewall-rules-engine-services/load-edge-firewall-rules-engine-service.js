@@ -13,25 +13,25 @@ export const loadEdgeFirewallRulesEngineService = async ({ id, edgeFirewallId })
 
 /**
  * Parse each criteria based on its type
- * @param {Array} criterias
+ * @param {Array} criteria
  * @returns {Array}
  */
-const parseCriterias = (criterias) => {
-  const parsedCriterias = criterias.map((criteriaGroup) => {
-    return criteriaGroup.map((criteria) => {
-      switch (criteria.variable) {
+const parseCriteria = (criteria) => {
+  const parsedCriteria = criteria.map((criterionGroup) => {
+    return criterionGroup.map((criterion) => {
+      switch (criterion.variable) {
         case 'network':
           return {
-            ...criteria,
-            argument: criteria.argument.toString()
+            ...criterion,
+            argument: criterion.argument.toString()
           }
         default:
-          return criteria
+          return criterion
       }
     })
   })
 
-  return parsedCriterias
+  return parsedCriteria
 }
 
 /**
@@ -86,7 +86,7 @@ const adapt = (httpResponse) => {
     name: ruleEngine.name,
     description: ruleEngine.description,
     active: ruleEngine.is_active,
-    criteria: parseCriterias(ruleEngine.criteria),
+    criteria: parseCriteria(ruleEngine.criteria),
     behaviors: parseBehaviors(ruleEngine.behaviors)
   }
   return {
