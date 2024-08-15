@@ -13,6 +13,6 @@ describe('makeAzionAiBaseUrl', () => {
 
     const result = sut()
 
-    expect(result).toEqual('/api/v4/ai_api')
+    expect(result).toEqual('/api/v4/ai')
   })
 })
