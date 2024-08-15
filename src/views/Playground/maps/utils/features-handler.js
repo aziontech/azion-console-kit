@@ -23,7 +23,7 @@ const rangeVariations = (value, rangeVariation) => {
 export const bubblesHandler = (name, data) => {
   const featureData = data.find((feature) => feature.regionName === name)
 
-  if (!featureData || !featureData.value) {
+  if (!featureData?.value) {
     return
   }
 
@@ -37,7 +37,7 @@ export const bubblesHandler = (name, data) => {
 export const heatmapHandler = (name, data) => {
   const featureData = data.find((feature) => feature.countryName === name)
 
-  if (!featureData || !featureData.value) {
+  if (!featureData?.value) {
     return
   }
 

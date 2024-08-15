@@ -3,18 +3,15 @@
     id="general-map"
     class="w-full h-96"
   />
-  <div
-    ref="tooltipRef"
-    class="tooltip-heatmap"
-  />
-  <LegendBlock
+  <MapTooltipBlock :data="tooltipProps" />
+  <MapLegendBlock
     :title="legendProps.title"
     :captions="legendProps.caption"
   />
 </template>
 
 <script setup>
-  import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as regions from './json/regions.json'
@@ -28,27 +25,18 @@
   import { Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
 
-  import LegendBlock from './components/legend-block.vue'
+  import MapLegendBlock from './map-chart-blocks/map-legend-block.vue'
+  import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
   import { BUBBLES_DATA, HEATMAP_DATA } from './constants/data'
   import { bubblesHandler, heatmapHandler } from './utils/features-handler'
 
   const map = ref(null)
-  const tooltipRef = ref(null)
+  const tooltipProps = ref({})
 
   onMounted(() => {
     initMap()
-
-    map.value.getTargetElement().addEventListener('pointerleave', hideTooltip)
   })
-
-  onUnmounted(() => {
-    map.value.getTargetElement().removeEventListener('pointerleave', hideTooltip)
-  })
-
-  const hideTooltip = () => {
-    tooltipRef.value.style.display = 'none'
-  }
 
   const generateBubbles = () => {
     const bubbles = new GeoJSON().readFeatures(regions)
@@ -88,7 +76,7 @@
       }
 
       area.setProperties({
-        kind: 'heatMap',
+        kind: 'heatmap',
         value: areaData.value
       })
 
@@ -123,7 +111,7 @@
 
     map.value.on('pointermove', (event) => {
       if (event.dragging) {
-        tooltipRef.value.style.display = 'none'
+        tooltipProps.value = {}
         return
       }
 
@@ -133,20 +121,27 @@
     })
 
     map.value.on('pointerleave', () => {
-      tooltipRef.value.style.display = 'none'
+      hideTooltip()
     })
+  }
+
+  const hideTooltip = () => {
+    tooltipProps.value = {}
   }
 
   const displayHeatmapTooltip = (pixel) => {
     const feature = map.value.forEachFeatureAtPixel(pixel, (feature) => feature)
 
-    if (feature && feature.get('kind') === 'heatMap') {
-      tooltipRef.value.style.left = `${pixel[0]}px`
-      tooltipRef.value.style.top = `${pixel[1] - 15}px`
-      tooltipRef.value.innerHTML = `<p>${feature.get('name')}</p><p>${feature.get('value')}</p>`
-      tooltipRef.value.style.display = 'block'
+    if (feature && feature.get('kind') === 'heatmap') {
+      tooltipProps.value = {
+        label: feature.get('name'),
+        value: feature.get('value'),
+        kind: feature.get('kind'),
+        yAxis: pixel[1],
+        xAxis: pixel[0]
+      }
     } else {
-      tooltipRef.value.style.display = 'none'
+      hideTooltip()
     }
   }
 
@@ -189,16 +184,5 @@
 <style lang="scss">
   #general-map .ol-viewport {
     border-radius: 0.25rem;
-  }
-
-  .tooltip-heatmap {
-    position: absolute;
-    background: white;
-    border: 1px solid black;
-    padding: 5px;
-    border-radius: 3px;
-    pointer-events: none;
-    display: none;
-    z-index: 100;
   }
 </style>
