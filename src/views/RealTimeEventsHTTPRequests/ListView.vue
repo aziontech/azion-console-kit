@@ -1,12 +1,8 @@
 <script setup>
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
-  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
-  import { useRouter } from 'vue-router'
-  const emit = defineEmits(['update:dateTime'])
+
   const props = defineProps({
     documentationService: {
       type: Function,
@@ -20,28 +16,19 @@
       type: Function,
       required: true
     },
-    dateTime: {
+    filterData: {
       type: Object,
       default: () => ({})
-    }
-  })
-
-  const filterDate = computed({
-    get: () => {
-      return props.dateTime
-    },
-    set: (value) => {
-      emit('update:dateTime', value)
     }
   })
 
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
-  const router = useRouter()
+
   const openDetailDrawer = ({ configurationId, ts, requestId }) => {
     drawerRef.value.openDetailDrawer({
-      tsRange: filterDate.value,
+      tsRange: props.filterData.tsRange,
       configurationId,
       requestId,
       ts
@@ -52,7 +39,7 @@
     hasContentToList.value = event
   }
 
-  const reloadList = () => {
+  const reloadListTable = () => {
     if (hasContentToList.value) {
       listTableBlockRef.value.reload()
       return
@@ -61,7 +48,7 @@
   }
 
   const listProvider = async () => {
-    return await props.listHttpRequest({ tsRange: filterDate.value })
+    return await props.listHttpRequest({ tsRange: props.filterData.tsRange })
   }
 
   const getColumns = computed(() => {
@@ -98,13 +85,9 @@
     tsFormat: rowData.data
   })
 
-  const goToCreateEdgeApplication = () => {
-    router.push({ name: 'create-edge-application', query: { origin: 'realTimeEvents' } })
-  }
-
-  const goToCreateWAF = () => {
-    router.push({ name: 'create-waf-rules' })
-  }
+  defineExpose({
+    reloadListTable
+  })
 </script>
 
 <template>
@@ -112,19 +95,8 @@
     ref="drawerRef"
     :loadService="props.loadHttpRequest"
   />
-  <div class="flex flex-col gap-8 my-4">
-    <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">
-        Logs of events from requests made to your edge applications and edge firewalls.
-      </p>
-    </div>
-    <IntervalFilterBlock
-      v-model:filterDate="filterDate"
-      @applyTSRange="reloadList"
-    />
-  </div>
+
   <ListTableBlock
-    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
@@ -134,32 +106,12 @@
     isTabs
     exportFileName="http-requests-logs"
     :csvMapper="customColumnMapper"
-  />
-
-  <EmptyResultsBlock
-    v-else
-    title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or create a new edge application or edge firewall with a WAF. Logs are displayed once there are incoming requests and traffic."
-    :documentationService="documentationService"
-    :inTabs="true"
   >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Edge Application"
-        @click="goToCreateEdgeApplication"
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
       />
     </template>
-    <template #extraActionsRight>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="WAF"
-        @click="goToCreateWAF"
-      />
-    </template>
-  </EmptyResultsBlock>
+  </ListTableBlock>
 </template>

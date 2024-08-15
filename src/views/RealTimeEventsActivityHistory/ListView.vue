@@ -1,9 +1,7 @@
 <script setup>
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
-  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   const emit = defineEmits(['update:dateTime'])
 
@@ -50,7 +48,7 @@
     hasContentToList.value = event
   }
 
-  const reloadList = () => {
+  const reloadListTable = () => {
     if (hasContentToList.value) {
       listTableBlockRef.value.reload()
       return
@@ -94,8 +92,13 @@
       }
     ]
   })
+
   const customColumnMapper = (rowData) => ({
     title: rowData.data.text
+  })
+
+  defineExpose({
+    reloadListTable
   })
 </script>
 
@@ -104,20 +107,7 @@
     ref="drawerRef"
     :loadService="props.loadActivityHistory"
   />
-  <div class="flex flex-col gap-8 my-4">
-    <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">
-        Logs of events from an Azion account regarding activities registered on Activity History.
-        Use the Real-Time Events GraphQL API to query up to 2 years of logs.
-      </p>
-    </div>
-    <IntervalFilterBlock
-      v-model:filterDate="filterDate"
-      @applyTSRange="reloadList"
-    />
-  </div>
   <ListTableBlock
-    v-if="hasContentToList && filterDate.tsRangeBegin"
     isTabs
     ref="listTableBlockRef"
     :listService="listProvider"
@@ -127,13 +117,12 @@
     emptyListMessage="No logs have been found for this period."
     :csvMapper="customColumnMapper"
     exportFileName="activity-history-logs"
-  />
-
-  <EmptyResultsBlock
-    v-else
-    title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or use Azion products and services to generate activity."
-    :documentationService="documentationService"
-    :inTabs="true"
-  />
+  >
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
+      />
+    </template>
+  </ListTableBlock>
 </template>

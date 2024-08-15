@@ -1,8 +1,6 @@
 <script setup>
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import { computed, ref } from 'vue'
-  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
   const emit = defineEmits(['update:dateTime'])
@@ -59,7 +57,7 @@
     hasContentToList.value = event
   }
 
-  const reloadList = () => {
+  const reloadListTable = () => {
     if (hasContentToList.value) {
       listTableBlockRef.value.reload()
       return
@@ -106,9 +104,12 @@
       }
     ]
   })
-
   const customColumnMapper = (rowData) => ({
     upstreamCacheStatus: rowData.data.content
+  })
+
+  defineExpose({
+    reloadListTable
   })
 </script>
 
@@ -118,19 +119,7 @@
     :loadService="props.loadTieredCache"
     :clipboardWrite="props.clipboardWrite"
   />
-  <div class="flex flex-col gap-8 my-4">
-    <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">
-        Logs of events from requests made to edge applications using Tiered Cache.
-      </p>
-    </div>
-    <IntervalFilterBlock
-      v-model:filterDate="filterDate"
-      @applyTSRange="reloadList"
-    />
-  </div>
   <ListTableBlock
-    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
@@ -140,15 +129,12 @@
     isTabs
     exportFileName="tiered-cache-logs"
     :csvMapper="customColumnMapper"
-  />
-
-  <EmptyResultsBlock
-    v-else
-    title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or create a new edge application with Tiered Cache configurations. Logs are displayed once there are incoming requests and traffic."
-    createButtonLabel="Edge Application"
-    createPagePath="/edge-applications/create?origin=realTimeEvents"
-    :documentationService="documentationService"
-    :inTabs="true"
-  />
+  >
+    <template #header="{ exportTableCSV }">
+      <slot
+        name="header"
+        :downloadCSV="exportTableCSV"
+      />
+    </template>
+  </ListTableBlock>
 </template>
