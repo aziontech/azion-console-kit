@@ -15,7 +15,7 @@
     type="button"
     class="deep-chat-suggestion-button"
     :style="`
-    width: 230px;
+    width: 180px;
     text-align:left;
     max-width:100%;
     height: 102px;
@@ -42,7 +42,7 @@
   >
     <div :style="`display:flex;flex-direction:column;align-items:flex-start;gap:1rem`">
       <img
-        :style="`width:16px;height:16px;object-fit:cover;`"
+        :style="`width:16px;height:16px;object-fit:fill;`"
         :src="iconSrc"
       />
 
