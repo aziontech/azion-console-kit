@@ -31,9 +31,7 @@
 
   const tooltipStyle = computed(() => {
     const parent = mapTooltipRef.value?.parentElement
-    if (!parent) {
-      return {}
-    }
+    if (!parent) return
 
     const OFFSET = 15
 
