@@ -23,7 +23,8 @@
   })
 
   const COMPONENTS = {
-    heatmap: defineAsyncComponent(() => import('./map-tooltip-contents/heatmap-tooltip.vue'))
+    heatmap: defineAsyncComponent(() => import('./map-tooltip-contents/heatmap-tooltip.vue')),
+    bubble: defineAsyncComponent(() => import('./map-tooltip-contents/bubbles-tooltip.vue'))
   }
 
   const mapTooltipRef = ref(null)
@@ -34,21 +35,28 @@
       return {}
     }
 
+    const OFFSET = 15
+
     const { xAxis, yAxis } = props.data
     const positions = {
       top: `${yAxis}px`,
-      left: `${xAxis}px`
+      left: `${xAxis + OFFSET}px`
     }
 
     const { offsetHeight: parentHeight, offsetWidth: parentWidth } = parent
     const { offsetHeight: tooltipHeight, offsetWidth: tooltipWidth } = mapTooltipRef.value
 
-    if (xAxis - tooltipWidth / 2 < 0) {
-      positions.left = '0px'
-    }
-
     if (xAxis + tooltipWidth / 2 > parentWidth) {
       positions.left = `${parentWidth - tooltipWidth}px`
+    }
+
+    if (xAxis > parentWidth - (tooltipWidth + OFFSET)) {
+      positions.right = `${parentWidth - xAxis + OFFSET}px`
+      positions.left = 'auto'
+    }
+
+    if (yAxis + tooltipHeight / 2 > parentHeight) {
+      positions.top = `${parentHeight - tooltipHeight}px`
     }
 
     return positions

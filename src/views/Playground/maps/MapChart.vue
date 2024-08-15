@@ -133,7 +133,7 @@
   const displayHeatmapTooltip = (pixel) => {
     const feature = map.value.forEachFeatureAtPixel(pixel, (feature) => feature)
 
-    if (feature && feature.get('kind') === 'heatmap') {
+    if (feature && feature.get('kind')) {
       tooltipProps.value = {
         label: feature.get('name'),
         value: feature.get('value'),
