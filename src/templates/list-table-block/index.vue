@@ -14,6 +14,7 @@
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
+      rowHover
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -89,6 +90,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        class="hover:cursor-pointer"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
