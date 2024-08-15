@@ -18,75 +18,110 @@
                 :disabled="invoiceData.temporaryBill"
               />
             </div>
-            <div
-              class="flex justify-between mt-4"
-              v-if="!invoiceData.temporaryBill"
-            >
+            <div class="flex justify-between mt-4">
               <span class="text-color-secondary text-sm">Payment Data</span>
-              <span class="font-medium text-color text-sm">---</span>
+              <SkeletonBlock
+                :isLoaded="isInvoiceDataLoaded"
+                class="font-medium text-color text-sm"
+              >
+                <span>---</span>
+              </SkeletonBlock>
             </div>
             <div
               class="flex justify-between items-center"
-              v-if="!invoiceData.temporaryBill"
+              v-if="!invoiceData?.temporaryBill"
             >
               <span class="text-color-secondary text-sm">Invoice ID</span>
-              <div class="flex gap-3 items-center">
+              <SkeletonBlock
+                :isLoaded="isInvoiceDataLoaded"
+                width="10rem"
+                class="flex gap-3 items-center"
+              >
                 <span class="font-medium text-color text-sm">{{ invoiceData.billDetailId }}</span>
                 <PrimeButton
                   icon="pi pi-copy"
                   outlined
+                  v-if="invoiceData?.billDetailId"
                   @click="clipboard(invoiceData.billDetailId)"
                 />
-              </div>
+              </SkeletonBlock>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Payment Method</span>
-              <span
-                v-if="cardDefault.cardData"
-                class="flex gap-2 text-color font-medium text-sm"
+              <SkeletonBlock
+                :isLoaded="isCardDefaultLoaded"
+                class="flex gap-3 items-center"
+                width="8rem"
+                sizeHeight="small"
+                elementType="span"
               >
-                <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
-                {{ cardDefault.cardData.cardNumber }}
-              </span>
-              <span
-                v-else
-                class="text-color-secondary text-sm"
-                >---</span
-              >
+                <span
+                  v-if="cardDefault.cardData"
+                  class="flex gap-2 text-color font-medium text-sm"
+                >
+                  <cardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
+                  {{ cardDefault.cardData.cardNumber }}
+                </span>
+                <span v-else>---</span>
+              </SkeletonBlock>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Billing Period</span>
-              <span class="font-medium text-color text-sm">{{ invoiceData.billingPeriod }}</span>
+              <SkeletonBlock
+                width="10rem"
+                :isLoaded="isInvoiceDataLoaded"
+                class="font-medium text-color text-sm"
+              >
+                {{ invoiceData.billingPeriod }}
+              </SkeletonBlock>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Products Charges</span>
-              <span class="text-color text-sm"> {{ invoiceData.productChanges }}</span>
+              <SkeletonBlock
+                :isLoaded="isInvoiceDataLoaded"
+                class="text-color text-sm"
+              >
+                {{ invoiceData.productChanges }}
+              </SkeletonBlock>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
-              <span class="text-color text-sm"> {{ invoiceData.servicePlan }}</span>
+              <SkeletonBlock
+                :isLoaded="isInvoiceDataLoaded"
+                class="text-color text-sm"
+              >
+                {{ invoiceData.servicePlan }}
+              </SkeletonBlock>
             </div>
           </div>
 
           <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Credit Used for Payment</span>
-              <span class="text-color">
-                <span class="text-color-secondary text-sm">$</span>
-                {{ invoiceData.creditUsedForPayment }}</span
+              <SkeletonBlock
+                :isLoaded="isInvoiceDataLoaded"
+                class="text-color"
               >
+                <span class="text-color-secondary text-sm">$</span>
+                {{ invoiceData.creditUsedForPayment }}
+              </SkeletonBlock>
             </div>
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm flex items-center gap-3">
                 <b class="font-medium text-2xl text-color"> Total </b>
                 (Amount Payable)
               </span>
-              <span class="font-medium flex items-center gap-1">
+              <SkeletonBlock
+                sizeHeight="medium"
+                width="8rem"
+                :isLoaded="isInvoiceDataLoaded"
+                class="font-medium flex items-center gap-1"
+              >
                 <span class="text-sm">$</span>
                 <span class="text-2xl">
                   {{ invoiceData.total }}
                 </span>
-              </span>
+              </SkeletonBlock>
             </div>
           </div>
         </div>
@@ -100,6 +135,7 @@
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import ContentBlock from '@/templates/content-block'
+  import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
@@ -129,6 +165,8 @@
 
   const invoiceData = ref({})
   const cardDefault = ref({})
+  const isInvoiceDataLoaded = ref(true)
+  const isCardDefaultLoaded = ref(true)
   const listServiceProducts = ref([])
 
   onMounted(() => {
@@ -138,10 +176,13 @@
   })
 
   const loadInvoiceData = async () => {
+    isInvoiceDataLoaded.value = false
     try {
       invoiceData.value = await props.loadInvoiceDataService(route.params.billId)
     } catch {
       invoiceData.value = null
+    } finally {
+      isInvoiceDataLoaded.value = true
     }
   }
 
@@ -156,10 +197,13 @@
   }
 
   const loadCardDefault = async () => {
+    isCardDefaultLoaded.value = false
     try {
       cardDefault.value = await props.loadPaymentMethodDefaultService()
     } catch {
       cardDefault.value = null
+    } finally {
+      isCardDefaultLoaded.value = true
     }
   }
 

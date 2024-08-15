@@ -19,8 +19,7 @@ export const loadCurrentInvoiceService = async () => {
           }
       ) {
           billId,
-          billDetailId
-          totalValue,
+          billDetailId,
           createdDate,
           periodFrom,
           periodTo,
@@ -55,7 +54,9 @@ const adapt = (httpResponse) => {
   } = httpResponse
 
   const invoice = billDetail.length > 0 ? billDetail[0] : {}
+
   const emptyDefaultValue = '---'
+
   let billingPeriod = emptyDefaultValue
   if (invoice.periodFrom && invoice.periodTo) {
     billingPeriod = `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(

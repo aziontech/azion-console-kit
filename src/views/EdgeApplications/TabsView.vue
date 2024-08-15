@@ -266,7 +266,6 @@
         @tab-click="({ index = 0 }) => changeTab(index)"
         class="w-full h-full"
         v-if="edgeApplication"
-        data-testid="edge-application-details-tab-view"
       >
         <TabPanel
           v-for="(tab, index) in filteredTabs"
@@ -275,20 +274,18 @@
               id: `tab_${index}`
             },
             root: {
-              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`
+              'data-testid': `edge-application-details-tab-panel__${tab.header}__tab`,
+              id: `${tab.header}`
             }
           }"
           :key="index"
           :header="tab.header"
-          :id="tab.header"
-          data-testid="edge-application-details-tab-panel"
         >
           <component
             :is="tab.component"
             v-if="tab.show"
             @updatedApplication="updatedApplication"
             v-bind="tab.props()"
-            data-testid="edge-application-details-tab-panel-component"
           />
         </TabPanel>
       </TabView>

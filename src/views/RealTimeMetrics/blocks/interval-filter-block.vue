@@ -169,7 +169,7 @@
 </script>
 
 <template>
-  <div class="flex flex-column gap-6 md:flex-row md:gap-6 w-full">
+  <div class="flex flex-column gap-6 md:flex-row md:gap-3 w-full">
     <div class="w-full lg:max-w-xs max-w-full">
       <Dropdown
         appendTo="self"

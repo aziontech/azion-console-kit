@@ -1,16 +1,22 @@
+import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
-    query getBillDetail($billID: ID!) {
-  		products: billDetail(
+    query getBillDetail($billID: ID!, $invoiceId: String!) {
+  	  products: billDetail(
         aggregate: { sum: value }
         groupBy: [productSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         value: sum
@@ -21,7 +27,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -32,7 +43,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug]
         orderBy: [productSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -43,7 +59,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug, regionName]
         orderBy: [productSlug_ASC, metricSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -55,7 +76,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
         groupBy: [productSlug, metricSlug, regionName]
         orderBy: [productSlug_ASC, metricSlug_ASC],
         limit: 10000,
-        filter: { billIdEq: $billID }
+        filter: { 
+          or: [ 
+            { billIdEq: $billID },
+            { invoiceNumberEq: $invoiceId }
+          ]
+        }
       ) {
         productSlug
         metricSlug
@@ -67,7 +93,8 @@ export const listServiceAndProductsChangesService = async (billID) => {
   const graphQLPayload = {
     query: BILL_DETAIL_QUERY,
     variables: {
-      billID
+      billID,
+      invoiceId: billID
     }
   }
 
@@ -126,33 +153,33 @@ const PRODUCT_NAMES = {
 }
 
 const METRIC_SLUGS = {
-  application_accelerator_data_transferred: 'Total Data Transfered (per GB)',
-  requests: 'Total Requests (per 10,000)',
-  data_transferred: 'Total Data Transfered (per GB)',
-  data_stream_requests: 'Total Requests (per 10,000)',
-  network_layer_protection_requests: 'Total Requests (per 10,000)',
-  tiered_cache_data_transferred: 'Total Data Transfered (per GB)',
-  load_balancer_data_transferred: 'Total Data Transfered (per GB)',
-  waf_requests: 'Total Requests (per 10,000)',
-  ddos_protection_20gbps: 'DDoS Protection 20Gbps',
-  ddos_protection_50gbps: 'DDoS Protection 50Gbps',
-  ddos_protection_data_transferred: 'Total Data Transfered (per GB)',
-  ddos_protection_unlimited: 'DDoS Protection Unlimited',
-  compute_time: 'Compute Time',
-  invocations: 'Invocations',
-  images_processed: 'Images Processed',
-  hosted_zones: 'Hosted Zones',
-  edge_dns_queries: 'Standard Queries',
-  data_ingested: 'Data Ingested (GB)',
-  plan_business: 'Plan Business',
-  plan_enterprise: 'Plan Enterprise',
-  plan_missioncritical: 'Plan Mission critical',
-  support_enterprise: 'Total Days',
-  support_mission_critical: 'Total Days',
-  data_stream_data_streamed: 'Data Streamed (GB)'
+  application_accelerator_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  requests: { title: 'Total Requests (per 10,000)' },
+  data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  data_stream_requests: { title: 'Total Requests (per 10,000)' },
+  network_layer_protection_requests: { title: 'Total Requests (per 10,000)' },
+  tiered_cache_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  load_balancer_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  waf_requests: { title: 'Total Requests (per 10,000)' },
+  ddos_protection_20gbps: { title: 'DDoS Protection 20Gbps' },
+  ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
+  ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  ddos_protection_unlimited: { title: 'DDoS Protection Unlimited' },
+  compute_time: { title: 'Compute Time' },
+  invocations: { title: 'Invocations' },
+  images_processed: { title: 'Images Processed' },
+  hosted_zones: { title: 'Hosted Zones' },
+  edge_dns_queries: { title: 'Standard Queries' },
+  data_ingested: { title: 'Data Ingested (GB)', unit: 'GB' },
+  plan_business: { title: 'Plan Business' },
+  plan_enterprise: { title: 'Plan Enterprise' },
+  plan_missioncritical: { title: 'Plan Mission critical' },
+  support_enterprise: { title: 'Total Days', unit: 'Days' },
+  support_mission_critical: { title: 'Total Days', unit: 'Days' },
+  data_stream_data_streamed: { title: 'Data Streamed (GB)', unit: 'GB' }
 }
 
-const mapRegionMetrics = (metric, regionMetricsGrouped) => {
+const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
   return regionMetricsGrouped.reduce((list, regionMetric) => {
     if (
       regionMetric.productSlug === metric.productSlug &&
@@ -160,8 +187,8 @@ const mapRegionMetrics = (metric, regionMetricsGrouped) => {
     ) {
       list.push({
         country: regionMetric.regionName,
-        quantity: regionMetric.accounted,
-        price: regionMetric.value,
+        quantity: formatUnitValue(regionMetric.accounted, unit),
+        price: formatCurrencyString(currency, regionMetric.value),
         slug: regionMetric.metricSlug
       })
     }
@@ -172,12 +199,13 @@ const mapRegionMetrics = (metric, regionMetricsGrouped) => {
 const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
   return metricsGrouped.reduce((list, metric) => {
     if (metric.productSlug === product.productSlug) {
+      const unit = METRIC_SLUGS[metric.metricSlug].unit
       list.push({
-        service: METRIC_SLUGS[metric.metricSlug],
+        service: METRIC_SLUGS[metric.metricSlug].title,
         slug: metric.metricSlug,
-        quantity: metric.accounted,
-        price: metric.value,
-        data: mapRegionMetrics(metric, regionMetricsGrouped)
+        quantity: formatUnitValue(metric.accounted, unit),
+        price: formatCurrencyString(product.currency, metric.value),
+        data: mapRegionMetrics(metric, regionMetricsGrouped, product.currency, unit)
       })
     }
     return list
@@ -187,7 +215,7 @@ const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
 const mapProducts = (products, metricsGrouped, regionMetricsGrouped) => {
   return products.map((product) => ({
     service: PRODUCT_NAMES[product.productSlug],
-    value: product.value,
+    value: formatCurrencyString(product.currency, product.value),
     slug: product.productSlug,
     currency: product.currency,
     descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)

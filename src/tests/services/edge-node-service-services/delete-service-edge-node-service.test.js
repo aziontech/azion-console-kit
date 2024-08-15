@@ -37,7 +37,7 @@ describe('EdgeNodeServices', () => {
 
     const feedbackMessage = await sut(mockId)
 
-    expect(feedbackMessage).toBe('Service on Edge Node successfully deleted')
+    expect(feedbackMessage).toBe('Service successfully unbound')
   })
 
   it.each([

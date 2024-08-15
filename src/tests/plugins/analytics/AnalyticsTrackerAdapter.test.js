@@ -10,7 +10,6 @@ const makeSut = () => {
     track: vi.fn(),
     identify: vi.fn()
   }
-
   const sut = new AnalyticsTrackerAdapter(analyticsClientSpy)
 
   return {
