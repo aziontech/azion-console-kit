@@ -2,7 +2,7 @@
 export const azionAiRoutes = {
   path: '/copilot',
   name: 'copilot',
-  component: () => import('@views/AzionAI/AzionAiView.vue'),
+  component: () => import('@views/Copilot/CopilotView.vue'),
   meta: {
     breadCrumbs: [
       {
