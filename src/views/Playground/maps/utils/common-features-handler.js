@@ -1,12 +1,12 @@
 /*
   This file contains the styling for the base features
-  that are common to all maps: lakes, oceans and lands.
+  that are common to all maps: lakes, oceans and countries.
 */
 
 import GeoJSON from 'ol/format/GeoJSON.js'
 
 import * as lakesLayer from '../json/lakes'
-import * as landsLayer from '../json/land'
+import * as countriesLayer from '../json/countries'
 import * as oceansLayer from '../json/ocean'
 
 import { setFeatureStyle } from './features-styler'
@@ -29,10 +29,10 @@ export const setOceanFeature = () => {
   return oceanFeatures
 }
 
-export const setLandFeature = () => {
-  const landFeatures = setBaseFeatureData(landsLayer)
+export const setCountryFeature = () => {
+  const countriesFeatures = setBaseFeatureData(countriesLayer)
 
-  return landFeatures
+  return countriesFeatures
 }
 
 export const setLakeFeature = () => {

@@ -18,13 +18,17 @@
   import { storeToRefs } from 'pinia'
   import * as regions from './json/regions.json'
   import * as countries from './json/countries.json'
-  import { setOceanFeature, setLandFeature, setLakeFeature } from './utils/common-features-handler'
+  import {
+    setOceanFeature,
+    setCountryFeature,
+    setLakeFeature
+  } from './utils/common-features-handler'
   import { setFeatureStyle } from './utils/features-styler'
   import { bubblesHandler, heatmapHandler } from './utils/features-handler'
 
   import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
-  import Circle from 'ol/geom/Circle.js'
+  import { Circle } from 'ol/geom.js'
   import { Vector as VectorSource } from 'ol/source.js'
   import { Vector as VectorLayer } from 'ol/layer.js'
   import { fromLonLat } from 'ol/proj.js'
@@ -81,7 +85,6 @@
 
     areas.forEach((area) => {
       const areaData = heatmapHandler(area.get('name'), MOCK_HEATMAP_DATA)
-
       if (!areaData) {
         return
       }
@@ -104,7 +107,7 @@
           source: new VectorSource({
             features: [
               ...setOceanFeature(),
-              ...setLandFeature(),
+              ...setCountryFeature(),
               ...setLakeFeature(),
               ...generateBubbles(),
               ...generateAreas()
@@ -189,7 +192,7 @@
       .getSource()
       .getFeatures()
       .forEach((feature) => {
-        if (feature.get('base')) {
+        if (feature.get('layer')) {
           setFeatureStyle(feature)
         }
       })

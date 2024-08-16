@@ -3,7 +3,7 @@ import { Style, Fill, Stroke } from 'ol/style.js'
 import { useAccountStore } from '@/stores/account'
 import { storeToRefs } from 'pinia'
 
-import { VARIATIONS } from '../constants/color-scheme'
+import { VARIATIONS, COMMON_LAYERS_COLORS } from '../constants/color-scheme'
 
 const getCurrentTheme = () => {
   const accountStore = useAccountStore()
@@ -21,8 +21,7 @@ const getStyleValues = (feature, variation) => {
 
   if (!variation) {
     return {
-      fill: feature.get('style')[currentTheme].fill,
-      stroke: feature.get('style')[currentTheme].stroke
+      ...COMMON_LAYERS_COLORS[feature.get('layer')].style[currentTheme]
     }
   }
 
@@ -34,10 +33,6 @@ const getStyleValues = (feature, variation) => {
 
 export const setFeatureStyle = (feature, variation = null) => {
   const styleValues = getStyleValues(feature, variation)
-
-  if (!styleValues) {
-    return
-  }
 
   const featureStyle = new Style({
     fill: new Fill({

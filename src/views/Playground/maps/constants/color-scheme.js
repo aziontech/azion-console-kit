@@ -73,7 +73,7 @@ export const VARIATIONS = {
   }
 }
 
-const COMMON_LAYERS_COLOR_WATERS = {
+const COMMON_LAYERS_COLOR_LAKES = {
   style: {
     dark: {
       stroke: {
@@ -86,6 +86,25 @@ const COMMON_LAYERS_COLOR_WATERS = {
       stroke: {
         color: '#b5b5b5',
         width: 1
+      },
+      fill: { color: '#ffffff' }
+    }
+  }
+}
+
+const COMMON_LAYERS_COLOR_OCEANS = {
+  style: {
+    dark: {
+      stroke: {
+        color: 'transparent',
+        width: 0
+      },
+      fill: { color: '#171717' }
+    },
+    light: {
+      stroke: {
+        color: 'transparent',
+        width: 0
       },
       fill: { color: '#ffffff' }
     }
@@ -113,6 +132,6 @@ const COMMON_LAYERS_COLOR_LANDS = {
 
 export const COMMON_LAYERS_COLORS = {
   countries: COMMON_LAYERS_COLOR_LANDS,
-  oceans: COMMON_LAYERS_COLOR_WATERS,
-  lakes: COMMON_LAYERS_COLOR_WATERS
+  oceans: COMMON_LAYERS_COLOR_OCEANS,
+  lakes: COMMON_LAYERS_COLOR_LAKES
 }
