@@ -58,9 +58,8 @@ export const BAR_CHART_DATA = {
 export const ROTATED_BAR_CHART_DATA = {
   data: {
     x: 'x',
-    xFormat: '%Y',
     columns: [
-      ['x', '2010', '2011', '2012', '2013', '2014', '2015'],
+      ['x', 'Netherlands', 'Nigeria', 'France', 'Brazil', 'China', 'Chile'],
       ['Values', 130, 200, 100, 160, 150, 125]
     ],
     types: {
@@ -77,7 +76,12 @@ export const ROTATED_BAR_CHART_DATA = {
     }
   },
   axis: {
-    ...AXIS_FORMATTING.axis,
+    x: {
+      type: 'category'
+    },
+    y: {
+      show: false
+    },
     rotated: true
   },
   legend: {
