@@ -145,7 +145,7 @@
   }
 
   const requestDigitalCertificates = async () => {
-    digitalCertificates.value = []
+    digitalCertificates.value = await props.listDigitalCertificatesService({})
   }
 
   const showToast = (severity, summary) => {
