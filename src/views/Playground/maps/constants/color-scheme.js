@@ -72,3 +72,47 @@ export const VARIATIONS = {
     dark: COLORS.dark.red
   }
 }
+
+const COMMON_LAYERS_COLOR_WATERS = {
+  style: {
+    dark: {
+      stroke: {
+        color: '#3e3e3e',
+        width: 1
+      },
+      fill: { color: '#171717' }
+    },
+    light: {
+      stroke: {
+        color: '#b5b5b5',
+        width: 1
+      },
+      fill: { color: '#ffffff' }
+    }
+  }
+}
+
+const COMMON_LAYERS_COLOR_LANDS = {
+  style: {
+    dark: {
+      stroke: {
+        color: '#3e3e3e',
+        width: 1
+      },
+      fill: { color: '#2c2c2c' }
+    },
+    light: {
+      stroke: {
+        color: '#b5b5b5',
+        width: 1
+      },
+      fill: { color: '#e8e8e8' }
+    }
+  }
+}
+
+export const COMMON_LAYERS_COLORS = {
+  countries: COMMON_LAYERS_COLOR_LANDS,
+  oceans: COMMON_LAYERS_COLOR_WATERS,
+  lakes: COMMON_LAYERS_COLOR_WATERS
+}
