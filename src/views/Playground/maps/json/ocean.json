@@ -4,23 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "base": true,
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#ffffff00",
-              "width": 0
-            },
-            "fill": { "color": "#171717" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#ffffff00",
-              "width": 0
-            },
-            "fill": { "color": "#ffffff" }
-          }
-        }
+        "layer": "oceans"
       },
       "geometry": {
         "type": "Polygon",
@@ -85,23 +69,7 @@
     {
       "type": "Feature",
       "properties": {
-        "base": true,
-        "style": {
-          "dark": {
-            "stroke": {
-              "color": "#ffffff00",
-              "width": 0
-            },
-            "fill": { "color": "#171717" }
-          },
-          "light": {
-            "stroke": {
-              "color": "#ffffff00",
-              "width": 0
-            },
-            "fill": { "color": "#ffffff" }
-          }
-        }
+        "layer": "oceans"
       },
       "geometry": {
         "type": "Polygon",
