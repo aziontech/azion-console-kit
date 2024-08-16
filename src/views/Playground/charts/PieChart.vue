@@ -1,16 +1,22 @@
 <script setup>
   import { onMounted } from 'vue'
-  import { PIE_CHART_DATA } from './constants/data'
   import c3 from 'c3'
 
   onMounted(() => {
     generate()
   })
 
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
+
   const generate = () => {
     c3.generate({
-      bindto: `#playground-pie-chart`,
-      ...PIE_CHART_DATA
+      bindto: `#pie-chart-${props.data.id}`,
+      ...props.data
     })
   }
 </script>
@@ -18,6 +24,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`playground-pie-chart`"
+    :id="`pie-chart-${props.data.id}`"
   />
 </template>

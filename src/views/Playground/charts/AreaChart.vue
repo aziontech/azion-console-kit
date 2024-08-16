@@ -1,16 +1,22 @@
 <script setup>
   import { onMounted } from 'vue'
-  import { AREA_CHART_DATA } from './constants/data'
   import c3 from 'c3'
 
   onMounted(() => {
     generate()
   })
 
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
+
   const generate = () => {
     c3.generate({
-      bindto: `#playground-area-chart`,
-      ...AREA_CHART_DATA
+      bindto: `#area-chart-${props.data.id}`,
+      ...props.data
     })
   }
 </script>
@@ -18,6 +24,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`playground-area-chart`"
+    :id="`area-chart-${props.data.id}`"
   />
 </template>

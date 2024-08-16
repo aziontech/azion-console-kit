@@ -36,7 +36,12 @@
   import MapLegendBlock from './map-chart-blocks/map-legend-block.vue'
   import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
-  import { MOCK_BUBBLES_DATA, MOCK_HEATMAP_DATA } from './constants/data'
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
 
   const mapTemplateRef = ref(null)
   const map = ref(null)
@@ -57,7 +62,7 @@
     const bubbles = new GeoJSON().readFeatures(regions)
 
     bubbles.forEach((bubble) => {
-      const bubbleData = bubblesHandler(bubble.get('name'), MOCK_BUBBLES_DATA)
+      const bubbleData = bubblesHandler(bubble.get('name'), props.data.bubbles)
 
       if (!bubbleData) {
         return
@@ -82,7 +87,7 @@
     const areas = new GeoJSON().readFeatures(countries)
 
     areas.forEach((area) => {
-      const areaData = heatmapHandler(area.get('name'), MOCK_HEATMAP_DATA)
+      const areaData = heatmapHandler(area.get('name'), props.data.heatmap)
 
       if (!areaData) {
         return

@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center gap-2">
     <h2 class="text-2xl font-bold text-color">
-      {{ props.report.value }}
-      <span class="text-sm font-normal">{{ props.report.unit }}</span>
+      {{ data.value }}
+      <span class="text-sm font-normal">{{ data.unit }}</span>
     </h2>
     <PrimeTag
       :class="variationProps?.class"
@@ -17,9 +17,12 @@
   import { computed } from 'vue'
   import PrimeTag from 'primevue/tag'
 
-  import { BIG_NUMBERS_CHART_DATA } from './constants/data'
-
-  const props = { report: BIG_NUMBERS_CHART_DATA }
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
 
   const getTagPropsByVariation = (variation) => {
     const variations = {
@@ -51,11 +54,11 @@
   }
 
   const variationProps = computed(() => {
-    return tagProps(props.report)
+    return tagProps(props.data)
   })
 
-  const tagProps = (report) => {
-    const { variationValue, variationType } = report
+  const tagProps = (data) => {
+    const { variationValue, variationType } = data
     const upperLimit = 0.01
     const lowerLimit = -0.01
     const precision = 2

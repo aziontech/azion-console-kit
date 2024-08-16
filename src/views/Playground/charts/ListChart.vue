@@ -1,8 +1,14 @@
 <script setup>
   import ListTableBlock from '@templates/list-table-block/index'
-  import { COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA } from './constants/data.js'
   import { computed, onBeforeUnmount } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
 
   let listDataTimeout = null
   const getColumns = computed(() => {
@@ -41,7 +47,7 @@
   const fakeListDataWithTimoutDelay = () => {
     return new Promise((resolve) => {
       listDataTimeout = setTimeout(() => {
-        resolve(COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA.data)
+        resolve(props.data)
       }, 1000)
     })
   }

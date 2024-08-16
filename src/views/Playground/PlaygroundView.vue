@@ -4,19 +4,48 @@
       v-for="chart in CHARTS"
       :key="chart.title"
     >
-      <Card class="p-3 md:p-6 col-span-12 lg:col-span-6">
+      <Card
+        class="p-3 md:p-6"
+        :class="classSizes(chart.size).cardCols"
+      >
         <template #title>
           <div class="flex flex-col gap-3">
-            <span class="text-base font-medium">{{ chart.title }}</span>
-            <span class="text-color-secondary text-sm font-normal">{{ chart.description }}</span>
+            <div class="flex w-full items-center justify-between gap-2">
+              <span class="w-full gap-2 flex">
+                <PrimeTag
+                  icon="pi pi-user"
+                  severity="info"
+                  :pt="{ icon: { class: 'mr-0' } }"
+                />
+                <span class="text-base font-medium overflow-ellipsis break-all line-clamp-1">{{
+                  chart.title
+                }}</span>
+              </span>
+              <PrimeButton
+                icon="pi pi-ellipsis-h"
+                outlined
+                size="small"
+              />
+            </div>
+
+            <span
+              v-if="chart.description"
+              class="break-words text-sm text-color-secondary font-normal line-height-1 py-3.5"
+            >
+              {{ chart.description }}
+            </span>
           </div>
         </template>
         <template #content>
           <div
-            class="mt-auto h-96 min-h-96 flex items-center relative"
+            class="mt-auto flex items-center relative"
+            :class="classSizes(chart.size).contentSize"
             v-if="showContent"
           >
-            <component :is="chart.component" />
+            <component
+              :is="chart.component"
+              :data="chart.data"
+            />
           </div>
           <Skeleton
             v-else
@@ -31,7 +60,11 @@
 <script setup>
   import { defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue'
   import Card from 'primevue/card'
+  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
+
+  import * as MOCKS from './mocks_data'
 
   const showContent = ref(true)
   const reRenderChart = () => {
@@ -52,71 +85,130 @@
     window.removeEventListener('resize', reRenderChart)
   })
 
+  const classSizes = (size) => {
+    return {
+      cardCols: `col-span-12 ${size === 'sm' ? 'lg:col-span-4' : 'lg:col-span-6'}`,
+      contentSize: size === 'sm' ? `h-auto` : `h-96 min-h-96`
+    }
+  }
+
   const CHARTS = [
     {
-      component: defineAsyncComponent(() => import('./maps/MapChart.vue')),
-      title: 'Map',
-      description:
-        'Highlights areas of high activity while also showing the volume of data by location. Ideal for analyzing patterns, hotspots, and the significance of data points across a region.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
-      title: 'Bar Chart',
-      description:
-        'Displays data using rectangular bars, with length representing value. Useful for comparing quantities across different categories.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
-      title: 'Ordered Bar Chart',
-      description:
-        'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
-      title: 'Stacked Line Chart',
-      description:
-        'Lines are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
-      title: 'Stacked Bar Chart',
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
-      title: 'Pie Chart',
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
-      title: 'Donut Chart',
-      description:
-        'A variation of a pie chart with a central hole. It provides a similar view but can also display additional data in the center.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
-      title: 'Area Chart',
-      description:
-        'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.'
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
-      title: 'List Chart',
-      description:
-        'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information'
+      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
+      title: 'Big Numbers Chart',
+      size: 'sm',
+      data: MOCKS.BIG_NUMBERS_REGULAR_CHART_DATA
     },
     {
       component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
       title: 'Big Numbers Chart',
-      description: 'Display data in a big number format. Useful for displaying variations in data.'
+      size: 'sm',
+      data: MOCKS.BIG_NUMBERS_INVERSE_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
+      title: 'Big Numbers Chart',
+      size: 'sm',
+      data: MOCKS.BIG_NUMBERS_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
+      title: 'Gauge Chart',
+      size: 'sm',
+      description:
+        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
+      data: MOCKS.GAUGE_HIGH_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
+      title: 'Gauge Chart',
+      size: 'sm',
+      description:
+        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
+      data: MOCKS.GAUGE_MEDIUM_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
+      title: 'Gauge Chart',
+      size: 'sm',
+      description:
+        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
+      data: MOCKS.GAUGE_LOW_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./maps/MapChart.vue')),
+      title: 'Map',
+      size: 'md',
+      description:
+        'Highlights areas of high activity while also showing the volume of data by location. Ideal for analyzing patterns, hotspots, and the significance of data points across a region.',
+      data: {
+        bubbles: MOCKS.BUBBLES_DATA,
+        heatmap: MOCKS.HEATMAP_DATA
+      }
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
+      title: 'Bar Chart',
+      size: 'md',
+      description:
+        'Displays data using rectangular bars, with length representing value. Useful for comparing quantities across different categories.',
+      data: MOCKS.BAR_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
+      title: 'Ordered Bar Chart',
+      size: 'md',
+      description:
+        'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.',
+      data: MOCKS.ROTATED_BAR_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
+      title: 'Stacked Line Chart',
+      size: 'md',
+      description:
+        'Lines are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
+      data: MOCKS.STACKED_LINE_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
+      title: 'Stacked Bar Chart',
+      size: 'md',
+      description:
+        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
+      data: MOCKS.STACKED_BAR_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
+      title: 'Pie Chart',
+      size: 'md',
+      description:
+        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
+      data: MOCKS.PIE_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
+      title: 'Donut Chart',
+      size: 'md',
+      description:
+        'A variation of a pie chart with a central hole. It provides a similar view but can also display additional data in the center.',
+      data: MOCKS.DONUT_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
+      title: 'Area Chart',
+      size: 'md',
+      description:
+        'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.',
+      data: MOCKS.AREA_CHART_DATA
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
+      title: 'List Chart',
+      size: 'md',
+      description:
+        'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information',
+      data: MOCKS.COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA
     }
   ]
 </script>

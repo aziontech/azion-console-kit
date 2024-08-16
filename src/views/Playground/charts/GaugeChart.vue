@@ -1,16 +1,22 @@
 <script setup>
   import { onMounted } from 'vue'
-  import { GAUGE_CHART_DATA } from './constants/data'
   import c3 from 'c3'
 
   onMounted(() => {
     generate()
   })
 
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true
+    }
+  })
+
   const generate = () => {
     c3.generate({
-      bindto: `#playground-gauge-chart`,
-      ...GAUGE_CHART_DATA
+      bindto: `#gauge-chart-${props.data.id}`,
+      ...props.data
     })
   }
 </script>
@@ -18,6 +24,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`playground-gauge-chart`"
+    :id="`gauge-chart-${props.data.id}`"
   />
 </template>
