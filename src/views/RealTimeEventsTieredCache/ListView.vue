@@ -84,7 +84,6 @@
       }
     ]
   })
-
   const customColumnMapper = (rowData) => ({
     upstreamCacheStatus: rowData.data.content
   })

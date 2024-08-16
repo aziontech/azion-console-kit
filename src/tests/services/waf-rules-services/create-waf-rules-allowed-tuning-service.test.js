@@ -12,7 +12,7 @@ const fixtures = {
       id: 0,
       ruleId: 1010,
       ipCount: 1,
-      matchZone: 'query_string',
+      matchZone: 'cookie',
       pathCount: 1,
       topCountries: ['Brazil'],
       matchesOn: 'value',
@@ -65,7 +65,7 @@ describe('WafRulesServices', () => {
           {
             matches_on: 'value',
             zone: 'conditional_request_header',
-            zone_input: 'arg'
+            zone_input: 'cookie'
           }
         ]
       }

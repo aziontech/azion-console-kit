@@ -56,7 +56,7 @@
           severity="info"
           class="w-fit"
         >
-          Sensitive data is handled by a PCI-compliant payment partner.
+          Once a variable is saved as a secret, its behavior cannot be edited.
         </InlineMessage>
       </div>
     </template>

@@ -38,7 +38,7 @@
     }
   })
 
-  const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
+  const emit = defineEmits(['on-edit-success', 'on-edit-fail', 'on-load-fail'])
 
   const { scrollToError } = useScrollToError()
   const router = useRouter()
@@ -101,6 +101,7 @@
       const initialValues = await props.loadService({ id })
       resetForm({ values: initialValues })
     } catch (error) {
+      emit('on-load-fail')
       showToast('error', error)
     }
   }
