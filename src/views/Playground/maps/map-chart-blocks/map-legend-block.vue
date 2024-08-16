@@ -33,6 +33,10 @@
 </script>
 
 <style lang="scss">
+  /*
+  styling added because surface-card token does not support opacity
+  TODO: remove this styling once the tokens are added to new theme package
+  */
   .azion-dark #map-legend-block {
     background-color: rgba(#171717, 0.85);
   }

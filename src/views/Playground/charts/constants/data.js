@@ -68,7 +68,8 @@ export const ROTATED_BAR_CHART_DATA = {
     },
     color: function (color, data) {
       return COLOR_PATTERNS.color.pattern[data.index]
-    }
+    },
+    labels: true
   },
   bar: {
     width: {
