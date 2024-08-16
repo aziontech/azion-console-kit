@@ -28,7 +28,7 @@ const getStyleValues = (feature, variation) => {
 
   return {
     fill: { color: VARIATIONS[variation][currentTheme].fillColor },
-    stroke: { color: VARIATIONS[variation][currentTheme].strokeColor, width: 2 }
+    stroke: { color: VARIATIONS[variation][currentTheme].strokeColor, width: 1 }
   }
 }
 
