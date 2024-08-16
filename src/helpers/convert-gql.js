@@ -17,6 +17,7 @@ const getGraphQLType = (value) => {
     if (!isNaN(Date.parse(value))) {
       return 'DateTime'
     }
+
     return 'String'
   }
 }
@@ -64,6 +65,37 @@ const convertGQL = (filter, table) => {
   let variables = {}
 
   if (filter) {
+    if (filter.fields) {
+      const separatedObjects = filter.fields.reduce(
+        (newFilters, item) => {
+          if (item.operator === 'Range') {
+            newFilters.range.push(item)
+          } else {
+            newFilters.others.push(item)
+          }
+          return newFilters
+        },
+        { range: [], others: [] }
+      )
+
+      const fieldsFormatAnd = separatedObjects.others.reduce((newFields, field) => {
+        newFields[`${field.valueField}${field.operator}`] = field.value
+        return newFields
+      }, {})
+
+      filter.and = {
+        ...filter.and,
+        ...fieldsFormatAnd
+      }
+
+      separatedObjects.range.forEach((field) => {
+        if (filterQuery !== '') filterQuery += ', '
+        filterQuery += `${field.valueField}Range: { begin: $${field.valueField}Range_begin, end: $${field.valueField}Range_end },\n`
+        variables[`${field.valueField}Range_begin`] = field.value.begin
+        variables[`${field.valueField}Range_end`] = field.value.end
+      })
+    }
+
     if (filter.tsRange && filter.tsRange.tsRangeBegin && filter.tsRange.tsRangeEnd) {
       filterQuery += `tsRange: { begin: $tsRange_begin, end: $tsRange_end }`
       variables.tsRange_begin = filter.tsRange.tsRangeBegin

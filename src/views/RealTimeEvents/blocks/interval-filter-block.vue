@@ -2,7 +2,7 @@
   import { useAccountStore } from '@/stores/account'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import DATE_TIME_INTERVALS from './constants/date-time-interval'
 
   const accountStore = useAccountStore()
@@ -25,6 +25,7 @@
     get: () => props.filterDate.value,
     set: (value) => emit('update:filterDate', value)
   })
+
   const timer = ref()
   const maxDate = ref()
   const dates = ref([])
@@ -138,11 +139,22 @@
     isVisibleCalendar.value = false
   }
 
+  watch(
+    () => props.filterDate,
+    (newValue) => {
+      if (newValue.tsRangeBegin) {
+        updatedTimeRange(newValue)
+      }
+    },
+    { immediate: true }
+  )
+
   onMounted(() => {
     updateCurrentTime()
     timer.value = setInterval(updateCurrentTime, 60000)
     setInitialValues()
   })
+
   onUnmounted(() => {
     clearInterval(timer.value)
   })
