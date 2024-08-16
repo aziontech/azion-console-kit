@@ -284,3 +284,10 @@ export const COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA = {
     }
   ]
 }
+
+export const BIG_NUMBERS_CHART_DATA = {
+  value: '2.3',
+  variationType: 'regular',
+  variationValue: 1.1,
+  unit: 'bits/s'
+}

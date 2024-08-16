@@ -112,6 +112,11 @@
       title: 'List Chart',
       description:
         'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information'
+    },
+    {
+      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
+      title: 'Big Numbers Chart',
+      description: 'Display data in a big number format. Useful for displaying variations in data.'
     }
   ]
 </script>
