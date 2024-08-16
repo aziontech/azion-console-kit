@@ -49,7 +49,7 @@ export const MOCK_BUBBLES_DATA = [
   },
   {
     regionName: 'Paris',
-    value: 190,
+    value: 1190,
     rangeVariation: 'regular'
   },
   {

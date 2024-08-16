@@ -21,17 +21,24 @@ const getStyleValues = (feature, variation) => {
 
   if (!variation) {
     return {
-      ...COMMON_LAYERS_COLORS[feature.get('layer')].style[currentTheme]
+      ...feature.get('style')[currentTheme]
     }
   }
 
   return {
     fill: { color: VARIATIONS[variation][currentTheme].fillColor },
-    stroke: { color: VARIATIONS[variation][currentTheme].strokeColor, width: 1 }
+    stroke: { color: VARIATIONS[variation][currentTheme].strokeColor, width: 1 },
+    zIndex: 1
   }
 }
 
 export const setFeatureStyle = (feature, variation = null) => {
+  if (!feature.get('style') && !variation) {
+    feature.setProperties({
+      ...COMMON_LAYERS_COLORS[feature.get('layer')]
+    })
+  }
+
   const styleValues = getStyleValues(feature, variation)
 
   const featureStyle = new Style({

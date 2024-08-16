@@ -79,15 +79,18 @@
   }
 
   const generateAreas = () => {
-    const areas = new GeoJSON().readFeatures(countries, {
-      featureProjection: 'EPSG:3857'
-    })
+    const areas = new GeoJSON().readFeatures(countries)
 
     areas.forEach((area) => {
       const areaData = heatmapHandler(area.get('name'), MOCK_HEATMAP_DATA)
+
       if (!areaData) {
         return
       }
+
+      const geometry = area.getGeometry()
+      const transformedGeometry = geometry.transform('EPSG:4326', 'EPSG:3857')
+      area.setGeometry(transformedGeometry)
 
       area.setProperties({
         kind: 'heatmap',
@@ -130,6 +133,12 @@
     map.value.on('singleclick', (event) => {
       handleTooltipByEvent(event)
     })
+  }
+
+  const rerenderMap = () => {
+    map.value.setTarget(null)
+    map.value = null
+    initMap()
   }
 
   const handleTooltipByEvent = (event) => {
@@ -187,14 +196,6 @@
 
   const { currentTheme } = storeToRefs(useAccountStore())
   watch(currentTheme, () => {
-    map.value
-      .getAllLayers()[0]
-      .getSource()
-      .getFeatures()
-      .forEach((feature) => {
-        if (feature.get('layer')) {
-          setFeatureStyle(feature)
-        }
-      })
+    rerenderMap()
   })
 </script>
