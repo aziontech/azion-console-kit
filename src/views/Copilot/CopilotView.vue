@@ -14,26 +14,23 @@
 
 <template>
   <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Copilot">
-        <template #default>
-          <PrimeButton
-            severity="primary"
-            :label="'New Chat'"
-            icon="pi pi-pen-to-square"
-            @click="handleClearChat"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
     <template #content>
+      <div class="fixed z-10 right-24 bottom-[100px] max-sm:bottom-[112px] max-sm:right-[72px]">
+        <PrimeButton
+          text
+          v-tooltip.top="{ value: 'Start a new chat', showDelay: 200 }"
+          icon="pi pi-pen-to-square"
+          @click="handleClearChat"
+        />
+      </div>
+      <AzionAiChatFullSizeBlock ref="azionAiChat" />
+
       <InlineMessage
-        class="w-fit mb-8"
+        class="w-fit mt-4"
         severity="info"
         >Copilot is in experimental mode and can give you some wrong answers. Please, always
         validate your answers.
       </InlineMessage>
-      <AzionAiChatFullSizeBlock ref="azionAiChat" />
     </template>
   </ContentBlock>
 </template>

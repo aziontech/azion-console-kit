@@ -212,6 +212,14 @@
           right: '26px',
           margin: '0'
         }
+      },
+      svg: {
+        styles: {
+          default: {
+            color: 'var(--text-color) !important',
+            filter: 'unset !important'
+          }
+        }
       }
     },
     loading: {
@@ -230,8 +238,8 @@
           objectFit: 'cover',
           width: '28px',
           height: '28px',
-          bottom: '32px',
-          right: '36px',
+          bottom: '22px',
+          right: '28px',
           margin: '0'
         }
       }
@@ -243,7 +251,7 @@
         #chat-view{
           font-size:16px;
         }
-        
+
         #messages p{
           tab-size: 4;
           font-feature-settings: normal;
@@ -252,7 +260,7 @@
           color: var(--text-color) !important;
         }
 
-        #messages ul, 
+        #messages ul,
         #messages ol {
           tab-size: 4;
           font-feature-settings: normal;
