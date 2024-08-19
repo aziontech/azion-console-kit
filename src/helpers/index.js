@@ -31,7 +31,7 @@ import { getVulcanPresets } from './get-vulcan-presets'
 import { goToClassicInterface } from './go-to-classic-interface'
 import { removeHtmlTagFromText } from './remove-html-tag-from-text'
 import { getCsvCellContentFromRowData } from './get-csv-cell-content-from-row-data'
-
+import { useRouteFilterManager } from './hash-route.js'
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -68,5 +68,6 @@ export {
   formatCurrencyString,
   formatUnitValue,
   openShowMorePlan,
-  getCsvCellContentFromRowData
+  getCsvCellContentFromRowData,
+  useRouteFilterManager
 }
