@@ -63,6 +63,11 @@
       "origin-id": 142611,
       "origin-key": "1d1b43b7-d18c-427d-9187-493d6c3aacb2",
       "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 142604,
+      "origin-key": "ddd40b86-49df-45e0-b47d-cb84c83537d9",
+      "name": "console_kit_stage_2024_07_29_single"
     }
   ],
   "rules-engine": {
@@ -147,6 +152,16 @@
         "id": 269474,
         "name": "Secure Headers",
         "phase": "response"
+      },
+      {
+        "id": 276673,
+        "name": "Deliver Static Assets",
+        "phase": "request"
+      },
+      {
+        "id": 276674,
+        "name": "Redirect to index.html",
+        "phase": "request"
       }
     ]
   },
