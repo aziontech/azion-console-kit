@@ -130,8 +130,28 @@ const COMMON_LAYERS_COLOR_LANDS = {
   }
 }
 
+const COMMON_LAYERS_COLOR_REGIONS = {
+  style: {
+    dark: {
+      stroke: {
+        color: 'transparent',
+        width: 0
+      },
+      fill: { color: 'transparent' }
+    },
+    light: {
+      stroke: {
+        color: 'transparent',
+        width: 0
+      },
+      fill: { color: 'transparent' }
+    }
+  }
+}
+
 export const COMMON_LAYERS_COLORS = {
   countries: COMMON_LAYERS_COLOR_LANDS,
   oceans: COMMON_LAYERS_COLOR_OCEANS,
-  lakes: COMMON_LAYERS_COLOR_LAKES
+  lakes: COMMON_LAYERS_COLOR_LAKES,
+  regions: COMMON_LAYERS_COLOR_REGIONS
 }

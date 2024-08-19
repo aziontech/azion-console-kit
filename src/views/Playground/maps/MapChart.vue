@@ -6,13 +6,14 @@
   />
   <MapTooltipBlock :data="tooltipProps" />
   <MapLegendBlock
+    v-if="legendProps.show"
     :title="legendProps.title"
     :captions="legendProps.caption"
   />
 </template>
 
 <script setup>
-  import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { onClickOutside } from '@vueuse/core'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -65,7 +66,7 @@
       const bubbleData = bubblesHandler(bubble.get('name'), props.data.bubbles)
 
       if (!bubbleData) {
-        return
+        return setFeatureStyle(bubble)
       }
 
       bubble.setGeometry(
@@ -177,27 +178,35 @@
     }
   }
 
-  const legendProps = {
-    title: 'Total accesses:',
-    caption: [
-      {
-        label: '100.000 accesses',
-        bullet: 'bg-scale-red border-scale-red'
-      },
-      {
-        label: '10.000 accesses',
-        bullet: 'bg-scale-orange border-scale-orange'
-      },
-      {
-        label: '1.000 accesses',
-        bullet: 'bg-scale-yellow border-scale-yellow'
-      },
-      {
-        label: '< 100 accesses',
-        bullet: 'bg-scale-green border-scale-green'
-      }
-    ]
-  }
+  const legendProps = computed(() => {
+    const addedFeatures = map.value?.getAllLayers()[0]?.getSource()?.getFeatures() || []
+    const getFeaturesKinds = addedFeatures
+      .map((feature) => feature.get('kind'))
+      .filter((value, index, self) => self.indexOf(value) === index && value)
+
+    return {
+      show: getFeaturesKinds.length > 1,
+      title: 'Total accesses:',
+      caption: [
+        {
+          label: '100.000 accesses',
+          bullet: 'bg-scale-red border-scale-red'
+        },
+        {
+          label: '10.000 accesses',
+          bullet: 'bg-scale-orange border-scale-orange'
+        },
+        {
+          label: '1.000 accesses',
+          bullet: 'bg-scale-yellow border-scale-yellow'
+        },
+        {
+          label: '< 100 accesses',
+          bullet: 'bg-scale-green border-scale-green'
+        }
+      ]
+    }
+  })
 
   const { currentTheme } = storeToRefs(useAccountStore())
   watch(currentTheme, () => {
