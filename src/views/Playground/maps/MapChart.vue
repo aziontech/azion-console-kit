@@ -185,7 +185,7 @@
       .filter((value, index, self) => self.indexOf(value) === index && value)
 
     return {
-      show: getFeaturesKinds.length > 1,
+      show: getFeaturesKinds.length === 1,
       title: 'Total accesses:',
       caption: [
         {
