@@ -212,7 +212,6 @@
 </script>
 
 <template>
-  {{ filterHash }}
   <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
     <advancedFilter
       :disabled="disabledFilter"
