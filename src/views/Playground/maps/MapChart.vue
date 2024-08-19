@@ -59,7 +59,7 @@
 
   onClickOutside(mapTemplateRef, () => hideTooltip())
 
-  const generateBubbles = () => {
+  const generateBubbles = computed(() => {
     const bubbles = new GeoJSON().readFeatures(regions)
 
     bubbles.forEach((bubble) => {
@@ -82,9 +82,9 @@
     })
 
     return bubbles
-  }
+  })
 
-  const generateAreas = () => {
+  const generateAreas = computed(() => {
     const areas = new GeoJSON().readFeatures(countries)
 
     areas.forEach((area) => {
@@ -107,7 +107,7 @@
     })
 
     return areas
-  }
+  })
 
   const initMap = () => {
     map.value = new Map({
@@ -118,8 +118,8 @@
               ...setOceanFeature(),
               ...setCountryFeature(),
               ...setLakeFeature(),
-              ...generateBubbles(),
-              ...generateAreas()
+              ...generateBubbles.value,
+              ...generateAreas.value
             ]
           })
         })
