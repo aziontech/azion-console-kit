@@ -335,7 +335,7 @@
             <div class="text-sm">
               <span>{{ resultsText }}</span>
               <PrimeButton
-                label="See full integrations list."
+                label="Back to Recommended."
                 link
                 class="ml-3 p-0"
                 size="small"
