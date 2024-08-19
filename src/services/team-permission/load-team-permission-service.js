@@ -38,7 +38,7 @@ const extractApiError = (httpResponse) => {
   const apiKeyError = Object.keys(httpResponse.body)[0]
   const apiValidationError = extractErrorKey(httpResponse.body, apiKeyError)
 
-  return `${apiKeyError}: ${apiValidationError}`
+  return `${apiValidationError}`
 }
 
 const parseHttpResponse = (httpResponse) => {
