@@ -377,7 +377,7 @@ export const HEATMAP_DATA = [
     rangeVariation: 'regular'
   },
   {
-    countryName: 'United States of America',
+    countryName: 'United States',
     value: 122890,
     rangeVariation: 'regular'
   }

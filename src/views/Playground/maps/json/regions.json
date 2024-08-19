@@ -89,7 +89,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Saint Barthelemy",
+        "name": "Saint Barthélemy",
         "capital": "Gustavia"
       },
       "geometry": {
@@ -699,7 +699,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Heard Island and McDonald Islands"
+        "name": "Heard and McDonald Islands"
       },
       "geometry": {
         "coordinates": [72.31, -53.06],
@@ -734,7 +734,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Palestinian Territory"
+        "name": "Palestine"
       },
       "geometry": {
         "coordinates": [34.2, 31.25],
@@ -769,7 +769,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Svalbard",
+        "name": "Svalbard and Jan Mayen",
         "capital": "Longyearbyen"
       },
       "geometry": {
@@ -877,7 +877,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Pitcairn",
+        "name": "Pitcairn Islands",
         "capital": "Adamstown"
       },
       "geometry": {
@@ -1013,17 +1013,6 @@
       },
       "geometry": {
         "coordinates": [159.57, -9.26],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "layer": "regions",
-        "name": "European Union"
-      },
-      "geometry": {
-        "coordinates": [9.9, 50.1021],
         "type": "Point"
       }
     },
@@ -1246,7 +1235,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Macedonia",
+        "name": "North Macedonia",
         "capital": "Skopje"
       },
       "geometry": {
@@ -1425,7 +1414,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Saint Helena Ascension and Tristan da Cunha",
+        "name": "Saint Helena",
         "capital": "Jamestown"
       },
       "geometry": {
@@ -1473,7 +1462,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Micronesia",
+        "name": "Federated States of Micronesia",
         "capital": "Palikir"
       },
       "geometry": {
@@ -1509,7 +1498,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Netherlands",
+        "name": "The Netherlands",
         "capital": "Amsterdam"
       },
       "geometry": {
@@ -1736,7 +1725,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Cocos Islands",
+        "name": "Cocos (Keeling) Islands",
         "capital": "West Island"
       },
       "geometry": {
@@ -1784,7 +1773,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Congo Democratic Republic",
+        "name": "DR Congo",
         "capital": "Kinshasa"
       },
       "geometry": {
@@ -1796,7 +1785,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Czech Republic",
+        "name": "Czechia",
         "capital": "Prague"
       },
       "geometry": {
@@ -1844,7 +1833,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Cape Verde",
+        "name": "Cabo Verde",
         "capital": "Praia"
       },
       "geometry": {
@@ -1952,7 +1941,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Saint Kitts and Nevis",
+        "name": "St Kitts and Nevis",
         "capital": "Basseterre"
       },
       "geometry": {
@@ -1976,18 +1965,6 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Sao Tome and Principe",
-        "capital": "Sao Tome"
-      },
-      "geometry": {
-        "coordinates": [6.39, 0.12],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "layer": "regions",
         "name": "Slovakia",
         "capital": "Bratislava"
       },
@@ -2000,7 +1977,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Korea South",
+        "name": "South Korea",
         "capital": "Seoul"
       },
       "geometry": {
@@ -2024,7 +2001,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Korea North",
+        "name": "North Korea",
         "capital": "Pyongyang"
       },
       "geometry": {
@@ -2360,7 +2337,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Turkey",
+        "name": "Türkiye",
         "capital": "Ankara"
       },
       "geometry": {
@@ -2491,6 +2468,18 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
+        "name": "French Guiana",
+        "capital": "Cayenne"
+      },
+      "geometry": {
+        "coordinates": [-52.54, 5.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
         "name": "Togo",
         "capital": "Lome"
       },
@@ -2539,19 +2528,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Holy See",
-        "capital": "Vatican City"
-      },
-      "geometry": {
-        "coordinates": [12.27, 41.54],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "layer": "regions",
-        "name": "Saint Vincent and the Grenadines",
+        "name": "St Vincent and Grenadines",
         "capital": "Kingstown"
       },
       "geometry": {
@@ -2623,7 +2600,7 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Virgin Islands",
+        "name": "U.S. Virgin Islands",
         "capital": "Charlotte Amalie"
       },
       "geometry": {
@@ -2695,33 +2672,10 @@
       "type": "Feature",
       "properties": {
         "layer": "regions",
-        "name": "Netherlands Antilles",
-        "capital": "Willemstad"
-      },
-      "geometry": {
-        "coordinates": [-68.56, 12.06],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "layer": "regions",
         "name": "Antarctica"
       },
       "geometry": {
         "coordinates": [0, -90],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "layer": "regions",
-        "name": "Asia &amp; Pacific"
-      },
-      "geometry": {
-        "coordinates": [0, 0],
         "type": "Point"
       }
     },
@@ -2878,6 +2832,30 @@
       },
       "geometry": {
         "coordinates": [32.35, -25.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kosovo",
+        "capital": "Pristina"
+      },
+      "geometry": {
+        "coordinates": [21.08, 42.66],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "South Sudan",
+        "capital": "Juba"
+      },
+      "geometry": {
+        "coordinates": [31.53, 4.86],
         "type": "Point"
       }
     }
