@@ -385,62 +385,62 @@ export const HEATMAP_DATA = [
 
 export const BUBBLES_DATA = [
   {
-    regionName: 'Rio de Janeiro',
+    countryName: 'Chile',
     value: 32559,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'New York',
-    value: 19,
+    countryName: 'Djibouti',
+    value: 195,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Tokio',
+    countryName: 'Netherlands',
     value: 29528,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'London',
+    countryName: 'United Arab Emirates',
     value: 25003,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Paris',
+    countryName: 'South Africa',
     value: 1190,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Cape Town',
+    countryName: 'Nigeria',
     value: 80,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Sydney',
+    countryName: 'Venezuela',
     value: 350,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Moscow',
+    countryName: 'Mexico',
     value: 11890,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Cairo',
+    countryName: 'India',
     value: 4559,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Sao Paulo',
+    countryName: 'Uruguay',
     value: 43921,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Brasilia',
+    countryName: 'Madagascar',
     value: 8987,
     rangeVariation: 'regular'
   },
   {
-    regionName: 'Salvador',
+    countryName: 'France',
     value: 19876,
     rangeVariation: 'regular'
   }

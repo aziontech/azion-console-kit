@@ -21,7 +21,7 @@ const rangeVariations = (value, rangeVariation) => {
 }
 
 export const bubblesHandler = (name, data) => {
-  const featureData = data.find((feature) => feature.regionName === name)
+  const featureData = data.find((feature) => feature.countryName === name)
 
   if (!featureData?.value) {
     return
