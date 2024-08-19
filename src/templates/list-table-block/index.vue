@@ -5,6 +5,7 @@
     data-testid="data-table-container"
   >
     <DataTable
+      ref="dataTableRef"
       class="overflow-clip rounded-md"
       v-if="!isLoading"
       @rowReorder="onRowReorder"
@@ -13,46 +14,68 @@
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
+      rowHover
       v-model:filters="filters"
       :paginator="showPagination"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
+      :exportFilename="exportFileName"
+      :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
     >
-      <template #header>
-        <div
-          class="flex flex-wrap justify-between gap-2 w-full"
-          data-testid="data-table-header"
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
+        <slot
+          name="header"
+          :exportTableCSV="handleExportTableDataToCSV"
         >
-          <span
-            class="flex flex-row p-input-icon-left items-center max-sm:w-full"
-            data-testid="data-table-search"
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-header"
           >
-            <i class="pi pi-search" />
-            <InputText
-              class="h-8 w-full md:min-w-[320px]"
-              v-model.trim="filters.global.value"
-              data-testid="data-table-search-input"
-              placeholder="Search"
-            />
-          </span>
-          <slot
-            name="addButton"
-            data-testid="data-table-add-button"
-          >
+            <span
+              class="flex flex-row p-input-icon-left items-center max-sm:w-full"
+              data-testid="data-table-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="h-8 w-full md:min-w-[320px]"
+                v-model.trim="filters.global.value"
+                data-testid="data-table-search-input"
+                placeholder="Search"
+              />
+            </span>
+
             <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :data-testid="`create_${addButtonLabel}_button`"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
+              v-if="hasExportToCsvMapper"
+              @click="handleExportTableDataToCSV"
+              outlined
+              class="max-sm:w-full ml-auto"
+              icon="pi pi-download"
+              :data-testid="`export_button`"
+              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
             />
-          </slot>
-        </div>
+
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :data-testid="`create_${addButtonLabel}_button`"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+              />
+            </slot>
+          </div>
+        </slot>
       </template>
 
       <Column
@@ -75,6 +98,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
+        class="hover:cursor-pointer"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -209,32 +233,37 @@
       }"
       data-testid="data-table-skeleton"
     >
-      <template #header>
-        <div
-          class="flex flex-wrap justify-between gap-2 w-full"
-          data-testid="data-table-skeleton-header"
-        >
-          <span
-            class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
-            data-testid="data-table-skeleton-search"
+      <template
+        #header
+        v-if="!props.hiddenHeader"
+      >
+        <slot name="header">
+          <div
+            class="flex flex-wrap justify-between gap-2 w-full"
+            data-testid="data-table-skeleton-header"
           >
-            <i class="pi pi-search" />
-            <InputText
-              class="w-full h-8 md:min-w-[320px]"
-              v-model="filters.global.value"
-              placeholder="Search"
-              data-testid="data-table-skeleton-search-input"
+            <span
+              class="flex flex-row h-8 p-input-icon-left max-sm:w-full"
+              data-testid="data-table-skeleton-search"
+            >
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full h-8 md:min-w-[320px]"
+                v-model="filters.global.value"
+                placeholder="Search"
+                data-testid="data-table-skeleton-search-input"
+              />
+            </span>
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+              data-testid="data-table-skeleton-add-button"
             />
-          </span>
-          <PrimeButton
-            class="max-sm:w-full"
-            @click="navigateToAddPage"
-            icon="pi pi-plus"
-            :label="addButtonLabel"
-            v-if="addButtonLabel"
-            data-testid="data-table-skeleton-add-button"
-          />
-        </div>
+          </div>
+        </slot>
       </template>
       <Column
         sortable
@@ -267,6 +296,7 @@
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
+  import { getCsvCellContentFromRowData } from '@/helpers'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -278,6 +308,9 @@
   ])
 
   const props = defineProps({
+    hiddenHeader: {
+      type: Boolean
+    },
     columns: {
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
@@ -329,6 +362,12 @@
     selectedItensData: {
       type: Array,
       default: () => []
+    },
+    csvMapper: {
+      type: Function
+    },
+    exportFileName: {
+      type: String
     }
   })
 
@@ -336,6 +375,7 @@
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
+  const dataTableRef = ref(null)
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -344,6 +384,7 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
+  const hasExportToCsvMapper = ref(!!props.csvMapper)
 
   const dialog = useDialog()
   const router = useRouter()
@@ -363,6 +404,20 @@
     selectedColumns.value = props.columns
   })
 
+  /**
+   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
+   */
+  const exportFunctionMapper = (rowData) => {
+    if (!hasExportToCsvMapper.value) {
+      return
+    }
+    const columnMapper = props.csvMapper(rowData)
+    return getCsvCellContentFromRowData({ columnMapper, rowData })
+  }
+
+  const handleExportTableDataToCSV = () => {
+    dataTableRef.value.exportCSV()
+  }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
