@@ -335,7 +335,7 @@
             <div class="text-sm">
               <span>{{ resultsText }}</span>
               <PrimeButton
-                label="Back to Recommended."
+                label="Back to the list."
                 link
                 class="ml-3 p-0"
                 size="small"
