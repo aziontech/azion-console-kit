@@ -10,6 +10,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
@@ -490,11 +492,6 @@
     return behaviorItem.isFirst ? 'Then' : 'And'
   }
 
-  const isNotFirstCriteria = (index) => {
-    const totalCriteria = criteria.value.length
-    return totalCriteria > 1 && index < totalCriteria - 1
-  }
-
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
     const MAXIMUM_ALLOWED = 10
     return criteria.value[criteriaIndex].value.length >= MAXIMUM_ALLOWED
@@ -593,121 +590,129 @@
   >
     <template #inputs>
       <div
-        class="flex flex-col"
+        class="flex flex-col gap-8"
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
-        data-testid="rule-form-criteria-item"
       >
-        <div
-          v-for="(item, conditionalIndex) in criteriaItem.value"
-          :key="conditionalIndex"
-          data-testid="rule-form-criteria-item-conditional"
-        >
-          <div class="flex items-center gap-2">
-            <Divider
-              align="left"
-              type="dashed"
-              class="capitalize z-0"
-              data-testid="rule-form-criteria-item-conditional-divider"
+        <Accordion :activeIndex="0">
+          <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
+            <template #header>
+              <div class="ml-auto flex justify-center items-center">
+                <PrimeButton
+                  :disabled="criteriaIndex === 0"
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
+                  @click="removeCriteria(criteriaIndex)"
+                  :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
+                />
+              </div>
+            </template>
+            <div
+              v-for="(item, conditionalIndex) in criteriaItem.value"
+              :key="conditionalIndex"
+              data-testid="rule-form-criteria-item-conditional"
             >
-              {{ item.conditional }}
-            </Divider>
+              <div class="flex items-center gap-2">
+                <Divider
+                  align="left"
+                  type="dashed"
+                  class="capitalize z-0"
+                  data-testid="rule-form-criteria-item-conditional-divider"
+                >
+                  {{ item.conditional }}
+                </Divider>
 
-            <PrimeButton
-              v-if="conditionalIndex !== 0"
-              icon="pi pi-trash"
-              size="small"
-              outlined
-              @click="removeConditional(criteriaIndex, conditionalIndex)"
-              data-testid="rule-form-criteria-item-conditional-remove-button"
-            />
-          </div>
+                <PrimeButton
+                  v-if="conditionalIndex !== 0"
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
+                  @click="removeConditional(criteriaIndex, conditionalIndex)"
+                  data-testid="rule-form-criteria-item-conditional-remove-button"
+                />
+              </div>
 
-          <div class="flex gap-2 mt-6 mb-8">
-            <div class="w-full">
-              <FieldAutoComplete
-                :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
-                :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                :value="criteria[criteriaIndex].value[conditionalIndex].variable"
-                :suggestions="variableItems"
-                :onComplete="searchVariableOption"
-                icon="pi pi-dollar"
-                :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
-                completeOnFocus
-              />
+              <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-6 mb-8 w-full">
+                <div class="flex flex-col w-full">
+                  <FieldAutoComplete
+                    :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
+                    :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                    :value="criteria[criteriaIndex].value[conditionalIndex].variable"
+                    :suggestions="variableItems"
+                    :onComplete="searchVariableOption"
+                    icon="pi pi-search"
+                    :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
+                    completeOnFocus
+                  />
+                </div>
+                <div class="flex flex-col w-full sm:max-w-[160px]">
+                  <FieldDropdown
+                    :options="CRITERIA_OPERATOR_OPTIONS"
+                    optionLabel="label"
+                    optionValue="value"
+                    class="h-fit w-full"
+                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
+                    :value="criteria[criteriaIndex].value[conditionalIndex].operator"
+                    :disabled="isDefaultPhase"
+                    :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <FieldText
+                    :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
+                    v-if="
+                      criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+                      criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
+                    "
+                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
+                    :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
+                    :disabled="isDefaultPhase"
+                  />
+                </div>
+              </div>
             </div>
 
-            <FieldDropdown
-              :options="CRITERIA_OPERATOR_OPTIONS"
-              optionLabel="label"
-              optionValue="value"
-              class="h-fit"
-              :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
-              :value="criteria[criteriaIndex].value[conditionalIndex].operator"
-              :disabled="isDefaultPhase"
-              :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
-            />
-
-            <div class="flex flex-col w-full">
-              <FieldText
-                :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
-                v-if="
-                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
-                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
-                "
-                :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
-                :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
-                :disabled="isDefaultPhase"
+            <div
+              class="flex gap-2 w-full"
+              v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
+              data-testid="rule-form-criteria-item-conditional-add-button"
+            >
+              <PrimeButton
+                class="w-full"
+                icon="pi pi-plus-circle"
+                label="And"
+                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+                outlined
+                @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
+              />
+              <PrimeButton
+                class="w-full"
+                icon="pi pi-plus-circle"
+                label="Or"
+                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+                outlined
+                @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
               />
             </div>
-          </div>
-        </div>
-
-        <div
-          class="flex gap-2 mb-8"
-          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
-          data-testid="rule-form-criteria-item-conditional-add-button"
+          </AccordionTab>
+        </Accordion>
+        <Divider
+          v-if="criteriaIndex !== criteria.length - 1"
+          align="center"
+          type="dashed"
+          class="capitalize z-0"
         >
-          <PrimeButton
-            icon="pi pi-plus-circle"
-            label="And"
-            size="small"
-            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-            outlined
-            @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
-          />
-          <PrimeButton
-            icon="pi pi-plus-circle"
-            label="Or"
-            size="small"
-            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-            outlined
-            @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
-          />
-        </div>
-
-        <div
-          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
-          class="flex items-center gap-2"
-        >
-          <Divider type="solid" />
-          <PrimeButton
-            v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-trash"
-            size="small"
-            outlined
-            @click="removeCriteria(criteriaIndex + 1)"
-            :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
-          />
-        </div>
+          and
+        </Divider>
       </div>
       <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
-          size="small"
           outlined
+          class="w-full"
           :disabled="maximumCriteriaReached"
           @click="addNewCriteria"
           data-testid="rule-form-criteria-add-button"
@@ -728,120 +733,132 @@
         v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
       >
-        <div class="flex items-center gap-2">
-          <Divider
-            align="left"
-            type="dashed z-0"
-            data-testid="rule-form-behaviors-item-divider"
-          >
-            {{ getBehaviorLabel(behaviorItem) }}
-          </Divider>
-
-          <PrimeButton
-            v-if="behaviorIndex !== 0"
-            icon="pi pi-trash"
-            size="small"
-            outlined
-            @click="removeBehavior(behaviorIndex)"
-            data-testid="rule-form-behaviors-item-remove-button"
-          />
-        </div>
-
-        <div class="flex gap-2 mt-6 mb-8">
-          <div class="w-1/2">
-            <FieldDropdown
-              :key="behaviorItem.key"
-              :name="`behaviors[${behaviorIndex}].name`"
-              :options="behaviorsOptions"
-              optionLabel="label"
-              optionValue="value"
-              optionDisabled="requires"
-              :value="behaviors[behaviorIndex].value.name"
-              @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-              :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
-            />
-          </div>
-
-          <div class="w-1/2">
-            <template v-if="behaviorItem.value.name === 'run_function'">
-              <FieldDropdown
-                :filter="true"
-                :loading="loadingFunctionsInstance"
-                :name="`behaviors[${behaviorIndex}].target`"
-                :options="functionsInstanceOptions"
-                optionLabel="name.text"
-                optionValue="id"
-                :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.target"
-                :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
-              />
-            </template>
-            <template v-else-if="behaviorItem.value.name === 'set_origin'">
-              <FieldDropdown
-                :loading="loadingOrigins"
-                :name="`behaviors[${behaviorIndex}].target`"
-                :options="originsOptions"
-                optionLabel="name"
-                optionValue="originId"
-                :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.target"
-                :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
-              />
-            </template>
-            <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
-              <FieldDropdown
-                :loading="loadingCacheSettings"
-                :name="`behaviors[${behaviorIndex}].target`"
-                :options="cacheSettingsOptions"
-                optionLabel="name"
-                optionValue="id"
-                :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.target"
-                :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
-              />
-            </template>
-            <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
-              <div class="flex flex-col w-full">
-                <FieldText
-                  placeholder="Captured Array"
-                  class="w-full mb-3"
-                  :name="`behaviors[${behaviorIndex}].target.captured_array`"
-                  :key="behaviorItem.key"
-                  :value="behaviors[behaviorIndex].value.target.captured_array"
-                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
-                />
-                <FieldText
-                  placeholder="Subject"
-                  class="w-full mb-3"
-                  :name="`behaviors[${behaviorIndex}].target.subject`"
-                  :key="behaviorItem.key"
-                  :value="behaviors[behaviorIndex].value.target.subject"
-                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
-                />
-                <FieldText
-                  placeholder="Regex"
-                  class="w-full"
-                  :name="`behaviors[${behaviorIndex}].target.regex`"
-                  :key="behaviorItem.key"
-                  :value="behaviors[behaviorIndex].value.target.regex"
-                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
+        <Accordion :activeIndex="0">
+          <AccordionTab :header="`Behavior ${behaviorIndex + 1}`">
+            <template #header>
+              <div class="ml-auto flex justify-center items-center">
+                <PrimeButton
+                  :disabled="behaviorIndex === 0"
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
+                  @click="removeBehavior(behaviorIndex)"
+                  data-testid="rule-form-behaviors-item-remove-button"
                 />
               </div>
             </template>
-            <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
-              <div class="[&>input]:w-full">
-                <FieldText
-                  :name="`behaviors[${behaviorIndex}].target`"
+            <div class="flex items-center gap-2">
+              <Divider
+                align="left"
+                type="dashed z-0"
+                data-testid="rule-form-behaviors-item-divider"
+              >
+                {{ getBehaviorLabel(behaviorItem) }}
+              </Divider>
+            </div>
+
+            <div class="flex gap-2 mt-6 mb-8">
+              <div class="w-1/2">
+                <FieldDropdown
                   :key="behaviorItem.key"
-                  :value="behaviors[behaviorIndex].value.target"
-                  :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
+                  :name="`behaviors[${behaviorIndex}].name`"
+                  :options="behaviorsOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  optionDisabled="requires"
+                  :value="behaviors[behaviorIndex].value.name"
+                  @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
+                  :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
                 />
               </div>
-            </template>
-          </div>
-        </div>
+
+              <div class="w-1/2">
+                <template v-if="behaviorItem.value.name === 'run_function'">
+                  <FieldDropdown
+                    :filter="true"
+                    :loading="loadingFunctionsInstance"
+                    :name="`behaviors[${behaviorIndex}].target`"
+                    :options="functionsInstanceOptions"
+                    optionLabel="name.text"
+                    optionValue="id"
+                    :key="behaviorItem.key"
+                    :value="behaviors[behaviorIndex].value.target"
+                    :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
+                  />
+                </template>
+                <template v-else-if="behaviorItem.value.name === 'set_origin'">
+                  <FieldDropdown
+                    :loading="loadingOrigins"
+                    :name="`behaviors[${behaviorIndex}].target`"
+                    :options="originsOptions"
+                    optionLabel="name"
+                    optionValue="originId"
+                    :key="behaviorItem.key"
+                    :value="behaviors[behaviorIndex].value.target"
+                    :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
+                  />
+                </template>
+                <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
+                  <FieldDropdown
+                    :loading="loadingCacheSettings"
+                    :name="`behaviors[${behaviorIndex}].target`"
+                    :options="cacheSettingsOptions"
+                    optionLabel="name"
+                    optionValue="id"
+                    :key="behaviorItem.key"
+                    :value="behaviors[behaviorIndex].value.target"
+                    :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
+                  />
+                </template>
+                <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
+                  <div class="flex flex-col w-full gap-2">
+                    <div class="w-full flex flex-col">
+                      <FieldText
+                        placeholder="Captured Array"
+                        class="w-full"
+                        :name="`behaviors[${behaviorIndex}].target.captured_array`"
+                        :key="behaviorItem.key"
+                        :value="behaviors[behaviorIndex].value.target.captured_array"
+                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
+                      />
+                    </div>
+                    <div class="w-full flex flex-col">
+                      <FieldText
+                        placeholder="Subject"
+                        class="w-full"
+                        :name="`behaviors[${behaviorIndex}].target.subject`"
+                        :key="behaviorItem.key"
+                        :value="behaviors[behaviorIndex].value.target.subject"
+                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
+                      />
+                    </div>
+                    <div class="w-full flex flex-col">
+                      <FieldText
+                        placeholder="Regex"
+                        class="w-full"
+                        :name="`behaviors[${behaviorIndex}].target.regex`"
+                        :key="behaviorItem.key"
+                        :value="behaviors[behaviorIndex].value.target.regex"
+                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
+                      />
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
+                  <div class="[&>input]:w-full">
+                    <FieldText
+                      :name="`behaviors[${behaviorIndex}].target`"
+                      :key="behaviorItem.key"
+                      :value="behaviors[behaviorIndex].value.target"
+                      :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
+                    />
+                  </div>
+                </template>
+              </div>
+            </div>
+          </AccordionTab>
+        </Accordion>
       </div>
-      <Divider type="solid" />
       <div>
         <PrimeButton
           :disabled="disableAddBehaviorButtonComputed"
