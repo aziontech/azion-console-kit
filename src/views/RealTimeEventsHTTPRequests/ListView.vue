@@ -22,33 +22,24 @@
     }
   })
 
-  const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
 
   const openDetailDrawer = ({ configurationId, ts, requestId }) => {
     drawerRef.value.openDetailDrawer({
-      tsRange: props.filterData.tsRange,
+      ...props.filterData,
       configurationId,
       requestId,
       ts
     })
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
-  }
-
   const reloadListTable = () => {
-    if (hasContentToList.value) {
-      listTableBlockRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
+    listTableBlockRef.value.reload()
   }
 
   const listProvider = async () => {
-    return await props.listHttpRequest({ tsRange: props.filterData.tsRange })
+    return await props.listHttpRequest({ ...props.filterData })
   }
 
   const getColumns = computed(() => {
@@ -97,11 +88,11 @@
   />
 
   <ListTableBlock
+    lazyLoad
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
     :editInDrawer="openDetailDrawer"
-    @on-load-data="handleLoadData"
     emptyListMessage="No logs have been found for this period."
     isTabs
     exportFileName="http-requests-logs"

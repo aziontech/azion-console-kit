@@ -24,14 +24,14 @@
             <component
               :is="tab.component"
               v-bind="tab.props"
-              ref="viewRef"
               v-model:filterData="filterData"
-              v-if="tabActive(tab.table)"
+              ref="tabRef"
             >
               <template #header="{ downloadCSV }">
                 <ContentFilterBlock
                   v-model:filterData="filterData"
                   :downloadCSV="downloadCSV"
+                  @updatedFilter="reload"
                 />
               </template>
             </component>
@@ -45,7 +45,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, onMounted, ref } from 'vue'
+  import { onBeforeMount, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
@@ -58,6 +58,7 @@
   import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
   import RealTimeEventsTieredCache from '@/views/RealTimeEventsTieredCache/ListView'
   import ContentFilterBlock from '@/views/RealTimeEvents/blocks/content-filter-block.vue'
+  import { useRouteFilterManager } from '@/helpers'
 
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
@@ -98,12 +99,15 @@
 
   const route = useRoute()
   const router = useRouter()
+  const tabRef = ref([])
+  const { getFiltersFromHash } = useRouteFilterManager()
+
   const tabSelectIndex = ref(0)
-  const filterData = ref({
+  const filterData = ref(null)
+  const defaultFilter = {
     tsRange: {},
     fields: []
-  })
-  const viewRef = ref(null)
+  }
 
   const mapTabs = {
     httpRequests: {
@@ -186,24 +190,15 @@
 
   const tabPanels = Object.values(mapTabs)
 
-  const isActiveTab = computed(() => ({
-    httpRequests: mapTabs.httpRequests.index === tabSelectIndex.value,
-    EdgeFunctions: mapTabs.EdgeFunctions.index === tabSelectIndex.value,
-    EdgeFunctionsConsole: mapTabs.EdgeFunctionsConsole.index === tabSelectIndex.value,
-    ImageProcessor: mapTabs.ImageProcessor.index === tabSelectIndex.value,
-    TieredCache: mapTabs.TieredCache.index === tabSelectIndex.value,
-    EdgeDNS: mapTabs.EdgeDNS.index === tabSelectIndex.value,
-    DataStream: mapTabs.DataStream.index === tabSelectIndex.value,
-    ActivityHistory: mapTabs.ActivityHistory.index === tabSelectIndex.value
-  }))
-
-  const tabActive = (tab) => {
-    return isActiveTab.value[tab]
+  const resetFields = () => {
+    filterData.value.fields = []
   }
 
   const changePage = async ({ index }) => {
     const tab = tabPanels.find((tab) => tab.index === index)
     selectedTab(tab)
+    resetFields()
+    reload()
   }
 
   const updateRouter = (tabName) => {
@@ -235,7 +230,17 @@
     selectedTab(tabPanels[0])
   }
 
+  const reload = () => {
+    tabRef.value[tabSelectIndex.value].reloadListTable()
+  }
+
+  onBeforeMount(() => {
+    const filter = getFiltersFromHash()
+    filterData.value = filter || defaultFilter
+  })
+
   onMounted(() => {
     tabSelectInitial()
+    reload()
   })
 </script>

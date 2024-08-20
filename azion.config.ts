@@ -1,26 +1,26 @@
-/* if you have two environments for the same application
-/* you can import your config based on environment value, 
-/* ex: require(`./azion/${environment}/azion.json`)
-*/
-/* eslint-env node */
+import { defineConfig } from 'azion'
+import { AzionConfig, AzionCache, AzionOrigin, AzionRules, AzionRequestRule, AzionResponseRule } from 'azion/config'
+
+
 const environment = process.env.VITE_ENVIRONMENT || 'production'
 
-const addStagePrefix = (origin) => {
+
+const addStagePrefix = (origins: AzionOrigin[]): AzionOrigin[] => {
   if (environment === 'stage') {
-    return origin?.map((origin) => ({
+    return origins?.map((origin: AzionOrigin) => ({
       ...origin,
       hostHeader: `stage-${origin.hostHeader}`,
       addresses: origin.addresses?.map((addr) => `stage-${addr}`)
     }))
   }
-  return origin
+  return origins
 }
 
-const addStageSuffixToCookies = (cookieName) => {
+const addStageSuffixToCookies = (cookieName: string) => {
   return environment === 'stage' ? `${cookieName}_stg` : cookieName
 }
 
-const cacheConfig = [
+const cacheConfig: AzionCache[] = [
   {
     name: 'Statics - Cache',
     stale: false,
@@ -74,7 +74,7 @@ const cacheConfig = [
   }
 ]
 
-const commonRules = [
+const commonRules: AzionRequestRule[] = [
   {
     name: 'Apply Common Configuration for All Requests',
     description:
@@ -89,7 +89,7 @@ const commonRules = [
   }
 ]
 
-const frontRules = [
+const frontRules: AzionRequestRule[] = [
   {
     name: 'Set Storage Origin for All Requests',
     description: 'Sets the default object storage as the origin for all requests.',
@@ -126,7 +126,7 @@ const frontRules = [
   }
 ]
 
-const backRules = [
+const backRules: AzionRequestRule[] = [
   {
     name: 'Route API Default Requests to API Origin',
     description: 'Routes all default API requests to the specific API origin.',
@@ -252,7 +252,7 @@ const backRules = [
   }
 ]
 
-const AzionConfig = {
+const myApplication: AzionConfig = defineConfig({
   cache: [...cacheConfig],
   origin: addStagePrefix([
     {
@@ -369,8 +369,8 @@ const AzionConfig = {
           ]
         }
       }
-    ]
-  }
-}
+    ] as AzionResponseRule[]
+  } as AzionRules
+})
 
-module.exports = AzionConfig
+export default myApplication
