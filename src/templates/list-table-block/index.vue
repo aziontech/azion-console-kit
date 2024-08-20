@@ -44,7 +44,7 @@
             >
               <i class="pi pi-search" />
               <InputText
-                class="h-2 w-full md:min-w-[20rem]"
+                class="h-8 w-full md:min-w-[320px]"
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"
@@ -248,7 +248,7 @@
             >
               <i class="pi pi-search" />
               <InputText
-                class="w-full h-8 md:min-w-[20rem]"
+                class="w-full h-8 md:min-w-[320px]"
                 v-model="filters.global.value"
                 placeholder="Search"
                 data-testid="data-table-skeleton-search-input"
@@ -314,9 +314,6 @@
     columns: {
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
-    },
-    lazyLoad: {
-      type: Boolean
     },
     isGraphql: {
       type: Boolean
@@ -403,9 +400,7 @@
   })
 
   onMounted(() => {
-    if (!props.lazyLoad) {
-      loadData({ page: 1 })
-    }
+    loadData({ page: 1 })
     selectedColumns.value = props.columns
   })
 
