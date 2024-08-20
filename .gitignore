@@ -46,7 +46,3 @@ src/views/Playground/PlaygroundView.vue
 #Paths added by Azion CLI
 .edge/
 .vulcan
-
-/azion/args.json
-/azion/azion.json
-/azion/files.json
