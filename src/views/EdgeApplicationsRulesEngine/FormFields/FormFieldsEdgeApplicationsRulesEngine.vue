@@ -733,131 +733,118 @@
         v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
       >
-        <Accordion :activeIndex="0">
-          <AccordionTab :header="`Behavior ${behaviorIndex + 1}`">
-            <template #header>
-              <div class="ml-auto flex justify-center items-center">
-                <PrimeButton
-                  :disabled="behaviorIndex === 0"
-                  icon="pi pi-trash"
-                  size="small"
-                  outlined
-                  @click="removeBehavior(behaviorIndex)"
-                  data-testid="rule-form-behaviors-item-remove-button"
+        <div class="flex items-center gap-2">
+          <Divider
+            align="left"
+            type="dashed z-0"
+            data-testid="rule-form-behaviors-item-divider"
+          >
+            {{ getBehaviorLabel(behaviorItem) }}
+          </Divider>
+
+          <PrimeButton
+            v-if="behaviorIndex !== 0"
+            icon="pi pi-trash"
+            size="small"
+            outlined
+            @click="removeBehavior(behaviorIndex)"
+            data-testid="rule-form-behaviors-item-remove-button"
+          />
+        </div>
+
+        <div class="flex gap-2 mt-6 mb-8">
+          <div class="w-1/2">
+            <FieldDropdown
+              :key="behaviorItem.key"
+              :name="`behaviors[${behaviorIndex}].name`"
+              :options="behaviorsOptions"
+              optionLabel="label"
+              optionValue="value"
+              optionDisabled="requires"
+              :value="behaviors[behaviorIndex].value.name"
+              @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
+              :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
+            />
+          </div>
+
+          <div class="w-1/2">
+            <template v-if="behaviorItem.value.name === 'run_function'">
+              <FieldDropdown
+                :filter="true"
+                :loading="loadingFunctionsInstance"
+                :name="`behaviors[${behaviorIndex}].target`"
+                :options="functionsInstanceOptions"
+                optionLabel="name.text"
+                optionValue="id"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.target"
+                :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
+              />
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_origin'">
+              <FieldDropdown
+                :loading="loadingOrigins"
+                :name="`behaviors[${behaviorIndex}].target`"
+                :options="originsOptions"
+                optionLabel="name"
+                optionValue="originId"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.target"
+                :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
+              />
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
+              <FieldDropdown
+                :loading="loadingCacheSettings"
+                :name="`behaviors[${behaviorIndex}].target`"
+                :options="cacheSettingsOptions"
+                optionLabel="name"
+                optionValue="id"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.target"
+                :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
+              />
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
+              <div class="flex flex-col w-full">
+                <FieldText
+                  placeholder="Captured Array"
+                  class="w-full mb-3"
+                  :name="`behaviors[${behaviorIndex}].target.captured_array`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[behaviorIndex].value.target.captured_array"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
+                />
+                <FieldText
+                  placeholder="Subject"
+                  class="w-full mb-3"
+                  :name="`behaviors[${behaviorIndex}].target.subject`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[behaviorIndex].value.target.subject"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
+                />
+                <FieldText
+                  placeholder="Regex"
+                  class="w-full"
+                  :name="`behaviors[${behaviorIndex}].target.regex`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[behaviorIndex].value.target.regex"
+                  :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
                 />
               </div>
             </template>
-            <div class="flex items-center gap-2">
-              <Divider
-                align="left"
-                type="dashed z-0"
-                data-testid="rule-form-behaviors-item-divider"
-              >
-                {{ getBehaviorLabel(behaviorItem) }}
-              </Divider>
-            </div>
-
-            <div class="flex gap-2 mt-6 mb-8">
-              <div class="w-1/2">
-                <FieldDropdown
+            <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
+              <div class="[&>input]:w-full">
+                <FieldText
+                  :name="`behaviors[${behaviorIndex}].target`"
                   :key="behaviorItem.key"
-                  :name="`behaviors[${behaviorIndex}].name`"
-                  :options="behaviorsOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  optionDisabled="requires"
-                  :value="behaviors[behaviorIndex].value.name"
-                  @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-                  :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
+                  :value="behaviors[behaviorIndex].value.target"
+                  :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
                 />
               </div>
-
-              <div class="w-1/2">
-                <template v-if="behaviorItem.value.name === 'run_function'">
-                  <FieldDropdown
-                    :filter="true"
-                    :loading="loadingFunctionsInstance"
-                    :name="`behaviors[${behaviorIndex}].target`"
-                    :options="functionsInstanceOptions"
-                    optionLabel="name.text"
-                    optionValue="id"
-                    :key="behaviorItem.key"
-                    :value="behaviors[behaviorIndex].value.target"
-                    :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
-                  />
-                </template>
-                <template v-else-if="behaviorItem.value.name === 'set_origin'">
-                  <FieldDropdown
-                    :loading="loadingOrigins"
-                    :name="`behaviors[${behaviorIndex}].target`"
-                    :options="originsOptions"
-                    optionLabel="name"
-                    optionValue="originId"
-                    :key="behaviorItem.key"
-                    :value="behaviors[behaviorIndex].value.target"
-                    :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
-                  />
-                </template>
-                <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
-                  <FieldDropdown
-                    :loading="loadingCacheSettings"
-                    :name="`behaviors[${behaviorIndex}].target`"
-                    :options="cacheSettingsOptions"
-                    optionLabel="name"
-                    optionValue="id"
-                    :key="behaviorItem.key"
-                    :value="behaviors[behaviorIndex].value.target"
-                    :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
-                  />
-                </template>
-                <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
-                  <div class="flex flex-col w-full gap-2">
-                    <div class="w-full flex flex-col">
-                      <FieldText
-                        placeholder="Captured Array"
-                        class="w-full"
-                        :name="`behaviors[${behaviorIndex}].target.captured_array`"
-                        :key="behaviorItem.key"
-                        :value="behaviors[behaviorIndex].value.target.captured_array"
-                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
-                      />
-                    </div>
-                    <div class="w-full flex flex-col">
-                      <FieldText
-                        placeholder="Subject"
-                        class="w-full"
-                        :name="`behaviors[${behaviorIndex}].target.subject`"
-                        :key="behaviorItem.key"
-                        :value="behaviors[behaviorIndex].value.target.subject"
-                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
-                      />
-                    </div>
-                    <div class="w-full flex flex-col">
-                      <FieldText
-                        placeholder="Regex"
-                        class="w-full"
-                        :name="`behaviors[${behaviorIndex}].target.regex`"
-                        :key="behaviorItem.key"
-                        :value="behaviors[behaviorIndex].value.target.regex"
-                        :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
-                      />
-                    </div>
-                  </div>
-                </template>
-                <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
-                  <div class="[&>input]:w-full">
-                    <FieldText
-                      :name="`behaviors[${behaviorIndex}].target`"
-                      :key="behaviorItem.key"
-                      :value="behaviors[behaviorIndex].value.target"
-                      :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
-                    />
-                  </div>
-                </template>
-              </div>
-            </div>
-          </AccordionTab>
-        </Accordion>
+            </template>
+          </div>
+        </div>
       </div>
       <div>
         <PrimeButton
