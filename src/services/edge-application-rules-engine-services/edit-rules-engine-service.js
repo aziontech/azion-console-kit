@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
+import { adaptBehavior } from './helper-behavior'
 
 export const editRulesEngineService = async ({ id, payload, reorder = false }) => {
   const parsedPayload = adapt(payload, reorder)
@@ -45,7 +46,7 @@ const adapt = (payload, reorder) => {
     parsedPayload = {
       name,
       phase: phase.content || phase,
-      behaviors,
+      behaviors: adaptBehavior(behaviors),
       criteria,
       is_active: isActive,
       description
