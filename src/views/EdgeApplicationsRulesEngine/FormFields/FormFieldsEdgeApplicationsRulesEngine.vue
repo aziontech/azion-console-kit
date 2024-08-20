@@ -488,6 +488,10 @@
     variableItems.value = VARIABLE_AUTOCOMPLETE_OPTIONS.filter((item) => item.includes(event.query))
   }
 
+  const isNotLastCriteria = (criteriaIndex) => {
+    return criteriaIndex !== criteria.value.length - 1
+  }
+
   const getBehaviorLabel = (behaviorItem) => {
     return behaviorItem.isFirst ? 'Then' : 'And'
   }
@@ -699,7 +703,7 @@
           </AccordionTab>
         </Accordion>
         <Divider
-          v-if="criteriaIndex !== criteria.length - 1"
+          v-if="isNotLastCriteria(criteriaIndex)"
           align="center"
           type="dashed"
           class="capitalize z-0"
