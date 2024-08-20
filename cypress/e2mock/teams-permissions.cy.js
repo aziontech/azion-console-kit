@@ -20,7 +20,7 @@ describe('Teams Permissions Spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.teams.listRow('name')).click()
 
     //assert
-    cy.verifyToast('error', `detail: ${fixtures.errorMessage.detail}`)
+    cy.verifyToast('error', fixtures.errorMessage.detail)
     cy.location('pathname').should('eq', '/teams-permission')
   })
 })
