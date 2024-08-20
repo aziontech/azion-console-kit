@@ -14,6 +14,10 @@
     downloadCSV: {
       type: Function,
       required: true
+    },
+    playgroundOpener: {
+      type: Function,
+      required: true
     }
   })
 
@@ -71,6 +75,7 @@
           icon-pos="right"
           icon="pi pi-external-link"
           label="Open in GraphQL Playground"
+          @click="props.playgroundOpener()"
         />
         <PrimeButton
           outlined

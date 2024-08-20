@@ -29,6 +29,7 @@
             >
               <template #header="{ downloadCSV }">
                 <ContentFilterBlock
+                  :playgroundOpener="playgroundOpener"
                   v-model:filterData="filterData"
                   :downloadCSV="downloadCSV"
                   @updatedFilter="reload"
@@ -93,6 +94,10 @@
     },
     tieredCache: {
       type: Object,
+      required: true
+    },
+    playgroundOpener: {
+      type: Function,
       required: true
     }
   })

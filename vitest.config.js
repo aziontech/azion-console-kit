@@ -7,6 +7,7 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
+      setupFiles: ['src/tests/setup-tests.js'],
       environment: 'jsdom',
       passWithNoTests: true,
       exclude: [
