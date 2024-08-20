@@ -1,26 +1,26 @@
-import { defineConfig } from 'azion'
-import { AzionConfig, AzionCache, AzionOrigin, AzionRules, AzionRequestRule, AzionResponseRule } from 'azion/config'
-
-
+/* if you have two environments for the same application
+/* you can import your config based on environment value, 
+/* ex: require(`./azion/${environment}/azion.json`)
+*/
+/* eslint-env node */
 const environment = process.env.VITE_ENVIRONMENT || 'production'
 
-
-const addStagePrefix = (origins: AzionOrigin[]): AzionOrigin[] => {
+const addStagePrefix = (origin) => {
   if (environment === 'stage') {
-    return origins?.map((origin: AzionOrigin) => ({
+    return origin?.map((origin) => ({
       ...origin,
       hostHeader: `stage-${origin.hostHeader}`,
       addresses: origin.addresses?.map((addr) => `stage-${addr}`)
     }))
   }
-  return origins
+  return origin
 }
 
-const addStageSuffixToCookies = (cookieName: string) => {
+const addStageSuffixToCookies = (cookieName) => {
   return environment === 'stage' ? `${cookieName}_stg` : cookieName
 }
 
-const cacheConfig: AzionCache[] = [
+const cacheConfig = [
   {
     name: 'Statics - Cache',
     stale: false,
@@ -74,7 +74,7 @@ const cacheConfig: AzionCache[] = [
   }
 ]
 
-const commonRules: AzionRequestRule[] = [
+const commonRules = [
   {
     name: 'Apply Common Configuration for All Requests',
     description:
@@ -89,7 +89,7 @@ const commonRules: AzionRequestRule[] = [
   }
 ]
 
-const frontRules: AzionRequestRule[] = [
+const frontRules = [
   {
     name: 'Set Storage Origin for All Requests',
     description: 'Sets the default object storage as the origin for all requests.',
@@ -126,7 +126,7 @@ const frontRules: AzionRequestRule[] = [
   }
 ]
 
-const backRules: AzionRequestRule[] = [
+const backRules = [
   {
     name: 'Route API Default Requests to API Origin',
     description: 'Routes all default API requests to the specific API origin.',
@@ -252,7 +252,7 @@ const backRules: AzionRequestRule[] = [
   }
 ]
 
-const myApplication: AzionConfig = defineConfig({
+const AzionConfig = {
   cache: [...cacheConfig],
   origin: addStagePrefix([
     {
@@ -369,8 +369,8 @@ const myApplication: AzionConfig = defineConfig({
           ]
         }
       }
-    ] as AzionResponseRule[]
-  } as AzionRules
-})
+    ]
+  }
+}
 
-export default myApplication
+module.exports = AzionConfig
