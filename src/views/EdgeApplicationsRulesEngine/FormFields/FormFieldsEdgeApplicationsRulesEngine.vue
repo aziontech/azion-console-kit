@@ -173,6 +173,20 @@
     }
   })
 
+  const placeholderBehaviors = (behavior) => {
+    const placeholders = {
+      add_request_cookie: 'cookie-name=value',
+      add_request_header: 'header-name=value',
+      filter_request_cookie: 'cookie-name or cookie-name=cookie-value',
+      filter_request_header: 'header-name',
+      redirect_to_301: 'location',
+      redirect_to_302: 'location',
+      rewrite_request: 'URL-path'
+    }
+
+    return placeholders[behavior] || ''
+  }
+
   const isDefaultPhase = computed(() => props.initialPhase === 'default')
 
   const behaviorsRequestOptions = ref([
@@ -360,7 +374,6 @@
     data-testid="rule-form-general"
   >
     <template #inputs>
-      {{ behaviors }}
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name"
@@ -632,10 +645,10 @@
             <template v-if="behaviorItem.value.name === 'capture_match_groups'">
               <div class="flex flex-col w-full">
                 <FieldText
-                  placeholder="Captured Array"
                   class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].captured_array`"
                   :key="behaviorItem.key"
+                  placeholder="captured array name"
                   :value="behaviors[behaviorIndex].value.captured_array"
                   :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
                 />
@@ -662,6 +675,7 @@
                 <FieldText
                   :name="`behaviors[${behaviorIndex}].target`"
                   :key="behaviorItem.key"
+                  :placeholder="placeholderBehaviors(behaviorItem.value.name)"
                   :value="behaviors[behaviorIndex].value.target"
                   :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
                 />
