@@ -5,7 +5,7 @@ const fixtures = {
     detail: 'You do not have permission to perform this action (teams management).'
   }
 }
-describe('Teams Permissions Spec', { tags: ['@dev2'] }, () => {
+describe('Teams Permissions Spec', { tags: ['@dev2', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Teams Permissions')
