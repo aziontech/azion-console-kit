@@ -21,10 +21,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Install SO deps
+        run: apk add curl bash git
+
       - name: Install dependencies
         run: yarn ci
+        
       - name: Run security-linter
         run: yarn sec
+
   package-audit:
     runs-on: ubuntu-latest
     container:
@@ -32,10 +38,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Install SO deps
+        run: apk add curl bash git
+      
       - name: Install dependencies
         run: yarn ci
+      
       - name: Run package-audit
         run: yarn audit
+
   run-tests:
     runs-on: ubuntu-latest
     container:
