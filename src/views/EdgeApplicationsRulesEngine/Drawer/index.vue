@@ -1,6 +1,8 @@
 <script setup>
-  import { ref, inject } from 'vue'
+  import { ref, inject, onMounted } from 'vue'
   import * as yup from 'yup'
+  import { useToast } from 'primevue/usetoast'
+
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
@@ -61,6 +63,8 @@
     }
   })
 
+  const toast = useToast()
+
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
   const debouncedDrawerAnimate = 300
@@ -70,6 +74,9 @@
   )
   const loadEditRulesEngineDrawer = refDebounced(showEditRulesEngineDrawer, debouncedDrawerAnimate)
   const selectedRulesEngineToEdit = ref({})
+  const functionsInstanceOptions = ref([])
+  const cacheSettingsOptions = ref([])
+  const originsOptions = ref([])
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -88,8 +95,7 @@
     ],
     behaviors: [
       {
-        name: 'deliver',
-        target: {}
+        name: 'deliver'
       }
     ],
     isActive: true
@@ -138,6 +144,46 @@
       payload,
       id: props.edgeApplicationId
     })
+  }
+
+  const listFunctionsInstanceOptions = async () => {
+    try {
+      functionsInstanceOptions.value = await props.listEdgeApplicationFunctionsService(
+        props.edgeApplicationId
+      )
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
+
+  const listCacheSettingsOptions = async () => {
+    try {
+      cacheSettingsOptions.value = await props.listCacheSettingsService({
+        id: props.edgeApplicationId
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
+
+  const listOriginsOptions = async () => {
+    try {
+      originsOptions.value = await props.listOriginsService({ id: props.edgeApplicationId })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
   }
 
   const loadService = async () => {
@@ -192,6 +238,14 @@
     openDrawerEdit,
     closeDrawerEdit
   })
+
+  onMounted(async () => {
+    await Promise.all([
+      listFunctionsInstanceOptions(),
+      listCacheSettingsOptions(),
+      listOriginsOptions()
+    ])
+  })
 </script>
 
 <template>
@@ -212,9 +266,9 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
-        :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
-        :listOriginsService="props.listOriginsService"
-        :listCacheSettingsService="props.listCacheSettingsService"
+        :functionsInstanceOptions="functionsInstanceOptions"
+        :originsOptions="originsOptions"
+        :cacheSettingsOptions="cacheSettingsOptions"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -242,10 +296,10 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
-        :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
-        :listOriginsService="props.listOriginsService"
+        :functionsInstanceOptions="functionsInstanceOptions"
+        :originsOptions="originsOptions"
+        :cacheSettingsOptions="cacheSettingsOptions"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
-        :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
         :initialPhase="initialPhase"
