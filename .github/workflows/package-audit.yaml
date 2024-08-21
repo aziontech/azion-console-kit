@@ -2,7 +2,7 @@ name: Package Audit
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
   push:
@@ -30,4 +30,3 @@ jobs:
       
       - name: Run package-audit
         run: yarn audit
-        
