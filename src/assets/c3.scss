@@ -27,6 +27,13 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   --series-eight-color: #a5326b;
 }
 
+:root {
+  --scale-red: #ff7c75;
+  --scale-orange: #fa9e64;
+  --scale-yellow: #f0ca5b;
+  --scale-green: #6bd690;
+}
+
 .c3 svg {
   font: 10px sans-serif;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -86,9 +93,8 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 }
 
 /*-- Text on Chart --*/
-.c3-text.c3-empty {
-  fill: #808080;
-  font-size: 2em;
+.c3-text {
+  fill: var(--text-color-secondary) !important;
 }
 
 /*-- Line --*/
@@ -270,15 +276,15 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-max {
-  fill: #777;
+  fill: var(--text-color-secondary);
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-min {
-  fill: #777;
+  fill: var(--text-color-secondary);
 }
 
 .c3-chart-arc .c3-gauge-value {
-  fill: #000;
+  fill: var(--text-color);
 }
 
 .c3-chart-arc.c3-target g path {
