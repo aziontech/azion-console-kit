@@ -8,7 +8,7 @@ const fixtures = {
 describe('Teams Permissions Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
-    cy.openProduct('Teams Permissions')
+    cy.openProduct('Ten Permissions')
   })
 
   it('should block users without access of entering in the edit page', function () {
