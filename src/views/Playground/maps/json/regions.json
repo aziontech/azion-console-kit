@@ -1,0 +1,2863 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bangladesh",
+        "capital": "Dhaka"
+      },
+      "geometry": {
+        "coordinates": [90.24, 23.43],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Belgium",
+        "capital": "Brussels"
+      },
+      "geometry": {
+        "coordinates": [4.2, 50.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Burkina Faso",
+        "capital": "Ouagadougou"
+      },
+      "geometry": {
+        "coordinates": [-1.31, 12.22],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bulgaria",
+        "capital": "Sofia"
+      },
+      "geometry": {
+        "coordinates": [23.19, 42.41],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bosnia and Herzegovina",
+        "capital": "Sarajevo"
+      },
+      "geometry": {
+        "coordinates": [18.25, 43.52],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Barbados",
+        "capital": "Bridgetown"
+      },
+      "geometry": {
+        "coordinates": [-59.37, 13.06],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Wallis and Futuna",
+        "capital": "Mata-Utu"
+      },
+      "geometry": {
+        "coordinates": [-171.56, -13.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saint Barthélemy",
+        "capital": "Gustavia"
+      },
+      "geometry": {
+        "coordinates": [-62.51, 17.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bermuda",
+        "capital": "Hamilton"
+      },
+      "geometry": {
+        "coordinates": [-64.47, 32.17],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Brunei",
+        "capital": "Bandar Seri Begawan"
+      },
+      "geometry": {
+        "coordinates": [114.56, 4.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bolivia",
+        "capital": "La Paz"
+      },
+      "geometry": {
+        "coordinates": [-68.09, -16.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bahrain",
+        "capital": "Manama"
+      },
+      "geometry": {
+        "coordinates": [50.34, 26.14],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Burundi",
+        "capital": "Bujumbura"
+      },
+      "geometry": {
+        "coordinates": [29.21, -3.22],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Benin",
+        "capital": "Porto-Novo"
+      },
+      "geometry": {
+        "coordinates": [2.37, 6.29],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bhutan",
+        "capital": "Thimphu"
+      },
+      "geometry": {
+        "coordinates": [89.36, 27.29],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Jamaica",
+        "capital": "Kingston"
+      },
+      "geometry": {
+        "coordinates": [-76.48, 18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bouvet Island"
+      },
+      "geometry": {
+        "coordinates": [3.24, -54.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Botswana",
+        "capital": "Gaborone"
+      },
+      "geometry": {
+        "coordinates": [25.55, -24.45],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Samoa",
+        "capital": "Apia"
+      },
+      "geometry": {
+        "coordinates": [-171.44, -13.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Brazil",
+        "capital": "Brasilia"
+      },
+      "geometry": {
+        "coordinates": [-47.55, -15.47],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Bahamas",
+        "capital": "Nassau"
+      },
+      "geometry": {
+        "coordinates": [-77.21, 25.05],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Jersey",
+        "capital": "Saint Helier"
+      },
+      "geometry": {
+        "coordinates": [-2.06, 49.11],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Belarus",
+        "capital": "Minsk"
+      },
+      "geometry": {
+        "coordinates": [27.34, 53.54],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Belize",
+        "capital": "Belmopan"
+      },
+      "geometry": {
+        "coordinates": [-88.46, 17.15],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Russia",
+        "capital": "Moscow"
+      },
+      "geometry": {
+        "coordinates": [37.35, 55.45],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Rwanda",
+        "capital": "Kigali"
+      },
+      "geometry": {
+        "coordinates": [30.04, -1.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Serbia",
+        "capital": "Belgrade"
+      },
+      "geometry": {
+        "coordinates": [20.3, 44.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Timor-Leste",
+        "capital": "Dili"
+      },
+      "geometry": {
+        "coordinates": [125.36, -8.35],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Turkmenistan",
+        "capital": "Ashgabat"
+      },
+      "geometry": {
+        "coordinates": [58.23, 37.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tajikistan",
+        "capital": "Dushanbe"
+      },
+      "geometry": {
+        "coordinates": [68.48, 38.35],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Romania",
+        "capital": "Bucharest"
+      },
+      "geometry": {
+        "coordinates": [26.06, 44.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tokelau"
+      },
+      "geometry": {
+        "coordinates": [-172, -9],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guinea-Bissau",
+        "capital": "Bissau"
+      },
+      "geometry": {
+        "coordinates": [-15.35, 11.51],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guam",
+        "capital": "Hagatna"
+      },
+      "geometry": {
+        "coordinates": [144.44, 13.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guatemala",
+        "capital": "Guatemala City"
+      },
+      "geometry": {
+        "coordinates": [-90.31, 14.37],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Greece",
+        "capital": "Athens"
+      },
+      "geometry": {
+        "coordinates": [23.44, 37.59],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Equatorial Guinea",
+        "capital": "Malabo"
+      },
+      "geometry": {
+        "coordinates": [8.47, 3.45],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Japan",
+        "capital": "Tokyo"
+      },
+      "geometry": {
+        "coordinates": [139.45, 35.41],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guyana",
+        "capital": "Georgetown"
+      },
+      "geometry": {
+        "coordinates": [-58.1, 6.48],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guernsey",
+        "capital": "Saint Peter Port"
+      },
+      "geometry": {
+        "coordinates": [-2.32, 49.27],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Georgia",
+        "capital": "T'bilisi"
+      },
+      "geometry": {
+        "coordinates": [44.47, 41.43],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Grenada",
+        "capital": "Saint George's"
+      },
+      "geometry": {
+        "coordinates": [-61.45, 12.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "United Kingdom",
+        "capital": "London"
+      },
+      "geometry": {
+        "coordinates": [-0.1, 51.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Gabon",
+        "capital": "Libreville"
+      },
+      "geometry": {
+        "coordinates": [9.27, 0.23],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "El Salvador",
+        "capital": "San Salvador"
+      },
+      "geometry": {
+        "coordinates": [-89.12, 13.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Guinea",
+        "capital": "Conakry"
+      },
+      "geometry": {
+        "coordinates": [-13.42, 9.33],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Gambia",
+        "capital": "Banjul"
+      },
+      "geometry": {
+        "coordinates": [-16.34, 13.27],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Greenland",
+        "capital": "Nuuk"
+      },
+      "geometry": {
+        "coordinates": [-51.45, 64.11],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Gibraltar",
+        "capital": "Gibraltar"
+      },
+      "geometry": {
+        "coordinates": [-5.21, 36.08],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ghana",
+        "capital": "Accra"
+      },
+      "geometry": {
+        "coordinates": [-0.13, 5.33],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Oman",
+        "capital": "Muscat"
+      },
+      "geometry": {
+        "coordinates": [58.35, 23.37],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tunisia",
+        "capital": "Tunis"
+      },
+      "geometry": {
+        "coordinates": [10.11, 36.48],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Jordan",
+        "capital": "Amman"
+      },
+      "geometry": {
+        "coordinates": [35.56, 31.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Croatia",
+        "capital": "Zagreb"
+      },
+      "geometry": {
+        "coordinates": [16, 45.48],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Haiti",
+        "capital": "Port-au-Prince"
+      },
+      "geometry": {
+        "coordinates": [-72.2, 18.32],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Hungary",
+        "capital": "Budapest"
+      },
+      "geometry": {
+        "coordinates": [19.05, 47.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Hong Kong",
+        "capital": "Hong Kong"
+      },
+      "geometry": {
+        "coordinates": [114.1, 22.15],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Honduras",
+        "capital": "Tegucigalpa"
+      },
+      "geometry": {
+        "coordinates": [-87.13, 14.06],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Heard and McDonald Islands"
+      },
+      "geometry": {
+        "coordinates": [72.31, -53.06],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Venezuela",
+        "capital": "Caracas"
+      },
+      "geometry": {
+        "coordinates": [-66.56, 10.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Puerto Rico",
+        "capital": "San Juan"
+      },
+      "geometry": {
+        "coordinates": [-66.07, 18.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Palestine"
+      },
+      "geometry": {
+        "coordinates": [34.2, 31.25],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Palau",
+        "capital": "Melekeok"
+      },
+      "geometry": {
+        "coordinates": [134.38, 7.29],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Portugal",
+        "capital": "Lisbon"
+      },
+      "geometry": {
+        "coordinates": [-9.08, 38.43],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Svalbard and Jan Mayen",
+        "capital": "Longyearbyen"
+      },
+      "geometry": {
+        "coordinates": [15.33, 78.13],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Paraguay",
+        "capital": "Asuncion"
+      },
+      "geometry": {
+        "coordinates": [-57.4, -25.16],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Iraq",
+        "capital": "Baghdad"
+      },
+      "geometry": {
+        "coordinates": [44.23, 33.2],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Panama",
+        "capital": "Panama City"
+      },
+      "geometry": {
+        "coordinates": [-79.32, 8.58],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "French Polynesia",
+        "capital": "Papeete"
+      },
+      "geometry": {
+        "coordinates": [-149.34, -17.32],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Papua New Guinea",
+        "capital": "Port Moresby"
+      },
+      "geometry": {
+        "coordinates": [147.1, -9.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Peru",
+        "capital": "Lima"
+      },
+      "geometry": {
+        "coordinates": [-77.03, -12.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Pakistan",
+        "capital": "Islamabad"
+      },
+      "geometry": {
+        "coordinates": [73.1, 33.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Philippines",
+        "capital": "Manila"
+      },
+      "geometry": {
+        "coordinates": [121, 14.35],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Pitcairn Islands",
+        "capital": "Adamstown"
+      },
+      "geometry": {
+        "coordinates": [-130.05, -25.04],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Poland",
+        "capital": "Warsaw"
+      },
+      "geometry": {
+        "coordinates": [21, 52.15],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saint Pierre and Miquelon",
+        "capital": "Saint-Pierre"
+      },
+      "geometry": {
+        "coordinates": [-56.11, 46.46],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Zambia",
+        "capital": "Lusaka"
+      },
+      "geometry": {
+        "coordinates": [28.17, -15.25],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Western Sahara"
+      },
+      "geometry": {
+        "coordinates": [-13, 24.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Estonia",
+        "capital": "Tallinn"
+      },
+      "geometry": {
+        "coordinates": [24.43, 59.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Egypt",
+        "capital": "Cairo"
+      },
+      "geometry": {
+        "coordinates": [31.15, 30.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "South Africa",
+        "capital": "Pretoria"
+      },
+      "geometry": {
+        "coordinates": [28.13, -25.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ecuador",
+        "capital": "Quito"
+      },
+      "geometry": {
+        "coordinates": [-78.3, -0.13],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Italy",
+        "capital": "Rome"
+      },
+      "geometry": {
+        "coordinates": [12.29, 41.54],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Vietnam",
+        "capital": "Hanoi"
+      },
+      "geometry": {
+        "coordinates": [105.51, 21.02],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Solomon Islands",
+        "capital": "Honiara"
+      },
+      "geometry": {
+        "coordinates": [159.57, -9.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ethiopia",
+        "capital": "Addis Ababa"
+      },
+      "geometry": {
+        "coordinates": [38.42, 9.02],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Somalia",
+        "capital": "Mogadishu"
+      },
+      "geometry": {
+        "coordinates": [45.22, 2.04],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Zimbabwe",
+        "capital": "Harare"
+      },
+      "geometry": {
+        "coordinates": [31.03, -17.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saudi Arabia",
+        "capital": "Riyadh"
+      },
+      "geometry": {
+        "coordinates": [46.43, 24.38],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Spain",
+        "capital": "Madrid"
+      },
+      "geometry": {
+        "coordinates": [-3.41, 40.24],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Eritrea",
+        "capital": "Asmara"
+      },
+      "geometry": {
+        "coordinates": [38.56, 15.2],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Montenegro",
+        "capital": "Podgorica"
+      },
+      "geometry": {
+        "coordinates": [19.16, 42.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Moldova",
+        "capital": "Chisinau"
+      },
+      "geometry": {
+        "coordinates": [28.51, 47],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Madagascar",
+        "capital": "Antananarivo"
+      },
+      "geometry": {
+        "coordinates": [47.31, -18.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saint Martin",
+        "capital": "Marigot"
+      },
+      "geometry": {
+        "coordinates": [-63.05, 18.04],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Morocco",
+        "capital": "Rabat"
+      },
+      "geometry": {
+        "coordinates": [-6.49, 34.01],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Monaco",
+        "capital": "Monaco"
+      },
+      "geometry": {
+        "coordinates": [7.25, 43.44],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Uzbekistan",
+        "capital": "Tashkent"
+      },
+      "geometry": {
+        "coordinates": [69.18, 41.2],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Myanmar",
+        "capital": "Rangoon"
+      },
+      "geometry": {
+        "coordinates": [96.09, 16.48],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mali",
+        "capital": "Bamako"
+      },
+      "geometry": {
+        "coordinates": [-8, 12.39],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Macao"
+      },
+      "geometry": {
+        "coordinates": [113.33, 22.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mongolia",
+        "capital": "Ulaanbaatar"
+      },
+      "geometry": {
+        "coordinates": [106.55, 47.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Marshall Islands",
+        "capital": "Majuro"
+      },
+      "geometry": {
+        "coordinates": [171.23, 7.06],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "North Macedonia",
+        "capital": "Skopje"
+      },
+      "geometry": {
+        "coordinates": [21.26, 42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mauritius",
+        "capital": "Port Louis"
+      },
+      "geometry": {
+        "coordinates": [57.29, -20.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Malta",
+        "capital": "Valletta"
+      },
+      "geometry": {
+        "coordinates": [14.3, 35.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Malawi",
+        "capital": "Lilongwe"
+      },
+      "geometry": {
+        "coordinates": [33.47, -13.59],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Maldives",
+        "capital": "Male"
+      },
+      "geometry": {
+        "coordinates": [73.3, 4.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Northern Mariana Islands",
+        "capital": "Saipan"
+      },
+      "geometry": {
+        "coordinates": [145.45, 15.12],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Montserrat",
+        "capital": "Plymouth"
+      },
+      "geometry": {
+        "coordinates": [-62.13, 16.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mauritania",
+        "capital": "Nouakchott"
+      },
+      "geometry": {
+        "coordinates": [-16.02, 18.07],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Isle of Man",
+        "capital": "Douglas"
+      },
+      "geometry": {
+        "coordinates": [-4.29, 54.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Uganda",
+        "capital": "Kampala"
+      },
+      "geometry": {
+        "coordinates": [32.25, 0.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Malaysia",
+        "capital": "Kuala Lumpur"
+      },
+      "geometry": {
+        "coordinates": [101.42, 3.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mexico",
+        "capital": "Mexico City"
+      },
+      "geometry": {
+        "coordinates": [-99.08, 19.26],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Israel",
+        "capital": "Jerusalem"
+      },
+      "geometry": {
+        "coordinates": [35.14, 31.46],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "France",
+        "capital": "Paris"
+      },
+      "geometry": {
+        "coordinates": [2.2, 48.52],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "British Indian Ocean Territory"
+      },
+      "geometry": {
+        "coordinates": [71.3, -6],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saint Helena",
+        "capital": "Jamestown"
+      },
+      "geometry": {
+        "coordinates": [-5.44, -15.56],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Finland",
+        "capital": "Helsinki"
+      },
+      "geometry": {
+        "coordinates": [24.56, 60.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Fiji",
+        "capital": "Suva"
+      },
+      "geometry": {
+        "coordinates": [178.25, -18.08],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Falkland Islands",
+        "capital": "Stanley"
+      },
+      "geometry": {
+        "coordinates": [-57.51, -51.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Federated States of Micronesia",
+        "capital": "Palikir"
+      },
+      "geometry": {
+        "coordinates": [158.09, 6.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Faroe Islands",
+        "capital": "Torshavn"
+      },
+      "geometry": {
+        "coordinates": [-6.46, 62.01],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Nicaragua",
+        "capital": "Managua"
+      },
+      "geometry": {
+        "coordinates": [-86.17, 12.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "The Netherlands",
+        "capital": "Amsterdam"
+      },
+      "geometry": {
+        "coordinates": [4.54, 52.23],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Norway",
+        "capital": "Oslo"
+      },
+      "geometry": {
+        "coordinates": [10.45, 59.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Namibia",
+        "capital": "Windhoek"
+      },
+      "geometry": {
+        "coordinates": [17.05, -22.34],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Vanuatu",
+        "capital": "Port-Vila"
+      },
+      "geometry": {
+        "coordinates": [168.19, -17.44],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "New Caledonia",
+        "capital": "Noumea"
+      },
+      "geometry": {
+        "coordinates": [166.27, -22.16],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Niger",
+        "capital": "Niamey"
+      },
+      "geometry": {
+        "coordinates": [2.07, 13.31],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Norfolk Island",
+        "capital": "Kingston"
+      },
+      "geometry": {
+        "coordinates": [167.58, -29.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Nigeria",
+        "capital": "Abuja"
+      },
+      "geometry": {
+        "coordinates": [7.32, 9.05],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "New Zealand",
+        "capital": "Wellington"
+      },
+      "geometry": {
+        "coordinates": [174.51, -41.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Nepal",
+        "capital": "Kathmandu"
+      },
+      "geometry": {
+        "coordinates": [85.19, 27.43],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Nauru"
+      },
+      "geometry": {
+        "coordinates": [166.55, -0.32],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Niue",
+        "capital": "Alofi"
+      },
+      "geometry": {
+        "coordinates": [-169.55, -19.01],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cook Islands",
+        "capital": "Avarua"
+      },
+      "geometry": {
+        "coordinates": [-159.46, -21.12],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ivory Coast",
+        "capital": "Yamoussoukro"
+      },
+      "geometry": {
+        "coordinates": [-5.17, 6.49],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Switzerland",
+        "capital": "Bern"
+      },
+      "geometry": {
+        "coordinates": [7.26, 46.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Colombia",
+        "capital": "Bogota"
+      },
+      "geometry": {
+        "coordinates": [-74.05, 4.36],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "China",
+        "capital": "Beijing"
+      },
+      "geometry": {
+        "coordinates": [116.23, 39.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cameroon",
+        "capital": "Yaounde"
+      },
+      "geometry": {
+        "coordinates": [11.31, 3.52],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Chile",
+        "capital": "Santiago"
+      },
+      "geometry": {
+        "coordinates": [-70.4, -33.27],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cocos (Keeling) Islands",
+        "capital": "West Island"
+      },
+      "geometry": {
+        "coordinates": [96.5, -12.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Canada",
+        "capital": "Ottawa"
+      },
+      "geometry": {
+        "coordinates": [-75.42, 45.25],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Congo Republic",
+        "capital": "Brazzaville"
+      },
+      "geometry": {
+        "coordinates": [15.17, -4.15],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Central African Republic",
+        "capital": "Bangui"
+      },
+      "geometry": {
+        "coordinates": [18.35, 4.22],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "DR Congo",
+        "capital": "Kinshasa"
+      },
+      "geometry": {
+        "coordinates": [15.18, -4.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Czechia",
+        "capital": "Prague"
+      },
+      "geometry": {
+        "coordinates": [14.28, 50.05],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cyprus",
+        "capital": "Nicosia"
+      },
+      "geometry": {
+        "coordinates": [33.22, 35.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Christmas Island",
+        "capital": "The Settlement"
+      },
+      "geometry": {
+        "coordinates": [105.43, -10.25],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Costa Rica",
+        "capital": "San Jose"
+      },
+      "geometry": {
+        "coordinates": [-84.05, 9.56],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cabo Verde",
+        "capital": "Praia"
+      },
+      "geometry": {
+        "coordinates": [-23.31, 14.55],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cuba",
+        "capital": "Havana"
+      },
+      "geometry": {
+        "coordinates": [-82.21, 23.07],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Swaziland",
+        "capital": "Mbabane"
+      },
+      "geometry": {
+        "coordinates": [31.06, -26.18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Syria",
+        "capital": "Damascus"
+      },
+      "geometry": {
+        "coordinates": [36.18, 33.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kyrgyzstan",
+        "capital": "Bishkek"
+      },
+      "geometry": {
+        "coordinates": [74.36, 42.52],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kenya",
+        "capital": "Nairobi"
+      },
+      "geometry": {
+        "coordinates": [36.49, -1.17],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Suriname",
+        "capital": "Paramaribo"
+      },
+      "geometry": {
+        "coordinates": [-55.1, 5.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kiribati",
+        "capital": "Tarawa"
+      },
+      "geometry": {
+        "coordinates": [172.58, 1.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cambodia",
+        "capital": "Phnom Penh"
+      },
+      "geometry": {
+        "coordinates": [104.55, 11.33],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "St Kitts and Nevis",
+        "capital": "Basseterre"
+      },
+      "geometry": {
+        "coordinates": [-62.43, 17.18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Comoros",
+        "capital": "Moroni"
+      },
+      "geometry": {
+        "coordinates": [43.14, -11.42],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Slovakia",
+        "capital": "Bratislava"
+      },
+      "geometry": {
+        "coordinates": [17.07, 48.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "South Korea",
+        "capital": "Seoul"
+      },
+      "geometry": {
+        "coordinates": [126.59, 37.33],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Slovenia",
+        "capital": "Ljubljana"
+      },
+      "geometry": {
+        "coordinates": [14.31, 46.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "North Korea",
+        "capital": "Pyongyang"
+      },
+      "geometry": {
+        "coordinates": [125.45, 39.01],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kuwait",
+        "capital": "Kuwait City"
+      },
+      "geometry": {
+        "coordinates": [47.58, 29.22],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Senegal",
+        "capital": "Dakar"
+      },
+      "geometry": {
+        "coordinates": [-17.26, 14.4],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "San Marino",
+        "capital": "San Marino"
+      },
+      "geometry": {
+        "coordinates": [12.25, 43.56],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Sierra Leone",
+        "capital": "Freetown"
+      },
+      "geometry": {
+        "coordinates": [-13.15, 8.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Seychelles",
+        "capital": "Victoria"
+      },
+      "geometry": {
+        "coordinates": [55.27, -4.38],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kazakhstan",
+        "capital": "Astana"
+      },
+      "geometry": {
+        "coordinates": [71.25, 51.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Cayman Islands",
+        "capital": "George Town"
+      },
+      "geometry": {
+        "coordinates": [-81.23, 19.18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Singapore",
+        "capital": "Singapore"
+      },
+      "geometry": {
+        "coordinates": [103.51, 1.17],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Sweden",
+        "capital": "Stockholm"
+      },
+      "geometry": {
+        "coordinates": [18.03, 59.2],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Sudan",
+        "capital": "Khartoum"
+      },
+      "geometry": {
+        "coordinates": [32.32, 15.36],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Dominican Republic",
+        "capital": "Santo Domingo"
+      },
+      "geometry": {
+        "coordinates": [-69.54, 18.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Dominica",
+        "capital": "Roseau"
+      },
+      "geometry": {
+        "coordinates": [-61.24, 15.18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Djibouti",
+        "capital": "Djibouti"
+      },
+      "geometry": {
+        "coordinates": [43.09, 11.35],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Denmark",
+        "capital": "Copenhagen"
+      },
+      "geometry": {
+        "coordinates": [12.35, 55.4],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "British Virgin Islands",
+        "capital": "Road Town"
+      },
+      "geometry": {
+        "coordinates": [-64.37, 18.27],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Germany",
+        "capital": "Berlin"
+      },
+      "geometry": {
+        "coordinates": [13.24, 52.31],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Yemen",
+        "capital": "Sanaa"
+      },
+      "geometry": {
+        "coordinates": [44.12, 15.21],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Algeria",
+        "capital": "Algiers"
+      },
+      "geometry": {
+        "coordinates": [3.03, 36.45],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "United States",
+        "capital": "Washington, DC"
+      },
+      "geometry": {
+        "coordinates": [-77.02, 38.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Uruguay",
+        "capital": "Montevideo"
+      },
+      "geometry": {
+        "coordinates": [-56.11, -34.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mayotte",
+        "capital": "Mamoudzou"
+      },
+      "geometry": {
+        "coordinates": [45.13, -12.46],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Lebanon",
+        "capital": "Beirut"
+      },
+      "geometry": {
+        "coordinates": [35.3, 33.52],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Saint Lucia",
+        "capital": "Castries"
+      },
+      "geometry": {
+        "coordinates": [-61, 14.01],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Laos",
+        "capital": "Vientiane"
+      },
+      "geometry": {
+        "coordinates": [102.36, 17.58],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tuvalu",
+        "capital": "Funafuti"
+      },
+      "geometry": {
+        "coordinates": [179.12, -8.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Taiwan",
+        "capital": "Taipei"
+      },
+      "geometry": {
+        "coordinates": [121.3, 25.03],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Trinidad and Tobago",
+        "capital": "Port-of-Spain"
+      },
+      "geometry": {
+        "coordinates": [-61.31, 10.39],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Türkiye",
+        "capital": "Ankara"
+      },
+      "geometry": {
+        "coordinates": [32.52, 39.56],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Sri Lanka",
+        "capital": "Colombo"
+      },
+      "geometry": {
+        "coordinates": [79.51, 6.56],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Liechtenstein",
+        "capital": "Vaduz"
+      },
+      "geometry": {
+        "coordinates": [9.31, 47.08],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Latvia",
+        "capital": "Riga"
+      },
+      "geometry": {
+        "coordinates": [24.06, 56.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tonga",
+        "capital": "Nuku'alofa"
+      },
+      "geometry": {
+        "coordinates": [-175.12, -21.08],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Lithuania",
+        "capital": "Vilnius"
+      },
+      "geometry": {
+        "coordinates": [25.19, 54.41],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Luxembourg",
+        "capital": "Luxembourg"
+      },
+      "geometry": {
+        "coordinates": [6.07, 49.36],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Liberia",
+        "capital": "Monrovia"
+      },
+      "geometry": {
+        "coordinates": [-10.48, 6.18],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Lesotho",
+        "capital": "Maseru"
+      },
+      "geometry": {
+        "coordinates": [27.29, -29.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Thailand",
+        "capital": "Bangkok"
+      },
+      "geometry": {
+        "coordinates": [100.31, 13.45],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "French Southern Territories"
+      },
+      "geometry": {
+        "coordinates": [77.32, -37.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "French Guiana",
+        "capital": "Cayenne"
+      },
+      "geometry": {
+        "coordinates": [-52.54, 5.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Togo",
+        "capital": "Lome"
+      },
+      "geometry": {
+        "coordinates": [1.13, 6.08],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Chad",
+        "capital": "N'Djamena"
+      },
+      "geometry": {
+        "coordinates": [15.02, 12.06],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Turks and Caicos Islands",
+        "capital": "Grand Turk"
+      },
+      "geometry": {
+        "coordinates": [-71.08, 21.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Libya",
+        "capital": "Tripoli"
+      },
+      "geometry": {
+        "coordinates": [13.1, 32.53],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "St Vincent and Grenadines",
+        "capital": "Kingstown"
+      },
+      "geometry": {
+        "coordinates": [-61.14, 13.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "United Arab Emirates",
+        "capital": "Abu Dhabi"
+      },
+      "geometry": {
+        "coordinates": [54.22, 24.28],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Andorra",
+        "capital": "Andorra la Vella"
+      },
+      "geometry": {
+        "coordinates": [1.31, 42.3],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Antigua and Barbuda",
+        "capital": "Saint John's"
+      },
+      "geometry": {
+        "coordinates": [-61.51, 17.07],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Afghanistan",
+        "capital": "Kabul"
+      },
+      "geometry": {
+        "coordinates": [69.11, 34.31],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Anguilla",
+        "capital": "The Valley"
+      },
+      "geometry": {
+        "coordinates": [-63.03, 18.13],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "U.S. Virgin Islands",
+        "capital": "Charlotte Amalie"
+      },
+      "geometry": {
+        "coordinates": [-64.56, 18.21],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Iceland",
+        "capital": "Reykjavik"
+      },
+      "geometry": {
+        "coordinates": [-21.57, 64.09],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Iran",
+        "capital": "Tehran"
+      },
+      "geometry": {
+        "coordinates": [51.25, 35.4],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Armenia",
+        "capital": "Yerevan"
+      },
+      "geometry": {
+        "coordinates": [44.3, 40.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Albania",
+        "capital": "Tirana"
+      },
+      "geometry": {
+        "coordinates": [19.49, 41.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Angola",
+        "capital": "Luanda"
+      },
+      "geometry": {
+        "coordinates": [13.14, -8.5],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Antarctica"
+      },
+      "geometry": {
+        "coordinates": [0, -90],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "American Samoa",
+        "capital": "Pago Pago"
+      },
+      "geometry": {
+        "coordinates": [-170.42, -14.16],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Argentina",
+        "capital": "Buenos Aires"
+      },
+      "geometry": {
+        "coordinates": [-58.4, -34.36],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Australia",
+        "capital": "Canberra"
+      },
+      "geometry": {
+        "coordinates": [149.13, -35.17],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Austria",
+        "capital": "Vienna"
+      },
+      "geometry": {
+        "coordinates": [16.22, 48.12],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Aruba",
+        "capital": "Oranjestad"
+      },
+      "geometry": {
+        "coordinates": [-70.02, 12.31],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "India",
+        "capital": "New Delhi"
+      },
+      "geometry": {
+        "coordinates": [77.12, 28.36],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Tanzania",
+        "capital": "Dar es Salaam"
+      },
+      "geometry": {
+        "coordinates": [39.17, -6.48],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Azerbaijan",
+        "capital": "Baku"
+      },
+      "geometry": {
+        "coordinates": [49.52, 40.23],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ireland",
+        "capital": "Dublin"
+      },
+      "geometry": {
+        "coordinates": [-6.14, 53.19],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Indonesia",
+        "capital": "Jakarta"
+      },
+      "geometry": {
+        "coordinates": [106.49, -6.1],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Ukraine",
+        "capital": "Kiew"
+      },
+      "geometry": {
+        "coordinates": [30.554, 50.441],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Qatar",
+        "capital": "Doha"
+      },
+      "geometry": {
+        "coordinates": [51.32, 25.17],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Mozambique",
+        "capital": "Maputo"
+      },
+      "geometry": {
+        "coordinates": [32.35, -25.57],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "Kosovo",
+        "capital": "Pristina"
+      },
+      "geometry": {
+        "coordinates": [21.08, 42.66],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "layer": "regions",
+        "name": "South Sudan",
+        "capital": "Juba"
+      },
+      "geometry": {
+        "coordinates": [31.53, 4.86],
+        "type": "Point"
+      }
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 <script setup>
   import PrimeButton from 'primevue/button'
-  import AdvancedFilter from '@/templates/advanced-filter'
+  import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash.vue'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block.vue'
-
+  import { useRouteFilterManager, eventsPlaygroundOpener } from '@/helpers'
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
   const props = defineProps({
@@ -14,10 +14,16 @@
     downloadCSV: {
       type: Function,
       required: true
+    },
+    playgroundOpener: {
+      type: Function,
+      required: true
     }
   })
 
-  const advancedFilter = computed({
+  const { setFilterInHash } = useRouteFilterManager()
+
+  const filter = computed({
     get: () => {
       return props.filterData
     },
@@ -28,32 +34,37 @@
 
   const listFields = ref([
     {
-      label: 'IP Address',
-      value: 'ip_address',
-      description: '',
+      label: 'Status',
+      value: 'status',
+      mostRelevant: 1,
+      description: 'HTTP status code of the request.',
       operator: [
-        { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
-        { value: 'Ne', type: 'String', props: { placeholder: 'Enter IP Address' } }
+        { value: 'Eq', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Lt', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Lte', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Gt', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Gte', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Ne', type: 'Int', props: { placeholder: 'Example: 200', services: [] } },
+        { value: 'Range', type: 'IntRange', props: { placeholder: 'Example: 200', services: [] } }
       ]
     }
   ])
 
-  const filterSearch = (filter) => {
-    emit('updatedFilter', filter)
+  const filterSearch = () => {
+    setFilterInHash(filter.value)
+    emit('updatedFilter')
   }
 </script>
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
     <IntervalFilterBlock
-      v-model:filterDate="advancedFilter.tsRange"
+      v-model:filterDate="filter.tsRange"
       @applyTSRange="filterSearch"
     />
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
       <AdvancedFilter
-        hashLess
-        v-model:externalFilter="advancedFilter.tsRange"
-        v-model:filterAdvanced="advancedFilter.fields"
+        v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="listFields"
         @applyFilter="filterSearch"
       />
@@ -64,10 +75,10 @@
           icon-pos="right"
           icon="pi pi-external-link"
           label="Open in GraphQL Playground"
+          @click="eventsPlaygroundOpener"
         />
         <PrimeButton
           outlined
-          class="p-4"
           icon="pi pi-download"
           v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
           @click="downloadCSV"

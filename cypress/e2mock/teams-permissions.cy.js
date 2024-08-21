@@ -5,7 +5,7 @@ const fixtures = {
     detail: 'You do not have permission to perform this action (teams management).'
   }
 }
-describe('Tams Permissions Spec', () => {
+describe('Teams Permissions Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Teams Permissions')
@@ -20,7 +20,7 @@ describe('Tams Permissions Spec', () => {
     cy.get(selectors.teams.listRow('name')).click()
 
     //assert
-    cy.verifyToast('error', `detail: ${fixtures.errorMessage.detail}`)
+    cy.verifyToast('error', fixtures.errorMessage.detail)
     cy.location('pathname').should('eq', '/teams-permission')
   })
 })
