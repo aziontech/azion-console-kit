@@ -144,20 +144,6 @@ export const STACKED_LINE_CHART_DATA = {
   ...COLOR_PATTERNS
 }
 
-export const PIE_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    columns: [
-      ['Netherlands', 30],
-      ['Nigeria', 120],
-      ['France', 40],
-      ['Brazil', 80]
-    ],
-    type: 'pie'
-  },
-  ...COLOR_PATTERNS
-}
-
 export const DONUT_CHART_DATA = {
   id: crypto.randomUUID().toString(),
   data: {
