@@ -492,6 +492,13 @@
     return criteriaIndex !== criteria.value.length - 1
   }
 
+  const shouldRenderCriteriaValueInput = (criteriaIndex, conditionalIndex) => {
+    return (
+      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+      criteria.value[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
+    )
+  }
+
   const getBehaviorLabel = (behaviorItem) => {
     return behaviorItem.isFirst ? 'Then' : 'And'
   }
@@ -666,10 +673,7 @@
                 <div class="flex flex-col w-full">
                   <FieldText
                     :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
-                    v-if="
-                      criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
-                      criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
-                    "
+                    v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
                     :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
                     :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
                     :disabled="isDefaultPhase"
