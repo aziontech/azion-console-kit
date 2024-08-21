@@ -19,6 +19,10 @@ jobs:
     container:
       image: node:18-alpine3.18
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn ci
       - name: Run security-linter
         run: yarn sec
   package-audit:
@@ -26,6 +30,10 @@ jobs:
     container:
       image: node:18-alpine3.18
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn ci
       - name: Run package-audit
         run: yarn audit
   run-tests:
