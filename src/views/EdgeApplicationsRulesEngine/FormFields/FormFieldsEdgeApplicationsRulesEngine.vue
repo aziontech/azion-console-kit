@@ -114,18 +114,15 @@
   const props = defineProps({
     functionsInstanceOptions: {
       type: Array,
-      required: true,
-      default: () => []
+      required: true
     },
     cacheSettingsOptions: {
       type: Array,
-      required: true,
-      default: () => []
+      required: true
     },
     originsOptions: {
       type: Array,
-      required: true,
-      default: () => []
+      required: true
     },
     isApplicationAcceleratorEnabled: {
       type: Boolean
@@ -618,7 +615,7 @@
                 :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
               />
             </template>
-            <template v-if="behaviorItem.value.name === 'set_origin'">
+            <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
                 :loading="loadingOrigins"
                 :name="`behaviors[${behaviorIndex}].originId`"
@@ -630,7 +627,7 @@
                 :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
               />
             </template>
-            <template v-if="behaviorItem.value.name === 'set_cache_policy'">
+            <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
                 :loading="loadingCacheSettings"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
@@ -642,7 +639,7 @@
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               />
             </template>
-            <template v-if="behaviorItem.value.name === 'capture_match_groups'">
+            <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
               <div class="flex flex-col w-full">
                 <FieldText
                   class="w-full mb-3"
@@ -670,7 +667,7 @@
                 />
               </div>
             </template>
-            <template v-if="showDefaultField(behaviorItem.value.name)">
+            <template v-else-if="showDefaultField(behaviorItem.value.name)">
               <div class="[&>input]:w-full">
                 <FieldText
                   :name="`behaviors[${behaviorIndex}].target`"
