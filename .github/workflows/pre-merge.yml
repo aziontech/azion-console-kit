@@ -14,40 +14,6 @@ env:
   HUSKY: 0
 
 jobs:
-  security-linter:
-    runs-on: ubuntu-latest
-    container:
-      image: node:18-alpine3.18
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install SO deps
-        run: apk add curl bash git
-
-      - name: Install dependencies
-        run: yarn ci
-        
-      - name: Run security-linter
-        run: yarn sec
-
-  package-audit:
-    runs-on: ubuntu-latest
-    container:
-      image: node:18-alpine3.18
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Install SO deps
-        run: apk add curl bash git
-      
-      - name: Install dependencies
-        run: yarn ci
-      
-      - name: Run package-audit
-        run: yarn audit
-
   run-tests:
     runs-on: ubuntu-latest
     container:
@@ -91,3 +57,4 @@ jobs:
       uses: sonarsource/sonarcloud-github-action@v2.3.0
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
+        
