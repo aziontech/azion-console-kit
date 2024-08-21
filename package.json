@@ -26,6 +26,7 @@
     "test:e2e:open:prod": "cypress open --e2e --config-file cypress.config.prod.js --env environment=prod",
     "test:e2e:open:preview-prod": "cypress open --e2e --config-file cypress.config.preview-prod.js --env environment=preview-prod",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "security-linter": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore --ignore-pattern '**/*.test.js' -c .eslintrc-security.cjs",
     "format": "prettier --write src/",
     "prepare": "husky install"
   },

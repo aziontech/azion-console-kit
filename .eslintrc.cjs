@@ -6,9 +6,7 @@ module.exports = {
   extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
-    '@vue/eslint-config-prettier/skip-formatting',
-    'plugin:security/recommended-legacy',
-    'plugin:xss/recommended'
+    '@vue/eslint-config-prettier/skip-formatting'
   ],
   overrides: [
     {
@@ -19,12 +17,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
-  plugins: ['no-unsanitized'],
   rules: {
     'no-case-declarations': 0,
     'no-console': 'error',
-    'id-length': ['error', { min: 2 }],
-    'no-unsanitized/method': 'error',
-    'no-unsanitized/property': 'error',
+    'id-length': ['error', { min: 2 }]
   }
 }
