@@ -4,7 +4,7 @@ import { openGraphQlPlayground } from './open-graphql-playground'
 
 export const eventsPlaygroundOpener = () => {
   const playgroundUrl = getStaticUrlsByEnvironment('playgroundEvents')
-  
+
   const { getLastQuery } = useGraphQLStore()
   const fullQuery = getLastQuery.query
   const variables = getLastQuery.variables

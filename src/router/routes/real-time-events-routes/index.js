@@ -7,7 +7,6 @@ export const realTimeEventsRoutes = {
   name: 'real-time-events',
   component: () => import('@/views/RealTimeEvents/TabsView.vue'),
   props: {
-    playgroundOpener: Helpers.eventsPlaygroundOpener,
     httpRequests: {
       listHttpRequest: RealTimeEventsService.listHttpRequest,
       loadHttpRequest: RealTimeEventsService.loadHttpRequest,
