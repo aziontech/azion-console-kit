@@ -52,80 +52,18 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 /**
  * Convert filter and table to gql body
  *
- * @param {Object} Filter - Object with the filter to apply
- * @param {Object} Table - Object with the table to query
- * @returns {String} Returns the body of the gql query with variables
+ * @param {Object} filter - Object with the filter to apply
+ * @param {Object} table - Object with the table to query
+ * @returns {Object} Returns the body of the gql query with variables
  */
 const convertGQL = (filter, table) => {
-  if (!table) {
-    throw new Error('Table parameter is required')
-  }
+  if (!table) throw new Error('Table parameter is required')
 
-  let filterQuery = ''
-  let variables = {}
-
-  if (filter) {
-    if (filter.fields) {
-      const separatedObjects = filter?.fields.reduce(
-        (newFilters, item) => {
-          if (item.operator === 'Range') {
-            newFilters.range.push(item)
-          } else {
-            newFilters.others.push(item)
-          }
-          return newFilters
-        },
-        { range: [], others: [] }
-      )
-
-      const fieldsFormatAnd = separatedObjects.others.reduce((newFields, field) => {
-        newFields[`${field.valueField}${field.operator}`] = field.value
-        return newFields
-      }, {})
-
-      filter.and = {
-        ...filter.and,
-        ...fieldsFormatAnd
-      }
-
-      separatedObjects.range.forEach((field) => {
-        if (filterQuery !== '') filterQuery += ', '
-        filterQuery += `${field.valueField}Range: { begin: $${field.valueField}Range_begin, end: $${field.valueField}Range_end },\n`
-        variables[`${field.valueField}Range_begin`] = field.value.begin
-        variables[`${field.valueField}Range_end`] = field.value.end
-      })
-    }
-
-    if (filter.tsRange && filter.tsRange.tsRangeBegin && filter.tsRange.tsRangeEnd) {
-      filterQuery += `tsRange: { begin: $tsRange_begin, end: $tsRange_end }`
-      variables.tsRange_begin = filter.tsRange.tsRangeBegin
-      variables.tsRange_end = filter.tsRange.tsRangeEnd
-    }
-
-    if (filter.and) {
-      const and = filter.and
-      Object.keys(and).forEach((key) => {
-        if (filterQuery !== '') filterQuery += ', '
-        filterQuery += `${key}: $and_${key}`
-        variables[`and_${key}`] = and[key]
-      })
-    }
-
-    if (filter.in) {
-      const inFilter = filter.in
-      Object.keys(inFilter).forEach((key) => {
-        if (filterQuery !== '') filterQuery += ', '
-        filterQuery += `${key}In: $in_${key}`
-        variables[`in_${key}`] = inFilter[key]
-      })
-    }
-  }
+  const variables = {}
+  const filterQuery = buildFilterQuery(filter, variables)
 
   const fieldsFormat = table.fields.join('\n')
-
-  const filterParameter = Object.keys(variables)
-    .map((key) => `$${key}: ${getGraphQLType(variables[key])}!`)
-    .join(', ')
+  const filterParameter = formatFilterParameter(variables)
 
   const queryConfig = {
     filterParameter,
@@ -135,15 +73,149 @@ const convertGQL = (filter, table) => {
     filterQuery,
     fields: fieldsFormat
   }
-
   const query = buildGraphQLQuery(queryConfig)
 
-  const bodyGQL = {
+  return {
     query,
     variables
   }
+}
 
-  return bodyGQL
+/**
+ * Build the filter query and populate variables.
+ * @param {Object} filter
+ * @param {Object} variables
+ * @returns {String} filterQuery
+ */
+const buildFilterQuery = (filter, variables) => {
+  if (!filter) return ''
+
+  let filterQuery = ''
+
+  if (filter.fields) {
+    const separatedObjects = separateFieldsByType(filter.fields)
+    addOtherFieldsToAnd(separatedObjects.others, filter)
+    filterQuery += buildRangeQueries(separatedObjects.range, variables)
+  }
+
+  if (filter.tsRange) {
+    filterQuery += buildTsRangeQuery(filter.tsRange, variables)
+  }
+
+  if (filter.and) {
+    filterQuery += buildAndQueries(filter.and, variables)
+  }
+
+  if (filter.in) {
+    filterQuery += buildInQueries(filter.in, variables)
+  }
+
+  return filterQuery
+}
+
+/**
+ * Separate fields by their operator type.
+ * @param {Array} fields
+ * @returns {Object} separated fields
+ */
+const separateFieldsByType = (fields) => {
+  return fields.reduce(
+    (newFilters, item) => {
+      const key = item.operator === 'Range' ? 'range' : 'others'
+      newFilters[key].push(item)
+      return newFilters
+    },
+    { range: [], others: [] }
+  )
+}
+
+/**
+ * Add other fields to the 'and' filter.
+ * @param {Array} others
+ * @param {Object} filter
+ */
+const addOtherFieldsToAnd = (others, filter) => {
+  const fieldsFormatAnd = others.reduce((newFields, field) => {
+    newFields[`${field.valueField}${field.operator}`] = field.value
+    return newFields
+  }, {})
+
+  filter.and = {
+    ...filter.and,
+    ...fieldsFormatAnd
+  }
+}
+
+/**
+ * Build range queries.
+ * @param {Array} range
+ * @param {Object} variables
+ * @returns {String} rangeQuery
+ */
+const buildRangeQueries = (range, variables) => {
+  return range
+    .map((field) => {
+      variables[`${field.valueField}Range_begin`] = field.value.begin
+      variables[`${field.valueField}Range_end`] = field.value.end
+      return `${field.valueField}Range: { begin: $${field.valueField}Range_begin, end: $${field.valueField}Range_end }`
+    })
+    .join(', ')
+}
+
+/**
+ * Build timestamp range query.
+ * @param {Object} tsRange
+ * @param {Object} variables
+ * @returns {String} tsRangeQuery
+ */
+const buildTsRangeQuery = (tsRange, variables) => {
+  if (tsRange.tsRangeBegin && tsRange.tsRangeEnd) {
+    variables.tsRange_begin = tsRange.tsRangeBegin
+    variables.tsRange_end = tsRange.tsRangeEnd
+    return `tsRange: { begin: $tsRange_begin, end: $tsRange_end }`
+  }
+  return ''
+}
+
+/**
+ * Build 'and' queries.
+ * @param {Object} and
+ * @param {Object} variables
+ * @returns {String} andQuery
+ */
+const buildAndQueries = (and, variables) => {
+  return Object.keys(and)
+    .map((key) => {
+      variables[`and_${key}`] = and[key]
+      return `${key}: $and_${key}`
+    })
+    .join(', ')
+}
+
+/**
+ * Build 'in' queries.
+ * @param {Object} inFilter
+ * @param {Object} variables
+ * @returns {String} inQuery
+ */
+const buildInQueries = (inFilter, variables) => {
+  return Object.keys(inFilter)
+    .map((key) => {
+      variables[`in_${key}`] = inFilter[key]
+      return `${key}In: $in_${key}`
+    })
+    .join(', ')
+}
+
+/**
+ * Format filter parameters for the GraphQL query.
+ * @param {Object} variables
+ * @returns {String} formattedFilterParameter
+ */
+const formatFilterParameter = (variables) => {
+  return Object.keys(variables)
+    .map((key) => `$${key}: ${getGraphQLType(variables[key])}!`)
+    .join(', ')
 }
 
 export default convertGQL
