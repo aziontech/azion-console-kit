@@ -242,7 +242,7 @@
 </script>
 <template>
   <div
-    class="flex w-full min-w-0 flex-column gap-2 md:flex-row"
+    class="flex w-full min-w-0 flex-column gap-2 md:flex-row md:align-items-center"
     data-testid="search-filter-container"
   >
     <dialogFilter
@@ -313,13 +313,15 @@
       </ul>
     </div>
 
-    <PrimeButton
-      class="min-w-max max-sm:bg-red"
-      size="small"
-      :disabled="disabledSearch"
-      @click="searchFilter"
-      label="Search"
-      data-testid="search-filter-search-button"
-    />
+    <div class="h-auto w-full md:max-w-fit">
+      <PrimeButton
+        :disabled="disabledSearch"
+        @click="searchFilter"
+        label="Search"
+        size="small"
+        class="h-auto w-full md:max-w-fit"
+        data-testid="search-filter-search-button"
+      />
+    </div>
   </div>
 </template>

@@ -3,13 +3,11 @@ import GROUP_DASHBOARDS from './dashboards'
 import REPORTS from './reports'
 import MAP_SERVICE_OPERATION from './services-operator-in'
 import CHART_RULES from './chart-rules'
-import FILTERS_RULES from './filters-rules'
 
 export {
   TIME_INTERVALS,
   GROUP_DASHBOARDS,
   REPORTS,
   MAP_SERVICE_OPERATION,
-  CHART_RULES,
-  FILTERS_RULES
+  CHART_RULES
 }

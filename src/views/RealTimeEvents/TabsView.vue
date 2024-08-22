@@ -9,34 +9,21 @@
         class="w-full h-full"
         @tab-click="changePage"
       >
-        <template
-          :key="tab.tabName"
+        <TabPanel
+          :header="tab.title"
           v-for="tab in tabPanels"
+          :key="tab.index"
         >
-          <TabPanel :header="tab.label">
-            <div class="flex flex-col gap-8 my-4">
-              <div class="flex gap-1">
-                <p class="text-xs font-medium leading-4">
-                  {{ tab.description }}
-                </p>
-              </div>
-            </div>
-            <component
-              :is="tab.component"
-              v-bind="tab.props"
-              v-model:filterData="filterData"
-              ref="tabRef"
-            >
-              <template #header="{ downloadCSV }">
-                <ContentFilterBlock
-                  v-model:filterData="filterData"
-                  :downloadCSV="downloadCSV"
-                  @updatedFilter="reload"
-                />
-              </template>
-            </component>
-          </TabPanel>
-        </template>
+          <TabPanelBlock
+            ref="tabPanelBlockRef"
+            v-if="tab.index === tabSelectIndex"
+            :loadFieldsData="loadFieldsWithOperator"
+            :listService="selectedTabProps.listService"
+            :loadService="selectedTabProps.loadService"
+            :allFields="allFields"
+            :tabSelected="tab"
+          />
+        </TabPanel>
       </TabView>
     </template>
   </ContentBlock>
@@ -45,20 +32,17 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { onBeforeMount, onMounted, ref } from 'vue'
+  import { computed, onBeforeMount, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
-  import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
-  import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
-  import RealTimeEventsDataStreamListView from '@/views/RealTimeEventsDataStream/ListView'
-  import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
-  import RealTimeEventsEdgeDNSListView from '@/views/RealTimeEventsEdgeDNS/ListView'
-  import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
-  import RealTimeEventsTieredCache from '@/views/RealTimeEventsTieredCache/ListView'
-  import ContentFilterBlock from '@/views/RealTimeEvents/blocks/content-filter-block.vue'
-  import { useRouteFilterManager } from '@/helpers'
+  import TabPanel from 'primevue/tabpanel'
+  import TabPanelBlock from '@/views/RealTimeEvents/Blocks/tab-panel-block.vue'
+  import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
+  import {
+    buildFieldsQuery,
+    adapterFields,
+    buildOperatorQuery
+  } from '@/views/RealTimeEvents/Blocks/constants/query-fields'
 
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
@@ -94,120 +78,39 @@
     tieredCache: {
       type: Object,
       required: true
+    },
+    loadFieldsData: {
+      type: Function,
+      required: true
     }
   })
 
   const route = useRoute()
   const router = useRouter()
-  const tabRef = ref([])
-  const { getFiltersFromHash } = useRouteFilterManager()
+  const tabPanelBlockRef = ref(null)
+  const tabSelectIndex = ref(undefined)
+  const fieldsDefault = ref({})
+  const tabPanels = Object.values(TABS_EVENTS)
+  const allFields = ref([])
 
-  const tabSelectIndex = ref(0)
-  const filterData = ref(null)
-  const defaultFilter = {
-    tsRange: {},
-    fields: []
-  }
-
-  const mapTabs = {
-    httpRequests: {
-      index: 0,
-      table: 'httpRequests',
-      tabName: 'http-requests',
-      label: 'HTTP Requests',
-      props: props.httpRequests,
-      description:
-        'Logs of events from requests made to your edge applications and edge firewalls.',
-      component: RealTimeEventsHTTPRequestsListView
-    },
-    EdgeFunctions: {
-      index: 1,
-      tabName: 'edge-functions',
-      table: 'EdgeFunctions',
-      label: 'Edge Functions',
-      props: props.edgeFunctions,
-      description: 'Logs of events from requests made to your edge functions.',
-      component: RealTimeEventEdgeFunctionsListView
-    },
-    EdgeFunctionsConsole: {
-      index: 2,
-      tabName: 'edge-functions-console',
-      label: 'Edge Functions Console',
-      table: 'EdgeFunctionsConsole',
-      props: props.edgeFunctionsConsole,
-      description:
-        'Logs of events from edge applications using Edge Runtime returned by Cells Console.',
-      component: RealTimeEventEdgeFunctionsConsoleListView
-    },
-    ImageProcessor: {
-      index: 3,
-      tabName: 'image-processor',
-      label: 'Image Processor',
-      props: props.imageProcessor,
-      table: 'ImageProcessor',
-      description:
-        'Logs of events from requests made to edge applications that processed images with Image Processor.',
-      component: RealTimeEventsImageProcessor
-    },
-    TieredCache: {
-      index: 4,
-      tabName: 'tiered-cache',
-      label: 'Tiered Cache',
-      table: 'TieredCache',
-      props: props.tieredCache,
-      description: 'Logs of events from requests made to edge applications using Tiered Cache.',
-      component: RealTimeEventsTieredCache
-    },
-    EdgeDNS: {
-      index: 5,
-      tabName: 'edge-dns',
-      label: 'Edge DNS',
-      table: 'EdgeDNS',
-      props: props.edgeDNS,
-      description: 'Logs of events from queries made to Edge DNS.',
-      component: RealTimeEventsEdgeDNSListView
-    },
-    DataStream: {
-      index: 6,
-      tabName: 'data-stream',
-      label: 'Data Stream',
-      table: 'DataStream',
-      props: props.dataStream,
-      description: 'Logs of data sent to endpoints by Data Stream.',
-      component: RealTimeEventsDataStreamListView
-    },
-    ActivityHistory: {
-      index: 7,
-      tabName: 'activity-history',
-      label: 'Activity History',
-      table: 'ActivityHistory',
-      props: props.activityHistory,
-      description:
-        'Logs of events from an Azion account regarding activities registered on Activity History. Use the Real-Time Events GraphQL API to query up to 2 years of logs.',
-      component: RealTimeEventsActivityHistoryListView
-    }
-  }
-
-  const tabPanels = Object.values(mapTabs)
-
-  const resetFields = () => {
-    filterData.value.fields = []
-  }
+  const selectedTabProps = computed(() => {
+    const { panel } = tabPanels[tabSelectIndex.value]
+    return props[panel] || {}
+  })
 
   const changePage = async ({ index }) => {
     const tab = tabPanels.find((tab) => tab.index === index)
     selectedTab(tab)
-    resetFields()
-    reload()
+    await loadFieldsWithOperator(tabPanels[tabSelectIndex.value])
   }
 
-  const updateRouter = (tabName) => {
+  const updateRouter = (tabRouter) => {
     const { name, query, params } = route
     router.push({
       name,
       params: {
         ...params,
-        tab: tabName
+        tab: tabRouter
       },
       query
     })
@@ -215,14 +118,13 @@
 
   const selectedTab = (tabSelectValue) => {
     tabSelectIndex.value = tabSelectValue.index
-    updateRouter(tabSelectValue.tabName)
+    updateRouter(tabSelectValue.tabRouter)
   }
 
   const tabSelectInitial = () => {
     const { params } = route
-
     if (params.tab) {
-      const tabSelect = tabPanels.find((tab) => tab.tabName === params.tab)
+      const tabSelect = tabPanels.find((tab) => tab.tabRouter === params.tab)
       selectedTab(tabSelect)
       return
     }
@@ -230,17 +132,40 @@
     selectedTab(tabPanels[0])
   }
 
-  const reload = () => {
-    tabRef.value[tabSelectIndex.value].reloadListTable()
+  const loadFieldsDataset = async () => {
+    fieldsDefault.value = await props.loadFieldsData({
+      query: buildFieldsQuery()
+    })    
+    await loadFieldsWithOperator(tabPanels[tabSelectIndex.value])
+  }
+
+  let abortController = null
+  const loadFieldsWithOperator = async (tabSelected) => {
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    const { dataset } = tabSelected
+    const graphqlQuery = { query: buildOperatorQuery(dataset) }
+
+    try {
+      const operatorsData = await props.loadFieldsData({
+        ...graphqlQuery,
+        signal: abortController.signal
+      })
+
+      allFields.value = adapterFields(fieldsDefault, operatorsData, dataset)
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        allFields.value = []
+      }
+    }
   }
 
   onBeforeMount(() => {
-    const filter = getFiltersFromHash()
-    filterData.value = filter || defaultFilter
+    tabSelectInitial()
   })
 
   onMounted(() => {
-    tabSelectInitial()
-    reload()
+    loadFieldsDataset()
   })
 </script>

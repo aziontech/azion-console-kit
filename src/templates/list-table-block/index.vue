@@ -8,6 +8,7 @@
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       v-if="!isLoading"
+      :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
       removableSort
@@ -44,7 +45,7 @@
             >
               <i class="pi pi-search" />
               <InputText
-                class="h-2 w-full md:min-w-[20rem]"
+                class="h-8 w-full md:min-w-[20rem]"
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"
@@ -371,6 +372,10 @@
     },
     exportFileName: {
       type: String
+    },
+    pt: {
+      type: Object,
+      default: () => ({})
     }
   })
 
@@ -537,7 +542,7 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload })
+  defineExpose({ reload, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]

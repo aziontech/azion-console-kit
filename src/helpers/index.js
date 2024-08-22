@@ -32,6 +32,8 @@ import { goToClassicInterface } from './go-to-classic-interface'
 import { removeHtmlTagFromText } from './remove-html-tag-from-text'
 import { getCsvCellContentFromRowData } from './get-csv-cell-content-from-row-data'
 import { useRouteFilterManager } from './hash-route.js'
+import FILTERS_RULES from './real-time-filters-rules'
+
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -69,5 +71,6 @@ export {
   formatUnitValue,
   openShowMorePlan,
   getCsvCellContentFromRowData,
-  useRouteFilterManager
+  useRouteFilterManager,
+  FILTERS_RULES
 }

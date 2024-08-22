@@ -13,38 +13,13 @@ const FILTER_BLACK_LIST = [
 const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange']
 const FIELDS_LIKE = ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn']
 
+const ALIAS_MAPPING = {
+  configurationId: 'domain'
+}
+
 const FILTER_WHITELIST = {
   SUPPORTED_FILTER_TYPE,
   FIELDS_LIKE
-}
-
-const OPERATORS = {
-  Eq: { value: 'Eq', label: 'Equals', format: ({ field, value }) => `${field} = ${value}` },
-  Ne: { value: 'Ne', label: 'Not Equals', format: ({ field, value }) => `${field} ≠ ${value}` },
-  In: { value: 'In', label: 'In', format: ({ field, value }) => `${field} IN (${value})` },
-  Like: { value: 'Like', label: 'Contains', format: ({ field, value }) => `${field} ⊃ ${value}` },
-  Ilike: {
-    value: 'Ilike',
-    label: 'Not Contains',
-    format: ({ field, value }) => `${field} ⊅ ${value}`
-  },
-  Range: {
-    value: 'Range',
-    label: 'Between',
-    format: ({ field, begin, end }) => `${begin} ≤ ${field} ≤ ${end}`
-  },
-  Lt: { value: 'Lt', label: 'Less Than', format: ({ field, value }) => `${field} < ${value}` },
-  Lte: {
-    value: 'Lte',
-    label: 'Less Than or Equal',
-    format: ({ field, value }) => `${field} ≤ ${value}`
-  },
-  Gt: { value: 'Gt', label: 'Greater Than', format: ({ field, value }) => `${field} > ${value}` },
-  Gte: {
-    value: 'Gte',
-    label: 'Greater Than or Equal',
-    format: ({ field, value }) => `${field} ≥ ${value}`
-  }
 }
 
 const MOST_RELEVANT_FIELDS = {
@@ -84,13 +59,40 @@ const FILTER_LIKE_ALIAS = {
   configurationIdIn: 'Domain'
 }
 
+/**
+ * Verify if the provided name is blacklisted.
+ *
+ * @param {object} name - The name to be verified.
+ * @return {boolean} Whether the name is blacklisted or not.
+ */
+const verifyBlackListFields = ({ name }) => {
+  return !FILTERS_RULES.FILTER_BLACK_LIST.includes(name)
+}
+
+/**
+ * Verify if the whitelist fields are supported.
+ *
+ * @param {object} name - the name of the field
+ * @param {object} type - the type object containing the name of the type
+ * @param {string} type.name - the name of the type
+ * @return {boolean} true if the field is supported, false otherwise
+ */
+const verifyWhiteListFields = ({ name, type: { name: typeName } }) => {
+  return (
+    FILTERS_RULES.FILTER_WHITELIST.SUPPORTED_FILTER_TYPE.includes(typeName) ||
+    FILTERS_RULES.FILTER_WHITELIST.FIELDS_LIKE.includes(name)
+  )
+}
+
 const FILTERS_RULES = {
   FILTER_BLACK_LIST,
   FILTER_WHITELIST,
-  OPERATORS,
+  verifyWhiteListFields,
+  verifyBlackListFields,
   MOST_RELEVANT_FIELDS,
   FILTER_LIKE_TYPE,
-  FILTER_LIKE_ALIAS
+  FILTER_LIKE_ALIAS,
+  ALIAS_MAPPING
 }
 
 export default FILTERS_RULES

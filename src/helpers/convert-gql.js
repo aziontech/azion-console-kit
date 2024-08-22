@@ -66,7 +66,7 @@ const convertGQL = (filter, table) => {
 
   if (filter) {
     if (filter.fields) {
-      const separatedObjects = filter.fields.reduce(
+      const separatedObjects = filter?.fields.reduce(
         (newFilters, item) => {
           if (item.operator === 'Range') {
             newFilters.range.push(item)
