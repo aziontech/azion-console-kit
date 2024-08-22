@@ -167,9 +167,11 @@
     if (!filterDisplay?.length) return
 
     const newDisplay = filterDisplay.map((item) => {
-      const { label, disabled, operator } = props.fieldsInFilter.find(
-        ({ value }) => value === item.valueField
-      )
+      const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
+
+      const { label, disabled, operator } = selectedFields.find(({ operator }) => {
+        return operator.find(({ value }) => value === item.operator)
+      })
 
       const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
 

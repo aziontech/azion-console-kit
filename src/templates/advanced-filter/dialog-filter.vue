@@ -132,7 +132,9 @@
     buttonOverPanel.value.$el.click()
     inputFilterDisabled.value = true
     editFilter.value = true
-    const field = options.value.find(({ value }) => value.value === item.valueField)
+    const field = options.value.find(
+      ({ value }) => value.value === item.valueField && value.label === item.field
+    )
     filterSelected.value = field.value
     changeFilter()
     const operator = filterSelected.value.operator.find(

@@ -4,7 +4,9 @@
  * @returns {String} Returns the type of the variable relative to the graphql type
  */
 const getGraphQLType = (value) => {
-  if (typeof value === 'number') {
+  if (Array.isArray(value)) {
+    return '[String]'
+  } else if (typeof value === 'number') {
     return Number.isInteger(value) ? 'Int' : 'Float'
   } else if (value instanceof Date) {
     return 'DateTime'
@@ -29,22 +31,20 @@ const getGraphQLType = (value) => {
  * @return {string} The constructed GraphQL query string.
  */
 function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
-  const indentedFields = fields
-    .split('\n')
-    .map((field) => `    ${field}`)
-    .join('\n')
-
+  const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
   return [
-    `query (${filterParameter}) {`,
-    `  ${dataset} (`,
-    `    limit: ${limit}`,
-    `    orderBy: [${orderBy}]`,
-    `    filter: {`,
-    `      ${filterQuery}`,
-    `    }`,
-    `  ) {`,
-    indentedFields,
-    `  }`,
+    `query (`,
+    filterParameter.join('\n'),
+    `) {`,
+    `\t${dataset} (`,
+    `\t\tlimit: ${limit}`,
+    `\t\torderBy: [${orderBy}]`,
+    `\t\tfilter: {`,
+    filter,
+    `\t\t}`,
+    `\t) {`,
+    fields,
+    `\t}`,
     `}`
   ].join('\n')
 }
@@ -62,7 +62,7 @@ const convertGQL = (filter, table) => {
   const variables = {}
   const filterQuery = buildFilterQuery(filter, variables)
 
-  const fieldsFormat = table.fields.join('\n')
+  const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
   const filterParameter = formatFilterParameter(variables)
 
   const queryConfig = {
@@ -85,32 +85,32 @@ const convertGQL = (filter, table) => {
  * Build the filter query and populate variables.
  * @param {Object} filter
  * @param {Object} variables
- * @returns {String} filterQuery
+ * @returns {Array<String>} filterQueries
  */
 const buildFilterQuery = (filter, variables) => {
-  if (!filter) return ''
+  if (!filter) return []
 
-  let filterQuery = ''
+  let filterQueries = []
 
   if (filter.fields) {
     const separatedObjects = separateFieldsByType(filter.fields)
-    addOtherFieldsToAnd(separatedObjects.others, filter)
-    filterQuery += buildRangeQueries(separatedObjects.range, variables)
+    mergeFieldsIntoFilter(separatedObjects.others, filter)
+    filterQueries.push(...buildRangeQueries(separatedObjects.range, variables))
   }
 
   if (filter.tsRange) {
-    filterQuery += buildTsRangeQuery(filter.tsRange, variables)
+    filterQueries.push(...buildTsRangeQuery(filter.tsRange, variables))
   }
 
   if (filter.and) {
-    filterQuery += buildAndQueries(filter.and, variables)
+    filterQueries.push(...buildFilterQueriesWithPrefix(filter.and, variables, 'and'))
   }
 
   if (filter.in) {
-    filterQuery += buildInQueries(filter.in, variables)
+    filterQueries.push(...buildFilterQueriesWithPrefix(filter.in, variables, 'in'))
   }
 
-  return filterQuery
+  return filterQueries
 }
 
 /**
@@ -130,81 +130,64 @@ const separateFieldsByType = (fields) => {
 }
 
 /**
- * Add other fields to the 'and' filter.
- * @param {Array} others
- * @param {Object} filter
+ * Merges fields into the given filter object, separating 'In' operators into a distinct 'in' property.
+ *
+ * @param {Array} fields - Array of field objects to be merged.
+ * @param {Object} filter - The filter object where the fields will be merged.
  */
-const addOtherFieldsToAnd = (others, filter) => {
-  const fieldsFormatAnd = others.reduce((newFields, field) => {
-    newFields[`${field.valueField}${field.operator}`] = field.value
-    return newFields
-  }, {})
-
-  filter.and = {
-    ...filter.and,
-    ...fieldsFormatAnd
-  }
+const mergeFieldsIntoFilter = (fields, filter) => {
+  fields.forEach(({ operator, valueField, value }) => {
+    const filterKey = operator === 'In' ? 'in' : 'and'
+    filter[filterKey] = {
+      ...filter[filterKey],
+      [`${valueField}${operator}`]: value
+    }
+  })
 }
 
 /**
  * Build range queries.
  * @param {Array} range
  * @param {Object} variables
- * @returns {String} rangeQuery
+ * @returns {Array<String>} rangeQueries
  */
 const buildRangeQueries = (range, variables) => {
-  return range
-    .map((field) => {
-      variables[`${field.valueField}Range_begin`] = field.value.begin
-      variables[`${field.valueField}Range_end`] = field.value.end
-      return `${field.valueField}Range: { begin: $${field.valueField}Range_begin, end: $${field.valueField}Range_end }`
-    })
-    .join(', ')
+  return range.map((field) => {
+    variables[`${field.valueField}Range_begin`] = field.value.begin
+    variables[`${field.valueField}Range_end`] = field.value.end
+    return `${field.valueField}Range: { begin: $${field.valueField}Range_begin, end: $${field.valueField}Range_end }`
+  })
 }
 
 /**
  * Build timestamp range query.
  * @param {Object} tsRange
  * @param {Object} variables
- * @returns {String} tsRangeQuery
+ * @returns {Array<String>} tsRangeQueries
  */
 const buildTsRangeQuery = (tsRange, variables) => {
+  const tsRangeQueries = []
   if (tsRange.tsRangeBegin && tsRange.tsRangeEnd) {
     variables.tsRange_begin = tsRange.tsRangeBegin
     variables.tsRange_end = tsRange.tsRangeEnd
-    return `tsRange: { begin: $tsRange_begin, end: $tsRange_end }`
+    tsRangeQueries.push(`tsRange: { begin: $tsRange_begin, end: $tsRange_end }`)
   }
-  return ''
+  return tsRangeQueries
 }
 
 /**
- * Build 'and' queries.
- * @param {Object} and
- * @param {Object} variables
- * @returns {String} andQuery
+ * Builds GraphQL filter queries with a specified variable name prefix.
+ * @param {Object} filter - The filter object containing the fields and values for queries.
+ * @param {Object} variables - The variables object to be populated with filter values.
+ * @param {string} prefix - The prefix for the variable names in the queries.
+ * @returns {Array<string>} - An array of GraphQL filter query strings using the specified prefix for variables.
  */
-const buildAndQueries = (and, variables) => {
-  return Object.keys(and)
-    .map((key) => {
-      variables[`and_${key}`] = and[key]
-      return `${key}: $and_${key}`
-    })
-    .join(', ')
-}
-
-/**
- * Build 'in' queries.
- * @param {Object} inFilter
- * @param {Object} variables
- * @returns {String} inQuery
- */
-const buildInQueries = (inFilter, variables) => {
-  return Object.keys(inFilter)
-    .map((key) => {
-      variables[`in_${key}`] = inFilter[key]
-      return `${key}In: $in_${key}`
-    })
-    .join(', ')
+const buildFilterQueriesWithPrefix = (filter, variables, prefix) => {
+  return Object.entries(filter).map(([key, value]) => {
+    const variableName = `${prefix}_${key}`
+    variables[variableName] = Array.isArray(value) ? value.map((item) => `${item.value}`) : value
+    return `${key}: $${variableName}`
+  })
 }
 
 /**
@@ -213,9 +196,7 @@ const buildInQueries = (inFilter, variables) => {
  * @returns {String} formattedFilterParameter
  */
 const formatFilterParameter = (variables) => {
-  return Object.keys(variables)
-    .map((key) => `$${key}: ${getGraphQLType(variables[key])}!`)
-    .join(', ')
+  return Object.keys(variables).map((key) => `\t$${key}: ${getGraphQLType(variables[key])}!`)
 }
 
 export default convertGQL
