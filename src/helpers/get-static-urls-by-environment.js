@@ -9,9 +9,13 @@ const urls = {
     stage: 'https://stage-manager.azion.com/billing-subscriptions',
     production: 'https://manager.azion.com/billing-subscriptions'
   },
-  playground: {
+  playgroundMetrics: {
     stage: 'https://stage-manager.azion.com/metrics/graphql',
     production: 'https://manager.azion.com/metrics/graphql'
+  },
+  playgroundEvents: {
+    stage: 'https://stage-manager.azion.com/events/graphql',
+    production: 'https://manager.azion.com/events/graphql'
   },
   helpCenter: {
     stage: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/',

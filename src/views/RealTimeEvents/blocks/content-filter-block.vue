@@ -3,7 +3,7 @@
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash.vue'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block.vue'
-  import { useRouteFilterManager } from '@/helpers/hash-route'
+  import { useRouteFilterManager, eventsPlaygroundOpener } from '@/helpers'
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
   const props = defineProps({
@@ -12,6 +12,10 @@
       default: () => ({})
     },
     downloadCSV: {
+      type: Function,
+      required: true
+    },
+    playgroundOpener: {
       type: Function,
       required: true
     }
@@ -71,6 +75,7 @@
           icon-pos="right"
           icon="pi pi-external-link"
           label="Open in GraphQL Playground"
+          @click="eventsPlaygroundOpener"
         />
         <PrimeButton
           outlined

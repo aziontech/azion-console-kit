@@ -3,9 +3,13 @@ import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSigna
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
+import { useGraphQLStore } from '@/stores/graphql-query'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
+
+  const graphqlStore = useGraphQLStore()
+  graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 

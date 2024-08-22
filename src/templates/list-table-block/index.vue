@@ -44,7 +44,7 @@
             >
               <i class="pi pi-search" />
               <InputText
-                class="h-2 w-full md:min-w-[20rem]"
+                class="h-8 w-full md:min-w-[20rem]"
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"

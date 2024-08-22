@@ -91,8 +91,6 @@ describe('DigitalCertificatesServices', () => {
 
     const response = sut(stubId)
 
-    expect(response).rejects.toBe(
-      `Digital Certificate can't be deleted because it is being used.`
-    )
+    expect(response).rejects.toBe(`Digital Certificate can't be deleted because it is being used.`)
   })
 })

@@ -29,7 +29,7 @@
       required: false,
       default: false
     },
-    loadingEdgeApplications: {
+    isLoadingRequests: {
       type: Boolean
     }
   })
@@ -87,8 +87,8 @@
     }
   ])
 
-  const isLoadingEdgeApplications = computed(() => {
-    return props.loadingEdgeApplications
+  const isLoadingRequestsData = computed(() => {
+    return props.isLoadingRequests
   })
 
   watch(edgeCertificate, async (newEdgeCertificate) => {
@@ -135,8 +135,8 @@
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
           :options="edgeApplicationOptions"
-          :loading="isLoadingEdgeApplications"
-          :disabled="isLoadingEdgeApplications"
+          :loading="isLoadingRequestsData"
+          :disabled="isLoadingRequestsData"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
@@ -171,8 +171,8 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :options="edgeCertificatesOptions"
-          :loading="!edgeCertificatesOptions.length"
-          :disabled="!edgeCertificatesOptions.length"
+          :loading="isLoadingRequestsData"
+          :disabled="isLoadingRequestsData"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
@@ -218,7 +218,7 @@
           required
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
-          :loading="!trustedCACertificatesOptions.length"
+          :loading="isLoadingRequestsData"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"

@@ -10,9 +10,7 @@
       "@assets/*": ["src/assets/*"],
       "@routes/*": ["src/router/routes/*"],
       "@modules/*": ["src/modules/*"]
-    },
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    }
   },
   "exclude": ["node_modules", "dist"]
 }
