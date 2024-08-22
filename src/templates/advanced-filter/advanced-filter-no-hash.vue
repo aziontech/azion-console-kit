@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { OPERATOR_MAPPING } from './component'

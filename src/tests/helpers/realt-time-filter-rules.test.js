@@ -63,9 +63,10 @@ describe('RealTimeMetricsModule', () => {
         },
         FILTER_LIKE_ALIAS: {
           configurationIdIn: 'Domain'
-        }
+        },
+        ALIAS_MAPPING: { configurationId: 'domain' }
       }
-      
+
       expect(JSON.stringify(FILTERS_RULES)).toEqual(JSON.stringify(filterRules))
     })
 

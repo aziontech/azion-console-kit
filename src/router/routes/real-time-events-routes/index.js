@@ -1,4 +1,3 @@
-import * as Helpers from '@/helpers'
 import * as RealTimeEventsService from '@/services/real-time-events-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */

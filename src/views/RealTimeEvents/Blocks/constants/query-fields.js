@@ -41,7 +41,7 @@ const buildFieldsQuery = () => `
 `
 
 const formatFieldName = (name) => {
-  const words = name.split(/(?=[A-Z])/)  
+  const words = name.split(/(?=[A-Z])/)
   const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 
   return formattedWords.join(' ')

@@ -41,8 +41,6 @@ export function useRouteFilterManager() {
    */
   const setFilterInHash = async (filter) => {
     const encodedFilter = encodeFilter(filter)
-    console.log('encodedFilter', encodedFilter)
-
     await router.push({ ...route, query: { ...route.query, filters: encodedFilter } })
   }
 

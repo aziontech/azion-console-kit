@@ -4,10 +4,4 @@ import REPORTS from './reports'
 import MAP_SERVICE_OPERATION from './services-operator-in'
 import CHART_RULES from './chart-rules'
 
-export {
-  TIME_INTERVALS,
-  GROUP_DASHBOARDS,
-  REPORTS,
-  MAP_SERVICE_OPERATION,
-  CHART_RULES
-}
+export { TIME_INTERVALS, GROUP_DASHBOARDS, REPORTS, MAP_SERVICE_OPERATION, CHART_RULES }
