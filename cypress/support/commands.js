@@ -31,10 +31,7 @@ const login = (email, password) => {
 }
 
 // Disable test failure for all uncaught exceptions
-Cypress.on('uncaught:exception', (err, runnable) => {
-  cy.log(`Uncaught exception in test: | ${runnable.title}`)
-  cy.log(`Uncaught exception: | ${err}`)
-
+Cypress.on('uncaught:exception', () => {
   return false
 })
 
