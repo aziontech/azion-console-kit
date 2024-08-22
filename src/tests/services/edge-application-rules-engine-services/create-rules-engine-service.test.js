@@ -3,12 +3,49 @@ import { createRulesEngineService } from '@/services/edge-application-rules-engi
 import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
+const parsedBehavior = [
+  { name: 'add_request_cookie', target: 'add request cookie' },
+  {
+    name: 'capture_match_groups',
+    target: {
+      captured_array: 'capture_array',
+      subject: 'test',
+      regex: '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\\.[a-zA-z]{2,3}$'
+    }
+  },
+  { name: 'set_cache_policy', target: '407041' },
+  { name: 'set_origin', target: '398616' },
+  { name: 'deliver', target: undefined }
+]
+
 const fixtures = {
   ruleEngineMock: {
     edgeApplicationId: 415267839,
     name: 'teste name',
     phase: 'request',
-    behaviors: 'behaviors-mock',
+    behaviors: [
+      {
+        name: 'add_request_cookie',
+        target: 'add request cookie'
+      },
+      {
+        name: 'capture_match_groups',
+        captured_array: 'capture_array',
+        subject: 'test',
+        regex: '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\\.[a-zA-z]{2,3}$'
+      },
+      {
+        name: 'set_cache_policy',
+        cacheId: '407041'
+      },
+      {
+        name: 'set_origin',
+        originId: '398616'
+      },
+      {
+        name: 'deliver'
+      }
+    ],
     criteria: 'mock-criteria',
     isActive: true,
     description: 'description'
@@ -37,7 +74,7 @@ describe('EdgeApplicationRulesEnginesServices', () => {
         name: fixtures.ruleEngineMock.name,
         phase: fixtures.ruleEngineMock.phase,
         criteria: fixtures.ruleEngineMock.criteria,
-        behaviors: fixtures.ruleEngineMock.behaviors,
+        behaviors: parsedBehavior,
         is_active: fixtures.ruleEngineMock.isActive,
         description: fixtures.ruleEngineMock.description
       }
