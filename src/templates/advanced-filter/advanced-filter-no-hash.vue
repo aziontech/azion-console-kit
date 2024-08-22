@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { OPERATOR_MAPPING } from './component'
@@ -19,7 +19,8 @@
       type: Boolean
     },
     filterAdvanced: {
-      type: Object
+      type: Array,
+      required: true
     }
   })
 
@@ -105,7 +106,7 @@
   }
 
   const updateDisplayFilter = (filterDisplay) => {
-    if (!filterDisplay?.length || !props.fieldsInFilter?.length) return
+    if (!filterDisplay?.length) return
 
     const newDisplay = filterDisplay.map((item) => {
       const { label, disabled, operator } = props.fieldsInFilter.find(
@@ -135,16 +136,8 @@
   watch(
     () => props.fieldsInFilter,
     () => {
-      updateDisplayFilter(displayFilter.value)
+      updateDisplayFilter(props.filterAdvanced)
     }
-  )
-
-  watch(
-    () => props.filterAdvanced,
-    (newValue) => {
-      updateDisplayFilter(newValue)
-    },
-    { immediate: true }
   )
 
   defineExpose({
@@ -158,7 +151,6 @@
     data-testid="search-filter-container"
   >
     <dialogFilter
-      :disabled="props.disabled"
       ref="refDialogFilter"
       :filtersOptions="listField"
       :counter="displayFilter.length"

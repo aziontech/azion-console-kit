@@ -7,7 +7,7 @@
       <TabView
         :activeIndex="tabSelectIndex"
         class="w-full h-full"
-        @tab-click="changePage"
+        @tab-click="handleTabClick"
       >
         <TabPanel
           :header="tab.title"
@@ -15,12 +15,10 @@
           :key="tab.index"
         >
           <TabPanelBlock
-            ref="tabPanelBlockRef"
-            v-if="tab.index === tabSelectIndex"
-            :loadFieldsData="loadFieldsWithOperator"
+            v-if="isTabActive(tab)"
             :listService="selectedTabProps.listService"
             :loadService="selectedTabProps.loadService"
-            :allFields="allFields"
+            :filterFields="generatedFilterFields"
             :tabSelected="tab"
           />
         </TabPanel>
@@ -32,7 +30,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, onBeforeMount, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -87,26 +85,33 @@
 
   const route = useRoute()
   const router = useRouter()
+
   const tabPanelBlockRef = ref(null)
   const tabSelectIndex = ref(undefined)
-  const fieldsDefault = ref({})
+  const fieldAllDataset = ref({})
+  const generatedFilterFields = ref([])
+
   const tabPanels = Object.values(TABS_EVENTS)
-  const allFields = ref([])
 
   const selectedTabProps = computed(() => {
     const { panel } = tabPanels[tabSelectIndex.value]
     return props[panel] || {}
   })
 
-  const changePage = async ({ index }) => {
-    const tab = tabPanels.find((tab) => tab.index === index)
-    selectedTab(tab)
-    await loadFieldsWithOperator(tabPanels[tabSelectIndex.value])
+  const isTabActive = (tab) => {
+    return tab.index === tabSelectIndex.value
   }
 
-  const updateRouter = (tabRouter) => {
+  const handleTabClick = async ({ index }) => {
+    const tab = tabPanels.find((tab) => tab.index === index)
+    await selectTab(tab)
+    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
+    tabPanelBlockRef.value?.reloadListTable()
+  }
+
+  const updateRouter = async (tabRouter) => {
     const { name, query, params } = route
-    router.push({
+    await router.push({
       name,
       params: {
         ...params,
@@ -116,40 +121,31 @@
     })
   }
 
-  const selectedTab = (tabSelectValue) => {
+  const selectTab = async (tabSelectValue) => {
     tabSelectIndex.value = tabSelectValue.index
-    updateRouter(tabSelectValue.tabRouter)
+    await updateRouter(tabSelectValue.tabRouter)
   }
 
-  const tabSelectInitial = () => {
+  const initializeTabSelection = async () => {
     const { params } = route
     if (params.tab) {
-      const tabSelect = tabPanels.find((tab) => tab.tabRouter === params.tab)
-      selectedTab(tabSelect)
+      const selectedTab = tabPanels.find((tab) => tab.tabRouter === params.tab)
+      await selectTab(selectedTab)
       return
     }
 
-    selectedTab(tabPanels[0])
+    await selectTab(tabPanels[0])
   }
 
-  const reload = () => {
-    tabRef.value[tabSelectIndex.value].reloadListTable()
-  }
-
-  onBeforeMount(() => {
-    const filter = getFiltersFromHash()
-    filterData.value = filter || defaultFilter
-  })
-
-  const loadFieldsDataset = async () => {
-    fieldsDefault.value = await props.loadFieldsData({
+  const loadFieldsAndOperators = async () => {
+    fieldAllDataset.value = await props.loadFieldsData({
       query: buildFieldsQuery()
-    })    
-    await loadFieldsWithOperator(tabPanels[tabSelectIndex.value])
+    })
+    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
   }
 
   let abortController = null
-  const loadFieldsWithOperator = async (tabSelected) => {
+  const fetchFieldsWithOperator = async (tabSelected) => {
     if (abortController) abortController.abort()
     abortController = new AbortController()
 
@@ -162,20 +158,16 @@
         signal: abortController.signal
       })
 
-      allFields.value = adapterFields(fieldsDefault, operatorsData, dataset)
+      generatedFilterFields.value = adapterFields(fieldAllDataset.value, operatorsData, dataset)
     } catch (error) {
       if (error.name !== 'AbortError') {
-        allFields.value = []
+        generatedFilterFields.value = []
       }
     }
   }
 
-  onBeforeMount(() => {
-    tabSelectInitial()
-    reload()
-  })
-
   onMounted(() => {
-    loadFieldsDataset()
+    initializeTabSelection()
+    loadFieldsAndOperators()
   })
 </script>

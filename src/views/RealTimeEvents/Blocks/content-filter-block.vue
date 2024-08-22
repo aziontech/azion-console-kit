@@ -3,6 +3,7 @@
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
   import { computed } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
+  import { eventsPlaygroundOpener } from '@/helpers'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -41,7 +42,6 @@
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
     <IntervalFilterBlock
-      v-model:filterDate="filter.tsRange"
       v-model:filterDate="filter.tsRange"
       @applyTSRange="filterSearch"
     />

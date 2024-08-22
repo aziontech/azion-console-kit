@@ -39,18 +39,20 @@ export function useRouteFilterManager() {
    * Updates the URL hash with the provided filter object.
    * @param {Object} filter - The filter object to set in the URL hash.
    */
-  const setFilterInHash = (filter) => {
+  const setFilterInHash = async (filter) => {
     const encodedFilter = encodeFilter(filter)
-    router.push({ ...route, query: { ...route.query, filters: encodedFilter } })
+    console.log('encodedFilter', encodedFilter)
+
+    await router.push({ ...route, query: { ...route.query, filters: encodedFilter } })
   }
 
   /**
    * Removes the filter object from the URL hash.
    */
-  const removeFiltersFromHash = () => {
+  const removeFiltersFromHash = async () => {
     const { filters, ...restQuery } = route.query
     if (filters) {
-      router.push({ ...route, query: restQuery })
+      await router.push({ ...route, query: restQuery })
     }
   }
 

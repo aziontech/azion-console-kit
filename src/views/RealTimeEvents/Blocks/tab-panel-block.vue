@@ -18,7 +18,7 @@
     tabSelected: {
       type: Object
     },
-    allFields: {
+    filterFields: {
       type: Array,
       default: () => []
     }
@@ -28,7 +28,6 @@
   const listTableBlockRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
-  const pullHash = ref(false)
 
   const defaultFilter = {
     tsRange: {},
@@ -41,7 +40,7 @@
   })
 
   const isTabSelected = computed(() => {
-    return !!props.tabSelected?.tabRouter && pullHash.value
+    return !!props.tabSelected?.tabRouter
   })
 
   const openDetailDrawer = (row) => {
@@ -51,26 +50,29 @@
     })
   }
 
-  const reloadListTable = () => {
+  const reloadListTable = async () => {
     listTableBlockRef.value?.reload()
-    setFilterInHash({
+  }
+
+  const reloadListTableWithHash = async () => {
+    await setFilterInHash({
       ...filterData.value,
       dataset: props.tabSelected.dataset
     })
+    reloadListTable()
   }
 
   const exportTableCSV = () => {
     listTableBlockRef.value?.handleExportTableDataToCSV()
   }
 
-  const resetFilter = () => {
+  const refreshFilterData = () => {
     const filter = getFiltersFromHash()
     filterData.value = defaultFilter
     if (filter) {
       filterData.value = filter
       filterData.value.fields = filter.dataset === props.tabSelected.dataset ? filter.fields : []
     }
-    pullHash.value = true
   }
 
   const listProvider = async () => {
@@ -78,7 +80,7 @@
   }
 
   onBeforeMount(() => {
-    resetFilter()
+    refreshFilterData()
   })
 
   onMounted(() => {
@@ -100,12 +102,12 @@
         </p>
       </div>
     </div>
-    <div class="border-1 border-bottom-none border-round-top-xl p-3.5">
+    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border">
       <ContentFilterBlock
         v-model:filterData="filterData"
-        :fieldsInFilter="props.allFields"
+        :fieldsInFilter="props.filterFields"
         :downloadCSV="exportTableCSV"
-        @updatedFilter="reloadListTable"
+        @updatedFilter="reloadListTableWithHash"
       />
     </div>
     <ListTableBlock
