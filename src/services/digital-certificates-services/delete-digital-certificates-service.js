@@ -22,6 +22,8 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.PermissionError().message
     case 404:
       throw new Errors.NotFoundError().message
+    case 409:
+      throw new Error(httpResponse.body.detail).message
     case 500:
       throw new Errors.InternalServerError().message
     default:

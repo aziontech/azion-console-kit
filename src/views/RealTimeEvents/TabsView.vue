@@ -132,6 +132,15 @@
     selectedTab(tabPanels[0])
   }
 
+  const reload = () => {
+    tabRef.value[tabSelectIndex.value].reloadListTable()
+  }
+
+  onBeforeMount(() => {
+    const filter = getFiltersFromHash()
+    filterData.value = filter || defaultFilter
+  })
+
   const loadFieldsDataset = async () => {
     fieldsDefault.value = await props.loadFieldsData({
       query: buildFieldsQuery()
@@ -163,6 +172,7 @@
 
   onBeforeMount(() => {
     tabSelectInitial()
+    reload()
   })
 
   onMounted(() => {

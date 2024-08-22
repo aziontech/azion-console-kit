@@ -42,6 +42,7 @@
   <div class="flex flex-col gap-6 md:gap-4">
     <IntervalFilterBlock
       v-model:filterDate="filter.tsRange"
+      v-model:filterDate="filter.tsRange"
       @applyTSRange="filterSearch"
     />
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
@@ -59,6 +60,7 @@
           icon-pos="right"
           icon="pi pi-external-link"
           label="Open in GraphQL Playground"
+          @click="eventsPlaygroundOpener"
         />
         <PrimeButton
           outlined

@@ -17,7 +17,7 @@
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
-            :loadingEdgeApplications="loadingEdgeApplications"
+            :isLoadingRequests="isLoadingRequests"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -78,7 +78,7 @@
   const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
-  const loadingEdgeApplications = ref(true)
+  const isLoadingRequests = ref(true)
 
   const handleResponse = (value) => {
     domainName.value = value?.domainName
@@ -168,7 +168,7 @@
     } catch (error) {
       toastError(error)
     } finally {
-      loadingEdgeApplications.value = false
+      isLoadingRequests.value = false
     }
   })
 
