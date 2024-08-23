@@ -1,3 +1,5 @@
+import { MOCK_NEW_PAGE_INFO } from '../MOCK_METRICS_DATA'
+
 /**
  * @typedef {Object} Dashboard
  * @property {string} id - The unique identifier of the dashboard.
@@ -23,6 +25,7 @@
  * @property {Page[]} pagesDashboards - The list of pages in the group.
  */
 const PAGES_DASHBOARDS = {
+  ...MOCK_NEW_PAGE_INFO.page,
   build: [
     {
       id: 1,
@@ -148,6 +151,7 @@ const PAGES_DASHBOARDS = {
 }
 
 const GROUP_DASHBOARDS = [
+  { ...MOCK_NEW_PAGE_INFO.group },
   {
     label: 'Build',
     value: 'build',

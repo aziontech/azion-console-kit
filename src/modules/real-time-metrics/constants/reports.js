@@ -1,6 +1,8 @@
 import REPORTS_TEXTS from './reports-texts'
 import HELP_CENTER_URLS from './help-center-urls'
 
+import { MOCK_NEW_PAGE_INFO } from '../MOCK_METRICS_DATA'
+
 /**
  * @typedef {Object} Report
  * @property {string} id - The unique identifier of the report.
@@ -25,6 +27,14 @@ import HELP_CENTER_URLS from './help-center-urls'
  * @property {number} [maxYAxis] - The maximum value for the y-axis in the report.
  */
 const REPORTS = [
+  /**
+   * NEW
+   * New Charts - New Charts
+   * Remove after integrations
+   */
+
+  ...MOCK_NEW_PAGE_INFO.dashboard,
+
   /**
    * BUILD
    * Edge Applications - Data Transferred
