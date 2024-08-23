@@ -79,7 +79,9 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
 
   const dataset = Object.keys(resultQueryRaw)
 
-  if (dataset) {
+  const isTimeSeries = newReport.xAxis === 'ts'
+
+  if (dataset && isTimeSeries) {
     const props = { tsRangeFilter: filters.tsRange, data: resultQuery[dataset] }
 
     resultQuery[dataset] = FillResultQuery(props)
@@ -101,13 +103,11 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
   const groupBy = report.groupBy.filter((item) => item !== report.xAxis)
 
   const resultChart = ConvertBeholderToChart({
+    report: newReport,
     data: resultQuery,
-    dataset: report.dataset,
     variable,
     aggregation,
     groupBy,
-    isTopX: report.isTopX,
-    xAxis: report.xAxis,
     additionalSeries: report.fields || [],
     userUTC
   })
