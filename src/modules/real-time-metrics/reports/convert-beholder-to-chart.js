@@ -220,7 +220,7 @@ const formatTsChartData = ({
  * @param {Array} data - The data to be formatted.
  */
 
-const formatPieChartData = ({ report, data }) => {
+const formatCatAbsoluteChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
 
   return data[dataset].map((item) => {
@@ -262,7 +262,8 @@ function ConvertBeholderToChart({
         userUTC
       })
     case 'pie':
-      return formatPieChartData({ report, data })
+    case 'donut':
+      return formatCatAbsoluteChartData({ report, data })
     default:
       return []
   }
