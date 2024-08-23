@@ -353,12 +353,24 @@ function setLegendPadding(legendPosition) {
   return legendPosition === 'bottom' ? CHART_RULES.BOTTOM_LEGEND_PADDING : null
 }
 
+/**
+ * Determines whether the grid should be displayed for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
 function displayGrid(chartData) {
   const hiddenTypes = ['ordered-bar']
 
   return !hiddenTypes.includes(chartData.type)
 }
 
+/**
+ * Determines whether the legend should be hidden for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
 function displayLegend(chartData) {
   const hiddenTypes = ['ordered-bar']
 
