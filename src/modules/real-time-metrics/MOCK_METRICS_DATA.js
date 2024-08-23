@@ -48,13 +48,39 @@ export const MOCK_NEW_PAGE_INFO = {
   },
   dashboard: [
     {
-      id: '356217848089011234',
+      id: '222222222222222222',
       chartOwner: 'azion',
       label: 'Pie Chart',
       description: 'description',
       aggregationType: 'sum',
       columns: 6,
       type: 'pie',
+      xAxis: 'cat',
+      isTopX: true,
+      rotated: false,
+      dataUnit: 'bytes',
+      dataset: 'httpMetrics',
+      limit: 5,
+      fields: ['bandwidthTotal'],
+      groupBy: ['geolocCountryName'],
+      aggregations: [
+        {
+          aggregation: 'count',
+          variable: 'rows'
+        }
+      ],
+      orderDirection: 'DESC',
+      dashboardId: '11111111111111111',
+      helpCenterPath: 'path'
+    },
+    {
+      id: '333333333333333333',
+      chartOwner: 'azion',
+      label: 'Donut Chart',
+      description: 'description',
+      aggregationType: 'sum',
+      columns: 6,
+      type: 'donut',
       xAxis: 'cat',
       isTopX: true,
       rotated: false,
