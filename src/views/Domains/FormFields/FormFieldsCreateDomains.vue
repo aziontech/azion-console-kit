@@ -55,7 +55,7 @@
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt (BETA)", value: 'lets_encrypt' }
+      { name: "Let's Encrypt", value: 'lets_encrypt' }
     ]
     const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
       name: certificate.name,
