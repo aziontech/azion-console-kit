@@ -147,14 +147,6 @@
       }
     },
     {
-      component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
-      title: 'Bar Chart',
-      size: 6,
-      description:
-        'Displays data using rectangular bars, with length representing value. Useful for comparing quantities across different categories.',
-      data: MOCKS.BAR_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
       title: 'Ordered Bar Chart',
       size: 6,
@@ -177,14 +169,6 @@
       description:
         'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
       data: MOCKS.STACKED_BAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
-      title: 'Area Chart',
-      size: 6,
-      description:
-        'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.',
-      data: MOCKS.AREA_CHART_DATA
     },
     {
       component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
