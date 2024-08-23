@@ -30,7 +30,7 @@ function isNumeric(resultChart) {
  */
 function formatC3DataProp(chartData, resultChart) {
   const data = {
-    x: chartData.xAxis,
+    x: resultChart[0][0],
     type: chartData.type,
     columns: resultChart
   }
