@@ -85,7 +85,8 @@
     line: defineAsyncComponent(() => import('./components/chart/line-chart')),
     spline: defineAsyncComponent(() => import('./components/chart/spline-chart')),
     pie: defineAsyncComponent(() => import('./components/chart/pie-chart')),
-    donut: defineAsyncComponent(() => import('./components/chart/donut-chart'))
+    donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
+    'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())

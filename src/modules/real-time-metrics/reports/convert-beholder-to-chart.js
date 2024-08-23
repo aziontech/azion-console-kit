@@ -222,10 +222,28 @@ const formatTsChartData = ({
 
 const formatCatAbsoluteChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
+  const seriesName = report.groupBy[0]
+  const fieldName = report.fields[0]
 
   return data[dataset].map((item) => {
-    return [item[report.groupBy[0]], item[report.fields[0]]]
+    return [item[seriesName], item[fieldName]]
   })
+}
+
+const formatRotatedBarChartData = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const seriesName = report.groupBy[0]
+  const fieldName = report.fields[0]
+
+  const series = [seriesName]
+  const values = [fieldName]
+
+  data[dataset].forEach((item) => {
+    series.push(item[seriesName])
+    values.push(item[fieldName])
+  })
+
+  return [series, values]
 }
 
 /**
@@ -264,6 +282,8 @@ function ConvertBeholderToChart({
     case 'pie':
     case 'donut':
       return formatCatAbsoluteChartData({ report, data })
+    case 'ordered-bar':
+      return formatRotatedBarChartData({ report, data })
     default:
       return []
   }
