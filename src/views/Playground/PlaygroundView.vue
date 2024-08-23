@@ -147,14 +147,6 @@
       }
     },
     {
-      component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
-      title: 'Ordered Bar Chart',
-      size: 6,
-      description:
-        'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.',
-      data: MOCKS.ROTATED_BAR_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
       title: 'Stacked Line Chart',
       size: 6,
