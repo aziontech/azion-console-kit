@@ -179,14 +179,6 @@
       data: MOCKS.STACKED_BAR_CHART_DATA
     },
     {
-      component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
-      title: 'Donut Chart',
-      size: 6,
-      description:
-        'A variation of a pie chart with a central hole. It provides a similar view but can also display additional data in the center.',
-      data: MOCKS.DONUT_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
       title: 'Area Chart',
       size: 6,
