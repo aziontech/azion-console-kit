@@ -6,6 +6,10 @@
   Criei um grupo novo na tela do metrics para guardar todos os gráficos. Ela deve ser removida ao final da integração. O trabalho final que deve ir para stage é apenas o de formatação e de renderização dos dados, já que novas propriedades para apresentar os novos gráficos serão adicionados posteriormente.
 
   Qualquer dúvida sobre comos novos gráficos serão inseridos, Matheus criou um video tutorial há um tempo que certamente irá ajudar.
+
+  -- DOCS:
+  https://openlayers.org/en/latest/apidoc/
+  https://c3js.org/
 */
 
 export const MOCK_NEW_PAGE_INFO = {
