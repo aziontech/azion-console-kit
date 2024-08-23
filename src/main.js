@@ -21,6 +21,7 @@ import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
 import DialogService from 'primevue/dialogservice'
+import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 import StripeIntegrationPlugin from '@/plugins/StripeIntegrationPlugin'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
@@ -35,6 +36,7 @@ pinia.use(piniaPluginPersistedstate)
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
+app.directive('prompt', customAiPrompt)
 app.use(ToastService)
 app.use(pinia)
 app.use(router)
