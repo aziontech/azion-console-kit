@@ -120,36 +120,31 @@ const isSeriesBeyondLimits = (series) => {
 }
 
 /**
- * Function that transforms a list of tuples into a list of lists (columns).
+ * Formats time series chart data based on the provided report, data, variable, groupBy, and additionalSeries.
  *
- * @param {Array}   data             List of key-value objects with the data
- * @param {String}  dataset          Name of the dataset
- * @param {String}  variable         Name of the variable to display in the legend
- * @param {String}  aggregation      Name of the aggregation used
- * @param {Array}   groupBy          List of grouping variables
- * @param {Boolean} isTopX           Whether the obtained data is in the Top X format
- * @param {String}  xAxis            Name of the X-axis variable, can be empty in case of Top X
- * @param {Array}   additionalSeries List of additional fields to be plotted on the chart
- *
- * @returns {Array} List of data transformed to a column structure.
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ * @param {string} variable - The variable to be displayed in the legend.
+ * @param {string} aggregation - The aggregation to be applied.
+ * @param {Array} groupBy - The list of grouping variables.
+ * @param {Array} additionalSeries - The list of additional series to be included in the chart.
+ * @return {Array} The formatted chart data, including the X-axis data and series data.
  */
-function ConvertBeholderToChart({
+const formatTsChartData = ({
+  report,
   data,
-  dataset,
   variable,
   aggregation,
   groupBy,
-  isTopX,
-  xAxis,
   additionalSeries,
   userUTC
-}) {
+}) => {
   const xAxisData = []
   // topX data has the groupBy field values as the X-axis
-  if (isTopX) {
+  if (report.isTopX) {
     xAxisData.push(groupBy[0])
   } else {
-    xAxisData.push(xAxis)
+    xAxisData.push(report.xAxis)
   }
 
   const series = {}
@@ -157,7 +152,7 @@ function ConvertBeholderToChart({
   let lastXAxis = null
   let countValues = 0
 
-  data[dataset]?.forEach((item) => {
+  data[report.dataset]?.forEach((item) => {
     if (shouldHandleSeriesData(variable, groupBy)) {
       let key = variable
 
@@ -167,7 +162,7 @@ function ConvertBeholderToChart({
 
       // if there are groupBy values, it needs to generate a specific series for each group value.
       if (groupBy?.length) {
-        if (isTopX) {
+        if (report.isTopX) {
           xAxisData.push(item[groupBy[0]])
         } else {
           const keyValues = getGroupByKeyValues(groupBy, item)
@@ -203,8 +198,8 @@ function ConvertBeholderToChart({
       })
     }
 
-    if (shouldAddExtraPointsToAxis(isTopX, lastXAxis, item, xAxis)) {
-      const props = { series, item, xAxis, xAxisData, userUTC, countValues }
+    if (shouldAddExtraPointsToAxis(report.isTopX, lastXAxis, item, report.xAxis)) {
+      const props = { series, item, xAxis: report.xAxis, xAxisData, userUTC, countValues }
       const newExtraPoint = addExtraPointsToXAxis(props)
 
       lastXAxis = newExtraPoint
@@ -216,6 +211,61 @@ function ConvertBeholderToChart({
 
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
+const formatPieChartData = ({ report, data }) => {
+  const dataset = Object.keys(data)
+
+  return data[dataset].map((item) => {
+    return [item[report.groupBy[0]], item[report.fields[0]]]
+  })
+}
+
+/**
+ * Function that transforms a list of tuples into a list of lists (columns).
+ *
+ * @param {Object}  report           Report object
+ * @param {Array}   data             List of key-value objects with the data
+ * @param {String}  variable         Name of the variable to display in the legend
+ * @param {String}  aggregation      Name of the aggregation used
+ * @param {Array}   groupBy          List of grouping variables
+ * @param {Array}   additionalSeries List of additional fields to be plotted on the chart
+ *
+ * @returns {Array} List of data transformed to a column structure.
+ */
+function ConvertBeholderToChart({
+  report,
+  data,
+  variable,
+  aggregation,
+  groupBy,
+  additionalSeries,
+  userUTC
+}) {
+  switch (report.type) {
+    case 'line':
+    case 'spline':
+      return formatTsChartData({
+        report,
+        data,
+        variable,
+        aggregation,
+        groupBy,
+        additionalSeries,
+        userUTC
+      })
+    case 'pie':
+      return formatPieChartData({ report, data })
+    default:
+      return []
+  }
 }
 
 export default ConvertBeholderToChart
