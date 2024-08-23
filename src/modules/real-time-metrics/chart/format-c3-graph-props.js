@@ -43,7 +43,7 @@ function formatC3DataProp(chartData, resultChart) {
 
     data.types = { [field]: 'bar' }
     data.labels = true
-    data.color = (_, data) => CHART_RULES.LINE_PATTERNS[data.index]
+    data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index]
 
     return data
   }
@@ -393,7 +393,7 @@ export default function FormatC3GraphProps({
   hasMeanLineSeries = false,
   hasMeanLineTotal = false
 }) {
-  const pattern = [...CHART_RULES.LINE_PATTERNS]
+  const pattern = [...CHART_RULES.BASE_COLOR_PATTERNS]
 
   const legendPosition = setLegendPosition(chartData, resultChart)
 

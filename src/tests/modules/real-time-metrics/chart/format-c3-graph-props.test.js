@@ -75,7 +75,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE
+          pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE
         },
         grid: {
           y: {
@@ -185,7 +185,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE_PER_SERIES
+          pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE_PER_SERIES
         },
         grid: {
           y: {
@@ -279,7 +279,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS
+          pattern: FIXTURES.BASE_COLOR_PATTERNS
         },
         grid: {
           y: {
