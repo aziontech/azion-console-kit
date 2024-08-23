@@ -26,13 +26,17 @@ export default async function ResolveReport(report, filters, userUTC, signal) {
   const hasAggregation = reportData?.resultChart?.length <= maxSeriesToDisplayTag
   const hasResults = reportData?.resultChart?.length
 
+  const isTimeSeries = report.xAxis === 'ts'
+  const hasMeanLine = hasResults > minSeriesToShowMeanLine && isTimeSeries
+  const hasMeanLinePerSeries = hasResults > minSeriesToShowMeanLinePerSeries && isTimeSeries
+
   const reportInfo = {
     reportId: report.id,
     resultQuery: reportData.resultChart,
     reportQuery: reportData.gqlQuery,
     error: reportData.error,
-    hasMeanLine: reportData.resultChart.length > minSeriesToShowMeanLine,
-    hasMeanLinePerSeries: reportData.resultChart.length > minSeriesToShowMeanLinePerSeries,
+    hasMeanLine,
+    hasMeanLinePerSeries,
     hasFeedbackTag: hasAggregation,
     showMeanLine: false,
     showMeanLinePerSeries: false
