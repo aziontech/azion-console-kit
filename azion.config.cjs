@@ -149,7 +149,7 @@ const backRules = [
     match: '^/api/marketplace',
     behavior: {
       setOrigin: {
-        name: 'origin-manager',
+        name: 'origin-marketplace',
         type: 'single_origin'
       },
       forwardCookies: true,
@@ -257,6 +257,12 @@ const AzionConfig = {
       type: 'single_origin',
       hostHeader: `manager.azion.com`,
       addresses: [`manager.azion.com`]
+    },
+    {
+      name: 'origin-marketplace',
+      type: 'single_origin',
+      hostHeader: `marketplace.azion.com`,
+      addresses: [`marketplace.azion.com`]
     },
     {
       name: 'origin-cities',
