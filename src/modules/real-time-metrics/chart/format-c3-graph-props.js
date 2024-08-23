@@ -444,7 +444,7 @@ export default function FormatC3GraphProps({
       }
     },
     zoom: {
-      enabled: true
+      enabled: chartData.xAxis === 'ts'
     }
   }
 
