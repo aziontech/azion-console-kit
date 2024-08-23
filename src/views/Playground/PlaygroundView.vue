@@ -179,14 +179,6 @@
       data: MOCKS.STACKED_BAR_CHART_DATA
     },
     {
-      component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
-      title: 'Pie Chart',
-      size: 6,
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
-      data: MOCKS.PIE_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
       title: 'Donut Chart',
       size: 6,
