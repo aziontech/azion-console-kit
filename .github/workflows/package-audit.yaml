@@ -28,5 +28,5 @@ jobs:
       - name: Install dependencies
         run: yarn ci
       
-      - name: Run package-audit
-        run: yarn audit-dependencies
+      - name: Run package-auditor
+        run: yarn package-audit
