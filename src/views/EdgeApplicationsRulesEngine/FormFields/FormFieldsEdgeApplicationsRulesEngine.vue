@@ -369,6 +369,8 @@
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
+  const testAccordion = ref([])
+  
 </script>
 
 <template>
@@ -445,7 +447,10 @@
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion :activeIndex="0">
+        <Accordion
+          v-model:activeIndex="testAccordion"
+          @update:activeIndex="(e) => handled(e, criteriaIndex)"
+        >
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
               <div class="ml-auto flex justify-center items-center">

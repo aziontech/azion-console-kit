@@ -88,4 +88,5 @@ router.beforeEach(beforeEachRoute)
 router.beforeEach(redirectToManager)
 router.afterEach(afterEachRouteGuard)
 
+
 export default router
