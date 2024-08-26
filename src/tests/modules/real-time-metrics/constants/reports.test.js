@@ -7,8 +7,113 @@ describe('RealTimeMetricsModule', () => {
       expect(REPORTS).toBeDefined()
     })
 
-    it('should have the correct array of values', () => {
+    it('should have the correct of values', () => {
       const reports = [
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'count',
+              variable: 'rows'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '11111111111111111',
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          description: 'description',
+          fields: ['bandwidthTotal'],
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: 'path',
+          id: '555555555555555555',
+          isTopX: true,
+          label: 'Maps Chart',
+          limit: 5,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'map',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'count',
+              variable: 'rows'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '11111111111111111',
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          description: 'description',
+          fields: ['bandwidthTotal'],
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: 'path',
+          id: '444444444444444444',
+          isTopX: true,
+          label: 'Ordered Bar Chart',
+          limit: 5,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'count',
+              variable: 'rows'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '11111111111111111',
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          description: 'description',
+          fields: ['bandwidthTotal'],
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: 'path',
+          id: '333333333333333333',
+          isTopX: true,
+          label: 'Donut Chart',
+          limit: 5,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'donut',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'count',
+              variable: 'rows'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '11111111111111111',
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          description: 'description',
+          fields: ['bandwidthTotal'],
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: 'path',
+          id: '222222222222222222',
+          isTopX: true,
+          label: 'Pie Chart',
+          limit: 5,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'pie',
+          xAxis: 'cat'
+        },
         {
           aggregationType: 'sum',
           chartOwner: 'azion',

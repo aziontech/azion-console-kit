@@ -136,7 +136,7 @@
       data: MOCKS.GAUGE_LOW_CHART_DATA
     },
     {
-      component: defineAsyncComponent(() => import('./maps/MapChart.vue')),
+      component: defineAsyncComponent(() => import('../../templates/graphs-card-block/components/map/map-chart.vue')),
       title: 'Map',
       size: 6,
       description:

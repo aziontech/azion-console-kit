@@ -246,6 +246,41 @@ const formatRotatedBarChartData = ({ report, data }) => {
   return [series, values]
 }
 
+// {
+//   countryName: 'United States',
+//   value: 122890,
+//   rangeVariation: 'regular'
+// }
+
+// {
+//   "geolocCountryName": "United States",
+//   "bandwidthTotal": 38659.87,
+//   "count": 1252
+// },
+
+const formatMapChartData = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const geolocCountryName = report.groupBy[0]
+  const fieldName = report.fields[0]
+
+  const heatmap = data[dataset].map((datasetMapData) => {
+    const result = {
+      countryName: datasetMapData[geolocCountryName],
+      value: datasetMapData[fieldName],
+      rangeVariation: report.variationType
+    }
+
+    return result
+  })
+
+  return [
+    {
+      bubbles: [],
+      heatmap
+    }
+  ]
+}
+
 /**
  * Function that transforms a list of tuples into a list of lists (columns).
  *
@@ -284,6 +319,8 @@ function ConvertBeholderToChart({
       return formatCatAbsoluteChartData({ report, data })
     case 'ordered-bar':
       return formatRotatedBarChartData({ report, data })
+    case 'map':
+      return formatMapChartData({ report, data })
     default:
       return []
   }

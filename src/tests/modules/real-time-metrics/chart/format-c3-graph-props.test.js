@@ -26,8 +26,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'line',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE,
+          type: 'line',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 6100T/s',
@@ -71,7 +71,8 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
@@ -123,8 +124,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'bar',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE_PER_SERIES,
+          type: 'bar',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 406,666,666,666,666.70%',
@@ -181,7 +182,8 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
@@ -233,8 +235,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'spline',
           columns: FIXTURES.RESULTS,
+          type: 'spline',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 6.1KTb/s',
@@ -275,7 +277,8 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
