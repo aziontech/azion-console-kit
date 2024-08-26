@@ -23,7 +23,12 @@ describe('convertGQL', () => {
     const filter = {
       tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' },
       and: { field1: 'value1', field2: 'value2' },
-      in: { field3: ['value3', 'value4'] }
+      in: {
+        field3: [
+          { value: 'value3', label: 'test1' },
+          { value: 'value4', label: 'test2' }
+        ]
+      }
     }
 
     const { sut } = makeSut()
@@ -80,7 +85,12 @@ describe('convertGQL', () => {
     const filter = {
       tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' },
       and: { field1: 'value1', field2: 'value2' },
-      in: { field3: ['value3', 'value4'] },
+      in: {
+        field3: [
+          { value: 'value3', label: 'test1' },
+          { value: 'value4', label: 'test2' }
+        ]
+      },
       fields: [
         {
           valueField: 'field1',

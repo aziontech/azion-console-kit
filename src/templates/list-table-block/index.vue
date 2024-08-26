@@ -8,6 +8,7 @@
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       v-if="!isLoading"
+      :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
       removableSort
@@ -371,6 +372,10 @@
     },
     exportFileName: {
       type: String
+    },
+    pt: {
+      type: Object,
+      default: () => ({})
     }
   })
 
@@ -537,7 +542,7 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload })
+  defineExpose({ reload, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]

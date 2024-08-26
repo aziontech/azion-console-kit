@@ -7,15 +7,12 @@
   import Divider from 'primevue/divider'
   import { useToast } from 'primevue/usetoast'
   import { computed, ref, watch } from 'vue'
+  import * as Helpers from '@/helpers'
 
   defineOptions({ name: 'drawer-events-tiered-cache' })
 
   const props = defineProps({
     loadService: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
       type: Function,
       required: true
     }
@@ -49,7 +46,7 @@
   }
 
   const copyCacheKey = () => {
-    props.clipboardWrite(details.value.cacheKey)
+    Helpers.clipboardWrite(details.value.cacheKey)
     toast.add({
       closable: true,
       severity: 'success',

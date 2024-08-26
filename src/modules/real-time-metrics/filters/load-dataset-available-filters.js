@@ -1,7 +1,6 @@
 import { loadRealTimeMetricsData } from '@/services/real-time-metrics-services'
-import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
-import ParserObjectField from './parser-object-field'
-import { capitalizeFirstLetter } from '@/helpers'
+import ParserObjectField from '@/modules/real-time-metrics/filters/parser-object-field'
+import { capitalizeFirstLetter, FILTERS_RULES } from '@/helpers'
 
 let abortController = null
 
@@ -32,31 +31,6 @@ __type(name: "${capitalizeFirstLetter(datasetName)}Filter") {
   }
 }
 }`
-
-/**
- * Verify if the provided name is blacklisted.
- *
- * @param {object} name - The name to be verified.
- * @return {boolean} Whether the name is blacklisted or not.
- */
-const verifyBlacklistFields = ({ name }) => {
-  return !FILTERS_RULES.FILTER_BLACK_LIST.includes(name)
-}
-
-/**
- * Verify if the whitelist fields are supported.
- *
- * @param {object} name - the name of the field
- * @param {object} type - the type object containing the name of the type
- * @param {string} type.name - the name of the type
- * @return {boolean} true if the field is supported, false otherwise
- */
-const verifyWhitelistFields = ({ name, type: { name: typeName } }) => {
-  return (
-    FILTERS_RULES.FILTER_WHITELIST.SUPPORTED_FILTER_TYPE.includes(typeName) ||
-    FILTERS_RULES.FILTER_WHITELIST.FIELDS_LIKE.includes(name)
-  )
-}
 
 /**
  * Loads the available filters for a given dataset.
@@ -91,8 +65,8 @@ export default async function LoadDatasetAvailableFilters(dataset) {
 
   if (!data.inputFields) return []
   const availableFilters = data.inputFields
-    .filter(verifyWhitelistFields)
-    .filter(verifyBlacklistFields)
+    .filter(FILTERS_RULES.verifyWhiteListFields)
+    .filter(FILTERS_RULES.verifyBlackListFields)
     .filter(({ description }) => !description.includes('DEPRECATED'))
     .map(ParserObjectField)
     .reduce(
