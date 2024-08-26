@@ -42,10 +42,6 @@
       to: '/billing'
     },
     {
-      label: 'Credentials',
-      to: '/credentials'
-    },
-    {
       label: 'Activity History',
       to: '/activity-history'
     },
