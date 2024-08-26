@@ -63,6 +63,16 @@
       "origin-id": 146198,
       "origin-key": "443ee462-5511-49d3-ae0e-4b1e6779cb88",
       "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 149080,
+      "origin-key": "7f1dcf08-9e37-476c-8f55-f61e48faab11",
+      "name": "origin-marketplace"
+    },
+    {
+      "origin-id": 146191,
+      "origin-key": "a21a7881-6408-473a-a632-d4daff3647f7",
+      "name": "console-kit-2024-08-21-stage_single"
     }
   ],
   "rules-engine": {
