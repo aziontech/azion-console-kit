@@ -157,6 +157,8 @@
     }
   })
 
+  const activeAccordions = ref([0])
+
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
   const behaviorsLabelsTags = computed(() => {
@@ -289,11 +291,23 @@
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
   }
 
+  const removeCriteriaDecorator = (index) => {
+    activeAccordions.value.splice(index, 1)
+    removeCriteria(index)
+    const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
+    activeAccordions.value[index] = invertedAccordionState
+  }
+
+  const handleTabClose = (index) => {
+    console.log(index)
+    activeAccordions.value[index] = 0
+  }
   const addNewConditional = ({ index, operator }) => {
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
   const addNewCriteria = () => {
+    activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
   }
 
@@ -440,12 +454,18 @@
     data-testid="rule-form-criteria"
   >
     <template #inputs>
+      {{ props.errors }}
+      <br />
+      {{ activeAccordions }}
       <div
         class="flex flex-col gap-8"
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion :activeIndex="0">
+        <Accordion
+          v-model:activeIndex="activeAccordions[criteriaIndex]"
+          @update:activeIndex="handleTabClose(criteriaIndex)"
+        >
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
               <div class="ml-auto flex justify-center items-center">
@@ -454,7 +474,7 @@
                   icon="pi pi-trash"
                   size="small"
                   outlined
-                  @click="removeCriteria(criteriaIndex)"
+                  @click="removeCriteriaDecorator(criteriaIndex)"
                   :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
                 />
               </div>
