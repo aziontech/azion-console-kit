@@ -30,24 +30,19 @@
   },
   "origin": [
     {
+      "origin-id": 149080,
+      "origin-key": "7f1dcf08-9e37-476c-8f55-f61e48faab11",
+      "name": "origin-marketplace"
+    },
+    {
       "origin-id": 146192,
       "origin-key": "94b3632f-e70d-4104-8a82-e424d014603d",
       "name": "origin-storage-default"
     },
     {
-      "origin-id": 146193,
-      "origin-key": "bded9065-b277-4e7b-b55a-bdb0b0064b21",
-      "name": "origin-manager"
-    },
-    {
-      "origin-id": 146194,
-      "origin-key": "1dde123c-36f0-4a92-aeb5-439d6fd9948c",
-      "name": "origin-vcs"
-    },
-    {
-      "origin-id": 146195,
-      "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
-      "name": "origin-cities"
+      "origin-id": 146191,
+      "origin-key": "a21a7881-6408-473a-a632-d4daff3647f7",
+      "name": "console-kit-2024-08-21-stage_single"
     },
     {
       "origin-id": 146196,
@@ -60,19 +55,14 @@
       "name": "origin-api"
     },
     {
-      "origin-id": 146198,
-      "origin-key": "443ee462-5511-49d3-ae0e-4b1e6779cb88",
-      "name": "origin-script-runner"
+      "origin-id": 146193,
+      "origin-key": "bded9065-b277-4e7b-b55a-bdb0b0064b21",
+      "name": "origin-manager"
     },
     {
-      "origin-id": 149080,
-      "origin-key": "7f1dcf08-9e37-476c-8f55-f61e48faab11",
-      "name": "origin-marketplace"
-    },
-    {
-      "origin-id": 146191,
-      "origin-key": "a21a7881-6408-473a-a632-d4daff3647f7",
-      "name": "console-kit-2024-08-21-stage_single"
+      "origin-id": 146195,
+      "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
+      "name": "origin-cities"
     }
   ],
   "rules-engine": {
@@ -116,11 +106,6 @@
       {
         "id": 277555,
         "name": "Route Specific API Services to Script Runner Origin",
-        "phase": "request"
-      },
-      {
-        "id": 277556,
-        "name": "Route Version Control System API to VCS Origin",
         "phase": "request"
       },
       {
