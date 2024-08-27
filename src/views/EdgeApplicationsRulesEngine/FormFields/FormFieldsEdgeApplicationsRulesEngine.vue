@@ -1,6 +1,6 @@
 <script setup>
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -298,10 +298,6 @@
     activeAccordions.value[index] = invertedAccordionState
   }
 
-  const handleTabClose = (index) => {
-    console.log(index)
-    activeAccordions.value[index] = 0
-  }
   const addNewConditional = ({ index, operator }) => {
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
@@ -383,6 +379,18 @@
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
+
+  watch(
+    () => props.errors,
+    () => {
+      const errorsKeys = Object.keys(props.errors)
+      if (errorsKeys.length > 0) {
+        const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
+        const index = match[1]
+        activeAccordions.value[index] = 0
+      }
+    }
+  )
 </script>
 
 <template>
@@ -454,18 +462,12 @@
     data-testid="rule-form-criteria"
   >
     <template #inputs>
-      {{ props.errors }}
-      <br />
-      {{ activeAccordions }}
       <div
         class="flex flex-col gap-8"
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion
-          v-model:activeIndex="activeAccordions[criteriaIndex]"
-          @update:activeIndex="handleTabClose(criteriaIndex)"
-        >
+        <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
               <div class="ml-auto flex justify-center items-center">
@@ -565,6 +567,7 @@
               />
             </div>
           </AccordionTab>
+          teste
         </Accordion>
         <Divider
           v-if="isNotLastCriteria(criteriaIndex)"
