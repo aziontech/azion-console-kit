@@ -23,7 +23,8 @@ const isValidRoute = (redirect) => {
  */
 const setRedirectRoute = ({ name, path, params, query, fullPath }, expirationMinutes = 60) => {
   const now = new Date()
-  const expiration = new Date(now.getTime() + expirationMinutes * 60000)
+  const MILLISECONDS_PER_MINUTE = 60000
+  const expiration = new Date(now.getTime() + expirationMinutes * MILLISECONDS_PER_MINUTE)
   const redirectData = {
     name,
     path,
