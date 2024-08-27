@@ -37,7 +37,7 @@ describe('RealTimeMetricsModule', () => {
           bottom: 16,
           right: 30
         },
-        LINE_PATTERNS: [
+        BASE_COLOR_PATTERNS: [
           'var(--series-one-color)',
           'var(--series-two-color)',
           'var(--series-three-color)',

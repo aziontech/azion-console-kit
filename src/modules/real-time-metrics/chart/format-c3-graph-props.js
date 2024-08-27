@@ -29,11 +29,26 @@ function isNumeric(resultChart) {
  * @returns {Object} - Returns the formatted C3 data properties
  */
 function formatC3DataProp(chartData, resultChart) {
+  const { type } = chartData
+  const x = resultChart[0][0]
+  const columns = resultChart
+
   const data = {
-    x: chartData.xAxis,
-    type: chartData.type,
-    columns: resultChart
+    x,
+    columns
   }
+
+  if (type === 'ordered-bar') {
+    const field = resultChart[1][0]
+
+    data.types = { [field]: 'bar' }
+    data.labels = true
+    data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index]
+
+    return data
+  }
+
+  data.type = type
 
   if (isDate(resultChart[0][1])) {
     data.xFormat = '%Y-%m-%dT%H:%M:%S.%LZ'
@@ -51,11 +66,15 @@ function formatC3DataProp(chartData, resultChart) {
 function formatC3XAxis(chartData, resultChart) {
   const isSeriesDate = isDate(resultChart[0][1])
   const isSeriesNumeric = isNumeric(resultChart)
+  const isTimeSeries = chartData.xAxis === 'ts'
   const isRotated = chartData.rotated
 
   const xAxis = {
-    type: isSeriesDate ? CHART_RULES.C3_TYPES.ts : CHART_RULES.C3_TYPES.cat,
-    tick: {
+    type: isSeriesDate ? CHART_RULES.C3_TYPES.ts : CHART_RULES.C3_TYPES.cat
+  }
+
+  if (isTimeSeries) {
+    xAxis.tick = {
       count: isSeriesNumeric ? CHART_RULES.MAX_COUNT : CHART_RULES.MIN_COUNT,
       outer: false
     }
@@ -169,6 +188,11 @@ function formatYAxisLabels(data, chartData) {
  * @returns {Object} - Returns the formatted Y axis of the C3 chart
  */
 function formatC3YAxis(chartData) {
+  const hiddenTypes = ['ordered-bar']
+
+  if (hiddenTypes.includes(chartData.type)) {
+    return { show: false }
+  }
   const isRotated = chartData.rotated
   const yAxis = {
     /**
@@ -330,6 +354,30 @@ function setLegendPadding(legendPosition) {
 }
 
 /**
+ * Determines whether the grid should be displayed for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
+function displayGrid(chartData) {
+  const hiddenTypes = ['ordered-bar']
+
+  return !hiddenTypes.includes(chartData.type)
+}
+
+/**
+ * Determines whether the legend should be hidden for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
+function displayLegend(chartData) {
+  const hiddenTypes = ['ordered-bar']
+
+  return hiddenTypes.includes(chartData.type)
+}
+
+/**
  * Format the properties for the C3 graph
  *
  * @param {Object} options - The options object
@@ -345,7 +393,7 @@ export default function FormatC3GraphProps({
   hasMeanLineSeries = false,
   hasMeanLineTotal = false
 }) {
-  const pattern = [...CHART_RULES.LINE_PATTERNS]
+  const pattern = [...CHART_RULES.BASE_COLOR_PATTERNS]
 
   const legendPosition = setLegendPosition(chartData, resultChart)
 
@@ -382,12 +430,12 @@ export default function FormatC3GraphProps({
       x: formatC3XAxis(chartData, resultChart),
       y: formatC3YAxis(chartData)
     },
-    legend: { position: legendPosition },
+    legend: { position: legendPosition, hide: displayLegend(chartData) },
     padding: setLegendPadding(legendPosition),
     color: { pattern },
     grid: {
       y: {
-        show: true
+        show: displayGrid(chartData)
       }
     },
     point: {
@@ -408,7 +456,7 @@ export default function FormatC3GraphProps({
       }
     },
     zoom: {
-      enabled: true
+      enabled: chartData.xAxis === 'ts'
     }
   }
 

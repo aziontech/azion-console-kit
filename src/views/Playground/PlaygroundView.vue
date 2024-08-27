@@ -94,24 +94,6 @@
 
   const CHARTS = [
     {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_REGULAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_INVERSE_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
       title: 'Gauge Chart',
       size: 4,
@@ -136,33 +118,6 @@
       data: MOCKS.GAUGE_LOW_CHART_DATA
     },
     {
-      component: defineAsyncComponent(() => import('./maps/MapChart.vue')),
-      title: 'Map',
-      size: 6,
-      description:
-        'Highlights areas of high activity while also showing the volume of data by location. Ideal for analyzing patterns, hotspots, and the significance of data points across a region.',
-      data: {
-        bubbles: MOCKS.BUBBLES_DATA,
-        heatmap: MOCKS.HEATMAP_DATA
-      }
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BarChart.vue')),
-      title: 'Bar Chart',
-      size: 6,
-      description:
-        'Displays data using rectangular bars, with length representing value. Useful for comparing quantities across different categories.',
-      data: MOCKS.BAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/RotatedBarChart.vue')),
-      title: 'Ordered Bar Chart',
-      size: 6,
-      description:
-        'A bar chart where bars are ordered by value, making it easy to identify the largest or smallest categories. Ideal for ranking and comparisons.',
-      data: MOCKS.ROTATED_BAR_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
       title: 'Stacked Line Chart',
       size: 6,
@@ -177,30 +132,6 @@
       description:
         'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
       data: MOCKS.STACKED_BAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/PieChart.vue')),
-      title: 'Pie Chart',
-      size: 6,
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
-      data: MOCKS.PIE_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/DonutChart.vue')),
-      title: 'Donut Chart',
-      size: 6,
-      description:
-        'A variation of a pie chart with a central hole. It provides a similar view but can also display additional data in the center.',
-      data: MOCKS.DONUT_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/AreaChart.vue')),
-      title: 'Area Chart',
-      size: 6,
-      description:
-        'A line chart where the area under the line is filled in, showing the magnitude of change over time. Useful for trend analysis and cumulative data.',
-      data: MOCKS.AREA_CHART_DATA
     },
     {
       component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
