@@ -10,6 +10,33 @@ describe('RealTimeMetricsModule', () => {
     it('should have the correct of values', () => {
       const reports = [
         {
+          id: '666666666666666666',
+          chartOwner: 'azion',
+          label: 'Big Numbers Chart',
+          description: 'description',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'big-numbers',
+          xAxis: 'ts',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          limit: 5,
+          fields: ['bandwidthTotal'],
+          groupBy: ['geolocCountryName'],
+          aggregations: [
+            {
+              aggregation: 'count',
+              variable: 'rows'
+            }
+          ],
+          orderDirection: 'DESC',
+          dashboardId: '11111111111111111',
+          helpCenterPath: 'path',
+          variationType: 'regular'
+        },
+        {
           aggregationType: 'sum',
           aggregations: [
             {

@@ -1,4 +1,5 @@
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
+import { formatBytesDataUnit } from '../chart/format-graph'
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -246,17 +247,22 @@ const formatRotatedBarChartData = ({ report, data }) => {
   return [series, values]
 }
 
-// {
-//   countryName: 'United States',
-//   value: 122890,
-//   rangeVariation: 'regular'
-// }
+const formatBigNumbers = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const fieldName = report.fields[0]
+  const firstValue = data[dataset][0][fieldName]
 
-// {
-//   "geolocCountryName": "United States",
-//   "bandwidthTotal": 38659.87,
-//   "count": 1252
-// },
+  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+  const unit = formatBytesDataUnit(firstValue, report)
+
+  return [
+    {
+      value: parseFloat(total).toFixed(1),
+      variationType: report.variationType,
+      unit
+    }
+  ]
+}
 
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
@@ -321,6 +327,8 @@ function ConvertBeholderToChart({
       return formatRotatedBarChartData({ report, data })
     case 'map':
       return formatMapChartData({ report, data })
+    case 'big-numbers':
+      return formatBigNumbers({ report, data })
     default:
       return []
   }

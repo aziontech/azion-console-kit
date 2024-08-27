@@ -94,24 +94,6 @@
 
   const CHARTS = [
     {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_REGULAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_INVERSE_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/BigNumbersChart.vue')),
-      title: 'Big Numbers Chart',
-      size: 4,
-      data: MOCKS.BIG_NUMBERS_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
       title: 'Gauge Chart',
       size: 4,
@@ -134,17 +116,6 @@
       description:
         'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
       data: MOCKS.GAUGE_LOW_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('../../templates/graphs-card-block/components/map/map-chart.vue')),
-      title: 'Map',
-      size: 6,
-      description:
-        'Highlights areas of high activity while also showing the volume of data by location. Ideal for analyzing patterns, hotspots, and the significance of data points across a region.',
-      data: {
-        bubbles: MOCKS.BUBBLES_DATA,
-        heatmap: MOCKS.HEATMAP_DATA
-      }
     },
     {
       component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),

@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center gap-2">
     <h2 class="text-2xl font-bold text-color">
-      {{ data.value }}
-      <span class="text-sm font-normal">{{ data.unit }}</span>
+      {{ resultChart[0].value }}
+      <span class="text-sm font-normal">{{ resultChart[0].unit }}</span>
     </h2>
     <PrimeTag
       :class="variationProps?.class"
@@ -18,9 +18,12 @@
   import PrimeTag from 'primevue/tag'
 
   const props = defineProps({
-    data: {
-      type: Object,
-      required: true
+    resultChart: {
+      type: Array,
+      default: () => []
+    },
+    variationValue: {
+      type: Array
     }
   })
 
@@ -54,27 +57,27 @@
   }
 
   const variationProps = computed(() => {
-    return tagProps(props.data)
+    return tagProps(props.resultChart[0])
   })
 
   const tagProps = (data) => {
-    const { variationValue, variationType } = data
+    const { variationType } = data
     const upperLimit = 0.01
     const lowerLimit = -0.01
     const precision = 2
 
-    if (variationValue > lowerLimit && variationValue < upperLimit) {
+    if (props.variationValue > lowerLimit && props.variationValue < upperLimit) {
       return {
         ...getTagPropsByVariation('not-compare'),
         value: "Can't compare"
       }
     }
 
-    const variationState = variationValue > upperLimit ? 'positive' : 'negative'
+    const variationState = props.variationValue > upperLimit ? 'positive' : 'negative'
 
     return {
       ...getTagPropsByVariation(`${variationState}-${variationType}`),
-      value: `${variationValue.toFixed(precision)}%`
+      value: `${props.variationValue.toFixed(precision)}%`
     }
   }
 </script>

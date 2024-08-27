@@ -36,6 +36,7 @@
           v-if="showChart"
           :is="chartType[report.type]"
           :chartData="report"
+          :variationValue="report.variationValue"
           :resultChart="report.resultQuery"
           :hasMeanLineTotal="report.showMeanLine"
           :hasMeanLineSeries="report.showMeanLinePerSeries"
@@ -87,7 +88,8 @@
     pie: defineAsyncComponent(() => import('./components/chart/pie-chart')),
     donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
     'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
-    map: defineAsyncComponent(() => import('./components/map/map-chart'))
+    map: defineAsyncComponent(() => import('./components/map/map-chart')),
+    'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())
