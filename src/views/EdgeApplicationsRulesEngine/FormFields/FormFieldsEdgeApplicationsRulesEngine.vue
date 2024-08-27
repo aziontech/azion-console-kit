@@ -380,15 +380,19 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
+  const openAccordionWithFormErrors = () => {
+    const errorsKeys = Object.keys(props.errors)
+    if (errorsKeys.length > 0) {
+      const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
+      const index = match[1]
+      activeAccordions.value[index] = 0
+    }
+  }
+
   watch(
     () => props.errors,
     () => {
-      const errorsKeys = Object.keys(props.errors)
-      if (errorsKeys.length > 0) {
-        const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
-        const index = match[1]
-        activeAccordions.value[index] = 0
-      }
+      openAccordionWithFormErrors()
     }
   )
 </script>
