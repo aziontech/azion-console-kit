@@ -35,6 +35,12 @@ jobs:
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
 
+      - name: Generate Specs JSON
+        run: yarn generate-specs-json
+
+      - name: Validate Specs Tags
+        run: node ./scripts/check_tags.js specs.json
+
       - name: Move Coverage Files
         run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
 

@@ -29,7 +29,8 @@
     "security-check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore --ignore-pattern 'cypress/**' --ignore-pattern 'cypress.config.*' --ignore-pattern '**/*.test.js' -c .eslintrc-security.cjs",
     "package-audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generate-specs-json": "npx find-cypress-specs --names --json > specs.json"
   },
   "dependencies": {
     "@analytics/segment": "^2.1.0",
@@ -43,6 +44,7 @@
     "azion-theme": "^1.5.6",
     "c3": "^0.7.20",
     "deep-chat": "^1.4.11",
+    "find-cypress-specs": "^1.44.11",
     "front-matter": "^4.0.2",
     "highlight.js": "^11.9.0",
     "lottie-web-vue": "^2.0.7",
