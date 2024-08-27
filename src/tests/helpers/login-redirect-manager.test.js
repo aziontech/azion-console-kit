@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { isValidRoute, setRedirectRoute, getRedirectRoute } from '@/helpers/login-redirect-manager'
+import { isValidRoute, setRedirectRoute, getRedirectRoute } from '@/helpers'
 import router from '@/router'
 
 describe('login-redirect-manager', () => {
