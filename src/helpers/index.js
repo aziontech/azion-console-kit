@@ -36,6 +36,7 @@ import FILTERS_RULES from './real-time-filters-rules'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
 import { isValidRoute, setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
+
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,

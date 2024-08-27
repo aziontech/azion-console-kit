@@ -6,7 +6,7 @@ import router from '@/router'
  * @param {Object} to - The `to` object from Vue Router.
  * @returns {boolean} - Returns `true` if the route is valid, otherwise `false`.
  */
-const isValidRoute = (redirect) => {
+export const isValidRoute = (redirect) => {
   const matchedRoute = router.getRoutes().find((route) => {
     return route.name === redirect.name
   })
@@ -21,7 +21,10 @@ const isValidRoute = (redirect) => {
  * @param {Object} to - The `to` object from Vue Router.
  * @param {number} [expirationMinutes=60] - The expiration time in minutes.
  */
-const setRedirectRoute = ({ name, path, params, query, fullPath }, expirationMinutes = 60) => {
+export const setRedirectRoute = (
+  { name, path, params, query, fullPath },
+  expirationMinutes = 60
+) => {
   const now = new Date()
   const MILLISECONDS_PER_MINUTE = 60000
   const expiration = new Date(now.getTime() + expirationMinutes * MILLISECONDS_PER_MINUTE)
@@ -43,12 +46,12 @@ const setRedirectRoute = ({ name, path, params, query, fullPath }, expirationMin
  *
  * @returns {Object|null} - Returns a `to` object or `null` if it is not valid.
  */
-const getRedirectRoute = () => {
+export const getRedirectRoute = () => {
   const encryptedData = localStorage.getItem('redirectRoute')
+
+  if (!encryptedData) return null
+
   const decryptedData = JSON.parse(atob(encryptedData))
-
-  if (!encryptedData || !decryptedData) return null
-
   const now = new Date().getTime()
 
   localStorage.removeItem('redirectRoute')
@@ -57,5 +60,3 @@ const getRedirectRoute = () => {
 
   return decryptedData
 }
-
-export { setRedirectRoute, getRedirectRoute, isValidRoute }
