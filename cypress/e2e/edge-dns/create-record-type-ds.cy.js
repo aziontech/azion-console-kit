@@ -3,14 +3,14 @@ import selectors from '../../support/selectors'
 
 let zoneName = ''
 
-describe('Edge DNS spec', () => {
+describe('Edge DNS spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     zoneName = generateUniqueName('DNSZone')
     cy.openProduct('Edge DNS')
   })
 
-  it('Create a record of type DS', { tags: ['@dev5'] }, () => {
+  it('Create a record of type DS', () => {
     // Arrange
     cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
 
