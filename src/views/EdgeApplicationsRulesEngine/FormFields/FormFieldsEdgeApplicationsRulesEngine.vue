@@ -1,6 +1,6 @@
 <script setup>
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -157,6 +157,8 @@
     }
   })
 
+  const activeAccordions = ref([0])
+
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
   const behaviorsLabelsTags = computed(() => {
@@ -289,11 +291,19 @@
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
   }
 
+  const removeCriteriaDecorator = (index) => {
+    activeAccordions.value.splice(index, 1)
+    removeCriteria(index)
+    const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
+    activeAccordions.value[index] = invertedAccordionState
+  }
+
   const addNewConditional = ({ index, operator }) => {
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
   const addNewCriteria = () => {
+    activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
   }
 
@@ -369,6 +379,22 @@
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
+
+  const openAccordionWithFormErrors = () => {
+    const errorsKeys = Object.keys(props.errors)
+    if (errorsKeys.length > 0) {
+      const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
+      const index = match[1]
+      activeAccordions.value[index] = 0
+    }
+  }
+
+  watch(
+    () => props.errors,
+    () => {
+      openAccordionWithFormErrors()
+    }
+  )
 </script>
 
 <template>
@@ -445,7 +471,7 @@
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion :activeIndex="0">
+        <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
               <div class="ml-auto flex justify-center items-center">
@@ -454,7 +480,7 @@
                   icon="pi pi-trash"
                   size="small"
                   outlined
-                  @click="removeCriteria(criteriaIndex)"
+                  @click="removeCriteriaDecorator(criteriaIndex)"
                   :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
                 />
               </div>
