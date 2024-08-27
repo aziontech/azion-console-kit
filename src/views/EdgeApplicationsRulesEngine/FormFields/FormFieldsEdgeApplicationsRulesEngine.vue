@@ -567,7 +567,6 @@
               />
             </div>
           </AccordionTab>
-          teste
         </Accordion>
         <Divider
           v-if="isNotLastCriteria(criteriaIndex)"
