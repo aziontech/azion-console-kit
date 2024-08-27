@@ -36,5 +36,6 @@ jobs:
           VITE_STRIPE_TOKEN_PROD: ${{ secrets.PROD_STRIPE_TOKEN }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
           VITE_SEGMENT_TOKEN: ${{ secrets.PROD_SEGMENT_TOKEN }}
+          CROSS_EDGE_SECRET: ${{ secrets.PROD_CROSS_EDGE_SECRET}}
           NODE_ENV: production
           VITE_ENVIRONMENT: production

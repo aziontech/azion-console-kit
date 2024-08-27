@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
+import { FILTERS_RULES } from '@/helpers'
 
 describe('RealTimeMetricsModule', () => {
   describe('Filter rules constants', () => {
@@ -23,50 +23,6 @@ describe('RealTimeMetricsModule', () => {
         FILTER_WHITELIST: {
           SUPPORTED_FILTER_TYPE: ['String', 'Int', 'Float', 'IntRange', 'FloatRange'],
           FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn']
-        },
-        OPERATORS: {
-          Eq: { value: 'Eq', label: 'Equals', format: ({ field, value }) => `${field} = ${value}` },
-          Ne: {
-            value: 'Ne',
-            label: 'Not Equals',
-            format: ({ field, value }) => `${field} ≠ ${value}`
-          },
-          In: { value: 'In', label: 'In', format: ({ field, value }) => `${field} IN (${value})` },
-          Like: {
-            value: 'Like',
-            label: 'Contains',
-            format: ({ field, value }) => `${field} ⊃ ${value}`
-          },
-          Ilike: {
-            value: 'Ilike',
-            label: 'Not Contains',
-            format: ({ field, value }) => `${field} ⊅ ${value}`
-          },
-          Range: {
-            value: 'Range',
-            label: 'Between',
-            format: ({ field, begin, end }) => `${begin} ≤ ${field} ≤ ${end}`
-          },
-          Lt: {
-            value: 'Lt',
-            label: 'Less Than',
-            format: ({ field, value }) => `${field} < ${value}`
-          },
-          Lte: {
-            value: 'Lte',
-            label: 'Less Than or Equal',
-            format: ({ field, value }) => `${field} ≤ ${value}`
-          },
-          Gt: {
-            value: 'Gt',
-            label: 'Greater Than',
-            format: ({ field, value }) => `${field} > ${value}`
-          },
-          Gte: {
-            value: 'Gte',
-            label: 'Greater Than or Equal',
-            format: ({ field, value }) => `${field} ≥ ${value}`
-          }
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [
@@ -107,10 +63,41 @@ describe('RealTimeMetricsModule', () => {
         },
         FILTER_LIKE_ALIAS: {
           configurationIdIn: 'Domain'
-        }
+        },
+        ALIAS_MAPPING: { configurationId: 'domain' }
       }
 
       expect(JSON.stringify(FILTERS_RULES)).toEqual(JSON.stringify(filterRules))
+    })
+
+    it('should return false if the field is blacklisted', () => {
+      const blacklistedField = { name: 'clientId' }
+      const result = FILTERS_RULES.verifyBlackListFields(blacklistedField)
+      expect(result).toBeFalsy()
+    })
+
+    it('should return true if the field is not blacklisted', () => {
+      const notBlacklistedField = { name: 'Domain' }
+      const result = FILTERS_RULES.verifyBlackListFields(notBlacklistedField)
+      expect(result).toBeTruthy()
+    })
+
+    it('should return true if the field type is supported', () => {
+      const supportedField = { name: 'exampleField', type: { name: 'String' } }
+      const result = FILTERS_RULES.verifyWhiteListFields(supportedField)
+      expect(result).toBe(true)
+    })
+
+    it('should return true if the field name is in FIELDS_LIKE', () => {
+      const fieldsLikeField = { name: 'configurationIdIn', type: { name: 'ArrayObject' } }
+      const result = FILTERS_RULES.verifyWhiteListFields(fieldsLikeField)
+      expect(result).toBe(true)
+    })
+
+    it('should return false if the field type is not supported and name is not in FIELDS_LIKE', () => {
+      const unsupportedField = { name: 'unsupportedField', type: { name: 'UnsupportedType' } }
+      const result = FILTERS_RULES.verifyWhiteListFields(unsupportedField)
+      expect(result).toBe(false)
     })
   })
 })

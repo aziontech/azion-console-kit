@@ -132,7 +132,9 @@
     buttonOverPanel.value.$el.click()
     inputFilterDisabled.value = true
     editFilter.value = true
-    const field = options.value.find(({ value }) => value.value === item.valueField)
+    const field = options.value.find(
+      ({ value }) => value.value === item.valueField && value.label === item.field
+    )
     filterSelected.value = field.value
     changeFilter()
     const operator = filterSelected.value.operator.find(
@@ -178,7 +180,7 @@
     icon="pi pi-plus"
     label="Filter"
     type="button"
-    class="min-w-fit md:rounded-[6px_0px_0px_6px]"
+    class="min-w-fit md:rounded-[6px_0px_0px_6px] h-full"
     severity="secondary"
     badgeClass="!text-xl"
     size="small"
@@ -365,6 +367,7 @@
         @click="toggle"
         class="max-md:min-w-max"
         severity="primary"
+        size="small"
         outlined
         data-testid="filter-cancel-button"
       />
@@ -373,6 +376,7 @@
         class="max-md:w-full"
         label="Apply"
         severity="secondary"
+        size="small"
         @click="onSubmit"
         :disabled="disabledSubmit"
         data-testid="filter-apply-button"

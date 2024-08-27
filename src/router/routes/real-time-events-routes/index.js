@@ -1,4 +1,3 @@
-import * as Helpers from '@/helpers'
 import * as RealTimeEventsService from '@/services/real-time-events-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -8,46 +7,38 @@ export const realTimeEventsRoutes = {
   component: () => import('@/views/RealTimeEvents/TabsView.vue'),
   props: {
     httpRequests: {
-      listHttpRequest: RealTimeEventsService.listHttpRequest,
-      loadHttpRequest: RealTimeEventsService.loadHttpRequest,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsHttpRequest
+      listService: RealTimeEventsService.listHttpRequest,
+      loadService: RealTimeEventsService.loadHttpRequest
     },
     edgeFunctions: {
-      listEdgeFunctions: RealTimeEventsService.listEdgeFunctions,
-      loadEdgeFunctions: RealTimeEventsService.loadEdgeFunctions,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeFunctions
+      listService: RealTimeEventsService.listEdgeFunctions,
+      loadService: RealTimeEventsService.loadEdgeFunctions
     },
     edgeFunctionsConsole: {
-      listEdgeFunctionsConsole: RealTimeEventsService.listEdgeFunctionsConsole,
-      loadEdgeFunctionsConsole: RealTimeEventsService.loadEdgeFunctionsConsole,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeFunctionsConsole
+      listService: RealTimeEventsService.listEdgeFunctionsConsole,
+      loadService: RealTimeEventsService.loadEdgeFunctionsConsole
     },
     imageProcessor: {
-      listImageProcessor: RealTimeEventsService.listImageProcessor,
-      loadImageProcessor: RealTimeEventsService.loadImageProcessor,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsImageProcessor
+      listService: RealTimeEventsService.listImageProcessor,
+      loadService: RealTimeEventsService.loadImageProcessor
     },
     tieredCache: {
-      listTieredCache: RealTimeEventsService.listTieredCache,
-      loadTieredCache: RealTimeEventsService.loadTieredCache,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsTieredCache,
-      clipboardWrite: Helpers.clipboardWrite
+      listService: RealTimeEventsService.listTieredCache,
+      loadService: RealTimeEventsService.loadTieredCache
     },
     edgeDNS: {
-      listEdgeDNS: RealTimeEventsService.listEdgeDNS,
-      loadEdgeDNS: RealTimeEventsService.loadEdgeDNS,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeDNS
+      listService: RealTimeEventsService.listEdgeDNS,
+      loadService: RealTimeEventsService.loadEdgeDNS
     },
     dataStream: {
-      listDataStream: RealTimeEventsService.listDataStream,
-      loadDataStream: RealTimeEventsService.loadDataStream,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStream
+      listService: RealTimeEventsService.listDataStream,
+      loadService: RealTimeEventsService.loadDataStream
     },
     activityHistory: {
-      listActivityHistory: RealTimeEventsService.listActivityHistory,
-      loadActivityHistory: RealTimeEventsService.loadActivityHistory,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsActivityHistory
-    }
+      listService: RealTimeEventsService.listActivityHistory,
+      loadService: RealTimeEventsService.loadActivityHistory
+    },
+    loadFieldsData: RealTimeEventsService.loadFieldsEventsData
   },
   meta: {
     breadCrumbs: [

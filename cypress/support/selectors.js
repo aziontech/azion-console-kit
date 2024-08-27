@@ -8,7 +8,6 @@ import TEAMS_BLOCK_SELECTORS from './selectors/block-selectors/teams-block.js'
 // Views
 import LOGIN_VIEW_SELECTORS from './selectors/view-selectors/login.js'
 import ACTIVITY_HISTORY_VIEW_SELECTORS from './selectors/view-selectors/activity-history.js'
-import CREDENTIALS_VIEW_SELECTORS from './selectors/view-selectors/credentials.js'
 import YOUR_SETTINGS_VIEW_SELECTORS from './selectors/view-selectors/your-settings.js'
 import ACCOUNT_SETTINGS_VIEW_SELECTORS from './selectors/view-selectors/account-settings.js'
 import USERS_MANAGEMENT_VIEW_SELECTORS from './selectors/view-selectors/users-management.js'
@@ -39,7 +38,6 @@ const selectors = {
   menuAccount: MENU_ACCOUNT_SELECTORS,
   activityHistory: ACTIVITY_HISTORY_VIEW_SELECTORS,
   edgeApplication: EDGE_APPLICATION_PRODUCT_SELECTORS,
-  credential: CREDENTIALS_VIEW_SELECTORS,
   yourSettings: YOUR_SETTINGS_VIEW_SELECTORS,
   networkLists: NETWORK_LISTS_PRODUCT_SELECTORS,
   variables: VARIABLES_PRODUCT_SELECTORS,

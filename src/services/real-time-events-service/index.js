@@ -6,6 +6,7 @@ import { listHttpRequest, loadHttpRequest } from './http-request'
 import { listImageProcessor, loadImageProcessor } from './image-processor'
 import { listEdgeDNS, loadEdgeDNS } from './edge-dns'
 import { listTieredCache, loadTieredCache } from './tiered-cache'
+import { loadFieldsEventsData } from './load-fields-real-time-events-data'
 
 export {
   listActivityHistory,
@@ -23,5 +24,6 @@ export {
   listEdgeDNS,
   loadEdgeDNS,
   listTieredCache,
-  loadTieredCache
+  loadTieredCache,
+  loadFieldsEventsData
 }

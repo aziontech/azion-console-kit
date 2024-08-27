@@ -222,13 +222,16 @@
       ref="refAdvancedFilter"
       @applyFilter="applyFilter"
     />
-    <PrimeButton
-      class="h-auto w-full md:max-w-fit"
-      outlined
-      icon-pos="right"
-      icon="pi pi-external-link"
-      label="Open in GraphQL Playground"
-      @click="props.playgroundOpener()"
-    />
+    <div class="flex align-items-center w-full md:max-w-fit">
+      <PrimeButton
+        class="h-auto w-full md:max-w-fit"
+        outlined
+        size="small"
+        icon-pos="right"
+        icon="pi pi-external-link"
+        label="Open in GraphQL Playground"
+        @click="props.playgroundOpener()"
+      />
+    </div>
   </div>
 </template>
