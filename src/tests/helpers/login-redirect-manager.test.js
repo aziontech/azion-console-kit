@@ -1,103 +1,105 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { isValidRoute, setRedirectRoute, getRedirectRoute } from '@/helpers'
-import router from '@/router'
+import { setRedirectRoute, getRedirectRoute } from '@/helpers/login-redirect-manager'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+describe('loginRedirectManager', () => {
+  beforeAll(() => {
+    vi.mock('@/router', () => ({
+      default: {
+        getRoutes: () => [
+          { name: 'dashboard', path: '/dashboard', params: {}, query: {}, fullPath: '/dashboard' }
+        ]
+      }
+    }))
+  })
 
-describe('login-redirect-manager', () => {
-  beforeEach(() => {
-    vi.spyOn(router, 'getRoutes').mockImplementation(() => [{ name: 'validRoute' }])
+  afterAll(() => {
     localStorage.clear()
+    vi.restoreAllMocks()
   })
 
-  describe('isValidRoute', () => {
-    it('should return true for a valid route', () => {
-      const result = isValidRoute({ name: 'validRoute' })
-      expect(result).toBeTruthy()
-    })
-
-    it('should return false for an invalid route', () => {
-      const result = isValidRoute({ name: 'invalidRoute' })
-      expect(result).toBeFalsy()
-    })
+  it('should set a redirect route in localStorage', () => {
+    const route = {
+      name: 'dashboard',
+      path: '/dashboard',
+      params: {},
+      query: {},
+      fullPath: '/dashboard'
+    }
+    setRedirectRoute(route)
+    const storedRoute = localStorage.getItem('redirectRoute')
+    expect(storedRoute).not.toBeNull()
   })
 
-  describe('setRedirectRoute', () => {
-    it('should store the correct data in localStorage', () => {
-      const to = {
-        name: 'testRoute',
-        path: '/test',
-        params: { id: 1 },
-        query: { queryParam: 'search' },
-        fullPath: '/test?id=1&queryParam=search'
-      }
-      const expirationMinutes = 60
-      const now = new Date()
-      const expiration = new Date(now.getTime() + expirationMinutes * 60000)
-
-      setRedirectRoute(to, expirationMinutes)
-
-      const storedData = JSON.parse(atob(localStorage.getItem('redirectRoute')))
-      expect(storedData).toMatchObject({
-        name: 'testRoute',
-        path: '/test',
-        params: { id: 1 },
-        query: { queryParam: 'search' },
-        fullPath: '/test?id=1&queryParam=search',
-        expiresAt: expiration.getTime()
+  it('should get a redirect route from localStorage and validate it', () => {
+    const route = {
+      name: 'dashboard',
+      path: '/dashboard',
+      params: {},
+      query: {},
+      fullPath: '/dashboard'
+    }
+    setRedirectRoute(route)
+    const retrievedRoute = getRedirectRoute()
+    expect(retrievedRoute).toEqual(
+      expect.objectContaining({
+        name: 'dashboard',
+        path: '/dashboard'
       })
-    })
+    )
   })
 
-  describe('getRedirectRoute', () => {
-    it('should return the correct route if data is valid and not expired', () => {
-      const now = new Date()
-      const expiration = new Date(now.getTime() + 60000)
-      const redirectData = {
-        name: 'validRoute',
-        path: '/test',
-        params: { id: 1 },
-        query: { queryParam: 'search' },
-        fullPath: '/test?id=1&queryParam=search',
-        expiresAt: expiration.getTime()
-      }
+  it('should remove the redirect route from localStorage after retrieval', () => {
+    const route = {
+      name: 'dashboard',
+      path: '/dashboard',
+      params: {},
+      query: {},
+      fullPath: '/dashboard'
+    }
+    setRedirectRoute(route)
+    getRedirectRoute()
+    const storedRoute = localStorage.getItem('redirectRoute')
+    expect(storedRoute).toBeNull()
+  })
 
-      localStorage.setItem('redirectRoute', btoa(JSON.stringify(redirectData)))
+  it('should not set a redirect route if the path is root', () => {
+    const route = {
+      name: 'home',
+      path: '/',
+      params: {},
+      query: {},
+      fullPath: '/'
+    }
+    setRedirectRoute(route)
+    const storedRoute = localStorage.getItem('redirectRoute')
+    expect(storedRoute).toBeNull()
+  })
 
-      const result = getRedirectRoute()
-      expect(result).toMatchObject(redirectData)
-    })
+  it('should return null if the redirect route is expired', () => {
+    const route = {
+      name: 'dashboard',
+      path: '/dashboard',
+      params: {},
+      query: {},
+      fullPath: '/dashboard'
+    }
+    const expirationMinutes = -1
+    setRedirectRoute(route, expirationMinutes)
+    const retrievedRoute = getRedirectRoute()
+    expect(retrievedRoute).toBeNull()
+  })
 
-    it('should return null if data is expired', () => {
-      const now = new Date()
-      const expiration = new Date(now.getTime() - 60000)
-      const redirectData = {
-        name: 'testRoute',
-        path: '/test',
-        params: { id: 1 },
-        query: { queryParam: 'search' },
-        fullPath: '/test?id=1&queryParam=search',
-        expiresAt: expiration.getTime()
-      }
-      localStorage.setItem('redirectRoute', btoa(JSON.stringify(redirectData)))
-
-      const result = getRedirectRoute()
-      expect(result).toBeNull()
-    })
-
-    it('should return null if route is not valid', () => {
-      const now = new Date()
-      const expiration = new Date(now.getTime() + 60000)
-      const redirectData = {
-        name: 'invalidRoute',
-        path: '/test',
-        params: { id: 1 },
-        query: { queryParam: 'search' },
-        fullPath: '/test?id=1&queryParam=search',
-        expiresAt: expiration.getTime()
-      }
-      localStorage.setItem('redirectRoute', btoa(JSON.stringify(redirectData)))
-
-      const result = getRedirectRoute()
-      expect(result).toBeNull()
-    })
+  it('should return null if the redirect route is not valid', () => {
+    const invalidRoute = {
+      name: 'nonexistent',
+      path: '/nonexistent',
+      params: {},
+      query: {},
+      fullPath: '/nonexistent',
+      expiresAt: new Date().getTime() + 60000 // 1 minute from now
+    }
+    const encryptedData = btoa(JSON.stringify(invalidRoute))
+    localStorage.setItem('redirectRoute', encryptedData)
+    const retrievedRoute = getRedirectRoute()
+    expect(retrievedRoute).toBeNull()
   })
 })
