@@ -34,7 +34,7 @@ import { getCsvCellContentFromRowData } from './get-csv-cell-content-from-row-da
 import { useRouteFilterManager } from './hash-route.js'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
-
+import { isValidRoute, setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -74,5 +74,8 @@ export {
   getCsvCellContentFromRowData,
   useRouteFilterManager,
   openGraphQlPlayground,
-  eventsPlaygroundOpener
+  eventsPlaygroundOpener,
+  isValidRoute,
+  setRedirectRoute,
+  getRedirectRoute
 }

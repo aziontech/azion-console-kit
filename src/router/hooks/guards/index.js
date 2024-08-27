@@ -3,6 +3,6 @@ import { loadingGuard } from './loadingGuard'
 import { accountGuard } from './accountGuard'
 import { themeGuard } from './themeGuard'
 import { billingGuard } from './billingGuard'
-import { redirectAuth } from './redirectGuard'
+import { redirectGuard } from './redirectGuard'
 
-export { logoutGuard, loadingGuard, accountGuard, themeGuard, billingGuard, redirectAuth }
+export { logoutGuard, loadingGuard, accountGuard, themeGuard, billingGuard, redirectGuard }

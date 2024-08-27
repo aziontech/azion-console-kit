@@ -11,22 +11,7 @@ export default async function beforeEachRoute(to, from, next) {
   await guards.accountGuard(to, next)
   guards.themeGuard()
   guards.billingGuard(to, next)
-  guards.redirectAuth(to, next)
+  guards.redirectGuard(to, next)
+  
   return next()
 }
-
-/*
- logout guard
- -->true /logoin
- -->false next
-loading guard
--->true next
--->false next
-account guard
--->true next
--->false /login
-theme guard
--->true next
--->false next
-billing guard
--->true next
