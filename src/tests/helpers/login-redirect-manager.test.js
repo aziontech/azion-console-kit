@@ -1,16 +1,12 @@
 import { setRedirectRoute, getRedirectRoute } from '@/helpers/login-redirect-manager'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-describe('loginRedirectManager', () => {
-  beforeAll(() => {
-    vi.mock('@/router', () => ({
-      default: {
-        getRoutes: () => [
-          { name: 'dashboard', path: '/dashboard', params: {}, query: {}, fullPath: '/dashboard' }
-        ]
-      }
-    }))
-  })
+import { afterAll, describe, expect, it, vi } from 'vitest'
 
+const routerMock = {
+  getRoutes: () => [
+    { name: 'dashboard', path: '/dashboard', params: {}, query: {}, fullPath: '/dashboard' }
+  ]
+}
+describe('loginRedirectManager', () => {
   afterAll(() => {
     localStorage.clear()
     vi.restoreAllMocks()
@@ -38,7 +34,7 @@ describe('loginRedirectManager', () => {
       fullPath: '/dashboard'
     }
     setRedirectRoute(route)
-    const retrievedRoute = getRedirectRoute()
+    const retrievedRoute = getRedirectRoute(routerMock)
     expect(retrievedRoute).toEqual(
       expect.objectContaining({
         name: 'dashboard',
@@ -56,7 +52,7 @@ describe('loginRedirectManager', () => {
       fullPath: '/dashboard'
     }
     setRedirectRoute(route)
-    getRedirectRoute()
+    getRedirectRoute(routerMock)
     const storedRoute = localStorage.getItem('redirectRoute')
     expect(storedRoute).toBeNull()
   })
@@ -84,7 +80,7 @@ describe('loginRedirectManager', () => {
     }
     const expirationMinutes = -1
     setRedirectRoute(route, expirationMinutes)
-    const retrievedRoute = getRedirectRoute()
+    const retrievedRoute = getRedirectRoute(routerMock)
     expect(retrievedRoute).toBeNull()
   })
 
@@ -99,7 +95,7 @@ describe('loginRedirectManager', () => {
     }
     const encryptedData = btoa(JSON.stringify(invalidRoute))
     localStorage.setItem('redirectRoute', encryptedData)
-    const retrievedRoute = getRedirectRoute()
+    const retrievedRoute = getRedirectRoute(routerMock)
     expect(retrievedRoute).toBeNull()
   })
 })
