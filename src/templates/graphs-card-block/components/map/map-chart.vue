@@ -17,7 +17,6 @@
   import { onClickOutside } from '@vueuse/core'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import * as regions from './json/regions.json'
   import * as countries from './json/countries.json'
   import {
     setOceanFeature,
@@ -25,23 +24,18 @@
     setLakeFeature
   } from './utils/common-features-handler'
   import { setFeatureStyle } from './utils/features-styler'
-  import { bubblesHandler, heatmapHandler } from './utils/features-handler'
+  import { heatmapHandler } from './utils/features-handler'
 
   import { Map, View } from 'ol/index.js'
   import GeoJSON from 'ol/format/GeoJSON.js'
-  import { Circle } from 'ol/geom.js'
   import { Vector as VectorSource } from 'ol/source.js'
   import { Vector as VectorLayer } from 'ol/layer.js'
-  import { fromLonLat } from 'ol/proj.js'
 
   import MapLegendBlock from './map-chart-blocks/map-legend-block.vue'
   import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
   const props = defineProps({
-    data: {
-      type: Object,
-      required: true
-    }
+    resultChart: Array
   })
 
   const mapTemplateRef = ref(null)
@@ -59,36 +53,11 @@
 
   onClickOutside(mapTemplateRef, () => hideTooltip())
 
-  const generateBubbles = computed(() => {
-    const bubbles = new GeoJSON().readFeatures(regions)
-
-    bubbles.forEach((bubble) => {
-      const bubbleData = bubblesHandler(bubble.get('name'), props.data.bubbles)
-
-      if (!bubbleData) {
-        return setFeatureStyle(bubble)
-      }
-
-      bubble.setGeometry(
-        new Circle(fromLonLat(bubble.getGeometry().getCoordinates()), bubbleData.size)
-      )
-
-      bubble.setProperties({
-        kind: 'bubble',
-        value: bubbleData.value
-      })
-
-      setFeatureStyle(bubble, bubbleData.variation)
-    })
-
-    return bubbles
-  })
-
   const generateAreas = computed(() => {
     const areas = new GeoJSON().readFeatures(countries)
 
     areas.forEach((area) => {
-      const areaData = heatmapHandler(area.get('name'), props.data.heatmap)
+      const areaData = heatmapHandler(area.get('name'), props.resultChart[0].heatmap)
 
       if (!areaData) {
         return
@@ -118,7 +87,6 @@
               ...setOceanFeature(),
               ...setCountryFeature(),
               ...setLakeFeature(),
-              ...generateBubbles.value,
               ...generateAreas.value
             ]
           })
