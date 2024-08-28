@@ -231,6 +231,55 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   })
 }
 
+// {
+//   id: crypto.randomUUID().toString(),
+//   data: {
+//     columns: [['Netherlands', 35.5]],
+//     type: 'gauge'
+//   },
+//   color: {
+//     pattern: [
+//       'var(--scale-red)',
+//       'var(--scale-orange)',
+//       'var(--scale-yellow)',
+//       'var(--scale-green)'
+//     ],
+//     threshold: {
+//       values: [30, 60, 90]
+//     }
+//   }
+// }
+
+const formatGaugeChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const geolocCountryName = report.groupBy[0]
+  const columnName = data[dataset][0][geolocCountryName]
+  const fieldName = report.fields[0]
+
+  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        columns: [[columnName, total]],
+        type: 'gauge'
+      },
+      color: {
+        pattern: [
+          'var(--scale-red)',
+          'var(--scale-orange)',
+          'var(--scale-yellow)',
+          'var(--scale-green)'
+        ],
+        threshold: {
+          values: [30, 60, 90]
+        }
+      }
+    }
+  ]
+}
+
 const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
@@ -329,6 +378,8 @@ function ConvertBeholderToChart({
       return formatMapChartData({ report, data })
     case 'big-numbers':
       return formatBigNumbers({ report, data })
+    case 'gauge':
+      return formatGaugeChart({ report, data })
     default:
       return []
   }

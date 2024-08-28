@@ -38,6 +38,33 @@ export const MOCK_NEW_PAGE_INFO = {
   },
   dashboard: [
     {
+      id: '777777777777777777',
+      chartOwner: 'azion',
+      label: 'Gauge Chart',
+      description: 'description',
+      aggregationType: 'sum',
+      columns: 6,
+      type: 'gauge',
+      xAxis: 'ts',
+      isTopX: true,
+      rotated: true,
+      dataUnit: 'bytes',
+      dataset: 'httpMetrics',
+      limit: 5,
+      fields: ['bandwidthTotal'],
+      groupBy: ['geolocCountryName'],
+      aggregations: [
+        {
+          aggregation: 'count',
+          variable: 'rows'
+        }
+      ],
+      orderDirection: 'DESC',
+      dashboardId: '11111111111111111',
+      helpCenterPath: 'path',
+      variationType: 'regular'
+    },
+    {
       id: '666666666666666666',
       chartOwner: 'azion',
       label: 'Big Numbers Chart',

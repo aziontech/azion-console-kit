@@ -7,16 +7,16 @@
   })
 
   const props = defineProps({
-    data: {
-      type: Object,
-      required: true
+    resultChart: {
+      type: Array,
+      default: () => []
     }
   })
 
   const generate = () => {
     c3.generate({
-      bindto: `#gauge-chart-${props.data.id}`,
-      ...props.data
+      bindto: `#gauge-chart-${props.resultChart[0].id}`,
+      ...props.resultChart[0]
     })
   }
 </script>
@@ -24,6 +24,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`gauge-chart-${props.data.id}`"
+    :id="`gauge-chart-${props.resultChart[0].id}`"
   />
 </template>
