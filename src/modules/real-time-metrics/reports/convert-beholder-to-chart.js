@@ -1,5 +1,6 @@
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
+import { formatYAxisLabels } from '@modules/real-time-metrics/chart'
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -264,6 +265,14 @@ const formatGaugeChart = ({ report, data }) => {
       data: {
         columns: [[columnName, total]],
         type: 'gauge'
+      },
+      gauge: {
+        label: {
+          format: function (value) {
+            return `${formatYAxisLabels(value, report)}`
+          },
+          show: false
+        }
       },
       color: {
         pattern: [

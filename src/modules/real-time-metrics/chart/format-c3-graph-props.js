@@ -166,7 +166,7 @@ function formatDataUnit(data) {
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted Y axis labels for the C3 chart
  */
-function formatYAxisLabels(data, chartData) {
+export function formatYAxisLabels(data, chartData) {
   if (chartData.dataUnit === 'bytes' || chartData.dataUnit === 'bitsPerSecond') {
     return formatBytesDataUnit(data, chartData)
   }
@@ -387,7 +387,7 @@ function displayLegend(chartData) {
  * @param {boolean} options.hasMeanLineTotal - Flag indicating if the chart has mean line total
  * @returns {Object} The formatted C3 graph properties
  */
-export default function FormatC3GraphProps({
+export function FormatC3GraphProps({
   chartData,
   resultChart,
   hasMeanLineSeries = false,
