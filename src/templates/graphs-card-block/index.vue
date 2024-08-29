@@ -2,7 +2,7 @@
   <div
     :class="[
       cardColumns,
-      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6'
+      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6 relative'
     ]"
   >
     <header class="flex w-full items-center justify-between gap-2">
@@ -90,7 +90,8 @@
     'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
     map: defineAsyncComponent(() => import('./components/map/map-chart')),
     'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart')),
-    list: defineAsyncComponent(() => import('./components/chart/list-chart'))
+    list: defineAsyncComponent(() => import('./components/chart/list-chart')),
+    gauge: defineAsyncComponent(() => import('./components/chart/gauge-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())

@@ -1,5 +1,6 @@
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
+import { formatYAxisLabels } from '@modules/real-time-metrics/chart'
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -231,6 +232,63 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   })
 }
 
+// {
+//   id: crypto.randomUUID().toString(),
+//   data: {
+//     columns: [['Netherlands', 35.5]],
+//     type: 'gauge'
+//   },
+//   color: {
+//     pattern: [
+//       'var(--scale-red)',
+//       'var(--scale-orange)',
+//       'var(--scale-yellow)',
+//       'var(--scale-green)'
+//     ],
+//     threshold: {
+//       values: [30, 60, 90]
+//     }
+//   }
+// }
+
+const formatGaugeChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const geolocCountryName = report.groupBy[0]
+  const columnName = data[dataset][0][geolocCountryName]
+  const fieldName = report.fields[0]
+
+  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        columns: [[columnName, total]],
+        type: 'gauge'
+      },
+      gauge: {
+        label: {
+          format: function (value) {
+            return `${formatYAxisLabels(value, report)}`
+          },
+          show: false
+        }
+      },
+      color: {
+        pattern: [
+          'var(--scale-red)',
+          'var(--scale-orange)',
+          'var(--scale-yellow)',
+          'var(--scale-green)'
+        ],
+        threshold: {
+          values: [30, 60, 90]
+        }
+      }
+    }
+  ]
+}
+
 const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
@@ -344,6 +402,8 @@ function ConvertBeholderToChart({
       return formatBigNumbers({ report, data })
     case 'list':
       return formatListChart({ report, data })
+    case 'gauge':
+      return formatGaugeChart({ report, data })
     default:
       return []
   }

@@ -94,30 +94,6 @@
 
   const CHARTS = [
     {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_HIGH_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_MEDIUM_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_LOW_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
       title: 'Stacked Line Chart',
       size: 6,
