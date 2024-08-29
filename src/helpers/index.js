@@ -35,6 +35,7 @@ import { useRouteFilterManager } from './hash-route.js'
 import FILTERS_RULES from './real-time-filters-rules'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
+import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
 
 export {
   InviteSession,
@@ -76,5 +77,7 @@ export {
   useRouteFilterManager,
   FILTERS_RULES,
   openGraphQlPlayground,
-  eventsPlaygroundOpener
+  eventsPlaygroundOpener,
+  setRedirectRoute,
+  getRedirectRoute
 }

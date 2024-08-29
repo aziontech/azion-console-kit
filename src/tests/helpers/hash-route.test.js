@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useRouteFilterManager } from '@/helpers/hash-route'
+import { useRouteFilterManager } from '@/helpers'
 import { useRoute, useRouter } from 'vue-router'
 
 vi.mock('vue-router', () => ({

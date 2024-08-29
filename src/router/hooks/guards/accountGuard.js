@@ -1,6 +1,7 @@
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { loadAccountJobRoleService } from '@/services/account-settings-services'
 import { useAccountStore } from '@/stores/account'
+import { setRedirectRoute } from '@/helpers'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function accountGuard(to, next) {
@@ -28,6 +29,7 @@ export async function accountGuard(to, next) {
 
       accountStore.setAccountData(accountInfo)
     } catch {
+      setRedirectRoute(to)
       return next('/login')
     }
   }
