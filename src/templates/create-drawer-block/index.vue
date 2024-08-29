@@ -38,6 +38,10 @@
     showBarGoBack: {
       type: Boolean,
       default: false
+    },
+    isOverlapped: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -135,7 +139,7 @@
     :update:visible="toggleDrawerVisibility"
     position="right"
     :pt="{
-      root: { class: 'max-w-4xl w-full' },
+      root: { class: `w-full ${props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'}` },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"

@@ -1,6 +1,7 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import { useField } from 'vee-validate'
@@ -67,20 +68,27 @@
     description="Select an existing edge function and customize the arguments. Only edge functions previously created in the Edge Functions module can be instantiated."
   >
     <template #inputs>
-      <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
-        <FieldDropdown
-          label="Edge Function"
-          required
-          name="edgeFunctionID"
-          :options="edgeFunctionsList"
-          @onChange="changeArgs"
-          :value="edgeFunctionID"
-          optionLabel="label"
-          optionValue="value"
-          :optionDisabled="(option) => option.disabled"
-          filter
-          appendTo="self"
-          data-testid="edge-firewall-functions-form__edge-function-dropdown"
+      <div class="flex gap-2 items-end">
+        <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
+          <FieldDropdown
+            label="Edge Function"
+            required
+            name="edgeFunctionID"
+            :options="edgeFunctionsList"
+            @onChange="changeArgs"
+            :value="edgeFunctionID"
+            optionLabel="label"
+            optionValue="value"
+            :optionDisabled="(option) => option.disabled"
+            filter
+            appendTo="self"
+            data-testid="edge-firewall-functions-form__edge-function-dropdown"
+          />
+        </div>
+        <PrimeButton
+          icon="pi pi-plus"
+          outlined
+          size="small"
         />
       </div>
 
