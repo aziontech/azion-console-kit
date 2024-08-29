@@ -89,7 +89,8 @@
     donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
     'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
     map: defineAsyncComponent(() => import('./components/map/map-chart')),
-    'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart'))
+    'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart')),
+    list: defineAsyncComponent(() => import('./components/chart/list-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())

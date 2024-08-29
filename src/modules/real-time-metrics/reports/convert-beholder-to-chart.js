@@ -178,7 +178,7 @@ const formatTsChartData = ({
         }
 
         series[key] = [key]
-        /* 
+        /*
           if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
         */
         if (countValues > 0) {
@@ -264,6 +264,19 @@ const formatBigNumbers = ({ report, data }) => {
   ]
 }
 
+const formatListChart = ({ data }) => {
+  const firstArray = data[Object.keys(data)[0]]
+  const responseData = firstArray.map((item) => {
+    return {
+      countryFlag: { country: item.geolocCountryName, code: 'br' },
+      count: item.count,
+      bandwidthTotal: item.bandwidthTotal,
+      bandwidthMissedData: item.bandwidthMissedData
+    }
+  })
+  return responseData
+}
+
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
@@ -329,6 +342,8 @@ function ConvertBeholderToChart({
       return formatMapChartData({ report, data })
     case 'big-numbers':
       return formatBigNumbers({ report, data })
+    case 'list':
+      return formatListChart({ report, data })
     default:
       return []
   }

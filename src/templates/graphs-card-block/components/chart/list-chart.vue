@@ -1,24 +1,21 @@
 <script setup>
   import ListTableBlock from '@templates/list-table-block/index'
-  import { computed, onBeforeUnmount } from 'vue'
+  import { computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const props = defineProps({
-    data: {
-      type: Object,
-      required: true
-    }
+    chartData: Object,
+    resultChart: Array
   })
 
-  let listDataTimeout = null
   const getColumns = computed(() => {
     return [
       {
-        field: 'order',
-        header: 'Order'
+        field: 'count',
+        header: 'Count'
       },
       {
-        field: 'country',
+        field: 'countryFlag',
         header: 'Country',
         type: 'component',
         filterPath: 'country.country',
@@ -30,37 +27,27 @@
         }
       },
       {
-        field: 'ipsRange',
-        header: 'IPs Range'
+        field: 'bandwidthTotal',
+        header: 'Total Bandwidth'
       },
       {
-        field: 'blockedRequests',
-        header: 'Blocked Requests'
-      },
-      {
-        field: 'blockedBandwidth',
-        header: 'Blocked Bandwidth'
+        field: 'bandwidthMissedData',
+        header: 'Missed Data Bandwidth'
       }
     ]
   })
 
-  const fakeListDataWithTimoutDelay = () => {
+  const loadResultChartDataWithPromisse = () => {
     return new Promise((resolve) => {
-      listDataTimeout = setTimeout(() => {
-        resolve(props.data)
-      }, 1000)
+      resolve(props.resultChart)
     })
   }
-
-  onBeforeUnmount(() => {
-    clearTimeout(listDataTimeout)
-  })
 </script>
 
 <template>
   <div class="w-full h-full overflow-scroll overscroll-contain">
     <ListTableBlock
-      :listService="fakeListDataWithTimoutDelay"
+      :listService="loadResultChartDataWithPromisse"
       :columns="getColumns"
     />
   </div>
