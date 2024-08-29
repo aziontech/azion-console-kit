@@ -12,8 +12,9 @@ jobs:
     name: Run Dev E2E Tests
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        group: [2,3,4,5,6,7]
+        group: [2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v3
 
@@ -24,7 +25,6 @@ jobs:
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
-        continue-on-error: true
         env:
           DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
           DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
@@ -35,7 +35,6 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
-
 
       - name: Generate Specs JSON
         run: yarn generate-specs-json
