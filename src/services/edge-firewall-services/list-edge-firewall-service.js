@@ -1,6 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
-import { makeDomainsBaseUrl } from '../domains-services/make-domains-base-url'
 
 export const listEdgeFirewallService = async ({
   orderBy = 'name',
@@ -18,39 +17,9 @@ export const listEdgeFirewallService = async ({
 
   return parseHttpResponse(httpResponse)
 }
-
-const getDomainById = async ({ id }) => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}/${id}`,
-    method: 'GET'
-  })
-
-  httpResponse = adaptDomains(httpResponse)
-
-  return parseHttpResponse(httpResponse)
-}
-
-const adaptDomains = (httpResponse) => {
-  return {
-    body: httpResponse.body.results,
-    statusCode: httpResponse.statusCode
-  }
-}
-
 const adapt = async (httpResponse) => {
-  /***************************************************
-   * @todo: API should be deliver this results as BFF
-   ***************************************************/
-
   const parsedEdgeFirewalls = await Promise.all(
     httpResponse.body.results?.map(async (edgeFirewall) => {
-      const domainsList = await Promise.all(
-        edgeFirewall.domains?.map(async (domain) => {
-          const domainData = await getDomainById({ id: domain })
-          return domainData.name
-        })
-      )
-
       return {
         id: edgeFirewall.id,
         name: edgeFirewall.name,
@@ -59,7 +28,6 @@ const adapt = async (httpResponse) => {
           new Date(edgeFirewall.last_modified)
         ),
         lastModifyDate: edgeFirewall.last_modified,
-        domainsList: domainsList,
         status: edgeFirewall.is_active
           ? {
               content: 'Active',
