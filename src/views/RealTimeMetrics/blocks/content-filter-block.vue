@@ -229,7 +229,7 @@
         size="small"
         icon-pos="right"
         icon="pi pi-external-link"
-        label="Open in GraphQL Playground"
+        label="GraphQL Playground"
         @click="props.playgroundOpener()"
       />
     </div>
