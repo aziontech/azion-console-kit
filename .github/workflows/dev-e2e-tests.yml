@@ -24,6 +24,7 @@ jobs:
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
+        continue-on-error: true
         env:
           DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
           DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
@@ -34,7 +35,7 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
-          continue-on-error: true
+
 
       - name: Generate Specs JSON
         run: yarn generate-specs-json
