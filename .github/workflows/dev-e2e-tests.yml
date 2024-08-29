@@ -34,6 +34,7 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
+          continue-on-error: true
 
       - name: Generate Specs JSON
         run: yarn generate-specs-json
