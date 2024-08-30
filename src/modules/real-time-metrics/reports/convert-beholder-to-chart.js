@@ -1,6 +1,31 @@
+/* eslint-disable id-length */
+
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
 import { formatYAxisLabels } from '@modules/real-time-metrics/chart'
+
+const COLOR_PATTERNS = {
+  color: {
+    pattern: [
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)',
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)'
+    ]
+  }
+}
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -232,24 +257,55 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   })
 }
 
-// {
-//   id: crypto.randomUUID().toString(),
-//   data: {
-//     columns: [['Netherlands', 35.5]],
-//     type: 'gauge'
-//   },
-//   color: {
-//     pattern: [
-//       'var(--scale-red)',
-//       'var(--scale-orange)',
-//       'var(--scale-yellow)',
-//       'var(--scale-green)'
-//     ],
-//     threshold: {
-//       values: [30, 60, 90]
-//     }
-//   }
-// }
+const formatStackedChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
+
+  const rows = report.fields.map((field) => {
+    return [
+      field,
+      ...timestamps.map((ts) => {
+        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
+        return entry ? entry[field] : 0
+      })
+    ]
+  })
+
+  const header = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [header, ...rows]
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        x: 'x',
+        columns,
+        type: 'bar',
+        groups: [report.fields]
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          localtime: false,
+          tick: {
+            format: '%m-%d %H:%M'
+          }
+        }
+      },
+      grid: {
+        y: {
+          lines: [{ value: 0 }]
+        }
+      },
+      bar: {
+        width: {
+          ratio: 0.25
+        }
+      },
+      ...COLOR_PATTERNS
+    }
+  ]
+}
 
 const formatGaugeChart = ({ report, data }) => {
   const dataset = Object.keys(data)
@@ -282,7 +338,7 @@ const formatGaugeChart = ({ report, data }) => {
           'var(--scale-green)'
         ],
         threshold: {
-          values: [30, 60, 90]
+          values: [30, 60, 200000000]
         }
       }
     }
@@ -389,6 +445,8 @@ function ConvertBeholderToChart({
       return formatBigNumbers({ report, data })
     case 'gauge':
       return formatGaugeChart({ report, data })
+    case 'stacked-bar':
+      return formatStackedChart({ report, data })
     default:
       return []
   }

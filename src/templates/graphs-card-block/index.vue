@@ -90,7 +90,8 @@
     'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
     map: defineAsyncComponent(() => import('./components/map/map-chart')),
     'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart')),
-    gauge: defineAsyncComponent(() => import('./components/chart/gauge-chart'))
+    gauge: defineAsyncComponent(() => import('./components/chart/gauge-chart')),
+    'stacked-bar': defineAsyncComponent(() => import('./components/chart/stacked-bar-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())

@@ -10,6 +10,26 @@ describe('RealTimeMetricsModule', () => {
     it('should have the correct of values', () => {
       const reports = [
         {
+          id: '888888888888888888',
+          chartOwner: 'azion',
+          label: 'Stacked Bar Chart',
+          description: 'description',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'stacked-bar',
+          xAxis: 'ts',
+          isTopX: false,
+          rotated: false,
+          dataUnit: 'bytes',
+          dataset: 'httpMetrics',
+          limit: 5000,
+          fields: ['dataTransferredOut', 'dataTransferredIn'],
+          groupBy: [],
+          orderDirection: 'ASC',
+          dashboardId: '11111111111111111',
+          helpCenterPath: 'path'
+        },
+        {
           id: '777777777777777777',
           chartOwner: 'azion',
           label: 'Gauge Chart',
