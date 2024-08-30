@@ -102,14 +102,6 @@
       data: MOCKS.STACKED_LINE_CHART_DATA
     },
     {
-      component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
-      title: 'Stacked Bar Chart',
-      size: 6,
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
-      data: MOCKS.STACKED_BAR_CHART_DATA
-    },
-    {
       component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
       title: 'List Chart',
       size: 12,
