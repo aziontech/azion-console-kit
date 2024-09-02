@@ -1,11 +1,11 @@
 {
-  "name": "azion-platform-kit",
+  "name": "azion-console-kit",
   "version": "1.21.0",
   "private": true,
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aziontech/azion-platform-kit.git"
+    "url": "https://github.com/aziontech/azion-console-kit.git"
   },
   "scripts": {
     "dev": "vite",
