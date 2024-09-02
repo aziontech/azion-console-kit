@@ -70,7 +70,7 @@ describe('TeamPermissionService', () => {
 
     const apiErrorResponse = sut(fixtures.teamPermissionMock)
 
-    expect(apiErrorResponse).rejects.toBe('error: api error message')
+    expect(apiErrorResponse).rejects.toBe(apiErrorMock.error)
   })
 
   it.each([

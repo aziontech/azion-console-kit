@@ -95,10 +95,6 @@
         header: 'Name'
       },
       {
-        field: 'digitalCertificateId',
-        header: 'Digital Certificate'
-      },
-      {
         field: 'domainName',
         header: 'Domain Name',
         filterPath: 'domainName.content',

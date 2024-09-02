@@ -1,7 +1,7 @@
 import selectors from '../support/selectors'
 
 
-describe('Activity History Spec', () => {
+describe('Activity History Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('POST', '/api/v3/events/graphql', { fixture: 'activity-history.json' }).as('activityHistoryApi')

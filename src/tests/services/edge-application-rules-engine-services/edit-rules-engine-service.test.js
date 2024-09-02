@@ -3,12 +3,49 @@ import { editRulesEngineService } from '@/services/edge-application-rules-engine
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
+const parsedBehavior = [
+  { name: 'add_request_cookie', target: 'add request cookie' },
+  {
+    name: 'capture_match_groups',
+    target: {
+      captured_array: 'capture_array',
+      subject: 'test',
+      regex: '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\\.[a-zA-z]{2,3}$'
+    }
+  },
+  { name: 'set_cache_policy', target: '407041' },
+  { name: 'set_origin', target: '398616' },
+  { name: 'deliver', target: undefined }
+]
+
 const fixtures = {
   rulePayload: {
     id: 12321,
     name: 'teste name',
     phase: { content: 'request' },
-    behaviors: '',
+    behaviors: [
+      {
+        name: 'add_request_cookie',
+        target: 'add request cookie'
+      },
+      {
+        name: 'capture_match_groups',
+        captured_array: 'capture_array',
+        subject: 'test',
+        regex: '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\\.[a-zA-z]{2,3}$'
+      },
+      {
+        name: 'set_cache_policy',
+        cacheId: '407041'
+      },
+      {
+        name: 'set_origin',
+        originId: '398616'
+      },
+      {
+        name: 'deliver'
+      }
+    ],
     criteria: '',
     is_active: true,
     description: 'description',
@@ -39,7 +76,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
       url: `v3/edge_applications/${edgeApplicationIdMock}/rules_engine/${phaseRulesMock}/rules/${fixtures.rulePayload.id}`,
       method: 'PATCH',
       body: {
-        behaviors: '',
+        behaviors: parsedBehavior,
         criteria: '',
         description: 'description',
         is_active: undefined,

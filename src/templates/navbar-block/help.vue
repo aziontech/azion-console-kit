@@ -20,17 +20,19 @@
 <script setup>
   import { computed, inject } from 'vue'
   import { useHelpCenterStore } from '@/stores/help-center'
-
+  import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'navbar-help-block' })
 
   const helpCenterStore = useHelpCenterStore()
+  const askAzionAiChatStore = useAzionAiChatStore()
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
 
   const openHelpCenter = () => {
     helpCenterStore.toggle()
+    askAzionAiChatStore.close()
   }
 
   const currentLabel = computed(() => {

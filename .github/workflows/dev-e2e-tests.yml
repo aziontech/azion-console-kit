@@ -12,8 +12,9 @@ jobs:
     name: Run Dev E2E Tests
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        group: [2,3,4,5,6,7]
+        group: [2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v3
 
@@ -34,6 +35,12 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           env: grepTags=@dev${{ matrix.group }}+-@xfail
+
+      - name: Generate Specs JSON
+        run: yarn generate-specs-json
+
+      - name: Validate Specs Tags
+        run: node ./scripts/check_tags.js specs.json
 
       - name: Move Coverage Files
         run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json

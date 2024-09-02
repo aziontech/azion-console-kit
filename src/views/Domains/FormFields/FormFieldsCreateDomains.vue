@@ -9,9 +9,11 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import GetHelp from '@modules/azion-ai-chat/azion-ai-get-help.vue'
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
+  import { DomainsPrompts } from '@/modules/azion-ai-chat/contextual-prompts'
 
   const props = defineProps({
     digitalCertificates: {
@@ -27,7 +29,7 @@
       required: false,
       default: false
     },
-    loadingEdgeApplications: {
+    isLoadingRequests: {
       type: Boolean
     }
   })
@@ -55,7 +57,7 @@
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt (BETA)", value: 'lets_encrypt' }
+      { name: "Let's Encrypt", value: 'lets_encrypt' }
     ]
     const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
       name: certificate.name,
@@ -85,8 +87,8 @@
     }
   ])
 
-  const isLoadingEdgeApplications = computed(() => {
-    return props.loadingEdgeApplications
+  const isLoadingRequestsData = computed(() => {
+    return props.isLoadingRequests
   })
 
   watch(edgeCertificate, async (newEdgeCertificate) => {
@@ -96,9 +98,13 @@
 
 <template>
   <form-horizontal
-    title="General"
-    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    description=" Create a domain with Azion to launch an edge application and set up security with digital
+      certificates."
   >
+    <template #title>
+      General
+      <GetHelp :prompt="DomainsPrompts.create.general" />
+    </template>
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -115,9 +121,12 @@
   </form-horizontal>
 
   <form-horizontal
-    title="Settings"
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
+    <template #title>
+      Settings
+      <GetHelp :prompt="DomainsPrompts.create.settings" />
+    </template>
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
@@ -126,8 +135,8 @@
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
           :options="edgeApplicationOptions"
-          :loading="isLoadingEdgeApplications"
-          :disabled="isLoadingEdgeApplications"
+          :loading="isLoadingRequestsData"
+          :disabled="isLoadingRequestsData"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
@@ -162,8 +171,8 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :options="edgeCertificatesOptions"
-          :loading="!edgeCertificatesOptions.length"
-          :disabled="!edgeCertificatesOptions.length"
+          :loading="isLoadingRequestsData"
+          :disabled="isLoadingRequestsData"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
@@ -209,7 +218,7 @@
           required
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
-          :loading="!trustedCACertificatesOptions.length"
+          :loading="isLoadingRequestsData"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"

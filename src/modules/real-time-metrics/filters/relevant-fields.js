@@ -1,4 +1,4 @@
-import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
+import { FILTERS_RULES } from '@/helpers'
 
 /**
  * Check if the given field is relevant in the specified dataset.

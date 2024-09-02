@@ -23,7 +23,12 @@ describe('convertGQL', () => {
     const filter = {
       tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' },
       and: { field1: 'value1', field2: 'value2' },
-      in: { field3: ['value3', 'value4'] }
+      in: {
+        field3: [
+          { value: 'value3', label: 'test1' },
+          { value: 'value4', label: 'test2' }
+        ]
+      }
     }
 
     const { sut } = makeSut()
@@ -80,7 +85,20 @@ describe('convertGQL', () => {
     const filter = {
       tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' },
       and: { field1: 'value1', field2: 'value2' },
-      in: { field3: ['value3', 'value4'] }
+      in: {
+        field3: [
+          { value: 'value3', label: 'test1' },
+          { value: 'value4', label: 'test2' }
+        ]
+      },
+      fields: [
+        {
+          valueField: 'field1',
+          operator: 'Range',
+          value: { begin: '2022-01-01', end: '2022-01-31' }
+        },
+        { valueField: 'field2', operator: 'Equal', value: 'value2' }
+      ]
     }
 
     const { sut } = makeSut()
@@ -92,7 +110,34 @@ describe('convertGQL', () => {
         tsRange_end: '2022-01-31',
         and_field1: 'value1',
         and_field2: 'value2',
-        in_field3: ['value3', 'value4']
+        in_field3: ['value3', 'value4'],
+        field1Range_begin: '2022-01-01',
+        field1Range_end: '2022-01-31',
+        and_field2Equal: 'value2'
+      }
+    })
+  })
+
+  it('should convert filter and table to gql body when filter.fields is provided', () => {
+    const filter = {
+      fields: [
+        {
+          valueField: 'field1',
+          operator: 'Range',
+          value: { begin: '2022-01-01', end: '2022-01-31' }
+        },
+        { valueField: 'field2', operator: 'Equal', value: 'value2' }
+      ]
+    }
+
+    const { sut } = makeSut()
+
+    expect(sut(filter, fixtures.table)).toEqual({
+      query: expect.any(String),
+      variables: {
+        field1Range_begin: '2022-01-01',
+        field1Range_end: '2022-01-31',
+        and_field2Equal: 'value2'
       }
     })
   })

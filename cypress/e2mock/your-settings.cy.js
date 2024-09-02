@@ -13,7 +13,7 @@ const payload = {
   two_factor_enabled: true
 }
 
-describe('Your Settings spec', () => {
+describe('Your Settings spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('GET', '/api/v4/iam/user', { fixture: 'your-settings.json' }).as('getUser')

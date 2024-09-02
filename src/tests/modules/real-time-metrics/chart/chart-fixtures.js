@@ -351,7 +351,7 @@ export const COLUMNS_WITH_MEAN_LINE_PER_SERIES = [
   ]
 ]
 
-export const LINE_PATTERNS = [
+export const BASE_COLOR_PATTERNS = [
   'var(--series-one-color)',
   'var(--series-two-color)',
   'var(--series-three-color)',
@@ -370,6 +370,9 @@ export const LINE_PATTERNS = [
   'var(--series-eight-color)'
 ]
 
-export const LINE_PATTERNS_WITH_MEAN_LINE = [...LINE_PATTERNS, 'var(--text-color)']
+export const BASE_COLOR_PATTERNS_WITH_MEAN_LINE = [...BASE_COLOR_PATTERNS, 'var(--text-color)']
 
-export const LINE_PATTERNS_WITH_MEAN_LINE_PER_SERIES = [...LINE_PATTERNS, ...LINE_PATTERNS]
+export const BASE_COLOR_PATTERNS_WITH_MEAN_LINE_PER_SERIES = [
+  ...BASE_COLOR_PATTERNS,
+  ...BASE_COLOR_PATTERNS
+]

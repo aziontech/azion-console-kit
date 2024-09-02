@@ -7,62 +7,19 @@
       <TabView
         :activeIndex="tabSelectIndex"
         class="w-full h-full"
-        @tab-click="changePage"
+        @tab-click="handleTabClick"
       >
-        <TabPanel :header="mapTabs.httpRequests.label">
-          <RealTimeEventsHTTPRequestsListView
-            v-bind="props.httpRequests"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.httpRequests.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.EdgeFunctions.label">
-          <RealTimeEventEdgeFunctionsListView
-            v-bind="props.edgeFunctions"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.EdgeFunctions.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
-          <RealTimeEventEdgeFunctionsConsoleListView
-            v-bind="props.edgeFunctionsConsole"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.EdgeFunctionsConsole.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.ImageProcessor.label">
-          <RealTimeEventsImageProcessor
-            v-bind="props.imageProcessor"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.ImageProcessor.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.TieredCache.label">
-          <RealTimeEventsTieredCache
-            v-bind="props.tieredCache"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.TieredCache.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.EdgeDNS.label">
-          <RealTimeEventsEdgeDNSListView
-            v-bind="props.edgeDNS"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.EdgeDNS.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.DataStream.label">
-          <RealTimeEventsDataStreamListView
-            v-bind="props.dataStream"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.DataStream.index === tabSelectIndex"
-          />
-        </TabPanel>
-        <TabPanel :header="mapTabs.ActivityHistory.label">
-          <RealTimeEventsActivityHistoryListView
-            v-bind="props.activityHistory"
-            v-model:dateTime="timeFilter"
-            v-if="mapTabs.ActivityHistory.index === tabSelectIndex"
+        <TabPanel
+          :header="tab.title"
+          v-for="tab in tabPanels"
+          :key="tab.index"
+        >
+          <TabPanelBlock
+            v-if="isTabActive(tab)"
+            :listService="selectedTabProps.listService"
+            :loadService="selectedTabProps.loadService"
+            :filterFields="generatedFilterFields"
+            :tabSelected="tab"
           />
         </TabPanel>
       </TabView>
@@ -73,18 +30,18 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { onMounted, ref } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
-  import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
-  import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
-  import RealTimeEventsDataStreamListView from '@/views/RealTimeEventsDataStream/ListView'
-  import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
-  import RealTimeEventsEdgeDNSListView from '@/views/RealTimeEventsEdgeDNS/ListView'
-  import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
-  import RealTimeEventsTieredCache from '@/views/RealTimeEventsTieredCache/ListView'
+  import TabPanel from 'primevue/tabpanel'
+  import TabPanelBlock from '@/views/RealTimeEvents/Blocks/tab-panel-block.vue'
+  import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
+  import {
+    buildFieldsQuery,
+    adapterFields,
+    buildOperatorQuery
+  } from '@/views/RealTimeEvents/Blocks/constants/query-fields'
+
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -119,92 +76,98 @@
     tieredCache: {
       type: Object,
       required: true
+    },
+    loadFieldsData: {
+      type: Function,
+      required: true
     }
   })
 
   const route = useRoute()
   const router = useRouter()
-  const tabSelectIndex = ref(0)
-  const timeFilter = ref({})
 
-  const mapTabs = ref({
-    httpRequests: {
-      index: 0,
-      tabName: 'http-requests',
-      label: 'HTTP Requests'
-    },
-    EdgeFunctions: {
-      index: 1,
-      tabName: 'edge-functions',
-      label: 'Edge Functions'
-    },
-    EdgeFunctionsConsole: {
-      index: 2,
-      tabName: 'edge-functions-console',
-      label: 'Edge Functions Console'
-    },
-    ImageProcessor: {
-      index: 3,
-      tabName: 'image-processor',
-      label: 'Image Processor'
-    },
-    TieredCache: {
-      index: 4,
-      tabName: 'tiered-cache',
-      label: 'Tiered Cache'
-    },
-    EdgeDNS: {
-      index: 5,
-      tabName: 'edge-dns',
-      label: 'Edge DNS'
-    },
-    DataStream: {
-      index: 6,
-      tabName: 'data-stream',
-      label: 'Data Stream'
-    },
-    ActivityHistory: {
-      index: 7,
-      tabName: 'activity-history',
-      label: 'Activity History'
-    }
+  const tabPanelBlockRef = ref(null)
+  const tabSelectIndex = ref(undefined)
+  const fieldAllDataset = ref({})
+  const generatedFilterFields = ref([])
+
+  const tabPanels = Object.values(TABS_EVENTS)
+
+  const selectedTabProps = computed(() => {
+    const { panel } = tabPanels[tabSelectIndex.value]
+    return props[panel] || {}
   })
 
-  const changePage = async ({ index }) => {
-    const tab = Object.values(mapTabs.value).find((tab) => tab.index === index)
-    selectedTab(tab)
+  const isTabActive = (tab) => {
+    return tab.index === tabSelectIndex.value
   }
 
-  const updateRouter = (tabName) => {
+  const handleTabClick = async ({ index }) => {
+    const tab = tabPanels.find((tab) => tab.index === index)
+    await selectTab(tab)
+    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
+    tabPanelBlockRef.value?.reloadListTable()
+  }
+
+  const updateRouter = async (tabRouter) => {
     const { name, query, params } = route
-    router.push({
+    await router.push({
       name,
       params: {
         ...params,
-        tab: tabName
+        tab: tabRouter
       },
       query
     })
   }
 
-  const selectedTab = (tabSelectValue) => {
+  const selectTab = async (tabSelectValue) => {
     tabSelectIndex.value = tabSelectValue.index
-    updateRouter(tabSelectValue.tabName)
+    await updateRouter(tabSelectValue.tabRouter)
   }
 
-  const tabSelectInitial = () => {
+  const initializeTabSelection = async () => {
     const { params } = route
-
     if (params.tab) {
-      const tabSelect = Object.values(mapTabs.value).find((tab) => tab.tabName === params.tab)
-      selectedTab(tabSelect)
+      const selectedTab = tabPanels.find((tab) => tab.tabRouter === params.tab)
+      await selectTab(selectedTab)
       return
     }
 
-    selectedTab(Object.values(mapTabs.value)[0])
+    await selectTab(tabPanels[0])
+  }
+
+  const loadFieldsAndOperators = async () => {
+    fieldAllDataset.value = await props.loadFieldsData({
+      query: buildFieldsQuery()
+    })
+    await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
+  }
+
+  let abortController = null
+  const fetchFieldsWithOperator = async (tabSelected) => {
+    if (abortController) abortController.abort()
+    abortController = new AbortController()
+
+    const { dataset } = tabSelected
+    const graphqlQuery = { query: buildOperatorQuery(dataset) }
+
+    try {
+      const operatorsData = await props.loadFieldsData({
+        ...graphqlQuery,
+        signal: abortController.signal
+      })
+
+      generatedFilterFields.value = adapterFields(fieldAllDataset.value, operatorsData, dataset)
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        generatedFilterFields.value = []
+      }
+    }
   }
 
   onMounted(() => {
-    tabSelectInitial()
+    initializeTabSelection()
+    loadFieldsAndOperators()
   })
 </script>

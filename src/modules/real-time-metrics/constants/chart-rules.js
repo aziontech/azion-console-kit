@@ -39,7 +39,7 @@ const BOTTOM_LEGEND_PADDING = {
   right: 30
 }
 
-const LINE_PATTERNS = [
+const BASE_COLOR_PATTERNS = [
   'var(--series-one-color)',
   'var(--series-two-color)',
   'var(--series-three-color)',
@@ -74,7 +74,7 @@ const CHART_RULES = {
   C3_TYPES,
   LABEL,
   BOTTOM_LEGEND_PADDING,
-  LINE_PATTERNS,
+  BASE_COLOR_PATTERNS,
   MEAN_LINE_PATTERN
 }
 

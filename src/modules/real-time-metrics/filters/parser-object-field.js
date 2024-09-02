@@ -1,4 +1,4 @@
-import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
+import { FILTERS_RULES } from '@/helpers'
 
 /**
  * Returns the field type and whether the field is part of an element.
