@@ -2,7 +2,7 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
-import { formatYAxisLabels } from '@modules/real-time-metrics/chart'
+import { formatYAxisLabels, getSeriesInfos } from '@modules/real-time-metrics/chart'
 
 const COLOR_PATTERNS = {
   color: {
@@ -281,6 +281,8 @@ const formatStackedChart = ({ report, data }) => {
   const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
   const columns = [headerChart, ...rows]
 
+  const { seriesNames } = getSeriesInfos(columns, report, false, false)
+
   return [
     {
       id: crypto.randomUUID().toString(),
@@ -288,7 +290,8 @@ const formatStackedChart = ({ report, data }) => {
         x: 'x',
         columns,
         type: 'bar',
-        groups: [report.fields]
+        groups: [report.fields],
+        names: seriesNames
       },
       axis: {
         x: {
@@ -448,36 +451,30 @@ const formatMapChartData = ({ report, data }) => {
   ]
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
 const formatStackedAreaChart = ({ report, data }) => {
   const dataset = Object.keys(data)
+  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
 
-  const timestamps = [
-    ...new Set(
-      data[dataset]
-        .map((entry) => {
-          const entryDate = new Date(entry[report.xAxis])
-          const formattedDate = entryDate.toISOString().split('T')[0]
-
-          return formattedDate
-        })
-        .sort()
-    )
-  ]
   const rows = report.fields.map((field) => {
     return [
       field,
       ...timestamps.map((ts) => {
-        const entry = data[dataset].find((item) => {
-          const itemDate = new Date(item[report.xAxis]).toISOString().split('T')[0]
-          return itemDate === ts
-        })
+        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
         return entry ? entry[field] : 0
       })
     ]
   })
 
-  const header = ['x', ...timestamps.map((ts) => new Date(ts))]
-  const columns = [header, ...rows]
+  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [headerChart, ...rows]
+
+  const { seriesNames } = getSeriesInfos(columns, report, false, false)
 
   return [
     {
@@ -487,7 +484,8 @@ const formatStackedAreaChart = ({ report, data }) => {
         xFormat: '%Y',
         columns,
         type: 'area',
-        groups: [report.fields]
+        groups: [report.fields],
+        names: seriesNames
       },
       grid: {
         y: {
@@ -499,7 +497,7 @@ const formatStackedAreaChart = ({ report, data }) => {
           type: 'timeseries',
           localtime: false,
           tick: {
-            format: '%m/%d'
+            format: '%m-%d %H:%M'
           }
         }
       },

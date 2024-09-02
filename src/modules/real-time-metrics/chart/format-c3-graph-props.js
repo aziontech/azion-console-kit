@@ -284,7 +284,7 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * @param {boolean} hasMeanLineTotal - Indicates if the chart has mean line total
  * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
-function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
+export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
   const sliced = resultChart.slice(1)
 
   let seriesNames = {}
