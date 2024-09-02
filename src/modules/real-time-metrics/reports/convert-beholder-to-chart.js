@@ -271,8 +271,8 @@ const formatStackedChart = ({ report, data }) => {
     ]
   })
 
-  const header = ['x', ...timestamps.map((ts) => new Date(ts))]
-  const columns = [header, ...rows]
+  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [headerChart, ...rows]
 
   return [
     {
