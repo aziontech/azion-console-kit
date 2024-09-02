@@ -388,6 +388,10 @@ const formatBigNumbers = ({ report, data }) => {
   ]
 }
 
+const formatListChart = ({ data }) => {
+  return Object.values(data)[0]
+}
+
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
@@ -513,6 +517,8 @@ function ConvertBeholderToChart({
       return formatMapChartData({ report, data })
     case 'big-numbers':
       return formatBigNumbers({ report, data })
+    case 'list':
+      return formatListChart({ report, data })
     case 'gauge':
       return formatGaugeChart({ report, data })
     case 'stacked-area':

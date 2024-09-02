@@ -58,13 +58,11 @@
 </template>
 
 <script setup>
-  import { defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import Card from 'primevue/card'
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
-
-  import * as MOCKS from './mocks_data'
 
   const showContent = ref(true)
   const reRenderChart = () => {
@@ -92,14 +90,5 @@
     }
   }
 
-  const CHARTS = [
-    {
-      component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
-      title: 'List Chart',
-      size: 12,
-      description:
-        'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information',
-      data: MOCKS.COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA
-    }
-  ]
+  const CHARTS = []
 </script>
