@@ -55,7 +55,7 @@
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt (BETA)", value: 'lets_encrypt' }
+      { name: "Let's Encrypt", value: 'lets_encrypt' }
     ]
     const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
       name: certificate.name,
@@ -96,9 +96,10 @@
 
 <template>
   <form-horizontal
-    title="General"
-    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    description=" Create a domain with Azion to launch an edge application and set up security with digital
+      certificates."
   >
+    <template #title> General </template>
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -115,9 +116,9 @@
   </form-horizontal>
 
   <form-horizontal
-    title="Settings"
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
+    <template #title> Settings </template>
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown

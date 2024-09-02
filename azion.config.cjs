@@ -1,5 +1,5 @@
 /* if you have two environments for the same application
-/* you can import your config based on environment value, 
+/* you can import your config based on environment value,
 /* ex: require(`./azion/${environment}/azion.json`)
 */
 /* eslint-env node */
@@ -81,7 +81,11 @@ const commonRules = [
       'Applies common settings for all requests, including standard headers and HTTP to HTTPS redirection.',
     match: '^\\/',
     behavior: {
-      setHeaders: ['Accept: application/json; version=3;'],
+      setHeaders: [
+        'Accept: application/json; version=3;',
+        'X-Cross-Edge-Secret: ' + process.env.CROSS_EDGE_SECRET || 'secret',
+        'X-User-Real-IP: ${remote_addr}'
+      ],
       bypassCache: true,
       forwardCookies: true,
       httpToHttps: true
@@ -145,7 +149,7 @@ const backRules = [
     match: '^/api/marketplace',
     behavior: {
       setOrigin: {
-        name: 'origin-manager',
+        name: 'origin-marketplace',
         type: 'single_origin'
       },
       forwardCookies: true,
@@ -185,7 +189,7 @@ const backRules = [
     match: '^/api/script-runner',
     behavior: {
       setOrigin: {
-        name: 'origin-script-runner',
+        name: 'origin-manager',
         type: 'single_origin'
       },
       forwardCookies: true,
@@ -196,17 +200,6 @@ const backRules = [
       },
       rewrite: `/script-runner/api/%{captured[1]}`,
       bypassCache: true
-    }
-  },
-  {
-    name: 'Route Version Control System API to VCS Origin',
-    description: 'Routes version control system API requests to the VCS origin.',
-    match: '^/api/vcs',
-    behavior: {
-      setOrigin: {
-        name: 'origin-vcs',
-        type: 'single_origin'
-      }
     }
   },
   {
@@ -262,14 +255,14 @@ const AzionConfig = {
     {
       name: 'origin-manager',
       type: 'single_origin',
-      hostHeader: `manager-origin.azion.com`,
-      addresses: [`manager-origin.azion.com`]
+      hostHeader: `manager.azion.com`,
+      addresses: [`manager.azion.com`]
     },
     {
-      name: 'origin-vcs',
+      name: 'origin-marketplace',
       type: 'single_origin',
-      hostHeader: `vcs-api.azion.net`,
-      addresses: [`vcs-api.azion.net`]
+      hostHeader: `marketplace.azion.com`,
+      addresses: [`marketplace.azion.com`]
     },
     {
       name: 'origin-cities',
@@ -288,12 +281,6 @@ const AzionConfig = {
       type: 'single_origin',
       hostHeader: `api.azion.com`,
       addresses: [`api.azion.com`]
-    },
-    {
-      name: 'origin-script-runner',
-      type: 'single_origin',
-      hostHeader: 'script-runner.azion.com',
-      addresses: ['script-runner.azion.com']
     }
   ]),
   rules: {

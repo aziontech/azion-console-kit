@@ -4,7 +4,7 @@ import selectors from '../../support/selectors'
 let variableKey
 let variableValue
 
-describe('Variables spec', () => {
+describe('Variables spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Variables')

@@ -19,7 +19,8 @@
       type: Boolean
     },
     filterAdvanced: {
-      type: Object
+      type: Array,
+      required: true
     }
   })
 
@@ -108,9 +109,11 @@
     if (!filterDisplay?.length) return
 
     const newDisplay = filterDisplay.map((item) => {
-      const { label, disabled, operator } = props.fieldsInFilter.find(
-        ({ value }) => value === item.valueField
-      )
+      const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
+
+      const { label, disabled, operator } = selectedFields.find(({ operator }) => {
+        return operator.find(({ value }) => value === item.operator)
+      })
 
       const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
 
@@ -135,16 +138,8 @@
   watch(
     () => props.fieldsInFilter,
     () => {
-      updateDisplayFilter(displayFilter.value)
+      updateDisplayFilter(props.filterAdvanced)
     }
-  )
-
-  watch(
-    () => props.filterAdvanced,
-    (newValue) => {
-      updateDisplayFilter(newValue)
-    },
-    { immediate: true }
   )
 
   defineExpose({
@@ -154,11 +149,10 @@
 
 <template>
   <div
-    class="flex w-full min-w-0 flex-column gap-2 md:flex-row"
+    class="flex w-full min-w-0 flex-column gap-2 md:flex-row md:align-items-center"
     data-testid="search-filter-container"
   >
     <dialogFilter
-      :disabled="props.disabled"
       ref="refDialogFilter"
       :filtersOptions="listField"
       :counter="displayFilter.length"
@@ -224,14 +218,15 @@
         </template>
       </ul>
     </div>
-
-    <PrimeButton
-      class="min-w-max max-sm:bg-red"
-      size="small"
-      :disabled="disabledSearch"
-      @click="searchFilter"
-      label="Search"
-      data-testid="search-filter-search-button"
-    />
+    <div class="h-auto w-full md:max-w-fit">
+      <PrimeButton
+        :disabled="disabledSearch"
+        @click="searchFilter"
+        label="Search"
+        size="small"
+        class="h-auto w-full md:max-w-fit"
+        data-testid="search-filter-search-button"
+      />
+    </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
-
+import { parsedBehavior } from './helper-behavior'
 export const loadRulesEngineService = async ({ edgeApplicationId, id, phase }) => {
   const rulesPhase = generateRulePhase(phase)
 
@@ -31,7 +31,7 @@ const adapt = (httpResponse) => {
     name: ruleEngine.name,
     phase: ruleEngine.phase,
     criteria: ruleEngine.criteria,
-    behaviors: ruleEngine.behaviors,
+    behaviors: parsedBehavior(ruleEngine.behaviors),
     isActive: ruleEngine.is_active,
     order: ruleEngine.order,
     description: ruleEngine.description
