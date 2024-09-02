@@ -378,7 +378,7 @@ const formatStackedAreaChart = ({ report, data }) => {
       data[dataset]
         .map((entry) => {
           const date = new Date(entry[report.xAxis])
-          return date.toISOString().split('T')[0] // Retorna apenas a data no formato 'YYYY-MM-DD'
+          return date.toISOString().split('T')[0] // Returns this date format: 'YYYY-MM-DD'
         })
         .sort()
     )
