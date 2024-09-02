@@ -294,8 +294,10 @@
   const removeCriteriaDecorator = (index) => {
     activeAccordions.value.splice(index, 1)
     removeCriteria(index)
-    const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
-    activeAccordions.value[index] = invertedAccordionState
+    if (activeAccordions.value[index]) {
+      const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
+      activeAccordions.value[index] = invertedAccordionState
+    }
   }
 
   const addNewConditional = ({ index, operator }) => {
@@ -388,6 +390,18 @@
       activeAccordions.value[index] = 0
     }
   }
+  watch(
+    () => criteria.value.length,
+    () => {
+      if (criteria.value.length > activeAccordions.value.length) {
+        criteria.value.forEach((index) => {
+          if (!activeAccordions.value[index]) {
+            activeAccordions.value.push(0)
+          }
+        })
+      }
+    }
+  )
 
   watch(
     () => props.errors,
@@ -465,14 +479,12 @@
     description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
     data-testid="rule-form-criteria"
   >
-    <template #inputs
-      >{{ criteria }}
+    <template #inputs>
       <div
         class="flex flex-col gap-8"
         v-for="(criteriaItem, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        {{ criteriaItem.key }}
         <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
