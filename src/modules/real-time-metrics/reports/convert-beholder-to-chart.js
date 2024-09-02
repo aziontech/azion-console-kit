@@ -1,6 +1,31 @@
+/* eslint-disable id-length */
+
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
 import { formatYAxisLabels } from '@modules/real-time-metrics/chart'
+
+const COLOR_PATTERNS = {
+  color: {
+    pattern: [
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)',
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)'
+    ]
+  }
+}
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -179,7 +204,7 @@ const formatTsChartData = ({
         }
 
         series[key] = [key]
-        /* 
+        /*
           if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
         */
         if (countValues > 0) {
@@ -345,6 +370,64 @@ const formatMapChartData = ({ report, data }) => {
   ]
 }
 
+const formatStackedAreaChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+
+  const timestamps = [
+    ...new Set(
+      data[dataset]
+        .map((entry) => {
+          const date = new Date(entry[report.xAxis])
+          return date.toISOString().split('T')[0] // Retorna apenas a data no formato 'YYYY-MM-DD'
+        })
+        .sort()
+    )
+  ]
+  const rows = report.fields.map((field) => {
+    return [
+      field,
+      ...timestamps.map((ts) => {
+        const entry = data[dataset].find((item) => {
+          const itemDate = new Date(item[report.xAxis]).toISOString().split('T')[0]
+          return itemDate === ts
+        })
+        return entry ? entry[field] : 0
+      })
+    ]
+  })
+
+  const header = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [header, ...rows]
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        x: 'x',
+        xFormat: '%Y',
+        columns,
+        type: 'area',
+        groups: [report.fields]
+      },
+      grid: {
+        y: {
+          lines: [{ value: 0 }]
+        }
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          localtime: false,
+          tick: {
+            format: '%m/%d'
+          }
+        }
+      },
+      ...COLOR_PATTERNS
+    }
+  ]
+}
+
 /**
  * Function that transforms a list of tuples into a list of lists (columns).
  *
@@ -389,6 +472,8 @@ function ConvertBeholderToChart({
       return formatBigNumbers({ report, data })
     case 'gauge':
       return formatGaugeChart({ report, data })
+    case 'stacked-area':
+      return formatStackedAreaChart({ report, data })
     default:
       return []
   }

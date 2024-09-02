@@ -7,16 +7,14 @@
   })
 
   const props = defineProps({
-    data: {
-      type: Object,
-      required: true
-    }
+    chartData: Object,
+    resultChart: Array
   })
 
   const generate = () => {
     c3.generate({
-      bindto: `#stacked-line-chart-${props.data.id}`,
-      ...props.data
+      bindto: `#stacked-area-chart-${props.resultChart[0].id.id}`,
+      ...props.resultChart[0]
     })
   }
 </script>
@@ -24,6 +22,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`stacked-line-chart-${props.data.id}`"
+    :id="`stacked-area-chart-${props.resultChart[0].id.id}`"
   />
 </template>
