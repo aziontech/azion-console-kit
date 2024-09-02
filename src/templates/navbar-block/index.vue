@@ -29,7 +29,6 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
-        <AiChatButton />
         <FeedbackFish
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
@@ -76,7 +75,6 @@
   import Create from './create'
   import FeedbackFish from './feedback-fish'
   import Help from './help'
-  import AiChatButton from './ai-chat-button.vue'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
   import { openDocumentation } from '@/helpers'
