@@ -389,20 +389,7 @@ const formatBigNumbers = ({ report, data }) => {
 }
 
 const formatListChart = ({ data }) => {
-  const dataset = Object.keys(data)
-  const dataArray = data[dataset]
-
-  const responseData = dataArray.map((item) => {
-    const keyName = Object.keys(item)
-    let responseObject = {}
-    keyName.forEach((key) => {
-      responseObject[key] = item[key]
-    })
-
-    return responseObject
-  })
-
-  return responseData
+  return Object.values(data)[0]
 }
 
 const formatMapChartData = ({ report, data }) => {
