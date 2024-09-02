@@ -216,6 +216,58 @@ export const MOCK_NEW_PAGE_INFO = {
       orderDirection: 'DESC',
       dashboardId: '11111111111111111',
       helpCenterPath: 'path'
+    },
+    {
+      id: '88888888888888888',
+      chartOwner: 'azion',
+      label: 'Stacked Area Chart',
+      description: 'description',
+      aggregationType: 'sum',
+      columns: 6,
+      type: 'stacked-area',
+      xAxis: 'ts',
+      isTopX: true,
+      rotated: false,
+      dataUnit: 'bytes',
+      dataset: 'httpMetrics',
+      limit: 5,
+      fields: ['dataTransferredOut', 'dataTransferredIn'],
+      groupBy: ['ts'],
+      aggregations: [
+        {
+          aggregation: 'count',
+          variable: 'rows'
+        }
+      ],
+      orderDirection: 'DESC',
+      dashboardId: '11111111111111111',
+      helpCenterPath: 'path'
+    },
+    {
+      id: '11111111111111111',
+      chartOwner: 'azion',
+      label: 'List Chart',
+      description: 'description',
+      aggregationType: 'sum',
+      columns: 12,
+      type: 'list',
+      xAxis: 'cat',
+      isTopX: true,
+      rotated: false,
+      dataUnit: 'bytes',
+      dataset: 'httpMetrics',
+      limit: 5,
+      fields: ['bandwidthTotal', 'bandwidthMissedData'],
+      groupBy: ['geolocCountryName'],
+      aggregations: [
+        {
+          aggregation: 'count',
+          variable: 'rows'
+        }
+      ],
+      orderDirection: 'DESC',
+      dashboardId: '11111111111111111',
+      helpCenterPath: 'path'
     }
   ]
 }

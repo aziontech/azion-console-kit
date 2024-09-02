@@ -90,7 +90,9 @@
     'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
     map: defineAsyncComponent(() => import('./components/map/map-chart')),
     'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart')),
+    list: defineAsyncComponent(() => import('./components/chart/list-chart')),
     gauge: defineAsyncComponent(() => import('./components/chart/gauge-chart')),
+    'stacked-area': defineAsyncComponent(() => import('./components/chart/stacked-area-chart')),
     'stacked-bar': defineAsyncComponent(() => import('./components/chart/stacked-bar-chart'))
   }
 
