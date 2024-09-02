@@ -40,11 +40,6 @@
       "name": "origin-manager"
     },
     {
-      "origin-id": 142754,
-      "origin-key": "d4cea926-0592-456a-a913-eff4268b7bd7",
-      "name": "origin-vcs"
-    },
-    {
       "origin-id": 142755,
       "origin-key": "341ed3e6-59ef-4b9b-a19b-f43a1d1501d4",
       "name": "origin-cities"
@@ -60,9 +55,14 @@
       "name": "origin-api"
     },
     {
-      "origin-id": 142758,
-      "origin-key": "6589b741-6654-4e8d-bb4e-b6c0c850d750",
-      "name": "origin-script-runner"
+      "origin-id": 152310,
+      "origin-key": "1b3c2fd6-4ac1-4063-9ff5-e2b4352f917c",
+      "name": "origin-marketplace"
+    },
+    {
+      "origin-id": 142751,
+      "origin-key": "4c361d2f-dbb5-42c0-a6b6-28b0e6e50d91",
+      "name": "console_kit_31-07-2024_single"
     }
   ],
   "rules-engine": {
@@ -106,11 +106,6 @@
       {
         "id": 269755,
         "name": "Route Specific API Services to Script Runner Origin",
-        "phase": "request"
-      },
-      {
-        "id": 269756,
-        "name": "Route Version Control System API to VCS Origin",
         "phase": "request"
       },
       {
