@@ -204,7 +204,7 @@ const formatTsChartData = ({
         }
 
         series[key] = [key]
-        /* 
+        /*
           if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
         */
         if (countValues > 0) {
@@ -411,6 +411,66 @@ const formatMapChartData = ({ report, data }) => {
   ]
 }
 
+const formatStackedAreaChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+
+  const timestamps = [
+    ...new Set(
+      data[dataset]
+        .map((entry) => {
+          const entryDate = new Date(entry[report.xAxis])
+          const formattedDate = entryDate.toISOString().split('T')[0]
+
+          return formattedDate
+        })
+        .sort()
+    )
+  ]
+  const rows = report.fields.map((field) => {
+    return [
+      field,
+      ...timestamps.map((ts) => {
+        const entry = data[dataset].find((item) => {
+          const itemDate = new Date(item[report.xAxis]).toISOString().split('T')[0]
+          return itemDate === ts
+        })
+        return entry ? entry[field] : 0
+      })
+    ]
+  })
+
+  const header = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [header, ...rows]
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        x: 'x',
+        xFormat: '%Y',
+        columns,
+        type: 'area',
+        groups: [report.fields]
+      },
+      grid: {
+        y: {
+          lines: [{ value: 0 }]
+        }
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          localtime: false,
+          tick: {
+            format: '%m/%d'
+          }
+        }
+      },
+      ...COLOR_PATTERNS
+    }
+  ]
+}
+
 /**
  * Function that transforms a list of tuples into a list of lists (columns).
  *
@@ -455,6 +515,8 @@ function ConvertBeholderToChart({
       return formatBigNumbers({ report, data })
     case 'gauge':
       return formatGaugeChart({ report, data })
+    case 'stacked-area':
+      return formatStackedAreaChart({ report, data })
     case 'stacked-bar':
       return formatStackedChart({ report, data })
     default:

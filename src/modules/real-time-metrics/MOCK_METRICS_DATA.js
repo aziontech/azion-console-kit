@@ -216,6 +216,32 @@ export const MOCK_NEW_PAGE_INFO = {
       orderDirection: 'DESC',
       dashboardId: '11111111111111111',
       helpCenterPath: 'path'
+    },
+    {
+      id: '88888888888888888',
+      chartOwner: 'azion',
+      label: 'Stacked Area Chart',
+      description: 'description',
+      aggregationType: 'sum',
+      columns: 6,
+      type: 'stacked-area',
+      xAxis: 'ts',
+      isTopX: true,
+      rotated: false,
+      dataUnit: 'bytes',
+      dataset: 'httpMetrics',
+      limit: 5,
+      fields: ['dataTransferredOut', 'dataTransferredIn'],
+      groupBy: ['ts'],
+      aggregations: [
+        {
+          aggregation: 'count',
+          variable: 'rows'
+        }
+      ],
+      orderDirection: 'DESC',
+      dashboardId: '11111111111111111',
+      helpCenterPath: 'path'
     }
   ]
 }
