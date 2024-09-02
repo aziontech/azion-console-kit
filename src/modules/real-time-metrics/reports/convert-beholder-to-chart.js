@@ -257,6 +257,13 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   })
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
 const formatStackedChart = ({ report, data }) => {
   const dataset = Object.keys(data)
   const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
@@ -307,6 +314,13 @@ const formatStackedChart = ({ report, data }) => {
   ]
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
 const formatGaugeChart = ({ report, data }) => {
   const dataset = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
@@ -355,6 +369,13 @@ const formatGaugeChart = ({ report, data }) => {
   ]
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
 const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
@@ -371,22 +392,35 @@ const formatRotatedBarChartData = ({ report, data }) => {
   return [series, values]
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
 const formatBigNumbers = ({ report, data }) => {
   const dataset = Object.keys(data)
   const fieldName = report.fields[0]
-  const firstValue = data[dataset][0][fieldName]
 
   const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
-  const unit = formatBytesDataUnit(firstValue, report)
+  const { unit, value } = formatBytesDataUnit(total, report)
 
   return [
     {
-      value: parseFloat(total).toFixed(1),
+      value,
       variationType: report.variationType,
       unit
     }
   ]
 }
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
 
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
