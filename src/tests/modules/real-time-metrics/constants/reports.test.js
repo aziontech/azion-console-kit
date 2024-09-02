@@ -54,7 +54,8 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '11111111111111111',
           helpCenterPath: 'path',
-          variationType: 'regular'
+          variationType: 'regular',
+          threshold: [1000000, 30000000, 100000000]
         },
         {
           id: '666666666666666666',

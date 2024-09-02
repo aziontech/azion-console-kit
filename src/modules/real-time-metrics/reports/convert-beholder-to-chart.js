@@ -313,13 +313,15 @@ const formatGaugeChart = ({ report, data }) => {
   const columnName = data[dataset][0][geolocCountryName]
   const fieldName = report.fields[0]
 
-  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+  const totalGaugeValue = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+  const threshold = report.threshold || [30, 60, 90]
+  const maxSupportedValue = threshold[threshold.length - 1]
 
   return [
     {
       id: crypto.randomUUID().toString(),
       data: {
-        columns: [[columnName, total]],
+        columns: [[columnName, totalGaugeValue]],
         type: 'gauge'
       },
       gauge: {
@@ -328,7 +330,8 @@ const formatGaugeChart = ({ report, data }) => {
             return `${formatYAxisLabels(value, report)}`
           },
           show: false
-        }
+        },
+        max: maxSupportedValue
       },
       color: {
         pattern: [
@@ -338,7 +341,14 @@ const formatGaugeChart = ({ report, data }) => {
           'var(--scale-green)'
         ],
         threshold: {
-          values: [30, 60, 200000000]
+          values: threshold
+        }
+      },
+      tooltip: {
+        format: {
+          value: function (value) {
+            return formatYAxisLabels(value, report)
+          }
         }
       }
     }
