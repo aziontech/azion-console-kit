@@ -13,7 +13,7 @@
 
   const generate = () => {
     c3.generate({
-      bindto: `#stacked-area-chart-${props.resultChart[0].id.id}`,
+      bindto: `#stacked-area-chart-${props.resultChart[0].id}`,
       ...props.resultChart[0]
     })
   }
@@ -22,6 +22,6 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :id="`stacked-area-chart-${props.resultChart[0].id.id}`"
+    :id="`stacked-area-chart-${props.resultChart[0].id}`"
   />
 </template>
