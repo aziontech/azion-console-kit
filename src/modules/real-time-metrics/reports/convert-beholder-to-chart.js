@@ -323,15 +323,19 @@ const formatBigNumbers = ({ report, data }) => {
 }
 
 const formatListChart = ({ data }) => {
-  const firstArray = data[Object.keys(data)[0]]
-  const responseData = firstArray.map((item) => {
-    return {
-      countryFlag: { country: item.geolocCountryName, code: 'br' },
-      count: item.count,
-      bandwidthTotal: item.bandwidthTotal,
-      bandwidthMissedData: item.bandwidthMissedData
-    }
+  const dataset = Object.keys(data)
+  const dataArray = data[dataset]
+
+  const responseData = dataArray.map((item) => {
+    const keyName = Object.keys(item)
+    let responseObject = {}
+    keyName.forEach((key) => {
+      responseObject[key] = item[key]
+    })
+
+    return responseObject
   })
+
   return responseData
 }
 
