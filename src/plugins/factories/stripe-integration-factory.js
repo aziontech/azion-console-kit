@@ -21,7 +21,10 @@ export function makeStripeClient(environment) {
   if (!stripeToken) {
     throw Error('Stripe token is missing, cannot load Stripe. View readme for more info.')
   }
-  const stripePromise = loadStripe(stripeToken)
+
+  const stripePromise = loadStripe(stripeToken, {
+    locale: 'en'
+  })
 
   return stripePromise
 }
