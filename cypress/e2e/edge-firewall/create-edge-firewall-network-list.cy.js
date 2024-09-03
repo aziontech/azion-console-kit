@@ -51,11 +51,12 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
 
     // Act - Set Criteria
+    cy.intercept('GET', '/api/v3/network_lists?page=1&page_size=200').as('networkList')
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownNetworkLists).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorFirstOption).click()
-    cy.wait(1000)
+    cy.wait('@networkList')
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).clear()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).type(networkListName)
