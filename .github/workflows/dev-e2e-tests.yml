@@ -43,7 +43,20 @@ jobs:
         run: node ./scripts/check_tags.js specs.json
 
       - name: Move Coverage Files
-        run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
+        run: |
+          echo "+++++++++++++"
+          pwd
+          echo "+++++++++++++"
+          ls
+          echo "+++++++++++++"
+          find .nyc_output
+          echo "+++++++++++++"
+          mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
+          echo "+++++++++++++"          
+          find .nyc_output
+          echo "+++++++++++++"
+          ls .nyc_output/*
+          echo "+++++++++++++"
 
       - name: Upload Cypress Screenshots
         if: ${{ failure() }}
