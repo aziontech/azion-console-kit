@@ -122,14 +122,18 @@
   ]
 
   const handleTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Device Groups'
-    }).track()
+    tracker.product
+      .clickToCreate({
+        productName: 'Device Groups'
+      })
+      .track()
   }
   const handleTrackEditEvent = () => {
-    tracker.product.clickToEdit({
-      productName: 'Device Groups'
-    }).track()
+    tracker.product
+      .clickToEdit({
+        productName: 'Device Groups'
+      })
+      .track()
   }
 </script>
 
