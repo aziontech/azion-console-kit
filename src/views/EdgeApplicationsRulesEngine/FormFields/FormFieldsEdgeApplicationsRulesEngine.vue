@@ -482,7 +482,7 @@
     <template #inputs>
       <div
         class="flex flex-col gap-8"
-        v-for="(criteriaItem, criteriaIndex) in criteria"
+        v-for="(_, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
         <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
@@ -571,6 +571,10 @@
                 class="w-full"
                 icon="pi pi-plus-circle"
                 label="And"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
                 :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
                 outlined
                 @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
@@ -579,6 +583,10 @@
                 class="w-full"
                 icon="pi pi-plus-circle"
                 label="Or"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
                 :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
                 outlined
                 @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
@@ -597,6 +605,10 @@
       </div>
       <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
+          :pt="{
+            root: { class: 'justify-center' },
+            label: { class: 'grow-0' }
+          }"
           icon="pi pi-plus-circle"
           label="Add Criteria"
           outlined
