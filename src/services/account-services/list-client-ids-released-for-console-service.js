@@ -11,7 +11,5 @@ export const listClientIdsReleasedForConsoleService = async () => {
 const adapt = (httpResponse) => {
   const responseIsArray = Array.isArray(httpResponse?.body?.client_ids)
 
-  return responseIsArray
-    ? httpResponse?.body?.client_ids
-    : []
+  return responseIsArray ? httpResponse?.body?.client_ids : []
 }
