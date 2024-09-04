@@ -102,6 +102,7 @@ jobs:
           name: coverage_reportx
           path: .nyc_output/*
           retention-days: 1
+          include-hidden-files: true
 
   download_and_merge:
     name: Download and Merge Coverage Reports
