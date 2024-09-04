@@ -242,6 +242,19 @@ const backRules = [
       },
       rewrite: '/billing/graphql'
     }
+  },
+  {
+    name: 'Route List Client Ids to Github Pages',
+    description: 'this route will get the client ids of the accounts released to the console',
+    match: '^/api/allowed-accounts',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-github-pages-allowed-accounts',
+        type: 'single_origin'
+      },
+      rewrite: '/aziontech/console-client-list/main/clids.json'
+    }
   }
 ]
 
@@ -281,7 +294,13 @@ const AzionConfig = {
       type: 'single_origin',
       hostHeader: `api.azion.com`,
       addresses: [`api.azion.com`]
-    }
+    },
+    {
+      name: 'origin-github-pages-allowed-accounts',
+      type: 'single_origin',
+      hostHeader: `raw.githubusercontent.com`,
+      addresses: [`raw.githubusercontent.com`]
+    },
   ]),
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
