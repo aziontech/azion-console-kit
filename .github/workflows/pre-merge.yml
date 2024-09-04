@@ -51,7 +51,7 @@ jobs:
       matrix:
         group: [2, 3, 4, 5, 6, 7]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload Cypress Screenshots
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress_screenshots_${{ matrix.group }}
           path: cypress/screenshots
@@ -90,14 +90,14 @@ jobs:
 
       - name: Upload Cypress Videos
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress_videos_${{ matrix.group }}
           path: cypress/videos
           retention-days: 1
 
       - name: Upload Coverage Files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage_reportx
           path: .nyc_output/*
@@ -122,7 +122,7 @@ jobs:
         run: npm install --global nyc
 
       - name: Download Coverage Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: coverage_report
 
@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload Coverage Report Artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage_e2e_report
           path: coverage.zip
