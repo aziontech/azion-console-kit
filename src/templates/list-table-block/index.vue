@@ -4,8 +4,6 @@
     :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
-    {{ columns }}
-    {{ data }}
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"

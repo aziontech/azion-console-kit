@@ -10,27 +10,6 @@ describe('RealTimeMetricsModule', () => {
     it('should have the correct array values', () => {
       const groupDashboards = [
         {
-          label: 'New',
-          value: 'new',
-          id: 1,
-          pagesDashboards: [
-            {
-              id: 0,
-              label: 'New Charts',
-              path: 'new-charts',
-              groupId: 0,
-              dashboards: [
-                {
-                  id: '11111111111111111',
-                  label: 'New Charts',
-                  path: 'new-charts',
-                  dataset: 'httpMetrics'
-                }
-              ]
-            }
-          ]
-        },
-        {
           label: 'Build',
           value: 'build',
           id: 1,
