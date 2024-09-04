@@ -2,6 +2,8 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
+import countries from '../helpers/countries-code.json'
+
 import {
   formatYAxisLabels,
   getSeriesInfos,
@@ -474,11 +476,16 @@ const formatListChart = ({ report, data }) => {
   const dataset = Object.keys(data)
   const fieldsRequest = Object.keys(data[dataset][0])
   const fieldNames = report.fields
+  const fieldCountryName = report.groupBy[0]
 
   const dataValue = data[dataset].map((obj) => {
     const extractedObj = {}
     fieldNames.forEach((key) => {
       extractedObj[key] = formatYAxisLabels(obj[key], report)
+      extractedObj[fieldCountryName] = {
+        code: countries[obj[fieldCountryName]] || '-',
+        country: obj[fieldCountryName]
+      }
     })
 
     return { ...obj, ...extractedObj }

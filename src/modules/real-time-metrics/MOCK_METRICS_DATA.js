@@ -218,7 +218,7 @@ export const MOCK_NEW_PAGE_INFO = {
       helpCenterPath: 'path'
     },
     {
-      id: '88888888888888888',
+      id: '999999999999999999',
       chartOwner: 'azion',
       label: 'Stacked Area Chart',
       description: 'description',

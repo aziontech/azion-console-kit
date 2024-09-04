@@ -190,7 +190,7 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'cat'
         },
         {
-          id: '88888888888888888',
+          id: '999999999999999999',
           chartOwner: 'azion',
           label: 'Stacked Area Chart',
           description: 'description',
