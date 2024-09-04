@@ -60,6 +60,7 @@
   const selectedRulesEngineToEdit = ref('')
   const edgeFirewallFunctionsOptions = ref([])
   const wafRulesOptions = ref([])
+  const isOverlapped = ref(false)
 
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
@@ -187,6 +188,10 @@
     }
   }
 
+  const handleToggleDrawer = (isOpen) => {
+    isOverlapped.value = isOpen
+  }
+
   const listWafRulesOptions = async () => {
     try {
       const result = await props.listWafRulesService()
@@ -233,6 +238,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateRulesEngineDrawer"
+    :isOverlapped="isOverlapped"
     :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -243,6 +249,7 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        @toggleDrawer="handleToggleDrawer"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
         :listNetworkListService="listNetworkListService"
@@ -254,6 +261,7 @@
     v-if="showEditDrawer"
     :id="selectedRulesEngineToEdit"
     v-model:visible="showEditRulesEngineDrawer"
+    :isOverlapped="isOverlapped"
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
@@ -264,6 +272,7 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        @toggleDrawer="handleToggleDrawer"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
         :listNetworkListService="listNetworkListService"

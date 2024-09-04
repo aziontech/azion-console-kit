@@ -1,7 +1,6 @@
 <template>
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
-    :isOverlapped="isOverlapped"
     v-model:visible="showCreateFunctionDrawer"
     :createService="props.createFunctionService"
     :schema="validationSchema"
@@ -70,7 +69,6 @@
     }
   })
 
-  const isOverlapped = ref(false)
   const showCreateFunctionDrawer = ref(false)
   const showEditFunctionDrawer = ref(false)
   const debouncedDrawerAnimate = 300

@@ -139,7 +139,11 @@
     :update:visible="toggleDrawerVisibility"
     position="right"
     :pt="{
-      root: { class: `w-full ${props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'}` },
+      root: {
+        class: `w-full transition-all duration-300 ease-in-out ${
+          props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+        }`
+      },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
