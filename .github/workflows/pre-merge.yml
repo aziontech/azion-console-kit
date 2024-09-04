@@ -14,7 +14,7 @@ env:
   HUSKY: 0
 
 jobs:
-  run-unit-tests:
+  run-tests:
     runs-on: ubuntu-latest
     container:
       image: node:18-alpine3.18
@@ -155,7 +155,7 @@ jobs:
           retention-days: 7
   
   sonarcloud:
-            needs: [run-unit-tests, download_and_merge]
+            needs: [run-tests, download_and_merge]
             runs-on: ubuntu-latest
             steps:
             - uses: actions/checkout@v4
