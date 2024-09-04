@@ -43,7 +43,7 @@ jobs:
             coverage/unit/sonar-report.xml
           retention-days: 1
 
-run-dev-e2e-tests:
+  run-dev-e2e-tests:
     name: Run Dev E2E Tests
     runs-on: ubuntu-latest
     strategy:
@@ -103,7 +103,7 @@ run-dev-e2e-tests:
           path: .nyc_output/*
           retention-days: 1
 
-download_and_merge:
+  download_and_merge:
     name: Download and Merge Coverage Reports
     needs: run-dev-e2e-tests
     runs-on: ubuntu-latest
@@ -180,4 +180,3 @@ download_and_merge:
               with:
                 args: >
                   -Dsonar.javascript.lcov.reportPaths=coverage/unit/lcov.info,coverage/e2e/lcov.info
-                  
