@@ -1,3 +1,17 @@
-import { FormatC3GraphProps, formatYAxisLabels, getSeriesInfos } from './format-c3-graph-props'
+import {
+  FormatC3GraphProps,
+  formatYAxisLabels,
+  getSeriesInfos,
+  formatC3YAxis,
+  isDate,
+  camelToTitle
+} from './format-c3-graph-props'
 
-export { FormatC3GraphProps, formatYAxisLabels, getSeriesInfos }
+export {
+  FormatC3GraphProps,
+  formatYAxisLabels,
+  getSeriesInfos,
+  formatC3YAxis,
+  isDate,
+  camelToTitle
+}

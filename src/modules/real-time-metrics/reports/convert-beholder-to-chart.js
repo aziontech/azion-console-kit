@@ -2,7 +2,13 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatBytesDataUnit } from '../chart/format-graph'
-import { formatYAxisLabels, getSeriesInfos } from '@modules/real-time-metrics/chart'
+import {
+  formatYAxisLabels,
+  getSeriesInfos,
+  formatC3YAxis,
+  isDate,
+  camelToTitle
+} from '@modules/real-time-metrics/chart'
 
 const COLOR_PATTERNS = {
   color: {
@@ -24,6 +30,93 @@ const COLOR_PATTERNS = {
       'var(--series-seven-color)',
       'var(--series-eight-color)'
     ]
+  }
+}
+
+const objectStackedChart = ({ columns, seriesNames, report, type }) => {
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        x: 'x',
+        columns,
+        type,
+        groups: [report.fields],
+        names: seriesNames
+      },
+      tooltip: {
+        format: {
+          title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d),
+          name: (name, ratio, id) => {
+            return camelToTitle(id)
+          },
+          value: function (value) {
+            return formatYAxisLabels(value, report)
+          }
+        }
+      },
+      legend: {
+        hide: false,
+        position: 'bottom'
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          localtime: false,
+          tick: {
+            format: '%b-%d %H:%M',
+            width: 40
+          }
+        },
+        y: formatC3YAxis(report, false)
+      },
+      padding: {
+        bottom: 16,
+        right: 30
+      },
+      grid: {
+        y: {
+          lines: [{ value: 0 }]
+        }
+      },
+      bar: {
+        width: {
+          ratio: 0.25
+        }
+      },
+      ...COLOR_PATTERNS
+    }
+  ]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+const handleStackedData = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
+
+  const rows = report.fields.map((field) => {
+    return [
+      field,
+      ...timestamps.map((ts) => {
+        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
+        return entry ? entry[field] : 0
+      })
+    ]
+  })
+
+  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [headerChart, ...rows]
+
+  const { seriesNames } = getSeriesInfos(columns, report, false, false)
+
+  return {
+    columns,
+    seriesNames
   }
 }
 
@@ -264,57 +357,10 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
  * @param {Array} data - The data to be formatted.
  */
 
-const formatStackedChart = ({ report, data }) => {
-  const dataset = Object.keys(data)
-  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
-
-  const rows = report.fields.map((field) => {
-    return [
-      field,
-      ...timestamps.map((ts) => {
-        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
-        return entry ? entry[field] : 0
-      })
-    ]
-  })
-
-  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
-  const columns = [headerChart, ...rows]
-
-  const { seriesNames } = getSeriesInfos(columns, report, false, false)
-
-  return [
-    {
-      id: crypto.randomUUID().toString(),
-      data: {
-        x: 'x',
-        columns,
-        type: 'bar',
-        groups: [report.fields],
-        names: seriesNames
-      },
-      axis: {
-        x: {
-          type: 'timeseries',
-          localtime: false,
-          tick: {
-            format: '%m-%d %H:%M'
-          }
-        }
-      },
-      grid: {
-        y: {
-          lines: [{ value: 0 }]
-        }
-      },
-      bar: {
-        width: {
-          ratio: 0.25
-        }
-      },
-      ...COLOR_PATTERNS
-    }
-  ]
+const formatStackedBarChart = ({ report, data }) => {
+  const { columns, seriesNames } = handleStackedData({ report, data })
+  const type = 'bar'
+  return objectStackedChart({ columns, seriesNames, report, type })
 }
 
 /**
@@ -424,8 +470,33 @@ const formatBigNumbers = ({ report, data }) => {
  * @param {Object} report - The report object containing chart configuration.
  * @param {Array} data - The data to be formatted.
  */
-const formatListChart = ({ data }) => {
-  return Object.values(data)[0]
+const formatListChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const fieldsRequest = Object.keys(data[dataset][0])
+  const fieldNames = report.fields
+
+  const dataValue = data[dataset].map((obj) => {
+    const extractedObj = {}
+    fieldNames.forEach((key) => {
+      extractedObj[key] = formatYAxisLabels(obj[key], report)
+    })
+
+    return { ...obj, ...extractedObj }
+  })
+
+  const header = fieldsRequest.map((field) => camelToTitle(field))
+
+  const columns = fieldsRequest.map((field, index) => ({
+    field: field,
+    header: header[index]
+  }))
+
+  return [
+    {
+      data: dataValue,
+      columns
+    }
+  ]
 }
 
 const formatMapChartData = ({ report, data }) => {
@@ -458,52 +529,9 @@ const formatMapChartData = ({ report, data }) => {
  * @param {Array} data - The data to be formatted.
  */
 const formatStackedAreaChart = ({ report, data }) => {
-  const dataset = Object.keys(data)
-  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
-
-  const rows = report.fields.map((field) => {
-    return [
-      field,
-      ...timestamps.map((ts) => {
-        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
-        return entry ? entry[field] : 0
-      })
-    ]
-  })
-
-  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
-  const columns = [headerChart, ...rows]
-
-  const { seriesNames } = getSeriesInfos(columns, report, false, false)
-
-  return [
-    {
-      id: crypto.randomUUID().toString(),
-      data: {
-        x: 'x',
-        xFormat: '%Y',
-        columns,
-        type: 'area',
-        groups: [report.fields],
-        names: seriesNames
-      },
-      grid: {
-        y: {
-          lines: [{ value: 0 }]
-        }
-      },
-      axis: {
-        x: {
-          type: 'timeseries',
-          localtime: false,
-          tick: {
-            format: '%m-%d %H:%M'
-          }
-        }
-      },
-      ...COLOR_PATTERNS
-    }
-  ]
+  const { columns, seriesNames } = handleStackedData({ report, data })
+  const type = 'area'
+  return objectStackedChart({ columns, seriesNames, report, type })
 }
 
 /**
@@ -555,7 +583,7 @@ function ConvertBeholderToChart({
     case 'stacked-area':
       return formatStackedAreaChart({ report, data })
     case 'stacked-bar':
-      return formatStackedChart({ report, data })
+      return formatStackedBarChart({ report, data })
     default:
       return []
   }

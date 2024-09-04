@@ -79,9 +79,8 @@ describe('RealTimeMetricsModule', () => {
           pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false
@@ -190,9 +189,8 @@ describe('RealTimeMetricsModule', () => {
           pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE_PER_SERIES
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false
@@ -285,9 +283,8 @@ describe('RealTimeMetricsModule', () => {
           pattern: FIXTURES.BASE_COLOR_PATTERNS
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false
