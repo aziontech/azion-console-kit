@@ -1,6 +1,7 @@
 import { getEnvironment, getStaticUrlsByEnvironment } from '@/helpers'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
+import { listClientIdsReleasedForConsoleService } from '@/services/account-services'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export default async function redirectToManager(to, __, next) {
@@ -28,12 +29,15 @@ export default async function redirectToManager(to, __, next) {
       }
 
       // account that are kind client, can access with developer service plan
-      const { isDeveloperSupportPlan } = await loadContractServicePlan({
-        clientId: accountData.client_id
-      })
+      const [{ isDeveloperSupportPlan }, clientIdsReleadesForConsole] = await Promise.all([
+        loadContractServicePlan({ clientId: accountData.client_id }),
+        listClientIdsReleasedForConsoleService()
+      ])
       accountStore.setAccountData({ isDeveloperSupportPlan: isDeveloperSupportPlan })
-
       if (!isDeveloperSupportPlan) {
+        if (clientIdsReleadesForConsole.includes(accountData.client_id)) {
+          return next()
+        }
         permanentRedirectToManager()
       }
     }
