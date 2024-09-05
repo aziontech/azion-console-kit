@@ -97,7 +97,7 @@ jobs:
         run: |
           pwd
           find ./
-          npx nyc merge ./coverage_report/coverage_report .nyc_output/out.json
+          npx nyc merge ./coverage_report .nyc_output/out.json
 
       - name: Generate Text Coverage Report
         run: npx nyc report --reporter=text-summary
