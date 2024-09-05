@@ -15,7 +15,7 @@ describe('AccountServices', () => {
     vi.clearAllMocks()
   })
 
-  it('deve chamar o serviço da API com os parâmetros corretos', async () => {
+  it('should call the API service with the correct parameters', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
@@ -31,7 +31,7 @@ describe('AccountServices', () => {
     })
   })
 
-  it('deve retornar um array de client IDs de produção quando o ambiente for produção', async () => {
+  it('should return an array of production client IDs when the environment is production', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
@@ -44,7 +44,7 @@ describe('AccountServices', () => {
     expect(result).toEqual(['id1', 'id2'])
   })
 
-  it('deve retornar um array de client IDs de stage quando o ambiente não for produção', async () => {
+  it('should return an array of stage client IDs when the environment is not production', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
@@ -57,7 +57,7 @@ describe('AccountServices', () => {
     expect(result).toEqual(['id3', 'id4'])
   })
 
-  it('deve retornar um array vazio quando o corpo da resposta não contiver client_ids', async () => {
+  it('should return an empty array when the response body does not contain client_ids', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { production: {}, stage: {} }
