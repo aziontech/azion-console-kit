@@ -94,7 +94,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge Coverage Reports
-        run: npx nyc merge ./coverage_report/coverage_reportx .nyc_output/out.json
+        run: npx nyc merge ./coverage_report/coverage_report .nyc_output/out.json
 
       - name: Generate Text Coverage Report
         run: npx nyc report --reporter=text-summary
