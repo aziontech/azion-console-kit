@@ -10,10 +10,12 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, ref, reactive, provide, watch } from 'vue'
+  import { computed, ref, reactive, provide, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -49,6 +51,14 @@
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
+
+  const handleTrackClickToEditErrorResponses = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Error Responses'
+      })
+      .track()
+  }
 
   const handleLoadEdgeApplication = async () => {
     try {
@@ -134,8 +144,9 @@
     verifyTab(edgeApplication.value)
     const tab = getTabFromIndex(index)
     activeTab.value = index
-
     changeRouteByTab(tab)
+
+    if (tab === 'error-responses') handleTrackClickToEditErrorResponses()
   }
 
   const visibleOnSaved = ref(false)
