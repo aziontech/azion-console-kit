@@ -42,8 +42,8 @@ function formatC3DataProp(chartData, resultChart) {
     const field = resultChart[1][0]
 
     data.types = { [field]: 'bar' }
-    ;(data.labels = { format: (value) => formatYAxisLabels(value, chartData) }),
-      (data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index])
+    data.labels = { format: (value) => formatYAxisLabels(value, chartData) }
+    data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index]
 
     return data
   }
