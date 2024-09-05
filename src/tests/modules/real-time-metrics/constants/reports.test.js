@@ -7,7 +7,7 @@ describe('RealTimeMetricsModule', () => {
       expect(REPORTS).toBeDefined()
     })
 
-    it('should have the correct array of values', () => {
+    it('should have the correct of values', () => {
       const reports = [
         {
           aggregationType: 'sum',
