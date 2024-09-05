@@ -11,9 +11,7 @@ export const listClientIdsReleasedForConsoleService = async () => {
 
 const adapt = (httpResponse) => {
   const environment = getEnvironment()
+  const clientIds = httpResponse?.body?.[environment]?.client_ids
 
-  if (environment === 'production') {
-    return httpResponse?.body?.production?.client_ids ?? []
-  }
-  return httpResponse?.body?.stage?.client_ids ?? []
+  return clientIds ?? []
 }

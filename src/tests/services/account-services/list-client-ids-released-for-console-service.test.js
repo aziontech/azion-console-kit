@@ -49,7 +49,7 @@ describe('AccountServices', () => {
       statusCode: 200,
       body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
     })
-    getEnvironment.mockReturnValue('development')
+    getEnvironment.mockReturnValue('stage')
 
     const { sut } = makeSut()
     const result = await sut()
