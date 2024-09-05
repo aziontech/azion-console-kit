@@ -92,7 +92,7 @@
   }
 
   const openCreateDeviceGroupDrawer = () => {
-    handleTrackEvent()
+    handleTrackClickToCreate()
     drawerDeviceGroups.value.openDrawerCreate()
   }
 
@@ -121,14 +121,14 @@
     }
   ]
 
-  const handleTrackEvent = () => {
+  const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
         productName: 'Device Groups'
       })
       .track()
   }
-  const handleTrackEditEvent = () => {
+  const handleTrackClickToEdit = () => {
     tracker.product
       .clickToEdit({
         productName: 'Device Groups'
@@ -154,7 +154,7 @@
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
-      @on-before-go-to-edit="handleTrackEditEvent"
+      @on-before-go-to-edit="handleTrackClickToEdit"
       emptyListMessage="No device groups found."
       :actions="actions"
       isTabs
