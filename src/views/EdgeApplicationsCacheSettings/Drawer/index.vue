@@ -6,6 +6,7 @@
   import { refDebounced } from '@vueuse/core'
   import { ref, inject, computed } from 'vue'
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -194,6 +195,7 @@
   }
 
   const handleCreateCacheSettings = () => {
+    handleTrackCreation()
     emit('onSuccess')
     closeCreateDrawer()
   }
@@ -207,9 +209,43 @@
       .track()
   }
 
+  const handleTrackCreation = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Cache Settings'
+      })
+      .track()
+  }
+
   const handleEditedCacheSettings = () => {
     emit('onSuccess')
     handleTrackSuccessEdit()
+    closeCreateDrawer()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Cache Settings',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Cache Settings',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+
     closeCreateDrawer()
   }
 
@@ -227,6 +263,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCacheSettings"
+    @onError="handleFailedToCreate"
     title="Create Cache Settings"
   >
     <template #formFields>
@@ -246,6 +283,7 @@
     :editService="editCacheSettingsServiceWithDecorator"
     :schema="validationSchema"
     @onSuccess="handleEditedCacheSettings"
+    @onError="handleFailedToEdit"
     title="Edit Cache Settings"
   >
     <template #formFields>
