@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload Cypress Screenshots
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_screenshots_${{ matrix.group }}
           path: cypress/screenshots
@@ -90,14 +90,14 @@ jobs:
 
       - name: Upload Cypress Videos
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: cypress_videos_${{ matrix.group }}
           path: cypress/videos
           retention-days: 1
 
       - name: Upload Coverage Files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: coverage_reportx
           path: .nyc_output/*
@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload Coverage Report Artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: coverage_e2e_report
           path: coverage.zip
