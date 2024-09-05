@@ -59,7 +59,7 @@
           size="small"
           icon-pos="right"
           icon="pi pi-external-link"
-          label="GraphQL Playground"
+          label="Open in GraphiQL Playground"
           @click="eventsPlaygroundOpener"
         />
         <PrimeButton
