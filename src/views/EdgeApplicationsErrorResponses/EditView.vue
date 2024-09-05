@@ -54,7 +54,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Device Groups',
+        productName: 'Error Responses',
         errorMessage: message,
         fieldName: fieldName,
         errorType: 'api'
