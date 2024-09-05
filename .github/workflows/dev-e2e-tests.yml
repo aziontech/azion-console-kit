@@ -64,7 +64,7 @@ jobs:
       - name: Upload Coverage Files
         uses: actions/upload-artifact@v4
         with:
-          name: coverage_reportx
+          name: coverage_report_${{ matrix.group }}
           path: .nyc_output/*
           retention-days: 1
           include-hidden-files: true
@@ -90,9 +90,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: coverage_report
+          pattern: coverage_report_*
+          merge-multiple: true
 
       - name: Merge Coverage Reports
-        run: npx nyc merge ./coverage_report/coverage_reportx .nyc_output/out.json
+        run: npx nyc merge ./coverage_report .nyc_output/out.json
 
       - name: Generate Text Coverage Report
         run: npx nyc report --reporter=text-summary
