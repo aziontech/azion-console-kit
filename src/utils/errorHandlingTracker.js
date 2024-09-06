@@ -7,7 +7,6 @@ export const handleTrackerError = (error) => {
   }
 
   const [fieldName, ...restOfStringArr] = error.split(':')
-  const message = 'Error: ' + restOfStringArr.join(':').trim() 
 
   return { fieldName, message }
 }

@@ -7,6 +7,5 @@ export const loginService = async (payload) => {
     method: 'POST',
     body: payload
   })
-  // lalala lelele lili
   return parseHttpResponse(httpResponse)
 }
