@@ -97,9 +97,7 @@
     />
     <div class="flex flex-col gap-8 my-4">
       <div class="flex gap-1">
-        <p class="text-xs text-color font-medium leading-4">
-          Specification
-        </p>
+        <p class="text-xs text-color font-medium leading-4">Specification</p>
         <p class="text-xs text-color-secondary font-normal leading-4">
           {{ props.tabSelected.description }}
         </p>
