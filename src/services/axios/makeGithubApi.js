@@ -8,6 +8,7 @@ const api = () => {
 
   axios.defaults.headers.common['Accept'] = 'application/json; version=3'
   axios.defaults.headers.common['Content-Type'] = 'application/json'
+  axios.defaults.headers.common['Pragema'] = 'azion-debug-cache'
 
   return axios.create({
     baseURL
