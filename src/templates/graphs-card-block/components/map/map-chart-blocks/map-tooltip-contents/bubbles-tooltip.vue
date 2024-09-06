@@ -1,15 +1,22 @@
 <template>
-  <div class="flex gap-2 justify-between text-color text-xs font-normal">
+  <div class="flex flex-col gap-2 text-color text-xs font-normal">
     <p>{{ data?.label }}</p>
-    <p>{{ data?.value }}</p>
+    <div class="flex justify-between gap-4">
+      <p>{{ fieldName }} :</p>
+      <p>{{ value }}</p>
+    </div>
   </div>
 </template>
-
 <script setup>
-  defineProps({
+  import { formatYAxisLabels, camelToTitle } from '@modules/real-time-metrics/chart'
+  import { computed } from 'vue'
+
+  const props = defineProps({
     data: {
       type: Object,
       default: () => {}
     }
   })
+  const value = computed(() => formatYAxisLabels(props.data?.value, props.data?.chartData))
+  const fieldName = computed(() => camelToTitle(props.data?.chartData.moreDataSet[0].fields[0]))
 </script>

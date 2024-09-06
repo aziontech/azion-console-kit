@@ -118,6 +118,8 @@ export default class GqlRules {
           aggregationsText += '}'
         }
 
+        if (groupBy !== null) fields.push(...groupBy)
+
         return `
           test: ${dataset} (
             limit: ${limit}
@@ -184,7 +186,7 @@ export default class GqlRules {
 
     if (this.moreDataSet.length) {
       query = query.trim().slice(0, -1)
-      query += this.generateGraphQuery(this.moreDataSet, filtersStr, this.orderBy, params)
+      query += this.generateGraphQuery(this.moreDataSet, filtersStr, this.orderBy)
     }
 
     const graphQLQuery = {

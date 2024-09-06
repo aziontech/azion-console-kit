@@ -506,88 +506,38 @@ const formatListChart = ({ report, data }) => {
   ]
 }
 
-const BUBBLES_DATA = [
-  {
-    countryName: 'Chile',
-    value: 32559,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Djibouti',
-    value: 195,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Netherlands',
-    value: 29528,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'United Arab Emirates',
-    value: 25003,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'South Africa',
-    value: 1190,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Nigeria',
-    value: 80,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Venezuela',
-    value: 350,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Mexico',
-    value: 11890,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'India',
-    value: 4559,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Uruguay',
-    value: 43921,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'Madagascar',
-    value: 8987,
-    rangeVariation: 'regular'
-  },
-  {
-    countryName: 'France',
-    value: 19876,
-    rangeVariation: 'regular'
-  }
-]
-
 const formatMapChartData = ({ report, data }) => {
-  const dataset = Object.keys(data)
+  const datasets = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
   const fieldName = report.fields[0]
 
-  const heatmap = data[dataset].map((datasetMapData) => {
-    const result = {
-      countryName: datasetMapData[geolocCountryName],
-      value: datasetMapData[fieldName],
-      rangeVariation: report.variationType
-    }
+  const geolocCountryNameBubbles = report.moreDataSet[0].groupBy[0]
+  const fieldNameBubbles = report.moreDataSet[0].fields[0]
 
-    return result
-  })
+  const formatMapData = []
+
+  for (const dataset of datasets) {
+    const formatData = data[dataset].map((datasetMapData) => {
+      const countryName =
+        datasetMapData[geolocCountryName] || datasetMapData[geolocCountryNameBubbles]
+      const value = datasetMapData[fieldName] || datasetMapData[fieldNameBubbles]
+
+      const result = {
+        countryName,
+        value,
+        rangeVariation: report.variationType
+      }
+
+      return result
+    })
+
+    formatMapData.push(formatData)
+  }
 
   return [
     {
-      bubbles: BUBBLES_DATA,
-      heatmap
+      heatmap: formatMapData[0],
+      bubbles: formatMapData[1]
     }
   ]
 }
