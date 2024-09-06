@@ -1,4 +1,126 @@
+/* eslint-disable id-length */
+
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
+import { formatBytesDataUnit } from '../chart/format-graph'
+import countries from '../helpers/countries-code.json'
+
+import {
+  formatYAxisLabels,
+  getSeriesInfos,
+  formatC3YAxis,
+  isDate,
+  camelToTitle
+} from '@modules/real-time-metrics/chart'
+
+const COLOR_PATTERNS = {
+  color: {
+    pattern: [
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)',
+      'var(--series-one-color)',
+      'var(--series-two-color)',
+      'var(--series-three-color)',
+      'var(--series-four-color)',
+      'var(--series-five-color)',
+      'var(--series-six-color)',
+      'var(--series-seven-color)',
+      'var(--series-eight-color)'
+    ]
+  }
+}
+
+const objectStackedChart = ({ columns, seriesNames, report, type }) => {
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        x: 'x',
+        columns,
+        type,
+        groups: [report.fields],
+        names: seriesNames
+      },
+      tooltip: {
+        format: {
+          title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d),
+          name: (name, ratio, id) => {
+            return camelToTitle(id)
+          },
+          value: function (value) {
+            return formatYAxisLabels(value, report)
+          }
+        }
+      },
+      legend: {
+        hide: false,
+        position: 'bottom'
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          localtime: false,
+          tick: {
+            format: '%b-%d %H:%M',
+            width: 40
+          }
+        },
+        y: formatC3YAxis(report, false)
+      },
+      padding: {
+        bottom: 16,
+        right: 30
+      },
+      grid: {
+        y: {
+          lines: [{ value: 0 }]
+        }
+      },
+      bar: {
+        width: {
+          ratio: 0.25
+        }
+      },
+      ...COLOR_PATTERNS
+    }
+  ]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+const handleStackedData = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const timestamps = data[dataset].map((entry) => entry[report.xAxis]).sort()
+
+  const rows = report.fields.map((field) => {
+    return [
+      field,
+      ...timestamps.map((ts) => {
+        const entry = data[dataset].find((item) => item[report.xAxis] === ts)
+        return entry ? entry[field] : 0
+      })
+    ]
+  })
+
+  const headerChart = ['x', ...timestamps.map((ts) => new Date(ts))]
+  const columns = [headerChart, ...rows]
+
+  const { seriesNames } = getSeriesInfos(columns, report, false, false)
+
+  return {
+    columns,
+    seriesNames
+  }
+}
 
 /**
  * Fills the series with zeroes to make them all the same length.
@@ -177,7 +299,7 @@ const formatTsChartData = ({
         }
 
         series[key] = [key]
-        /* 
+        /*
           if the series is new and there are already records of other series, it needs to be filled with zero values to ensure correct display in the REPORTS
         */
         if (countValues > 0) {
@@ -230,6 +352,81 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   })
 }
 
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
+const formatStackedBarChart = ({ report, data }) => {
+  const { columns, seriesNames } = handleStackedData({ report, data })
+  const type = 'bar'
+  return objectStackedChart({ columns, seriesNames, report, type })
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
+const formatGaugeChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const geolocCountryName = report.groupBy[0]
+  const columnName = data[dataset][0][geolocCountryName]
+  const fieldName = report.fields[0]
+
+  const totalGaugeValue = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+  const threshold = report.threshold || [30, 60, 90]
+  const maxSupportedValue = threshold[threshold.length - 1]
+
+  return [
+    {
+      id: crypto.randomUUID().toString(),
+      data: {
+        columns: [[columnName, totalGaugeValue]],
+        type: 'gauge'
+      },
+      gauge: {
+        label: {
+          format: function (value) {
+            return `${formatYAxisLabels(value, report)}`
+          },
+          show: false
+        },
+        max: maxSupportedValue
+      },
+      color: {
+        pattern: [
+          'var(--scale-red)',
+          'var(--scale-orange)',
+          'var(--scale-yellow)',
+          'var(--scale-green)'
+        ],
+        threshold: {
+          values: threshold
+        }
+      },
+      tooltip: {
+        format: {
+          value: function (value) {
+            return formatYAxisLabels(value, report)
+          }
+        }
+      }
+    }
+  ]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
 const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
@@ -244,6 +441,69 @@ const formatRotatedBarChartData = ({ report, data }) => {
   })
 
   return [series, values]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+
+const formatBigNumbers = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const fieldName = report.fields[0]
+
+  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
+  const { unit, value } = formatBytesDataUnit(total, report)
+
+  return [
+    {
+      value,
+      variationType: report.variationType,
+      unit
+    }
+  ]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+const formatListChart = ({ report, data }) => {
+  const dataset = Object.keys(data)
+  const fieldsRequest = Object.keys(data[dataset][0])
+  const fieldNames = report.fields
+  const fieldCountryName = report.groupBy[0]
+
+  const dataValue = data[dataset].map((obj) => {
+    const extractedObj = {}
+    fieldNames.forEach((key) => {
+      extractedObj[key] = formatYAxisLabels(obj[key], report)
+      extractedObj[fieldCountryName] = {
+        code: countries[obj[fieldCountryName]] || '-',
+        country: obj[fieldCountryName]
+      }
+    })
+
+    return { ...obj, ...extractedObj }
+  })
+
+  const header = fieldsRequest.map((field) => camelToTitle(field))
+
+  const columns = fieldsRequest.map((field, index) => ({
+    field: field,
+    header: header[index]
+  }))
+
+  return [
+    {
+      data: dataValue,
+      columns
+    }
+  ]
 }
 
 const formatMapChartData = ({ report, data }) => {
@@ -267,6 +527,18 @@ const formatMapChartData = ({ report, data }) => {
       heatmap
     }
   ]
+}
+
+/**
+ * Formats pie chart data based on the provided report and data.
+ *
+ * @param {Object} report - The report object containing chart configuration.
+ * @param {Array} data - The data to be formatted.
+ */
+const formatStackedAreaChart = ({ report, data }) => {
+  const { columns, seriesNames } = handleStackedData({ report, data })
+  const type = 'area'
+  return objectStackedChart({ columns, seriesNames, report, type })
 }
 
 /**
@@ -309,6 +581,16 @@ function ConvertBeholderToChart({
       return formatRotatedBarChartData({ report, data })
     case 'map':
       return formatMapChartData({ report, data })
+    case 'big-numbers':
+      return formatBigNumbers({ report, data })
+    case 'list':
+      return formatListChart({ report, data })
+    case 'gauge':
+      return formatGaugeChart({ report, data })
+    case 'stacked-area':
+      return formatStackedAreaChart({ report, data })
+    case 'stacked-bar':
+      return formatStackedBarChart({ report, data })
     default:
       return []
   }

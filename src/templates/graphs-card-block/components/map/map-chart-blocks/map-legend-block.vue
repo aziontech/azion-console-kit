@@ -1,7 +1,7 @@
 <template>
   <div
     id="map-legend-block"
-    class="w-44 h-32 absolute bottom-3 right-3 surface-card rounded border surface-border px-4 py-3 flex flex-col gap-2 text-color"
+    class="z-50 w-44 h-32 absolute bottom-3 right-3 surface-card rounded border surface-border px-4 py-3 flex flex-col gap-2 text-color"
   >
     <p class="text-sm font-medium">{{ title }}</p>
     <ul class="flex flex-col gap-1">

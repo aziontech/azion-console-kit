@@ -5,8 +5,11 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import FormFieldsDrawerDeviceGroup from '@/views/EdgeApplicationsDeviceGroups/FormFields/FormFieldsEdgeApplicationsDeviceGroups'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
   defineOptions({ name: 'drawer-device-groups' })
 
   const emit = defineEmits(['onSuccess'])
@@ -57,8 +60,13 @@
     userAgent: ''
   })
 
-  const handleSuccess = () => {
+  const handleSuccessEdit = () => {
     handleTrackSuccessEdit()
+    emit('onSuccess')
+  }
+
+  const handleSuccessCreate = () => {
+    handleTrackCreation()
     emit('onSuccess')
   }
 
@@ -73,14 +81,6 @@
       edgeApplicationId: props.edgeApplicationId
     })
     return deviceGroup
-  }
-  const handleTrackSuccessEdit = () => {
-    tracker.product
-      .productEdited({
-        productName: 'Edge Application',
-        tab: 'deviceGroups'
-      })
-      .track()
   }
 
   const editService = async (payload) => {
@@ -103,6 +103,49 @@
     showEditDrawer.value = false
   }
 
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'deviceGroups'
+      })
+      .track()
+  }
+
+  const handleTrackCreation = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Device Groups'
+      })
+      .track()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Device Groups',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Device Groups',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+
+    closeDrawerEdit()
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -117,7 +160,8 @@
     :createService="props.createDeviceGroupService"
     :schema="validationSchema"
     :initialValues="initialValues"
-    @onSuccess="handleSuccess"
+    @onSuccess="handleSuccessCreate"
+    @onError="handleFailedToCreate"
     :showBarGoBack="true"
     title="Create Device Group"
   >
@@ -133,9 +177,9 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="handleSuccess"
+    @onSuccess="handleSuccessEdit"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedToEdit"
     title="Edit Device Group"
   >
     <template #formFields>

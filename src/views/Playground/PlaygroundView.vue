@@ -58,13 +58,11 @@
 </template>
 
 <script setup>
-  import { defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import Card from 'primevue/card'
   import PrimeButton from 'primevue/button'
   import PrimeTag from 'primevue/tag'
   import Skeleton from 'primevue/skeleton'
-
-  import * as MOCKS from './mocks_data'
 
   const showContent = ref(true)
   const reRenderChart = () => {
@@ -92,54 +90,5 @@
     }
   }
 
-  const CHARTS = [
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_HIGH_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_MEDIUM_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/GaugeChart.vue')),
-      title: 'Gauge Chart',
-      size: 4,
-      description:
-        'Displays a value within a range, often used to show progress or performance against a goal. Great for KPI tracking.',
-      data: MOCKS.GAUGE_LOW_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/StackedLineChart.vue')),
-      title: 'Stacked Line Chart',
-      size: 6,
-      description:
-        'Lines are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
-      data: MOCKS.STACKED_LINE_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/StackedBarChart.vue')),
-      title: 'Stacked Bar Chart',
-      size: 6,
-      description:
-        'Bars are divided into segments representing subcategories. Useful for comparing parts of a whole across multiple categories.',
-      data: MOCKS.STACKED_BAR_CHART_DATA
-    },
-    {
-      component: defineAsyncComponent(() => import('./charts/ListChart.vue')),
-      title: 'List Chart',
-      size: 12,
-      description:
-        'Diplays a data information to show in a list table format. Useful for displaying data in a table format. And manipulate columns to hide/show some information',
-      data: MOCKS.COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA
-    }
-  ]
+  const CHARTS = []
 </script>

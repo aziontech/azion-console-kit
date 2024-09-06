@@ -3,7 +3,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
 import * as Errors from '@/services/axios/errors'
 
 export const editDeviceGroupService = async (payload) => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
+  const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/device_groups/${payload.id}`,
     method: 'PATCH',
     body: adapt(payload)
