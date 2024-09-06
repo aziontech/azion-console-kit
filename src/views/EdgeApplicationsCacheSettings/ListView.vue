@@ -5,7 +5,7 @@
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
 
-    const props = defineProps({
+  const props = defineProps({
     edgeApplicationId: {
       required: true,
       type: String
