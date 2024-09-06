@@ -166,12 +166,11 @@ jobs:
         
     - uses: actions/download-artifact@v4
       with:
-        name: coverage_unit_report
+        path: coverage_unit_report
         
     - uses: actions/download-artifact@v4
       with:
-        name: coverage_e2e_report
-        path: coverage.zip
+        path: coverage_e2e_report
         
     - name: Extract E2E Coverage Report
       run: |
