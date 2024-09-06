@@ -2,8 +2,11 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     edgeApplicationId: {
@@ -69,6 +72,7 @@
   ]
 
   const openCreateDrawer = () => {
+    handleTrackClickToCreate()
     drawerRef.value.openCreateDrawer()
   }
   const openEditDrawer = (item) => {
@@ -103,6 +107,22 @@
       }
     ]
   })
+
+  const handleTrackClickToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Cache Settings'
+      })
+      .track()
+  }
+
+  const handleTrackClickToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Cache Settings'
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -124,6 +144,7 @@
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
+    @on-before-go-to-edit="handleTrackClickToEdit"
     emptyListMessage="No cache settings found."
     :actions="actions"
     isTabs
