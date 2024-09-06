@@ -35,7 +35,7 @@ jobs:
         run: yarn test:unit:coverage
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage_unit_report
           path: |
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [2, 3, 4, 5, 6, 7]
+        group: [13, 14]
     steps:
       - uses: actions/checkout@v4
 
@@ -166,11 +166,11 @@ jobs:
         
     - uses: actions/download-artifact@v4
       with:
-        path: coverage_unit_report
+        name: coverage_unit_report
         
     - uses: actions/download-artifact@v4
       with:
-        path: coverage_e2e_report
+        name: coverage_e2e_report
         
     - name: Extract E2E Coverage Report
       run: |
