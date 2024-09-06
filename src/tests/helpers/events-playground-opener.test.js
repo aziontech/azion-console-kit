@@ -10,12 +10,12 @@ const scenarios = [
   {
     label: 'should open a new window for the events playground in the prod environment',
     href: 'https://azion.com',
-    expected: 'https://stage-manager.azion.com/events/graphql#query=undefined&variables=undefined'
+    expected: 'https://manager.azion.com/events/graphql#query=undefined&variables=undefined'
   },
   {
     label: 'should open a new window for the events playground in the stage environment',
     href: 'http://localhost',
-    expected: 'https://stage-manager.azion.com/events/graphql#query=undefined&variables=undefined'
+    expected: 'https://manager.azion.com/events/graphql#query=undefined&variables=undefined'
   }
 ]
 

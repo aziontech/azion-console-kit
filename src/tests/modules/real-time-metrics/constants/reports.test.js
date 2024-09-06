@@ -812,6 +812,59 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          id: '541669034905662013',
+          chartOwner: 'azion',
+          label: 'Transactions',
+          description: '',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'big-numbers',
+          xAxis: 'ts',
+          isTopX: true,
+          rotated: true,
+          dataset: 'botManagerMetrics',
+          dataUnit: 'count',
+          limit: 5000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          groupBy: [],
+          fields: ['sum'],
+          orderDirection: 'ASC',
+          dashboardId: '371360344901061482',
+          // variationType: 'regular',
+          helpCenterPath: ''
+        },
+        {
+          id: '329891149133127508',
+          chartOwner: 'azion',
+          label: 'Bot Traffic',
+          description: '',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'line',
+          xAxis: 'ts',
+          isTopX: false,
+          rotated: false,
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          limit: 5000,
+          groupBy: ['classified'],
+          orderDirection: 'ASC',
+          dashboardId: '371360344901061482',
+          variationType: 'regular',
+          helpCenterPath: ''
+        },
+        {
           aggregationType: 'sum',
           aggregations: [
             {

@@ -10,6 +10,13 @@ export function formatBytesDataUnit(data, chartData) {
   let unit = 'byte'
   let value = data
 
+  if (chartData.dataUnit === 'count') {
+    return {
+      value: value,
+      unit: ''
+    }
+  }
+
   if (chartData.dataUnit === 'bitsPerSecond' || chartData.dataUnit === 'bites') {
     return `${parseFloat(value).toFixed(1)} bits/s`
   }
