@@ -174,7 +174,7 @@ jobs:
         
     - name: Extract E2E Coverage Report
       run: |
-        unzip coverage_e2e/coverage.zip -d coverage_e2e
+        unzip coverage.zip -d coverage_e2e
         pwd
         find ./
         
