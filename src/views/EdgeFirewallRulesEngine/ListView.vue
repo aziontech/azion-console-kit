@@ -4,7 +4,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import Drawer from './Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({
     name: 'edge-firewall-rules-engine-list-view'
@@ -78,6 +81,18 @@
     return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
   }
 
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Edge Functions'
+    })
+  }
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge Functions'
+    })
+  }
+
   const reloadList = () => {
     if (hasContentToList.value) {
       listTableBlockRef.value.reload()
@@ -87,6 +102,7 @@
   }
 
   const openCreateDrawer = () => {
+    handleCreateTrackEvent()
     drawerRef.value.openCreateDrawer()
   }
   const openEditDrawer = (item) => {
@@ -165,6 +181,7 @@
     :editInDrawer="openEditDrawer"
     :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
+    @on-before-go-to-edit="handleTrackEditEvent"
     emptyListMessage="No rules found."
     addButtonLabel="Rules Engine"
     :actions="actions"
