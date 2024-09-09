@@ -834,36 +834,36 @@ const REPORTS = [
    * SECURE
    * Bot Manager - Bot Manager Summary
    */
-  // {
-  //   id: '259047966206560862',
-  //   chartOwner: 'azion',
-  //   label: 'Bot Hits',
-  //   description: '',
-  //   aggregationType: 'sum',
-  //   columns: 6,
-  //   type: 'big-numbers',
-  //   xAxis: 'sum',
-  //   isTopX: true,
-  //   rotated: true,
-  //   dataset: 'botManagerMetrics',
-  //   dataUnit: 'count',
-  //   limit: 5000,
-  //   aggregations: [
-  //     {
-  //       aggregation: 'sum',
-  //       variable: 'requests'
-  //     }
-  //   ],
-  //   filters: {
-  //     classifiedIn: ['bad bot','legitimate']
-  //   },
-  //   groupBy: [],
-  //   fields: ['sum'],
-  //   orderDirection: 'ASC',
-  //   dashboardId: '371360344901061482',
-  //   variationType: 'regular',
-  //   helpCenterPath: ''
-  // },
+  {
+    id: '259047966206560862',
+    chartOwner: 'azion',
+    label: 'Bot Hits',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'big-numbers',
+    xAxis: 'ts',
+    isTopX: true,
+    rotated: true,
+    dataset: 'botManagerMetrics',
+    dataUnit: 'count',
+    limit: 5000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      classifiedIn: ['bad bot', 'legitimate']
+    },
+    groupBy: [],
+    fields: ['sum'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
   {
     id: '541669034905662013',
     chartOwner: 'azion',
@@ -888,7 +888,7 @@ const REPORTS = [
     fields: ['sum'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
-    // variationType: 'regular',
+    variationType: 'regular',
     helpCenterPath: ''
   },
   {
@@ -971,6 +971,33 @@ const REPORTS = [
   //   variationType: 'regular',
   //   helpCenterPath: ''
   // },
+  {
+    id: '577704475532819772',
+    chartOwner: 'azion',
+    label: 'Bot Action',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'action',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    limit: 10,
+    groupBy: ['action'],
+    fields: ['action'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
   /**
    * OBSERVE
    * Data Stream - Data Streamed

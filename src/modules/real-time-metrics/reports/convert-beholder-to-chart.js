@@ -431,13 +431,15 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
   const fieldName = report.fields[0]
+  const dataUnit = report.dataUnit
+  const sumName = report.aggregations[0].aggregation
 
   const series = [seriesName]
-  const values = [fieldName]
+  const values = [dataUnit]
 
   data[dataset].forEach((item) => {
     series.push(item[seriesName])
-    values.push(item[fieldName])
+    values.push(item[sumName] || item[fieldName])
   })
 
   return [series, values]

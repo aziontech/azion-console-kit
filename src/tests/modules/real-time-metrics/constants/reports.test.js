@@ -812,9 +812,9 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
-          id: '541669034905662013',
+          id: '259047966206560862',
           chartOwner: 'azion',
-          label: 'Transactions',
+          label: 'Bot Hits',
           description: '',
           aggregationType: 'sum',
           columns: 6,
@@ -833,22 +833,25 @@ describe('RealTimeMetricsModule', () => {
           ],
           groupBy: [],
           fields: ['sum'],
+          filters: {
+            classifiedIn: ['bad bot', 'legitimate']
+          },
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
-          // variationType: 'regular',
+          variationType: 'regular',
           helpCenterPath: ''
         },
         {
-          id: '329891149133127508',
+          id: '541669034905662013',
           chartOwner: 'azion',
-          label: 'Bot Traffic',
+          label: 'Transactions',
           description: '',
           aggregationType: 'sum',
           columns: 6,
-          type: 'line',
+          type: 'big-numbers',
           xAxis: 'ts',
-          isTopX: false,
-          rotated: false,
+          isTopX: true,
+          rotated: true,
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
           aggregations: [
@@ -858,7 +861,61 @@ describe('RealTimeMetricsModule', () => {
             }
           ],
           limit: 5000,
+          groupBy: [],
+          fields: ['sum'],
+          orderDirection: 'ASC',
+          dashboardId: '371360344901061482',
+          variationType: 'regular',
+          helpCenterPath: ''
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: '',
           groupBy: ['classified'],
+          helpCenterPath: '',
+          id: '329891149133127508',
+          isTopX: false,
+          label: 'Bot Traffic',
+          limit: 5000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          variationType: 'regular',
+          xAxis: 'ts'
+        },
+        {
+          id: '577704475532819772',
+          chartOwner: 'azion',
+          label: 'Bot Action',
+          description: '',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'ordered-bar',
+          xAxis: 'action',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          limit: 10,
+          groupBy: ['action'],
+          fields: ['action'],
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
           variationType: 'regular',

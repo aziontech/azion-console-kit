@@ -157,6 +157,25 @@ function extractAnd(filters) {
   return null
 }
 
+const extractGeneric = (pFilters) => {
+  if (pFilters.or) {
+    return {
+      filters: {
+        or: pFilters.or
+      }
+    }
+  }
+  if (pFilters.classifiedIn) {
+    return {
+      filters: {
+        classifiedIn: pFilters.classifiedIn
+      }
+    }
+  }
+
+  return null
+}
+
 /**
  * Extracts filters, parameters, and variables from the given filters object.
  *
@@ -185,6 +204,11 @@ export default function ExtractFiltersAndVariables(pFilters) {
     Object.assign(filters, andFilter.filters)
     params.push(...andFilter.params)
     Object.assign(variables, andFilter.variables)
+  }
+
+  const genericFilter = extractGeneric(pFilters)
+  if (genericFilter) {
+    Object.assign(filters, genericFilter.filters)
   }
 
   return {

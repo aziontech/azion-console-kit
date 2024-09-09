@@ -39,7 +39,7 @@ function formatC3DataProp(chartData, resultChart) {
   }
 
   if (type === 'ordered-bar') {
-    const field = resultChart[1][0]
+    const field = chartData.dataUnit
 
     data.types = { [field]: 'bar' }
     data.labels = { format: (value) => formatYAxisLabels(value, chartData) }
