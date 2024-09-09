@@ -47,3 +47,4 @@ src/views/Playground/PlaygroundView.vue
 .edge/
 .vulcan
 specs.json
+coverage.txt

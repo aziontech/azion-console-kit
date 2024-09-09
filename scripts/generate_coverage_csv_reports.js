@@ -1,5 +1,5 @@
 import fs from 'fs';
-import xlsx from 'xlsx';
+import path from 'path';
 import console from 'console';
 
 function parseTxtFile(filePath) {
@@ -29,25 +29,24 @@ function generateParentPathsData(parsedData) {
     return [headers, ...parentPathsData];
 }
 
-function exportToXlsx(allData, parentPathsData, outputFilePath) {
-    console.log('Starting to export data to .xlsx file:', outputFilePath);
+function exportToCsv(data, outputFilePath) {
+    console.log('Starting to export data to .csv file:', outputFilePath);
 
-    const allDataWorksheet = xlsx.utils.aoa_to_sheet(allData);
-    const parentPathsWorksheet = xlsx.utils.aoa_to_sheet(parentPathsData);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, allDataWorksheet, 'All Data');
-    xlsx.utils.book_append_sheet(workbook, parentPathsWorksheet, 'Parent Paths Data');
-
-    xlsx.writeFile(workbook, outputFilePath);
+    const csvContent = data.map(row => row.join(',')).join('\n');
+    fs.writeFileSync(outputFilePath, csvContent);
 
     console.log('Data exported successfully to', outputFilePath);
 }
 
 const txtFilePath = './coverage.txt';
-const xlsxFilePath = './coverage/e2e/coverage-report.xlsx';
+const allDataCsvPath = path.join('./coverage/e2e', 'coverage-report-all.csv');
+const parentPathsCsvPath = path.join('./coverage/e2e', 'coverage-report-parents.csv');
 
 console.log('Script execution started.');
 const parsedData = parseTxtFile(txtFilePath);
 const parentPathsData = generateParentPathsData(parsedData);
-exportToXlsx(parsedData, parentPathsData, xlsxFilePath);
+
+exportToCsv(parsedData, allDataCsvPath);
+exportToCsv(parentPathsData, parentPathsCsvPath);
+
 console.log('Script execution completed.');
