@@ -6,6 +6,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -208,6 +209,32 @@
     }
   }
 
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Error Responses',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Error Responses',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+
+    closeDrawerEdit()
+  }
+
   const closeDrawerEdit = () => {
     showEditRulesEngineDrawer.value = false
   }
@@ -256,6 +283,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateRulesEngine"
+    @onError="handleFailedToCreate"
     :showBarGoBack="true"
     title="Create Rule"
     data-testid="rules-engine-create-drawer"
@@ -286,7 +314,7 @@
     :schema="validationSchema"
     @onSuccess="handleEditRulesEngine"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedToEdit"
     title="Edit Rule"
     data-testid="rules-engine-edit-drawer"
   >
