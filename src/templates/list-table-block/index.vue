@@ -490,12 +490,12 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
+        const errorMessage = error.message || error
         toast.add({
           closable: true,
           severity: 'error',
           summary: 'error',
-          detail: 'Error fetching data:',
-          error
+          detail: `Error fetching data: ${errorMessage}`
         })
       } finally {
         isLoading.value = false
