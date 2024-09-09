@@ -23,7 +23,7 @@ function generateParentPathsData(parsedData) {
 
     const parentPathsData = data.filter(row => {
         const fileName = row[0].trim();
-        return !fileName.includes('.');
+        return !fileName.includes('.') || (fileName.startsWith('...') && !fileName.slice(3).includes('.'));
     });
 
     return [headers, ...parentPathsData];
