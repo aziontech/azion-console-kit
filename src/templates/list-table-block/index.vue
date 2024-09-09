@@ -495,7 +495,7 @@
           closable: true,
           severity: 'error',
           summary: 'error',
-          detail: `Error fetching data: ${errorMessage}`
+          detail: errorMessage
         })
       } finally {
         isLoading.value = false
