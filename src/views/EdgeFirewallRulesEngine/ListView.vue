@@ -83,13 +83,13 @@
 
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
-      productName: 'Edge Functions'
+      productName: 'Rules Engine'
     })
   }
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Edge Functions'
+      productName: 'Rules Engine'
     })
   }
 
