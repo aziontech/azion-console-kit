@@ -41,7 +41,9 @@ const makeSut = () => {
 
 describe('FeedbackServices', () => {
   it('should call API with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(fixtures.mockHttpResponse)
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce(fixtures.mockHttpResponse)
 
     const { sut } = makeSut()
     await sut(fixtures.mockPayload)
