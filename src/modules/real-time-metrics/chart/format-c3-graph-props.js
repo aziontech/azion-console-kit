@@ -288,7 +288,7 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
 export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
-  const sliced = resultChart.slice(1)
+  let sliced = resultChart.slice(1)
 
   let seriesNames = {}
   let seriesAccumulator = 0
@@ -298,6 +298,7 @@ export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMea
 
   sliced.forEach((series) => {
     let seriesTotal = series.slice(1).reduce((acc, value) => acc + value, 0)
+
     if (hasMeanLineTotal) {
       seriesAccumulator += seriesTotal
       numberOfSeries += series.slice(1).length
@@ -396,26 +397,44 @@ export function FormatC3GraphProps({
   hasMeanLineSeries = false,
   hasMeanLineTotal = false
 }) {
+  const timeSeriesInfo = {
+    seriesNames: null,
+    meanLineTotal: null,
+    meanLineSeries: null
+  }
+
   const pattern = [...CHART_RULES.BASE_COLOR_PATTERNS]
 
   const legendPosition = setLegendPosition(chartData, resultChart)
 
-  const { seriesNames, meanLineTotal, meanLineSeries } = getSeriesInfos(
-    resultChart,
-    chartData,
-    hasMeanLineSeries,
-    hasMeanLineTotal
-  )
+  const isTimeseries = chartData.xAxis === 'ts'
+
+  if (isTimeseries) {
+    const { seriesNames, meanLineTotal, meanLineSeries } = getSeriesInfos(
+      resultChart,
+      chartData,
+      hasMeanLineSeries,
+      hasMeanLineTotal
+    )
+
+    timeSeriesInfo.seriesNames = seriesNames
+    timeSeriesInfo.meanLineSeries = meanLineSeries
+    timeSeriesInfo.meanLineTotal = meanLineTotal
+  }
+
   const data = {
-    ...formatC3DataProp(chartData, resultChart),
-    names: seriesNames
+    ...formatC3DataProp(chartData, resultChart)
+  }
+
+  if (isTimeseries) {
+    data.names = timeSeriesInfo.seriesNames
   }
 
   if (hasMeanLineTotal && resultChart.length > 1) {
     const meanLineIndex = resultChart.length - 1
     pattern.splice(meanLineIndex, 0, CHART_RULES.MEAN_LINE_PATTERN)
 
-    data.columns = [...data.columns, meanLineTotal]
+    data.columns = [...data.columns, timeSeriesInfo.meanLineTotal]
   }
 
   if (hasMeanLineSeries && resultChart.length > 1) {
@@ -423,11 +442,35 @@ export function FormatC3GraphProps({
     const meanLineSeriesIndex = resultChart.length + meanLineIndexCount
     const existsColorPattern = pattern.slice(0, meanLineSeriesIndex)
     pattern.splice(meanLineSeriesIndex, 0, ...existsColorPattern)
-    data.columns = [...data.columns, ...meanLineSeries]
+    data.columns = [...data.columns, ...timeSeriesInfo.meanLineSeries]
   }
 
   const showFocus = (chartData) => {
     return chartData.type !== 'ordered-bar'
+  }
+
+  const formatGauge = () => {
+    const threshold = chartData.threshold || [30, 60, 90]
+    const maxSupportedValue = threshold.at(-1)
+    const color = CHART_RULES.GAUGE_COLOR_SCHEMA[chartData.variationType]
+
+    return {
+      gauge: {
+        label: {
+          format: function (value) {
+            return `${formatYAxisLabels(value, chartData)}`
+          },
+          show: false
+        },
+        max: maxSupportedValue
+      },
+      color: {
+        pattern: color,
+        threshold: {
+          values: threshold
+        }
+      }
+    }
   }
 
   const c3Props = {
@@ -471,6 +514,16 @@ export function FormatC3GraphProps({
     zoom: {
       enabled: chartData.xAxis === 'ts'
     }
+  }
+
+  if (chartData.type === 'gauge') {
+    delete c3Props.data.x
+    delete c3Props.axis
+    delete c3Props.grid
+
+    const { gauge, color } = formatGauge()
+    c3Props.gauge = gauge
+    c3Props.color = color
   }
 
   return c3Props

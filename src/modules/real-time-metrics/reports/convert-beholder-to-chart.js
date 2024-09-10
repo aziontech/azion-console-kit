@@ -374,50 +374,13 @@ const formatStackedBarChart = ({ report, data }) => {
 
 const formatGaugeChart = ({ report, data }) => {
   const dataset = Object.keys(data)
-  const geolocCountryName = report.groupBy[0]
-  const columnName = data[dataset][0][geolocCountryName]
-  const fieldName = report.fields[0]
+  const columnName = report.groupBy[0] || report.aggregations[0].variable
 
-  const totalGaugeValue = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
-  const threshold = report.threshold || [30, 60, 90]
-  const maxSupportedValue = threshold[threshold.length - 1]
+  const keyValue = Object.keys(data[dataset][0])
 
-  return [
-    {
-      id: crypto.randomUUID().toString(),
-      data: {
-        columns: [[columnName, totalGaugeValue]],
-        type: 'gauge'
-      },
-      gauge: {
-        label: {
-          format: function (value) {
-            return `${formatYAxisLabels(value, report)}`
-          },
-          show: false
-        },
-        max: maxSupportedValue
-      },
-      color: {
-        pattern: [
-          'var(--scale-red)',
-          'var(--scale-orange)',
-          'var(--scale-yellow)',
-          'var(--scale-green)'
-        ],
-        threshold: {
-          values: threshold
-        }
-      },
-      tooltip: {
-        format: {
-          value: function (value) {
-            return formatYAxisLabels(value, report)
-          }
-        }
-      }
-    }
-  ]
+  const total = data[dataset][0][keyValue[0]]
+
+  return [[camelToTitle(columnName), total]]
 }
 
 /**
