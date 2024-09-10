@@ -6,7 +6,7 @@ import { CHART_RULES } from '@modules/real-time-metrics/constants'
  * @param {any} date - The input to be checked
  * @returns {boolean} - Returns true if the input is a valid date, otherwise returns false
  */
-function isDate(date) {
+export function isDate(date) {
   const series = date
   // eslint-disable-next-line eqeqeq
   return new Date(series) != 'Invalid Date'
@@ -42,7 +42,7 @@ function formatC3DataProp(chartData, resultChart) {
     const field = resultChart[1][0]
 
     data.types = { [field]: 'bar' }
-    data.labels = true
+    data.labels = { format: (value) => formatYAxisLabels(value, chartData) }
     data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index]
 
     return data
@@ -63,7 +63,7 @@ function formatC3DataProp(chartData, resultChart) {
  * @param {Array} resultChart - The result chart
  * @returns {Object} - Returns the formatted C3 X Axis
  */
-function formatC3XAxis(chartData, resultChart) {
+export function formatC3XAxis(chartData, resultChart) {
   const isSeriesDate = isDate(resultChart[0][1])
   const isSeriesNumeric = isNumeric(resultChart)
   const isTimeSeries = chartData.xAxis === 'ts'
@@ -166,7 +166,7 @@ function formatDataUnit(data) {
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted Y axis labels for the C3 chart
  */
-function formatYAxisLabels(data, chartData) {
+export function formatYAxisLabels(data, chartData) {
   if (chartData.dataUnit === 'bytes' || chartData.dataUnit === 'bitsPerSecond') {
     return formatBytesDataUnit(data, chartData)
   }
@@ -187,7 +187,7 @@ function formatYAxisLabels(data, chartData) {
  * @param {Object} chartData - The chart data
  * @returns {Object} - Returns the formatted Y axis of the C3 chart
  */
-function formatC3YAxis(chartData) {
+export function formatC3YAxis(chartData, hasCount = true) {
   const hiddenTypes = ['ordered-bar']
 
   if (hiddenTypes.includes(chartData.type)) {
@@ -199,11 +199,14 @@ function formatC3YAxis(chartData) {
      * Configuration of the Y axis tick
      */
     tick: {
-      count: CHART_RULES.MAX_COUNT,
       format: (d) => formatYAxisLabels(d, chartData)
     },
     min: !isRotated ? CHART_RULES.RESET_COUNT : undefined,
     padding: { bottom: 0 }
+  }
+
+  if (hasCount) {
+    yAxis.tick.count = CHART_RULES.MAX_COUNT
   }
   if (chartData.maxYAxis) {
     yAxis.max = chartData.maxYAxis
@@ -249,7 +252,7 @@ function generateMeanLineValues(resultChart, mean) {
  * @param {string} text - The camelCase string to convert
  * @returns {string} - The title case string
  */
-function camelToTitle(text) {
+export function camelToTitle(text) {
   const title = text.replace(/([A-Z])/g, ' $1').replace(/([a-zA-Z])(\d+)/g, '$1 $2')
   return title.charAt(0).toUpperCase() + title.slice(1)
 }
@@ -284,7 +287,7 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * @param {boolean} hasMeanLineTotal - Indicates if the chart has mean line total
  * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
-function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
+export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
   const sliced = resultChart.slice(1)
 
   let seriesNames = {}
@@ -387,7 +390,7 @@ function displayLegend(chartData) {
  * @param {boolean} options.hasMeanLineTotal - Flag indicating if the chart has mean line total
  * @returns {Object} The formatted C3 graph properties
  */
-export default function FormatC3GraphProps({
+export function FormatC3GraphProps({
   chartData,
   resultChart,
   hasMeanLineSeries = false,
@@ -423,6 +426,10 @@ export default function FormatC3GraphProps({
     data.columns = [...data.columns, ...meanLineSeries]
   }
 
+  const showFocus = (chartData) => {
+    return chartData.type !== 'ordered-bar'
+  }
+
   const c3Props = {
     data,
     axis: {
@@ -436,6 +443,9 @@ export default function FormatC3GraphProps({
     grid: {
       y: {
         show: displayGrid(chartData)
+      },
+      focus: {
+        show: showFocus(chartData)
       }
     },
     point: {
@@ -452,7 +462,10 @@ export default function FormatC3GraphProps({
         )
       },
       format: {
-        title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d)
+        title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d),
+        value: function (value) {
+          return formatYAxisLabels(value, chartData)
+        }
       }
     },
     zoom: {

@@ -5,8 +5,11 @@
   import ListTableBlock from '@/templates/list-table-block'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     edgeApplicationId: {
@@ -89,6 +92,7 @@
   }
 
   const openCreateDeviceGroupDrawer = () => {
+    handleTrackClickToCreate()
     drawerDeviceGroups.value.openDrawerCreate()
   }
 
@@ -116,6 +120,21 @@
       service: deleteDeviceGroupsWithDecorator
     }
   ]
+
+  const handleTrackClickToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Device Groups'
+      })
+      .track()
+  }
+  const handleTrackClickToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Device Groups'
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -135,6 +154,7 @@
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
+      @on-before-go-to-edit="handleTrackClickToEdit"
       emptyListMessage="No device groups found."
       :actions="actions"
       isTabs

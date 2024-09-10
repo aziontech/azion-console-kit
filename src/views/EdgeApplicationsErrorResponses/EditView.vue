@@ -5,6 +5,7 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -49,6 +50,17 @@
       })
       .track()
   }
+  const handleTrackFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Error Responses',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     originId: yup.string().required().label('Origin'),
@@ -75,6 +87,7 @@
     :schema="validationSchema"
     isTabs
     @on-edit-success="handleTrackSuccessEdit"
+    @on-edit-fail="handleTrackFailedToEdit"
     disableRedirect
   >
     <template #form="{ errors }">
