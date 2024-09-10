@@ -73,7 +73,7 @@
   const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
-        productName: 'Waf Rules'
+        productName: 'WAF Rules'
       })
       .track()
   }
@@ -81,7 +81,7 @@
   const handleTrackClickToEdit = () => {
     tracker.product
       .clickToEdit({
-        productName: 'Waf Rules'
+        productName: 'WAF Rules'
       })
       .track()
   }
