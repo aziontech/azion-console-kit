@@ -97,12 +97,13 @@
     />
     <div class="flex flex-col gap-8 my-4">
       <div class="flex gap-1">
-        <p class="text-xs font-medium leading-4">
+        <p class="text-xs text-color font-medium leading-4">Specification</p>
+        <p class="text-xs text-color-secondary font-normal leading-4">
           {{ props.tabSelected.description }}
         </p>
       </div>
     </div>
-    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border">
+    <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
       <ContentFilterBlock
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"

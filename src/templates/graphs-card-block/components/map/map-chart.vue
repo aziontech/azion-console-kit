@@ -35,7 +35,8 @@
   import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
   const props = defineProps({
-    resultChart: Array
+    resultChart: Array,
+    chartData: Object
   })
 
   const mapTemplateRef = ref(null)
@@ -139,7 +140,8 @@
         value: feature.get('value'),
         kind: feature.get('kind'),
         yAxis: pixel[1],
-        xAxis: pixel[0]
+        xAxis: pixel[0],
+        chartData: props.chartData
       }
     } else {
       hideTooltip()
