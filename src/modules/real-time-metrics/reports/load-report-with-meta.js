@@ -89,7 +89,7 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
 
   const hasDataset = dataset && resultQueryRaw[dataset].length > 1
 
-  if (hasDataset) {
+  if (hasDataset && isTimeSeries) {
     resultQuery = removeUnfinishedRegister(resultQueryRaw, filterLastRegisterFail)
   }
 
