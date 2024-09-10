@@ -255,6 +255,19 @@ const backRules = [
       },
       rewrite: '/aziontech/console-client-list/main/clids.json'
     }
+  },
+  {
+    name: 'Route Send Feedback',
+    description: 'this route will send user feedback to jira',
+    match: '^/api/webhook/console_feedback',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-console-feedback',
+        type: 'single_origin'
+      },
+      rewrite: '/webhook/console_feedback'
+    }
   }
 ]
 
@@ -302,6 +315,12 @@ const AzionConfig = {
       type: 'single_origin',
       hostHeader: `raw.githubusercontent.com`,
       addresses: [`raw.githubusercontent.com`]
+    },
+    {
+      name: 'origin-console-feedback',
+      type: 'single_origin',
+      hostHeader: `https://automate.azion.net`,
+      addresses: [`https://automate.azion.net`]
     },
   ],
   rules: {

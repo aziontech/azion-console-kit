@@ -1142,11 +1142,6 @@
   resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.1.tgz#b9da6a878a371829a0502c9b6c1c143ef6663f4d"
   integrity sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==
 
-"@feedback-fish/vue@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@feedback-fish/vue/-/vue-1.0.1.tgz#27ab8b04591dcd347b35411ed03616e7e833ad76"
-  integrity sha512-j50djPdr8pUuiQDSgzSpSZGFHcGBYL0pMvipuRsMjN7/tm57mE477N4TRRFvsU09F1mvOlmUGcVm124j7e/3IA==
-
 "@guolao/vue-monaco-editor@^1.3.0":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@guolao/vue-monaco-editor/-/vue-monaco-editor-1.3.0.tgz"
