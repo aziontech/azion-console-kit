@@ -84,6 +84,8 @@
   import Textarea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
 
+  defineOptions({ name: 'console-feedback' })
+
   const props = defineProps({
     class: {
       type: String

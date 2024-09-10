@@ -8,7 +8,7 @@
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
   import InputText from 'primevue/inputtext'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   defineOptions({
     name: 'more-details'
@@ -130,7 +130,7 @@
   >
     <template #header>
       <h2>More Details</h2>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
     <div class="flex flex-col p-0 gap-6 sm:gap-8 sm:p-8">
       <div
