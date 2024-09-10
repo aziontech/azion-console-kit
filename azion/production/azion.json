@@ -63,6 +63,11 @@
       "origin-id": 142751,
       "origin-key": "4c361d2f-dbb5-42c0-a6b6-28b0e6e50d91",
       "name": "console_kit_31-07-2024_single"
+    },
+    {
+      "origin-id": 153663,
+      "origin-key": "6ec17c87-d2fb-4c28-a3b7-588b1ae61bf2",
+      "name": "origin-github-allowed-accounts"
     }
   ],
   "rules-engine": {
@@ -142,6 +147,11 @@
         "id": 269763,
         "name": "Secure Headers",
         "phase": "response"
+      },
+      {
+        "id": 296352,
+        "name": "Route List Client Ids to Github",
+        "phase": "request"
       }
     ]
   },
