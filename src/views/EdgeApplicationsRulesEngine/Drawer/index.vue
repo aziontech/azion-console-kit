@@ -213,7 +213,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Error Responses',
+        productName: 'Rules Engine',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -225,7 +225,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Error Responses',
+        productName: 'Rules Engine',
         errorMessage: message,
         fieldName: fieldName,
         errorType: 'api'
