@@ -319,8 +319,8 @@ const AzionConfig = {
     {
       name: 'origin-console-feedback',
       type: 'single_origin',
-      hostHeader: `https://automate.azion.net`,
-      addresses: [`https://automate.azion.net`]
+      hostHeader: `automate.azion.net`,
+      addresses: [`automate.azion.net`]
     },
   ],
   rules: {
