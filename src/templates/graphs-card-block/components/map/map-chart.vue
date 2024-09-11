@@ -38,8 +38,6 @@
     resultChart: Array
   })
 
-
-
   const mapTemplateRef = ref(null)
   const map = ref(null)
   const tooltipProps = ref({})
@@ -135,7 +133,6 @@
 
   const displayTooltip = (pixel) => {
     const feature = map.value.forEachFeatureAtPixel(pixel, (feature) => feature)
-
 
     if (feature && feature.get('kind')) {
       tooltipProps.value = {

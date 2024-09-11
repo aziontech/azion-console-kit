@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
- defineProps({
+  defineProps({
     data: {
       type: Object,
       default: () => {}
