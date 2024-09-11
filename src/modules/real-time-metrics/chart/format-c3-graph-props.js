@@ -90,6 +90,10 @@ export function formatC3XAxis(chartData, resultChart) {
 
   if (isRotated && !isSeriesDate) {
     xAxis.min = CHART_RULES.RESET_COUNT
+    xAxis.tick = {
+      ...xAxis.tick,
+      width: CHART_RULES.LABEL.width
+    }
   }
 
   return xAxis
@@ -353,18 +357,8 @@ function resetTooltipLabel(tooltipData) {
  * @param {string} legendPosition - The position of the legend
  * @returns {Object|null} - The legend padding object or null
  */
-function setLegendPadding(legendPosition, isRotated) {
-  let padding = {}
-
-  if (legendPosition === 'bottom') {
-    padding.position = CHART_RULES.BOTTOM_LEGEND_PADDING
-  }
-
-  if (isRotated) {
-    padding.left = CHART_RULES.LEFT_LEGEND_PADDING.left
-  }
-
-  return padding
+function setLegendPadding(legendPosition) {
+  return legendPosition === 'bottom' ? CHART_RULES.BOTTOM_LEGEND_PADDING : null
 }
 
 /**
@@ -491,9 +485,7 @@ export function FormatC3GraphProps({
       y: formatC3YAxis(chartData)
     },
     legend: { position: legendPosition, hide: displayLegend(chartData) },
-    padding: {
-      ...setLegendPadding(legendPosition, chartData.rotated)
-    },
+    padding: setLegendPadding(legendPosition),
     color: { pattern },
     grid: {
       y: {

@@ -34,7 +34,7 @@ const GAUGE_COLOR_SCHEMA = {
 }
 
 const LABEL = {
-  width: 40,
+  width: 50,
   defaultPosition: 'outer-center',
   rotatedPosition: 'outer-middle'
 }
@@ -42,10 +42,6 @@ const LABEL = {
 const BOTTOM_LEGEND_PADDING = {
   bottom: 16,
   right: 30
-}
-
-const LEFT_LEGEND_PADDING = {
-  left: 100
 }
 
 const BASE_COLOR_PATTERNS = [
@@ -85,8 +81,7 @@ const CHART_RULES = {
   BOTTOM_LEGEND_PADDING,
   BASE_COLOR_PATTERNS,
   MEAN_LINE_PATTERN,
-  GAUGE_COLOR_SCHEMA,
-  LEFT_LEGEND_PADDING
+  GAUGE_COLOR_SCHEMA
 }
 
 export default CHART_RULES
