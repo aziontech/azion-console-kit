@@ -330,7 +330,6 @@ const formatTsChartData = ({
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
-
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
@@ -474,7 +473,7 @@ const formatListChart = ({ report, data }) => {
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
-  const fieldName = report.fields[0]
+  const fieldName = report.aggregations[0].aggregation || report.fields[0]
 
   const heatmap = data[dataset].map((datasetMapData) => {
     const result = {

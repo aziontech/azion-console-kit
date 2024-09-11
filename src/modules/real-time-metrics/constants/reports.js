@@ -955,7 +955,7 @@ const REPORTS = [
     type: 'ordered-bar',
     xAxis: 'requests',
     isTopX: true,
-    rotated: false,
+    rotated: true,
     dataUnit: 'count',
     dataset: 'botManagerMetrics',
     aggregations: [
@@ -982,7 +982,7 @@ const REPORTS = [
     type: 'ordered-bar',
     xAxis: 'cat',
     isTopX: true,
-    rotated: false,
+    rotated: true,
     dataUnit: 'count',
     dataset: 'botManagerMetrics',
     aggregations: [
@@ -1014,7 +1014,7 @@ const REPORTS = [
     type: 'ordered-bar',
     xAxis: 'cat',
     isTopX: true,
-    rotated: false,
+    rotated: true,
     dataUnit: 'count',
     dataset: 'botManagerMetrics',
     aggregations: [
