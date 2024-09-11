@@ -479,6 +479,7 @@ const formatMapChartData = ({ report, data }) => {
     const result = {
       countryName: datasetMapData[geolocCountryName],
       value: datasetMapData[fieldName],
+      exhibitionValue: formatYAxisLabels(datasetMapData[fieldName], report),
       rangeVariation: report.variationType
     }
 

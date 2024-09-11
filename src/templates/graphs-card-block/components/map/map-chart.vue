@@ -35,9 +35,10 @@
   import MapTooltipBlock from './map-chart-blocks/map-tooltip-block.vue'
 
   const props = defineProps({
-    resultChart: Array,
-    chartData: Object
+    resultChart: Array
   })
+
+
 
   const mapTemplateRef = ref(null)
   const map = ref(null)
@@ -70,7 +71,8 @@
 
       area.setProperties({
         kind: 'heatmap',
-        value: areaData.value
+        value: areaData.value,
+        exhibitionValue: areaData.exhibitionValue
       })
 
       setFeatureStyle(area, areaData.variation)
@@ -134,14 +136,15 @@
   const displayTooltip = (pixel) => {
     const feature = map.value.forEachFeatureAtPixel(pixel, (feature) => feature)
 
+
     if (feature && feature.get('kind')) {
       tooltipProps.value = {
         label: feature.get('name'),
         value: feature.get('value'),
+        exhibitionValue: feature.get('exhibitionValue'),
         kind: feature.get('kind'),
         yAxis: pixel[1],
-        xAxis: pixel[0],
-        chartData: props.chartData
+        xAxis: pixel[0]
       }
     } else {
       hideTooltip()
