@@ -172,6 +172,13 @@ const extractGeneric = (pFilters) => {
       }
     }
   }
+  if (pFilters.not) {
+    return {
+      filters: {
+        not: pFilters.not
+      }
+    }
+  }
 
   return null
 }
