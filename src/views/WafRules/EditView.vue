@@ -3,6 +3,8 @@
     :editService="submitEditWafRules"
     :loadService="loadWaf"
     :schema="validationSchema"
+    @on-edit-success="handleTrackSuccessEdit"
+    @on-edit-fail="handleTrackFailEdit"
     :isTabs="true"
     :updatedRedirect="props.updatedRedirect"
     disableRedirect
@@ -24,14 +26,37 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import EditFormBlock from '@templates/edit-form-block'
 
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const emit = defineEmits(['handleWafRulesUpdated'])
 
   const route = useRoute()
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'WAF Rules'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'WAF Rules',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const props = defineProps({
     editWafRulesService: {
