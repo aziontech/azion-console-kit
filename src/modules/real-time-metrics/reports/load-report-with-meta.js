@@ -77,7 +77,12 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
   const isTimeSeries = newReport.xAxis === 'ts'
 
   if (dataset && isTimeSeries) {
-    const props = { tsRangeFilter: filters.tsRange, data: resultQuery[dataset] }
+    const props = {
+      tsRangeFilter: filters.tsRange,
+      data: resultQuery[dataset],
+      groupBy: report.groupBy[1] || null,
+      aggregationType: report.aggregationType
+    }
 
     resultQuery[dataset] = FillResultQuery(props)
   }
