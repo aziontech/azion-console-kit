@@ -1,7 +1,7 @@
 /* eslint-disable id-length */
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
-import { formatBytesDataUnit } from '../chart/format-graph'
+import { formatDataUnit } from '../chart/format-graph'
 import countries from '../helpers/countries-code.json'
 
 import {
@@ -394,14 +394,14 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const seriesName = report.groupBy[0]
   const fieldName = report.fields[0]
   const dataUnit = report.dataUnit
-  const sumName = report.aggregations[0].aggregation
+  const aggregation = report.aggregationType
 
   const series = [seriesName]
   const values = [dataUnit]
 
   data[dataset].forEach((item) => {
     series.push(camelToTitle(item[seriesName]))
-    values.push(item[sumName] || item[fieldName])
+    values.push(item[aggregation] || item[fieldName])
   })
 
   return [series, values]
@@ -417,9 +417,10 @@ const formatRotatedBarChartData = ({ report, data }) => {
 const formatBigNumbers = ({ report, data }) => {
   const dataset = Object.keys(data)
   const fieldName = report.fields[0]
+  const aggregation = report.aggregationType
 
-  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
-  const { unit, value } = formatBytesDataUnit(total, report)
+  const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
+  const { unit, value } = formatDataUnit(total, report)
 
   return [
     {
