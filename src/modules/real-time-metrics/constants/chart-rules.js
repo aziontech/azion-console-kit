@@ -44,6 +44,10 @@ const BOTTOM_LEGEND_PADDING = {
   right: 30
 }
 
+const LEFT_LEGEND_PADDING = {
+  left: 100
+}
+
 const BASE_COLOR_PATTERNS = [
   'var(--series-one-color)',
   'var(--series-two-color)',
@@ -81,7 +85,8 @@ const CHART_RULES = {
   BOTTOM_LEGEND_PADDING,
   BASE_COLOR_PATTERNS,
   MEAN_LINE_PATTERN,
-  GAUGE_COLOR_SCHEMA
+  GAUGE_COLOR_SCHEMA,
+  LEFT_LEGEND_PADDING
 }
 
 export default CHART_RULES

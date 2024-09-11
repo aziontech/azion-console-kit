@@ -353,8 +353,18 @@ function resetTooltipLabel(tooltipData) {
  * @param {string} legendPosition - The position of the legend
  * @returns {Object|null} - The legend padding object or null
  */
-function setLegendPadding(legendPosition) {
-  return legendPosition === 'bottom' ? CHART_RULES.BOTTOM_LEGEND_PADDING : null
+function setLegendPadding(legendPosition, isRotated) {
+  let padding = {}
+
+  if (legendPosition === 'bottom') {
+    padding.position = CHART_RULES.BOTTOM_LEGEND_PADDING
+  }
+
+  if (isRotated) {
+    padding.left = CHART_RULES.LEFT_LEGEND_PADDING.left
+  }
+
+  return padding
 }
 
 /**
@@ -481,7 +491,9 @@ export function FormatC3GraphProps({
       y: formatC3YAxis(chartData)
     },
     legend: { position: legendPosition, hide: displayLegend(chartData) },
-    padding: setLegendPadding(legendPosition),
+    padding: {
+      ...setLegendPadding(legendPosition, chartData.rotated)
+    },
     color: { pattern },
     grid: {
       y: {

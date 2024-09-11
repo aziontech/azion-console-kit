@@ -400,7 +400,7 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const values = [dataUnit]
 
   data[dataset].forEach((item) => {
-    series.push(item[seriesName])
+    series.push(camelToTitle(item[seriesName]))
     values.push(item[sumName] || item[fieldName])
   })
 
