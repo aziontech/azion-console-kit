@@ -29,7 +29,7 @@ describe('RealTimeMetricsModule', () => {
           cat: 'category'
         },
         LABEL: {
-          width: 40,
+          width: 50,
           defaultPosition: 'outer-center',
           rotatedPosition: 'outer-middle'
         },
@@ -55,7 +55,21 @@ describe('RealTimeMetricsModule', () => {
           'var(--series-seven-color)',
           'var(--series-eight-color)'
         ],
-        MEAN_LINE_PATTERN: 'var(--text-color)'
+        MEAN_LINE_PATTERN: 'var(--text-color)',
+        GAUGE_COLOR_SCHEMA: {
+          inverse: [
+            'var(--scale-green)',
+            'var(--scale-yellow)',
+            'var(--scale-orange)',
+            'var(--scale-red)'
+          ],
+          regular: [
+            'var(--scale-red)',
+            'var(--scale-orange)',
+            'var(--scale-yellow)',
+            'var(--scale-green)'
+          ]
+        }
       }
 
       expect(CHART_RULES).toEqual(chartRules)
