@@ -179,7 +179,7 @@ const extractGeneric = (pFilters) => {
       }
     }
   }
-  if(pFilters.classifiedEq) {
+  if (pFilters.classifiedEq) {
     return {
       filters: {
         classifiedEq: pFilters.classifiedEq
@@ -187,7 +187,7 @@ const extractGeneric = (pFilters) => {
     }
   }
 
-  if(pFilters.actionEq) {
+  if (pFilters.actionEq) {
     return {
       filters: {
         actionEq: pFilters.actionEq
@@ -195,7 +195,7 @@ const extractGeneric = (pFilters) => {
     }
   }
 
-  if(pFilters.botCategoryIn) {
+  if (pFilters.botCategoryIn) {
     return {
       filters: {
         botCategoryIn: pFilters.botCategoryIn
