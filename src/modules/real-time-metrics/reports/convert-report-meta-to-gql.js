@@ -79,8 +79,8 @@ export default class GqlRules {
    * @return {void}
    */
   setOrderBy() {
+    const hasAggregation = this.aggregations?.length
     if (this.isTopX) {
-      const hasAggregation = this.aggregations?.length
       if (hasAggregation) {
         this.orderBy = `${this.aggregations[0].aggregation}_${this.orderDirection}`
       } else {
@@ -88,8 +88,10 @@ export default class GqlRules {
       }
     } else if (this.xAxis === 'ts') {
       this.orderBy = `ts_${this.orderDirection}`
+    } else if (hasAggregation) {
+      this.orderBy = `${this.aggregations[0].aggregation}_${this.orderDirection}`
     } else {
-      this.orderBy = `${this.aggregationType}_${this.orderDirection}`
+      this.orderBy = this.xAxis
     }
   }
 
