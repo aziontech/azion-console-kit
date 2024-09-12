@@ -179,7 +179,29 @@ const extractGeneric = (pFilters) => {
       }
     }
   }
+  if(pFilters.classifiedEq) {
+    return {
+      filters: {
+        classifiedEq: pFilters.classifiedEq
+      }
+    }
+  }
 
+  if(pFilters.actionEq) {
+    return {
+      filters: {
+        actionEq: pFilters.actionEq
+      }
+    }
+  }
+
+  if(pFilters.botCategoryIn) {
+    return {
+      filters: {
+        botCategoryIn: pFilters.botCategoryIn
+      }
+    }
+  }
   return null
 }
 
