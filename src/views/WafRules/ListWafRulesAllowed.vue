@@ -91,10 +91,13 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const route = useRoute()
   const hasContentToList = ref(true)
@@ -212,6 +215,18 @@
     hasContentToList.value = event
   }
 
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Allowed Rules'
+    })
+  }
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Allowed Rules'
+    })
+  }
+
   const goToWafRulesTuning = () => {
     emit('handle-go-to-tuning', { index: 1 })
   }
@@ -245,10 +260,12 @@
   const openEditDrawerWafRulesAllowed = (event) => {
     selectedWafRulesAllowedToEdit.value = parseInt(event.id)
     showEditWafRulesAllowedDrawer.value = true
+    handleTrackEditEvent()
   }
 
   const openCreateDrawerWafAllowed = () => {
     showCreateWafRulesAllowedDrawer.value = true
+    handleCreateTrackEvent()
   }
 
   const actions = [
