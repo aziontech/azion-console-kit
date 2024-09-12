@@ -48,6 +48,10 @@ function formatC3DataProp(chartData, resultChart) {
     return data
   }
 
+  if (type === 'pie') {
+    delete data.x
+  }
+
   data.type = type
 
   if (isDate(resultChart[0][1])) {
@@ -453,6 +457,20 @@ export function FormatC3GraphProps({
     return chartData.type !== 'ordered-bar'
   }
 
+  const handleAxis = () => {
+    const axis = {
+      rotated: chartData.rotated,
+      x: formatC3XAxis(chartData, resultChart),
+      y: formatC3YAxis(chartData)
+    }
+
+    if (chartData.type === 'pie') {
+      return null
+    }
+
+    return axis
+  }
+
   const formatGauge = () => {
     const threshold = chartData.threshold || [30, 60, 90]
     const maxSupportedValue = threshold.at(-1)
@@ -479,11 +497,7 @@ export function FormatC3GraphProps({
 
   const c3Props = {
     data,
-    axis: {
-      rotated: chartData.rotated,
-      x: formatC3XAxis(chartData, resultChart),
-      y: formatC3YAxis(chartData)
-    },
+    axis: { ...handleAxis() },
     legend: { position: legendPosition, hide: displayLegend(chartData) },
     padding: setLegendPadding(legendPosition),
     color: { pattern },

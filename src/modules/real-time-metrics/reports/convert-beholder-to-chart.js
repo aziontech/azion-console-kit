@@ -344,10 +344,10 @@ const formatTsChartData = ({
 const formatCatAbsoluteChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
-  const fieldName = report.fields[0]
+  const fieldName = report.aggregationType || report.fields[0]
 
   return data[dataset].map((item) => {
-    return [item[seriesName], item[fieldName]]
+    return [camelToTitle(item[seriesName]), item[fieldName]]
   })
 }
 
