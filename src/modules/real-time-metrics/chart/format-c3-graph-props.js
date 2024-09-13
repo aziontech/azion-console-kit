@@ -6,10 +6,18 @@ import { CHART_RULES } from '@modules/real-time-metrics/constants'
  * @param {any} date - The input to be checked
  * @returns {boolean} - Returns true if the input is a valid date, otherwise returns false
  */
-export function isDate(date) {
-  const series = date
-  // eslint-disable-next-line eqeqeq
-  return new Date(series) != 'Invalid Date'
+export function isDate(date, isTimeseries) {
+  const parsedDate = new Date(date)
+  const isValid = !isNaN(parsedDate.getTime()) && parsedDate.toString() !== 'Invalid Date'
+
+  if (isTimeseries) return true
+
+  //Additional check to ensure numeric like 0 and 1 are not considered valid dates
+  if (typeof date === 'number' && !isTimeseries) {
+    return false
+  }
+
+  return isValid
 }
 
 /**
@@ -33,6 +41,8 @@ function formatC3DataProp(chartData, resultChart) {
   const x = resultChart[0][0]
   const columns = resultChart
 
+  const isTimeseries = chartData.xAxis === 'ts'
+
   const data = {
     x,
     columns
@@ -54,7 +64,7 @@ function formatC3DataProp(chartData, resultChart) {
 
   data.type = type
 
-  if (isDate(resultChart[0][1])) {
+  if (isDate(resultChart[0][1], isTimeseries)) {
     data.xFormat = '%Y-%m-%dT%H:%M:%S.%LZ'
   }
 
@@ -68,7 +78,9 @@ function formatC3DataProp(chartData, resultChart) {
  * @returns {Object} - Returns the formatted C3 X Axis
  */
 export function formatC3XAxis(chartData, resultChart) {
-  const isSeriesDate = isDate(resultChart[0][1])
+  const isTimeseries = chartData.xAxis === 'ts'
+
+  const isSeriesDate = isDate(resultChart[0][1], isTimeseries)
   const isSeriesNumeric = isNumeric(resultChart)
   const isTimeSeries = chartData.xAxis === 'ts'
   const isRotated = chartData.rotated
@@ -96,7 +108,7 @@ export function formatC3XAxis(chartData, resultChart) {
     xAxis.min = CHART_RULES.RESET_COUNT
     xAxis.tick = {
       ...xAxis.tick,
-      width: CHART_RULES.LABEL.width
+      width: CHART_RULES.LABEL.rotatedWidth
     }
   }
 
@@ -523,7 +535,15 @@ export function FormatC3GraphProps({
         )
       },
       format: {
-        title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d),
+        title: (d) => {
+          if (isDate(d, isTimeseries)) {
+            return new Date(d).toLocaleString('en-US')
+          }
+          if (typeof d === 'number') {
+            return ''
+          }
+          return d
+        },
         value: function (value) {
           return formatYAxisLabels(value, chartData)
         }

@@ -30,6 +30,7 @@ describe('RealTimeMetricsModule', () => {
         },
         LABEL: {
           width: 50,
+          rotatedWidth: 80,
           defaultPosition: 'outer-center',
           rotatedPosition: 'outer-middle'
         },
