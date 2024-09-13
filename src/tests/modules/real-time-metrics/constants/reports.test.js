@@ -1057,39 +1057,6 @@ describe('RealTimeMetricsModule', () => {
             }
           ],
           chartOwner: 'azion',
-          columns: 6,
-          dashboardId: '371360344901061482',
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
-          description: 'Number of requests identified as bots, grouped by CAPTCHA challenge result',
-          fields: ['botCategory', 'challengeSolved'],
-          filters: {
-            actionEq: 'redirect',
-            not: {
-              botCategoryIn: ['', 'Non-Bot Like']
-            }
-          },
-          groupBy: ['botCategory', 'challengeSolved'],
-          helpCenterPath: '',
-          id: '181943102250840225',
-          isTopX: true,
-          label: 'Top 3 Bot CAPTCHA',
-          limit: 3,
-          orderDirection: 'DESC',
-          rotated: true,
-          type: 'ordered-bar',
-          variationType: 'regular',
-          xAxis: 'cat'
-        },
-        {
-          aggregationType: 'sum',
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
-          chartOwner: 'azion',
           columns: 12,
           dashboardId: '371360344901061482',
           dataUnit: 'count',

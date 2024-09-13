@@ -1221,44 +1221,6 @@ botCategory
     }
   },
   {
-    id: '181943102250840225',
-    label: 'Top 3 Bot CAPTCHA',
-    gqlQuery: {
-      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-      botManagerMetrics (
-        limit: 3
-        aggregate: {sum: requests 
-}
-        groupBy: [botCategory, challengeSolved]
-        orderBy: [sum_DESC]
-        filter: {
-          tsRange: {
-begin: $tsRange_begin
-end: $tsRange_end
-
-}
-actionEq: "redirect"
-not: {
-botCategoryIn: ["","Non-Bot Like"]
-
-}
-
-        }
-        ) {
-          botCategory
-challengeSolved
-sum
-botCategory
-challengeSolved
-        }
-      }`,
-      variables: {
-        tsRange_begin: '2024-01-01T12:00:00',
-        tsRange_end: '2024-12-01T12:00:00'
-      }
-    }
-  },
-  {
     id: '190246009413028885',
     label: 'Bot Activity Map',
     gqlQuery: {

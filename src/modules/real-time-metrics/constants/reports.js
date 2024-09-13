@@ -1071,39 +1071,6 @@ const REPORTS = [
     helpCenterPath: ''
   },
   {
-    id: '181943102250840225',
-    chartOwner: 'azion',
-    label: 'Top 3 Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.top3BotCaptcha.description,
-    aggregationType: 'sum',
-    columns: 6,
-    type: 'ordered-bar',
-    xAxis: 'cat',
-    isTopX: true,
-    rotated: true,
-    dataUnit: 'count',
-    dataset: 'botManagerMetrics',
-    aggregations: [
-      {
-        aggregation: 'sum',
-        variable: 'requests'
-      }
-    ],
-    filters: {
-      actionEq: 'redirect',
-      not: {
-        botCategoryIn: ['', 'Non-Bot Like']
-      }
-    },
-    limit: 3,
-    groupBy: ['botCategory', 'challengeSolved'],
-    fields: ['botCategory', 'challengeSolved'],
-    orderDirection: 'DESC',
-    dashboardId: '371360344901061482',
-    variationType: 'regular',
-    helpCenterPath: ''
-  },
-  {
     id: '190246009413028885',
     chartOwner: 'azion',
     label: 'Bot Activity Map',

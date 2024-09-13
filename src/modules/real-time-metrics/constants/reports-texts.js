@@ -201,9 +201,6 @@ const REPORTS_TEXTS = {
       top10BotClassification: {
         description: 'Number of requests by bot category'
       },
-      top3BotCaptcha: {
-        description: 'Number of requests identified as bots, grouped by CAPTCHA challenge result'
-      },
       botActivityMap: {
         description: 'Sum of requests identified as bots, presented by the country of origin'
       }
