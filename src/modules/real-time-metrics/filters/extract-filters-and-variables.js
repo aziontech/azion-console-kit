@@ -158,51 +158,19 @@ function extractAnd(filters) {
 }
 
 const extractGeneric = (pFilters) => {
-  if (pFilters.or) {
-    return {
-      filters: {
-        or: pFilters.or
-      }
-    }
-  }
-  if (pFilters.classifiedIn) {
-    return {
-      filters: {
-        classifiedIn: pFilters.classifiedIn
-      }
-    }
-  }
-  if (pFilters.not) {
-    return {
-      filters: {
-        not: pFilters.not
-      }
-    }
-  }
-  if (pFilters.classifiedEq) {
-    return {
-      filters: {
-        classifiedEq: pFilters.classifiedEq
-      }
-    }
-  }
+  const defaultFilters = Object.keys(pFilters)
 
-  if (pFilters.actionEq) {
-    return {
-      filters: {
-        actionEq: pFilters.actionEq
-      }
-    }
-  }
+  if (!defaultFilters.length) return null
 
-  if (pFilters.botCategoryIn) {
-    return {
-      filters: {
-        botCategoryIn: pFilters.botCategoryIn
-      }
+  const filters = {}
+
+  defaultFilters.forEach((key) => {
+    if (key !== 'tsRange') {
+      filters[key] = pFilters[key]
     }
-  }
-  return null
+  })
+
+  return { filters }
 }
 
 /**
