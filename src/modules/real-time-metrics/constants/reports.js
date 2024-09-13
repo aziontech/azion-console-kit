@@ -674,7 +674,7 @@ const REPORTS = [
    * Overview - Request
    */
   {
-    id: '357842594513814093',
+    id: '357822591213814093',
     chartOwner: 'azion',
     label: 'Total Attacks',
     description: '',
@@ -978,35 +978,6 @@ const REPORTS = [
     helpCenterPath: ''
   },
   {
-    id: '071851224118431167',
-    chartOwner: 'azion',
-    label: 'Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
-    aggregationType: 'sum',
-    columns: 6,
-    type: 'line',
-    xAxis: 'ts',
-    isTopX: false,
-    rotated: false,
-    dataUnit: 'count',
-    dataset: 'botManagerMetrics',
-    aggregations: [
-      {
-        aggregation: 'sum',
-        variable: 'requests'
-      }
-    ],
-    filters: {
-      actionEq: 'redirect'
-    },
-    limit: 5000,
-    groupBy: ['challengeSolved'],
-    orderDirection: 'ASC',
-    dashboardId: '371360344901061482',
-    variationType: 'regular',
-    helpCenterPath: ''
-  },
-  {
     id: '577704475532819772',
     chartOwner: 'azion',
     label: 'Bot Action',
@@ -1039,10 +1010,69 @@ const REPORTS = [
     helpCenterPath: ''
   },
   {
+    id: '071851224118431167',
+    chartOwner: 'azion',
+    label: 'Bot CAPTCHA',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      actionEq: 'redirect'
+    },
+    limit: 5000,
+    groupBy: ['challengeSolved'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
+  {
+    id: '455330743572401794',
+    chartOwner: 'azion',
+    label: 'Bot CAPTCHA',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      actionEq: 'redirect'
+    },
+    limit: 2,
+    groupBy: ['challengeSolved'],
+    fields: ['challengeSolved'],
+    orderDirection: 'DESC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
+  {
     id: '424388331488145485',
     chartOwner: 'azion',
-    label: 'Top 10 Bot Classifications',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.top10BotClassification.description,
+    label: 'Bot Classifications',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botClassification.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',

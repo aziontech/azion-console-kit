@@ -825,7 +825,7 @@ ts
     }
   },
   {
-    id: '357842594513814093',
+    id: '357822591213814093',
     label: 'Total Attacks',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
@@ -871,7 +871,10 @@ end: $tsRange_end
 
         }
         ) {
-          ts
+          wafRequestsAllowed
+wafRequestsBlocked
+wafRequestsThreat
+ts
         }
       }`,
       variables: {
@@ -1027,6 +1030,68 @@ ts
     }
   },
   {
+    id: '892249168369791027',
+    label: 'Bad Bot Hits',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 5000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts]
+        orderBy: [ts_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+classifiedEq: "bad bot"
+
+        }
+        ) {
+          sum
+ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '934654293238823255',
+    label: 'Good Bot Hits',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 5000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts]
+        orderBy: [ts_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+classifiedEq: "good bot"
+
+        }
+        ) {
+          sum
+ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '259047966206560862',
     label: 'Bot Hits',
     gqlQuery: {
@@ -1119,38 +1184,6 @@ classified
     }
   },
   {
-    id: '071851224118431167',
-    label: 'Bot CAPTCHA',
-    gqlQuery: {
-      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-      botManagerMetrics (
-        limit: 5000
-        aggregate: {sum: requests 
-}
-        groupBy: [ts, challengeSolved]
-        orderBy: [ts_ASC]
-        filter: {
-          tsRange: {
-begin: $tsRange_begin
-end: $tsRange_end
-
-}
-actionEq: "redirect"
-
-        }
-        ) {
-          sum
-ts
-challengeSolved
-        }
-      }`,
-      variables: {
-        tsRange_begin: '2024-01-01T12:00:00',
-        tsRange_end: '2024-12-01T12:00:00'
-      }
-    }
-  },
-  {
     id: '577704475532819772',
     label: 'Bot Action',
     gqlQuery: {
@@ -1186,8 +1219,72 @@ action
     }
   },
   {
+    id: '071851224118431167',
+    label: 'Bot CAPTCHA',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 5000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, challengeSolved]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+actionEq: "redirect"
+
+        }
+        ) {
+          sum
+ts
+challengeSolved
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '455330743572401794',
+    label: 'Bot CAPTCHA',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 2
+        aggregate: {sum: requests 
+}
+        groupBy: [challengeSolved]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+actionEq: "redirect"
+
+        }
+        ) {
+          challengeSolved
+sum
+challengeSolved
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '424388331488145485',
-    label: 'Top 10 Bot Classifications',
+    label: 'Bot Classifications',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       botManagerMetrics (

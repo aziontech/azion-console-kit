@@ -198,7 +198,7 @@ const REPORTS_TEXTS = {
         description:
           'Action taken by the Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages'
       },
-      top10BotClassification: {
+      botClassification: {
         description: 'Number of requests by bot category'
       },
       botActivityMap: {
