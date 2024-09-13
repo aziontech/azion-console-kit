@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center gap-2 mt-7">
+  <div class="flex justify-between items-center gap-2 mt-7 flex-wrap">
     <div class="flex items-center gap-3">
       <h2 class="text-2xl font-bold text-color">
         {{ resultChart[0].value }}
