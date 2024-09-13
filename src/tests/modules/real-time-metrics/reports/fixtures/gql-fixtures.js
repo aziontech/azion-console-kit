@@ -1043,7 +1043,7 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-classifiedIn: ["bad bot","legitimate"]
+classifiedIn: ["bad bot","good bot"]
 
         }
         ) {
@@ -1135,6 +1135,7 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+actionEq: "redirect"
 
         }
         ) {
@@ -1159,11 +1160,15 @@ challengeSolved
         aggregate: {sum: requests 
 }
         groupBy: [action]
-        orderBy: [sum_ASC]
+        orderBy: [sum_DESC]
         filter: {
           tsRange: {
 begin: $tsRange_begin
 end: $tsRange_end
+
+}
+not: {
+botCategoryIn: ["","Non-Bot Like"]
 
 }
 
@@ -1190,7 +1195,7 @@ action
         aggregate: {sum: requests 
 }
         groupBy: [botCategory]
-        orderBy: [sum_ASC]
+        orderBy: [sum_DESC]
         filter: {
           tsRange: {
 begin: $tsRange_begin
@@ -1225,13 +1230,14 @@ botCategory
         aggregate: {sum: requests 
 }
         groupBy: [botCategory, challengeSolved]
-        orderBy: [sum_ASC]
+        orderBy: [sum_DESC]
         filter: {
           tsRange: {
 begin: $tsRange_begin
 end: $tsRange_end
 
 }
+actionEq: "redirect"
 not: {
 botCategoryIn: ["","Non-Bot Like"]
 
@@ -1269,6 +1275,7 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+classifiedIn: ["bad bot","good bot"]
 
         }
         ) {

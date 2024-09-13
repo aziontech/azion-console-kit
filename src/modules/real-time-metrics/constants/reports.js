@@ -835,12 +835,12 @@ const REPORTS = [
    * Bot Manager - Bot Manager Summary
    */
   {
-    id: '259047966206560862',
+    id: '892249168369791027',
     chartOwner: 'azion',
-    label: 'Bot Hits',
-    description: '',
+    label: 'Bad Bot Hits',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.badBotHits.description,
     aggregationType: 'sum',
-    columns: 6,
+    columns: 3,
     type: 'big-numbers',
     xAxis: 'ts',
     isTopX: false,
@@ -855,23 +855,82 @@ const REPORTS = [
       }
     ],
     filters: {
-      classifiedIn: ['bad bot', 'legitimate']
+      classifiedEq: 'bad bot'
     },
     groupBy: [],
     fields: [],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: '',
-    threshold: [1000, 3000, 9000]
+    helpCenterPath: ''
+  },
+  {
+    id: '934654293238823255',
+    chartOwner: 'azion',
+    label: 'Good Bot Hits',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.goodBotHits.description,
+    aggregationType: 'sum',
+    columns: 3,
+    type: 'big-numbers',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'botManagerMetrics',
+    dataUnit: 'count',
+    limit: 5000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      classifiedEq: 'good bot'
+    },
+    groupBy: [],
+    fields: [],
+    orderDirection: 'DESC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
+  {
+    id: '259047966206560862',
+    chartOwner: 'azion',
+    label: 'Bot Hits',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botHits.description,
+    aggregationType: 'sum',
+    columns: 3,
+    type: 'big-numbers',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'botManagerMetrics',
+    dataUnit: 'count',
+    limit: 5000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      classifiedIn: ['bad bot', 'good bot']
+    },
+    groupBy: [],
+    fields: [],
+    orderDirection: 'DESC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: ''
   },
   {
     id: '541669034905662013',
     chartOwner: 'azion',
     label: 'Transactions',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.transactions.description,
     aggregationType: 'sum',
-    columns: 6,
+    columns: 3,
     type: 'big-numbers',
     xAxis: 'ts',
     isTopX: false,
@@ -890,14 +949,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: '',
-    threshold: [1000, 3000, 9000]
+    helpCenterPath: ''
   },
   {
     id: '329891149133127508',
     chartOwner: 'azion',
     label: 'Bot Traffic',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botTraffic.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -923,7 +981,7 @@ const REPORTS = [
     id: '071851224118431167',
     chartOwner: 'azion',
     label: 'Bot CAPTCHA',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -938,6 +996,9 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
+    filters: {
+      actionEq: 'redirect'
+    },
     limit: 5000,
     groupBy: ['challengeSolved'],
     orderDirection: 'ASC',
@@ -949,13 +1010,13 @@ const REPORTS = [
     id: '577704475532819772',
     chartOwner: 'azion',
     label: 'Bot Action',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botAction.description,
     aggregationType: 'sum',
     columns: 6,
-    type: 'ordered-bar',
-    xAxis: 'requests',
+    type: 'pie',
+    xAxis: 'cat',
     isTopX: true,
-    rotated: true,
+    rotated: false,
     dataUnit: 'count',
     dataset: 'botManagerMetrics',
     aggregations: [
@@ -964,10 +1025,15 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
+    filters: {
+      not: {
+        botCategoryIn: ['', 'Non-Bot Like']
+      }
+    },
     limit: 10,
     groupBy: ['action'],
     fields: ['action'],
-    orderDirection: 'ASC',
+    orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
     helpCenterPath: ''
@@ -976,7 +1042,7 @@ const REPORTS = [
     id: '424388331488145485',
     chartOwner: 'azion',
     label: 'Top 10 Bot Classifications',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.top10BotClassification.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -999,7 +1065,7 @@ const REPORTS = [
     limit: 10,
     groupBy: ['botCategory'],
     fields: ['botCategory'],
-    orderDirection: 'ASC',
+    orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
     helpCenterPath: ''
@@ -1008,7 +1074,7 @@ const REPORTS = [
     id: '181943102250840225',
     chartOwner: 'azion',
     label: 'Top 3 Bot CAPTCHA',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.top3BotCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -1024,6 +1090,7 @@ const REPORTS = [
       }
     ],
     filters: {
+      actionEq: 'redirect',
       not: {
         botCategoryIn: ['', 'Non-Bot Like']
       }
@@ -1031,7 +1098,7 @@ const REPORTS = [
     limit: 3,
     groupBy: ['botCategory', 'challengeSolved'],
     fields: ['botCategory', 'challengeSolved'],
-    orderDirection: 'ASC',
+    orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
     helpCenterPath: ''
@@ -1040,7 +1107,7 @@ const REPORTS = [
     id: '190246009413028885',
     chartOwner: 'azion',
     label: 'Bot Activity Map',
-    description: '',
+    description: REPORTS_TEXTS.botManager.botManagerSummary.botActivityMap.description,
     aggregationType: 'sum',
     columns: 12,
     type: 'map',
@@ -1055,6 +1122,9 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
+    filters: {
+      classifiedIn: ['bad bot', 'good bot']
+    },
     limit: 5000,
     groupBy: ['geoipCountry'],
     fields: ['geoipCountry'],

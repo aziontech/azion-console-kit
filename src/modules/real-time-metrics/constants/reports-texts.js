@@ -173,6 +173,41 @@ const REPORTS_TEXTS = {
           'Percentage of data successfully delivered by Tiered Cache to the edge without searching for the content on the origin server. Displays the average number of data in percentages.'
       }
     }
+  },
+  botManager: {
+    botManagerSummary: {
+      badBotHits: {
+        description: 'Number of requests identified as bad bot'
+      },
+      goodBotHits: {
+        description: 'Number of requests identified as good bot'
+      },
+      botHits: {
+        description: 'Number of requests identified as bot'
+      },
+      transactions: {
+        description: 'Number of requests evaluated by the Azion Bot Manager'
+      },
+      botTraffic: {
+        description: 'Sum of requests grouped by classification'
+      },
+      botCaptcha: {
+        description: 'Sum of CAPTCHA challenge results returned for requests classified as bots'
+      },
+      botAction: {
+        description:
+          'Action taken by the Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages'
+      },
+      top10BotClassification: {
+        description: 'Number of requests by bot category'
+      },
+      top3BotCaptcha: {
+        description: 'Number of requests identified as bots, grouped by CAPTCHA challenge result'
+      },
+      botActivityMap: {
+        description: 'Sum of requests identified as bots, presented by the country of origin'
+      }
+    }
   }
 }
 

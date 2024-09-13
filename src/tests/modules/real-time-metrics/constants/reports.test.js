@@ -812,233 +812,304 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 3,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests identified as bad bot',
+          fields: [],
+          filters: {
+            classifiedEq: 'bad bot'
+          },
+          groupBy: [],
+          helpCenterPath: '',
+          id: '892249168369791027',
+          isTopX: false,
+          label: 'Bad Bot Hits',
+          limit: 5000,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'big-numbers',
+          variationType: 'regular',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 3,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests identified as good bot',
+          fields: [],
+          filters: {
+            classifiedEq: 'good bot'
+          },
+          groupBy: [],
+          helpCenterPath: '',
+          id: '934654293238823255',
+          isTopX: false,
+          label: 'Good Bot Hits',
+          limit: 5000,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'big-numbers',
+          variationType: 'regular',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 3,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests identified as bot',
+          fields: [],
+          filters: {
+            classifiedIn: ['bad bot', 'good bot']
+          },
+          groupBy: [],
+          helpCenterPath: '',
           id: '259047966206560862',
-          chartOwner: 'azion',
+          isTopX: false,
           label: 'Bot Hits',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'big-numbers',
-          xAxis: 'ts',
-          isTopX: false,
-          rotated: false,
-          dataset: 'botManagerMetrics',
-          dataUnit: 'count',
           limit: 5000,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'big-numbers',
+          variationType: 'regular',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
               variable: 'requests'
             }
           ],
-          filters: {
-            classifiedIn: ['bad bot', 'legitimate']
-          },
-          groupBy: [],
-          fields: [],
-          orderDirection: 'DESC',
+          chartOwner: 'azion',
+          columns: 3,
           dashboardId: '371360344901061482',
-          variationType: 'regular',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests evaluated by the Azion Bot Manager',
+          fields: [],
+          groupBy: [],
           helpCenterPath: '',
-          threshold: [1000, 3000, 9000]
-        },
-        {
           id: '541669034905662013',
-          chartOwner: 'azion',
+          isTopX: false,
           label: 'Transactions',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'big-numbers',
-          xAxis: 'ts',
-          isTopX: false,
-          rotated: true,
-          dataset: 'botManagerMetrics',
-          dataUnit: 'count',
           limit: 5000,
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
-          groupBy: [],
-          fields: [],
           orderDirection: 'DESC',
-          dashboardId: '371360344901061482',
+          rotated: true,
+          type: 'big-numbers',
           variationType: 'regular',
-          helpCenterPath: '',
-          threshold: [1000, 3000, 9000]
+          xAxis: 'ts'
         },
         {
-          id: '329891149133127508',
-          chartOwner: 'azion',
-          label: 'Bot Traffic',
-          description: '',
           aggregationType: 'sum',
-          columns: 6,
-          type: 'line',
-          xAxis: 'ts',
-          isTopX: false,
-          rotated: false,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
           aggregations: [
             {
               aggregation: 'sum',
               variable: 'requests'
             }
           ],
-          limit: 5000,
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Sum of requests grouped by classification',
           groupBy: ['classified'],
-          orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
-        },
-        {
-          id: '071851224118431167',
-          chartOwner: 'azion',
-          label: 'Bot CAPTCHA',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'line',
-          xAxis: 'ts',
+          helpCenterPath: '',
+          id: '329891149133127508',
           isTopX: false,
+          label: 'Bot Traffic',
+          limit: 5000,
+          orderDirection: 'ASC',
           rotated: false,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
+          type: 'line',
+          variationType: 'regular',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
               variable: 'requests'
             }
           ],
-          limit: 5000,
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Sum of CAPTCHA challenge results returned for requests classified as bots',
+          filters: {
+            actionEq: 'redirect'
+          },
           groupBy: ['challengeSolved'],
-          orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
-        },
-        {
-          id: '577704475532819772',
-          chartOwner: 'azion',
-          label: 'Bot Action',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'ordered-bar',
-          xAxis: 'requests',
-          isTopX: true,
-          rotated: true,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
-          limit: 10,
-          groupBy: ['action'],
-          fields: ['action'],
-          orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
-        },
-        {
-          id: '424388331488145485',
-          chartOwner: 'azion',
-          label: 'Top 10 Bot Classifications',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'ordered-bar',
-          xAxis: 'cat',
-          isTopX: true,
-          rotated: true,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
-          filters: {
-            not: {
-              botCategoryIn: ['', 'Non-Bot Like']
-            }
-          },
-          limit: 10,
-          groupBy: ['botCategory'],
-          fields: ['botCategory'],
-          orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
-        },
-        {
-          id: '181943102250840225',
-          chartOwner: 'azion',
-          label: 'Top 3 Bot CAPTCHA',
-          description: '',
-          aggregationType: 'sum',
-          columns: 6,
-          type: 'ordered-bar',
-          xAxis: 'cat',
-          isTopX: true,
-          rotated: true,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
-          filters: {
-            not: {
-              botCategoryIn: ['', 'Non-Bot Like']
-            }
-          },
-          limit: 3,
-          groupBy: ['botCategory', 'challengeSolved'],
-          fields: ['botCategory', 'challengeSolved'],
-          orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
-        },
-        {
-          id: '190246009413028885',
-          chartOwner: 'azion',
-          label: 'Bot Activity Map',
-          description: '',
-          aggregationType: 'sum',
-          columns: 12,
-          type: 'map',
-          xAxis: 'cat',
-          isTopX: true,
-          rotated: false,
-          dataUnit: 'count',
-          dataset: 'botManagerMetrics',
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'requests'
-            }
-          ],
+          helpCenterPath: '',
+          id: '071851224118431167',
+          isTopX: false,
+          label: 'Bot CAPTCHA',
           limit: 5000,
-          groupBy: ['geoipCountry'],
-          fields: ['geoipCountry'],
           orderDirection: 'ASC',
-          dashboardId: '371360344901061482',
+          rotated: false,
+          type: 'line',
           variationType: 'regular',
-          helpCenterPath: ''
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description:
+            'Action taken by the Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages',
+          fields: ['action'],
+          filters: {
+            not: {
+              botCategoryIn: ['', 'Non-Bot Like']
+            }
+          },
+          groupBy: ['action'],
+          helpCenterPath: '',
+          id: '577704475532819772',
+          isTopX: true,
+          label: 'Bot Action',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests by bot category',
+          fields: ['botCategory'],
+          filters: {
+            not: {
+              botCategoryIn: ['', 'Non-Bot Like']
+            }
+          },
+          groupBy: ['botCategory'],
+          helpCenterPath: '',
+          id: '424388331488145485',
+          isTopX: true,
+          label: 'Top 10 Bot Classifications',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Number of requests identified as bots, grouped by CAPTCHA challenge result',
+          fields: ['botCategory', 'challengeSolved'],
+          filters: {
+            actionEq: 'redirect',
+            not: {
+              botCategoryIn: ['', 'Non-Bot Like']
+            }
+          },
+          groupBy: ['botCategory', 'challengeSolved'],
+          helpCenterPath: '',
+          id: '181943102250840225',
+          isTopX: true,
+          label: 'Top 3 Bot CAPTCHA',
+          limit: 3,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description: 'Sum of requests identified as bots, presented by the country of origin',
+          fields: ['geoipCountry'],
+          filters: {
+            classifiedIn: ['bad bot', 'good bot']
+          },
+          groupBy: ['geoipCountry'],
+          helpCenterPath: '',
+          id: '190246009413028885',
+          isTopX: true,
+          label: 'Bot Activity Map',
+          limit: 5000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'map',
+          variationType: 'regular',
+          xAxis: 'cat'
         },
         {
           aggregationType: 'sum',
