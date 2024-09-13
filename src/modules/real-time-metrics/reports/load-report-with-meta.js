@@ -75,8 +75,12 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
   const dataset = Object.keys(resultQueryRaw)
 
   const isTimeSeries = newReport.xAxis === 'ts'
+  const rawNumberReport = ['big-numbers', 'gauge']
+  const isAbsoluteNumber = rawNumberReport.includes(newReport.type)
 
-  if (dataset && isTimeSeries) {
+  const shouldFillResults = dataset && isTimeSeries && !isAbsoluteNumber
+
+  if (shouldFillResults) {
     const props = {
       tsRangeFilter: filters.tsRange,
       data: resultQuery[dataset],
