@@ -65,7 +65,7 @@
           label="Send feedback"
           class="w-36"
           size="small"
-          icon="pi pi-github"
+          icon="pi pi-send"
           :loading="loading"
           @click="sendFeedback()"
         />
