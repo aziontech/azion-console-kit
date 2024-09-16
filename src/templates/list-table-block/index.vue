@@ -352,6 +352,10 @@
     onReorderService: {
       type: Function
     },
+    isReorderAllEnabled: {
+      type: Boolean,
+      default: false
+    },
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
@@ -438,7 +442,7 @@
 
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data.value, event.value)
+      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
       data.value = event.value
       await props.onReorderService(tableData)
       reload()
