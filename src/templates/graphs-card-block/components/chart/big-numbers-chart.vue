@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between items-center gap-2 mt-7 flex-wrap">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 flex-wrap">
       <h2 class="text-2xl font-bold text-color">
         {{ resultChart[0].value }}
         <span class="text-sm font-normal">{{ resultChart[0].unit }}</span>
