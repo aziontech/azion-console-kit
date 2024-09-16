@@ -665,7 +665,7 @@ describe('RealTimeMetricsModule', () => {
           description: '',
           groupBy: [],
           helpCenterPath: '',
-          id: '357842594513814093',
+          id: '357822591213814093',
           isTopX: false,
           label: 'Total Attacks',
           limit: 5000,
