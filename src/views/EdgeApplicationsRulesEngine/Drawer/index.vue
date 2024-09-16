@@ -249,6 +249,9 @@
     closeDrawerCreate()
   }
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Rules Engine'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',
