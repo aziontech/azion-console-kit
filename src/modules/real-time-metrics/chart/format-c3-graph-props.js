@@ -308,7 +308,7 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
 export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
-  let sliced = resultChart.slice(1)
+  const sliced = resultChart.slice(1)
 
   let seriesNames = {}
   let seriesAccumulator = 0
