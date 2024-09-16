@@ -148,6 +148,8 @@
   }
 
   const listFunctionsInstanceOptions = async () => {
+    if (!props.isEdgeFunctionEnabled) return
+
     try {
       functionsInstanceOptions.value = await props.listEdgeApplicationFunctionsService(
         props.edgeApplicationId
