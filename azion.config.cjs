@@ -255,53 +255,74 @@ const backRules = [
       },
       rewrite: '/aziontech/console-client-list/main/clids.json'
     }
+  },
+  {
+    name: 'Route Send Feedback',
+    description: 'this route will send user feedback to jira',
+    match: '^/api/webhook/console_feedback',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-console-feedback',
+        type: 'single_origin'
+      },
+      rewrite: '/webhook/console_feedback'
+    }
   }
 ]
 
 const AzionConfig = {
   cache: [...cacheConfig],
-  origin: addStagePrefix([
-    {
-      name: 'origin-storage-default',
-      type: 'object_storage'
-    },
-    {
-      name: 'origin-manager',
-      type: 'single_origin',
-      hostHeader: `manager.azion.com`,
-      addresses: [`manager.azion.com`]
-    },
-    {
-      name: 'origin-marketplace',
-      type: 'single_origin',
-      hostHeader: `marketplace.azion.com`,
-      addresses: [`marketplace.azion.com`]
-    },
-    {
-      name: 'origin-cities',
-      type: 'single_origin',
-      hostHeader: `cities.azion.com`,
-      addresses: [`cities.azion.com`]
-    },
-    {
-      name: 'origin-sso',
-      type: 'single_origin',
-      hostHeader: `sso.azion.com`,
-      addresses: [`sso.azion.com`]
-    },
-    {
-      name: 'origin-api',
-      type: 'single_origin',
-      hostHeader: `api.azion.com`,
-      addresses: [`api.azion.com`]
-    },
+  origin: [
+    ...addStagePrefix([
+      {
+        name: 'origin-storage-default',
+        type: 'object_storage'
+      },
+      {
+        name: 'origin-manager',
+        type: 'single_origin',
+        hostHeader: `manager.azion.com`,
+        addresses: [`manager.azion.com`]
+      },
+      {
+        name: 'origin-marketplace',
+        type: 'single_origin',
+        hostHeader: `marketplace.azion.com`,
+        addresses: [`marketplace.azion.com`]
+      },
+      {
+        name: 'origin-cities',
+        type: 'single_origin',
+        hostHeader: `cities.azion.com`,
+        addresses: [`cities.azion.com`]
+      },
+      {
+        name: 'origin-sso',
+        type: 'single_origin',
+        hostHeader: `sso.azion.com`,
+        addresses: [`sso.azion.com`]
+      },
+      {
+        name: 'origin-api',
+        type: 'single_origin',
+        hostHeader: `api.azion.com`,
+        addresses: [`api.azion.com`]
+      },
+    ]),
     {
       name: 'origin-github-allowed-accounts',
       type: 'single_origin',
       hostHeader: `raw.githubusercontent.com`,
       addresses: [`raw.githubusercontent.com`]
     },
-  ]),
+    {
+      name: 'origin-console-feedback',
+      type: 'single_origin',
+      hostHeader: `automate.azion.net`,
+      addresses: [`automate.azion.net`]
+    },
+  ],
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
     response: [

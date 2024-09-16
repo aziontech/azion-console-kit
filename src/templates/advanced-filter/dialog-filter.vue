@@ -231,7 +231,7 @@
         data-testid="filter-options-container"
       >
         <span
-          class="text-color-secondary"
+          class="text-color-secondary text-sm"
           data-testid="filter-description"
         >
           Each combination of operator can only be used once.

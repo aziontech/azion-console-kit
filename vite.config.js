@@ -59,6 +59,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/allowed-accounts/, '')
         },
+        '/api/webhook/console_feedback': {
+          target: `https://automate.azion.net/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        },
         '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,

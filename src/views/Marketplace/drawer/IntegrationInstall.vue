@@ -14,7 +14,7 @@
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   import PermissionsFieldset from '../components/PermissionsFieldset'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   import LabelBlock from '@/templates/label-block'
 
   const router = useRouter()
@@ -211,7 +211,7 @@
   >
     <template #header>
       <div>Install an Integration</div>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0 relative">

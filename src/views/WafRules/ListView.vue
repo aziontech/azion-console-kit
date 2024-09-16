@@ -10,6 +10,8 @@
         :columns="getColumns"
         addButtonLabel="WAF Rule"
         createPagePath="waf/create"
+        @on-before-go-to-edit="handleTrackClickToEdit"
+        @on-before-go-to-add-page="handleTrackClickToCreate"
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
@@ -31,7 +33,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
 
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
@@ -39,6 +41,9 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listWafRulesService: {
@@ -64,6 +69,22 @@
       service: props.deleteWafRulesService
     }
   ]
+
+  const handleTrackClickToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'WAF Rules'
+      })
+      .track()
+  }
+
+  const handleTrackClickToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'WAF Rules'
+      })
+      .track()
+  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
