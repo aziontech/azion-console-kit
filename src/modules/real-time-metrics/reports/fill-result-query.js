@@ -64,23 +64,81 @@ function resetResult(result) {
 }
 
 /**
- * Generates default results based on a given time range, result, and interval.
+ * Calculates the number of results that should be generated for a given time range and interval,
+ * as well as the interval to be added to the timestamp for each result.
  *
- * @param {Object} tsRange - An object containing the begin and end timestamps of the range.
- * @param {Object} result - The result object to be used for generating the default results.
- * @param {string} interval - The interval to be used for generating the default results.
- * @return {Array} An array of default results.
+ * @param {object} tsRange - The timestamp range object with begin and end properties
+ * @param {string} interval - The interval to be used for generating the default results
+ * @return {object} An object containing the number of results, the interval to be added and the begin timestamp
  */
-function generateDefaultResults(tsRange, result, interval) {
+function getIntervalDefaults(tsRange, interval) {
   const intervalToBeAdded = TIME_INTERVALS.RESAMPLING_INTERVALS.INTERVAL_TO_BE_ADDED[interval]
   const { begin, end } = tsRange
   const numberOfResults = (end - begin) / intervalToBeAdded
+
+  return {
+    numberOfResults,
+    intervalToBeAdded,
+    begin
+  }
+}
+
+/**
+ * Generates default results based on a given time range, result, and interval.
+ *
+ * @param {Object} intervalDefaults - An object containing the number of results and the interval to be added
+ * @param {Object} data - An object containing the result data
+ * @return {Array} An array of default results
+ */
+function generateDefaultResults(intervalDefaults, data) {
+  const result = resetResult(data[0])
+  const { numberOfResults, intervalToBeAdded, begin } = intervalDefaults
   const defaultResults = []
 
   for (let idx = 1; idx <= numberOfResults; idx++) {
     const newTimestamp = new Date(intervalToBeAdded * idx + begin).fromLocaletoBeholderFormat()
     const currentResult = { ...result, ts: `${newTimestamp}Z` }
     defaultResults.push(currentResult)
+  }
+
+  return defaultResults
+}
+
+/**
+ * Generates default results based on a given time range, result, interval, and group by column.
+ * If there is data for the given group by value and timestamp, it will be added to the default results.
+ * If there isn't, a new item will be created with the group by value, timestamp and zero as the value for the given aggregation type.
+ *
+ * @param {Object} intervalDefaults - An object containing the number of results, the interval to be added and the begin timestamp
+ * @param {Object} data - An object containing the result data
+ * @param {string} groupBy - The column to group the data by
+ * @param {string} aggregationType - The type of aggregation to use for filling the gaps
+ * @return {Array} An array of default results
+ */
+function generateDefaultGroupedResults(intervalDefaults, data, groupBy, aggregationType) {
+  const { numberOfResults, intervalToBeAdded, begin } = intervalDefaults
+  const defaultResults = []
+
+  const groupedValues = [...new Set(data.map((item) => item[groupBy]))]
+
+  for (let idx = 1; idx <= numberOfResults; idx++) {
+    const newTimestamp = new Date(intervalToBeAdded * idx + begin).toISOString()
+
+    groupedValues.forEach((groupItem) => {
+      const existingItem = data.find(
+        (item) => item.ts === newTimestamp && item.classified === groupItem
+      )
+
+      if (existingItem) {
+        defaultResults.push(existingItem)
+      } else {
+        defaultResults.push({
+          [aggregationType]: 0,
+          [groupBy]: groupItem,
+          ts: newTimestamp
+        })
+      }
+    })
   }
 
   return defaultResults
@@ -123,14 +181,20 @@ function sortByTimestamp(data) {
  * @param {Array} data - the data to be formatted
  * @return {Array} the formatted results
  */
-export default function FillResultQuery({ tsRangeFilter, data }) {
+export default function FillResultQuery({ tsRangeFilter, data, groupBy, aggregationType }) {
   const tsRange = resetTsRange(tsRangeFilter)
   const tsRangeDifference = getTsRangeDifference(tsRange)
   const queryInterval = getQueryInterval(tsRangeDifference)
+  let defaultResults = []
 
   if (!data?.length) return []
-  const resetResults = [...data].map((item) => resetResult(item))
-  const defaultResults = generateDefaultResults(tsRange, resetResults[0], queryInterval)
+
+  const intervalDefaults = getIntervalDefaults(tsRange, queryInterval)
+
+  defaultResults = groupBy
+    ? generateDefaultGroupedResults(intervalDefaults, data, groupBy, aggregationType)
+    : generateDefaultResults(intervalDefaults, data)
+
   const filteredResults = replaceItemByTimestamp(data, defaultResults)
 
   return sortByTimestamp(filteredResults)

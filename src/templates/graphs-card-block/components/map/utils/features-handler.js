@@ -43,6 +43,7 @@ export const heatmapHandler = (name, data) => {
 
   return {
     variation: rangeVariations(featureData.value, featureData.rangeVariation),
-    value: featureData.value
+    value: featureData.value,
+    exhibitionValue: featureData.exhibitionValue
   }
 }
