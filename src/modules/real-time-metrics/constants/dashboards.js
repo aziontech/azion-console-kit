@@ -127,6 +127,20 @@ const PAGES_DASHBOARDS = {
           dataset: 'idnsQueriesMetrics'
         }
       ]
+    },
+    {
+      id: 9,
+      label: 'Bot Manager',
+      path: 'bot-manager',
+      groupId: 2,
+      dashboards: [
+        {
+          id: '371360344901061482',
+          label: 'Bot Manager Summary',
+          path: 'bot-manager-summary',
+          dataset: 'botManagerMetrics'
+        }
+      ]
     }
   ],
   observe: [

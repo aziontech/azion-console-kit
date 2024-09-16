@@ -2,7 +2,7 @@
   <div
     :class="[
       cardColumns,
-      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6 relative'
+      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6'
     ]"
   >
     <header class="flex w-full items-center justify-between gap-2">
@@ -31,7 +31,7 @@
           The chart can't be plotted. There was an issue loading the data.
         </InlineMessage>
       </div>
-      <section class="flex-auto">
+      <section class="flex-auto relative">
         <component
           v-if="showChart"
           :is="chartType[report.type]"

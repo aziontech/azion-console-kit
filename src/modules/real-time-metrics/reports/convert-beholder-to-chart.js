@@ -1,7 +1,7 @@
 /* eslint-disable id-length */
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
-import { formatBytesDataUnit } from '../chart/format-graph'
+import { formatDataUnit } from '../chart/format-graph'
 import countries from '../helpers/countries-code.json'
 
 import {
@@ -330,7 +330,6 @@ const formatTsChartData = ({
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
-
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
@@ -345,10 +344,10 @@ const formatTsChartData = ({
 const formatCatAbsoluteChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
-  const fieldName = report.fields[0]
+  const fieldName = report.aggregationType || report.fields[0]
 
   return data[dataset].map((item) => {
-    return [item[seriesName], item[fieldName]]
+    return [camelToTitle(item[seriesName]), item[fieldName]]
   })
 }
 
@@ -374,50 +373,13 @@ const formatStackedBarChart = ({ report, data }) => {
 
 const formatGaugeChart = ({ report, data }) => {
   const dataset = Object.keys(data)
-  const geolocCountryName = report.groupBy[0]
-  const columnName = data[dataset][0][geolocCountryName]
-  const fieldName = report.fields[0]
+  const columnName = report.groupBy[0] || report.aggregations[0].variable
 
-  const totalGaugeValue = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
-  const threshold = report.threshold || [30, 60, 90]
-  const maxSupportedValue = threshold[threshold.length - 1]
+  const keyValue = Object.keys(data[dataset][0])
 
-  return [
-    {
-      id: crypto.randomUUID().toString(),
-      data: {
-        columns: [[columnName, totalGaugeValue]],
-        type: 'gauge'
-      },
-      gauge: {
-        label: {
-          format: function (value) {
-            return `${formatYAxisLabels(value, report)}`
-          },
-          show: false
-        },
-        max: maxSupportedValue
-      },
-      color: {
-        pattern: [
-          'var(--scale-red)',
-          'var(--scale-orange)',
-          'var(--scale-yellow)',
-          'var(--scale-green)'
-        ],
-        threshold: {
-          values: threshold
-        }
-      },
-      tooltip: {
-        format: {
-          value: function (value) {
-            return formatYAxisLabels(value, report)
-          }
-        }
-      }
-    }
-  ]
+  const total = data[dataset][0][keyValue[0]]
+
+  return [[camelToTitle(columnName), total]]
 }
 
 /**
@@ -431,13 +393,15 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const seriesName = report.groupBy[0]
   const fieldName = report.fields[0]
+  const dataUnit = report.dataUnit
+  const aggregation = report.aggregationType
 
   const series = [seriesName]
-  const values = [fieldName]
+  const values = [dataUnit]
 
   data[dataset].forEach((item) => {
-    series.push(item[seriesName])
-    values.push(item[fieldName])
+    series.push(camelToTitle(item[seriesName]))
+    values.push(item[aggregation] || item[fieldName])
   })
 
   return [series, values]
@@ -453,9 +417,10 @@ const formatRotatedBarChartData = ({ report, data }) => {
 const formatBigNumbers = ({ report, data }) => {
   const dataset = Object.keys(data)
   const fieldName = report.fields[0]
+  const aggregation = report.aggregationType
 
-  const total = data[dataset].reduce((acc, current) => acc + current[fieldName], 0)
-  const { unit, value } = formatBytesDataUnit(total, report)
+  const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
+  const { unit, value } = formatDataUnit(total, report)
 
   return [
     {
@@ -509,12 +474,13 @@ const formatListChart = ({ report, data }) => {
 const formatMapChartData = ({ report, data }) => {
   const dataset = Object.keys(data)
   const geolocCountryName = report.groupBy[0]
-  const fieldName = report.fields[0]
+  const fieldName = report.aggregations[0].aggregation || report.fields[0]
 
   const heatmap = data[dataset].map((datasetMapData) => {
     const result = {
       countryName: datasetMapData[geolocCountryName],
       value: datasetMapData[fieldName],
+      exhibitionValue: formatYAxisLabels(datasetMapData[fieldName], report),
       rangeVariation: report.variationType
     }
 

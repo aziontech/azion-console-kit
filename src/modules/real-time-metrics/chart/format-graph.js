@@ -6,9 +6,16 @@ import { CHART_RULES } from '@modules/real-time-metrics/constants'
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted data for byte unit display
  */
-export function formatBytesDataUnit(data, chartData) {
+export function formatDataUnit(data, chartData) {
   let unit = 'byte'
   let value = data
+
+  if (chartData.dataUnit === 'count') {
+    return {
+      value: value,
+      unit: ''
+    }
+  }
 
   if (chartData.dataUnit === 'bitsPerSecond' || chartData.dataUnit === 'bites') {
     return `${parseFloat(value).toFixed(1)} bits/s`
