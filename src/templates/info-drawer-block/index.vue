@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import Sidebar from 'primevue/sidebar'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])
@@ -43,7 +43,7 @@
   >
     <template #header>
       <h2 class="text-xl">{{ props.title }}</h2>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
 
     <slot name="body"></slot>

@@ -4,7 +4,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
   import { useAccountStore } from '@/stores/account'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
@@ -210,7 +210,7 @@
   >
     <template #header>
       <h2>Add Payment Method</h2>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
 
     <div class="flex w-full">

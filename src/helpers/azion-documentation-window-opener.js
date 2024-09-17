@@ -8,7 +8,7 @@ export const GOOGLE_AUTHENTICATOR_DOCUMENTATION =
 export const AZION_SITE = 'https://www.azion.com/'
 export const AZION_BLOG = 'https://www.azion.com/en/blog/'
 export const AZION_DISCORD = 'https://discord.com/invite/Yp9N7RMVZy'
-export const AZION_GITHUB = 'https://github.com/aziontech/azion-platform-kit'
+export const AZION_GITHUB = 'https://github.com/aziontech/azion-console-kit'
 export const AZION_X = 'https://x.com/aziontech'
 export const AZION_PLAN = 'https://www.azion.com/en/professional-services&id=#plans'
 

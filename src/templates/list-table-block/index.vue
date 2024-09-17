@@ -298,6 +298,7 @@
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
+  import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -347,6 +348,9 @@
     },
     reorderableRows: {
       type: Boolean
+    },
+    onReorderService: {
+      type: Function
     },
     emptyListMessage: {
       type: String,
@@ -432,8 +436,25 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const onRowReorder = (event) => {
-    data.value = event.value
+  const onRowReorder = async (event) => {
+    try {
+      const tableData = getArrayChangedIndexes(data.value, event.value)
+      data.value = event.value
+      await props.onReorderService(tableData)
+      reload()
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Reorder saved'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
   }
 
   const openDialog = (dialogComponent, body) => {
