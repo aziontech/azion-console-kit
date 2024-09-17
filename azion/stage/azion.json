@@ -68,6 +68,11 @@
       "origin-id": 153113,
       "origin-key": "ab771dc5-8ee9-4f9f-bb5d-3fa6fe9483c5",
       "name": "origin-github-allowed-accounts"
+    },
+    {
+      "origin-id": 153761,
+      "origin-key": "f1f976fb-0558-4592-a930-dcad70ab2e7c",
+      "name": "origin-console-feedback"
     }
   ],
   "rules-engine": {
@@ -151,6 +156,11 @@
       {
         "id": 294965,
         "name": "Route List Client Ids to Github",
+        "phase": "request"
+      },
+      {
+        "id": 296641,
+        "name": "Route Send Feedback",
         "phase": "request"
       }
     ]

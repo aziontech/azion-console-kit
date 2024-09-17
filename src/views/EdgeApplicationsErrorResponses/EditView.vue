@@ -43,6 +43,9 @@
     })
   }
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Error Responses'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',

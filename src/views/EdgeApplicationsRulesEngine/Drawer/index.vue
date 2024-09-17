@@ -148,6 +148,8 @@
   }
 
   const listFunctionsInstanceOptions = async () => {
+    if (!props.isEdgeFunctionEnabled) return
+
     try {
       functionsInstanceOptions.value = await props.listEdgeApplicationFunctionsService(
         props.edgeApplicationId
@@ -247,6 +249,9 @@
     closeDrawerCreate()
   }
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Rules Engine'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',

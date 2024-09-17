@@ -17,6 +17,7 @@ import {
  * @param {boolean} options.isTopX - Whether the obtained data is in the Top X format.
  * @param {string} options.xAxis - The X-axis variable.
  * @param {string} options.orderDirection - The direction of ordering.
+ * @param {string} options.aggregationType - The direction of type.
  */
 export default class GqlRules {
   queryBody = {}
@@ -37,7 +38,8 @@ export default class GqlRules {
     limit = 2000,
     isTopX = false,
     xAxis = 'ts',
-    orderDirection = 'ASC'
+    orderDirection = 'ASC',
+    aggregationType = 'sum'
   }) {
     this.dataset = dataset
     this.aggregations = aggregations
@@ -49,6 +51,7 @@ export default class GqlRules {
     this.isTopX = isTopX
     this.xAxis = xAxis
     this.orderDirection = orderDirection
+    this.aggregationType = aggregationType
   }
 
   /**
@@ -62,9 +65,12 @@ export default class GqlRules {
       const hasSameGroupBy = groupByParam.some((group) => this.groupBy.includes(group))
       if (!hasSameGroupBy) this.groupBy.push(...groupByParam)
     }
-    const hasAxisAndGroupBy = !!(this.groupBy?.length && this.xAxis)
-    const hasGroupByAxis = hasAxisAndGroupBy && this.groupBy.includes(this.xAxis)
-    if (!hasGroupByAxis && !this.isTopX) this.groupBy.unshift(this.xAxis)
+
+    const isXAxisTS = this.xAxis === 'ts'
+
+    const hasAxisTSAndGroupBy = !!(this.groupBy?.length && isXAxisTS)
+    const hasGroupByAxis = hasAxisTSAndGroupBy && this.groupBy.includes(this.xAxis)
+    if (!hasGroupByAxis && !this.isTopX && isXAxisTS) this.groupBy.unshift(this.xAxis)
   }
 
   /**
@@ -73,8 +79,8 @@ export default class GqlRules {
    * @return {void}
    */
   setOrderBy() {
+    const hasAggregation = this.aggregations?.length
     if (this.isTopX) {
-      const hasAggregation = this.aggregations?.length
       if (hasAggregation) {
         this.orderBy = `${this.aggregations[0].aggregation}_${this.orderDirection}`
       } else {
@@ -82,6 +88,8 @@ export default class GqlRules {
       }
     } else if (this.xAxis === 'ts') {
       this.orderBy = `ts_${this.orderDirection}`
+    } else if (hasAggregation) {
+      this.orderBy = `${this.aggregations[0].aggregation}_${this.orderDirection}`
     } else {
       this.orderBy = this.xAxis
     }

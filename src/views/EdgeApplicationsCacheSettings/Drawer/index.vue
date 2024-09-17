@@ -201,6 +201,9 @@
   }
 
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Cache Settings'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',

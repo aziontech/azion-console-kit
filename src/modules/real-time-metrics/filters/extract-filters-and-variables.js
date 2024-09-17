@@ -157,6 +157,22 @@ function extractAnd(filters) {
   return null
 }
 
+const extractGeneric = (pFilters) => {
+  const defaultFilters = Object.keys(pFilters)
+
+  if (!defaultFilters.length) return null
+
+  const filters = {}
+
+  defaultFilters.forEach((key) => {
+    if (key !== 'tsRange') {
+      filters[key] = pFilters[key]
+    }
+  })
+
+  return { filters }
+}
+
 /**
  * Extracts filters, parameters, and variables from the given filters object.
  *
@@ -185,6 +201,11 @@ export default function ExtractFiltersAndVariables(pFilters) {
     Object.assign(filters, andFilter.filters)
     params.push(...andFilter.params)
     Object.assign(variables, andFilter.variables)
+  }
+
+  const genericFilter = extractGeneric(pFilters)
+  if (genericFilter) {
+    Object.assign(filters, genericFilter.filters)
   }
 
   return {

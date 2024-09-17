@@ -36,19 +36,14 @@ function removeUnfinishedRegister(registers, { filterEndDatetime, currentEndDate
 export default async function LoadReportWithMeta(filters, report, userUTC) {
   const { signal } = report
 
-  const newReport = { ...report }
-  if (!newReport.filters) newReport.filters = {}
-
-  if (!newReport.hasFeedbackTag) {
-    newReport.filters.tsRange = filters.tsRange
-  }
-
-  if (filters.and) {
-    newReport.filters.and = filters.and
-  }
-
-  if (filters.datasets) {
-    newReport.filters.datasets = filters.datasets
+  const newReport = {
+    ...report,
+    filters: {
+      ...report.filters,
+      ...(report.hasFeedbackTag ? {} : { tsRange: filters.tsRange }),
+      ...(filters.and ? { and: filters.and } : {}),
+      ...(filters.datasets ? { datasets: filters.datasets } : {})
+    }
   }
 
   const filterLastRegisterFail = {
@@ -80,16 +75,27 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
   const dataset = Object.keys(resultQueryRaw)
 
   const isTimeSeries = newReport.xAxis === 'ts'
+  const rawNumberReport = ['big-numbers', 'gauge']
+  const isAbsoluteNumber = rawNumberReport.includes(newReport.type)
 
-  if (dataset && isTimeSeries) {
-    const props = { tsRangeFilter: filters.tsRange, data: resultQuery[dataset] }
+  const shouldFillResults = dataset && isTimeSeries && !isAbsoluteNumber
+
+  if (shouldFillResults) {
+    const props = {
+      tsRangeFilter: filters.tsRange,
+      data: resultQuery[dataset],
+      groupBy: report.groupBy[1] || null,
+      aggregationType: report.aggregationType
+    }
 
     resultQuery[dataset] = FillResultQuery(props)
   }
 
   const hasDataset = dataset && resultQueryRaw[dataset].length > 1
 
-  if (hasDataset) {
+  const shouldRemoveUnfinishedRegister = hasDataset && isTimeSeries && !isAbsoluteNumber
+
+  if (shouldRemoveUnfinishedRegister) {
     resultQuery = removeUnfinishedRegister(resultQueryRaw, filterLastRegisterFail)
   }
 
