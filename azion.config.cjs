@@ -4,6 +4,7 @@
 */
 /* eslint-env node */
 const environment = process.env.VITE_ENVIRONMENT || 'production'
+const branch = environment === 'production' ? 'main' : 'dev'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
@@ -253,7 +254,7 @@ const backRules = [
         name: 'origin-github-allowed-accounts',
         type: 'single_origin'
       },
-      rewrite: '/aziontech/console-client-list/main/clids.json'
+      rewrite: `/aziontech/console-client-list/${branch}/clids.json`
     }
   },
   {
