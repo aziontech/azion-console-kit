@@ -9,7 +9,7 @@ import istanbul from 'vite-plugin-istanbul'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
-  const branch = env.VITE_ENVIRONMENT === 'production' ? 'main' : 'dev'
+
   return {
     plugins: [
       vue(),
@@ -55,7 +55,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
         '/api/allowed-accounts': {
-          target: `https://raw.githubusercontent.com/aziontech/console-client-list/${branch}/clids.json`,
+          target: `https://raw.githubusercontent.com/aziontech/console-client-list/main/clids.json`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/allowed-accounts/, '')
         },
