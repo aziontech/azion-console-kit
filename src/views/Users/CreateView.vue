@@ -8,6 +8,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        @on-response="handleResponse"
         :createService="props.createUsersService"
         :schema="validationSchema"
       >
@@ -39,6 +40,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -81,4 +86,10 @@
       }),
     twoFactorEnabled: yup.boolean()
   })
+
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'User'
+    })
+  }
 </script>
