@@ -12,8 +12,8 @@ export function formatDataUnit(data, chartData) {
 
   if (chartData.dataUnit === 'count') {
     return {
-      value: value,
-      unit: ''
+      value: Intl.NumberFormat('en', { notation: 'compact' }).format(value),
+      unit: chartData?.aggregations?.[0]?.variable || ''
     }
   }
 
