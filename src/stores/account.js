@@ -26,6 +26,12 @@ export const useAccountStore = defineStore({
     shouldAvoidCalculateServicePlan(state) {
       return !!state.account?.isDeveloperSupportPlan
     },
+    viewsAccessRestriction(state) {
+      return state.account?.consoleReleasedClient?.views
+    },
+    hasAccessConsole(state) {
+      return state.account?.consoleReleasedClient?.hasAccessConsole
+    },
     currentTheme(state) {
       return state.account?.colorTheme
     },

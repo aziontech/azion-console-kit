@@ -6,8 +6,11 @@
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -81,6 +84,12 @@
 
     return userData
   }
+
+  const handleResponse = () => {
+    tracker.product.productEdited({
+      productName: 'User'
+    })
+  }
 </script>
 
 <template>
@@ -95,6 +104,7 @@
       <EditFormBlock
         :editService="props.editAnotherUserService"
         :loadService="loadUser"
+        @on-edit-success="handleResponse"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
