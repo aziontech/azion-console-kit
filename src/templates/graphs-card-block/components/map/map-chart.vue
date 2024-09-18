@@ -163,15 +163,15 @@
       title: `Total ${dataUnit}:`,
       caption: [
         {
-          label: `100.000 ${dataUnit}`,
+          label: `100,000 ${dataUnit}`,
           bullet: 'bg-scale-red border-scale-red'
         },
         {
-          label: `10.000 ${dataUnit}`,
+          label: `10,000 ${dataUnit}`,
           bullet: 'bg-scale-orange border-scale-orange'
         },
         {
-          label: `1.000 ${dataUnit}`,
+          label: `1,000 ${dataUnit}`,
           bullet: 'bg-scale-yellow border-scale-yellow'
         },
         {
