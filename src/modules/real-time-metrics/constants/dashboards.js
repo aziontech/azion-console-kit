@@ -136,8 +136,8 @@ const PAGES_DASHBOARDS = {
       dashboards: [
         {
           id: '371360344901061482',
-          label: 'Bot Manager Overview',
-          path: 'bot-manager-overview',
+          label: 'Overview',
+          path: 'overview',
           dataset: 'botManagerMetrics'
         }
       ]
