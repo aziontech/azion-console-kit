@@ -861,7 +861,7 @@ const REPORTS = [
     fields: [],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
+    variationType: 'inverse',
     helpCenterPath: ''
   },
   {
@@ -891,7 +891,7 @@ const REPORTS = [
     fields: [],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
+    variationType: 'neutral',
     helpCenterPath: ''
   },
   {
@@ -921,7 +921,7 @@ const REPORTS = [
     fields: [],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
+    variationType: 'inverse',
     helpCenterPath: ''
   },
   {
@@ -948,7 +948,7 @@ const REPORTS = [
     fields: [],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
+    variationType: 'neutral',
     helpCenterPath: ''
   },
   {
