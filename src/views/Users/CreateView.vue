@@ -8,6 +8,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        @on-response="handleResponse"
         :createService="props.createUsersService"
         :schema="validationSchema"
         @on-response-fail="handleTrackFailedCreation"
@@ -98,5 +99,10 @@
         errorMessage: message
       })
       .track()
+  }
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'User'
+    })
   }
 </script>

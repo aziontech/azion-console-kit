@@ -97,6 +97,12 @@
 
     return userData
   }
+
+  const handleResponse = () => {
+    tracker.product.productEdited({
+      productName: 'User'
+    })
+  }
 </script>
 
 <template>
@@ -111,6 +117,7 @@
       <EditFormBlock
         :editService="props.editAnotherUserService"
         :loadService="loadUser"
+        @on-edit-success="handleResponse"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
         @on-edit-fail="handleTrackFailedEdit"

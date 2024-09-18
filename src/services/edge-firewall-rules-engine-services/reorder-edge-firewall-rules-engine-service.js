@@ -18,6 +18,5 @@ const adapt = (payload) => {
       )
       .map(({ id }) => id)
   }
-
   return parsedPayload
 }
