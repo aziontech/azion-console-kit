@@ -57,7 +57,8 @@
     :createService="handleCreateWafRulesAllowedService"
     :schema="validationSchemaAllowed"
     :initialValues="initialValues"
-    @onSuccess="reloadWafRulesAllowedList"
+    @onError="handleFailedToCreate"
+    @onSuccess="handleSucessCreation"
     title="Create Allowed Rule"
   >
     <template #formFields>
@@ -72,7 +73,8 @@
     :loadService="handleLoadWafRulesAllowedService"
     :editService="handleEditWafRulesAllowedService"
     :schema="validationSchemaAllowed"
-    @onSuccess="reloadWafRulesAllowedList"
+    @onSuccess="handleSuccessEdit"
+    @onError="handleFailedToEdit"
     title="Edit Allowed Rule"
   >
     <template #formFields>
@@ -88,6 +90,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CreateDrawerBlock from '@templates/create-drawer-block'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
@@ -159,6 +162,48 @@
   }
 
   const wafRuleId = ref(route.params.id)
+
+  const handleSuccessEdit = () => {
+    reloadWafRulesAllowedList()
+    tracker.product
+      .productEdited({
+        productName: 'Allowed Rules'
+      })
+      .track()
+  }
+
+  const handleSucessCreation = () => {
+    reloadWafRulesAllowedList()
+    tracker.product
+      .productCreated({
+        productName: 'Allowed Rules'
+      })
+      .track()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Allowed Rules',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Allowed Rules',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+  }
 
   const wafRulesAllowedColumns = ref([
     {
