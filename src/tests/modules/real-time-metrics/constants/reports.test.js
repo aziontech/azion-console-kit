@@ -838,7 +838,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'inverse',
           xAxis: 'ts'
         },
         {
@@ -868,7 +868,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'neutral',
           xAxis: 'ts'
         },
         {
@@ -898,7 +898,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'inverse',
           xAxis: 'ts'
         },
         {
@@ -925,7 +925,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: true,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'neutral',
           xAxis: 'ts'
         },
         {
@@ -1084,7 +1084,7 @@ describe('RealTimeMetricsModule', () => {
           label: 'Bot Activity Map',
           description: 'Sum of requests identified as bots, presented by the country of origin',
           aggregationType: 'sum',
-          columns: 12,
+          columns: 6,
           type: 'map',
           xAxis: 'cat',
           isTopX: true,
