@@ -6,6 +6,8 @@
     <template #content>
       <CreateFormBlock
         :createService="createNetworkListService"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -30,8 +32,12 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createNetworkListService: {
@@ -57,6 +63,24 @@
     { name: 'Countries', value: 'countries' },
     { name: 'IP/CIDR', value: 'ip_cidr' }
   ])
+
+  const handleTrackCreation = () => {
+    tracker.product.productCreated({
+      productName: 'Network Lists'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Network Lists',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),

@@ -255,14 +255,19 @@
                 data-testid="data-table-skeleton-search-input"
               />
             </span>
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-              data-testid="data-table-skeleton-add-button"
-            />
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+                data-testid="data-table-skeleton-add-button"
+              />
+            </slot>
           </div>
         </slot>
       </template>
@@ -352,6 +357,10 @@
     onReorderService: {
       type: Function
     },
+    isReorderAllEnabled: {
+      type: Boolean,
+      default: false
+    },
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
@@ -438,7 +447,7 @@
 
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data.value, event.value)
+      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
       data.value = event.value
       await props.onReorderService(tableData)
       reload()

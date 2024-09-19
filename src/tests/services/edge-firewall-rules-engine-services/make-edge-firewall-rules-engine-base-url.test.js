@@ -13,7 +13,7 @@ describe('EdgeFirewallServices', () => {
   it('should return the API base url to edge firewall rules engine reorder service', () => {
     const edgeFirewallId = '123'
     const { sut } = makeSut()
-    const correctApiUrl = `v4/edge/firewall/${edgeFirewallId}/rules/order`
+    const correctApiUrl = `v4/edge_firewall/firewalls/${edgeFirewallId}/rules/order`
 
     const baseUrl = sut(edgeFirewallId)
 

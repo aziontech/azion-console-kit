@@ -5,6 +5,16 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('@/helpers/get-environment')
 
+const fixtures = {
+  production: { access: { id1: { type: 'global' }, id2: { type: 'global' } } },
+  stage: {
+    access: {
+      id3: { type: 'global' },
+      id4: { type: 'restricted', views: ['real-time-metrics'] }
+    }
+  }
+}
+
 const makeSut = () => {
   const sut = listClientIdsReleasedForConsoleService
   return { sut }
@@ -18,8 +28,9 @@ describe('AccountServices', () => {
   it('should call the API service with the correct parameters', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
+      body: fixtures
     })
+
     getEnvironment.mockReturnValue('production')
 
     const { sut } = makeSut()
@@ -34,27 +45,34 @@ describe('AccountServices', () => {
   it('should return an array of production client IDs when the environment is production', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
+      body: fixtures
     })
     getEnvironment.mockReturnValue('production')
 
     const { sut } = makeSut()
-    const result = await sut()
+    const result = await sut('id1')
 
-    expect(result).toEqual(['id1', 'id2'])
+    expect(result).toEqual({
+      hasAccessConsole: true,
+      views: []
+    })
   })
 
   it('should return an array of stage client IDs when the environment is not production', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { production: { client_ids: ['id1', 'id2'] }, stage: { client_ids: ['id3', 'id4'] } }
+      body: fixtures
     })
+
     getEnvironment.mockReturnValue('stage')
 
     const { sut } = makeSut()
-    const result = await sut()
+    const result = await sut('id1')
 
-    expect(result).toEqual(['id3', 'id4'])
+    expect(result).toEqual({
+      hasAccessConsole: false,
+      views: []
+    })
   })
 
   it('should return an empty array when the response body does not contain client_ids', async () => {
@@ -67,6 +85,6 @@ describe('AccountServices', () => {
     const { sut } = makeSut()
     const result = await sut()
 
-    expect(result).toEqual([])
+    expect(result).toEqual({})
   })
 })

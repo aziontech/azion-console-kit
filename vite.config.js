@@ -73,7 +73,17 @@ const getConfig = () => {
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
-        }
+        },
+        '/webpagetest': {
+          target: `https://www.azion.com/api/webpagetest`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/webpagetest/, '')
+        },
+        '/webpagetest-external': {
+          target: `https://www.azion.com/api/webpagetest`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
+        },
       }
     }
   }

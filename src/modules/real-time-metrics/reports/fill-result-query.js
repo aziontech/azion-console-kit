@@ -122,22 +122,14 @@ function generateDefaultGroupedResults(intervalDefaults, data, groupBy, aggregat
   const groupedValues = [...new Set(data.map((item) => item[groupBy]))]
 
   for (let idx = 1; idx <= numberOfResults; idx++) {
-    const newTimestamp = new Date(intervalToBeAdded * idx + begin).toISOString()
+    const newTimestamp = new Date(intervalToBeAdded * idx + begin).fromLocaletoBeholderFormat()
 
     groupedValues.forEach((groupItem) => {
-      const existingItem = data.find(
-        (item) => item.ts === newTimestamp && item.classified === groupItem
-      )
-
-      if (existingItem) {
-        defaultResults.push(existingItem)
-      } else {
-        defaultResults.push({
-          [aggregationType]: 0,
-          [groupBy]: groupItem,
-          ts: newTimestamp
-        })
-      }
+      defaultResults.push({
+        [aggregationType]: 0,
+        [groupBy]: groupItem,
+        ts: `${newTimestamp}Z`
+      })
     })
   }
 

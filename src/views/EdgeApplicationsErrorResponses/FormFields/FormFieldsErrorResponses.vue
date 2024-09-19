@@ -116,7 +116,7 @@
     }
   ]
   const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
-  const disableOriginKey = computed(() => errorResponses.value.length < 2)
+  const disableOriginKey = computed(() => errorResponses.value.some((data) => data.value.uri))
 
   const { value: originId } = useField('originId')
   const {
@@ -280,7 +280,7 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Origin"
-          required
+          :required="disableOriginKey"
           :options="originOptions"
           optionLabel="name"
           data-testid="error-responses-form__origin"
@@ -289,7 +289,7 @@
           name="originId"
           :value="originId"
           scrollHeight="170px"
-          :disabled="disableOriginKey"
+          :disabled="!disableOriginKey"
         />
       </div>
     </template>

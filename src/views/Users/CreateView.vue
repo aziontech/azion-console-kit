@@ -8,8 +8,10 @@
     </template>
     <template #content>
       <CreateFormBlock
+        @on-response="handleResponse"
         :createService="props.createUsersService"
         :schema="validationSchema"
+        @on-response-fail="handleTrackFailedCreation"
       >
         <template #form="{ resetForm }">
           <FormFieldsUsers
@@ -39,6 +41,11 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -81,4 +88,21 @@
       }),
     twoFactorEnabled: yup.boolean()
   })
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'User',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'User'
+    })
+  }
 </script>
