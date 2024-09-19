@@ -476,11 +476,19 @@ const formatMapChartData = ({ report, data }) => {
   const geolocCountryName = report.groupBy[0]
   const fieldName = report.aggregations[0].aggregation || report.fields[0]
 
+  const exhibitionValueFormatter = (value) => {
+    const variableType = report.aggregations[0].variable
+    return `${camelToTitle(variableType)}: ${Intl.NumberFormat('en', {
+      notation: 'compact'
+    }).format(value)}`
+  }
+
   const heatmap = data[dataset].map((datasetMapData) => {
+    const value = datasetMapData[fieldName]
     const result = {
       countryName: datasetMapData[geolocCountryName],
-      value: datasetMapData[fieldName],
-      exhibitionValue: formatYAxisLabels(datasetMapData[fieldName], report),
+      value,
+      exhibitionValue: exhibitionValueFormatter(value),
       rangeVariation: report.variationType
     }
 

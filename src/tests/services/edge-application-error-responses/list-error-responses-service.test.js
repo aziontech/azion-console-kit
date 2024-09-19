@@ -40,7 +40,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     await sut({ edgeApplicationId: edgeApplicationId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge/applications/${edgeApplicationId}/error_responses`,
+      url: `v4/edge_application/applications/${edgeApplicationId}/error_responses`,
       method: 'GET'
     })
   })

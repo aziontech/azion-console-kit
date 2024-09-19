@@ -4,13 +4,13 @@ import { useAccountStore } from '@/stores/account'
 import { listClientIdsReleasedForConsoleService } from '@/services/account-services'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export default async function redirectToManager(to, __, next) {
+export default async function redirectToManager(to, from, next) {
   const accountStore = useAccountStore()
   const isPrivateRoute = !to.meta.isPublic
   const accountData = accountStore.accountData
 
-  if (accountStore.shouldAvoidCalculateServicePlan) {
-    return next()
+  if (accountStore.shouldAvoidCalculateServicePlan || accountStore.hasAccessConsole) {
+    return forceRedirectViewAccess(to, next, from, accountStore)
   }
 
   try {
@@ -29,14 +29,19 @@ export default async function redirectToManager(to, __, next) {
       }
 
       // account that are kind client, can access with developer service plan
-      const [{ isDeveloperSupportPlan }, clientIdsReleadesForConsole] = await Promise.all([
+      const [{ isDeveloperSupportPlan }, consoleReleasedClient] = await Promise.all([
         loadContractServicePlan({ clientId: accountData.client_id }),
-        listClientIdsReleasedForConsoleService()
+        listClientIdsReleasedForConsoleService(accountData.client_id)
       ])
-      accountStore.setAccountData({ isDeveloperSupportPlan: isDeveloperSupportPlan })
+
+      accountStore.setAccountData({
+        isDeveloperSupportPlan: isDeveloperSupportPlan,
+        consoleReleasedClient
+      })
+
       if (!isDeveloperSupportPlan) {
-        if (clientIdsReleadesForConsole.includes(accountData.client_id)) {
-          return next()
+        if (accountStore.hasAccessConsole) {
+          return forceRedirectViewAccess(to, next, from, accountStore)
         }
         permanentRedirectToManager()
       }
@@ -53,4 +58,21 @@ function permanentRedirectToManager() {
     const managerUrl = getStaticUrlsByEnvironment('manager')
     window.location.replace(managerUrl)
   }
+}
+
+function forceRedirectViewAccess(to, next, from, accountStore) {
+  const viewsAccessRestriction = accountStore.viewsAccessRestriction
+  const isPrivateRoute = !to.meta.isPublic
+
+  if (isPrivateRoute && viewsAccessRestriction?.length) {
+    if (!viewsAccessRestriction.includes(to.name)) {
+      if (viewsAccessRestriction.includes(from.name)) {
+        return next(false)
+      } else {
+        return next({ name: viewsAccessRestriction[0] })
+      }
+    }
+  }
+
+  return next()
 }

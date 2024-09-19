@@ -6341,10 +6341,6 @@ primeicons@^7.0.0:
   resolved "https://registry.yarnpkg.com/primeicons/-/primeicons-7.0.0.tgz#6b25c3fdcb29bb745a3035bdc1ed5902f4a419cf"
   integrity sha512-jK3Et9UzwzTsd6tzl2RmwrVY/b8raJ3QZLzoDACj+oTJ0oX7L9Hy+XnVwgo4QVKlKpnP/Ur13SXV/pVh4LzaDw==
 
-"primevue-sass-theme@git+https://github.com/primefaces/primevue-sass-theme.git#3.39.0":
-  version "3.39.0"
-  resolved "git+https://github.com/primefaces/primevue-sass-theme.git#f30329513d57d5cbe93927c437ed4caeb6ca8d20"
-
 primevue@^3.35.0:
   version "3.35.0"
   resolved "https://registry.npmjs.org/primevue/-/primevue-3.35.0.tgz"

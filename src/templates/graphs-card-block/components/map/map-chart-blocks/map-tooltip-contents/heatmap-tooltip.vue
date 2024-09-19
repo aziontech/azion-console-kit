@@ -1,6 +1,6 @@
 <template>
-  <div class="flex gap-2 justify-between text-color text-xs font-normal">
-    <p>{{ data?.label }}</p>
+  <div class="flex flex-col gap-2 text-color text-xs font-normal">
+    <p class="font-bold">{{ data?.label }}</p>
     <p>{{ data?.exhibitionValue }}</p>
   </div>
 </template>

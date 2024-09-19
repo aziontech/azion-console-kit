@@ -177,32 +177,32 @@ const REPORTS_TEXTS = {
   botManager: {
     botManagerSummary: {
       badBotHits: {
-        description: 'Number of requests identified as bad bot'
+        description: 'Number of requests identified as bad bots.'
       },
       goodBotHits: {
-        description: 'Number of requests identified as good bot'
+        description: 'Number of requests identified as good bots.'
       },
       botHits: {
-        description: 'Number of requests identified as bot'
+        description: 'Number of requests identified as bots.'
       },
       transactions: {
-        description: 'Number of requests evaluated by the Azion Bot Manager'
+        description: 'Number of requests evaluated by Azion Bot Manager.'
       },
       botTraffic: {
-        description: 'Sum of requests grouped by classification'
+        description: 'Sum of requests grouped by classification.'
       },
       botCaptcha: {
-        description: 'Sum of CAPTCHA challenge results returned for requests classified as bots'
+        description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.'
       },
       botAction: {
         description:
-          'Action taken by the Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages'
+          'Actions taken by Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages.'
       },
       botClassification: {
-        description: 'Number of requests by bot category'
+        description: 'Number of requests by bot categories.'
       },
       botActivityMap: {
-        description: 'Sum of requests identified as bots, presented by the country of origin'
+        description: 'Sum of requests identified as bots, presented by the country of origin.'
       }
     }
   }
