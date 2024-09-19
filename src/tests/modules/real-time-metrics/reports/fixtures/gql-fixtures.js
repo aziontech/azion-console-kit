@@ -1158,7 +1158,7 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       botManagerMetrics (
-        limit: 5000
+        limit: 10000
         aggregate: {sum: requests 
 }
         groupBy: [ts, classified]
