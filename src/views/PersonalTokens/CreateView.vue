@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
@@ -13,8 +13,12 @@
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
   import { useRouter } from 'vue-router'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   defineOptions({ name: 'create-personal-token' })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createPersonalTokenService: {
@@ -71,6 +75,9 @@
   const dialog = useDialog()
 
   const handleResponse = ({ token }) => {
+    tracker.product.productCreated({
+      productName: 'Personal Token'
+    })
     personalTokenKey.value = token
     dialog.open(CopyTokenDialog, {
       data: {
@@ -81,6 +88,18 @@
         router.push({ name: 'list-personal-tokens' })
       }
     })
+  }
+
+  const handleFailedResponse = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Personal Token',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const copyPersonalToken = async () => {
@@ -112,6 +131,7 @@
       <CreateFormBlock
         :createService="props.createPersonalTokenService"
         @on-response="handleResponse"
+        @on-response-fail="handleFailedResponse"
         :initialValues="initialValues"
         :schema="validationSchema"
         :disabledCallback="true"
