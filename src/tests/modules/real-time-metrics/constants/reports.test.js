@@ -947,7 +947,7 @@ describe('RealTimeMetricsModule', () => {
           id: '329891149133127508',
           isTopX: false,
           label: 'Bot Traffic',
-          limit: 5000,
+          limit: 10000,
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',

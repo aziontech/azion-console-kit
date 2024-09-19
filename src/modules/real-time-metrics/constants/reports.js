@@ -970,7 +970,7 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    limit: 5000,
+    limit: 10000,
     groupBy: ['classified'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
