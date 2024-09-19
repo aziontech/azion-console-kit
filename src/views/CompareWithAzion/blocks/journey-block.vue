@@ -33,42 +33,45 @@
   import { inject } from 'vue'
   import Button from 'primevue/button'
   import { useCreateModalStore } from '@/stores/create-modal'
-  
+
   const createModalStore = useCreateModalStore()
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const openModalCreate = () => {
-    tracker.create.createEventInHomeAndHeader({ url: '/compare-with-azion', location: 'compare-with-azion' }).track()
+    tracker.create
+      .createEventInHomeAndHeader({ url: '/compare-with-azion', location: 'compare-with-azion' })
+      .track()
     createModalStore.toggle()
   }
 
   const data = {
-    title: "Start your journey with Azion",
+    title: 'Start your journey with Azion',
     items: [
       {
-        title: "Get Started",
-        description: "Welcome aboard! Feel free to explore or get a head start below.",
+        title: 'Get Started',
+        description: 'Welcome aboard! Feel free to explore or get a head start below.',
         button: {
-          label: "Create",
-          icon: "pi pi-plus",
-          action: function() {
+          label: 'Create',
+          icon: 'pi pi-plus',
+          action: function () {
             openModalCreate()
           }
         }
       },
       {
-        title: "Connect with the Azion Discord Community",
-        description: "Join our Discord community to get support, share ideas, and stay up-to-date on the latest Azion news and events.",
+        title: 'Connect with the Azion Discord Community',
+        description:
+          'Join our Discord community to get support, share ideas, and stay up-to-date on the latest Azion news and events.',
         button: {
-          label: "Azion Discord",
-          icon: "pi pi-discord",
+          label: 'Azion Discord',
+          icon: 'pi pi-discord',
           outlined: true,
-          action: function() {
-            window.open("https://discord.gg/pM8ANzztuB", "_blank")
+          action: function () {
+            window.open('https://discord.gg/pM8ANzztuB', '_blank')
           }
         }
       }
     ]
-  };
+  }
 </script>

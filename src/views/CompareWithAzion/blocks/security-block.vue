@@ -33,15 +33,23 @@
         v-if="tls_version"
         class="px-4 py-2 flex items-center"
       >
-        
         {{ props.securityHeaders.tls_version }}
       </li>
 
-      <li class="px-4 py-2 flex" v-if="props.securityHeaders.list.length">
+      <li
+        class="px-4 py-2 flex"
+        v-if="props.securityHeaders.list.length"
+      >
         <small class="w-24">Headers</small>
         <div class="flex flex-wrap gap-1">
-          <span v-for="item in props.securityHeaders.list" :key="item">
-            <Tag severity="danger" :value="item" />
+          <span
+            v-for="item in props.securityHeaders.list"
+            :key="item"
+          >
+            <Tag
+              severity="danger"
+              :value="item"
+            />
           </span>
         </div>
       </li>
@@ -50,8 +58,8 @@
 </template>
 
 <script setup>
-  import { ref } from "vue"
-  import Tag from "primevue/tag"
+  import { ref } from 'vue'
+  import Tag from 'primevue/tag'
 
   const props = defineProps({
     securityHeaders: ref({

@@ -2,8 +2,8 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import makeCompareWithAzionApi from '../axios/makeCompareWithAzionApi'
 import { makeWebpagetestBaseUrl } from './make-base-url'
 
-export const getTestById = async (id, clientId=undefined) => {
-  if(!id) {
+export const getTestById = async (id, clientId = undefined) => {
+  if (!id) {
     return {
       status: 400,
       error: `Invalid testId param.`
@@ -12,7 +12,7 @@ export const getTestById = async (id, clientId=undefined) => {
 
   let url = `${makeWebpagetestBaseUrl()}/db/test?id=${id}`
 
-  if(clientId) {
+  if (clientId) {
     url = url.concat(`&clientId=${clientId}`)
   }
 
@@ -28,7 +28,7 @@ export const getTestById = async (id, clientId=undefined) => {
 }
 
 export const getAllTestsByClientId = async (clientId) => {
-  if(!clientId) {
+  if (!clientId) {
     return {
       status: 400,
       error: `Invalid clientId param.`
@@ -47,7 +47,7 @@ export const getAllTestsByClientId = async (clientId) => {
 }
 
 export const getResult = async (testId) => {
-  if(!testId) {
+  if (!testId) {
     return {
       status: 400,
       error: `Invalid testId param.`

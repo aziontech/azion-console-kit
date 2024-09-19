@@ -20,4 +20,3 @@ export const compareWithAzionRoutes = {
     getResultFromWebpagetest: CompareWithAzionService.getResultFromWebpagetest
   }
 }
- 
