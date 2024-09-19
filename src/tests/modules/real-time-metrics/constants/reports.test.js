@@ -824,7 +824,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Number of requests identified as bad bot',
+          description: 'Number of requests identified as bad bots.',
           fields: [],
           filters: {
             classifiedEq: 'bad bot'
@@ -838,7 +838,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'inverse',
           xAxis: 'ts'
         },
         {
@@ -854,7 +854,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Number of requests identified as good bot',
+          description: 'Number of requests identified as good bots.',
           fields: [],
           filters: {
             classifiedEq: 'good bot'
@@ -868,7 +868,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'neutral',
           xAxis: 'ts'
         },
         {
@@ -884,7 +884,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Number of requests identified as bot',
+          description: 'Number of requests identified as bots.',
           fields: [],
           filters: {
             classifiedIn: ['bad bot', 'good bot']
@@ -898,7 +898,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: false,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'inverse',
           xAxis: 'ts'
         },
         {
@@ -914,7 +914,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Number of requests evaluated by the Azion Bot Manager',
+          description: 'Number of requests evaluated by Azion Bot Manager.',
           fields: [],
           groupBy: [],
           helpCenterPath: '',
@@ -925,7 +925,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           rotated: true,
           type: 'big-numbers',
-          variationType: 'regular',
+          variationType: 'neutral',
           xAxis: 'ts'
         },
         {
@@ -941,7 +941,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Sum of requests grouped by classification',
+          description: 'Sum of requests grouped by classification.',
           groupBy: ['classified'],
           helpCenterPath: '',
           id: '329891149133127508',
@@ -959,7 +959,7 @@ describe('RealTimeMetricsModule', () => {
           chartOwner: 'azion',
           label: 'Bot Action',
           description:
-            'Action taken by the Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages',
+            'Actions taken by Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages.',
           aggregationType: 'sum',
           columns: 6,
           type: 'pie',
@@ -991,7 +991,7 @@ describe('RealTimeMetricsModule', () => {
           id: '071851224118431167',
           chartOwner: 'azion',
           label: 'Bot CAPTCHA',
-          description: 'Sum of CAPTCHA challenge results returned for requests classified as bots',
+          description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.',
           aggregationType: 'sum',
           columns: 6,
           type: 'line',
@@ -1020,7 +1020,7 @@ describe('RealTimeMetricsModule', () => {
           id: '455330743572401794',
           chartOwner: 'azion',
           label: 'Bot CAPTCHA',
-          description: 'Sum of CAPTCHA challenge results returned for requests classified as bots',
+          description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.',
           aggregationType: 'sum',
           columns: 6,
           type: 'pie',
@@ -1050,7 +1050,7 @@ describe('RealTimeMetricsModule', () => {
           id: '424388331488145485',
           chartOwner: 'azion',
           label: 'Bot Classifications',
-          description: 'Number of requests by bot category',
+          description: 'Number of requests by bot categories.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1082,9 +1082,9 @@ describe('RealTimeMetricsModule', () => {
           id: '190246009413028885',
           chartOwner: 'azion',
           label: 'Bot Activity Map',
-          description: 'Sum of requests identified as bots, presented by the country of origin',
+          description: 'Sum of requests identified as bots, presented by the country of origin.',
           aggregationType: 'sum',
-          columns: 12,
+          columns: 6,
           type: 'map',
           xAxis: 'cat',
           isTopX: true,

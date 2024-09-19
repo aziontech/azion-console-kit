@@ -58,6 +58,9 @@
       },
       'no-variation': {
         severity: 'info'
+      },
+      neutral: {
+        severity: 'info'
       }
     }
     return variations[variation]
@@ -80,7 +83,13 @@
       }
     }
 
-    const variationState = props.variationValue > upperLimit ? 'positive' : 'negative'
+    let variationState = props.variationValue > upperLimit ? 'positive' : 'negative'
+    if (variationType === 'neutral') {
+      return {
+        ...getTagPropsByVariation(variationType),
+        value: `${props.variationValue.toFixed(precision)}%`
+      }
+    }
 
     return {
       ...getTagPropsByVariation(`${variationState}-${variationType}`),

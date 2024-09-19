@@ -196,16 +196,16 @@ export default function ExtractFiltersAndVariables(pFilters) {
     Object.assign(variables, dataset.variables)
   }
 
+  const genericFilter = extractGeneric(pFilters)
+  if (genericFilter) {
+    Object.assign(filters, genericFilter.filters)
+  }
+
   const andFilter = extractAnd(pFilters)
   if (andFilter) {
     Object.assign(filters, andFilter.filters)
     params.push(...andFilter.params)
     Object.assign(variables, andFilter.variables)
-  }
-
-  const genericFilter = extractGeneric(pFilters)
-  if (genericFilter) {
-    Object.assign(filters, genericFilter.filters)
   }
 
   return {

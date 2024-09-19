@@ -305,7 +305,7 @@
               optionLabel="label"
               optionValue="value"
               class="w-full"
-              placeholder="Select a operator"
+              placeholder="Select an operator"
               data-testid="filter-operator-dropdown"
             >
               <template
@@ -520,7 +520,7 @@
                 optionLabel="label"
                 optionValue="value"
                 class="w-full"
-                placeholder="Select a operator"
+                placeholder="Select an operator"
                 data-testid="filter-sidebar-operator-dropdown"
               >
                 <template
