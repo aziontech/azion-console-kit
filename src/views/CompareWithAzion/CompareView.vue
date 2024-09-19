@@ -131,7 +131,6 @@
   })
 
   const generalError = ref('')
-  // Origin Test
   const errorData = ref('')
   const resumeData = ref({})
   const gradeData = ref([])
