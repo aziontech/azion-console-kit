@@ -116,7 +116,8 @@
         body: (item) => ({
           data: {
             isLoading,
-            repurge: repurgeEvent(item)
+            item,
+            repurge: repurgeEvent
           }
         })
       }

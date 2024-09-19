@@ -14,9 +14,14 @@
     dialogRef.value.close()
   }
 
-  const handleRealTimePurge = () => {
-    dialogRef.value.data.repurge()
-    loading.value = true
+  const handleRealTimePurge = async () => {
+    try {
+      loading.value = true
+      await dialogRef.value.data.repurge(dialogRef.value.data.item)
+    } finally {
+      loading.value = false
+      closeDialog()
+    }
   }
 
   watch(
@@ -70,6 +75,14 @@
           to propagate to all edge nodes.
         </div>
       </div>
+      <template #closeicon>
+        <PrimeButton
+          outlined
+          type="button"
+          icon="pi pi-times"
+          @click="closeDialog"
+        />
+      </template>
       <template #footer>
         <PrimeButton
           severity="primary"
