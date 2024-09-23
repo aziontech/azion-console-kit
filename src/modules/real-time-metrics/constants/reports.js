@@ -1123,8 +1123,8 @@ const REPORTS = [
       classifiedIn: ['bad bot', 'good bot']
     },
     limit: 5000,
-    groupBy: ['geoipCountry'],
-    fields: ['geoipCountry'],
+    groupBy: ['geolocCountryName'],
+    fields: ['geolocCountryName'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
