@@ -830,7 +830,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedEq: 'bad bot'
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
           id: '892249168369791027',
           isTopX: false,
           label: 'Bad Bot Hits',
@@ -860,7 +860,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedEq: 'good bot'
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
           id: '934654293238823255',
           isTopX: false,
           label: 'Good Bot Hits',
@@ -890,7 +890,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedIn: ['bad bot', 'good bot']
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
           id: '259047966206560862',
           isTopX: false,
           label: 'Bot Hits',
@@ -917,7 +917,7 @@ describe('RealTimeMetricsModule', () => {
           description: 'Number of requests evaluated by Azion Bot Manager.',
           fields: [],
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/transactions',
           id: '541669034905662013',
           isTopX: false,
           label: 'Transactions',
@@ -943,7 +943,7 @@ describe('RealTimeMetricsModule', () => {
           dataset: 'botManagerMetrics',
           description: 'Sum of requests grouped by classification.',
           groupBy: ['classified'],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
           id: '329891149133127508',
           isTopX: false,
           label: 'Bot Traffic',
@@ -985,7 +985,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-action'
         },
         {
           id: '071851224118431167',
@@ -1014,7 +1014,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph'
         },
         {
           id: '455330743572401794',
@@ -1044,7 +1044,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-pie-graph'
         },
         {
           id: '424388331488145485',
@@ -1076,7 +1076,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-classifications'
         },
         {
           id: '190246009413028885',
@@ -1106,7 +1106,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
         },
         {
           aggregationType: 'sum',
