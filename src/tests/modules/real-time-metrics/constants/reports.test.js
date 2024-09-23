@@ -941,7 +941,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+          description:
+            'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
           groupBy: ['classified'],
           helpCenterPath: '',
           id: '329891149133127508',
@@ -1050,7 +1051,8 @@ describe('RealTimeMetricsModule', () => {
           id: '424388331488145485',
           chartOwner: 'azion',
           label: 'Bot Classifications',
-          description: 'Sum of requests classified according to the tactics used and the purpose of the bots.',
+          description:
+            'Sum of requests classified according to the tactics used and the purpose of the bots.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
