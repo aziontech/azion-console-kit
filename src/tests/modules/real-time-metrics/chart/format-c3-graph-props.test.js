@@ -57,7 +57,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {
@@ -169,7 +169,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {
@@ -263,7 +263,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {

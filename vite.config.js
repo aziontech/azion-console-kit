@@ -78,7 +78,17 @@ const getConfig = () => {
           target: 'https://ivg5gk272b.map.azionedge.net',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '/chat-completions')
-        }
+        },
+        '/webpagetest': {
+          target: `https://www.azion.com/api/webpagetest`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/webpagetest/, '')
+        },
+        '/webpagetest-external': {
+          target: `https://www.azion.com/api/webpagetest`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
+        },
       }
     }
   }

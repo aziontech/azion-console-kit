@@ -104,6 +104,9 @@
   }
 
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Device Groups'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',

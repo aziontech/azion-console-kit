@@ -6,6 +6,8 @@
     <template #content>
       <CreateFormBlock
         :createService="props.createWafRulesService"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -29,7 +31,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createWafRulesService: {
@@ -37,6 +44,24 @@
       required: true
     }
   })
+
+  const handleTrackCreation = () => {
+    tracker.product.productCreated({
+      productName: 'WAF Rules'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'WAF Rules',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required(),

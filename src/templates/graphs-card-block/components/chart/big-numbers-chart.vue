@@ -1,21 +1,25 @@
 <template>
-  <div class="flex items-center gap-2">
-    <h2 class="text-2xl font-bold text-color">
-      {{ resultChart[0].value }}
-      <span class="text-sm font-normal">{{ resultChart[0].unit }}</span>
-    </h2>
-    <PrimeTag
-      :class="variationProps?.class"
-      :value="variationProps.value"
-      :icon="variationProps?.icon"
-      :severity="variationProps.severity"
-    />
+  <div class="flex justify-between items-center gap-2 mt-7 flex-wrap">
+    <div class="flex items-center gap-3 flex-wrap">
+      <h2 class="text-2xl font-bold text-color">
+        {{ resultChart[0].value }}
+        <span class="text-sm font-normal">{{ resultChart[0].unit }}</span>
+      </h2>
+      <PrimeTag
+        :class="variationProps?.class"
+        :value="variationProps.value"
+        :icon="variationProps?.icon"
+        :severity="variationProps.severity"
+      />
+    </div>
+    <AggregationInfo :report="chartData" />
   </div>
 </template>
 
 <script setup>
   import { computed } from 'vue'
   import PrimeTag from 'primevue/tag'
+  import AggregationInfo from '../aggregation-info.vue'
 
   const props = defineProps({
     resultChart: {
@@ -24,6 +28,9 @@
     },
     variationValue: {
       type: Array
+    },
+    chartData: {
+      type: Object
     }
   })
 
@@ -51,6 +58,14 @@
       },
       'no-variation': {
         severity: 'info'
+      },
+      'positive-neutral': {
+        severity: 'info',
+        icon: 'pi pi-arrow-up-right'
+      },
+      'negative-neutral': {
+        severity: 'info',
+        icon: 'pi pi-arrow-down-left'
       }
     }
     return variations[variation]
@@ -73,7 +88,7 @@
       }
     }
 
-    const variationState = props.variationValue > upperLimit ? 'positive' : 'negative'
+    let variationState = props.variationValue > upperLimit ? 'positive' : 'negative'
 
     return {
       ...getTagPropsByVariation(`${variationState}-${variationType}`),

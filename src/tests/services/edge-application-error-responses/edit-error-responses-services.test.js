@@ -39,7 +39,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     const errorResponse = fixtures.errorResponsePayload.errorResponses[0]
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge/applications/${fixtures.errorResponsePayload.edgeApplicationId}/error_responses/${fixtures.errorResponsePayload.id}`,
+      url: `v4/edge_application/applications/${fixtures.errorResponsePayload.edgeApplicationId}/error_responses/${fixtures.errorResponsePayload.id}`,
       method: 'PATCH',
       body: {
         error_responses: [

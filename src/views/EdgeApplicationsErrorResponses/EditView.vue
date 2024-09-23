@@ -43,6 +43,9 @@
     })
   }
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Error Responses'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',
@@ -63,15 +66,22 @@
   }
 
   const validationSchema = yup.object({
-    originId: yup.string().required().label('Origin'),
-    errorResponses: yup.array().of(
-      yup.object().shape({
-        code: yup.string().required(),
-        timeout: yup.number().required().label('Response TTL'),
-        uri: yup.string().nullable(true),
-        customStatusCode: yup.string().nullable(true)
-      })
-    )
+    errorResponses: yup
+      .array()
+      .of(
+        yup.object().shape({
+          code: yup.string().required(),
+          timeout: yup.number().required().label('Response TTL'),
+          uri: yup.string().nullable(true),
+          customStatusCode: yup.string().nullable(true)
+        })
+      )
+      .default([]),
+    originId: yup.string().when('errorResponses', {
+      is: (errorResponses) => errorResponses.length && errorResponses.some((data) => data.uri),
+      then: (schema) => schema.required().label('Origin'),
+      otherwise: (schema) => schema.nullable()
+    })
   })
 
   const router = useRouter()

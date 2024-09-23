@@ -255,14 +255,19 @@
                 data-testid="data-table-skeleton-search-input"
               />
             </span>
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-              data-testid="data-table-skeleton-add-button"
-            />
+            <slot
+              name="addButton"
+              data-testid="data-table-add-button"
+            >
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+                data-testid="data-table-skeleton-add-button"
+              />
+            </slot>
           </div>
         </slot>
       </template>
@@ -298,6 +303,7 @@
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
+  import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -347,6 +353,13 @@
     },
     reorderableRows: {
       type: Boolean
+    },
+    onReorderService: {
+      type: Function
+    },
+    isReorderAllEnabled: {
+      type: Boolean,
+      default: false
     },
     emptyListMessage: {
       type: String,
@@ -432,8 +445,25 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const onRowReorder = (event) => {
-    data.value = event.value
+  const onRowReorder = async (event) => {
+    try {
+      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
+      data.value = event.value
+      await props.onReorderService(tableData)
+      reload()
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Reorder saved'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
   }
 
   const openDialog = (dialogComponent, body) => {

@@ -70,7 +70,8 @@
 
       area.setProperties({
         kind: 'heatmap',
-        value: areaData.value
+        value: areaData.value,
+        exhibitionValue: areaData.exhibitionValue
       })
 
       setFeatureStyle(area, areaData.variation)
@@ -138,10 +139,10 @@
       tooltipProps.value = {
         label: feature.get('name'),
         value: feature.get('value'),
+        exhibitionValue: feature.get('exhibitionValue'),
         kind: feature.get('kind'),
         yAxis: pixel[1],
-        xAxis: pixel[0],
-        chartData: props.chartData
+        xAxis: pixel[0]
       }
     } else {
       hideTooltip()
@@ -154,24 +155,27 @@
       .map((feature) => feature.get('kind'))
       .filter((value, index, self) => self.indexOf(value) === index && value)
 
+    const { aggregations } = props.chartData
+    const dataUnit = aggregations?.length ? aggregations[0]?.variable : 'accesses'
+
     return {
       show: getFeaturesKinds.length === 1,
-      title: 'Total accesses:',
+      title: `Total ${dataUnit}:`,
       caption: [
         {
-          label: '100.000 accesses',
+          label: `100,000 ${dataUnit}`,
           bullet: 'bg-scale-red border-scale-red'
         },
         {
-          label: '10.000 accesses',
+          label: `10,000 ${dataUnit}`,
           bullet: 'bg-scale-orange border-scale-orange'
         },
         {
-          label: '1.000 accesses',
+          label: `1,000 ${dataUnit}`,
           bullet: 'bg-scale-yellow border-scale-yellow'
         },
         {
-          label: '< 100 accesses',
+          label: `< 100 ${dataUnit}`,
           bullet: 'bg-scale-green border-scale-green'
         }
       ]
