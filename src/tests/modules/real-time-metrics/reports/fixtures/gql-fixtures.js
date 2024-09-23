@@ -1326,7 +1326,7 @@ botCategory
         limit: 5000
         aggregate: {sum: requests 
 }
-        groupBy: [geoipCountry]
+        groupBy: [geolocCountryName]
         orderBy: [sum_ASC]
         filter: {
           tsRange: {
@@ -1338,9 +1338,9 @@ classifiedIn: ["bad bot","good bot"]
 
         }
         ) {
-          geoipCountry
+          geolocCountryName
 sum
-geoipCountry
+geolocCountryName
         }
       }`,
       variables: {
