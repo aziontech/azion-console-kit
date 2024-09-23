@@ -161,9 +161,9 @@ const separateFieldsByType = (fields) => {
 const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
-    const isOperetorContains = operator === 'Like'
+    const isOperatorContains = operator === 'Like'
 
-    const fieldValue = isOperetorContains ? `%${value}%` : value
+    const fieldValue = isOperatorContains ? `%${value}%` : value
     filter[filterKey] = {
       ...filter[filterKey],
       [`${valueField}${operator}`]: fieldValue
