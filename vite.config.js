@@ -73,6 +73,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/ai': {
+          target: 'https://ivg5gk272b.map.azionedge.net',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/ai/, '/chat-completions')
         }
       }
     }

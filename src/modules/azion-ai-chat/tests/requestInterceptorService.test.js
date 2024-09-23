@@ -8,54 +8,91 @@ const makeSut = () => {
 }
 
 describe('requestInterceptorService', () => {
-  it('should add correct properties to the request', () => {
+  it('should return undefined if requestDetails.body is not provided', () => {
     const { sut } = makeSut()
-    const requestDetailsMock = {
-      body: {}
-    }
-    const sessionIdMock = '123'
-    const urlMock = 'https://example.com'
-    const userNameMock = 'john'
+    const requestDetails = {}
 
-    const result = sut(requestDetailsMock, {
-      sessionId: sessionIdMock,
-      url: urlMock,
-      userName: userNameMock
-    })
-
-    expect(result.body.session_id).toEqual(sessionIdMock)
-    expect(result.body.url).toEqual(urlMock)
-    expect(result.body.username).toEqual(userNameMock)
-    expect(result.body.app).toEqual('console')
-  })
-
-  it('should not modify the request when its undefined', () => {
-    const { sut } = makeSut()
-    const sessionIdMock = '123'
-    const urlMock = 'https://example.com'
-    const userNameMock = 'john'
-
-    const result = sut(undefined, {
-      sessionId: sessionIdMock,
-      url: urlMock,
-      userName: userNameMock
+    const result = sut(requestDetails, {
+      sessionId: '123',
+      url: '/test-url',
+      userName: 'testUser',
+      clientId: 'client123',
+      allMessage: [],
+      prompt: null
     })
 
     expect(result).toBeUndefined()
   })
 
-  it('should not modify the request when its empty', () => {
+  it('should modify requestDetails.body with valid data', () => {
     const { sut } = makeSut()
-    const requestDetailsMock = {}
-    const sessionIdMock = '123'
-    const urlMock = 'https://example.com'
-    const userNameMock = 'john'
+    const requestDetails = { body: {} }
 
-    const result = sut(requestDetailsMock, {
-      sessionId: sessionIdMock,
-      url: urlMock,
-      userName: userNameMock
+    const result = sut(requestDetails, {
+      sessionId: '123',
+      url: '/test-url',
+      userName: 'testUser',
+      clientId: 'client123',
+      allMessage: [{ role: 'user', text: 'Hello' }],
+      prompt: { user_prompt: 'User prompt', system_prompt: 'System prompt' }
     })
-    expect(result).toBeUndefined()
+
+    expect(result.body).toEqual({
+      messages: [{ role: 'user', content: 'Hello' }],
+      stream: true,
+      azion: {
+        session_id: '123',
+        user_name: 'testUser',
+        client_id: 'client123',
+        url: '/test-url',
+        app: 'console',
+        user_prompt: 'User prompt',
+        system_prompt: 'System prompt'
+      }
+    })
+  })
+
+  it('should handle different roles in allMessage', () => {
+    const { sut } = makeSut()
+    const requestDetails = { body: {} }
+
+    const result = sut(requestDetails, {
+      sessionId: '123',
+      url: '/test-url',
+      userName: 'testUser',
+      clientId: 'client123',
+      allMessage: [
+        { role: 'user', text: 'Hello' },
+        { role: 'system', text: 'System message' }
+      ],
+      prompt: null
+    })
+
+    expect(result.body.messages).toEqual([
+      { role: 'user', content: 'Hello' },
+      { role: 'system', content: 'System message' }
+    ])
+  })
+
+  it('should handle when prompt is not provided', () => {
+    const { sut } = makeSut()
+    const requestDetails = { body: {} }
+
+    const result = sut(requestDetails, {
+      sessionId: '123',
+      url: '/test-url',
+      userName: 'testUser',
+      clientId: 'client123',
+      allMessage: [{ role: 'user', text: 'Hello' }],
+      prompt: null
+    })
+
+    expect(result.body.azion).toEqual({
+      session_id: '123',
+      user_name: 'testUser',
+      client_id: 'client123',
+      url: '/test-url',
+      app: 'console'
+    })
   })
 })

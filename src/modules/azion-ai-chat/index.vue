@@ -34,10 +34,12 @@
     <div
       class="h-full flex justify-between flex-col"
       :key="renderCount"
+      v-if="isChatMobile"
     >
       <AzionAiChat ref="azionAiChatRef" />
     </div>
     <Sidebar
+      v-else
       :visible="isChatAiOpen"
       position="bottom"
       headerContent="Copilot"
@@ -110,11 +112,12 @@
 
   import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import { updateSessionId } from './services/make-session-id'
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import hljs from 'highlight.js'
   import { AZION_MESSAGE_TYPE } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
+  import { useWindowSize } from '@vueuse/core'
 
   defineOptions({
     name: 'azion-ai-chat-root-block'
@@ -123,6 +126,10 @@
   const azionAiChatMobileRef = ref(null)
   const renderCount = ref(1)
   const router = useRouter()
+  const { width } = useWindowSize()
+  const currentWidth = ref(width.value)
+  const SCREEN_BREAKPOINT_MD = 768
+
   onMounted(() => {
     window.addEventListener('message', aiCustomPromptListenerHandler)
     addSupportToHljs()
@@ -130,6 +137,10 @@
 
   onUnmounted(() => {
     window.removeEventListener('message', aiCustomPromptListenerHandler)
+  })
+
+  const isChatMobile = computed(() => {
+    return currentWidth.value > SCREEN_BREAKPOINT_MD
   })
 
   const azionAiChatStore = useAzionAiChatStore()
@@ -157,9 +168,9 @@
   const aiCustomPromptListenerHandler = (event) => {
     if (event.data.type === AZION_MESSAGE_TYPE) {
       azionAiChatStore.open()
-      azionAiChatRef?.value.deepChatRef.submitUserMessage({ text: event.data.prompt })
+      azionAiChatRef?.value.submitUserMessageGetHelp(event.data.prompt)
       setTimeout(() => {
-        azionAiChatMobileRef?.value.deepChatRef.submitUserMessage({ text: event.data.prompt })
+        azionAiChatMobileRef?.value.submitUserMessageGetHelp(event.data.prompt)
       }, 100)
     }
   }
@@ -168,4 +179,12 @@
     const url = `${window.location.origin}${router.resolve({ name: 'copilot' }).path}`
     windowOpen(url, '_blank')
   }
+
+  watch(
+    width,
+    () => {
+      currentWidth.value = width.value
+    },
+    { immediate: true }
+  )
 </script>

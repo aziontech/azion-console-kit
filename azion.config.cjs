@@ -268,6 +268,19 @@ const backRules = [
       },
       rewrite: '/webhook/console_feedback'
     }
+  },
+  {
+    name: 'Route Send Message to Copilot',
+    description: 'this router will send the user message to the chatbot',
+    match: '^/ai',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-console-ai',
+        type: 'single_origin'
+      },
+      rewrite: '/chat-completions'
+    }
   }
 ]
 
@@ -322,6 +335,12 @@ const AzionConfig = {
       hostHeader: `automate.azion.net`,
       addresses: [`automate.azion.net`]
     },
+    {
+      name: 'origin-console-ai',
+      type: 'single_origin',
+      hostHeader: `ivg5gk272b.map.azionedge.net`,
+      addresses: [`ivg5gk272b.map.azionedge.net`]
+    }
   ],
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],
