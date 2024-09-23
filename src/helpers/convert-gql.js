@@ -16,12 +16,35 @@ const getGraphQLType = (value) => {
       return 'String'
     }
 
-    if (!isNaN(Date.parse(value))) {
+    if (isValidDate(value)) {
       return 'DateTime'
     }
 
     return 'String'
   }
+}
+
+function isValidDate(dateString) {
+  const datePatterns = [
+    /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, // YYYY-MM-DD
+    /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/, // MM/DD/YYYY
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, // DD/MM/YYYY
+    /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/, // YYYY/MM/DD
+    /^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$/, // DD-MM-YYYY
+    /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])-\d{4}$/, // MM-DD-YYYY
+    /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d)-\d{2}$/, // MM-DD-YY
+    /^(0[1-9]|[12]\d)-(0[1-9]|1[0-2])-\d{2}$/, // DD-MM-YY
+    /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/ // YYYY-MM-DDTHH:mm:ss
+  ]
+  const matchesPattern = datePatterns.some((pattern) => pattern.test(dateString))
+
+  if (!matchesPattern) {
+    return false
+  }
+
+  const date = new Date(dateString)
+
+  return !isNaN(date.getTime())
 }
 
 /**
@@ -138,9 +161,12 @@ const separateFieldsByType = (fields) => {
 const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
+    const isOperetorContains = operator === 'Like'
+
+    const fieldValue = isOperetorContains ? `%${value}%` : value
     filter[filterKey] = {
       ...filter[filterKey],
-      [`${valueField}${operator}`]: value
+      [`${valueField}${operator}`]: fieldValue
     }
   })
 }
