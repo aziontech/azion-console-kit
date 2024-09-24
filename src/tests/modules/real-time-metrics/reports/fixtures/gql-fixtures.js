@@ -1209,7 +1209,6 @@ botCategoryIn: ["","Non-Bot Like"]
         ) {
           action
 sum
-action
         }
       }`,
       variables: {
@@ -1273,7 +1272,6 @@ actionEq: "redirect"
         ) {
           challengeSolved
 sum
-challengeSolved
         }
       }`,
       variables: {
@@ -1308,7 +1306,6 @@ botCategoryIn: ["","Non-Bot Like"]
         ) {
           botCategory
 sum
-botCategory
         }
       }`,
       variables: {
@@ -1340,7 +1337,6 @@ classifiedIn: ["bad bot","good bot"]
         ) {
           geolocCountryName
 sum
-geolocCountryName
         }
       }`,
       variables: {
@@ -1371,6 +1367,132 @@ end: $tsRange_end
         ) {
           sum
 ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '352234687543902797',
+    label: 'Total Requests',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      dataStreamedMetrics (
+        limit: 5000
+        aggregate: {sum: streamedLines 
+}
+        groupBy: [ts]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
+ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '847143804009563421',
+    label: 'Impacted URLs',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      securityMetrics (
+        limit: 10000
+        aggregate: {sum: value 
+}
+        groupBy: [ts]
+        orderBy: [ts_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+metricEq: "uniq_request_path"
+datasetEq: "bot_manager"
+
+        }
+        ) {
+          sum
+ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '978435123222265554',
+    label: 'Top IPs',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      securityMetrics (
+        limit: 10
+        aggregate: {sum: value 
+}
+        groupBy: [dimension1]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+datasetEq: "bot_manager"
+metricEq: "top_remote_addr"
+
+        }
+        ) {
+          dimension1
+sum
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '1030427483148242',
+    label: 'Top Impacted URLs',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      securityMetrics (
+        limit: 10
+        aggregate: {sum: value 
+}
+        groupBy: [dimension1]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+datasetEq: "bot_manager"
+metricEq: "top_request_path"
+
+        }
+        ) {
+          dimension1
+sum
         }
       }`,
       variables: {
