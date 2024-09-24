@@ -19,7 +19,7 @@
       v-model:filters="filters"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
-      :rows="MINIMUM_OF_ITEMS_PER_PAGE"
+      :rows="minimumOfItemsPerPage"
       @page="changeNumberOfLinesPerPage"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
@@ -396,7 +396,7 @@
 
   const tableDefinitions = useTableDefinitionsStore()
 
-  const MINIMUM_OF_ITEMS_PER_PAGE = ref(tableDefinitions.getNumberOfLinesPerPage)
+  const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
@@ -593,7 +593,7 @@
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-    MINIMUM_OF_ITEMS_PER_PAGE.value = numberOfLinesPerPage
+    minimumOfItemsPerPage.value = numberOfLinesPerPage
   }
 
   const filterBy = computed(() => {
