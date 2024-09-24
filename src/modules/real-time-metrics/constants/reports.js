@@ -1142,7 +1142,7 @@ const REPORTS = [
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
-    xAxis: 'cat',
+    xAxis: 'ts',
     isTopX: false,
     rotated: false,
     dataset: 'securityMetrics',
