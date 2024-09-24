@@ -108,7 +108,9 @@ export function formatC3XAxis(chartData, resultChart) {
     xAxis.min = CHART_RULES.RESET_COUNT
     xAxis.tick = {
       ...xAxis.tick,
-      width: CHART_RULES.LABEL.rotatedWidth
+      width: CHART_RULES.LABEL.rotatedWidth,
+      multiline: true,
+      multilineMax: 2
     }
   }
 
