@@ -346,6 +346,15 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   const seriesName = report.groupBy[0]
   const fieldName = report.aggregationType || report.fields[0]
 
+  const botCaptchaIds = ['455330743572401794', '071851224118431167']
+
+  if (botCaptchaIds.includes(report.id)) {
+    return data[dataset].map((item) => {
+      const captchaSeriesName = item[seriesName] == 'true' ? 'Solved' : 'Not Solved'
+      return [camelToTitle(captchaSeriesName), item[fieldName]]
+    })
+  }
+
   return data[dataset].map((item) => {
     return [camelToTitle(item[seriesName]), item[fieldName]]
   })

@@ -78,9 +78,7 @@ function getFeedbackDifference(currentAggregation, previousAggregation) {
   const currentValue = Object.values(currentAggregation)[0]
   const previousValue = Object.values(previousAggregation)[0]
 
-  if (previousValue === 0 && currentValue === 0) return 0
-  if (previousValue === 0 && currentValue > 0) return 100
-  if (previousValue === 0 && currentValue < 0) return -100
+  if (previousValue === 0) return 0
   return ((currentValue - previousValue) / previousValue) * 100
 }
 
