@@ -429,7 +429,11 @@ const formatBigNumbers = ({ report, data }) => {
   const aggregation = report.aggregationType
 
   const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
-  const { unit, value } = formatDataUnit(total, report)
+  let { unit, value } = formatDataUnit(total, report)
+
+  if (report.id === '847143804009563421') {
+    unit = 'URLs'
+  }
 
   return [
     {
