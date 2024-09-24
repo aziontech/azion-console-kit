@@ -985,7 +985,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-action'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action'
         },
         {
           id: '071851224118431167',
@@ -1044,7 +1044,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-pie-graph'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph'
         },
         {
           id: '424388331488145485',
@@ -1076,7 +1076,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-classifications'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications'
         },
         {
           id: '190246009413028885',

@@ -1007,7 +1007,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botAction
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotAction
   },
   {
     id: '071851224118431167',
@@ -1066,7 +1066,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botCaptchaPie
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotCaptchaPie
   },
   {
     id: '424388331488145485',
@@ -1098,7 +1098,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botClassification
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotClassification
   },
   {
     id: '190246009413028885',
