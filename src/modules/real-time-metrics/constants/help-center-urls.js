@@ -76,7 +76,21 @@ const HELP_CENTER_URLS = {
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
       threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests'
     }
-  }
+  },
+  botManager: {
+    botManagerSummary: {
+      badBotHits: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
+      goodBotHits: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
+      botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
+      transactions: '/real-time-metrics/bot-manager-advanced/overview/transactions',
+      botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
+      topBotAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
+      botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
+      topBotCaptchaPie: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
+      topBotClassification: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
+      botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
+    }
+  },
 }
 
 export default HELP_CENTER_URLS
