@@ -25,26 +25,22 @@ const getGraphQLType = (value) => {
 }
 
 function isValidDate(dateString) {
-  const datePatterns = [
-    /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, // YYYY-MM-DD
-    /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/, // MM/DD/YYYY
-    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, // DD/MM/YYYY
-    /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/, // YYYY/MM/DD
-    /^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$/, // DD-MM-YYYY
-    /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])-\d{4}$/, // MM-DD-YYYY
-    /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d)-\d{2}$/, // MM-DD-YY
-    /^(0[1-9]|[12]\d)-(0[1-9]|1[0-2])-\d{2}$/, // DD-MM-YY
-    /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/ // YYYY-MM-DDTHH:mm:ss
+  const dateRegexes = [
+    /^\d{2}\/\d{2}\/\d{4}$/, // dd/mm/yyyy
+    /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/mm/dd
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, // yyyy-mm-ddThh:mm:ss
+    /^\d{2}-\d{2}-\d{4}$/, // dd-mm-yyyy
+    /^\d{4}-\d{2}-\d{2}$/, // yyyy-mm-dd
+    /^\d{2}\/\d{1,2}\/\d{2}$/, // yy/m/d
+    /^\d{1,2}\/\d{1,2}\/\d{2}$/ // d/m/yy
   ]
-  const matchesPattern = datePatterns.some((pattern) => pattern.test(dateString))
 
-  if (!matchesPattern) {
+  const isValidFormat = dateRegexes.some((regex) => regex.test(dateString))
+  if (!isValidFormat) {
     return false
   }
 
-  const date = new Date(dateString)
-
-  return !isNaN(date.getTime())
+  return !isNaN(Date.parse(dateString))
 }
 
 /**
@@ -72,6 +68,15 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
   ].join('\n')
 }
 
+const formatValueContainOperator = (variable) => {
+  for (const key in variable) {
+    if (Object.prototype.hasOwnProperty.call(variable, key) && key.includes('Like')) {
+      variable[key] = `%${variable[key]}%`
+    }
+  }
+  return variable
+}
+
 /**
  * Convert filter and table to gql body
  *
@@ -82,11 +87,11 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 const convertGQL = (filter, table) => {
   if (!table) throw new Error('Table parameter is required')
 
-  const variables = {}
+  let variables = {}
   const filterQuery = buildFilterQuery(filter, variables)
-
   const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
   const filterParameter = formatFilterParameter(variables)
+  variables = formatValueContainOperator(variables)
 
   const queryConfig = {
     filterParameter,
@@ -96,6 +101,7 @@ const convertGQL = (filter, table) => {
     filterQuery,
     fields: fieldsFormat
   }
+
   const query = buildGraphQLQuery(queryConfig)
 
   return {
@@ -161,12 +167,10 @@ const separateFieldsByType = (fields) => {
 const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
-    const isOperatorContains = operator === 'Like'
 
-    const fieldValue = isOperatorContains ? `%${value}%` : value
     filter[filterKey] = {
       ...filter[filterKey],
-      [`${valueField}${operator}`]: fieldValue
+      [`${valueField}${operator}`]: value
     }
   })
 }
