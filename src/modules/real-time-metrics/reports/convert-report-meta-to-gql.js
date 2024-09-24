@@ -150,7 +150,7 @@ export default class GqlRules {
           ${filtersStr}
         }
         ) {
-          ${fields.join('\n')}
+          ${[...new Set(fields)].join('\n')}
         }
       }`
 
