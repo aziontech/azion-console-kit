@@ -175,7 +175,7 @@
           bullet: 'bg-scale-yellow border-scale-yellow'
         },
         {
-          label: `< 100 ${dataUnit}`,
+          label: `< 1,000 ${dataUnit}`,
           bullet: 'bg-scale-green border-scale-green'
         }
       ]

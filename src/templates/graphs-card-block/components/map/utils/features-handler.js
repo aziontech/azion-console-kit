@@ -2,7 +2,7 @@ const LIMITS = {
   high: 100_000,
   mediumHigh: 10_000,
   mediumLow: 1_000,
-  low: 100
+  low: 999
 }
 
 const BUBBLE_SIZE = 15
@@ -13,7 +13,7 @@ const rangeVariations = (value, rangeVariation) => {
       return `${rangeVariation}-high`
     case value >= LIMITS.mediumHigh:
       return `${rangeVariation}-medium-high`
-    case value >= LIMITS.low:
+    case value >= LIMITS.mediumLow:
       return `${rangeVariation}-medium-low`
     default:
       return `${rangeVariation}-low`
