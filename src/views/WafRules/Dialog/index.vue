@@ -99,6 +99,7 @@
           severity="secondary"
           label="Allow Rules"
           :loading="loading"
+          :disabled="!reason"
           @click="handleAllowRule"
           iconPos="right"
         />
