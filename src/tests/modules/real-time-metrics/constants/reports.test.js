@@ -957,7 +957,7 @@ describe('RealTimeMetricsModule', () => {
         {
           id: '577704475532819772',
           chartOwner: 'azion',
-          label: 'Bot Action',
+          label: 'Top Bot Action',
           description:
             'Actions taken by Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages.',
           aggregationType: 'sum',
@@ -1019,7 +1019,7 @@ describe('RealTimeMetricsModule', () => {
         {
           id: '455330743572401794',
           chartOwner: 'azion',
-          label: 'Bot CAPTCHA',
+          label: 'Top Bot CAPTCHA',
           description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.',
           aggregationType: 'sum',
           columns: 6,
@@ -1049,7 +1049,7 @@ describe('RealTimeMetricsModule', () => {
         {
           id: '424388331488145485',
           chartOwner: 'azion',
-          label: 'Bot Classifications',
+          label: 'Top Bot Classifications',
           description: 'Number of requests by bot categories.',
           aggregationType: 'sum',
           columns: 6,
