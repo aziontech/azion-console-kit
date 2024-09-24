@@ -33,10 +33,12 @@
 
     <div
       class="h-full flex justify-between flex-col"
-      :key="renderCount"
       v-if="isChatMobile"
     >
-      <AzionAiChat ref="azionAiChatRef" />
+      <AzionAiChat
+        :key="renderCount"
+        ref="azionAiChatRef"
+      />
     </div>
     <Sidebar
       v-else
@@ -55,7 +57,6 @@
         <div class="flex items-center justify-between">
           <h2 class="flex items-center gap-2">
             Copilot
-
             <PrimeTag
               class="ml-2"
               value="Experimental"
@@ -159,20 +160,22 @@
   }
 
   const handleClearChat = () => {
-    azionAiChatRef?.value.deepChatRef.clearMessages()
-    azionAiChatMobileRef?.value.deepChatRef.clearMessages()
-    updateSessionId()
     updateChatRenderInstance()
+    azionAiChatRef?.value?.clearMessages()
+    azionAiChatMobileRef?.value?.clearMessages()
+    updateSessionId()
   }
 
   const aiCustomPromptListenerHandler = (event) => {
-    if (event.data.type === AZION_MESSAGE_TYPE) {
-      azionAiChatStore.open()
-      azionAiChatRef?.value.submitUserMessageGetHelp(event.data.prompt)
-      setTimeout(() => {
-        azionAiChatMobileRef?.value.submitUserMessageGetHelp(event.data.prompt)
-      }, 100)
-    }
+    handleClearChat()
+    setTimeout(() => {
+      if (event.data.type === AZION_MESSAGE_TYPE) {
+        azionAiChatStore.open()
+        azionAiChatRef?.value?.submitUserMessageGetHelp(event.data.prompt)
+
+        azionAiChatMobileRef?.value?.submitUserMessageGetHelp(event.data.prompt)
+      }
+    }, 100)
   }
 
   const openChatInNewTab = () => {

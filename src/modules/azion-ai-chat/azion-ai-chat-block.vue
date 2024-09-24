@@ -323,8 +323,14 @@
     loadPromptSuggestionWithRoleDecorator(accountStore.value.jobRole)
   })
 
+  const clearMessages = () => {
+    deepChatRef.value.clearMessages()
+    promptOrigin.value = null
+  }
+
   defineExpose({
     deepChatRef,
+    clearMessages,
     submitUserMessageGetHelp
   })
 </script>
