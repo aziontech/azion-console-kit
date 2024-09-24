@@ -1,4 +1,10 @@
-import { SignUpTracker, SignInTracker, CreateTracker, ProductTracker } from './trackers'
+import {
+  SignUpTracker,
+  SignInTracker,
+  CreateTracker,
+  ProductTracker,
+  WafRulesTracker
+} from './trackers'
 
 /**
  * @typedef {Object} TrackerEvent
@@ -27,6 +33,8 @@ export class AnalyticsTrackerAdapter {
   #createTracker = null
   /** @type {ProductTracker} */
   #productTracker = null
+  /** @type {WafTracker} */
+  #wafRulesTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -40,6 +48,7 @@ export class AnalyticsTrackerAdapter {
     this.#signInTracker = new SignInTracker(this)
     this.#createTracker = new CreateTracker(this)
     this.#productTracker = new ProductTracker(this)
+    this.#wafRulesTracker = new WafRulesTracker(this)
   }
 
   /**
@@ -118,5 +127,12 @@ export class AnalyticsTrackerAdapter {
    */
   get product() {
     return this.#productTracker
+  }
+
+  /**
+   * @return {ProductTracker}
+   */
+  get wafRules() {
+    return this.#wafRulesTracker
   }
 }

@@ -515,4 +515,79 @@ describe('AnalyticsTrackerAdapter', () => {
       fieldName: fieldName
     })
   })
+
+  it('should be able to track clicked on with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const targetName = 'Search'
+
+    sut.product.clickedOn({
+      target: targetName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked on Search', {
+      application: fixtures.application
+    })
+  })
+
+  // Waf Rules Tracker - Scenarios
+  it('should be able to track click to allow rules with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const originName = 'page'
+
+    sut.wafRules.clickedToAllowRules({
+      origin: originName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Allow Rules', {
+      application: fixtures.application,
+      origin: 'page'
+    })
+  })
+
+  it('should be able to track allow rules with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const originName = 'page'
+
+    sut.wafRules.allowedRules({
+      origin: originName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Allowed Rules', {
+      application: fixtures.application,
+      origin: originName
+    })
+  })
+
+  it('should be able to track failed edited event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+    const originName = 'page'
+
+    sut.wafRules.failedToAllowRules({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName,
+      origin: 'page'
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Allow Rules', {
+      application: fixtures.application,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName,
+      origin: originName
+    })
+  })
 })
