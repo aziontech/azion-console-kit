@@ -84,10 +84,10 @@ const HELP_CENTER_URLS = {
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
       transactions: '/real-time-metrics/bot-manager-advanced/overview/transactions',
       botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
-      botAction: '/real-time-metrics/bot-manager-advanced/overview/bot-action',
+      botAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
       botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
-      botCaptchaPie: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-pie-graph',
-      botClassification: '/real-time-metrics/bot-manager-advanced/overview/bot-classifications',
+      botCaptchaPie: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
+      botClassification: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
       botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
     }
   },
