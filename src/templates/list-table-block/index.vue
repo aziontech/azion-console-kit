@@ -17,9 +17,10 @@
       @row-click="editItemSelected"
       rowHover
       v-model:filters="filters"
-      :paginator="showPagination"
+      :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="MINIMUM_OF_ITEMS_PER_PAGE"
+      @page="changeNumberOfLinesPerPage"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
       :exportFilename="exportFileName"
@@ -304,6 +305,7 @@
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
+  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -392,7 +394,9 @@
     }
   })
 
-  const MINIMUM_OF_ITEMS_PER_PAGE = 10
+  const tableDefinitions = useTableDefinitionsStore()
+
+  const MINIMUM_OF_ITEMS_PER_PAGE = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
@@ -586,15 +590,17 @@
     }
   }
 
+  const changeNumberOfLinesPerPage = (event) => {
+    const numberOfLinesPerPage = event.rows
+    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
+    MINIMUM_OF_ITEMS_PER_PAGE.value = numberOfLinesPerPage
+  }
+
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
 
     return [...filters, ...filtersPath]
-  })
-
-  const showPagination = computed(() => {
-    return data.value.length > MINIMUM_OF_ITEMS_PER_PAGE
   })
 
   watch(data, (currentState) => {
