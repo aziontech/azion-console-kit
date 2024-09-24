@@ -10,6 +10,7 @@
         :loadService="loadUser"
         disableRedirect
         disableAfterCreateToastFeedback
+        @on-edit-fail="handleTrackFailEdit"
         @on-edit-success="successSubmit"
       >
         <template #form>
@@ -31,17 +32,40 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
 
   import ContentBlock from '@/templates/content-block'
   import EditFormBlock from '@/templates/edit-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
 
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   const toast = useToast()
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Your Settings'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Your Settings',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const props = defineProps({
     loadUserService: {
@@ -114,6 +138,7 @@
   }
 
   const successSubmit = () => {
+    handleTrackSuccessEdit()
     const { isEmailChanged, areOtherKeysChanged } = validateFormChanges(userChanges.value)
     userData.value = { ...userChanges.value }
 
