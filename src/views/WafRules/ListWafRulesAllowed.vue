@@ -309,6 +309,11 @@
   }
 
   const openCreateDrawerWafAllowed = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Allowed Rule'
+      })
+      .track()
     showCreateWafRulesAllowedDrawer.value = true
     handleCreateTrackEvent()
   }

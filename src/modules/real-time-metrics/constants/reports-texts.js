@@ -189,7 +189,8 @@ const REPORTS_TEXTS = {
         description: 'Number of requests evaluated by Azion Bot Manager.'
       },
       botTraffic: {
-        description: 'Sum of requests grouped by classification.'
+        description:
+          'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.'
       },
       botCaptcha: {
         description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.'
@@ -199,7 +200,8 @@ const REPORTS_TEXTS = {
           'Actions taken by Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages.'
       },
       botClassification: {
-        description: 'Number of requests by bot categories.'
+        description:
+          'Sum of requests classified according to the tactics used and the purpose of the bots.'
       },
       botActivityMap: {
         description: 'Sum of requests identified as bots, presented by the country of origin.'
