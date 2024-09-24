@@ -1,5 +1,6 @@
 <template>
   <div
+    :class="[customClassHelper, { hidden: !helpCenterStore.isOpen }]"
     class="flex flex-col surface-border border-l w-slide h-full z-[0] sticky top-12 right-0 ease-in-out"
   >
     <!-- Header -->
@@ -52,7 +53,7 @@
   import PrimeButton from 'primevue/button'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import { ref, watchEffect } from 'vue'
+  import { computed, ref, watchEffect } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import AzionAiChatBlock from '@/modules/azion-ai-chat/index.vue'
   import { windowOpen } from '@/helpers'
@@ -67,9 +68,11 @@
 
   const helpCenterStore = useHelpCenterStore()
   const openChatInNewTab = () => {
-    const url = `${window.location.origin}${router.resolve({ name: COPILOT_ROUTE_NAME }).path}`
-    windowOpen(url, '_blank')
+    const copilotPath = router.resolve({ name: COPILOT_ROUTE_NAME }).path;
+    windowOpen(`${window.location.origin}${copilotPath}`, '_blank');
   }
+
+  const customClassHelper = computed(() => (helpCenterStore.isOpen ? 'active-helper' : ''))
 
   watchEffect(() => {
     isCopilotInFullSizeMode.value = currentRoute.name === COPILOT_ROUTE_NAME

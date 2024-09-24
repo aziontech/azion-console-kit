@@ -13,10 +13,7 @@
   >
     <slot :customClass="customClass"></slot>
 
-    <HelpBlock
-      class="z-10"
-      :class="[customClassHelper, { hidden: !helpCenterStore.isOpen }]"
-    />
+    <HelpBlock />
   </main>
 
   <FooterBlock />
@@ -49,5 +46,4 @@
   const accountHandler = new AccountHandler(switchAccountService, listTypeAccountService)
 
   const customClass = computed(() => (helpCenterStore.isOpen ? 'active' : ''))
-  const customClassHelper = computed(() => (helpCenterStore.isOpen ? 'active-helper' : ''))
 </script>

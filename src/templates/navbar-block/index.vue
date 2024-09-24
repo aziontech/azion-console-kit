@@ -74,7 +74,7 @@
   import SidebarBlock from '@templates/sidebar-block'
   import Create from './create'
   import ConsoleFeedback from './feedback'
-  import Help from './help'
+  import Help from './buttonHelp'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
   import { openDocumentation } from '@/helpers'
