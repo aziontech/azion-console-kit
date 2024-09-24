@@ -1131,6 +1131,103 @@ const REPORTS = [
     helpCenterPath: ''
   },
   /**
+   * SECURE
+   * Bot Manager - Bot Manager Breakdown
+   */
+  {
+    id: '847143804009563421',
+    chartOwner: 'azion',
+    label: 'Impacted URLs',
+    description: '',
+    aggregationType: 'sum',
+    columns: 3,
+    type: 'big-numbers',
+    xAxis: 'cat',
+    isTopX: false,
+    rotated: false,
+    dataset: 'securityMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      metricEq: 'uniq_request_path',
+      datasetEq: 'bot_manager'
+    },
+    groupBy: [],
+    fields: [],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'inverse',
+    helpCenterPath: ''
+  },
+  {
+    id: '978435123222265554',
+    chartOwner: 'azion',
+    label: 'Top IPs',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'securityMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      datasetEq: 'bot_manager',
+      metricEq: 'top_remote_addr'
+    },
+    limit: 10,
+    groupBy: ['dimension1'],
+    fields: ['dimension1'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
+  {
+    id: '1030427483148242',
+    chartOwner: 'azion',
+    label: 'Top Impacted URLs',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'securityMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      datasetEq: 'bot_manager',
+      metricEq: 'top_request_path'
+    },
+    limit: 10,
+    groupBy: ['dimension1'],
+    fields: ['dimension1'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: ''
+  },
+  /**
    * OBSERVE
    * Data Stream - Data Streamed
    */
