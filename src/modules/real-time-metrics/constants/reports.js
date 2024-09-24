@@ -832,7 +832,7 @@ const REPORTS = [
   },
   /**
    * SECURE
-   * Bot Manager - Bot Manager Summary
+   * Bot Manager - Bot Manager Overview
    */
   {
     id: '892249168369791027',
@@ -1035,7 +1035,7 @@ const REPORTS = [
     groupBy: ['challengeSolved'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
+    variationType: 'inverse',
     helpCenterPath: ''
   },
   {

@@ -1013,7 +1013,7 @@ describe('RealTimeMetricsModule', () => {
           groupBy: ['challengeSolved'],
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
-          variationType: 'regular',
+          variationType: 'inverse',
           helpCenterPath: ''
         },
         {
