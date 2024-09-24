@@ -980,7 +980,7 @@ const REPORTS = [
   {
     id: '577704475532819772',
     chartOwner: 'azion',
-    label: 'Bot Action',
+    label: 'Top Bot Action',
     description: REPORTS_TEXTS.botManager.botManagerSummary.botAction.description,
     aggregationType: 'sum',
     columns: 6,
@@ -1041,7 +1041,7 @@ const REPORTS = [
   {
     id: '455330743572401794',
     chartOwner: 'azion',
-    label: 'Bot CAPTCHA',
+    label: 'Top Bot CAPTCHA',
     description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
@@ -1071,7 +1071,7 @@ const REPORTS = [
   {
     id: '424388331488145485',
     chartOwner: 'azion',
-    label: 'Bot Classifications',
+    label: 'Top Bot Classifications',
     description: REPORTS_TEXTS.botManager.botManagerSummary.botClassification.description,
     aggregationType: 'sum',
     columns: 6,
