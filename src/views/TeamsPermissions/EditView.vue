@@ -67,8 +67,17 @@
 
   const router = useRouter()
 
-  const handleLoadFail = () => {
+  const handleLoadFail = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
     router.push({ name: 'teams-permission' })
+    tracker.product
+      .failedToEdit({
+        productName: 'Teams Permissions',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const validationSchema = yup.object({
