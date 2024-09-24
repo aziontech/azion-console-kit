@@ -113,7 +113,7 @@ describe('AzionDocumentationWindowOpener', () => {
     sut.openAzionGithub()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      'https://github.com/aziontech/azion-platform-kit',
+      'https://github.com/aziontech/azion-console-kit',
       '_blank'
     )
   })

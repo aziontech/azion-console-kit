@@ -5,7 +5,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -174,7 +174,7 @@
   >
     <template #header>
       <h2>{{ title }}</h2>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
     <div class="pb-16 w-full space-y-8">
       <form

@@ -5,7 +5,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -83,6 +86,7 @@
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
+
   const getColumns = computed(() => {
     return [
       {
@@ -121,6 +125,18 @@
     ]
   })
 
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Rules Engine'
+    })
+  }
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Rules Engine'
+    })
+  }
+
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
@@ -152,6 +168,7 @@
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
+    handleCreateTrackEvent()
     PARSE_PHASE[selectedPhase.value]
     drawerRulesEngineRef.value.openDrawerCreate(PARSE_PHASE[selectedPhase.value])
   }
@@ -210,6 +227,7 @@
       thead: { class: !hasContentToList && 'hidden' }
     }"
     emptyListMessage="No rules found."
+    @on-before-go-to-edit="handleTrackEditEvent"
     :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
     data-testid="rules-engine-list"
     :actions="actions"

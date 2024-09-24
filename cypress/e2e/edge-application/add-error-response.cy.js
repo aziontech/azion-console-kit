@@ -32,6 +32,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
     cy.login()
+    cy.intercept('GET', '/api/v3/edge_applications/*/origins*').as('getOriginsApi')
 
     fixtures = {
       functionName: generateUniqueName('EdgeFunction'),
@@ -66,6 +67,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     //select origin
     cy.get(selectors.edgeApplication.errorResponses.origin).click()
+    cy.wait('@getOriginsApi')
     cy.get(selectors.edgeApplication.errorResponses.origin).find('li').eq(0).click()
 
     //assert

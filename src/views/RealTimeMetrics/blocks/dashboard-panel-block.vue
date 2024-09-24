@@ -1,5 +1,6 @@
 <script setup>
   import GraphsCardBlock from '@/templates/graphs-card-block'
+  import BigNumbers from '@/templates/graphs-card-block/big-numbers-card.vue'
   import SelectButton from 'primevue/selectbutton'
   import Skeleton from 'primevue/skeleton'
   import { computed } from 'vue'
@@ -45,8 +46,26 @@
   })
 
   const reports = computed(() => {
-    return getCurrentReportsData({ reports: props.reportData })
+    const reports = getCurrentReportsData({ reports: props.reportData })
+    const listGeneralReports = []
+    const listBigNumbersReports = []
+    for (const report of reports) {
+      if (report.type !== 'big-numbers') {
+        listGeneralReports.push(report)
+      } else {
+        listBigNumbersReports.push(report)
+      }
+    }
+
+    return {
+      generalReports: listGeneralReports,
+      bigNumberReports: listBigNumbersReports
+    }
   })
+
+  const showReportCharts = computed(
+    () => reports.value.generalReports.length || reports.value.bigNumberReports.length
+  )
 
   const changeDashboard = async (evt) => {
     setCurrentDashboard(evt.value)
@@ -72,10 +91,27 @@
     />
     <div
       class="grid grid-cols-12 gap-4 m-0"
-      v-if="reports?.length"
+      v-if="showReportCharts"
     >
+      <div
+        class="col-span-12"
+        v-if="reports.bigNumberReports.length"
+      >
+        <div class="grid grid-cols-12 gap-4 m-0">
+          <template
+            v-for="bigNumberReport of reports.bigNumberReports"
+            :key="bigNumberReport.id"
+          >
+            <BigNumbers
+              :report="bigNumberReport"
+              :clipboardWrite="clipboardWrite"
+            />
+          </template>
+        </div>
+      </div>
+
       <template
-        v-for="report of reports"
+        v-for="report of reports.generalReports"
         :key="report.id"
       >
         <GraphsCardBlock

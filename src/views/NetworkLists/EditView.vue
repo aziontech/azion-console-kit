@@ -7,6 +7,8 @@
       <EditFormBlock
         :editService="props.editNetworkListsService"
         :loadService="props.loadNetworkListsService"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
@@ -30,9 +32,13 @@
   import FormFieldsEditNetworkLists from './FormFields/FormFieldsEditNetworkLists'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadNetworkListsService: { type: Function, required: true },
@@ -64,4 +70,23 @@
         schema.required('Countries is a required field').min(1, 'Select at least one country')
     })
   })
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Network Lists'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Network Lists',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>

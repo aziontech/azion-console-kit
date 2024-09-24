@@ -47,7 +47,7 @@
       />
     </label>
     <div class="flex gap-1 items-center">
-      <span class="text-2xl font-bold">
+      <span class="text-2xl font-medium">
         <slot></slot>
       </span>
       <span class="text-sm text-color">{{ props.sufix }}</span>

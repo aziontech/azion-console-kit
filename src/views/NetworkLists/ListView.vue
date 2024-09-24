@@ -12,6 +12,8 @@
         createPagePath="network-lists/create"
         editPagePath="network-lists/edit"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No network lists found."
         :actions="actions"
       />
@@ -32,12 +34,15 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'network-list-view' })
 
@@ -68,6 +73,18 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Network Lists'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Network Lists'
+    })
   }
 
   const getColumns = computed(() => {

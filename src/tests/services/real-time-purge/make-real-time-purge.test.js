@@ -13,7 +13,7 @@ describe('RealTimePurgeServices', () => {
   it('should return the API base url to real-time purge', () => {
     const { sut } = makeSut()
     const version = 'v4'
-    const correctApiUrl = `${version}/edge/purge`
+    const correctApiUrl = `${version}/workspace/purge`
 
     const baseUrl = sut()
 

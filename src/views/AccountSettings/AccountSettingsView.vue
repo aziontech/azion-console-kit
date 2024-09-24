@@ -3,8 +3,13 @@
   import ContentBlock from '@/templates/content-block'
   import EditFormBlock from '@/templates/edit-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import FormFieldsAccountSettings from './FormFields/FormFieldsAccountSettings'
+  import { inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineProps({
     getAccountSettingsService: {
@@ -28,6 +33,25 @@
       required: true
     }
   })
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Account Settings'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Account Settings',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     accountName: yup.string().required().label('Account Name'),
@@ -55,6 +79,8 @@
       <EditFormBlock
         :editService="updateAccountSettingsService"
         :loadService="getAccountSettingsService"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
         updatedRedirect="home"
         :schema="validationSchema"
       >

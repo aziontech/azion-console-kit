@@ -6,10 +6,18 @@ import { CHART_RULES } from '@modules/real-time-metrics/constants'
  * @param {any} date - The input to be checked
  * @returns {boolean} - Returns true if the input is a valid date, otherwise returns false
  */
-function isDate(date) {
-  const series = date
-  // eslint-disable-next-line eqeqeq
-  return new Date(series) != 'Invalid Date'
+export function isDate(date, isTimeseries) {
+  const parsedDate = new Date(date)
+  const isValid = !isNaN(parsedDate.getTime()) && parsedDate.toString() !== 'Invalid Date'
+
+  if (isTimeseries) return true
+
+  //Additional check to ensure numeric like 0 and 1 are not considered valid dates
+  if (typeof date === 'number' && !isTimeseries) {
+    return false
+  }
+
+  return isValid
 }
 
 /**
@@ -29,13 +37,34 @@ function isNumeric(resultChart) {
  * @returns {Object} - Returns the formatted C3 data properties
  */
 function formatC3DataProp(chartData, resultChart) {
+  const { type } = chartData
+  const x = resultChart[0][0]
+  const columns = resultChart
+
+  const isTimeseries = chartData.xAxis === 'ts'
+
   const data = {
-    x: chartData.xAxis,
-    type: chartData.type,
-    columns: resultChart
+    x,
+    columns
   }
 
-  if (isDate(resultChart[0][1])) {
+  if (type === 'ordered-bar') {
+    const field = chartData.dataUnit
+
+    data.types = { [field]: 'bar' }
+    data.labels = { format: (value) => formatYAxisLabels(value, chartData) }
+    data.color = (_, data) => CHART_RULES.BASE_COLOR_PATTERNS[data.index]
+
+    return data
+  }
+
+  if (type === 'pie') {
+    delete data.x
+  }
+
+  data.type = type
+
+  if (isDate(resultChart[0][1], isTimeseries)) {
     data.xFormat = '%Y-%m-%dT%H:%M:%S.%LZ'
   }
 
@@ -48,14 +77,20 @@ function formatC3DataProp(chartData, resultChart) {
  * @param {Array} resultChart - The result chart
  * @returns {Object} - Returns the formatted C3 X Axis
  */
-function formatC3XAxis(chartData, resultChart) {
-  const isSeriesDate = isDate(resultChart[0][1])
+export function formatC3XAxis(chartData, resultChart) {
+  const isTimeseries = chartData.xAxis === 'ts'
+
+  const isSeriesDate = isDate(resultChart[0][1], isTimeseries)
   const isSeriesNumeric = isNumeric(resultChart)
+  const isTimeSeries = chartData.xAxis === 'ts'
   const isRotated = chartData.rotated
 
   const xAxis = {
-    type: isSeriesDate ? CHART_RULES.C3_TYPES.ts : CHART_RULES.C3_TYPES.cat,
-    tick: {
+    type: isSeriesDate ? CHART_RULES.C3_TYPES.ts : CHART_RULES.C3_TYPES.cat
+  }
+
+  if (isTimeSeries) {
+    xAxis.tick = {
       count: isSeriesNumeric ? CHART_RULES.MAX_COUNT : CHART_RULES.MIN_COUNT,
       outer: false
     }
@@ -71,6 +106,10 @@ function formatC3XAxis(chartData, resultChart) {
 
   if (isRotated && !isSeriesDate) {
     xAxis.min = CHART_RULES.RESET_COUNT
+    xAxis.tick = {
+      ...xAxis.tick,
+      width: CHART_RULES.LABEL.rotatedWidth
+    }
   }
 
   return xAxis
@@ -147,7 +186,7 @@ function formatDataUnit(data) {
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted Y axis labels for the C3 chart
  */
-function formatYAxisLabels(data, chartData) {
+export function formatYAxisLabels(data, chartData) {
   if (chartData.dataUnit === 'bytes' || chartData.dataUnit === 'bitsPerSecond') {
     return formatBytesDataUnit(data, chartData)
   }
@@ -168,18 +207,26 @@ function formatYAxisLabels(data, chartData) {
  * @param {Object} chartData - The chart data
  * @returns {Object} - Returns the formatted Y axis of the C3 chart
  */
-function formatC3YAxis(chartData) {
+export function formatC3YAxis(chartData, hasCount = true) {
+  const hiddenTypes = ['ordered-bar']
+
+  if (hiddenTypes.includes(chartData.type)) {
+    return { show: false }
+  }
   const isRotated = chartData.rotated
   const yAxis = {
     /**
      * Configuration of the Y axis tick
      */
     tick: {
-      count: CHART_RULES.MAX_COUNT,
       format: (d) => formatYAxisLabels(d, chartData)
     },
     min: !isRotated ? CHART_RULES.RESET_COUNT : undefined,
     padding: { bottom: 0 }
+  }
+
+  if (hasCount) {
+    yAxis.tick.count = CHART_RULES.MAX_COUNT
   }
   if (chartData.maxYAxis) {
     yAxis.max = chartData.maxYAxis
@@ -225,9 +272,12 @@ function generateMeanLineValues(resultChart, mean) {
  * @param {string} text - The camelCase string to convert
  * @returns {string} - The title case string
  */
-function camelToTitle(text) {
-  const title = text.replace(/([A-Z])/g, ' $1').replace(/([a-zA-Z])(\d+)/g, '$1 $2')
-  return title.charAt(0).toUpperCase() + title.slice(1)
+export function camelToTitle(text) {
+  return text
+    .replace(/([a-z])([A-Z0-9])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
 /**
@@ -260,7 +310,7 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * @param {boolean} hasMeanLineTotal - Indicates if the chart has mean line total
  * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
-function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
+export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
   const sliced = resultChart.slice(1)
 
   let seriesNames = {}
@@ -271,6 +321,7 @@ function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTo
 
   sliced.forEach((series) => {
     let seriesTotal = series.slice(1).reduce((acc, value) => acc + value, 0)
+
     if (hasMeanLineTotal) {
       seriesAccumulator += seriesTotal
       numberOfSeries += series.slice(1).length
@@ -330,6 +381,30 @@ function setLegendPadding(legendPosition) {
 }
 
 /**
+ * Determines whether the grid should be displayed for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
+function displayGrid(chartData) {
+  const hiddenTypes = ['ordered-bar']
+
+  return !hiddenTypes.includes(chartData.type)
+}
+
+/**
+ * Determines whether the legend should be hidden for the given chart data.
+ *
+ * @param {Object} chartData - The chart data to check.
+ * @return {Boolean}
+ */
+function displayLegend(chartData) {
+  const hiddenTypes = ['ordered-bar']
+
+  return hiddenTypes.includes(chartData.type)
+}
+
+/**
  * Format the properties for the C3 graph
  *
  * @param {Object} options - The options object
@@ -339,32 +414,50 @@ function setLegendPadding(legendPosition) {
  * @param {boolean} options.hasMeanLineTotal - Flag indicating if the chart has mean line total
  * @returns {Object} The formatted C3 graph properties
  */
-export default function FormatC3GraphProps({
+export function FormatC3GraphProps({
   chartData,
   resultChart,
   hasMeanLineSeries = false,
   hasMeanLineTotal = false
 }) {
-  const pattern = [...CHART_RULES.LINE_PATTERNS]
+  const timeSeriesInfo = {
+    seriesNames: null,
+    meanLineTotal: null,
+    meanLineSeries: null
+  }
+
+  const pattern = [...CHART_RULES.BASE_COLOR_PATTERNS]
 
   const legendPosition = setLegendPosition(chartData, resultChart)
 
-  const { seriesNames, meanLineTotal, meanLineSeries } = getSeriesInfos(
-    resultChart,
-    chartData,
-    hasMeanLineSeries,
-    hasMeanLineTotal
-  )
+  const isTimeseries = chartData.xAxis === 'ts'
+
+  if (isTimeseries) {
+    const { seriesNames, meanLineTotal, meanLineSeries } = getSeriesInfos(
+      resultChart,
+      chartData,
+      hasMeanLineSeries,
+      hasMeanLineTotal
+    )
+
+    timeSeriesInfo.seriesNames = seriesNames
+    timeSeriesInfo.meanLineSeries = meanLineSeries
+    timeSeriesInfo.meanLineTotal = meanLineTotal
+  }
+
   const data = {
-    ...formatC3DataProp(chartData, resultChart),
-    names: seriesNames
+    ...formatC3DataProp(chartData, resultChart)
+  }
+
+  if (isTimeseries) {
+    data.names = timeSeriesInfo.seriesNames
   }
 
   if (hasMeanLineTotal && resultChart.length > 1) {
     const meanLineIndex = resultChart.length - 1
     pattern.splice(meanLineIndex, 0, CHART_RULES.MEAN_LINE_PATTERN)
 
-    data.columns = [...data.columns, meanLineTotal]
+    data.columns = [...data.columns, timeSeriesInfo.meanLineTotal]
   }
 
   if (hasMeanLineSeries && resultChart.length > 1) {
@@ -372,22 +465,63 @@ export default function FormatC3GraphProps({
     const meanLineSeriesIndex = resultChart.length + meanLineIndexCount
     const existsColorPattern = pattern.slice(0, meanLineSeriesIndex)
     pattern.splice(meanLineSeriesIndex, 0, ...existsColorPattern)
-    data.columns = [...data.columns, ...meanLineSeries]
+    data.columns = [...data.columns, ...timeSeriesInfo.meanLineSeries]
+  }
+
+  const showFocus = (chartData) => {
+    return chartData.type !== 'ordered-bar'
+  }
+
+  const handleAxis = () => {
+    const axis = {
+      rotated: chartData.rotated,
+      x: formatC3XAxis(chartData, resultChart),
+      y: formatC3YAxis(chartData)
+    }
+
+    if (chartData.type === 'pie') {
+      return null
+    }
+
+    return axis
+  }
+
+  const formatGauge = () => {
+    const threshold = chartData.threshold || [30, 60, 90]
+    const maxSupportedValue = threshold.at(-1)
+    const color = CHART_RULES.GAUGE_COLOR_SCHEMA[chartData.variationType]
+
+    return {
+      gauge: {
+        label: {
+          format: function (value) {
+            return `${formatYAxisLabels(value, chartData)}`
+          },
+          show: false
+        },
+        max: maxSupportedValue
+      },
+      color: {
+        pattern: color,
+        threshold: {
+          values: threshold
+        }
+      }
+    }
   }
 
   const c3Props = {
     data,
-    axis: {
-      rotated: chartData.rotated,
-      x: formatC3XAxis(chartData, resultChart),
-      y: formatC3YAxis(chartData)
-    },
-    legend: { position: legendPosition },
+    axis: { ...handleAxis() },
+    legend: { position: legendPosition, hide: displayLegend(chartData) },
     padding: setLegendPadding(legendPosition),
     color: { pattern },
     grid: {
       y: {
-        show: true
+        show: displayGrid(chartData)
+      },
+      focus: {
+        show: showFocus(chartData)
       }
     },
     point: {
@@ -396,6 +530,16 @@ export default function FormatC3GraphProps({
     tooltip: {
       show: window.innerWidth > CHART_RULES.SCREEN_XSMALL_BREAKPOINT,
       contents(d, defaultTitleFormat, defaultValueFormat, color) {
+        if (chartData.type === 'ordered-bar') {
+          const { index } = d[0]
+          return this.getTooltipContent(
+            resetTooltipLabel(d),
+            defaultTitleFormat,
+            defaultValueFormat,
+            () => CHART_RULES.BASE_COLOR_PATTERNS[index]
+          )
+        }
+
         return this.getTooltipContent(
           resetTooltipLabel(d),
           defaultTitleFormat,
@@ -404,12 +548,40 @@ export default function FormatC3GraphProps({
         )
       },
       format: {
-        title: (d) => (isDate(d) ? new Date(d).toLocaleString('en-US') : d)
+        title: (d) => {
+          if (isDate(d, isTimeseries)) {
+            return new Date(d).toLocaleString('en-US')
+          }
+          if (typeof d === 'number') {
+            return null
+          }
+          return d
+        },
+        name: (name, _, __, idx) => {
+          if (chartData.type === 'ordered-bar') {
+            return resultChart[0][idx + 1]
+          }
+
+          return name
+        },
+        value: function (value) {
+          return formatYAxisLabels(value, chartData)
+        }
       }
     },
     zoom: {
-      enabled: true
+      enabled: chartData.xAxis === 'ts'
     }
+  }
+
+  if (chartData.type === 'gauge') {
+    delete c3Props.data.x
+    delete c3Props.axis
+    delete c3Props.grid
+
+    const { gauge, color } = formatGauge()
+    c3Props.gauge = gauge
+    c3Props.color = color
   }
 
   return c3Props

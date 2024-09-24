@@ -31,11 +31,12 @@
           The chart can't be plotted. There was an issue loading the data.
         </InlineMessage>
       </div>
-      <section class="flex-auto">
+      <section class="flex-auto relative">
         <component
           v-if="showChart"
           :is="chartType[report.type]"
           :chartData="report"
+          :variationValue="report.variationValue"
           :resultChart="report.resultQuery"
           :hasMeanLineTotal="report.showMeanLine"
           :hasMeanLineSeries="report.showMeanLinePerSeries"
@@ -81,9 +82,18 @@
   })
 
   const chartType = {
-    bar: defineAsyncComponent(() => import('./components/chart/bar-chart/bar-chart')),
-    line: defineAsyncComponent(() => import('./components/chart/line-chart/line-chart')),
-    spline: defineAsyncComponent(() => import('./components/chart/spline-chart/spline-chart'))
+    bar: defineAsyncComponent(() => import('./components/chart/bar-chart')),
+    line: defineAsyncComponent(() => import('./components/chart/line-chart')),
+    spline: defineAsyncComponent(() => import('./components/chart/spline-chart')),
+    pie: defineAsyncComponent(() => import('./components/chart/pie-chart')),
+    donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
+    'ordered-bar': defineAsyncComponent(() => import('./components/chart/ordered-bar-chart')),
+    map: defineAsyncComponent(() => import('./components/map/map-chart')),
+    'big-numbers': defineAsyncComponent(() => import('./components/chart/big-numbers-chart')),
+    list: defineAsyncComponent(() => import('./components/chart/list-chart')),
+    gauge: defineAsyncComponent(() => import('./components/chart/gauge-chart')),
+    'stacked-area': defineAsyncComponent(() => import('./components/chart/stacked-area-chart')),
+    'stacked-bar': defineAsyncComponent(() => import('./components/chart/stacked-bar-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())

@@ -1,6 +1,6 @@
 <script setup>
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -157,6 +157,8 @@
     }
   })
 
+  const activeAccordions = ref([0])
+
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
   const behaviorsLabelsTags = computed(() => {
@@ -289,11 +291,21 @@
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
   }
 
+  const removeCriteriaDecorator = (index) => {
+    activeAccordions.value.splice(index, 1)
+    removeCriteria(index)
+    if (activeAccordions.value[index]) {
+      const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
+      activeAccordions.value[index] = invertedAccordionState
+    }
+  }
+
   const addNewConditional = ({ index, operator }) => {
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
   const addNewCriteria = () => {
+    activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
   }
 
@@ -369,6 +381,34 @@
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
+
+  const openAccordionWithFormErrors = () => {
+    const errorsKeys = Object.keys(props.errors)
+    if (errorsKeys.length > 0) {
+      const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
+      const index = match[1]
+      activeAccordions.value[index] = 0
+    }
+  }
+  watch(
+    () => criteria.value.length,
+    () => {
+      if (criteria.value.length > activeAccordions.value.length) {
+        criteria.value.forEach((index) => {
+          if (!activeAccordions.value[index]) {
+            activeAccordions.value.push(0)
+          }
+        })
+      }
+    }
+  )
+
+  watch(
+    () => props.errors,
+    () => {
+      openAccordionWithFormErrors()
+    }
+  )
 </script>
 
 <template>
@@ -442,10 +482,10 @@
     <template #inputs>
       <div
         class="flex flex-col gap-8"
-        v-for="(criteriaItem, criteriaIndex) in criteria"
+        v-for="(_, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion :activeIndex="0">
+        <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
           <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
             <template #header>
               <div class="ml-auto flex justify-center items-center">
@@ -454,13 +494,13 @@
                   icon="pi pi-trash"
                   size="small"
                   outlined
-                  @click="removeCriteria(criteriaIndex)"
+                  @click="removeCriteriaDecorator(criteriaIndex)"
                   :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
                 />
               </div>
             </template>
             <div
-              v-for="(item, conditionalIndex) in criteriaItem.value"
+              v-for="(item, conditionalIndex) in criteria[criteriaIndex].value"
               :key="conditionalIndex"
               data-testid="rule-form-criteria-item-conditional"
             >
@@ -531,6 +571,10 @@
                 class="w-full"
                 icon="pi pi-plus-circle"
                 label="And"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
                 :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
                 outlined
                 @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
@@ -539,6 +583,10 @@
                 class="w-full"
                 icon="pi pi-plus-circle"
                 label="Or"
+                :pt="{
+                  root: { class: 'justify-center' },
+                  label: { class: 'grow-0' }
+                }"
                 :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
                 outlined
                 @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
@@ -557,6 +605,10 @@
       </div>
       <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
+          :pt="{
+            root: { class: 'justify-center' },
+            label: { class: 'grow-0' }
+          }"
           icon="pi pi-plus-circle"
           label="Add Criteria"
           outlined

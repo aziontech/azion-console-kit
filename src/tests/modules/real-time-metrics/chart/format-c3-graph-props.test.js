@@ -26,8 +26,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'line',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE,
+          type: 'line',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 6100T/s',
@@ -57,7 +57,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {
@@ -71,16 +71,16 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE
+          pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false
@@ -123,8 +123,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'bar',
           columns: FIXTURES.COLUMNS_WITH_MEAN_LINE_PER_SERIES,
+          type: 'bar',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 406,666,666,666,666.70%',
@@ -169,7 +169,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {
@@ -181,16 +181,16 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE_PER_SERIES
+          pattern: FIXTURES.BASE_COLOR_PATTERNS_WITH_MEAN_LINE_PER_SERIES
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false
@@ -233,8 +233,8 @@ describe('RealTimeMetricsModule', () => {
       const expected = {
         data: {
           x: 'ts',
-          type: 'spline',
           columns: FIXTURES.RESULTS,
+          type: 'spline',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
             serieTest1: 'Serie Test 1 - 6.1KTb/s',
@@ -263,7 +263,7 @@ describe('RealTimeMetricsModule', () => {
               count: 4,
               outer: false,
               format: '%b-%d %H:%M',
-              width: 40
+              width: 50
             }
           },
           y: {
@@ -275,16 +275,16 @@ describe('RealTimeMetricsModule', () => {
           }
         },
         legend: {
-          position: 'right'
+          position: 'right',
+          hide: false
         },
         padding: null,
         color: {
-          pattern: FIXTURES.LINE_PATTERNS
+          pattern: FIXTURES.BASE_COLOR_PATTERNS
         },
         grid: {
-          y: {
-            show: true
-          }
+          y: { show: true },
+          focus: { show: true }
         },
         point: {
           show: false

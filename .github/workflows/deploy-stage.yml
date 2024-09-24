@@ -10,6 +10,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-console
+      cancel-in-progress: false
     container:
       image: node:18-alpine3.18
     steps:

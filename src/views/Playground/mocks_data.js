@@ -33,64 +33,6 @@ const COLOR_PATTERNS = {
   }
 }
 
-export const BAR_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    x: 'x',
-    xFormat: '%Y',
-    columns: [
-      ['x', '2010', '2011', '2012', '2013', '2014', '2015'],
-      ['Netherlands', 130, 200, 100, 160, 150, 125],
-      ['Nigeria', 180, -20, 140, 120, 150, 90],
-      ['France', 230, 250, 200, -50, 250, 75],
-      ['Brazil', -10, 180, 40, 30, 50, 50]
-    ],
-    type: 'bar'
-  },
-  bar: {
-    width: {
-      ratio: 0.65
-    }
-  },
-  ...AXIS_FORMATTING,
-  ...COLOR_PATTERNS
-}
-
-export const ROTATED_BAR_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    x: 'x',
-    columns: [
-      ['x', 'Netherlands', 'Nigeria', 'France', 'Brazil', 'China', 'Chile'],
-      ['Values', 130, 200, 100, 160, 150, 125]
-    ],
-    types: {
-      Values: 'bar'
-    },
-    color: function (color, data) {
-      return COLOR_PATTERNS.color.pattern[data.index]
-    },
-    labels: true
-  },
-  bar: {
-    width: {
-      ratio: 0.65
-    }
-  },
-  axis: {
-    x: {
-      type: 'category'
-    },
-    y: {
-      show: false
-    },
-    rotated: true
-  },
-  legend: {
-    hide: true
-  }
-}
-
 export const STACKED_BAR_CHART_DATA = {
   id: crypto.randomUUID().toString(),
   data: {
@@ -141,37 +83,6 @@ export const STACKED_LINE_CHART_DATA = {
     }
   },
   ...AXIS_FORMATTING,
-  ...COLOR_PATTERNS
-}
-
-export const PIE_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    columns: [
-      ['Netherlands', 30],
-      ['Nigeria', 120],
-      ['France', 40],
-      ['Brazil', 80]
-    ],
-    type: 'pie'
-  },
-  ...COLOR_PATTERNS
-}
-
-export const DONUT_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    columns: [
-      ['Netherlands', 30],
-      ['Nigeria', 120],
-      ['France', 40],
-      ['Brazil', 80]
-    ],
-    type: 'donut'
-  },
-  donut: {
-    title: 'Actions'
-  },
   ...COLOR_PATTERNS
 }
 
@@ -230,25 +141,6 @@ export const GAUGE_LOW_CHART_DATA = {
       values: [30, 60, 90]
     }
   }
-}
-
-export const AREA_CHART_DATA = {
-  id: crypto.randomUUID().toString(),
-  data: {
-    columns: [
-      ['Netherlands', 300, 350, 300, 50, 80, 100],
-      ['Nigeria', 130, 100, 40, 100, 150, 150],
-      ['France', 13, 40, 140, 20, 50, 50],
-      ['Brazil', 30, 400, 200, 250, 150, 90]
-    ],
-    types: {
-      Netherlands: 'area',
-      Nigeria: 'area',
-      France: 'area',
-      Brazil: 'area'
-    }
-  },
-  ...COLOR_PATTERNS
 }
 
 export const COUNTRY_IP_BLOCK_BANDWIDTH_LIST_DATA = [

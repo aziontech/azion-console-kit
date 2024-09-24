@@ -5,7 +5,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listUsersService: {
@@ -21,6 +24,18 @@
       type: Function
     }
   })
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'User'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'User'
+    })
+  }
 
   const hasContentToList = ref(true)
   const pageTitle = 'Users'
@@ -110,6 +125,8 @@
         createPagePath="users/create"
         editPagePath="users/edit"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."
         :actions="actions"
       />

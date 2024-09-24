@@ -20,7 +20,7 @@
       <div class="flex w-full items-center justify-between">
         <h2>Preview</h2>
         <div class="flex gap-2">
-          <FeedbackFish />
+          <ConsoleFeedback />
           <PrimeButton
             icon="pi pi-times"
             size="small"
@@ -42,7 +42,7 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import CodePreview from './code-preview.vue'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   const props = defineProps({
     updateObject: {

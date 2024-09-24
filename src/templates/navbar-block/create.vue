@@ -53,7 +53,7 @@
       <div class="flex items-center justify-between">
         <h2>Create</h2>
         <div class="flex gap-2">
-          <FeedbackFish />
+          <ConsoleFeedback />
           <PrimeButton
             icon="pi pi-times"
             @click="closeCreateModalStore()"
@@ -75,7 +75,7 @@
   import { computed, inject } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
   import { useRoute } from 'vue-router'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'

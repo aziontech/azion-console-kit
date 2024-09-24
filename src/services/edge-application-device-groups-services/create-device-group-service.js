@@ -4,7 +4,7 @@ import * as Errors from '@/services/axios/errors'
 
 export const createDeviceGroupService = async (payload) => {
   const { edgeApplicationId } = payload
-  let httpResponse = await AxiosHttpClientAdapter.request({
+  const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/device_groups`,
     method: 'POST',
     body: adapt(payload)

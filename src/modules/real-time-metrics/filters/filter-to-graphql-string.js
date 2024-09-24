@@ -17,6 +17,14 @@ const shouldReplaceString = (value) => {
  */
 export default function FiltersToGraphQLString(name, value) {
   let result = `${name}: `
+
+  if (Array.isArray(value)) {
+    const listFilterValues = value.map((item) => `"${item}"`)
+
+    result += `[${listFilterValues}]`
+    return `${result}\n`
+  }
+
   if (typeof value === 'object') {
     result += '{\n'
     Object.keys(value).forEach((key) => {

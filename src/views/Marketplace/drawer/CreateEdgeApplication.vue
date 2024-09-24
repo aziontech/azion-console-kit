@@ -1,6 +1,6 @@
 <script setup>
   import Sidebar from 'primevue/sidebar'
-  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   const emit = defineEmits(['update:visible'])
 
   const props = defineProps({
@@ -32,7 +32,7 @@
   >
     <template #header>
       <div>Create Edge Application</div>
-      <FeedbackFish />
+      <ConsoleFeedback />
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0">

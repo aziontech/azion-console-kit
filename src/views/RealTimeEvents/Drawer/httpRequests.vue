@@ -132,22 +132,25 @@
                 label="Request Time"
                 sufix="ms"
                 :tooltipMessage="requestTimeTooltip"
-                >{{ details.requestTime }}
+              >
+                {{ details.requestTime }}
               </BigNumber>
 
               <BigNumber
                 label="Bytes Sent"
                 sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
-                >{{ details.bytesSent }}
+              >
+                {{ details.bytesSent }}
               </BigNumber>
 
               <BigNumber
                 label="Request Length"
                 sufix="bytes"
                 :tooltipMessage="requestLengthTooltip"
-                >{{ details.requestLength }}</BigNumber
               >
+                {{ details.requestLength }}
+              </BigNumber>
             </div>
 
             <Divider />

@@ -6,8 +6,12 @@
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -58,6 +62,18 @@
 
   const currentEmail = ref()
 
+  const handleTrackFailedEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'User',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const toast = useToast()
   const formSubmit = async (onSubmit, values) => {
     await onSubmit()
@@ -81,6 +97,12 @@
 
     return userData
   }
+
+  const handleResponse = () => {
+    tracker.product.productEdited({
+      productName: 'User'
+    })
+  }
 </script>
 
 <template>
@@ -95,8 +117,10 @@
       <EditFormBlock
         :editService="props.editAnotherUserService"
         :loadService="loadUser"
+        @on-edit-success="handleResponse"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
+        @on-edit-fail="handleTrackFailedEdit"
       >
         <template #form>
           <FormFieldsUsers

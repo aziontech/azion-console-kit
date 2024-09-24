@@ -5,7 +5,8 @@
     :createService="props.createFunctionService"
     :schema="validationSchema"
     :initialValues="initialValues"
-    @onSuccess="handleCreateFunction"
+    @onSuccess="handleSuccessCreate"
+    @onError="handleFailedToCreate"
     :showBarGoBack="true"
     title="Create Instance"
   >
@@ -20,9 +21,9 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="handleSuccess"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onSuccess="handleSuccessEdit"
+    @onError="handleFailedToEdit"
     title="Edit Instance"
   >
     <template #formFields>
@@ -40,6 +41,7 @@
   import { refDebounced } from '@vueuse/core'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -86,17 +88,61 @@
     args: '{}'
   })
 
-  const handleSuccess = () => {
+  const handleSuccessEdit = () => {
     handleTrackSuccessEdit()
     emit('onSuccess')
   }
+
+  const handleSuccessCreate = () => {
+    handleTrackCreation()
+    emit('onSuccess')
+    closeDrawerCreate()
+  }
+
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Functions Instances'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',
         tab: 'functions'
       })
       .track()
+  }
+
+  const handleTrackCreation = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Functions Instances'
+      })
+      .track()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Functions Instances',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Functions Instances',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+
+    closeDrawerEdit()
   }
 
   const validationSchema = yup.object({
@@ -132,10 +178,6 @@
     showCreateFunctionDrawer.value = true
   }
 
-  const closeDrawerCreate = () => {
-    showCreateFunctionDrawer.value = false
-  }
-
   const openDrawerEdit = (functionID) => {
     if (functionID) {
       showEditFunctionDrawer.value = true
@@ -147,9 +189,8 @@
     showEditFunctionDrawer.value = false
   }
 
-  const handleCreateFunction = () => {
-    closeDrawerCreate()
-    emit('onSuccess')
+  const closeDrawerCreate = () => {
+    showCreateFunctionDrawer.value = false
   }
 
   defineExpose({

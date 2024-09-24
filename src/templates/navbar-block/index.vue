@@ -29,7 +29,7 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
-        <FeedbackFish
+        <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
         />
@@ -73,7 +73,7 @@
   import AzionMobileLogo from '@assets/svg/mobile-logo'
   import SidebarBlock from '@templates/sidebar-block'
   import Create from './create'
-  import FeedbackFish from './feedback-fish'
+  import ConsoleFeedback from './feedback'
   import Help from './help'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'

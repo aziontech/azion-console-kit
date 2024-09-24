@@ -29,7 +29,7 @@ describe('RealTimePurgeServices', () => {
     await sut(fixtures.realTimePurgeMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge/purge/cachekey`,
+      url: `${version}/workspace/purge/cachekey`,
       method: 'POST',
       body: {
         items: ['www.example.com', 'www.test.com.br'],

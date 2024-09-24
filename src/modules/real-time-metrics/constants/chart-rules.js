@@ -28,8 +28,14 @@ const C3_TYPES = {
   cat: 'category'
 }
 
+const GAUGE_COLOR_SCHEMA = {
+  regular: ['var(--scale-red)', 'var(--scale-orange)', 'var(--scale-yellow)', 'var(--scale-green)'],
+  inverse: ['var(--scale-green)', 'var(--scale-yellow)', 'var(--scale-orange)', 'var(--scale-red)']
+}
+
 const LABEL = {
-  width: 40,
+  width: 50,
+  rotatedWidth: 80,
   defaultPosition: 'outer-center',
   rotatedPosition: 'outer-middle'
 }
@@ -39,7 +45,7 @@ const BOTTOM_LEGEND_PADDING = {
   right: 30
 }
 
-const LINE_PATTERNS = [
+const BASE_COLOR_PATTERNS = [
   'var(--series-one-color)',
   'var(--series-two-color)',
   'var(--series-three-color)',
@@ -74,8 +80,9 @@ const CHART_RULES = {
   C3_TYPES,
   LABEL,
   BOTTOM_LEGEND_PADDING,
-  LINE_PATTERNS,
-  MEAN_LINE_PATTERN
+  BASE_COLOR_PATTERNS,
+  MEAN_LINE_PATTERN,
+  GAUGE_COLOR_SCHEMA
 }
 
 export default CHART_RULES

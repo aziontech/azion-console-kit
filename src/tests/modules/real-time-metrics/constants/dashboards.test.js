@@ -122,6 +122,20 @@ describe('RealTimeMetricsModule', () => {
                   dataset: 'idnsQueriesMetrics'
                 }
               ]
+            },
+            {
+              id: 9,
+              label: 'Bot Manager Advanced',
+              path: 'bot-manager-advanced',
+              groupId: 2,
+              dashboards: [
+                {
+                  id: '371360344901061482',
+                  label: 'Overview',
+                  path: 'overview',
+                  dataset: 'botManagerMetrics'
+                }
+              ]
             }
           ]
         },

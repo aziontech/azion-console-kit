@@ -5,6 +5,7 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -42,6 +43,9 @@
     })
   }
   const handleTrackSuccessEdit = () => {
+    tracker.product.productEdited({
+      productName: 'Error Responses'
+    })
     tracker.product
       .productEdited({
         productName: 'Edge Application',
@@ -49,17 +53,35 @@
       })
       .track()
   }
+  const handleTrackFailedToEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Error Responses',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'api'
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
-    originId: yup.string().required().label('Origin'),
-    errorResponses: yup.array().of(
-      yup.object().shape({
-        code: yup.string().required(),
-        timeout: yup.number().required().label('Response TTL'),
-        uri: yup.string().nullable(true),
-        customStatusCode: yup.string().nullable(true)
-      })
-    )
+    errorResponses: yup
+      .array()
+      .of(
+        yup.object().shape({
+          code: yup.string().required(),
+          timeout: yup.number().required().label('Response TTL'),
+          uri: yup.string().nullable(true),
+          customStatusCode: yup.string().nullable(true)
+        })
+      )
+      .default([]),
+    originId: yup.string().when('errorResponses', {
+      is: (errorResponses) => errorResponses.length && errorResponses.some((data) => data.uri),
+      then: (schema) => schema.required().label('Origin'),
+      otherwise: (schema) => schema.nullable()
+    })
   })
 
   const router = useRouter()
@@ -75,6 +97,7 @@
     :schema="validationSchema"
     isTabs
     @on-edit-success="handleTrackSuccessEdit"
+    @on-edit-fail="handleTrackFailedToEdit"
     disableRedirect
   >
     <template #form="{ errors }">

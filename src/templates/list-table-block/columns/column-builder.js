@@ -98,8 +98,8 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'country-flag-column':
       return h(CountryFlagColumn, {
-        country: data.country,
-        code: data.code
+        country: data?.country,
+        code: data?.code
       })
     default:
       throw new Error('Invalid column appearance')

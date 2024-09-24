@@ -13,6 +13,7 @@ const createWAFCase = () => {
 
   // Act
   cy.get(selectors.wafs.nameInput).type(wafName)
+  cy.intercept('GET', '/api/v3/waf/rulesets/*').as('wafRules')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.verifyToast('success', 'Your waf rule has been created')
 }
@@ -27,7 +28,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
 
   it('should create an Edge Firewall with a rules engine using a WAF', () => {
     createWAFCase()
-    cy.wait(2000)
+    cy.wait('@wafRules')
     cy.openProduct('Edge Firewall')
 
     // Act - create Edge Firewall
