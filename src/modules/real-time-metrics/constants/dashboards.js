@@ -139,6 +139,12 @@ const PAGES_DASHBOARDS = {
           label: 'Overview',
           path: 'overview',
           dataset: 'botManagerMetrics'
+        },
+        {
+          id: '659868342290523846',
+          label: 'Breakdown',
+          path: 'breakdown',
+          dataset: 'securityMetrics'
         }
       ]
     }
