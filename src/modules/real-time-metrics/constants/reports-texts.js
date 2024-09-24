@@ -175,7 +175,7 @@ const REPORTS_TEXTS = {
     }
   },
   botManager: {
-    botManagerSummary: {
+    botManagerOverview: {
       badBotHits: {
         description: 'Number of requests identified as bad bots.'
       },
@@ -205,6 +205,17 @@ const REPORTS_TEXTS = {
       },
       botActivityMap: {
         description: 'Sum of requests identified as bots, presented by the country of origin.'
+      }
+    },
+    botManagerBreakdown: {
+      impactedUrls: {
+        description: 'TBD'
+      },
+      topIps: {
+        description: 'TBD'
+      },
+      topImpactedUrls: {
+        description: 'TBD'
       }
     }
   }

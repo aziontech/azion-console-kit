@@ -1115,7 +1115,7 @@ describe('RealTimeMetricsModule', () => {
           id: '847143804009563421',
           chartOwner: 'azion',
           label: 'Impacted URLs',
-          description: '',
+          description: 'TBD',
           aggregationType: 'sum',
           columns: 3,
           type: 'big-numbers',
@@ -1140,13 +1140,13 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'inverse',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
         },
         {
           id: '978435123222265554',
           chartOwner: 'azion',
           label: 'Top IPs',
-          description: '',
+          description: 'TBD',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1171,13 +1171,13 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
         },
         {
           id: '1030427483148242',
           chartOwner: 'azion',
           label: 'Top Impacted URLs',
-          description: '',
+          description: 'TBD',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1202,7 +1202,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
         },
         {
           aggregationType: 'sum',
