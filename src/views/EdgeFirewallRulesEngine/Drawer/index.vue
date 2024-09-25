@@ -133,7 +133,7 @@
 
   const handleCreateWithSuccess = () => {
     emit('onSuccess')
-    handleTrackSuccessEdit()
+    handleTrackCreation()
     closeCreateDrawer()
   }
 
@@ -143,7 +143,36 @@
     closeEditDrawer()
   }
 
+  const handleTrackCreation = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Rule',
+        product: 'edgeFirewall'
+      })
+      .track()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Rule',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message,
+        product: 'edgeFirewall'
+      })
+      .track()
+  }
+
   const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Rule',
+        product: 'edgeFirewall'
+      })
+      .track()
+
     tracker.product
       .productEdited({
         productName: 'Edge Firewall',
@@ -156,16 +185,13 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Edge Firewall',
+        productName: 'Rule',
         errorType: 'api',
         fieldName: fieldName.trim(),
+        product: 'edgeFirewall',
         errorMessage: message
       })
       .track()
-  }
-
-  const handleErrorToTrackerEvent = (error) => {
-    handleFailedEditEdgeFirewallRules(error)
   }
 
   const listFunctionsServiceWithDecorator = async () => {
@@ -237,7 +263,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
-    @onError="handleErrorToTrackerEvent"
+    @onError="handleFailedToCreate"
     title="Create Rule"
   >
     <template #formFields>
@@ -257,7 +283,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
-    @onError="handleErrorToTrackerEvent"
+    @onError="handleFailedEditEdgeFirewallRules"
     @onSuccess="handleEditWithSuccess"
     title="Edit Rule"
   >
