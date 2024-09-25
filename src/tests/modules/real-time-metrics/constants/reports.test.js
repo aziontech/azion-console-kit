@@ -1115,7 +1115,7 @@ describe('RealTimeMetricsModule', () => {
           id: '847143804009563421',
           chartOwner: 'azion',
           label: 'Impacted URLs',
-          description: 'TBD',
+          description: 'Sum of the detected bot actions, broken down by the affected URLs.',
           aggregationType: 'sum',
           columns: 3,
           type: 'big-numbers',
@@ -1140,13 +1140,14 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'inverse',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls'
         },
         {
           id: '978435123222265554',
           chartOwner: 'azion',
           label: 'Top IPs',
-          description: 'TBD',
+          description:
+            'Sum of the detected bot actions, broken down by the highest-ranking IP addresses.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1171,13 +1172,13 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips'
         },
         {
           id: '1030427483148242',
           chartOwner: 'azion',
           label: 'Top Impacted URLs',
-          description: 'TBD',
+          description: 'Sum of the detected bot actions, broken down by the most affected URLs.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1202,7 +1203,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
         },
         {
           aggregationType: 'sum',

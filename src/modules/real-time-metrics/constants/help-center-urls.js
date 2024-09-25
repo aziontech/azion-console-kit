@@ -93,9 +93,9 @@ const HELP_CENTER_URLS = {
       botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
     },
     botManagerBreakdown: {
-      impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown',
-      topIps: '/real-time-metrics/bot-manager-advanced/breakdown',
-      topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown'
+      impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls',
+      topIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips',
+      topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
   }
 }

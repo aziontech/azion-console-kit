@@ -209,13 +209,14 @@ const REPORTS_TEXTS = {
     },
     botManagerBreakdown: {
       impactedUrls: {
-        description: 'TBD'
+        description: 'Sum of the detected bot actions, broken down by the affected URLs.'
       },
       topIps: {
-        description: 'TBD'
+        description:
+          'Sum of the detected bot actions, broken down by the highest-ranking IP addresses.'
       },
       topImpactedUrls: {
-        description: 'TBD'
+        description: 'Sum of the detected bot actions, broken down by the most affected URLs.'
       }
     }
   }
