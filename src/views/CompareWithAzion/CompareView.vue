@@ -2,32 +2,48 @@
   <div class="px-4">
     <ContentBlock data-testid="view-compare-with-azion-test">
       <template #heading>
-        <PageHeadingBlock data-testid="view-compare-with-azion-test-heading" />
+        <PageHeadingBlock
+          pageTitle=""
+          data-testid="view-compare-with-azion-test-heading"
+        />
       </template>
 
       <template #content>
         <div
           class="w-fit"
-          v-if="hasGeneralErrorMessage()"
+          v-if="hasGeneralMessage()"
         >
           <RetryMessage
-            :timer="45"
+            :timer="60"
             :data="generalError"
-            @onRetry="() => {
-              resetGeneralErrorMessage()
-              init()
-            }"
+            @onRetry="
+              () => {
+                resetGeneralMessage()
+                init()
+              }
+            "
           />
         </div>
-        <div v-else class="grid md:grid-cols-2 gap-10">
+        <div
+          v-else
+          class="grid md:grid-cols-2 gap-10"
+        >
           <div>
-            <div v-if="errorData">
-              <Message
-                severity="error"
-                :closable="false"
-              >
-                {{ errorData }}
-              </Message>
+            <div
+              v-if="hasTestMessage()"
+              class="w-fit"
+            >
+              <RetryMessage
+                :timer="30"
+                :data="errorData"
+                @onRetry="
+                  async () => {
+                    resetTestMessage()
+                    const testById = await getTestById()
+                    loadTest(testById.body[0].id)
+                  }
+                "
+              />
             </div>
             <div v-else>
               <DataBlock
@@ -40,13 +56,21 @@
           </div>
 
           <div>
-            <div v-if="errorDataWithAzion">
-              <Message
-                severity="error"
-                :closable="false"
-              >
-                {{ errorDataWithAzion }}
-              </Message>
+            <div
+              v-if="hasTestWithAzionMessage()"
+              class="w-fit"
+            >
+              <RetryMessage
+                :timer="30"
+                :data="errorDataWithAzion"
+                @onRetry="
+                  async () => {
+                    resetTestWithAzionMessage()
+                    const testById = await getTestById()
+                    loadTestWithAzion(testById.body[0].id_azion)
+                  }
+                "
+              />
             </div>
             <div v-else>
               <DataBlock
@@ -67,7 +91,6 @@
 
 <script setup>
   import { onMounted, onBeforeMount, ref } from 'vue'
-  import Message from 'primevue/message'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
   import RetryMessage from './blocks/retry-message.vue'
@@ -105,11 +128,11 @@
   const accountStore = useAccountStore()
   const { client_id } = accountStore.account
   const generalError = ref({})
-  const errorData = ref('')
+  const errorData = ref({})
   const resumeData = ref({})
   const gradeData = ref([])
   const secureData = ref({})
-  const errorDataWithAzion = ref('')
+  const errorDataWithAzion = ref({})
   const resumeDataWithAzion = ref({})
   const gradeDataWithAzion = ref([])
   const secureDataWithAzion = ref({})
@@ -172,45 +195,41 @@
     }
   }
 
-  const resetGeneralErrorMessage = () => {
-    return generalError.value = {}
+  const hasGeneralMessage = () => Object.keys(generalError.value).length
+  const resetGeneralMessage = () => (generalError.value = {})
+  const setGeneralMessage = (general) => {
+    return (generalError.value = {
+      message: general.message,
+      retry: general.retry,
+      severity: general.severity
+    })
   }
 
-  const setGeneralErrorMessage = (message, retry) => {
-    return generalError.value = {
-      message: message,
-      retry: retry
-    }
+  const hasTestMessage = () => Object.keys(errorData.value).length
+  const resetTestMessage = () => (errorData.value = {})
+  const setTestMessage = (test) => {
+    return (errorData.value = {
+      message: test.message,
+      retry: test.retry,
+      severity: test.severity
+    })
   }
 
-  const hasGeneralErrorMessage = () => {
-    return Object.keys(generalError.value).length
-  } 
-
-  const setTestErrorMessage = (message) => {
-    return errorData.value = message
+  const hasTestWithAzionMessage = () => Object.keys(errorDataWithAzion.value).length
+  const resetTestWithAzionMessage = () => (errorDataWithAzion.value = {})
+  const setTestWithAzionMessage = (message) => {
+    return (errorDataWithAzion.value = message)
   }
 
-  const setTestWithAzionErrorMessage = (message) => {
-    return errorDataWithAzion.value = message
-  }
-
-  const init = async () => {
-    const testId = getQueryString('id')
-    const testById = await props.getTestById(testId, client_id)
-    
-    if (!testById.body.length) {
-      setGeneralErrorMessage(
-        'Unavailable comparative tests. 1. Propagating data; 2. Invalid id;',
-        true
-      )
-      return
-    }
-
-    getResultFromWebpagetest(testById.body[0].id)
+  const loadTest = async (id) => {
+    return getResultFromWebpagetest(id)
       .then((result) => {
         if (result.body.statusCode !== 200) {
-          setTestErrorMessage(`Test ${result.body.data.id} is ${result.body.statusText}`)
+          setTestMessage({
+            message: `Test ${result.body.data.id} is ${result.body.statusText}`,
+            severity: 'warn',
+            retry: true
+          })
           return
         }
 
@@ -220,13 +239,23 @@
         secureData.value = parseSecureData(medianFirstView)
       })
       .catch(() => {
-        setTestErrorMessage('Not possible to load the Origin test.')
+        setTestMessage({
+          message: 'Not possible to load the Origin test.',
+          severity: 'error',
+          retry: false
+        })
       })
+  }
 
-    getResultFromWebpagetest(testById.body[0].id_azion)
+  const loadTestWithAzion = async (id) => {
+    return getResultFromWebpagetest(id)
       .then((resutWithAzion) => {
         if (resutWithAzion.body.statusCode !== 200) {
-          setTestWithAzionErrorMessage(`Test ${resutWithAzion.body.data.id} is ${resutWithAzion.body.statusText}`)
+          setTestWithAzionMessage({
+            message: `Test ${resutWithAzion.body.data.id} is ${resutWithAzion.body.statusText}`,
+            severity: 'info',
+            retry: true
+          })
           return
         }
 
@@ -236,16 +265,39 @@
         secureDataWithAzion.value = parseSecureData(medianRepeatedViewWithAzion)
       })
       .catch(() => {
-        setTestWithAzionErrorMessage('Not possible to load the test with Azion.')
+        setTestWithAzionMessage({
+          message: 'Not possible to load the test with Azion.',
+          severity: 'error',
+          retry: false
+        })
       })
+  }
+
+  const getTestById = async () => await props.getTestById(getQueryString('id'), client_id)
+
+  const init = async () => {
+    const testById = await getTestById()
+
+    if (!testById.body.length) {
+      setGeneralMessage({
+        message: 'Propagating comparative consolidation...',
+        retry: true,
+        severity: 'info'
+      })
+      return
+    }
+
+    loadTest(testById.body[0].id)
+    loadTestWithAzion(testById.body[0].id_azion)
   }
 
   onMounted(() => {
     if (!client_id) {
-      setGeneralErrorMessage(
-        'The logged-in account does not have a valid client ID.',
-        false
-      )
+      setGeneralMessage({
+        message: 'The logged-in account does not have a valid client ID.',
+        severity: 'error',
+        retry: false
+      })
       return
     }
   })

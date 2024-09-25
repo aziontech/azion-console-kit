@@ -1,6 +1,6 @@
 <template>
   <Message
-    :severity="props.severity"
+    :severity="props.data.severity"
     :closable="false"
   >
     <div class="flex gap-2 items-center">
@@ -17,10 +17,13 @@
         >
           {{ counter }} seconds
         </strong>
-        <span v-else class="ml-2">
+        <span
+          v-else
+          class="ml-2"
+        >
           <i class="pi pi-spin pi-spinner"></i>
         </span>
-  
+
         <Button
           link
           :label="retryButton.label"
@@ -30,7 +33,7 @@
         )
       </div>
     </div>
-  </Message> 
+  </Message>
 </template>
 
 <script setup>
@@ -38,7 +41,7 @@
   import Message from 'primevue/message'
   import Button from 'primevue/button'
 
-  let interval;
+  let interval
   const emit = defineEmits(['onRetry'])
   const props = defineProps({
     data: ref({
@@ -53,7 +56,7 @@
     severity: {
       type: String,
       required: false,
-      default: "error"
+      default: 'error'
     }
   })
   const counter = ref(props.timer)
@@ -71,29 +74,29 @@
   }
 
   const setRetryButton = (status, label) => {
-    return retryButton.value = {
+    return (retryButton.value = {
       disabled: status,
       label: label
-    }
+    })
   }
 
   const setCounter = (number) => {
-    return counter.value = number
+    return (counter.value = number)
   }
 
   const startCounter = () => {
     interval = setInterval(() => {
-      const decreasedCounter = (counter.value - 1)
+      const decreasedCounter = counter.value - 1
       setCounter(decreasedCounter)
 
-      if(!decreasedCounter) {
+      if (!decreasedCounter) {
         timerZero()
       }
     }, 1000)
   }
 
   onMounted(() => {
-    if(!props.data.retry) {
+    if (!props.data.retry) {
       return
     }
 

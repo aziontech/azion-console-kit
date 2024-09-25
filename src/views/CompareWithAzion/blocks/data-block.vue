@@ -1,5 +1,8 @@
 <template>
-  <h2 class="text-3xl" v-html="props.title" />
+  <h2
+    class="text-3xl"
+    v-html="props.title"
+  />
 
   <div class="mt-12">
     <h3 class="text-xl mb-8">General</h3>
@@ -39,6 +42,6 @@
     secureData: ref({
       type: Object,
       required: true
-    }),
+    })
   })
 </script>

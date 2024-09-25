@@ -43,7 +43,8 @@ export const resultparse = {
     const grade = {}
     const secHeaders = test.data.median.firstView.securityHeaders
 
-    grade.security = secHeaders && secHeaders.securityHeadersGrade ? secHeaders.securityHeadersGrade : ''
+    grade.security =
+      secHeaders && secHeaders.securityHeadersGrade ? secHeaders.securityHeadersGrade : ''
     grade.ttfb = `${test.data.median.firstView.TTFB}ms`
     grade['score_keep-alive'] = gradeTranslate(test.data.median.firstView['score_keep-alive'])
     grade.score_gzip = gradeTranslate(test.data.median.firstView.score_gzip)
