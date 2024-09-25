@@ -16,12 +16,22 @@ const getGraphQLType = (value) => {
       return 'String'
     }
 
-    if (!isNaN(Date.parse(value))) {
+    if (isValidDate(value)) {
       return 'DateTime'
     }
 
     return 'String'
   }
+}
+
+function isValidDate(dateString) {
+  const dateRegexes = /^\d{2,4}[-/]\d{2}[-/]\d{2,4}?.*$/
+  const isValidFormat = dateRegexes.test(dateString)
+  if (!isValidFormat) {
+    return false
+  }
+
+  return !isNaN(Date.parse(dateString))
 }
 
 /**
@@ -49,6 +59,15 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
   ].join('\n')
 }
 
+const formatValueContainOperator = (variable) => {
+  for (const key in variable) {
+    if (variable[key] && key.includes('Like')) {
+      variable[key] = `%${variable[key]}%`
+    }
+  }
+  return variable
+}
+
 /**
  * Convert filter and table to gql body
  *
@@ -59,11 +78,11 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 const convertGQL = (filter, table) => {
   if (!table) throw new Error('Table parameter is required')
 
-  const variables = {}
+  let variables = {}
   const filterQuery = buildFilterQuery(filter, variables)
-
   const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
   const filterParameter = formatFilterParameter(variables)
+  variables = formatValueContainOperator(variables)
 
   const queryConfig = {
     filterParameter,
@@ -73,6 +92,7 @@ const convertGQL = (filter, table) => {
     filterQuery,
     fields: fieldsFormat
   }
+
   const query = buildGraphQLQuery(queryConfig)
 
   return {
@@ -138,6 +158,7 @@ const separateFieldsByType = (fields) => {
 const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
+
     filter[filterKey] = {
       ...filter[filterKey],
       [`${valueField}${operator}`]: value

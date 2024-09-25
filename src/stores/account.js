@@ -14,6 +14,10 @@ export const useAccountStore = defineStore({
       TRIAL: 'TRIAL',
       ONLINE: 'ONLINE',
       REGULAR: 'REGULAR'
+    },
+    flags: {
+      RESTRICT_ACCESS_TO_METRICS_ONLY: 'allow_only_metrics_on_console',
+      FULL_CONSOLE_ACCESS: 'allow_console'
     }
   }),
   getters: {
@@ -23,14 +27,17 @@ export const useAccountStore = defineStore({
     hasActiveUserId(state) {
       return !!state.account?.id
     },
-    shouldAvoidCalculateServicePlan(state) {
-      return !!state.account?.isDeveloperSupportPlan
-    },
-    viewsAccessRestriction(state) {
-      return state.account?.consoleReleasedClient?.views
+    metricsOnlyAccessRestriction(state) {
+      const flags = state.flags
+      const client_flags = state.account?.client_flags || []
+      return (
+        client_flags.includes(flags.RESTRICT_ACCESS_TO_METRICS_ONLY) &&
+        !client_flags.includes(flags.FULL_CONSOLE_ACCESS)
+      )
     },
     hasAccessConsole(state) {
-      return state.account?.consoleReleasedClient?.hasAccessConsole
+      const { client_flags = [], isDeveloperSupportPlan } = state.account
+      return client_flags.includes(state.flags.FULL_CONSOLE_ACCESS) || !!isDeveloperSupportPlan
     },
     currentTheme(state) {
       return state.account?.colorTheme

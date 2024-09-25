@@ -211,14 +211,24 @@
     }
   }
 
+  const handleTrackCreation = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Rule',
+        product: 'edgeApplication'
+      })
+      .track()
+  }
+
   const handleFailedToCreate = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Rules Engine',
+        productName: 'Rule',
         errorType: 'api',
         fieldName: fieldName.trim(),
-        errorMessage: message
+        errorMessage: message,
+        product: 'edgeApplication'
       })
       .track()
   }
@@ -227,10 +237,11 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Rules Engine',
+        productName: 'Rule',
         errorMessage: message,
         fieldName: fieldName,
-        errorType: 'api'
+        errorType: 'api',
+        product: 'edgeApplication'
       })
       .track()
 
@@ -246,11 +257,14 @@
 
   const handleCreateRulesEngine = () => {
     emit('onSuccess')
+    handleTrackCreation()
     closeDrawerCreate()
   }
+
   const handleTrackSuccessEdit = () => {
     tracker.product.productEdited({
-      productName: 'Rules Engine'
+      productName: 'Rule',
+      product: 'edgeApplication'
     })
     tracker.product
       .productEdited({

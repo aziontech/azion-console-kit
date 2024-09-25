@@ -139,4 +139,17 @@ export class ProductTracker {
     })
     return this.#trackerAdapter
   }
+
+  /**
+   * @param {Object} payload
+   * @param {String} payload.target
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickedOn(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: `Clicked on ${payload.target}`,
+      props: {}
+    })
+    return this.#trackerAdapter
+  }
 }
