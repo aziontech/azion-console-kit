@@ -25,17 +25,9 @@ const getGraphQLType = (value) => {
 }
 
 function isValidDate(dateString) {
-  const dateRegexes = [
-    /^\d{2}\/\d{2}\/\d{4}$/, // dd/mm/yyyy
-    /^\d{4}\/\d{2}\/\d{2}$/, // yyyy/mm/dd
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, // yyyy-mm-ddThh:mm:ss
-    /^\d{2}-\d{2}-\d{4}$/, // dd-mm-yyyy
-    /^\d{4}-\d{2}-\d{2}$/, // yyyy-mm-dd
-    /^\d{2}\/\d{1,2}\/\d{2}$/, // yy/m/d
-    /^\d{1,2}\/\d{1,2}\/\d{2}$/ // d/m/yy
-  ]
-
-  const isValidFormat = dateRegexes.some((regex) => regex.test(dateString))
+  // eslint-disable-next-line no-useless-escape
+  const dateRegexes = /^(?:(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01]))|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{2}|(?:[1-9]|[12]\d|3[01])[-\/](?:[1-9]|1[0-2])[-\/](?:\d{2}|\d{4})|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)$/
+  const isValidFormat = dateRegexes.test(dateString)
   if (!isValidFormat) {
     return false
   }
