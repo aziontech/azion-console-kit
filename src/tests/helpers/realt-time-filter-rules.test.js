@@ -21,7 +21,14 @@ describe('RealTimeMetricsModule', () => {
           'naxsiAttackFamilyIlike'
         ],
         FILTER_WHITELIST: {
-          SUPPORTED_FILTER_TYPE: ['String', 'Int', 'Float', 'IntRange', 'FloatRange'],
+          SUPPORTED_FILTER_TYPE: [
+            'String',
+            'Int',
+            'Float',
+            'IntRange',
+            'FloatRange',
+            'GenericScalar'
+          ],
           FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn']
         },
         MOST_RELEVANT_FIELDS: {

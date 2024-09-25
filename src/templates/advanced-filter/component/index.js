@@ -14,7 +14,8 @@ export const FIELDS_MAPPING = {
   IntRange: h(numberRangeFilter),
   FloatRange: h(floatRangeFilter),
   ArrayObject: h(multiselectFilter),
-  ArrayString: h(chipsFilter)
+  ArrayString: h(chipsFilter),
+  GenericScalar: h(textFilter)
 }
 
 export const OPERATOR_MAPPING = {

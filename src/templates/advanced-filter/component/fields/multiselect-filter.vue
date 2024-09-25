@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import MultiSelect from 'primevue/multiselect'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
@@ -79,7 +79,9 @@
     }
   }
 
-  serviceIn()
+  onMounted(() => {
+    serviceIn()
+  })
 </script>
 <template>
   <div class="flex flex-col w-full sm:w-full gap-2">
