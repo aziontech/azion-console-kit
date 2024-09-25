@@ -330,6 +330,18 @@ const formatTsChartData = ({
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
+
+  if (report.id === '071851224118431167') {
+    seriesArray.forEach((serie) => {
+      // linter complains about ternary
+      if (serie[0] === 'false') {
+        serie[0] = 'Not Solved'
+      }
+      if (serie[0] === 'true') {
+        serie[0] = 'Solved'
+      }
+    })
+  }
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
