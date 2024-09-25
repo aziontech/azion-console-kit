@@ -25,8 +25,9 @@ const getGraphQLType = (value) => {
 }
 
 function isValidDate(dateString) {
+  const dateRegexes =
   // eslint-disable-next-line no-useless-escape
-  const dateRegexes = /^(?:(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01]))|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{2}|(?:[1-9]|[12]\d|3[01])[-\/](?:[1-9]|1[0-2])[-\/](?:\d{2}|\d{4})|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)$/
+    /^(?:(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01]))|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{2}|(?:[1-9]|[12]\d|3[01])[-\/](?:[1-9]|1[0-2])[-\/](?:\d{2}|\d{4})|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:\d{4}[-\/](?:0[1-9]|1[0-2])[-\/](?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)|(?:0[1-9]|[12]\d|3[01])[-\/](?:0[1-9]|1[0-2])[-\/]\d{4}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)$/
   const isValidFormat = dateRegexes.test(dateString)
   if (!isValidFormat) {
     return false
@@ -62,7 +63,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 
 const formatValueContainOperator = (variable) => {
   for (const key in variable) {
-    if (Object.prototype.hasOwnProperty.call(variable, key) && key.includes('Like')) {
+    if (variable[key] && key.includes('Like')) {
       variable[key] = `%${variable[key]}%`
     }
   }
