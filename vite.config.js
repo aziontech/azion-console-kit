@@ -54,11 +54,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
-        '/api/allowed-accounts': {
-          target: `https://raw.githubusercontent.com/aziontech/console-client-list/main/clids.json`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/allowed-accounts/, '')
-        },
         '/api/webhook/console_feedback': {
           target: `https://automate.azion.net/`,
           changeOrigin: true,
