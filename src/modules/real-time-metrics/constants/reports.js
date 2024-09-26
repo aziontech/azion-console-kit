@@ -1028,9 +1028,7 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 5000,
     groupBy: ['challengeSolved'],
     orderDirection: 'ASC',
@@ -1057,9 +1055,7 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 2,
     groupBy: ['challengeSolved'],
     fields: ['challengeSolved'],

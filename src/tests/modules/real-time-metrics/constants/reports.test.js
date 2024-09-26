@@ -1007,9 +1007,7 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requests'
             }
           ],
-          filters: {
-            actionEq: 'redirect'
-          },
+          filters: {},
           limit: 5000,
           groupBy: ['challengeSolved'],
           orderDirection: 'ASC',
@@ -1036,9 +1034,7 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requests'
             }
           ],
-          filters: {
-            actionEq: 'redirect'
-          },
+          filters: {},
           limit: 2,
           groupBy: ['challengeSolved'],
           fields: ['challengeSolved'],
