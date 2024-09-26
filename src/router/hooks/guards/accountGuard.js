@@ -1,11 +1,9 @@
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { loadAccountJobRoleService } from '@/services/account-settings-services'
-import { useAccountStore } from '@/stores/account'
 import { setRedirectRoute } from '@/helpers'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function accountGuard(to, next) {
-  const accountStore = useAccountStore()
+export async function accountGuard(to, next, accountStore) {
   const isPrivateRoute = !to.meta.isPublic
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
 
