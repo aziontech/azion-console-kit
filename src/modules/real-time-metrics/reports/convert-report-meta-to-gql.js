@@ -123,6 +123,7 @@ export default class GqlRules {
 
     if (Object.keys(this.filters).length) {
       Object.keys(this.queryFilters).forEach((key) => {
+        if (key === 'datasets') return // used internally by the advanced filter
         filtersStr += FiltersToGraphQLString(key, this.queryFilters[key])
       })
     }
