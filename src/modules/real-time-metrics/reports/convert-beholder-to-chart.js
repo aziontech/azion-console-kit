@@ -520,6 +520,10 @@ const formatMapChartData = ({ report, data }) => {
     return result
   })
 
+  if (!heatmap.length) {
+    return []
+  }
+
   return [
     {
       bubbles: [],

@@ -22,7 +22,7 @@
         </span>
         <AggregationInfo
           :report="report"
-          v-if="showAggregation"
+          v-if="chartStatus.showAggregation"
         />
         <InlineMessage
           v-else
@@ -33,7 +33,7 @@
       </div>
       <section class="flex-auto relative">
         <component
-          v-if="showChart"
+          v-if="chartStatus.showChart"
           :is="chartType[report.type]"
           :chartData="report"
           :variationValue="report.variationValue"
@@ -42,9 +42,15 @@
           :hasMeanLineSeries="report.showMeanLinePerSeries"
         />
         <Skeleton
-          v-if="showSkeleton"
+          v-else-if="chartStatus.showSkeleton"
           class="w-full h-full"
         />
+        <p
+          v-else-if="chartStatus.showNoData"
+          class="text-color-secondary text-md h-full flex items-center justify-center"
+        >
+          No data available
+        </p>
       </section>
     </div>
   </div>
@@ -100,16 +106,15 @@
 
   const shouldRenderChart = ref(true)
 
-  const showChart = computed(() => {
-    return props.report.resultQuery?.length && shouldRenderChart.value
-  })
+  const chartStatus = computed(() => {
+    const { resultQuery, done, error } = props.report
 
-  const showAggregation = computed(() => {
-    return !props.report.error
-  })
-
-  const showSkeleton = computed(() => {
-    return !showChart.value && showAggregation.value
+    return {
+      showChart: resultQuery?.length && done && shouldRenderChart.value,
+      showSkeleton: !shouldRenderChart.value || (!error && !done),
+      showAggregation: !error,
+      showNoData: !resultQuery?.length && done
+    }
   })
 
   const reRenderChart = () => {
