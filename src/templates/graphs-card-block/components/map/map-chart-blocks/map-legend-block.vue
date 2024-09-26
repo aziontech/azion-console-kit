@@ -27,11 +27,11 @@
 
   const CAPTIONS = [
     {
-      label: `+100,000,000`,
+      label: `+1,000,000`,
       bullet: 'border-[#ff6259] bg-[#ff6259]'
     },
     {
-      label: `100,000 - 100,000,000`,
+      label: `100,000 - 1,000,000`,
       bullet: 'border-[#ff8780] bg-[#ff8780]'
     },
     {
