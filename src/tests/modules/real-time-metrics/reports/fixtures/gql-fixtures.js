@@ -1234,7 +1234,6 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-actionEq: "redirect"
 
         }
         ) {
@@ -1266,7 +1265,6 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-actionEq: "redirect"
 
         }
         ) {
