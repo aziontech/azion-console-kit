@@ -1420,7 +1420,7 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-metricEq: "uniq_request_path"
+metricEq: "uniq_request_url"
 datasetEq: "bot_manager"
 
         }
@@ -1485,7 +1485,7 @@ end: $tsRange_end
 
 }
 datasetEq: "bot_manager"
-metricEq: "top_request_path"
+metricEq: "top_request_url"
 
         }
         ) {

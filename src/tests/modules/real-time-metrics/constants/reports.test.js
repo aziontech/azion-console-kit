@@ -1128,7 +1128,7 @@ describe('RealTimeMetricsModule', () => {
             }
           ],
           filters: {
-            metricEq: 'uniq_request_path',
+            metricEq: 'uniq_request_url',
             datasetEq: 'bot_manager'
           },
           groupBy: [],
@@ -1191,7 +1191,7 @@ describe('RealTimeMetricsModule', () => {
           ],
           filters: {
             datasetEq: 'bot_manager',
-            metricEq: 'top_request_path'
+            metricEq: 'top_request_url'
           },
           limit: 10,
           groupBy: ['dimension1'],
