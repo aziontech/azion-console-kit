@@ -3,7 +3,8 @@ import {
   SignInTracker,
   CreateTracker,
   ProductTracker,
-  WafRulesTracker
+  WafRulesTracker,
+  RealTimeMetricsTracker
 } from './trackers'
 
 /**
@@ -35,6 +36,8 @@ export class AnalyticsTrackerAdapter {
   #productTracker = null
   /** @type {WafTracker} */
   #wafRulesTracker = null
+  /** @type {RealTimeMetricsTracker} */
+  #realTimeMetricsTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -49,6 +52,7 @@ export class AnalyticsTrackerAdapter {
     this.#createTracker = new CreateTracker(this)
     this.#productTracker = new ProductTracker(this)
     this.#wafRulesTracker = new WafRulesTracker(this)
+    this.#realTimeMetricsTracker = new RealTimeMetricsTracker(this)
   }
 
   /**
@@ -134,5 +138,12 @@ export class AnalyticsTrackerAdapter {
    */
   get wafRules() {
     return this.#wafRulesTracker
+  }
+
+  /**
+   * @return {RealTimeMetricsTracker}
+   */
+  get realTimeMetrics() {
+    return this.#realTimeMetricsTracker
   }
 }

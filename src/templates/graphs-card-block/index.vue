@@ -13,6 +13,7 @@
       <MoreOptionsMenu
         :report="report"
         :clipboardWrite="clipboardWrite"
+        :groupData="groupData"
       />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
@@ -65,6 +66,10 @@
   const props = defineProps({
     clipboardWrite: Function,
     report: {
+      type: Object,
+      required: true
+    },
+    groupData: {
       type: Object,
       required: true
     }

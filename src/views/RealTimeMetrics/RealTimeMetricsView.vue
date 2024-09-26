@@ -27,6 +27,7 @@
           :filterData="filterData"
           :userUTC="userUTC"
           @applyTSRange="load"
+          :groupData="groupData"
         />
         <ContentFilterBlock
           :key="filterData.current?.id"
@@ -59,12 +60,15 @@
   import RealTimeMetricsModule from '@/modules/real-time-metrics'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ContentFilterBlock from './blocks/content-filter-block.vue'
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineProps({
     playgroundOpener: {
@@ -173,12 +177,27 @@
     })
   }
 
+  const clickedToRealTimeMetrics = ({ eventName, payload }) => {
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName,
+        payload
+      })
+      .track()
+  }
+
   const currentInfo = computed(() => {
     if (!groupData.value) return
     return getCurrentInfo({ group: groupData.value })
   })
 
   watch(currentInfo, () => {
+    const eventName = 'Clicked to View Real-Time Metrics'
+    const payload = {
+      section: currentInfo.value.Group,
+      page: currentInfo.value.Page
+    }
+    clickedToRealTimeMetrics({ eventName, payload })
     setTimeout(() => {
       updateRouter()
     }, 100)
