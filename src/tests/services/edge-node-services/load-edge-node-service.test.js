@@ -7,7 +7,8 @@ const fixtures = {
     id: 76789,
     active: true,
     groups: [],
-    name: 'My Edge Service'
+    name: 'My Edge Service',
+    has_services: true
   }
 }
 
@@ -49,7 +50,8 @@ describe('EdgeNodeServices', () => {
       name: fixtures.mock.name,
       groups: fixtures.mock.groups,
       hashId: fixtures.mock.hashId,
-      id: fixtures.mock.id
+      id: fixtures.mock.id,
+      hasServices: fixtures.mock.has_services
     })
   })
 })

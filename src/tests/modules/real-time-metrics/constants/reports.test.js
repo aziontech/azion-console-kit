@@ -1045,7 +1045,8 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph'
+          helpCenterPath:
+            '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph'
         },
         {
           id: '424388331488145485',
