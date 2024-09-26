@@ -16,12 +16,7 @@
           <RetryMessage
             :timer="60"
             :data="generalError"
-            @onRetry="
-              () => {
-                resetGeneralMessage()
-                init()
-              }
-            "
+            @onRetry="retryGeneralMessage()"
           />
         </div>
         <div
@@ -36,13 +31,7 @@
               <RetryMessage
                 :timer="30"
                 :data="errorData"
-                @onRetry="
-                  async () => {
-                    resetTestMessage()
-                    const testById = await getTestById()
-                    loadTest(testById.body[0].id)
-                  }
-                "
+                @onRetry="retryTestMessage()"
               />
             </div>
             <div v-else>
@@ -63,13 +52,7 @@
               <RetryMessage
                 :timer="30"
                 :data="errorDataWithAzion"
-                @onRetry="
-                  async () => {
-                    resetTestWithAzionMessage()
-                    const testById = await getTestById()
-                    loadTestWithAzion(testById.body[0].id_azion)
-                  }
-                "
+                @onRetry="retryTestWithAzionMessage()"
               />
             </div>
             <div v-else>
@@ -204,6 +187,10 @@
       severity: general.severity
     })
   }
+  const retryGeneralMessage = () => {
+    resetGeneralMessage()
+    init()
+  }
 
   const hasTestMessage = () => Object.keys(errorData.value).length
   const resetTestMessage = () => (errorData.value = {})
@@ -214,11 +201,21 @@
       severity: test.severity
     })
   }
+  const retryTestMessage = async () => {
+    resetTestMessage()
+    const testById = await getTestById()
+    loadTest(testById.body[0].id)
+  }
 
   const hasTestWithAzionMessage = () => Object.keys(errorDataWithAzion.value).length
   const resetTestWithAzionMessage = () => (errorDataWithAzion.value = {})
   const setTestWithAzionMessage = (message) => {
     return (errorDataWithAzion.value = message)
+  }
+  const retryTestWithAzionMessage = async () => {
+    resetTestWithAzionMessage()
+    const testById = await getTestById()
+    loadTestWithAzion(testById.body[0].id_azion)
   }
 
   const loadTest = async (id) => {

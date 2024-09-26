@@ -42,6 +42,7 @@
   import Button from 'primevue/button'
 
   let interval
+  const RECONSULTATION_TIME_MS = 1000
   const emit = defineEmits(['onRetry'])
   const props = defineProps({
     data: ref({
@@ -50,12 +51,10 @@
     }),
     timer: {
       type: Number,
-      required: false,
       default: 30
     },
     severity: {
       type: String,
-      required: false,
       default: 'error'
     }
   })
