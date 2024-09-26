@@ -97,7 +97,7 @@
         <FieldSwitchBlock
           nameField="hasServices"
           name="hasServices"
-          input-class="w-full"
+          rootClass="w-full"
           auto
           isCard
           title="Add-On Services"
