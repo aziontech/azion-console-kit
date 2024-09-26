@@ -11,12 +11,12 @@
       <template #content>
         <div
           class="w-fit"
-          v-if="hasGeneralMessage()"
+          v-if="hasGeneralMessage"
         >
           <RetryMessage
             :timer="60"
             :data="generalError"
-            @onRetry="retryGeneralMessage()"
+            @onRetry="retryGeneralMessage"
           />
         </div>
         <div
@@ -25,13 +25,13 @@
         >
           <div>
             <div
-              v-if="hasTestMessage()"
+              v-if="hasTestMessage"
               class="w-fit"
             >
               <RetryMessage
                 :timer="30"
                 :data="errorData"
-                @onRetry="retryTestMessage()"
+                @onRetry="retryTestMessage"
               />
             </div>
             <div v-else>
@@ -46,13 +46,13 @@
 
           <div>
             <div
-              v-if="hasTestWithAzionMessage()"
+              v-if="hasTestWithAzionMessage"
               class="w-fit"
             >
               <RetryMessage
                 :timer="30"
                 :data="errorDataWithAzion"
-                @onRetry="retryTestWithAzionMessage()"
+                @onRetry="retryTestWithAzionMessage"
               />
             </div>
             <div v-else>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-  import { onMounted, onBeforeMount, ref } from 'vue'
+  import { computed, onMounted, onBeforeMount, ref } from 'vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
   import RetryMessage from './blocks/retry-message.vue'
@@ -178,7 +178,10 @@
     }
   }
 
-  const hasGeneralMessage = () => Object.keys(generalError.value).length
+  const hasGeneralMessage = computed(() => {
+    return Object.keys(generalError.value).length
+  })
+
   const resetGeneralMessage = () => (generalError.value = {})
   const setGeneralMessage = (general) => {
     return (generalError.value = {
@@ -192,7 +195,7 @@
     init()
   }
 
-  const hasTestMessage = () => Object.keys(errorData.value).length
+  const hasTestMessage = computed(() => Object.keys(errorData.value).length)
   const resetTestMessage = () => (errorData.value = {})
   const setTestMessage = (test) => {
     return (errorData.value = {
@@ -207,7 +210,7 @@
     loadTest(testById.body[0].id)
   }
 
-  const hasTestWithAzionMessage = () => Object.keys(errorDataWithAzion.value).length
+  const hasTestWithAzionMessage = computed(() => Object.keys(errorDataWithAzion.value).length)
   const resetTestWithAzionMessage = () => (errorDataWithAzion.value = {})
   const setTestWithAzionMessage = (message) => {
     return (errorDataWithAzion.value = message)

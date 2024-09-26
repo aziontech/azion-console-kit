@@ -37,11 +37,10 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import {  onMounted, ref } from 'vue'
   import Message from 'primevue/message'
   import Button from 'primevue/button'
-
-  const RECONSULTATION_TIME_MS = 1000
+  
   const emit = defineEmits(['onRetry'])
   const props = defineProps({
     data: ref({
@@ -57,25 +56,24 @@
       default: 'error'
     }
   })
+  
   const counter = ref(props.timer)
   const retryButton = ref({
     disabled: false,
     label: 'retry'
   })
+  const RECONSULTATION_TIME_MS = 1000
 
   const timerZero = () => {
     emit('onRetry')
 
     setCounter(0)
     clearInterval(interval)
-    setRetryButton(true, 'retrying')
-  }
 
-  const setRetryButton = (status, label) => {
-    return (retryButton.value = {
-      disabled: status,
-      label: label
-    })
+    retryButton.value = {
+      disabled: true,
+      label: 'retrying'
+    }
   }
 
   const setCounter = (number) => {
