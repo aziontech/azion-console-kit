@@ -116,6 +116,7 @@
       >
         <GraphsCardBlock
           :report="report"
+          :groupData="groupData"
           :clipboardWrite="clipboardWrite"
         />
       </template>
