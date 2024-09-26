@@ -77,9 +77,9 @@
       page: props.groupData.currentPage.label,
       option: interval.value.code === 'custom' ? 'none' : interval.value.name
     }
-    tracker.product
+    tracker.realTimeMetrics
       .clickedToRealTimeMetrics({
-        eventName: 'on Time Range',
+        eventName: 'Clicked on Time Range',
         payload
       })
       .track()
@@ -92,9 +92,9 @@
       page: props.groupData.currentPage.label,
       option: interval.value.code === 'custom' ? 'none' : interval.value.name
     }
-    tracker.product
+    tracker.realTimeMetrics
       .clickedToRealTimeMetrics({
-        eventName: 'on Date Picker',
+        eventName: 'Clicked on Date Picker',
         payload
       })
       .track()

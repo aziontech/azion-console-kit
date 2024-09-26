@@ -171,14 +171,14 @@
   }
 
   const clickedToRealTimeMetrics = (option) => {
-    const eventName = 'on More Options on Real-Time Metrics'
+    const eventName = 'Clicked on More Options on Real-Time Metrics'
     const payload = {
       section: props.groupData.current.value,
       page: props.groupData.currentPage.label,
       chart: props.report.label,
       option
     }
-    tracker.product
+    tracker.realTimeMetrics
       .clickedToRealTimeMetrics({
         eventName,
         payload

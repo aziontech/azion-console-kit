@@ -178,7 +178,7 @@
   }
 
   const clickedToRealTimeMetrics = ({ eventName, payload }) => {
-    tracker.product
+    tracker.realTimeMetrics
       .clickedToRealTimeMetrics({
         eventName,
         payload
@@ -192,7 +192,7 @@
   })
 
   watch(currentInfo, () => {
-    const eventName = 'to View Real-Time Metrics'
+    const eventName = 'Clicked to View Real-Time Metrics'
     const payload = {
       section: currentInfo.value.Group,
       page: currentInfo.value.Page

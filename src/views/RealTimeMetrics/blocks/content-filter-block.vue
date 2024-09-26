@@ -163,7 +163,7 @@
       section: props.groupData.current.value,
       page: props.groupData.currentPage.label
     }
-    tracker.product
+    tracker.realTimeMetrics
       .clickedToRealTimeMetrics({
         eventName: 'Applied Filter on Real-Time Metrics',
         payload
