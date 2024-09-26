@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import makeWebpagetestApi from '../axios/makeWebpagetestApi'
 
-
 export const getResultFromWebpagetest = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request(
     {

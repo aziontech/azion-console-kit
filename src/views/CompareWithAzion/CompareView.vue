@@ -300,9 +300,7 @@
   })
 
   onBeforeMount(async () => {
-    if (!client_id) {
-      return
-    }
+    if (!client_id) return
 
     const testId = getQueryString('id')
     await props.testConsolidationService({

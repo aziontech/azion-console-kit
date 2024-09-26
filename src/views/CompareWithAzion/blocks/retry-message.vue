@@ -7,12 +7,12 @@
       {{ props.data.message }}
 
       <div
-        v-if="props.data.retry"
+        v-if="props.data?.retry"
         class="flex items-center"
       >
         (&nbsp;&nbsp;
         <strong
-          v-if="props.data.retry && counter"
+          v-if="props.data?.retry && counter"
           class="flex items-center"
         >
           {{ counter }} seconds
@@ -41,7 +41,6 @@
   import Message from 'primevue/message'
   import Button from 'primevue/button'
 
-  let interval
   const RECONSULTATION_TIME_MS = 1000
   const emit = defineEmits(['onRetry'])
   const props = defineProps({
@@ -83,21 +82,18 @@
     return (counter.value = number)
   }
 
+  let interval
   const startCounter = () => {
     interval = setInterval(() => {
       const decreasedCounter = counter.value - 1
       setCounter(decreasedCounter)
 
-      if (!decreasedCounter) {
-        timerZero()
-      }
-    }, 1000)
+      if (!decreasedCounter) timerZero()
+    }, RECONSULTATION_TIME_MS)
   }
 
   onMounted(() => {
-    if (!props.data.retry) {
-      return
-    }
+    if (!props.data.retry) return
 
     setCounter(props.timer)
     startCounter()
