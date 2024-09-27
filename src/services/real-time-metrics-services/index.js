@@ -9,5 +9,5 @@ export {
   searchEdgeDnsService,
   searchEdgeFunctionsService,
   loadRealTimeMetricsData,
-	searchBotCategoryService
+  searchBotCategoryService
 }
