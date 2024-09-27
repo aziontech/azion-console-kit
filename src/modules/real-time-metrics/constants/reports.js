@@ -832,13 +832,13 @@ const REPORTS = [
   },
   /**
    * SECURE
-   * Bot Manager - Bot Manager Summary
+   * Bot Manager - Bot Manager Overview
    */
   {
     id: '892249168369791027',
     chartOwner: 'azion',
     label: 'Bad Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.badBotHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.badBotHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -862,13 +862,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'inverse',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.badBotHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.badBotHits
   },
   {
     id: '934654293238823255',
     chartOwner: 'azion',
     label: 'Good Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.goodBotHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.goodBotHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -892,13 +892,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'neutral',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.goodBotHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.goodBotHits
   },
   {
     id: '259047966206560862',
     chartOwner: 'azion',
     label: 'Bot Hits',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botHits.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botHits.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -922,13 +922,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'inverse',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botHits
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botHits
   },
   {
     id: '541669034905662013',
     chartOwner: 'azion',
     label: 'Transactions',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.transactions.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.transactions.description,
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
@@ -949,13 +949,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'neutral',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.transactions
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.transactions
   },
   {
     id: '329891149133127508',
     chartOwner: 'azion',
     label: 'Bot Traffic',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botTraffic.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botTraffic.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -975,13 +975,13 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botTraffic
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botTraffic
   },
   {
     id: '577704475532819772',
     chartOwner: 'azion',
     label: 'Top Bot Action',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botAction.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botAction.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -1007,13 +1007,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotAction
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotAction
   },
   {
     id: '071851224118431167',
     chartOwner: 'azion',
     label: 'Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -1028,21 +1028,19 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 5000,
     groupBy: ['challengeSolved'],
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
-    variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botCaptchaLine
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botCaptchaLine
   },
   {
     id: '455330743572401794',
     chartOwner: 'azion',
     label: 'Top Bot CAPTCHA',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botCaptcha.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botCaptcha.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -1057,22 +1055,20 @@ const REPORTS = [
         variable: 'requests'
       }
     ],
-    filters: {
-      actionEq: 'redirect'
-    },
+    filters: {},
     limit: 2,
     groupBy: ['challengeSolved'],
     fields: ['challengeSolved'],
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotCaptchaPie
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotCaptchaPie
   },
   {
     id: '424388331488145485',
     chartOwner: 'azion',
     label: 'Top Bot Classifications',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botClassification.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botClassification.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -1098,13 +1094,13 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.topBotClassification
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotClassification
   },
   {
     id: '190246009413028885',
     chartOwner: 'azion',
     label: 'Bot Activity Map',
-    description: REPORTS_TEXTS.botManager.botManagerSummary.botActivityMap.description,
+    description: REPORTS_TEXTS.botManager.botManagerOverview.botActivityMap.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'map',
@@ -1128,7 +1124,104 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '371360344901061482',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerSummary.botActivityMap
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botActivityMap
+  },
+  /**
+   * SECURE
+   * Bot Manager - Bot Manager Breakdown
+   */
+  {
+    id: '847143804009563421',
+    chartOwner: 'azion',
+    label: 'Impacted URLs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.impactedUrls.description,
+    aggregationType: 'sum',
+    columns: 3,
+    type: 'big-numbers',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'securityMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      metricEq: 'uniq_request_url',
+      datasetEq: 'bot_manager'
+    },
+    groupBy: [],
+    fields: [],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.impactedUrls
+  },
+  {
+    id: '978435123222265554',
+    chartOwner: 'azion',
+    label: 'Top IPs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topIps.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'securityMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      datasetEq: 'bot_manager',
+      metricEq: 'top_remote_addr'
+    },
+    limit: 10,
+    groupBy: ['dimension1'],
+    fields: ['dimension1'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topIps
+  },
+  {
+    id: '1030427483148242',
+    chartOwner: 'azion',
+    label: 'Top Impacted URLs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topImpactedUrls.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataUnit: 'count',
+    dataset: 'securityMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'value'
+      }
+    ],
+    filters: {
+      datasetEq: 'bot_manager',
+      metricEq: 'top_request_url'
+    },
+    limit: 10,
+    groupBy: ['dimension1'],
+    fields: ['dimension1'],
+    orderDirection: 'DESC',
+    dashboardId: '659868342290523846',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topImpactedUrls
   },
   /**
    * OBSERVE

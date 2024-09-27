@@ -78,7 +78,7 @@ const HELP_CENTER_URLS = {
     }
   },
   botManager: {
-    botManagerSummary: {
+    botManagerOverview: {
       badBotHits: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
       goodBotHits: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
@@ -91,6 +91,11 @@ const HELP_CENTER_URLS = {
       topBotClassification:
         '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
       botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
+    },
+    botManagerBreakdown: {
+      impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls',
+      topIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips',
+      topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
   }
 }

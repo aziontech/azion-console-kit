@@ -330,6 +330,18 @@ const formatTsChartData = ({
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
+
+  if (report.id === '071851224118431167') {
+    seriesArray.forEach((serie) => {
+      // linter complains about ternary
+      if (serie[0] === 'false') {
+        serie[0] = 'Not Solved'
+      }
+      if (serie[0] === 'true') {
+        serie[0] = 'Solved'
+      }
+    })
+  }
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
@@ -429,7 +441,11 @@ const formatBigNumbers = ({ report, data }) => {
   const aggregation = report.aggregationType
 
   const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
-  const { unit, value } = formatDataUnit(total, report)
+  let { unit, value } = formatDataUnit(total, report)
+
+  if (report.id === '847143804009563421') {
+    unit = 'URLs'
+  }
 
   return [
     {
@@ -503,6 +519,10 @@ const formatMapChartData = ({ report, data }) => {
 
     return result
   })
+
+  if (!heatmap.length) {
+    return []
+  }
 
   return [
     {

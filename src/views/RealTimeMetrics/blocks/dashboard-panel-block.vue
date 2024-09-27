@@ -68,6 +68,7 @@
   )
 
   const changeDashboard = async (evt) => {
+    if (!evt.value) return
     setCurrentDashboard(evt.value)
     await setDatasetAvailableFilters()
     await loadCurrentReports(props.userUTC)
