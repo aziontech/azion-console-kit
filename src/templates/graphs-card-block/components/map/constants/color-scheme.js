@@ -1,75 +1,91 @@
 const COLORS = {
   light: {
-    green: {
-      fillColor: '#6bd69080',
-      strokeColor: '#6bd690'
+    limit1: {
+      fillColor: '#f1e8ca',
+      strokeColor: '#f6de95'
     },
-    yellow: {
-      fillColor: '#f0ca5b80',
-      strokeColor: '#f0ca5b'
+    limit2: {
+      fillColor: '#f3d2bb',
+      strokeColor: '#fba86f'
     },
-    orange: {
-      fillColor: '#fa9e6480',
-      strokeColor: '#fa9e64'
+    limit3: {
+      fillColor: '#f3c8a9',
+      strokeColor: '#fa8e42'
     },
-    red: {
-      fillColor: '#f05a5a80',
-      strokeColor: '#f05a5a'
+    limit4: {
+      fillColor: '#f5c5c2',
+      strokeColor: '#ff8780'
+    },
+    limit5: {
+      fillColor: '#f5b6b2',
+      strokeColor: '#ff6259'
     }
   },
 
   dark: {
-    green: {
-      fillColor: '#6bd69080',
-      strokeColor: '#6bd690'
+    limit1: {
+      fillColor: '#776d50',
+      strokeColor: '#f6de95'
     },
-    yellow: {
-      fillColor: '#f0ca5b80',
-      strokeColor: '#f0ca5b'
+    limit2: {
+      fillColor: '#795841',
+      strokeColor: '#fba86f'
     },
-    orange: {
-      fillColor: '#fa9e6480',
-      strokeColor: '#fa9e64'
+    limit3: {
+      fillColor: '#784d2f',
+      strokeColor: '#fa8e42'
     },
-    red: {
-      fillColor: '#f05a5a80',
-      strokeColor: '#f05a5a'
+    limit4: {
+      fillColor: '#7a4a48',
+      strokeColor: '#ff8780'
+    },
+    limit5: {
+      fillColor: '#7a3c38',
+      strokeColor: '#ff6259'
     }
   }
 }
 
 export const VARIATIONS = {
-  'regular-high': {
-    light: COLORS.light.red,
-    dark: COLORS.dark.red
+  'regular-limit5': {
+    light: COLORS.light.limit5,
+    dark: COLORS.dark.limit5
   },
-  'regular-medium-high': {
-    light: COLORS.light.orange,
-    dark: COLORS.dark.orange
+  'regular-limit4': {
+    light: COLORS.light.limit4,
+    dark: COLORS.dark.limit4
   },
-  'regular-medium-low': {
-    light: COLORS.light.yellow,
-    dark: COLORS.dark.yellow
+  'regular-limit3': {
+    light: COLORS.light.limit3,
+    dark: COLORS.dark.limit3
   },
-  'regular-low': {
-    light: COLORS.light.green,
-    dark: COLORS.dark.green
+  'regular-limit2': {
+    light: COLORS.light.limit2,
+    dark: COLORS.dark.limit2
   },
-  'inverse-high': {
-    light: COLORS.light.green,
-    dark: COLORS.dark.green
+  'regular-limit1': {
+    light: COLORS.light.limit1,
+    dark: COLORS.dark.limit1
   },
-  'inverse-medium-high': {
-    light: COLORS.light.yellow,
-    dark: COLORS.dark.yellow
+  'inverse-limit1': {
+    light: COLORS.light.limit1,
+    dark: COLORS.dark.limit1
   },
-  'inverse-medium-low': {
-    light: COLORS.light.orange,
-    dark: COLORS.dark.orange
+  'inverse-limit2': {
+    light: COLORS.light.limit2,
+    dark: COLORS.dark.limit2
   },
-  'inverse-low': {
-    light: COLORS.light.red,
-    dark: COLORS.dark.red
+  'inverse-limit3': {
+    light: COLORS.light.limit3,
+    dark: COLORS.dark.limit3
+  },
+  'inverse-limit4': {
+    light: COLORS.light.limit4,
+    dark: COLORS.dark.limit4
+  },
+  'inverse-limit5': {
+    light: COLORS.light.limit5,
+    dark: COLORS.dark.limit5
   }
 }
 
@@ -80,14 +96,14 @@ const COMMON_LAYERS_COLOR_LAKES = {
         color: '#3e3e3e',
         width: 1
       },
-      fill: { color: '#171717' }
+      fill: { color: '#222222' }
     },
     light: {
       stroke: {
         color: '#b5b5b5',
         width: 1
       },
-      fill: { color: '#ffffff' }
+      fill: { color: '#eeeeee' }
     }
   }
 }
@@ -99,14 +115,14 @@ const COMMON_LAYERS_COLOR_OCEANS = {
         color: 'transparent',
         width: 0
       },
-      fill: { color: '#171717' }
+      fill: { color: '#222222' }
     },
     light: {
       stroke: {
         color: 'transparent',
         width: 0
       },
-      fill: { color: '#ffffff' }
+      fill: { color: '#eeeeee' }
     }
   }
 }

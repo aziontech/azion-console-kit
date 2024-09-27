@@ -10,8 +10,8 @@ const FILTER_BLACK_LIST = [
   'naxsiAttackFamilyIlike'
 ]
 
-const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange']
-const FIELDS_LIKE = ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn']
+const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']
+const FIELDS_LIKE = ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn']
 
 const ALIAS_MAPPING = {
   configurationId: 'domain'
@@ -52,7 +52,8 @@ const MOST_RELEVANT_FIELDS = {
 const FILTER_LIKE_TYPE = {
   configurationIdIn: 'ArrayObject',
   zoneIdIn: 'ArrayObject',
-  edgeFunctionIdIn: 'ArrayObject'
+  edgeFunctionIdIn: 'ArrayObject',
+  botCategoryIn: 'ArrayObject'
 }
 
 const FILTER_LIKE_ALIAS = {

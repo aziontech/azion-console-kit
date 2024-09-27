@@ -301,10 +301,16 @@ const setCurrentReportValue = (reportInfo) => {
 
   if (reportIdx < 0) return
 
+  if (Array.isArray(reportInfo.resultQuery[0]) && !reportInfo.resultQuery[0][1]) {
+    reportInfo.resultQuery = []
+  }
+
   reports.current[reportIdx] = {
     ...reports.current[reportIdx],
-    ...reportInfo
+    ...reportInfo,
+    done: true
   }
+
   notify(reportObservers, reports)
 }
 

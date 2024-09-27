@@ -78,7 +78,7 @@ const HELP_CENTER_URLS = {
     }
   },
   botManager: {
-    botManagerSummary: {
+    botManagerOverview: {
       badBotHits: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
       goodBotHits: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
@@ -86,11 +86,18 @@ const HELP_CENTER_URLS = {
       botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
       topBotAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
       botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
-      topBotCaptchaPie: '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
-      topBotClassification: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
+      topBotCaptchaPie:
+        '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph',
+      topBotClassification:
+        '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications',
       botActivityMap: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
+    },
+    botManagerBreakdown: {
+      impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls',
+      topIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips',
+      topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
-  },
+  }
 }
 
 export default HELP_CENTER_URLS
