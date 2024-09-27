@@ -26,26 +26,12 @@ const adapt = (payload) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (body) => {
-  let apiError = ''
-  const keys = Object.keys(body)
-  for (const keyError of keys) {
-    if (Array.isArray(body[keyError])) {
-      const errorValue = body[keyError][0]
-      if (typeof errorValue === 'string') {
-        apiError = errorValue
-        break
-      }
-      if (typeof errorValue === 'object') {
-        apiError = errorValue.message[0]
-        break
-      }
-    } else {
-      apiError = body[keyError]
-      break
-    }
+  for (const keyError of Object.keys(body)) {
+    const errorValue = Array.isArray(body[keyError]) ? body[keyError][0] : body[keyError]
+    if (typeof errorValue === 'string') return errorValue
+    if (typeof errorValue === 'object' && errorValue.message) return errorValue.message[0]
   }
-
-  return apiError
+  return ''
 }
 
 /**
