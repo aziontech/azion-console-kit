@@ -35,7 +35,7 @@ describe('BillingServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: [] }
+      body: { results: [] }
     })
 
     const { sut } = makeSut()
@@ -52,7 +52,7 @@ describe('BillingServices', () => {
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: [fixtures.paymentMockIsDefault] }
+      body: { results: [fixtures.paymentMockIsDefault] }
     })
     const { sut } = makeSut()
 
