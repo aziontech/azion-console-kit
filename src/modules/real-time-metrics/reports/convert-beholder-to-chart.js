@@ -331,15 +331,10 @@ const formatTsChartData = ({
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
 
-  if (report.id === '071851224118431167') {
+  const BOT_CAPTCHA_CHART = '071851224118431167'
+  if (report.id === BOT_CAPTCHA_CHART) {
     seriesArray.forEach((serie) => {
-      // linter complains about ternary
-      if (serie[0] === 'false') {
-        serie[0] = 'Not Solved'
-      }
-      if (serie[0] === 'true') {
-        serie[0] = 'Solved'
-      }
+      serie[0] = serie[0] === 'true' ? 'Solved' : 'Not Solved'
     })
   }
   // ensures that the X-axis is the first set of data.
@@ -443,7 +438,8 @@ const formatBigNumbers = ({ report, data }) => {
   const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
   let { unit, value } = formatDataUnit(total, report)
 
-  if (report.id === '847143804009563421') {
+  const IMPACTED_URLS_CHART = '847143804009563421'
+  if (report.id === IMPACTED_URLS_CHART) {
     unit = 'URLs'
   }
 
