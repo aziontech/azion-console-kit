@@ -1,22 +1,24 @@
 const LIMITS = {
-  high: 100_000,
-  mediumHigh: 10_000,
-  mediumLow: 1_000,
-  low: 100
+  limit5: 1_000_000,
+  limit4: 100_000,
+  limit3: 10_000,
+  limit2: 1000
 }
 
 const BUBBLE_SIZE = 15
 
 const rangeVariations = (value, rangeVariation) => {
   switch (true) {
-    case value >= LIMITS.high:
-      return `${rangeVariation}-high`
-    case value >= LIMITS.mediumHigh:
-      return `${rangeVariation}-medium-high`
-    case value >= LIMITS.low:
-      return `${rangeVariation}-medium-low`
+    case value > LIMITS.limit5:
+      return `${rangeVariation}-limit5`
+    case value >= LIMITS.limit4:
+      return `${rangeVariation}-limit4`
+    case value >= LIMITS.limit3:
+      return `${rangeVariation}-limit3`
+    case value >= LIMITS.limit2:
+      return `${rangeVariation}-limit2`
     default:
-      return `${rangeVariation}-low`
+      return `${rangeVariation}-limit1`
   }
 }
 

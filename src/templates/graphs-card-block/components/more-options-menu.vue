@@ -24,13 +24,17 @@
   import { useHelpCenterStore } from '@/stores/help-center'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
-  import { computed, ref, toRef } from 'vue'
+  import { computed, ref, toRef, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const helpCenterStore = useHelpCenterStore()
 
   const props = defineProps({
     report: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true }
+    clipboardWrite: { type: Function, required: true },
+    groupData: { type: Object, required: true }
   })
 
   const reportData = toRef(props, 'report')
@@ -79,10 +83,12 @@
   }
 
   const openHelpCenter = async () => {
+    clickedToRealTimeMetrics('helpCenter')
     await helpCenterStore.setArticleContent({ url: reportData.value.helpCenterPath })
   }
 
   const exportCSV = () => {
+    clickedToRealTimeMetrics('exportCsv')
     const csvFormattedSheet = generateCSV()
     if (!csvFormattedSheet) return false
 
@@ -120,6 +126,7 @@
   }
 
   const copyQuery = async () => {
+    clickedToRealTimeMetrics('copyQuery')
     const { query, variables } = reportData.value.reportQuery
     const clipboardQuery = formatGQL(query, variables)
     await props.clipboardWrite(clipboardQuery)
@@ -154,10 +161,28 @@
   }
 
   const toggleMeanLine = () => {
+    clickedToRealTimeMetrics('showMeanLine')
     reportData.value.showMeanLine = !reportData.value.showMeanLine
   }
 
   const toggleMeanLinePerSeries = () => {
+    clickedToRealTimeMetrics('showMeanLinePerSeries')
     reportData.value.showMeanLinePerSeries = !reportData.value.showMeanLinePerSeries
+  }
+
+  const clickedToRealTimeMetrics = (option) => {
+    const eventName = 'Clicked on More Options on Real-Time Metrics'
+    const payload = {
+      section: props.groupData.current.value,
+      page: props.groupData.currentPage.label,
+      chart: props.report.label,
+      option
+    }
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName,
+        payload
+      })
+      .track()
   }
 </script>

@@ -15,6 +15,7 @@
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
       @on-load-data="handleLoadData"
+      @on-before-go-to-edit="handleTrackClickToEdit"
       :actions="actions"
       isTabs
     >
@@ -58,8 +59,10 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block'
   import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import DrawerFunction from './Drawer'
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -150,6 +153,7 @@
   }
 
   const openCreateFunctionDrawer = () => {
+    handleTrackClickToCreate()
     drawerFunctionRef.value.openDrawerCreate()
   }
 
@@ -173,4 +177,19 @@
       service: deleteFunctionsWithDecorator
     }
   ]
+
+  const handleTrackClickToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Functions Instances'
+      })
+      .track()
+  }
+  const handleTrackClickToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Functions Instances'
+      })
+      .track()
+  }
 </script>

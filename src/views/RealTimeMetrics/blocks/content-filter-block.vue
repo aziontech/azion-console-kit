@@ -1,7 +1,7 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import advancedFilter from '@/templates/advanced-filter'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
   import { GetRelevantField } from '@/modules/real-time-metrics/filters'
 
@@ -15,6 +15,9 @@
 
   const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
     props.moduleActions
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const emit = defineEmits(['clearHash'])
   const props = defineProps({
@@ -155,7 +158,21 @@
     })
   }
 
+  const clickedAppliedFilterOnRealTimeMetrics = () => {
+    const payload = {
+      section: props.groupData.current.value,
+      page: props.groupData.currentPage.label
+    }
+    tracker.realTimeMetrics
+      .clickedToRealTimeMetrics({
+        eventName: 'Applied Filter on Real-Time Metrics',
+        payload
+      })
+      .track()
+  }
+
   const applyFilter = async (filter) => {
+    clickedAppliedFilterOnRealTimeMetrics()
     resetFilters()
 
     filter?.forEach((item) => {
