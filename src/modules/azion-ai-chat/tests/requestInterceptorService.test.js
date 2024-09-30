@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { requestInterceptorService } from '../services/request-interceptor-service'
+import { requestInterceptorService } from '../services/interceptor-service'
 
 const makeSut = () => {
   return {

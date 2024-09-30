@@ -10,6 +10,7 @@
     :submitButtonStyles="submitButtonStyles"
     :request="makeRequestConfig()"
     :requestInterceptor="interceptor"
+    :responseInterceptor="responseInterceptorService"
   >
     <div class="deep-chat-temporary-message">
       <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
@@ -39,7 +40,10 @@
   import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
-  import { requestInterceptorService } from './services/request-interceptor-service'
+  import {
+    requestInterceptorService,
+    responseInterceptorService
+  } from './services/interceptor-service'
   import { loadPromptSuggestion } from './services/load-prompt-suggestions'
   import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
@@ -334,3 +338,4 @@
     submitUserMessageGetHelp
   })
 </script>
+./services/interceptor-service

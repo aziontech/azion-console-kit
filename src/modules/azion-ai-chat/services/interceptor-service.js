@@ -46,3 +46,12 @@ export const requestInterceptorService = (
 
   return requestDetails
 }
+
+export const responseInterceptorService = ({ choices }) => {
+  if (!choices?.length) {
+    return
+  }
+  return {
+    text: choices[0].delta?.content
+  }
+}
