@@ -1453,7 +1453,7 @@ end: $tsRange_end
 
 }
 datasetEq: "bot_manager"
-metricEq: "top_remote_addr"
+metricEq: "top_bad_remote_addr"
 
         }
         ) {

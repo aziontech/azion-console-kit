@@ -1182,7 +1182,7 @@ const REPORTS = [
     ],
     filters: {
       datasetEq: 'bot_manager',
-      metricEq: 'top_remote_addr'
+      metricEq: 'top_bad_remote_addr'
     },
     limit: 10,
     groupBy: ['dimension1'],
