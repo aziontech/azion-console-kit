@@ -26,6 +26,9 @@ partialReports:
 
 env:
   CYPRESS_CACHE_FOLDER: cypressCache
+  PROD_CYPRESS_EMAIL: ${}
+  PROD_CYPRESS_PASSWORD: ${}
+  environemnt: prod
 #   environemnt: prod
 #   PROD_CYPRESS_EMAIL: abidk@lambdatest.com
 #   PROD_CYPRESS_PASSWORD: Mak@12345
