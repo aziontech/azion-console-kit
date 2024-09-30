@@ -211,9 +211,9 @@ const REPORTS_TEXTS = {
       impactedUrls: {
         description: 'Sum of the detected bot actions, broken down by the affected URLs.'
       },
-      topIps: {
+      topBadBotIps: {
         description:
-          'Sum of the detected bot actions, broken down by the highest-ranking IP addresses.'
+          'Sum of requests detected as bad bots, broken down by the highest-ranking IP addresses.'
       },
       topImpactedUrls: {
         description: 'Sum of the detected bot actions, broken down by the most affected URLs.'

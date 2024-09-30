@@ -1141,9 +1141,9 @@ describe('RealTimeMetricsModule', () => {
         {
           id: '978435123222265554',
           chartOwner: 'azion',
-          label: 'Top IPs',
+          label: 'Top Bad Bot IPs',
           description:
-            'Sum of the detected bot actions, broken down by the highest-ranking IP addresses.',
+            'Sum of requests detected as bad bots, broken down by the highest-ranking IP addresses.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1168,7 +1168,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips'
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips'
         },
         {
           id: '1030427483148242',

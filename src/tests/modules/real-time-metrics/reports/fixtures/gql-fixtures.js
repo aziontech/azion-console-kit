@@ -1437,7 +1437,7 @@ ts
   },
   {
     id: '978435123222265554',
-    label: 'Top IPs',
+    label: 'Top Bad Bot IPs',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       securityMetrics (

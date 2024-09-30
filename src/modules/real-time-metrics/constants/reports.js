@@ -1164,8 +1164,8 @@ const REPORTS = [
   {
     id: '978435123222265554',
     chartOwner: 'azion',
-    label: 'Top IPs',
-    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topIps.description,
+    label: 'Top Bad Bot IPs',
+    description: REPORTS_TEXTS.botManager.botManagerBreakdown.topBadBotIps.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -1190,7 +1190,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '659868342290523846',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topIps
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerBreakdown.topBadBotIps
   },
   {
     id: '1030427483148242',
