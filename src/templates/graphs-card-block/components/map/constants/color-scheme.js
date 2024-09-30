@@ -103,7 +103,7 @@ const COMMON_LAYERS_COLOR_LAKES = {
         color: '#b5b5b5',
         width: 1
       },
-      fill: { color: '#eeeeee' }
+      fill: { color: '#f9fafb' }
     }
   }
 }
@@ -122,7 +122,7 @@ const COMMON_LAYERS_COLOR_OCEANS = {
         color: 'transparent',
         width: 0
       },
-      fill: { color: '#eeeeee' }
+      fill: { color: '#f9fafb' }
     }
   }
 }
