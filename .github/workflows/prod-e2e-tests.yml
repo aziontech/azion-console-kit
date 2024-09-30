@@ -18,8 +18,8 @@ jobs:
 
       - name: Run hyperexecute
         env:
-          DEV_CYPRESS_EMAIL: ${{ secrets.DEV_CYPRESS_EMAIL }}
-          DEV_CYPRESS_PASSWORD: ${{ secrets.DEV_CYPRESS_PASSWORD }}
+          PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
+          PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
         run: |
           curl -O https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
           chmod u+x hyperexecute
