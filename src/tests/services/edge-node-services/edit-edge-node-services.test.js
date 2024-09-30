@@ -11,7 +11,8 @@ const fixtures = {
     name: 'Az-dns',
     hashId: 'a1b2c3d4e5f6g7h8i9j0',
     groups: [],
-    status: true
+    status: true,
+    hasServices: false
   }
 }
 
@@ -39,7 +40,8 @@ describe('EdgeNodeServices', () => {
         groups: [],
         hashId: 'a1b2c3d4e5f6g7h8i9j0',
         name: 'Az-dns',
-        status: true
+        status: true,
+        has_services: false
       }
     })
   })
