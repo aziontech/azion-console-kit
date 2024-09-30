@@ -10,8 +10,8 @@ pre:
   - npm pkg delete devDependencies.vitest-sonar-reporter devDependencies.vitest
   - npm install
   - npm install cypress -save-dev
-  - echo $PROD_CYPRESS_EMAIL
-  - echo ${PROD_CYPRESS_EMAIL}
+  - echo "++ $PROD_CYPRESS_EMAIL"
+  - echo ">> ${PROD_CYPRESS_EMAIL}"
   
 
 cacheKey: '{{ checksum "package.json" }}'
