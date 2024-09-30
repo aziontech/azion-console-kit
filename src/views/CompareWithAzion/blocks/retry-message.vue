@@ -37,10 +37,10 @@
 </template>
 
 <script setup>
-  import {  onMounted, ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import Message from 'primevue/message'
   import Button from 'primevue/button'
-  
+
   const emit = defineEmits(['onRetry'])
   const props = defineProps({
     data: ref({
@@ -56,7 +56,7 @@
       default: 'error'
     }
   })
-  
+
   const counter = ref(props.timer)
   const retryButton = ref({
     disabled: false,

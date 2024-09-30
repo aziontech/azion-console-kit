@@ -5,4 +5,11 @@ import { ProductTracker } from './ProductTracker'
 import { WafRulesTracker } from './WafRulesTracker'
 import { RealTimeMetricsTracker } from './RealTimeMetricsTracker'
 
-export { SignUpTracker, SignInTracker, CreateTracker, ProductTracker, WafRulesTracker, RealTimeMetricsTracker }
+export {
+  SignUpTracker,
+  SignInTracker,
+  CreateTracker,
+  ProductTracker,
+  WafRulesTracker,
+  RealTimeMetricsTracker
+}
