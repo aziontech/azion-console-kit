@@ -330,6 +330,13 @@ const formatTsChartData = ({
   })
 
   const seriesArray = fillSeriesWithZeroes(series, countValues)
+
+  const BOT_CAPTCHA_CHART = '071851224118431167'
+  if (report.id === BOT_CAPTCHA_CHART) {
+    seriesArray.forEach((serie) => {
+      serie[0] = serie[0] === 'true' ? 'Solved' : 'Not Solved'
+    })
+  }
   // ensures that the X-axis is the first set of data.
   return [xAxisData, ...seriesArray]
 }
@@ -346,9 +353,9 @@ const formatCatAbsoluteChartData = ({ report, data }) => {
   const seriesName = report.groupBy[0]
   const fieldName = report.aggregationType || report.fields[0]
 
-  const botCaptchaIds = ['455330743572401794', '071851224118431167']
+  const BOT_CAPTCHA_IDS = ['455330743572401794', '071851224118431167']
 
-  if (botCaptchaIds.includes(report.id)) {
+  if (BOT_CAPTCHA_IDS.includes(report.id)) {
     return data[dataset].map((item) => {
       const captchaSeriesName = item[seriesName] == 'true' ? 'Solved' : 'Not Solved'
       return [camelToTitle(captchaSeriesName), item[fieldName]]
@@ -408,8 +415,12 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const series = [seriesName]
   const values = [dataUnit]
 
+  const TOP_IMPACTED_URLS_CHART = '1030427483148242'
+
   data[dataset].forEach((item) => {
-    series.push(camelToTitle(item[seriesName]))
+    report.id !== TOP_IMPACTED_URLS_CHART
+      ? series.push(camelToTitle(item[seriesName]))
+      : series.push(item[seriesName])
     values.push(item[aggregation] || item[fieldName])
   })
 
@@ -429,7 +440,12 @@ const formatBigNumbers = ({ report, data }) => {
   const aggregation = report.aggregationType
 
   const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
-  const { unit, value } = formatDataUnit(total, report)
+  let { unit, value } = formatDataUnit(total, report)
+
+  const IMPACTED_URLS_CHART = '847143804009563421'
+  if (report.id === IMPACTED_URLS_CHART) {
+    unit = 'URLs'
+  }
 
   return [
     {
@@ -503,6 +519,10 @@ const formatMapChartData = ({ report, data }) => {
 
     return result
   })
+
+  if (!heatmap.length) {
+    return []
+  }
 
   return [
     {

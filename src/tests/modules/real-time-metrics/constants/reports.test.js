@@ -830,7 +830,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedEq: 'bad bot'
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bad-bot-hits',
           id: '892249168369791027',
           isTopX: false,
           label: 'Bad Bot Hits',
@@ -860,7 +860,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedEq: 'good bot'
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/good-bot-hits',
           id: '934654293238823255',
           isTopX: false,
           label: 'Good Bot Hits',
@@ -890,7 +890,7 @@ describe('RealTimeMetricsModule', () => {
             classifiedIn: ['bad bot', 'good bot']
           },
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
           id: '259047966206560862',
           isTopX: false,
           label: 'Bot Hits',
@@ -917,7 +917,7 @@ describe('RealTimeMetricsModule', () => {
           description: 'Number of requests evaluated by Azion Bot Manager.',
           fields: [],
           groupBy: [],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/transactions',
           id: '541669034905662013',
           isTopX: false,
           label: 'Transactions',
@@ -941,9 +941,10 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '371360344901061482',
           dataUnit: 'count',
           dataset: 'botManagerMetrics',
-          description: 'Sum of requests grouped by classification.',
+          description:
+            'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
           groupBy: ['classified'],
-          helpCenterPath: '',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
           id: '329891149133127508',
           isTopX: false,
           label: 'Bot Traffic',
@@ -957,7 +958,7 @@ describe('RealTimeMetricsModule', () => {
         {
           id: '577704475532819772',
           chartOwner: 'azion',
-          label: 'Bot Action',
+          label: 'Top Bot Action',
           description:
             'Actions taken by Azion Bot Manager for requests identified as bots, displayed in both absolute values and percentages.',
           aggregationType: 'sum',
@@ -985,7 +986,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action'
         },
         {
           id: '071851224118431167',
@@ -1006,20 +1007,18 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requests'
             }
           ],
-          filters: {
-            actionEq: 'redirect'
-          },
+          filters: {},
           limit: 5000,
           groupBy: ['challengeSolved'],
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
-          variationType: 'regular',
-          helpCenterPath: ''
+          variationType: 'inverse',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph'
         },
         {
           id: '455330743572401794',
           chartOwner: 'azion',
-          label: 'Bot CAPTCHA',
+          label: 'Top Bot CAPTCHA',
           description: 'Sum of CAPTCHA challenge results returned for requests classified as bots.',
           aggregationType: 'sum',
           columns: 6,
@@ -1035,22 +1034,22 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requests'
             }
           ],
-          filters: {
-            actionEq: 'redirect'
-          },
+          filters: {},
           limit: 2,
           groupBy: ['challengeSolved'],
           fields: ['challengeSolved'],
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath:
+            '/real-time-metrics/bot-manager-advanced/overview/top-bot-captcha-pie-graph'
         },
         {
           id: '424388331488145485',
           chartOwner: 'azion',
-          label: 'Bot Classifications',
-          description: 'Number of requests by bot categories.',
+          label: 'Top Bot Classifications',
+          description:
+            'Sum of requests classified according to the tactics used and the purpose of the bots.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
@@ -1076,7 +1075,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-classifications'
         },
         {
           id: '190246009413028885',
@@ -1106,7 +1105,101 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'ASC',
           dashboardId: '371360344901061482',
           variationType: 'regular',
-          helpCenterPath: ''
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/bot-activity-map'
+        },
+        {
+          id: '847143804009563421',
+          chartOwner: 'azion',
+          label: 'Impacted URLs',
+          description: 'Sum of the detected bot actions, broken down by the affected URLs.',
+          aggregationType: 'sum',
+          columns: 3,
+          type: 'big-numbers',
+          xAxis: 'ts',
+          isTopX: false,
+          rotated: false,
+          dataset: 'securityMetrics',
+          dataUnit: 'count',
+          limit: 10000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'value'
+            }
+          ],
+          filters: {
+            metricEq: 'uniq_request_url',
+            datasetEq: 'bot_manager'
+          },
+          groupBy: [],
+          fields: [],
+          orderDirection: 'DESC',
+          dashboardId: '659868342290523846',
+          variationType: 'inverse',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls'
+        },
+        {
+          id: '978435123222265554',
+          chartOwner: 'azion',
+          label: 'Top Bad Bot IPs',
+          description:
+            'Sum of requests detected as bad bots, broken down by the highest-ranking IP addresses.',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'ordered-bar',
+          xAxis: 'cat',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'count',
+          dataset: 'securityMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'value'
+            }
+          ],
+          filters: {
+            datasetEq: 'bot_manager',
+            metricEq: 'top_bad_remote_addr'
+          },
+          limit: 10,
+          groupBy: ['dimension1'],
+          fields: ['dimension1'],
+          orderDirection: 'DESC',
+          dashboardId: '659868342290523846',
+          variationType: 'regular',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips'
+        },
+        {
+          id: '1030427483148242',
+          chartOwner: 'azion',
+          label: 'Top Impacted URLs',
+          description: 'Sum of the detected bot actions, broken down by the most affected URLs.',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'ordered-bar',
+          xAxis: 'cat',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'count',
+          dataset: 'securityMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'value'
+            }
+          ],
+          filters: {
+            datasetEq: 'bot_manager',
+            metricEq: 'top_request_url'
+          },
+          limit: 10,
+          groupBy: ['dimension1'],
+          fields: ['dimension1'],
+          orderDirection: 'DESC',
+          dashboardId: '659868342290523846',
+          variationType: 'regular',
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
         },
         {
           aggregationType: 'sum',

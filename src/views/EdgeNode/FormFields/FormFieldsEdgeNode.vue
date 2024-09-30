@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
@@ -83,6 +84,25 @@
             Group multiple edge nodes in your edge maps for orchestration and routing.</small
           >
         </div>
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Orchestration Modules"
+    description="Choose orchestration modules to install on your Edge Node."
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-2">
+        <FieldSwitchBlock
+          nameField="hasServices"
+          name="hasServices"
+          rootClass="w-full"
+          auto
+          isCard
+          title="Add-On Services"
+          subtitle="Enables you to instantiate add-on services from your own Services Library."
+        />
       </div>
     </template>
   </FormHorizontal>

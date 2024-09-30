@@ -244,19 +244,6 @@ const backRules = [
     }
   },
   {
-    name: 'Route List Client Ids to Github',
-    description: 'this route will get the client ids of the accounts released to the console',
-    match: '^/api/allowed-accounts',
-    behavior: {
-      forwardCookies: true,
-      setOrigin: {
-        name: 'origin-github-allowed-accounts',
-        type: 'single_origin'
-      },
-      rewrite: '/aziontech/console-client-list/main/clids.json'
-    }
-  },
-  {
     name: 'Route Send Feedback',
     description: 'this route will send user feedback to jira',
     match: '^/api/webhook/console_feedback',
@@ -323,12 +310,6 @@ const AzionConfig = {
         addresses: [`api.azion.com`]
       },
     ]),
-    {
-      name: 'origin-github-allowed-accounts',
-      type: 'single_origin',
-      hostHeader: `raw.githubusercontent.com`,
-      addresses: [`raw.githubusercontent.com`]
-    },
     {
       name: 'origin-console-feedback',
       type: 'single_origin',

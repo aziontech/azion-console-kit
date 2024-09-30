@@ -8,7 +8,6 @@
   <MapLegendBlock
     v-if="legendProps.show"
     :title="legendProps.title"
-    :captions="legendProps.caption"
   />
 </template>
 
@@ -160,25 +159,7 @@
 
     return {
       show: getFeaturesKinds.length === 1,
-      title: `Total ${dataUnit}:`,
-      caption: [
-        {
-          label: `100,000 ${dataUnit}`,
-          bullet: 'bg-scale-red border-scale-red'
-        },
-        {
-          label: `10,000 ${dataUnit}`,
-          bullet: 'bg-scale-orange border-scale-orange'
-        },
-        {
-          label: `1,000 ${dataUnit}`,
-          bullet: 'bg-scale-yellow border-scale-yellow'
-        },
-        {
-          label: `< 100 ${dataUnit}`,
-          bullet: 'bg-scale-green border-scale-green'
-        }
-      ]
+      title: `Total ${dataUnit}:`
     }
   })
 

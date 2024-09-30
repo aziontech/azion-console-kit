@@ -5,6 +5,7 @@
     :nameId="props.name"
     @change="changeState"
     :inputClass="props.selectorClass"
+    :rootClass="rootClass"
     :data-testid="customTestId.selector"
   >
     <template #selector>
@@ -78,6 +79,9 @@
       type: Boolean
     },
     selectorClass: {
+      type: String
+    },
+    rootClass: {
       type: String
     }
   })

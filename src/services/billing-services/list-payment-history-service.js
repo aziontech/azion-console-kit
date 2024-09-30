@@ -33,7 +33,7 @@ const STATUS_AS_TAG = {
 const adapt = (httpResponse) => {
   const managerUrl = getStaticUrlsByEnvironment('manager')
 
-  const parseBilling = httpResponse.body.data?.map((card) => {
+  const parseBilling = httpResponse.body.results?.map((card) => {
     const typeCard = card.card_brand?.toLowerCase()
     const statusTag = STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged
     const invoiceUrl = card.invoice_url ? `${managerUrl}${card.invoice_url}` : null

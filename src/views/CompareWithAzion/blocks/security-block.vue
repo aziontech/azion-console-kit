@@ -30,7 +30,7 @@
       </li>
 
       <li
-        v-if="tls_version"
+        v-if="props.securityHeaders.tls_version"
         class="px-4 py-2 flex items-center"
       >
         {{ props.securityHeaders.tls_version }}

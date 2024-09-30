@@ -101,7 +101,7 @@
       const initialValues = await props.loadService({ id })
       resetForm({ values: initialValues })
     } catch (error) {
-      emit('on-load-fail')
+      emit('on-load-fail', error)
       showToast('error', error)
     }
   }

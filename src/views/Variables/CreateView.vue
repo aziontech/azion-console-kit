@@ -5,6 +5,11 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createVariablesService: {
@@ -23,6 +28,24 @@
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
   })
+
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'Variable'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Variable',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -34,6 +57,8 @@
       <CreateFormBlock
         :createService="props.createVariablesService"
         :schema="validationSchema"
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
       >
         <template #form>
           <FormFieldsVariables />

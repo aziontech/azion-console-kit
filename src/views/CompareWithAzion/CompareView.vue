@@ -1,81 +1,67 @@
 <template>
   <div class="px-4">
-    <ContentBlock data-testid="view-azion-compare">
+    <ContentBlock data-testid="view-compare-with-azion-test">
       <template #heading>
         <PageHeadingBlock
           pageTitle=""
-          data-testid="view-azion-compare-heading"
+          data-testid="view-compare-with-azion-test-heading"
         />
       </template>
 
       <template #content>
-        <Message
-          v-if="generalError"
-          severity="error"
-          :closable="false"
-        >
-          {{ generalError }}
-        </Message>
-
         <div
-          v-if="!generalError"
+          class="w-fit"
+          v-if="hasGeneralMessage"
+        >
+          <RetryMessage
+            :timer="60"
+            :data="generalError"
+            @onRetry="retryGeneralMessage"
+          />
+        </div>
+        <div
+          v-else
           class="grid md:grid-cols-2 gap-10"
         >
           <div>
-            <Message
-              v-if="errorData"
-              severity="error"
-              :closable="false"
+            <div
+              v-if="hasTestMessage"
+              class="w-fit"
             >
-              {{ errorData }}
-            </Message>
-
-            <div v-if="!errorData">
-              <h2 class="text-3xl">Current Performance</h2>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">General</h3>
-                <ResumeBlock :data="resumeData" />
-              </div>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">Page Performance</h3>
-                <GradeBlock :items="gradeData" />
-              </div>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">Security</h3>
-                <SecurityBlock :securityHeaders="secureData" />
-              </div>
+              <RetryMessage
+                :timer="30"
+                :data="errorData"
+                @onRetry="retryTestMessage"
+              />
+            </div>
+            <div v-else>
+              <DataBlock
+                title="Current Performance"
+                :resumeData="resumeData"
+                :gradeData="gradeData"
+                :secureData="secureData"
+              />
             </div>
           </div>
 
           <div>
-            <Message
-              v-if="errorDataWithAzion"
-              severity="error"
-              :closable="false"
+            <div
+              v-if="hasTestWithAzionMessage"
+              class="w-fit"
             >
-              {{ errorDataWithAzion }}
-            </Message>
-
-            <div v-if="!errorDataWithAzion">
-              <h2 class="text-3xl">Performance <span style="color: #f3652b">with Azion</span></h2>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">General</h3>
-                <ResumeBlock :data="resumeDataWithAzion" />
-              </div>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">Page Performance</h3>
-                <GradeBlock :items="gradeDataWithAzion" />
-              </div>
-
-              <div class="mt-12">
-                <h3 class="text-xl mb-8">Security</h3>
-                <SecurityBlock :securityHeaders="secureDataWithAzion" />
-              </div>
+              <RetryMessage
+                :timer="30"
+                :data="errorDataWithAzion"
+                @onRetry="retryTestWithAzionMessage"
+              />
+            </div>
+            <div v-else>
+              <DataBlock
+                title="Performance <span style='color: #f3652b'>with Azion</span>"
+                :resumeData="resumeDataWithAzion"
+                :gradeData="gradeDataWithAzion"
+                :secureData="secureDataWithAzion"
+              />
             </div>
           </div>
         </div>
@@ -87,25 +73,17 @@
 </template>
 
 <script setup>
-  import { onBeforeMount, ref } from 'vue'
-  import Message from 'primevue/message'
-
+  import { computed, onMounted, onBeforeMount, ref } from 'vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ContentBlock from '@/templates/content-block'
-
-  import GradeBlock from './blocks/grade-block.vue'
-  import SecurityBlock from './blocks/security-block.vue'
+  import RetryMessage from './blocks/retry-message.vue'
+  import DataBlock from './blocks/data-block.vue'
   import JourneyBlock from './blocks/journey-block.vue'
-  import ResumeBlock from './blocks/resume-block.vue'
-
   import { extract } from './utils/result-extract'
   import { convertMsToSeconds } from './utils/convert-ms-sec'
   import { formatBytesToKB } from './utils/format-bytes-to-kb'
   import { resultparse } from './utils/result-data-parse'
-
   import { useAccountStore } from '@/stores/account'
-  const accountStore = useAccountStore()
-  const { client_id } = accountStore.account
 
   const props = defineProps({
     testConsolidationService: {
@@ -130,12 +108,14 @@
     }
   })
 
-  const generalError = ref('')
-  const errorData = ref('')
+  const accountStore = useAccountStore()
+  const { client_id } = accountStore.account
+  const generalError = ref({})
+  const errorData = ref({})
   const resumeData = ref({})
   const gradeData = ref([])
   const secureData = ref({})
-  const errorDataWithAzion = ref('')
+  const errorDataWithAzion = ref({})
   const resumeDataWithAzion = ref({})
   const gradeDataWithAzion = ref([])
   const secureDataWithAzion = ref({})
@@ -143,80 +123,113 @@
   const getResultFromWebpagetest = async (id) => await props.getResultFromWebpagetest(id)
   const getQueryString = (name) => new URLSearchParams(window.location.search).get(name)
 
-  const parseGradeData = (obj) => {
+  const parseGradeData = (metrics) => {
     return [
       {
         label: 'Time to First Byte',
         measure: 's',
-        value: convertMsToSeconds(obj.ttfb)
+        value: convertMsToSeconds(metrics.ttfb)
       },
       {
         label: 'Start Render',
         measure: 's',
-        value: convertMsToSeconds(obj.render)
+        value: convertMsToSeconds(metrics.render)
       },
       {
         label: 'First Contentful Pain',
         measure: 's',
-        value: convertMsToSeconds(obj.chromeUserTiming.firstContentfulPaint)
+        value: convertMsToSeconds(metrics.chromeUserTiming.firstContentfulPaint)
       },
       {
         label: 'Speed Index',
         measure: 's',
-        value: convertMsToSeconds(obj.speedIndex)
+        value: convertMsToSeconds(metrics.speedIndex)
       },
       {
         label: 'Largest Contentful Pain',
         measure: 's',
-        value: convertMsToSeconds(obj.chromeUserTiming.largestContentfulPaint)
+        value: convertMsToSeconds(metrics.chromeUserTiming.largestContentfulPaint)
       },
       {
         label: 'Cumulative Layout Shift',
         measure: 's',
-        value: convertMsToSeconds(obj.chromeUserTiming.cumulativeLayoutShift)
+        value: convertMsToSeconds(metrics.chromeUserTiming.cumulativeLayoutShift)
       },
       {
         label: 'Total Block Time',
         measure: 's',
-        value: convertMsToSeconds(obj.totalBlockingTime)
+        value: convertMsToSeconds(metrics.totalBlockingTime)
       },
       {
         label: 'Page Weight',
         measure: 'KB',
-        value: formatBytesToKB(obj.bytesIn)
+        value: formatBytesToKB(metrics.bytesIn)
       }
     ]
   }
 
-  const parseSecureData = (data) => {
+  const parseSecureData = (testResult) => {
     return {
-      protocol: data.requests[0].securityDetails.protocol,
-      tls_verion: data.requests[0].securityDetails.tls_version,
-      list: data.securityHeaders.securityHeadersList || [],
-      grade: data.securityHeaders.securityHeadersGrade || '',
-      score: data.securityHeaders.securityHeadersScore || ''
+      protocol: testResult.requests[0].securityDetails.protocol,
+      tls_verion: testResult.requests[0].securityDetails.tls_version,
+      list: testResult.securityHeaders.securityHeadersList || [],
+      grade: testResult.securityHeaders.securityHeadersGrade || '',
+      score: testResult.securityHeaders.securityHeadersScore || ''
     }
   }
 
-  onBeforeMount(async () => {
-    const testId = getQueryString('id')
+  const hasGeneralMessage = computed(() => {
+    return Object.keys(generalError.value).length
+  })
 
-    await props.testConsolidationService({
-      testId: testId,
-      clientId: client_id
+  const resetGeneralMessage = () => (generalError.value = {})
+  const setGeneralMessage = (general) => {
+    return (generalError.value = {
+      message: general.message,
+      retry: general.retry,
+      severity: general.severity
     })
+  }
+  const retryGeneralMessage = () => {
+    resetGeneralMessage()
+    init()
+  }
 
-    const testById = await props.getTestById(testId, client_id)
+  const hasTestMessage = computed(() => Object.keys(errorData.value).length)
+  const resetTestMessage = () => (errorData.value = {})
+  const setTestMessage = (test) => {
+    return (errorData.value = {
+      message: test.message,
+      retry: test.retry,
+      severity: test.severity
+    })
+  }
+  const retryTestMessage = async () => {
+    resetTestMessage()
+    const testById = await getTestById()
+    loadTest(testById.body[0].id)
+  }
 
-    if (!testById.body.length) {
-      generalError.value = 'Unavailable comparative tests.'
-      return
-    }
+  const hasTestWithAzionMessage = computed(() => Object.keys(errorDataWithAzion.value).length)
+  const resetTestWithAzionMessage = () => (errorDataWithAzion.value = {})
+  const setTestWithAzionMessage = (message) => {
+    return (errorDataWithAzion.value = message)
+  }
+  const retryTestWithAzionMessage = async () => {
+    resetTestWithAzionMessage()
+    const testById = await getTestById()
+    loadTestWithAzion(testById.body[0].id_azion)
+  }
 
-    getResultFromWebpagetest(testById.body[0].id)
+  const loadTest = async (id) => {
+    return getResultFromWebpagetest(id)
       .then((result) => {
         if (result.body.statusCode !== 200) {
-          errorData.value = `Test ${result.body.data.id} is ${result.body.statusText}`
+          setTestMessage({
+            message: `Test ${result.body.data.id} is ${result.body.statusText}`,
+            severity: 'warn',
+            retry: true
+          })
           return
         }
 
@@ -226,13 +239,23 @@
         secureData.value = parseSecureData(medianFirstView)
       })
       .catch(() => {
-        errorData.value = 'Not possible to load the Origin test.'
+        setTestMessage({
+          message: 'Not possible to load the Origin test.',
+          severity: 'error',
+          retry: false
+        })
       })
+  }
 
-    getResultFromWebpagetest(testById.body[0].id_azion)
+  const loadTestWithAzion = async (id) => {
+    return getResultFromWebpagetest(id)
       .then((resutWithAzion) => {
         if (resutWithAzion.body.statusCode !== 200) {
-          errorDataWithAzion.value = `Test ${resutWithAzion.body.data.id} is ${resutWithAzion.body.statusText}`
+          setTestWithAzionMessage({
+            message: `Test ${resutWithAzion.body.data.id} is ${resutWithAzion.body.statusText}`,
+            severity: 'info',
+            retry: true
+          })
           return
         }
 
@@ -242,7 +265,52 @@
         secureDataWithAzion.value = parseSecureData(medianRepeatedViewWithAzion)
       })
       .catch(() => {
-        errorDataWithAzion.value = 'Not possible to load the test with Azion.'
+        setTestWithAzionMessage({
+          message: 'Not possible to load the test with Azion.',
+          severity: 'error',
+          retry: false
+        })
       })
+  }
+
+  const getTestById = async () => await props.getTestById(getQueryString('id'), client_id)
+
+  const init = async () => {
+    const testById = await getTestById()
+
+    if (!testById.body.length) {
+      setGeneralMessage({
+        message: 'Propagating comparative consolidation...',
+        retry: true,
+        severity: 'info'
+      })
+      return
+    }
+
+    loadTest(testById.body[0].id)
+    loadTestWithAzion(testById.body[0].id_azion)
+  }
+
+  onMounted(() => {
+    if (!client_id) {
+      setGeneralMessage({
+        message: 'The logged-in account does not have a valid client ID.',
+        severity: 'error',
+        retry: false
+      })
+      return
+    }
+  })
+
+  onBeforeMount(async () => {
+    if (!client_id) return
+
+    const testId = getQueryString('id')
+    await props.testConsolidationService({
+      testId: testId,
+      clientId: client_id
+    })
+
+    init()
   })
 </script>
