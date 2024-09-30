@@ -42,7 +42,7 @@ testDiscovery:
   command: find cypress/e2e/account-settings -type f -name '*.cy.js'
   # echo apps/account-billing-e2e/src/integration/billing/billingBreadCrumb.feature
 
-testRunnerCommand: npx cypress run --spec ./$test --browser=chrome --headed --config video=false --config-file ./cypress.config.prod.js --env isCI=lambda --env environment=prod --env PROD_CYPRESS_EMAIL=${PROD_CYPRESS_EMAIL} --env PROD_CYPRESS_PASSWORD=${PROD_CYPRESS_PASSWORD}
+testRunnerCommand: npx cypress run --spec ./$test --browser=chrome --headed --config video=false --config-file ./cypress.config.prod.js --env isCI=lambda,environment=prod,PROD_CYPRESS_EMAIL=${PROD_CYPRESS_EMAIL},PROD_CYPRE,WORD=${PROD_CYPRESS_PASSWORD}
 
 cypressOps:
   Build: 'Hyperexecute Cypress Account-Bill Build'
