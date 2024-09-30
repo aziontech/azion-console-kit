@@ -27,8 +27,8 @@ partialReports:
 
 env:
   CYPRESS_CACHE_FOLDER: cypressCache
-  DEV_CYPRESS_EMAIL: ${DEV_CYPRESS_EMAIL}
-  DEV_CYPRESS_PASSWORD: ${DEV_CYPRESS_PASSWORD}
+  PROD_CYPRESS_EMAIL: ${PROD_CYPRESS_EMAIL}
+  PROD_CYPRESS_PASSWORD: ${PROD_CYPRESS_PASSWORD}
 #   environemnt: prod
 #   PROD_CYPRESS_EMAIL: abidk@lambdatest.com
 #   PROD_CYPRESS_PASSWORD: Mak@12345
@@ -40,7 +40,7 @@ testDiscovery:
   command: find cypress/e2e/account-settings -type f -name '*.cy.js'
   # echo apps/account-billing-e2e/src/integration/billing/billingBreadCrumb.feature
 
-testRunnerCommand: npx cypress run --spec ./$test --browser=chrome --headed --config video=false --config-file ./cypress.config.prod.js --env isCI=lambda
+testRunnerCommand: npx cypress run --spec ./$test --browser=chrome --headed --config video=false --config-file ./cypress.config.prod.js --env isCI=lambda --env environment=prod
 
 cypressOps:
   Build: 'Hyperexecute Cypress Account-Bill Build'
