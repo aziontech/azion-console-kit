@@ -1,6 +1,6 @@
 version: 0.1
 
-runson: win
+runson: linux
 cypress: true
 
 autosplit: true
