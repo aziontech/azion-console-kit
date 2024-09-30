@@ -1,7 +1,7 @@
 <template>
   <Card
     :pt="{
-      root: { class: ['select-none', classStateRoot] }
+      root: { class: ['select-none', classStateRoot, rootClass] }
     }"
   >
     <template #content>
@@ -91,6 +91,9 @@
       required: true
     },
     inputClass: {
+      type: String
+    },
+    rootClass: {
       type: String
     }
   })
