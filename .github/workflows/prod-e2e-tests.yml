@@ -15,28 +15,35 @@ jobs:
         with:
           node-version: 18
 
-      - name: Run Cypress E2E Tests
-        uses: cypress-io/github-action@v6
-        env:
-          PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
-          PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
-        with:
-          browser: chrome
-          config-file: cypress.config.prod.js
-          env: environment=prod,grepTags=-@xfail
 
-      - name: Upload Cypress Screenshots Artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress_screenshots
-          path: cypress/screenshots
-          retention-days: 4
+      - name: Run hyperexecute
+        run: |
+          curl -O https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+          chmod u+x hyperexecute
+          ./hyperexecute --user alisson.marcelo --key o0EVawGHxX7gvx8Y3rgp04TOZ5kIeuCf1IIDrLNaxkjZ3QcIEA --config hyperexecute.yml 
 
-      - name: Upload Cypress Videos Artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress_videos
-          path: cypress/videos
-          retention-days: 1
+      # - name: Run Cypress E2E Tests
+      #   uses: cypress-io/github-action@v6
+      #   env:
+      #     PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
+      #     PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
+      #   with:
+      #     browser: chrome
+      #     config-file: cypress.config.prod.js
+      #     env: environment=prod,grepTags=-@xfail
+
+      # - name: Upload Cypress Screenshots Artifact
+      #   if: ${{ failure() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cypress_screenshots
+      #     path: cypress/screenshots
+      #     retention-days: 4
+
+      # - name: Upload Cypress Videos Artifact
+      #   if: ${{ failure() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cypress_videos
+      #     path: cypress/videos
+      #     retention-days: 1
