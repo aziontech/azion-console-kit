@@ -1,0 +1,65 @@
+version: 0.1
+
+runson: win
+cypress: true
+
+autosplit: true
+concurrency: 1
+
+pre:
+  - npm pkg delete devDependencies.vitest-sonar-reporter devDependencies.vitest
+  - npm install
+  - npm install cypress -save-dev
+
+cacheKey: '{{ checksum "package.json" }}'
+cacheDirectories:
+  - node_modules
+  - cypressCache
+
+alwaysRunPostSteps: true
+
+report: true
+partialReports:
+  frameworkName: cypressZip
+  location: cypress/results
+  type: html
+
+env:
+  CYPRESS_CACHE_FOLDER: cypressCache
+#   environemnt: prod
+#   PROD_CYPRESS_EMAIL: abidk@lambdatest.com
+#   PROD_CYPRESS_PASSWORD: Mak@12345
+#   CYPRESS_baseUrl: 'https://whoosh.int.virginmediao2.co.uk'
+
+testDiscovery:
+  mode: static
+  type: raw
+  command: find cypress/e2e/account-settings -type f -name '*.cy.js'
+  # echo apps/account-billing-e2e/src/integration/billing/billingBreadCrumb.feature
+
+testRunnerCommand: npx cypress run --spec ./$test --browser=chrome --headed --config video=false --config-file ./cypress.config.prod.js --env isCI=lambda
+
+cypressOps:
+  Build: 'Hyperexecute Cypress Account-Bill Build'
+  Tags: ['Hyperexecute', 'Cypress', 'Windows', 'Autosplit']
+  BuildTags: ['Hyperexecute-Cypress']
+  # Network: true
+  # FullHar: true
+  # accessibility: false
+  # accessibilityWcagVersion: 'wcag21a'
+  # accessibilityBestPractice: false
+  # accessibilityNeedsReview: false
+  # DedicatedProxy: true
+
+jobLabel: [cypress-v10, win, autosplit]
+# tunnel: true
+
+project:
+  name: Azion
+differentialUpload:
+  enabled: true
+  ttlHours: 300
+
+buildConfig:
+  buildPrefix: ${name}
+  buildName: 'name=${name}'
