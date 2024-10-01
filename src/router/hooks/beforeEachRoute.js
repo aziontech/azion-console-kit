@@ -1,20 +1,36 @@
-import * as guards from '@/router/hooks/guards'
+import {
+  logoutGuard,
+  loadingGuard,
+  accountGuard,
+  themeGuard,
+  billingGuard,
+  redirectGuard,
+  redirectToManagerGuard
+} from '@/router/hooks/guards'
 import { useHelpCenterStore } from '@/stores/help-center'
 import { useRouter } from 'vue-router'
 
-export default async function beforeEachRoute(routeHandler, guardDependency) {
-  const { to, next } = routeHandler
-  const { accountStore } = guardDependency
-
-  const helpCenterStore = useHelpCenterStore()
-  helpCenterStore.close()
+export default async function beforeEachRoute(guardDependency) {
+  useHelpCenterStore().close()
   const router = useRouter()
-  await guards.logoutGuard(to, next, accountStore)
-  guards.loadingGuard(to)
-  await guards.accountGuard(to, next, accountStore)
-  guards.themeGuard(accountStore)
-  guards.billingGuard(to, next, accountStore)
-  guards.redirectGuard(to, next, router)
+  const { next } = guardDependency
+
+  const guards = [
+    logoutGuard,
+    loadingGuard,
+    accountGuard,
+    themeGuard,
+    billingGuard,
+    redirectGuard,
+    redirectToManagerGuard
+  ]
+
+  for (const executeGuard of guards) {
+    const result = await executeGuard({ ...guardDependency, router })
+    if (result !== undefined) {
+      return next(result)
+    }
+  }
 
   return next()
 }

@@ -1,5 +1,5 @@
 import { describe, afterAll, it, expect, vi } from 'vitest'
-import redirectToManager from '@/router/hooks/redirectToManager'
+import redirectToManager from '@/router/hooks/guards/redirectToManagerGuard.js'
 
 vi.stubGlobal('window', {
   location: {
