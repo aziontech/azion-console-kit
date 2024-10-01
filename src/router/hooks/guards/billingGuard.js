@@ -1,4 +1,3 @@
-import { useAccountStore } from '@/stores/account'
 import { billingRoutes } from '@/router/routes/billing-routes'
 import { getStaticUrlsByEnvironment } from '@/helpers'
 
@@ -10,8 +9,7 @@ const BILLING_REDIRECT_OPTIONS = {
 const billingUrl = getStaticUrlsByEnvironment('billing')
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function billingGuard(to, next) {
-  const accountStore = useAccountStore()
+export async function billingGuard(to, next, accountStore) {
   const {
     hasActiveUserId,
     redirectToExternalBillingNeeded,

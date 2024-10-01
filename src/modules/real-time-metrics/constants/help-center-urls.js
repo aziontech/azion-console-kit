@@ -94,7 +94,7 @@ const HELP_CENTER_URLS = {
     },
     botManagerBreakdown: {
       impactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/impacted-urls',
-      topIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-ips',
+      topBadBotIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips',
       topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
   }

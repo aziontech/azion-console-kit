@@ -8,18 +8,11 @@ const LIMITS = {
 const BUBBLE_SIZE = 15
 
 const rangeVariations = (value, rangeVariation) => {
-  switch (true) {
-    case value > LIMITS.limit5:
-      return `${rangeVariation}-limit5`
-    case value >= LIMITS.limit4:
-      return `${rangeVariation}-limit4`
-    case value >= LIMITS.limit3:
-      return `${rangeVariation}-limit3`
-    case value >= LIMITS.limit2:
-      return `${rangeVariation}-limit2`
-    default:
-      return `${rangeVariation}-limit1`
-  }
+  if (value > LIMITS.limit5) return `${rangeVariation}-limit5`
+  if (value >= LIMITS.limit4) return `${rangeVariation}-limit4`
+  if (value >= LIMITS.limit3) return `${rangeVariation}-limit3`
+  if (value >= LIMITS.limit2) return `${rangeVariation}-limit2`
+  return `${rangeVariation}-limit1`
 }
 
 export const bubblesHandler = (name, data) => {

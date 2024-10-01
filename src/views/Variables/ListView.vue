@@ -7,6 +7,7 @@
       <ListTableBlock
         v-if="hasContentToList"
         @on-before-go-to-edit="checkIfIsEditable"
+        @on-before-go-to-add-page="handleTrackEvent"
         :listService="listVariablesService"
         :columns="getColumns"
         addButtonLabel="Variable"
@@ -41,7 +42,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { h, computed, ref } from 'vue'
+  import { h, computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'variables-view' })
 
@@ -118,6 +122,9 @@
   })
 
   const checkIfIsEditable = (item) => {
+    tracker.product.clickToEdit({
+      productName: 'Variable'
+    })
     enableRedirect.value = !item.value.isSecret
   }
 
@@ -128,4 +135,10 @@
     enableRedirect.value = true
     return next(false)
   })
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Variable'
+    })
+  }
 </script>

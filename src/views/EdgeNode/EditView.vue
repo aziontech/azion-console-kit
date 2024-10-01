@@ -17,7 +17,8 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     hashId: yup.string().required().label('Hash ID'),
-    groups: yup.array().label('Groups')
+    groups: yup.array().label('Groups'),
+    hasServices: yup.boolean().label('Service')
   })
 
   const formSubmit = async (onSubmit, values, formValid) => {

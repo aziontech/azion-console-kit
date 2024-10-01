@@ -16,7 +16,8 @@ const adapt = (httpResponse, id) => {
     name: httpResponse.body.name,
     id: id,
     hashId: httpResponse.body.hash_id,
-    groups: httpResponse.body.groups
+    groups: httpResponse.body.groups,
+    hasServices: httpResponse.body.has_services
   }
 
   return {

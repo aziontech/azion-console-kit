@@ -14,10 +14,10 @@ export class RealTimeMetricsTracker {
   }
 
   /**
- * @param {Object} payload
- * @param {AzionProductsNames} payload.productName
- * @returns {AnalyticsTrackerAdapter}
- */
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
   clickedToRealTimeMetrics({ eventName, payload }) {
     this.#trackerAdapter.addEvent({
       eventName,
