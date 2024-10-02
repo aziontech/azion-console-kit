@@ -12,7 +12,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onBeforeMount, ref, watch, reactive, provide } from 'vue'
+  import { computed, onBeforeMount, ref, watch, reactive, provide, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
@@ -20,6 +20,10 @@
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadEdgeDNSService: { type: Function, required: true },
@@ -169,6 +173,7 @@
 
   const openCreateDrawerEDNSResource = () => {
     showCreateRecordDrawer.value = true
+    handleTrackEventGoToCreate()
   }
   const openEditDrawerEDNSResource = (event) => {
     selectedEdgeDnsRecordToEdit.value = event.id
@@ -265,6 +270,61 @@
       service: deleteRecordsServiceEdgeDNSDecorator
     }
   ]
+
+  const handleTrackEventGoToCreate = () => {
+    tracker.product
+      .clickToCreate({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackEventGoToEdit = () => {
+    tracker.product
+      .clickToEdit({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackSuccessCreated = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Record'
+      })
+      .track()
+  }
+
+  const handleTrackFailCreated = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Record',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Record'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Record',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -339,6 +399,7 @@
               emptyListMessage="No records found."
               :actions="actions"
               isTabs
+              @on-before-go-to-edit="handleTrackEventGoToEdit"
             >
               <template #addButton>
                 <PrimeButton
@@ -380,7 +441,8 @@
               :createService="createRecordsService"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
-              @onSuccess="reloadResourcesList"
+              @onSuccess="[reloadResourcesList, handleTrackSuccessCreated()]"
+              @onError="handleTrackFailCreated"
               title="Create Record"
             >
               <template #formFields>
@@ -395,7 +457,8 @@
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"
               :schema="validationSchemaEDNSRecords"
-              @onSuccess="reloadResourcesList"
+              @onSuccess="[reloadResourcesList, handleTrackSuccessEdit()]"
+              @onError="handleTrackFailEdit"
               title="Edit Record"
             >
               <template #formFields>
