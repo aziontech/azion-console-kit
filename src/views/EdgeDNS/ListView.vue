@@ -25,6 +25,8 @@
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No zone found."
         :actions="actions"
       />
@@ -45,7 +47,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
@@ -54,6 +56,9 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'edge-dns-view' })
 
@@ -97,6 +102,17 @@
       closable: true,
       severity: 'success',
       summary: 'Successfully copied!'
+    })
+  }
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge DNS Zone'
+    })
+  }
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Edge DNS Zone'
     })
   }
 

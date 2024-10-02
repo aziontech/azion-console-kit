@@ -12,7 +12,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onBeforeMount, ref, watch, reactive, provide } from 'vue'
+  import { computed, onBeforeMount, ref, watch, reactive, provide, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
@@ -20,6 +20,10 @@
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadEdgeDNSService: { type: Function, required: true },
@@ -154,6 +158,24 @@
       return
     }
     hasContentToList.value = true
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.productEdited({
+      productName: 'Edge DNS Zone'
+    })
+  }
+
+  const handleTrackFailEditEvent = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge DNS Zone',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const listRecordsServiceEdgeDNSDecorator = async () => {
@@ -305,6 +327,8 @@
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
+            @on-edit-success="handleTrackEditEvent"
+            @on-edit-fail="handleTrackFailEditEvent"
           >
             <template #form>
               <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
