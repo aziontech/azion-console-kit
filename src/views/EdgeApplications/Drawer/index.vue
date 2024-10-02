@@ -104,6 +104,7 @@
 <template>
   <CreateDrawerBlock
     v-if="showCreateDrawer"
+    data-testid="edge-application-drawer"
     v-model:visible="showCreateEdgeApplicationsDrawer"
     :createService="createEdgeApplicationService"
     :schema="validationSchema"

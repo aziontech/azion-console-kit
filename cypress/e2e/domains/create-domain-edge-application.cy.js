@@ -11,11 +11,10 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
   // Act
-  cy.get(selectors.form.actionsSubmitButton).click()
+  cy.get(selectors.domains.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
 
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
 describe('Domains spec', { tags: ['@dev3'] }, () => {

@@ -9,6 +9,7 @@ export default {
   edgeApplicationOption: '#edgeApplication_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
   createEdgeApplicationButton: '[data-testid="domains-form__create-edge-application-button"]',
+  edgeApplicationDrawer: '.p-sidebar-content',
   dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
   copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
