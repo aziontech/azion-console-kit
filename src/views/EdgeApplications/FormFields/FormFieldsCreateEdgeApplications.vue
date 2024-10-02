@@ -23,6 +23,10 @@
     },
     contactSalesEdgeApplicationService: {
       type: Function
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -204,6 +208,7 @@
 <template>
   <FormHorizontal
     title="General"
+    :isDrawer="props.isDrawer"
     description="Create an edge application to deliver your content from the edge."
     v-if="handleBlock('general')"
     data-testid="form-horizontal-general"
@@ -225,6 +230,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
+    :isDrawer="props.isDrawer"
     description="Choose the protocols used between the edge application and users."
     v-if="handleBlock('delivery-settings')"
     data-testid="form-horizontal-delivery-settings"
@@ -366,6 +372,7 @@
 
   <FormHorizontal
     title="Default Origin"
+    :isDrawer="props.isDrawer"
     description="Customize settings related to origin servers and hosts."
     v-if="handleBlock('default-origins')"
     data-testid="form-horizontal-default-origin"
@@ -444,6 +451,7 @@
 
   <FormHorizontal
     title="Cache Expiration Policies"
+    :isDrawer="props.isDrawer"
     description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
     v-if="handleBlock('cache-expiration-policies')"
     data-testid="form-horizontal-cache-expiration-policies"
@@ -519,6 +527,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    :isDrawer="props.isDrawer"
     title="Modules"
     description="Activate modules to extend the configuration possibilities of the application. Some modules require subscription."
     v-if="handleBlock('edge-application-modules')"
@@ -572,6 +581,7 @@
 
   <FormHorizontal
     title="Debug Rules"
+    :isDrawer="props.isDrawer"
     description="Log executed rules created in Rules Engine. Query logs using Data Stream, Real-Time Events, or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
     data-testid="form-horizontal-debug-rules"
