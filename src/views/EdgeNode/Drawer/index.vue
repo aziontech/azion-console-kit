@@ -103,8 +103,8 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
-        :edgeNodeId="props.edgeNodeId"
-        :listServicesHandle="props.listServiceEdgeNodeService"
+        :edgeNodeId="edgeNodeId"
+        :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
         :bound="false"
       />
@@ -123,10 +123,10 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
-        :edgeNodeId="props.edgeNodeId"
-        :listServicesHandle="props.listServiceEdgeNodeService"
+        :edgeNodeId="edgeNodeId"
+        :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
-        :bound="true"
+        bound
       />
     </template>
   </EditDrawerBlock>
