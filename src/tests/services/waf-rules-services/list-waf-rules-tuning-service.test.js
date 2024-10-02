@@ -89,4 +89,24 @@ describe('WafRulesService', () => {
 
     expect(result).toEqual([])
   })
+
+  it('Should return an API error for an 400 response status', async () => {
+    const apiErrorMock = 'Error message'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        errors: [
+          {
+            message: 'Error message'
+          }
+        ]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.payload)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
 })
