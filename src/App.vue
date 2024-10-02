@@ -19,13 +19,19 @@
   const route = useRoute()
 
   const updateTrackingTraits = () => {
-    const { kind: accountType, client_id: clientId, email, name } = accountStore.account
+    const {
+      kind: accountType,
+      user_id: userID,
+      client_id: clientId,
+      email,
+      name
+    } = accountStore.account
     const isAccountTypeWithoutClientId = accountType !== 'client'
     if (isAccountTypeWithoutClientId) return
 
     const defaultTraits = { client_id: clientId, email, name }
     tracker.assignGroupTraits(defaultTraits)
-    tracker.identify(clientId)
+    tracker.identify(userID)
   }
 
   const isLogged = computed(() => {
