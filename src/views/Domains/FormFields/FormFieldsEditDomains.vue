@@ -11,6 +11,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import Drawer from '@/views/EdgeApplications/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
 
@@ -96,6 +97,18 @@
   const isLoadingEdgeApplications = computed(() => {
     return props.loadingEdgeApplications
   })
+
+  const drawerRef = ref('')
+
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeApplicationCreated = () => {
+    emit('edgeApplicationCreated')
+  }
+
+  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName'])
 </script>
 
 <template>
@@ -164,6 +177,10 @@
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -178,7 +195,27 @@
           filter
           appendTo="self"
           placeholder="Select an edge application"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-edge-application-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
 
       <FieldSwitchBlock

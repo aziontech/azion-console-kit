@@ -159,6 +159,7 @@
                 <PrimeButton
                   @click="openDrawer"
                   class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
                   text
                   size="small"
                   icon="pi pi-plus-circle"
