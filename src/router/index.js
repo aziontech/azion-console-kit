@@ -87,7 +87,7 @@ const router = createRouter({
   ].concat(errorRoutes)
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore()
   const routeHandler = { to, from, next }
 
@@ -96,8 +96,8 @@ router.beforeEach((to, from, next) => {
     loadContractServicePlan
   }
 
-  beforeEachRoute(routeHandler, guardDependency)
-  redirectToManager(routeHandler, guardDependency)
+  await beforeEachRoute(routeHandler, guardDependency)
+  await redirectToManager(routeHandler, guardDependency)
 })
 
 router.afterEach(afterEachRouteGuard)
