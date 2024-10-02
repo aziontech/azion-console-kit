@@ -2,9 +2,10 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import { useToast } from 'primevue/usetoast'
 
   import { useField } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
 
   const props = defineProps({
@@ -27,6 +28,7 @@
 
   const listService = ref([])
   const loadingOptionsServices = ref(false)
+  const toast = useToast()
 
   const getServices = async () => {
     try {
@@ -35,6 +37,8 @@
         edgeNodeId: props.edgeNodeId,
         bound: props.bound
       })
+    } catch (error) {
+      showToast('error', error)
     } finally {
       loadingOptionsServices.value = false
     }
@@ -42,6 +46,14 @@
 
   const { value: variables, errorMessage: variablesError } = useField('variables')
   const { value: serviceId } = useField('serviceId')
+
+  const showToast = (severity, summary) => {
+    toast.add({
+      closable: true,
+      severity,
+      summary
+    })
+  }
 
   const editorOptions = computed(() => {
     return {
@@ -57,7 +69,9 @@
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
-  getServices()
+  onMounted(() => {
+    getServices()
+  })
 </script>
 
 <template>
