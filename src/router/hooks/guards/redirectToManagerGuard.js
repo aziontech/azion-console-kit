@@ -1,6 +1,6 @@
 import { getEnvironment, getStaticUrlsByEnvironment } from '@/helpers'
 
-export async function redirectToManagerGuard({to, from, accountStore, loadContractServicePlan}) {  
+export async function redirectToManagerGuard({ to, from, accountStore, loadContractServicePlan }) {
   const isPrivateRoute = !to.meta.isPublic
   const accountData = accountStore.accountData
 
