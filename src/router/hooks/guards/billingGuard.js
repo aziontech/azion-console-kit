@@ -30,6 +30,10 @@ export async function billingGuard({ to, accountStore }) {
       if (!billingAccessPermitted) {
         return '/'
       }
+
+      if (to.name === 'billing-tabs') {
+        return true
+      }
     } else if (paymentReviewPending) {
       return BILLING_REDIRECT_OPTIONS
     }

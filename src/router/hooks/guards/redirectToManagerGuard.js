@@ -47,6 +47,7 @@ function permanentRedirectToManager() {
   if (environment !== 'development') {
     const managerUrl = getStaticUrlsByEnvironment('manager')
     window.location.replace(managerUrl)
+    return true
   }
 }
 

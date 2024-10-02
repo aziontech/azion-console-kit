@@ -108,7 +108,7 @@ describe('redirectToManagerGuard', () => {
       isDeveloperSupportPlan: false
     })
     expect(windowLocationReplaceMock).toHaveBeenCalled()
-    expect(result).toBeFalsy()
+    expect(result).toBeTruthy()
   })
 
   it('should redirect to the RTM when accountData does not have a client_id', async () => {
@@ -124,7 +124,7 @@ describe('redirectToManagerGuard', () => {
     const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).toHaveBeenCalled()
-    expect(result).toBeFalsy()
+    expect(result).toBeTruthy()
   })
 
   it('should handle navigation restriction for metrics only access', async () => {
