@@ -31,7 +31,7 @@ jobs:
         with:
           browser: chrome
           config-file: cypress.config.prod.js
-          env: environment=prod,grepTags=@dev${{ matrix.group }}+-@xfail
+          env: environment=prod,grepTags=@dev${{ matrix.group }}+-@xfail+-@dont_run_prod
 
       - name: Generate Specs JSON
         run: yarn generate-specs-json
