@@ -20,16 +20,14 @@
 
   const updateTrackingTraits = () => {
     const {
-      kind: accountType,
       user_id: userID,
+      id: accountId,
       client_id: clientId,
       email,
       name
     } = accountStore.account
-    const isAccountTypeWithoutClientId = accountType !== 'client'
-    if (isAccountTypeWithoutClientId) return
 
-    const defaultTraits = { client_id: clientId, email, name }
+    const defaultTraits = { client_id: clientId, email, name, account_id: accountId }
     tracker.assignGroupTraits(defaultTraits)
     tracker.identify(userID)
   }
