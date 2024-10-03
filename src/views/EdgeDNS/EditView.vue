@@ -160,6 +160,24 @@
     hasContentToList.value = true
   }
 
+  const handleTrackEditEvent = () => {
+    tracker.product.productEdited({
+      productName: 'Edge DNS Zone'
+    })
+  }
+
+  const handleTrackFailEditEvent = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge DNS Zone',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const listRecordsServiceEdgeDNSDecorator = async () => {
     return await props.listRecordsService({ id: edgeDNSID.value })
   }
@@ -365,6 +383,8 @@
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
+            @on-edit-success="handleTrackEditEvent"
+            @on-edit-fail="handleTrackFailEditEvent"
           >
             <template #form>
               <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
