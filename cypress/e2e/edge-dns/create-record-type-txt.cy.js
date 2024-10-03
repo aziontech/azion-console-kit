@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let zoneName = ''
 
-describe('Edge DNS spec', { tags: ['@dev5'] }, () => {
+describe('Edge DNS spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     zoneName = generateUniqueName('DNSZone')

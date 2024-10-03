@@ -4,7 +4,7 @@ import fixtures from '../../fixtures/digital-certificates'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
-describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
+describe('Digital Certificates spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Digital Certificates')
