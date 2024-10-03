@@ -8,11 +8,12 @@
   import { createEdgeApplicationService } from '@/services/edge-application-services'
   import { useRoute } from 'vue-router'
 
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   defineOptions({
     name: 'edge-applications-drawer'
   })
   const emit = defineEmits(['onSuccess', 'onEdgeApplicationCreated'])
+
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const route = useRoute()
 

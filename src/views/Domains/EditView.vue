@@ -17,7 +17,7 @@
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
             :domainName="domainName"
-            :hasDomainName="true"
+            hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
             @edgeApplicationCreated="handleEdgeApplicationCreated"
