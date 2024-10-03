@@ -9,14 +9,8 @@
     :textInput="textInputStyles"
     :submitButtonStyles="submitButtonStyles"
     :request="makeRequestConfig()"
-    :requestInterceptor="
-      (requestDetails) =>
-        requestInterceptorService(requestDetails, {
-          sessionId: aiAskAzionSessionId,
-          url: currentRouteFullPath,
-          userName: account.name
-        })
-    "
+    :requestInterceptor="interceptor"
+    :responseInterceptor="responseInterceptorService"
   >
     <div class="deep-chat-temporary-message">
       <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
@@ -46,7 +40,10 @@
   import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
-  import { requestInterceptorService } from './services/request-interceptor-service'
+  import {
+    requestInterceptorService,
+    responseInterceptorService
+  } from './services/interceptor-service'
   import { loadPromptSuggestion } from './services/load-prompt-suggestions'
   import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
@@ -55,7 +52,6 @@
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   const { currentRoute } = useRouter()
-  const { account } = useAccountStore()
 
   defineOptions({
     name: 'azion-ai-chat-block'
@@ -63,19 +59,12 @@
 
   onMounted(() => {
     generateChatSessionId()
-    getUserNameInfo()
   })
-
+  const accountStore = ref(null)
   const deepChatRef = ref(null)
 
-  defineExpose({
-    deepChatRef
-  })
-
-  const currentRouteFullPath = currentRoute.value.path
   const aiAskAzionSessionId = ref('')
-  const accountName = ref('')
-
+  const promptOrigin = ref(null)
   const errorMessages = ref({
     overrides: {
       default: 'Connection failed. Try sending your message again.'
@@ -298,15 +287,32 @@
   const handleSubmitSuggestion = (promptText) => {
     deepChatRef.value.submitUserMessage({ text: promptText })
   }
+
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
   }
-  const getUserNameInfo = () => {
-    accountName.value = account.name
+
+  const submitUserMessageGetHelp = ({ user, system }) => {
+    promptOrigin.value = {
+      user_prompt: user,
+      system_prompt: system
+    }
+    deepChatRef.value.submitUserMessage({ text: user })
   }
 
   const calculateIconBySuggestionIndex = (index) => {
     return index === 0 ? suggestionIconMetrics : suggestionIconSecurity
+  }
+
+  const interceptor = (requestDetails) => {
+    requestInterceptorService(requestDetails, {
+      sessionId: aiAskAzionSessionId.value,
+      url: currentRoute.value.path,
+      userName: accountStore.value.name,
+      clientId: accountStore.value.client_id,
+      prompt: promptOrigin.value,
+      allMessage: deepChatRef.value.getMessages()
+    })
   }
 
   const loadPromptSuggestionWithRoleDecorator = (role) => {
@@ -314,10 +320,22 @@
   }
 
   watchEffect(() => {
-    const {
-      account: { jobRole }
-    } = useAccountStore()
+    const { account } = useAccountStore()
 
-    loadPromptSuggestionWithRoleDecorator(jobRole)
+    accountStore.value = account
+
+    loadPromptSuggestionWithRoleDecorator(accountStore.value.jobRole)
+  })
+
+  const clearMessages = () => {
+    deepChatRef.value.clearMessages()
+    promptOrigin.value = null
+  }
+
+  defineExpose({
+    deepChatRef,
+    clearMessages,
+    submitUserMessageGetHelp
   })
 </script>
+./services/interceptor-service
