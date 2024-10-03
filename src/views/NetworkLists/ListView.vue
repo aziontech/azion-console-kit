@@ -77,13 +77,13 @@
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Network Lists'
+      productName: 'Network List'
     })
   }
 
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
-      productName: 'Network Lists'
+      productName: 'Network List'
     })
   }
 
