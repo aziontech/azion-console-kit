@@ -32,6 +32,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -73,6 +74,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -129,6 +131,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -173,6 +176,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -217,6 +221,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -261,6 +266,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -312,6 +318,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
@@ -355,6 +362,7 @@ const TABS_EVENTS = {
       },
       {
         field: 'tsFormat',
+        sortField: 'ts',
         header: 'TS'
       }
     ],
