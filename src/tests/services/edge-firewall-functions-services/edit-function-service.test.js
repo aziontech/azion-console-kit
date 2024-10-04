@@ -1,53 +1,59 @@
-import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { resetPasswordService } from '@/services/auth-services'
+import { editFunctionService } from '@/services/edge-firewall-functions-services'
+import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-  userData: {
-    password: 'Azn1234!',
-    uidb64: 'MjYyNw',
-    token: '6fm-c07c9d5f5d6f2e450555'
+  functionPayload: {
+    id: 12,
+    edgeFirewallID: '2321',
+    edgeFunctionID: '1234',
+    name: 'teste',
+    args: '{"key":"value"}'
   }
 }
 
 const makeSut = () => {
-  const sut = resetPasswordService
+  const sut = editFunctionService
 
-  return { sut }
+  return {
+    sut
+  }
 }
 
-describe('ResetPasswordService', () => {
-  it('should call API with correct params', async () => {
+describe('EdgeFirewallFunctionsServices', () => {
+  it('should call API with correct params and parse args as JSON', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
 
     const { sut } = makeSut()
 
-    await sut(fixtures.userData)
+    await sut(fixtures.functionPayload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `password/new`,
-      method: 'POST',
+      url: `v3/edge_firewall/${fixtures.functionPayload.edgeFirewallID}/functions_instances/${fixtures.functionPayload.id}`,
+      method: 'PATCH',
       body: {
-        password: fixtures.userData.password,
-        uidb64: fixtures.userData.uidb64,
-        token: fixtures.userData.token
+        name: fixtures.functionPayload.name,
+        edge_function: fixtures.functionPayload.edgeFunctionID,
+        json_args: JSON.parse(fixtures.functionPayload.args)
       }
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 200,
+      body: {}
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.userData)
+    const data = await sut(fixtures.functionPayload)
 
-    expect(feedbackMessage).toBe('Password reset successfully')
+    expect(data).toBe('Your Function has been updated')
   })
+
   it.each([
     {
       statusCode: 401,
@@ -55,7 +61,7 @@ describe('ResetPasswordService', () => {
     },
     {
       statusCode: 403,
-      expectedError: new Errors.InvalidApiTokenError().message
+      expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
@@ -77,7 +83,7 @@ describe('ResetPasswordService', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.userData)
+      const response = sut(fixtures.functionPayload)
 
       expect(response).rejects.toBe(expectedError)
     }

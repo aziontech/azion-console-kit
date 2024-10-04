@@ -27,6 +27,7 @@
         title="No teams have been created"
         description="Click the button below to create your first team and add permissions."
         createButtonLabel="Team"
+        @click-to-create="handleTrackEventGoToCreate"
         createPagePath="teams-permission/create"
         :documentationService="documentationService"
       >
