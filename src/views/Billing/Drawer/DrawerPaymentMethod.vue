@@ -14,7 +14,8 @@
     createPaymentMethodService: {
       type: Function,
       required: true
-    }
+    },
+    getStripeClientService: { type: Function, required: true }
   })
 
   const showCreatePaymentMethodDrawer = ref(false)
@@ -56,6 +57,7 @@
 <template>
   <CreatePaymentMethodBlock
     :createService="props.createPaymentMethodService"
+    :stripeClientService="props.getStripeClientService"
     v-model:visible="showCreatePaymentMethodDrawer"
     v-if="showCreateDrawer"
     @onSuccess="handleCreatePaymentMethod"
