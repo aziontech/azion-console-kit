@@ -65,6 +65,7 @@
   })
 
   const toast = useToast()
+  const isOverlapped = ref(false)
 
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
@@ -102,6 +103,8 @@
     isActive: true
   })
 
+  const isLoadingRequests = ref(true)
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     description: yup
@@ -132,6 +135,10 @@
       })
     )
   })
+
+  const handleToggleDrawer = (isOpen) => {
+    isOverlapped.value = isOpen
+  }
 
   const createService = async (payload) => {
     return await props.createRulesEngineService({
@@ -164,6 +171,7 @@
   }
 
   const listCacheSettingsOptions = async () => {
+    isLoadingRequests.value = true
     try {
       cacheSettingsOptions.value = await props.listCacheSettingsService({
         id: props.edgeApplicationId
@@ -174,6 +182,8 @@
         severity: 'error',
         summary: error
       })
+    } finally {
+      isLoadingRequests.value = false
     }
   }
 
@@ -279,6 +289,10 @@
     closeDrawerEdit()
   }
 
+  const handleRefreshCacheSettings = async () => {
+    await listCacheSettingsOptions()
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -297,6 +311,7 @@
 <template>
   <CreateDrawerBlock
     v-if="loadCreateRulesEngineDrawer"
+    :isOverlapped="isOverlapped"
     v-model:visible="showCreateRulesEngineDrawer"
     :createService="createService"
     :schema="validationSchema"
@@ -309,6 +324,7 @@
   >
     <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
+        :isLoadingRequests="isLoadingRequests"
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
@@ -316,6 +332,8 @@
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"
+        @toggleDrawer="handleToggleDrawer"
+        @refreshCacheSettings="handleRefreshCacheSettings"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -326,6 +344,7 @@
   </CreateDrawerBlock>
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
+    :isOverlapped="isOverlapped"
     :id="selectedRulesEngineToEdit.id.toString()"
     v-model:visible="showEditRulesEngineDrawer"
     :loadService="loadService"
@@ -341,6 +360,8 @@
       <FormFieldsDrawerRulesEngine
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
+        :isLoadingRequests="isLoadingRequests"
+        @toggleDrawer="handleToggleDrawer"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
