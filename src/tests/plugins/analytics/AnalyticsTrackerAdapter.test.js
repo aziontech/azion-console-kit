@@ -590,4 +590,38 @@ describe('AnalyticsTrackerAdapter', () => {
       origin: originName
     })
   })
+
+  it('should be able to track a Clicked on event', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Purge'
+    const purgeType = 'cache key'
+
+    sut.product.clickedOnEvent(productNameMock, {
+      purgeType
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked on Purge', {
+      purgeType,
+      application: fixtures.application
+    })
+  })
+
+  it('should be able to track a realTimeMetrics', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const eventName = 'Clicked on More Options on Real-Time Metrics'
+    const payload = {
+      chart: 'map chart',
+      application: fixtures.application
+    }
+
+    sut.realTimeMetrics.clickedToRealTimeMetrics({ eventName, payload })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(eventName, payload)
+  })
+
+
 })
