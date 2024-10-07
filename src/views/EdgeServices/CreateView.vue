@@ -5,6 +5,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeService from './FormFields/FormFieldsEdgeService'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   defineOptions({ name: 'create-edge-service' })
 
   const props = defineProps({
@@ -31,6 +37,24 @@
     code: '',
     active: true
   }
+
+  const handleTrackSuccessCreated = () => {
+    tracker.product.productCreated({
+      productName: 'Edge Service'
+    })
+  }
+
+  const handleTrackFailCreated = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge Service',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -43,6 +67,8 @@
         :createService="props.createEdgeServiceServices"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleTrackSuccessCreated"
+        @on-response-fail="handleTrackFailCreated"
       >
         <template #form>
           <FormFieldsEdgeService />

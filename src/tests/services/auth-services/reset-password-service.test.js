@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { resetPasswordService } from '@/services/auth-services'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   userData: {
@@ -47,4 +48,38 @@ describe('ResetPasswordService', () => {
 
     expect(feedbackMessage).toBe('Password reset successfully')
   })
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.userData)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

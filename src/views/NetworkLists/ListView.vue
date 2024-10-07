@@ -22,6 +22,7 @@
         title="No network lists have been added"
         description="Click the button below to add a network list based on ASNs, countries, or IP addresses."
         createButtonLabel="Network List"
+        @click-to-create="handleCreateTrackEvent"
         createPagePath="network-lists/create"
         :documentationService="documentationService"
       >
@@ -77,13 +78,13 @@
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Network Lists'
+      productName: 'Network List'
     })
   }
 
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
-      productName: 'Network Lists'
+      productName: 'Network List'
     })
   }
 

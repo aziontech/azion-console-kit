@@ -1,4 +1,3 @@
-import { useAccountStore } from '@/stores/account'
 import { billingRoutes } from '@/router/routes/billing-routes'
 import { getStaticUrlsByEnvironment } from '@/helpers'
 
@@ -10,8 +9,7 @@ const BILLING_REDIRECT_OPTIONS = {
 const billingUrl = getStaticUrlsByEnvironment('billing')
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function billingGuard(to, next) {
-  const accountStore = useAccountStore()
+export async function billingGuard({ to, accountStore }) {
   const {
     hasActiveUserId,
     redirectToExternalBillingNeeded,
@@ -26,14 +24,18 @@ export async function billingGuard(to, next) {
     if (isCurrentRouteBilling) {
       if (redirectToExternalBillingNeeded) {
         window.open(billingUrl, '_blank')
-        return next(false)
+        return false
       }
 
       if (!billingAccessPermitted) {
-        return next('/')
+        return '/'
+      }
+
+      if (to.name === 'billing-tabs') {
+        return true
       }
     } else if (paymentReviewPending) {
-      return next(BILLING_REDIRECT_OPTIONS)
+      return BILLING_REDIRECT_OPTIONS
     }
   }
 }

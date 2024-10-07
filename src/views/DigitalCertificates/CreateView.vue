@@ -8,6 +8,8 @@
         :createService="createServiceBySelectedType"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleTrackSuccessCreated"
+        @on-response-fail="handleTrackFailCreated"
       >
         <template #form>
           <InlineMessage
@@ -49,10 +51,13 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { ref, watch } from 'vue'
+  import { ref, watch, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
-  const router = useRouter()
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createDigitalCertificatesService: {
@@ -64,6 +69,9 @@
       required: true
     }
   })
+
+  const router = useRouter()
+
   const createDigitalCertificateService = props.createDigitalCertificatesService
   const createCSRService = props.createDigitalCertificatesCSRService
 
@@ -148,8 +156,26 @@
       .label('subject alternative names (SAN)')
   })
 
-  function navigateToDomains() {
+  const navigateToDomains = () => {
     router.push({ name: 'list-domains' })
+  }
+
+  const handleTrackSuccessCreated = () => {
+    tracker.product.productCreated({
+      productName: 'Digital Certificate'
+    })
+  }
+
+  const handleTrackFailCreated = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Digital Certificate',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   watch(certificateSelection, () => {
