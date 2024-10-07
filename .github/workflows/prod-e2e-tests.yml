@@ -33,6 +33,8 @@ jobs:
           build: yarn build
           start: yarn dev --logLevel=warn
           browser: chrome
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
           config-file: cypress.config.prod.js
           env: environment=prod,grepTags=@dev${{ matrix.group }}+-@xfail+-@dont_run_prod
 
