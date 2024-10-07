@@ -1,3 +1,4 @@
+import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { azionAiRoutes } from '@routes/azion-ai-routes'
@@ -88,12 +89,16 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore()
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
   await beforeEachRoute({
     to,
     from,
     next,
     accountStore,
-    loadContractServicePlan
+    loadContractServicePlan,
+    tracker
   })
 })
 
