@@ -11,12 +11,25 @@ const fixtures = {
       name: 'Test Rule',
       description: 'Test Description',
       active: true,
-      criteria: [{ conditional: 'if', input: 'hostname', comparison: 'is_equal', subject: 'example.com' }],
+      criteria: [
+        { conditional: 'if', input: 'hostname', comparison: 'is_equal', subject: 'example.com' }
+      ],
       behaviors: [
         { name: 'run_function', functionId: '789' },
         { name: 'set_waf_ruleset_and_waf_mode', mode: 'blocking', waf_id: '101112' },
-        { name: 'set_rate_limit', type: 'second', limit_by: 'ip', average_rate_limit: 10, maximum_burst_size: 20 },
-        { name: 'set_custom_response', status_code: 403, content_type: 'text/plain', content_body: 'Forbidden' },
+        {
+          name: 'set_rate_limit',
+          type: 'second',
+          limit_by: 'ip',
+          average_rate_limit: 10,
+          maximum_burst_size: 20
+        },
+        {
+          name: 'set_custom_response',
+          status_code: 403,
+          content_type: 'text/plain',
+          content_body: 'Forbidden'
+        },
         { name: 'deny' }
       ]
     }
@@ -49,9 +62,23 @@ describe('EdgeFirewallRulesEngineServices', () => {
         criteria: fixtures.mock.payload.criteria,
         behaviors: [
           { name: 'run_function', argument: '789' },
-          { name: 'set_waf_ruleset_and_waf_mode', argument: { waf_mode: 'blocking', set_waf_ruleset_and_waf_mode: '101112' } },
-          { name: 'set_rate_limit', argument: { type: 'second', limit_by: 'ip', average_rate_limit: '10', maximum_burst_size: '20' } },
-          { name: 'set_custom_response', argument: { status_code: 403, content_type: 'text/plain', content_body: 'Forbidden' } },
+          {
+            name: 'set_waf_ruleset_and_waf_mode',
+            argument: { waf_mode: 'blocking', set_waf_ruleset_and_waf_mode: '101112' }
+          },
+          {
+            name: 'set_rate_limit',
+            argument: {
+              type: 'second',
+              limit_by: 'ip',
+              average_rate_limit: '10',
+              maximum_burst_size: '20'
+            }
+          },
+          {
+            name: 'set_custom_response',
+            argument: { status_code: 403, content_type: 'text/plain', content_body: 'Forbidden' }
+          },
           { name: 'deny' }
         ]
       }
@@ -78,7 +105,9 @@ describe('EdgeFirewallRulesEngineServices', () => {
     const { sut } = makeSut()
     const promise = sut(fixtures.mock)
 
-    await expect(promise).rejects.toBe('invalid_value:Test is an invalid value. Please modify it and try again.')
+    await expect(promise).rejects.toBe(
+      'invalid_value:Test is an invalid value. Please modify it and try again.'
+    )
   })
 
   it.each([

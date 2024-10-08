@@ -2,39 +2,39 @@ import { windowOpen } from '@/helpers/window-open'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 describe('windowOpen', () => {
-    afterEach(() => {
-        vi.restoreAllMocks()
-    })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
-    it('should call window.open with provided URL and options', () => {
-        const mockWindowOpen = vi.fn()
-        vi.stubGlobal('window', { open: mockWindowOpen })
+  it('should call window.open with provided URL and options', () => {
+    const mockWindowOpen = vi.fn()
+    vi.stubGlobal('window', { open: mockWindowOpen })
 
-        const url = 'https://example.com'
-        const options = '_blank'
+    const url = 'https://example.com'
+    const options = '_blank'
 
-        windowOpen(url, options)
+    windowOpen(url, options)
 
-        expect(mockWindowOpen).toHaveBeenCalledWith(url, options)
-    })
+    expect(mockWindowOpen).toHaveBeenCalledWith(url, options)
+  })
 
-    it('should call window.open without options when only URL is provided', () => {
-        const mockWindowOpen = vi.fn()
-        vi.stubGlobal('window', { open: mockWindowOpen })
+  it('should call window.open without options when only URL is provided', () => {
+    const mockWindowOpen = vi.fn()
+    vi.stubGlobal('window', { open: mockWindowOpen })
 
-        const url = 'https://example.com'
+    const url = 'https://example.com'
 
-        windowOpen(url)
+    windowOpen(url)
 
-        expect(mockWindowOpen).toHaveBeenCalledWith(url, undefined)
-    })
+    expect(mockWindowOpen).toHaveBeenCalledWith(url, undefined)
+  })
 
-    it('should call window.open with an empty string when no arguments are provided', () => {
-        const mockWindowOpen = vi.fn()
-        vi.stubGlobal('window', { open: mockWindowOpen })
+  it('should call window.open with an empty string when no arguments are provided', () => {
+    const mockWindowOpen = vi.fn()
+    vi.stubGlobal('window', { open: mockWindowOpen })
 
-        windowOpen()
+    windowOpen()
 
-        expect(mockWindowOpen).toHaveBeenCalledWith('', undefined)
-    })
+    expect(mockWindowOpen).toHaveBeenCalledWith('', undefined)
+  })
 })

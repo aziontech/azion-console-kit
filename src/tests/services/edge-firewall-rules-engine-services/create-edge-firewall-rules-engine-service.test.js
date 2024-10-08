@@ -13,8 +13,19 @@ const fixtures = {
     behaviors: [
       { name: 'run_function', functionId: 'abc123' },
       { name: 'set_waf_ruleset_and_waf_mode', mode: 'blocking', waf_id: 'def456' },
-      { name: 'set_rate_limit', type: 'second', limit_by: 'ip', average_rate_limit: 10, maximum_burst_size: 20 },
-      { name: 'set_custom_response', status_code: 403, content_type: 'text/plain', content_body: 'Not Access' }
+      {
+        name: 'set_rate_limit',
+        type: 'second',
+        limit_by: 'ip',
+        average_rate_limit: 10,
+        maximum_burst_size: 20
+      },
+      {
+        name: 'set_custom_response',
+        status_code: 403,
+        content_type: 'text/plain',
+        content_body: 'Not Access'
+      }
     ]
   }
 }
@@ -47,9 +58,23 @@ describe('EdgeFirewallRulesEngineService', () => {
         criteria: fixtures.payload.criteria,
         behaviors: [
           { name: 'run_function', argument: 'abc123' },
-          { name: 'set_waf_ruleset_and_waf_mode', argument: { waf_mode: 'blocking', set_waf_ruleset_and_waf_mode: 'def456' } },
-          { name: 'set_rate_limit', argument: { type: 'second', limit_by: 'ip', average_rate_limit: '10', maximum_burst_size: '20' } },
-          { name: 'set_custom_response', argument: { status_code: 403, content_type: 'text/plain', content_body: 'Not Access' } }
+          {
+            name: 'set_waf_ruleset_and_waf_mode',
+            argument: { waf_mode: 'blocking', set_waf_ruleset_and_waf_mode: 'def456' }
+          },
+          {
+            name: 'set_rate_limit',
+            argument: {
+              type: 'second',
+              limit_by: 'ip',
+              average_rate_limit: '10',
+              maximum_burst_size: '20'
+            }
+          },
+          {
+            name: 'set_custom_response',
+            argument: { status_code: 403, content_type: 'text/plain', content_body: 'Not Access' }
+          }
         ]
       }
     })

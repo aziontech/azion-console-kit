@@ -23,7 +23,7 @@ describe('RealTimeEventsModule', () => {
     })
 
     it('each tab should have the correct structure', () => {
-      Object.values(TABS_EVENTS).forEach(tab => {
+      Object.values(TABS_EVENTS).forEach((tab) => {
         expect(tab).toHaveProperty('panel')
         expect(tab).toHaveProperty('index')
         expect(tab).toHaveProperty('title')
@@ -36,8 +36,8 @@ describe('RealTimeEventsModule', () => {
     })
 
     it('columns should have the correct structure', () => {
-      Object.values(TABS_EVENTS).forEach(tab => {
-        tab.columns.forEach(column => {
+      Object.values(TABS_EVENTS).forEach((tab) => {
+        tab.columns.forEach((column) => {
           expect(column).toHaveProperty('field')
           expect(column).toHaveProperty('header')
         })
@@ -60,25 +60,60 @@ describe('RealTimeEventsModule', () => {
 
     it('should have the correct columns for each tab', () => {
       const expectedColumns = {
-        httpRequests: ['configurationId', 'host', 'requestUri', 'requestMethod', 'status', 'tsFormat'],
-        edgeFunctions: ['configurationId', 'functionLanguage', 'edgeFunctionsInitiatorTypeList', 'edgeFunctionsList', 'edgeFunctionsTime', 'tsFormat'],
-        edgeFunctionsConsole: ['configurationId', 'functionId', 'lineSource', 'level', 'line', 'tsFormat'],
-        imageProcessor: ['configurationId', 'host', 'requestUri', 'status', 'bytesSent', 'tsFormat'],
-        tieredCache: ['configurationId', 'host', 'requestUri', 'requestMethod', 'upstreamCacheStatus', 'tsFormat'],
+        httpRequests: [
+          'configurationId',
+          'host',
+          'requestUri',
+          'requestMethod',
+          'status',
+          'tsFormat'
+        ],
+        edgeFunctions: [
+          'configurationId',
+          'functionLanguage',
+          'edgeFunctionsInitiatorTypeList',
+          'edgeFunctionsList',
+          'edgeFunctionsTime',
+          'tsFormat'
+        ],
+        edgeFunctionsConsole: [
+          'configurationId',
+          'functionId',
+          'lineSource',
+          'level',
+          'line',
+          'tsFormat'
+        ],
+        imageProcessor: [
+          'configurationId',
+          'host',
+          'requestUri',
+          'status',
+          'bytesSent',
+          'tsFormat'
+        ],
+        tieredCache: [
+          'configurationId',
+          'host',
+          'requestUri',
+          'requestMethod',
+          'upstreamCacheStatus',
+          'tsFormat'
+        ],
         edgeDNS: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'tsFormat'],
         dataStream: ['configurationId', 'jobName', 'endpointType', 'url', 'statusCode', 'tsFormat'],
         activityHistory: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'tsFormat']
       }
 
       Object.entries(TABS_EVENTS).forEach(([tabName, tabData]) => {
-        const actualColumns = tabData.columns.map(column => column.field)
+        const actualColumns = tabData.columns.map((column) => column.field)
         expect(actualColumns).toEqual(expectedColumns[tabName])
       })
     })
 
     it('should have tsFormat field with sortField set to "ts" in all tabs', () => {
       Object.values(TABS_EVENTS).forEach((tabData) => {
-        const tsFormatColumn = tabData.columns.find(column => column.field === 'tsFormat')
+        const tsFormatColumn = tabData.columns.find((column) => column.field === 'tsFormat')
         expect(tsFormatColumn).toBeDefined()
         expect(tsFormatColumn.field).toBe('tsFormat')
         expect(tsFormatColumn.header).toBe('TS')
