@@ -635,6 +635,4 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith(eventName, payload)
   })
-
-
 })

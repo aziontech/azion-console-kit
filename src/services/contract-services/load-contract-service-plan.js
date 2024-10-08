@@ -23,7 +23,7 @@ function extractWordFromSlug(str) {
   if (index !== -1) {
     const start = index + keyword.length
     const remainingStr = str.substring(start)
-    const extractedWord = remainingStr.split('_')[0]
+    const extractedWord = remainingStr !== 'mission_critical' ? remainingStr.split('_')[0] : remainingStr
     return extractedWord
   }
 
