@@ -10,7 +10,7 @@ export const listEdgeApplicationsService = async ({
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/applications?${searchParams.toString()}`,
+    url: `${makeEdgeApplicationV4BaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -21,7 +21,6 @@ export const listEdgeApplicationsService = async ({
 
 const adapt = (httpResponse) => {
   const parsedEdgeApplications = httpResponse.body.results?.map((edgeApplication) => {
-
     return {
       id: edgeApplication.id,
       name: edgeApplication.name,

@@ -2,10 +2,13 @@ import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
 import * as OriginsService from '@/services/edge-application-origins-services'
+import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
+import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
+import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -73,7 +76,7 @@ export const edgeApplicationRoutes = {
           clipboardWrite: Helpers.clipboardWrite
         },
         cacheSettingsServices: {
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
           deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
           createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
           loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
@@ -90,7 +93,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
         },
         deviceGroupsServices: {
-          listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
+          listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
           deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
           createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
@@ -102,7 +105,7 @@ export const edgeApplicationRoutes = {
           editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         rulesEngineServices: {
-          listRulesEngineService: RulesEngineService.listRulesEngineService,
+          listRulesEngineService: RulesEngineServiceV4.listRulesEngineService,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
           editRulesEngineService: RulesEngineService.editRulesEngineService,
           createRulesEngineService: RulesEngineService.createRulesEngineService,
@@ -110,7 +113,7 @@ export const edgeApplicationRoutes = {
           reorderRulesEngine: RulesEngineService.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
         },
         clipboardWrite: Helpers.clipboardWrite
