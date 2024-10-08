@@ -22,6 +22,7 @@
         description="Click the button below to generate your first personal token."
         createButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>

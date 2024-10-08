@@ -24,6 +24,7 @@
         description="Click the button below to create your first variable."
         createButtonLabel="Variable"
         createPagePath="variables/create"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>

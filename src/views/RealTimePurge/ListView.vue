@@ -17,6 +17,7 @@
         addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
         :isGraphql="true"
         :enableEditClick="false"
         emptyListMessage="No purge found."
@@ -28,6 +29,7 @@
         title="No purges have been added"
         description="Click the button below to add your first purge."
         createButtonLabel="Purge"
+        @click-to-create="handleTrackEvent"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"
       >
@@ -47,9 +49,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
   import DialogPurge from './Dialog'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
@@ -77,6 +82,16 @@
     showDialogPurge.value = false
   }
 
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Purge'
+    })
+  }
+
+  const handleClickedOnEvent = (purgeType) => {
+    tracker.product.clickedOnEvent('Purge', { purgeType })
+  }
+
   const showToast = (severity, detail) => {
     if (!detail) return
     const options = {
@@ -98,6 +113,7 @@
     try {
       const { feedback } = await props.createRealTimePurgeService(dataPurge)
       showToast('success', feedback)
+      handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
       showToast('error', error)
     } finally {

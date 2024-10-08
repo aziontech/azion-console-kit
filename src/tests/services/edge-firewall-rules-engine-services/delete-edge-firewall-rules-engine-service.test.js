@@ -1,53 +1,46 @@
-import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { resetPasswordService } from '@/services/auth-services'
 import * as Errors from '@/services/axios/errors'
+import { deleteEdgeFirewallRulesEngineService } from '@/services/edge-firewall-rules-engine-services'
+import { describe, expect, it, vi } from 'vitest'
 
-const fixtures = {
-  userData: {
-    password: 'Azn1234!',
-    uidb64: 'MjYyNw',
-    token: '6fm-c07c9d5f5d6f2e450555'
+const makeSut = () => {
+  const sut = deleteEdgeFirewallRulesEngineService
+
+  return {
+    sut
   }
 }
 
-const makeSut = () => {
-  const sut = resetPasswordService
-
-  return { sut }
-}
-
-describe('ResetPasswordService', () => {
-  it('should call API with correct params', async () => {
+describe('EdgeFirewallRulesEngineServices', () => {
+  it('should call Api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 204
     })
-
+    const ruleEngineId = 12387555
+    const edgeFirewallId = 4245
     const { sut } = makeSut()
-
-    await sut(fixtures.userData)
+    await sut({ ruleEngineId, edgeFirewallId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `password/new`,
-      method: 'POST',
-      body: {
-        password: fixtures.userData.password,
-        uidb64: fixtures.userData.uidb64,
-        token: fixtures.userData.token
-      }
+      method: 'DELETE',
+      url: `v3/edge_firewall/${edgeFirewallId}/rules_engine/${ruleEngineId}`
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 204
     })
+    const ruleEngineId = 12387555
+    const edgeFirewallId = 4245
+
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.userData)
+    const feedbackMessage = await sut({ ruleEngineId, edgeFirewallId })
 
-    expect(feedbackMessage).toBe('Password reset successfully')
+    expect(feedbackMessage).toBe('Rules Engine successfully deleted')
   })
+
   it.each([
     {
       statusCode: 401,
@@ -55,7 +48,7 @@ describe('ResetPasswordService', () => {
     },
     {
       statusCode: 403,
-      expectedError: new Errors.InvalidApiTokenError().message
+      expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
@@ -77,7 +70,10 @@ describe('ResetPasswordService', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.userData)
+      const ruleEngineId = 12387555
+      const edgeFirewallId = 4245
+
+      const response = sut({ ruleEngineId, edgeFirewallId })
 
       expect(response).rejects.toBe(expectedError)
     }

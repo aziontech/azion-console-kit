@@ -136,6 +136,7 @@
         description=" Click the button below to create your first user."
         createButtonLabel="User"
         createPagePath="users/create"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
         data-testid="users__list-view__empty-results-block"
       >
