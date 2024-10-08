@@ -1151,20 +1151,17 @@ describe('RealTimeMetricsModule', () => {
           isTopX: true,
           rotated: true,
           dataUnit: 'count',
-          dataset: 'securityMetrics',
+          dataset: 'botManagerBreakdownMetrics',
           aggregations: [
             {
               aggregation: 'sum',
-              variable: 'value'
+              variable: 'badBotRequests'
             }
           ],
-          filters: {
-            datasetEq: 'bot_manager',
-            metricEq: 'top_bad_remote_addr'
-          },
-          limit: 10,
-          groupBy: ['dimension1'],
-          fields: ['dimension1'],
+          filters: {},
+          limit: 5,
+          groupBy: ['remoteAddr'],
+          fields: ['remoteAddr'],
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
@@ -1182,20 +1179,17 @@ describe('RealTimeMetricsModule', () => {
           isTopX: true,
           rotated: true,
           dataUnit: 'count',
-          dataset: 'securityMetrics',
+          dataset: 'botManagerBreakdownMetrics',
           aggregations: [
             {
               aggregation: 'sum',
-              variable: 'value'
+              variable: 'botRequests'
             }
           ],
-          filters: {
-            datasetEq: 'bot_manager',
-            metricEq: 'top_request_url'
-          },
-          limit: 10,
-          groupBy: ['dimension1'],
-          fields: ['dimension1'],
+          filters: {},
+          limit: 5,
+          groupBy: ['requestUrl'],
+          fields: ['requestUrl'],
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'regular',
