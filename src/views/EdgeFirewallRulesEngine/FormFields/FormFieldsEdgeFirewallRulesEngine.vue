@@ -5,14 +5,17 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import Drawer from '@/views/NetworkLists/Drawer'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
+
+  const emit = defineEmits(['toggleDrawer'])
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
@@ -50,6 +53,7 @@
     { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
   ]
 
+  const drawerRef = ref('')
   const conditionalMenuRef = ref({})
   const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
@@ -326,6 +330,10 @@
     ]
   }
 
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
     const MAXIMUM_ALLOWED = 10
     return criteria.value[criteriaIndex].value.length >= MAXIMUM_ALLOWED
@@ -458,6 +466,9 @@
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
 
+  const handleSuccess = () => {
+    setNetworkListOptions()
+  }
   const networkListOptions = ref([])
   const loadingNetworkList = ref(false)
   const setNetworkListOptions = async () => {
@@ -484,6 +495,13 @@
     criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
     criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
   }
+
+  watch(
+    () => drawerRef.value.showCreateDrawer,
+    () => {
+      emit('toggleDrawer', drawerRef.value.showCreateDrawer)
+    }
+  )
 </script>
 <template>
   <FormHorizontal
@@ -521,6 +539,10 @@
     description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
   >
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onSuccess="handleSuccess"
+      />
       <div
         class="flex flex-col"
         v-for="(criteriaItem, criteriaIndex) in criteria"
@@ -628,6 +650,14 @@
                 inputClass="w-full"
                 :filter="true"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+              />
+              <PrimeButton
+                v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
+                icon="pi pi-plus"
+                outlined
+                class="surface-border h-8 w-8"
+                v-tooltip.bottom="'New Network List'"
+                @click="openDrawer"
               />
             </div>
           </div>

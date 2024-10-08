@@ -13,6 +13,10 @@
     listCountriesService: {
       type: Function,
       required: true
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -71,6 +75,7 @@
 <template>
   <FormHorizontal
     title="General"
+    :isDrawer="props.isDrawer"
     description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Edge Firewall."
   >
     <template #inputs>
@@ -90,6 +95,7 @@
 
   <FormHorizontal
     title="Network List Settings"
+    :isDrawer="props.isDrawer"
     description="Specificy the type of network list you want to create and the properties that'll compose the list."
   >
     <template #inputs>
