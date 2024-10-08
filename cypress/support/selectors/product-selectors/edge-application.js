@@ -10,6 +10,10 @@ export default {
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
+    createCachePolicyButton:
+      '[data-testid="edge-applications-rules-engine-form__create-cache-policy-button"]',
+    setCachePolicySelect: (behaviorIndex) =>
+      `[data-testid="edge-application-rule-form__cache-settings-item[${behaviorIndex}]__dropdown"]`,
     criteriaVariableSelect: (criteriaIdx, position) =>
       `[data-testid="edge-application-rule-form__criteria-variable[${criteriaIdx}][${position}]__autocomplete"] > .p-autocomplete-input`,
     criteriaOperatorDropdown: (criteriaIdx, position) =>
@@ -20,6 +24,9 @@ export default {
     behaviorsDropdown: (behaviorIdx) =>
       `[data-testid="edge-application-rule-form__behaviors-item[${behaviorIdx}]__dropdown"] > .p-dropdown-trigger`,
     behaviorsOption: (option) => `li[aria-label="${option}"]`,
+    cachePolicyOptions: '#behaviors[0].cacheId_list',
+    cachePolicyOption: (option) => `li[aria-label="${option}"]`,
+    cachePolicyActionBar: '[data-testid="create-cache-settings-drawer__action-bar"]',
     criteriaConditionalButton: (type) =>
       `[data-testid="rule-form-criteria-item-conditional-add-button"] button[aria-label="${type}"]`,
     criteriaAddButton: '[data-testid="rule-form-criteria-add-button"]',
