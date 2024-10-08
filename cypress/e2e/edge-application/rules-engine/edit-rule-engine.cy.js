@@ -1,4 +1,4 @@
-import generateUniqueName from '../../account-settings../support/utils'
+import generateUniqueName from '../../../support/utils'
 import selectors from '../../../support/selectors'
 
 let fixtures = {}
