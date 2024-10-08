@@ -8,7 +8,7 @@ import istanbul from 'vite-plugin-istanbul'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
-  const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  const URLStartPrefix = env.VITE_ENVIRONMENT !== 'production' ? 'https://' : 'https://stage-'
 
   return {
     plugins: [
@@ -78,7 +78,7 @@ const getConfig = () => {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        },
+        }
       }
     }
   }

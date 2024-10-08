@@ -3,7 +3,7 @@ import generateUniqueName from '../../support/utils'
 
 let domainName
 let edgeAppName
-
+let digitalCertificateName
 const createEdgeApplicationCase = () => {
   // Arrange
   edgeAppName = generateUniqueName('edgeApp')
@@ -18,6 +18,31 @@ const createEdgeApplicationCase = () => {
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
+}
+
+const createDigitalCertificateCase = () => {
+  digitalCertificateName = generateUniqueName('digitalCertificate')
+  cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
+  cy.get(selectors.digitalCertificates.generateCSRRadioOption).click()
+  cy.get(selectors.digitalCertificates.subjectNameInput).type(
+    `${digitalCertificateName}.example.com`
+  )
+  cy.get(selectors.digitalCertificates.countryInput).type('BR')
+  cy.get(selectors.digitalCertificates.stateInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.cityInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.organizationInput).type(`${digitalCertificateName} S.A.`)
+  cy.get(selectors.digitalCertificates.organizationUnitInput).type('IT Department')
+  cy.get(selectors.digitalCertificates.emailInput).clear()
+  cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
+  cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
+
+  // Act
+  cy.get(selectors.domains.digitalCertificateActionBar)
+    .find(selectors.form.actionsSubmitButton)
+    .click()
+
+  // Assert
+  cy.verifyToast('success', 'Your digital certificate has been created!')
 }
 
 describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
@@ -38,7 +63,19 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.domains.edgeApplicationOption).click()
     cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
 
+    cy.get(selectors.domains.digitalCertificateDropdown).click()
+    cy.get(selectors.domains.createDigitalCertificateButton).click()
+    createDigitalCertificateCase()
+    cy.get(selectors.domains.digitalCertificateDropdown).click()
+    cy.get(selectors.domains.digitalCertificateDropdownFilter).type(digitalCertificateName)
+    cy.get(selectors.domains.edgeCertificateOption).click()
     // Act
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
+
+    cy.get(selectors.domains.digitalCertificateDropdown).click()
+    cy.get(selectors.domains.digitalCertificateDropdownFilter).clear()
+    cy.get(selectors.domains.edgeCertificateOption).click()
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert

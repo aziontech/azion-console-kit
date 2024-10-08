@@ -13,6 +13,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
+  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
 
   const props = defineProps({
     digitalCertificates: {
@@ -30,6 +31,10 @@
     },
     loadingEdgeApplications: {
       type: Boolean
+    },
+    updateDigitalCertificates: {
+      type: Function,
+      required: true
     }
   })
 
@@ -96,6 +101,15 @@
   const isLoadingEdgeApplications = computed(() => {
     return props.loadingEdgeApplications
   })
+
+  const digitalCertificateDrawerRef = ref('')
+  const openDrawer = () => {
+    digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
+
+  const onDigitalCertificateSuccess = () => {
+    props.updateDigitalCertificates()
+  }
 </script>
 
 <template>
@@ -164,6 +178,10 @@
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #inputs>
+      <DigitalCertificatesDrawer
+        ref="digitalCertificateDrawerRef"
+        @onSuccess="onDigitalCertificateSuccess"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -215,7 +233,27 @@
           filter
           appendTo="self"
           placeholder="Select a certificate"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
     </template>
   </form-horizontal>

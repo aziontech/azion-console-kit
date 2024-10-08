@@ -7,9 +7,14 @@ export default {
   mtlsTrustedCADropdownFilter:
     '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown-filter-input"]',
   edgeApplicationOption: '#edgeApplication_0',
+  edgeCertificateOption: '#edgeCertificate_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
   dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
+  digitalCertificateDropdownFilter:
+    '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
+  createDigitalCertificateButton: '[data-testid="domains-form__create-digital-certificate-button"]',
+  digitalCertificateActionBar: '[data-testid="digital-certificates-drawer__action-bar"]',
   copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
   confirmButton: '[data-testid="domains-dialog__confirm__button"]',
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,

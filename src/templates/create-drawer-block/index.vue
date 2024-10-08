@@ -20,6 +20,10 @@
       type: Boolean,
       default: false
     },
+    drawerId: {
+      type: String,
+      default: 'create-drawer-block'
+    },
     createService: {
       type: Function,
       required: true
@@ -174,6 +178,7 @@
         />
         <ActionBarBlock
           v-else
+          :data-testid="`${drawerId}__action-bar`"
           @onCancel="closeDrawer"
           @onSubmit="onSubmit"
           :inDrawer="true"
