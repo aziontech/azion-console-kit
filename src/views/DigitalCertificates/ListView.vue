@@ -14,6 +14,8 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No digital certificates found."
         :actions="actions"
+        @on-before-go-to-add-page="handleTrackEventGoToCreate"
+        @on-before-go-to-edit="handleTrackEventGoToEdit"
       />
 
       <EmptyResultsBlock
@@ -33,13 +35,16 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'digital-certificates-view' })
 
@@ -70,6 +75,18 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+
+  const handleTrackEventGoToCreate = () => {
+    tracker.product.clickToCreate({
+      productName: 'Digital Certificate'
+    })
+  }
+
+  const handleTrackEventGoToEdit = () => {
+    tracker.product.clickToEdit({
+      productName: 'Digital Certificate'
+    })
   }
 
   const getColumns = computed(() => {

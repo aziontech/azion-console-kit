@@ -23,6 +23,7 @@
         description="Click the button below to create your first function."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
+        @click-to-create="handleCreateTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>

@@ -38,7 +38,8 @@
     addCreditService: { type: Function, required: true },
     createPaymentMethodService: { type: Function, required: true },
     paymentServices: { type: Object, required: true },
-    billsServices: { type: Object, required: true }
+    billsServices: { type: Object, required: true },
+    getStripeClientService: { type: Function, required: true }
   })
 
   const cardDefault = ref({
@@ -159,6 +160,7 @@
       <DrawerPaymentMethod
         ref="drawerPaymentMethodRef"
         :createPaymentMethodService="props.createPaymentMethodService"
+        :getStripeClientService="props.getStripeClientService"
         @onSuccess="loadListPaymentMethods"
       />
       <TabView

@@ -56,6 +56,21 @@ export class ProductTracker {
 
   /**
    * @param {Object} payload
+   * @param {String} productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickedOnEvent(productName, payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: `Clicked on ${productName}`,
+      props: {
+        ...payload
+      }
+    })
+    return this.#trackerAdapter
+  }
+
+  /**
+   * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @param {String} payload.createdFrom
    * @param {String} payload.from

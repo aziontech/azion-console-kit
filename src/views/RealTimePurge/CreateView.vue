@@ -7,6 +7,8 @@
       <CreateFormBlock
         :createService="props.createRealTimePurgeService"
         :schema="validationSchema"
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
         :initialValues="initialValues"
       >
         <template #form>
@@ -39,7 +41,11 @@
   import FormFieldsCreateRealTimePurge from './FormFields/FormFieldsCreateRealTimePurge'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createRealTimePurgeService: {
@@ -51,6 +57,24 @@
       required: true
     }
   })
+
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'Purge'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Purge',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     layer: yup.string().required(),

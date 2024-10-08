@@ -6,7 +6,6 @@ export const loadServiceEdgeNodeService = async ({ id, edgeNodeId }) => {
     url: `${makeEdgeNodeBaseUrl()}/${edgeNodeId}/services/${id}`,
     method: 'GET'
   })
-
   httpResponse = adapt(httpResponse, id)
   return parseHttpResponse(httpResponse)
 }
@@ -20,11 +19,7 @@ const adapt = (httpResponse, id) => {
 
   const service = {
     id: id,
-    service: {
-      name: httpResponse.body.service_name,
-      serviceId: httpResponse.body.service_id,
-      id: httpResponse.body.id
-    },
+    serviceId: httpResponse.body.service_id,
     variables: variables
   }
 
