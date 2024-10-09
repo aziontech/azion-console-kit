@@ -5,13 +5,18 @@
     :createService="props.createFunctionService"
     :schema="validationSchema"
     :initialValues="initialValues"
+    :isOverlapped="isOverlapped"
     @onSuccess="handleSuccessCreate"
     @onError="handleFailedToCreate"
     :showBarGoBack="true"
     title="Create Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        :edgeFunctionsList="filteredEdgeFunctions"
+        :reloadEdgeFunctions="loadEdgeFunctions"
+      />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -19,6 +24,7 @@
     :id="selectedFunctionToEdit"
     v-model:visible="showEditFunctionDrawer"
     :loadService="loadService"
+    :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
     :showBarGoBack="true"
@@ -27,7 +33,10 @@
     title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        :edgeFunctionsList="filteredEdgeFunctions"
+      />
     </template>
   </EditDrawerBlock>
 </template>
@@ -76,6 +85,7 @@
   const loadCreateFunctionDrawer = refDebounced(showCreateFunctionDrawer, debouncedDrawerAnimate)
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
+  const isOverlapped = ref(false)
   const edgeFunctionsList = ref([])
   const filteredEdgeFunctions = computed(() =>
     edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application')
@@ -129,6 +139,10 @@
         errorMessage: message
       })
       .track()
+  }
+
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
   }
 
   const handleFailedToEdit = (error) => {
@@ -193,8 +207,16 @@
     showCreateFunctionDrawer.value = false
   }
 
+  const loadEdgeFunctions = async () => {
+    const response = await props.listEdgeFunctionsService({})
+    edgeFunctionsList.value = response
+  }
+
+  onMounted(loadEdgeFunctions)
+
   defineExpose({
     openDrawerCreate,
-    openDrawerEdit
+    openDrawerEdit,
+    loadEdgeFunctions
   })
 </script>

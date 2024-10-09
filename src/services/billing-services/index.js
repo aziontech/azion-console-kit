@@ -27,5 +27,5 @@ export {
   loadPaymentMethodDefaultService,
   listServiceAndProductsChangesService,
   loadInvoiceLastUpdatedService,
-	getStripeClientService
+  getStripeClientService
 }
