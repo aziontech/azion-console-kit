@@ -26,16 +26,13 @@
       type: Boolean
     },
     createService: {
-      type: Function,
-      required: true
+      type: Function
     },
     loadService: {
-      type: Function,
-      required: true
+      type: Function
     },
     editService: {
-      type: Function,
-      required: true
+      type: Function
     },
     showTieredCache: {
       type: Boolean,
@@ -254,7 +251,8 @@
 
   defineExpose({
     openCreateDrawer,
-    openEditDrawer
+    openEditDrawer,
+    showCreateDrawer
   })
 </script>
 
@@ -263,6 +261,8 @@
     v-if="showCreateDrawer"
     v-model:visible="showCreateCacheSettingsDrawer"
     :createService="createServiceWithEdgeApplicationIdDecorator"
+    id="create-cache-settings-drawer"
+    drawerId="create-cache-settings-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCacheSettings"

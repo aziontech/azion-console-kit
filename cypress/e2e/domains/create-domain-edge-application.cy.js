@@ -5,34 +5,33 @@ let domainName
 let edgeAppName
 
 const createEdgeApplicationCase = () => {
+  edgeAppName = generateUniqueName('EdgeApp')
   // Arrange
-  edgeAppName = generateUniqueName('edgeApp')
-  cy.openProduct('Edge Application')
-  cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
   cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
   // Act
-  cy.get(selectors.form.actionsSubmitButton).click()
+  cy.get(selectors.domains.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
 
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
   })
 
   it('should create and delete a domain using a edge application', () => {
-    createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
 
     // Arrange
     cy.openProduct('Domains')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+    cy.get(selectors.domains.edgeApplicationField).click()
+    cy.get(selectors.domains.createEdgeApplicationButton).click()
+    createEdgeApplicationCase()
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()

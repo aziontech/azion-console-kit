@@ -1,0 +1,27 @@
+name: Run cleanup e2e tests
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Cleanup e2e tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Cleanup Prod
+        env:
+            PROD_CYPRESS_TOKEN: ${{ secrets.PROD_CYPRESS_TOKEN }}
+        run: node scripts/cleanup.js PROD

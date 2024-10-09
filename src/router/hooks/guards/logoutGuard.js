@@ -1,12 +1,11 @@
 import { logoutService } from '@/services/auth-services'
-import { useAccountStore } from '@/stores/account'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function logoutGuard(to, next) {
+export async function logoutGuard({ to, accountStore, tracker }) {
   if (to.path === '/logout') {
+    tracker.reset()
     await logoutService()
-    const accountStore = useAccountStore()
     accountStore.setAccountData({})
-    return next()
+    return true
   }
 }

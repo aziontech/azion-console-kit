@@ -301,9 +301,10 @@
   import Dropdown from 'primevue/dropdown'
   import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
+  import { useLoadingStore } from '@/stores/loading'
 
   defineOptions({ name: 'profile-block' })
-
+  const { startLoading } = useLoadingStore()
   const user = useAccountStore().accountData
   const { currentTheme } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
@@ -347,6 +348,9 @@
     { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
     { name: 'System', value: 'system', icon: 'pi pi-desktop' }
   ]
+
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   const currentWidth = inject('currentWidth')
   const openSwitchAccount = inject('openSwitchAccount')
   const SCREEN_BREAKPOINT_MD = 768
@@ -372,6 +376,9 @@
   }
 
   const logout = () => {
+    startLoading()
+    tracker.reset()
+    closeDesktopMenu()
     window.location.href = '/logout'
   }
 

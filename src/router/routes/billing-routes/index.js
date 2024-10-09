@@ -17,6 +17,7 @@ export const billingRoutes = {
         loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
         addCreditService: BillingServices.addCreditService,
         createPaymentMethodService: BillingServices.createPaymentMethodService,
+        getStripeClientService: BillingServices.getStripeClientService,
         paymentServices: {
           listPaymentMethodsService: BillingServices.listPaymentMethodsService,
           deletePaymentService: BillingServices.deletePaymentService,

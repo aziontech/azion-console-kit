@@ -74,7 +74,7 @@
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
-        productName: 'Network Lists'
+        productName: 'Network List'
       })
       .track()
   }
@@ -82,7 +82,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Network Lists',
+        productName: 'Network List',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
