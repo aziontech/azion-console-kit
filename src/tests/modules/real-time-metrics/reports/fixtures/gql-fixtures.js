@@ -1440,11 +1440,11 @@ ts
     label: 'Top Bad Bot IPs',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-      securityMetrics (
-        limit: 10
-        aggregate: {sum: value 
+      botManagerBreakdownMetrics (
+        limit: 5
+        aggregate: {sum: badBotRequests 
 }
-        groupBy: [dimension1]
+        groupBy: [remoteAddr]
         orderBy: [sum_DESC]
         filter: {
           tsRange: {
@@ -1452,12 +1452,10 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-datasetEq: "bot_manager"
-metricEq: "top_bad_remote_addr"
 
         }
         ) {
-          dimension1
+          remoteAddr
 sum
         }
       }`,
@@ -1472,11 +1470,11 @@ sum
     label: 'Top Impacted URLs',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-      securityMetrics (
-        limit: 10
-        aggregate: {sum: value 
+      botManagerBreakdownMetrics (
+        limit: 5
+        aggregate: {sum: botRequests 
 }
-        groupBy: [dimension1]
+        groupBy: [requestUrl]
         orderBy: [sum_DESC]
         filter: {
           tsRange: {
@@ -1484,12 +1482,10 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
-datasetEq: "bot_manager"
-metricEq: "top_request_url"
 
         }
         ) {
-          dimension1
+          requestUrl
 sum
         }
       }`,

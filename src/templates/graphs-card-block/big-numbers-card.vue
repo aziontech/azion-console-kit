@@ -11,6 +11,7 @@
       <MoreOptionsMenu
         :report="report"
         :clipboardWrite="clipboardWrite"
+        :groupData="groupData"
       />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
@@ -42,7 +43,8 @@
     report: {
       type: Object,
       required: true
-    }
+    },
+    groupData: { type: Object, required: true }
   })
 
   const cardColumns = computed(() => {
