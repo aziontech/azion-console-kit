@@ -21,6 +21,7 @@
         title="No WAF rules have been created"
         description="Click the button below to create your first WAF rule."
         createButtonLabel="WAF Rule"
+        @click-to-create="handleTrackClickToEdit"
         createPagePath="waf/create"
         :documentationService="documentationService"
       >

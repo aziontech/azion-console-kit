@@ -109,8 +109,7 @@
 
 <template>
   <form-horizontal
-    description=" Create a domain with Azion to launch an edge application and set up security with digital
-      certificates."
+    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
   >
     <template #title> General </template>
     <template #inputs>

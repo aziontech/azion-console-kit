@@ -1,5 +1,5 @@
 import { describe, afterAll, it, expect, vi } from 'vitest'
-import redirectToManager from '@/router/hooks/redirectToManager'
+import { redirectToManagerGuard } from '@/router/hooks/guards/redirectToManagerGuard.js'
 
 vi.stubGlobal('window', {
   location: {
@@ -32,74 +32,69 @@ const makeSut = (scenario) => {
 
   const loadContractServicePlan = vi.fn().mockResolvedValue({ isDeveloperSupportPlan })
 
-  const guardDependency = {
+  return {
     accountStore,
-    loadContractServicePlan
-  }
-
-  const routeHandler = {
+    loadContractServicePlan,
     to: { meta: { isPublic: !isPrivateRoute }, name: 'some-route' },
-    from: { name: fromName },
-    next: vi.fn()
+    from: { name: fromName }
   }
-
-  return { guardDependency, routeHandler }
 }
 
 afterAll(() => {
   vi.unstubAllGlobals()
-  vi.unstubAllEnvs()
 })
 
-describe('redirectToManager', () => {
+describe('redirectToManagerGuard', () => {
   it('should call next if user has an active user id and is on a non-private route', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: false
     })
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
-    expect(routeHandler.next).toHaveBeenCalled()
+    expect(result).toBeTruthy()
   })
 
   it('should allow full access for users with an @azion.com account', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       email: '@azion.com'
     })
-    await redirectToManager(routeHandler, guardDependency)
 
-    expect(routeHandler.next).toHaveBeenCalled()
+    const result = await redirectToManagerGuard(dependencies)
+
+    expect(result).toBeTruthy()
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
   })
 
   it('should allow access for accounts with Developer type', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       email: '@developer.com',
       clientId: '123',
       isDeveloperSupportPlan: true
     })
-    await redirectToManager(routeHandler, guardDependency)
 
-    expect(guardDependency.accountStore.setAccountData).toHaveBeenCalledWith({
+    const result = await redirectToManagerGuard(dependencies)
+
+    expect(dependencies.accountStore.setAccountData).toHaveBeenCalledWith({
       isDeveloperSupportPlan: true
     })
-    expect(routeHandler.next).toHaveBeenCalled()
+    expect(result).toBeTruthy()
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
   })
   it('should redirect non-developer accounts to the RTM', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       hasAccessConsole: false,
@@ -107,73 +102,74 @@ describe('redirectToManager', () => {
       clientId: '123',
       isDeveloperSupportPlan: false
     })
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
-    expect(guardDependency.accountStore.setAccountData).toHaveBeenCalledWith({
+    expect(dependencies.accountStore.setAccountData).toHaveBeenCalledWith({
       isDeveloperSupportPlan: false
     })
     expect(windowLocationReplaceMock).toHaveBeenCalled()
+    expect(result).toBeTruthy()
   })
 
   it('should redirect to the RTM when accountData does not have a client_id', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       email: '@developer.com',
       clientId: null
     })
 
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).toHaveBeenCalled()
-    expect(routeHandler.next).toHaveBeenCalled()
+    expect(result).toBeTruthy()
   })
 
   it('should handle navigation restriction for metrics only access', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       metricsOnlyAccessRestriction: true
     })
 
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
-    expect(routeHandler.next).toHaveBeenCalled({ name: 'real-time-metrics' })
+    expect(result).toEqual({ name: 'real-time-metrics' })
   })
 
   it('should handle navigation restriction for metrics only access and from.name is not metrics', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       metricsOnlyAccessRestriction: true,
       fromName: 'real-time-metrics'
     })
 
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
-    expect(routeHandler.next).toHaveBeenCalledWith(false)
+    expect(result).toBeFalsy()
   })
 
   it('should allow access for accounts with console access', async () => {
     const windowLocationReplaceMock = vi.spyOn(window.location, 'replace')
 
-    const { routeHandler, guardDependency } = makeSut({
+    const dependencies = makeSut({
       hasActiveUserId: true,
       isPrivateRoute: true,
       hasAccessConsole: true
     })
 
-    await redirectToManager(routeHandler, guardDependency)
+    const result = await redirectToManagerGuard(dependencies)
 
     expect(windowLocationReplaceMock).not.toHaveBeenCalled()
-    expect(routeHandler.next).toHaveBeenCalled()
+    expect(result).toBeTruthy()
   })
 })

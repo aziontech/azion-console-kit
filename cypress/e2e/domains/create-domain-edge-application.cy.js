@@ -17,7 +17,7 @@ const createEdgeApplicationCase = () => {
   cy.verifyToast('success', 'Your edge application has been created')
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
   })

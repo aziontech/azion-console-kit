@@ -66,7 +66,7 @@
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
-      productName: 'Network Lists'
+      productName: 'Network List'
     })
   }
 
@@ -74,7 +74,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Network Lists',
+        productName: 'Network List',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message

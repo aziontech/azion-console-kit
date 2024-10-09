@@ -2,24 +2,58 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import { useToast } from 'primevue/usetoast'
 
   import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
 
   const props = defineProps({
-    listServices: {
-      type: Array,
+    listServicesHandle: {
+      type: Function,
       required: true
     },
     disabledFields: {
       type: Boolean,
       default: false
+    },
+    edgeNodeId: {
+      type: String,
+      required: true
+    },
+    bound: {
+      type: Boolean
     }
   })
 
+  const listService = ref([])
+  const loadingOptionsServices = ref(false)
+  const toast = useToast()
+
+  const getServices = async () => {
+    try {
+      loadingOptionsServices.value = true
+      listService.value = await props.listServicesHandle({
+        edgeNodeId: props.edgeNodeId,
+        bound: props.bound
+      })
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      loadingOptionsServices.value = false
+    }
+  }
+
   const { value: variables, errorMessage: variablesError } = useField('variables')
-  const { value: service } = useField('service')
+  const { value: serviceId } = useField('serviceId')
+
+  const showToast = (severity, summary) => {
+    toast.add({
+      closable: true,
+      severity,
+      summary
+    })
+  }
 
   const editorOptions = computed(() => {
     return {
@@ -33,6 +67,10 @@
   const store = useAccountStore()
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
+
+  onMounted(() => {
+    getServices()
   })
 </script>
 
@@ -49,15 +87,16 @@
             <FieldDropdown
               label="Service"
               required
-              name="service"
-              :options="props.listServices"
-              :loading="props.listServices.length === 0"
-              :disabled="props.disabledFields"
+              name="serviceId"
+              :options="listService"
+              :loading="loadingOptionsServices"
+              :disabled="props.bound"
               optionLabel="name"
-              :value="service"
+              optionValue="serviceId"
+              :value="serviceId"
               filter
-              class="w-full"
               appendTo="self"
+              class="w-full"
               description="Select the service to be provisioned."
             />
           </div>

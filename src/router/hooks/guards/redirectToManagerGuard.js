@@ -1,29 +1,26 @@
 import { getEnvironment, getStaticUrlsByEnvironment } from '@/helpers'
 
-export default async function redirectToManager(routeHandler, guardDependency) {
-  const { to, from, next } = routeHandler
-  const { accountStore, loadContractServicePlan } = guardDependency
+export async function redirectToManagerGuard({ to, from, accountStore, loadContractServicePlan }) {
   const isPrivateRoute = !to.meta.isPublic
   const accountData = accountStore.accountData
 
   try {
     if (accountStore.hasActiveUserId && isPrivateRoute) {
       const isAzion = accountData.email.includes('@azion.com')
-      // Azion internal access to console.
+
       if (isAzion || accountStore.hasAccessConsole) {
-        return next()
+        return true
       }
 
       if (accountStore.metricsOnlyAccessRestriction) {
-        return handleNavigationRestriction(to, from, next)
+        return handleNavigationRestriction(to, from)
       }
 
       const isNotClientKind = !accountData.client_id
       // [Brand,Reseller,Group] are the kins without client id.
-      if (isNotClientKind && !isAzion) {
-        permanentRedirectToManager()
+      if (isNotClientKind) {
+        return permanentRedirectToManager()
         //ensure that in development env, without redirect, you continue to next route.
-        return next()
       }
 
       // account that are kind client, can access with developer service plan
@@ -36,13 +33,13 @@ export default async function redirectToManager(routeHandler, guardDependency) {
       })
 
       if (!isDeveloperSupportPlan) {
-        permanentRedirectToManager()
+        return permanentRedirectToManager()
       }
     }
   } catch {
-    return next()
+    return true
   }
-  return next()
+  return true
 }
 
 function permanentRedirectToManager() {
@@ -50,20 +47,21 @@ function permanentRedirectToManager() {
   if (environment !== 'development') {
     const managerUrl = getStaticUrlsByEnvironment('manager')
     window.location.replace(managerUrl)
+    return true
   }
 }
 
-function handleNavigationRestriction(to, from, next) {
+function handleNavigationRestriction(to, from) {
   const metricsRouteName = 'real-time-metrics'
   const isNotNavigatingToMetrics = to.name !== metricsRouteName
   const isNavigatingFromMetrics = from.name === metricsRouteName
 
   if (isNotNavigatingToMetrics) {
     if (isNavigatingFromMetrics) {
-      return next(false)
+      return false
     }
-    return next({ name: metricsRouteName })
+    return { name: metricsRouteName }
   }
 
-  return next()
+  return true
 }
