@@ -104,7 +104,8 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleEdgeApplicationCreated = () => {
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
     emit('edgeApplicationCreated')
   }
 
