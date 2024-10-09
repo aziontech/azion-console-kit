@@ -31,15 +31,14 @@ export const BAR_CHART = {
       ['data1', 30, 200, 100, 400, 150, 250],
       ['data2', 130, 100, 140, 200, 150, 50]
     ],
-    type: 'bar',
-  
+    type: 'bar'
   },
   color: {
-    pattern: [ 'url(#linear-orange)', 'url(#linear-green)']
+    pattern: ['url(#linear-orange)', 'url(#linear-green)']
   },
   tooltip: {
     // eslint-disable-next-line id-length
-    contents: function(d, defaultTitleFormat, defaultValueFormat) {
+    contents: function (d, defaultTitleFormat, defaultValueFormat) {
       const { index } = d[0]
       return this.getTooltipContent(
         resetTooltipLabel(d),
@@ -49,5 +48,4 @@ export const BAR_CHART = {
       )
     }
   }
-  
 }
