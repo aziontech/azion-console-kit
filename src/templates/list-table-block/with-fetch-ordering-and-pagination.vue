@@ -16,8 +16,8 @@
       v-if="!isLoading"
       :pt="props.pt"
       :value="data"
-      v-model:sortField="sortField"
-      v-model:sortOrder="sortOrder"
+      v-model:sortField="sortFieldValue"
+      v-model:sortOrder="sortOrderValue"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="itemsByPage"
@@ -425,8 +425,8 @@
   const router = useRouter()
   const toast = useToast()
 
-  const sortField = ref(null)
-  const sortOrder = ref(null)
+  const sortFieldValue = ref(null)
+  const sortOrderValue = ref(null)
 
   const totalRecords = ref()
   const firstItem = ref(1)
@@ -628,20 +628,10 @@
     const { sortField, sortOrder } = event
     const ordering = sortOrder === -1 ? `-${sortField}` : sortField
 
-    try {
-      await reload({ ordering })
+    await reload({ ordering })
 
-      sortField.value = sortField
-      sortOrder.value = sortOrder
-    } catch (error) {
-      const errorMessage = error.message || error
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: errorMessage
-      })
-    }
+    sortFieldValue.value = sortField
+    sortOrderValue.value = sortOrder
   }
 
   const fetchOnSearch = () => {
