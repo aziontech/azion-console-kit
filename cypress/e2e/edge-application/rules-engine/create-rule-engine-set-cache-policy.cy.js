@@ -1,5 +1,5 @@
-import generateUniqueName from '../../support/utils'
-import selectors from '../../support/selectors'
+import generateUniqueName from '../../../support/utils'
+import selectors from '../../../support/selectors'
 
 let fixtures = {}
 
@@ -43,7 +43,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     }
   })
 
-  it('should create a rule engine', () => {
+  it('should create a rule engine set cache policy', () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
@@ -58,7 +58,25 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Set Cache Policy')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
+
+    cy.intercept('GET', 'api/v3/edge_applications/*/cache_settings?page_size=200').as(
+      'getCachePolicy'
+    )
+    cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
+      .find(selectors.form.actionsSubmitButton)
+      .click()
+    cy.verifyToast('success', 'Cache Settings successfully created')
+
+    cy.wait('@getCachePolicy')
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
+      .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))
+      .click()
+
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your Rules Engine has been created.')
 

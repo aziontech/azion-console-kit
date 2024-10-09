@@ -24,6 +24,10 @@
       type: String,
       default: 'create-drawer-block'
     },
+    isOverlapped: {
+      type: Boolean,
+      default: false
+    },
     createService: {
       type: Function,
       required: true
@@ -140,7 +144,11 @@
     :update:visible="toggleDrawerVisibility"
     position="right"
     :pt="{
-      root: { class: 'max-w-4xl w-full' },
+      root: {
+        class: `w-full transition-all duration-300 ease-in-out ${
+          props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+        }`
+      },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
