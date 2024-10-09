@@ -8,6 +8,7 @@
   import { themeSelect } from '@/helpers'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+  import C3Gradient from '@/views/Playground/c3-gradient'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -56,5 +57,7 @@
         class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
       />
     </ShellBlock>
+
+    <C3Gradient></C3Gradient>
   </div>
 </template>
