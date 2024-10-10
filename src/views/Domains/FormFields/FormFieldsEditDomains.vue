@@ -121,8 +121,9 @@
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
-  const onDigitalCertificateSuccess = () => {
+  const onDigitalCertificateSuccess = (id) => {
     props.updateDigitalCertificates()
+    edgeCertificate.value = id
   }
 </script>
 

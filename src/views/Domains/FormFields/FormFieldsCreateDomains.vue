@@ -114,7 +114,8 @@
     setEdgeCertificate(newEdgeCertificate)
   })
 
-  const onDigitalCertificateSuccess = () => {
+  const onDigitalCertificateSuccess = (domainId) => {
+    edgeCertificate.value = domainId
     props.updateDigitalCertificates()
   }
 

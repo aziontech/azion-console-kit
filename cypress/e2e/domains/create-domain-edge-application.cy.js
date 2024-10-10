@@ -33,6 +33,8 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
+  cy.intercept('GET', '/api/v3/digital_certificates*').as('getDigitalCertificatesApi')
+
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
     .find(selectors.form.actionsSubmitButton)
@@ -40,6 +42,7 @@ const createDigitalCertificateCase = () => {
 
   // Assert
   cy.verifyToast('success', 'Your digital certificate has been created!')
+  cy.wait('@getDigitalCertificatesApi')
 }
 
 describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
@@ -62,9 +65,6 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.createDigitalCertificateButton).click()
     createDigitalCertificateCase()
-    cy.get(selectors.domains.digitalCertificateDropdown).click()
-    cy.get(selectors.domains.digitalCertificateDropdownFilter).type(digitalCertificateName)
-    cy.get(selectors.domains.edgeCertificateOption).click()
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')

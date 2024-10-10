@@ -125,10 +125,9 @@
   const openCreateDrawer = () => {
     showCreateDigitalCertificateDrawer.value = true
   }
-  const handleCreateWithSuccess = () => {
+  const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
-    emit('onSuccess')
-    emit('onEdgeApplicationCreated')
+    emit('onSuccess', response.domainId)
     closeCreateDrawer()
   }
 
