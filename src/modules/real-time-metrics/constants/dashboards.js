@@ -130,8 +130,8 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 9,
-      label: 'Bot Manager Advanced',
-      path: 'bot-manager-advanced',
+      label: 'Bot Manager',
+      path: 'bot-manager',
       groupId: 2,
       dashboards: [
         {

@@ -91,7 +91,7 @@ export default class GqlRules {
     } else if (hasAggregation) {
       this.orderBy = `${this.aggregations[0].aggregation}_${this.orderDirection}`
     } else {
-      this.orderBy = this.xAxis
+      this.orderBy = this.xAxis ?? ''
     }
   }
 

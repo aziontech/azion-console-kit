@@ -1138,24 +1138,16 @@ const REPORTS = [
     aggregationType: 'sum',
     columns: 3,
     type: 'big-numbers',
-    xAxis: 'ts',
+    xAxis: '',
     isTopX: false,
     rotated: false,
-    dataset: 'securityMetrics',
+    dataset: 'botManagerBreakdownMetrics',
     dataUnit: 'count',
     limit: 10000,
-    aggregations: [
-      {
-        aggregation: 'sum',
-        variable: 'value'
-      }
-    ],
-    filters: {
-      metricEq: 'uniq_request_url',
-      datasetEq: 'bot_manager'
-    },
+    aggregations: [],
+    filters: {},
     groupBy: [],
-    fields: [],
+    fields: ['uniqRequestUrl'],
     orderDirection: 'DESC',
     dashboardId: '659868342290523846',
     variationType: 'inverse',

@@ -23,12 +23,12 @@ export default async function ResolveReport(report, filters, userUTC, signal) {
 
   if (reportData?.error || !reportData?.resultChart) return {}
 
-  const isTimeSeries = report.xAxis === 'ts'
+  const hasVariation = report.xAxis === 'ts' || report.type === 'big-numbers'
 
-  const hasAggregation = reportData?.resultChart?.length <= maxSeriesToDisplayTag && isTimeSeries
+  const hasAggregation = reportData?.resultChart?.length <= maxSeriesToDisplayTag && hasVariation
   const hasResults = reportData?.resultChart?.length
-  const hasMeanLine = hasResults > minSeriesToShowMeanLine && isTimeSeries
-  const hasMeanLinePerSeries = hasResults > minSeriesToShowMeanLinePerSeries && isTimeSeries
+  const hasMeanLine = hasResults > minSeriesToShowMeanLine && hasVariation
+  const hasMeanLinePerSeries = hasResults > minSeriesToShowMeanLinePerSeries && hasVariation
 
   const reportInfo = {
     reportId: report.id,

@@ -1408,25 +1408,21 @@ ts
     label: 'Impacted URLs',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
-      securityMetrics (
+      botManagerBreakdownMetrics (
         limit: 10000
-        aggregate: {sum: value 
-}
-        groupBy: [ts]
-        orderBy: [ts_DESC]
+        
+        groupBy: []
+        orderBy: []
         filter: {
           tsRange: {
 begin: $tsRange_begin
 end: $tsRange_end
 
 }
-metricEq: "uniq_request_url"
-datasetEq: "bot_manager"
 
         }
         ) {
-          sum
-ts
+          uniqRequestUrl
         }
       }`,
       variables: {
