@@ -18,6 +18,7 @@
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
             :isLoadingRequests="isLoadingRequests"
+            :updateDigitalCertificates="updateDigitalCertificates"
             @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
@@ -233,4 +234,15 @@
       .label('Trusted CA Certificate'),
     active: yup.boolean()
   })
+
+  const updateDigitalCertificates = async () => {
+    try {
+      isLoadingRequests.value = true
+      digitalCertificates.value = await props.listDigitalCertificatesService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      isLoadingRequests.value = false
+    }
+  }
 </script>

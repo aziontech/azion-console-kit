@@ -20,6 +20,7 @@
             hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
+            :updateDigitalCertificates="updateDigitalCertificates"
             @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
@@ -72,6 +73,10 @@
       required: true
     },
     clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    updateDigitalCertificates: {
       type: Function,
       required: true
     }
@@ -190,4 +195,15 @@
       .label('Trusted CA Certificate'),
     active: yup.boolean()
   })
+
+  const updateDigitalCertificates = async () => {
+    try {
+      loadingEdgeApplications.value = true
+      digitalCertificates.value = await props.listDigitalCertificatesService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      loadingEdgeApplications.value = false
+    }
+  }
 </script>
