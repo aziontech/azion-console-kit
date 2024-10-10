@@ -1,6 +1,6 @@
 <script setup>
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, nextTick } from 'vue'
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -114,6 +114,9 @@
       subtitle: 'Configure the responses delivered to end-users.'
     }
   ]
+
+  const cacheSettingsBehaviorIndex = ref(null)
+  const cacheSettingsKey = ref(0)
 
   const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings'])
 
@@ -316,7 +319,8 @@
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
-  const openDrawer = () => {
+  const openDrawer = (behaviorIndex) => {
+    cacheSettingsBehaviorIndex.value = behaviorIndex
     drawerRef.value.openCreateDrawer()
   }
 
@@ -433,8 +437,19 @@
     }
   )
 
-  const handleSuccess = () => {
+  watch(
+    () => props.cacheSettingsOptions,
+    () => {
+      nextTick(() => {
+        cacheSettingsKey.value++
+      })
+    },
+    { deep: true }
+  )
+
+  const handleSuccess = (cacheSettingsId) => {
     emit('refreshCacheSettings')
+    behaviors.value[cacheSettingsBehaviorIndex.value].value.cacheId = cacheSettingsId
   }
 </script>
 
@@ -729,12 +744,12 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
+                :key="`cache-settings-${cacheSettingsKey}`"
                 :loading="isLoadingRequestsData"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
                 :options="cacheSettingsOptions"
                 optionLabel="name"
                 optionValue="id"
-                :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.cacheId"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               >
@@ -745,7 +760,7 @@
                         class="w-full whitespace-nowrap flex"
                         data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
                         text
-                        @click="openDrawer"
+                        @click="openDrawer(behaviorIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
                         :pt="{

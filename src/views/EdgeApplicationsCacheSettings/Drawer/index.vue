@@ -191,9 +191,9 @@
     })
   }
 
-  const handleCreateCacheSettings = () => {
+  const handleCreateCacheSettings = (response) => {
     handleTrackCreation()
-    emit('onSuccess')
+    emit('onSuccess', response.cacheSettingsId)
     closeCreateDrawer()
   }
 

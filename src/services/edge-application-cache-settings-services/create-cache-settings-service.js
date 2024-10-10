@@ -102,7 +102,10 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return { feedback: 'Cache Settings successfully created' }
+      return {
+        feedback: 'Cache Settings successfully created',
+        cacheSettingsId: httpResponse.body.results.id
+      }
     case 400:
       throw new Error(extractApiError(httpResponse)).message
     case 401:
