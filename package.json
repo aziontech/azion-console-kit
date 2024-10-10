@@ -57,7 +57,7 @@
     "qrcode.vue": "^3.4.1",
     "recaptcha-v3": "^1.10.0",
     "vee-validate": "^4.11.1",
-    "vue": "^3.3.4",
+    "vue": "^3.5.10",
     "vue-router": "^4.2.4",
     "yup": "^1.2.0"
   },
