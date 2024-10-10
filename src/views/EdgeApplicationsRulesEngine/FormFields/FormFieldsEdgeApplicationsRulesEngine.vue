@@ -1,6 +1,6 @@
 <script setup>
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref, watch, nextTick } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -116,7 +116,6 @@
   ]
 
   const cacheSettingsBehaviorIndex = ref(null)
-  const cacheSettingsKey = ref(0)
 
   const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings'])
 
@@ -437,16 +436,6 @@
     }
   )
 
-  watch(
-    () => props.cacheSettingsOptions,
-    () => {
-      nextTick(() => {
-        cacheSettingsKey.value++
-      })
-    },
-    { deep: true }
-  )
-
   const handleSuccess = (cacheSettingsId) => {
     emit('refreshCacheSettings')
     behaviors.value[cacheSettingsBehaviorIndex.value].value.cacheId = cacheSettingsId
@@ -744,12 +733,12 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
-                :key="`cache-settings-${cacheSettingsKey}`"
                 :loading="isLoadingRequestsData"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
                 :options="cacheSettingsOptions"
                 optionLabel="name"
                 optionValue="id"
+                :key="`${behaviorItem.key}-cache-policy`"
                 :value="behaviors[behaviorIndex].value.cacheId"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               >
