@@ -57,9 +57,6 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
-    cy.get(selectors.domains.edgeApplicationOption).click()
     cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
 
     cy.get(selectors.domains.digitalCertificateDropdown).click()

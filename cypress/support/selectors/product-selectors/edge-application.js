@@ -74,6 +74,9 @@ export default {
       `[data-testid="edge-application-cache-settings-form__cache-by-cookie-field__radio__cacheByCookies-radio-${position}"]`
   },
   functionsInstance: {
+    createFunctionButton:
+      '[data-testid="edge-applications-functions-form__create-function-button"]',
+    edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
     dropdownFilter:
       '[data-testid="edge-application-function-instance-form__edge-function__dropdown-filter-input"]',
     firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
