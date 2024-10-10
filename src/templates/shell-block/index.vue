@@ -17,7 +17,7 @@
       }
     ]"
   >
-    <slot :customClass="customClass"></slot>
+    <slot :customClass="customClass" />
 
     <HelpBlock
       class="z-10"

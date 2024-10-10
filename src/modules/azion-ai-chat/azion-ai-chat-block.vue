@@ -1,44 +1,44 @@
 <template>
-  <deep-chat
-    :stream="true"
-    ref="deepChatRef"
-    :errorMessages="errorMessages"
-    :chatStyle="deepChatStyles"
-    :messageStyles="messageStyles"
-    :avatars="avatarStyles"
-    :textInput="textInputStyles"
-    :submitButtonStyles="submitButtonStyles"
-    :request="makeRequestConfig()"
-    :requestInterceptor="
-      (requestDetails) =>
-        requestInterceptorService(requestDetails, {
-          sessionId: aiAskAzionSessionId,
-          url: currentRouteFullPath,
-          userName: account.name
-        })
-    "
-  >
-    <div class="deep-chat-temporary-message">
-      <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
-        <img
-          :style="`width:32px;height:32px;object-fit:cover;`"
-          :src="introMessageAiAzionLogo"
-        />
-        <div
-          :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
-        >
-          <AzionAiChatSuggestion
-            v-for="(suggestionOption, suggestionIndex) in suggestionsOptions"
-            :key="suggestionIndex"
-            @click="handleSubmitSuggestion(suggestionOption.prompt)"
-            :text="suggestionOption.title"
-            :iconSrc="calculateIconBySuggestionIndex(suggestionIndex)"
+  <div class="flex flex-col w-full h-full">
+    <deep-chat
+      :stream="true"
+      ref="deepChatRef"
+      :errorMessages="errorMessages"
+      :chatStyle="deepChatStyles"
+      :messageStyles="messageStyles"
+      :avatars="avatarStyles"
+      :textInput="textInputStyles"
+      :submitButtonStyles="submitButtonStyles"
+      :request="DEEP_CHAT_CONFIG_REQUEST"
+      :requestInterceptor="interceptor"
+      :responseInterceptor="responseInterceptorService"
+    >
+      <div class="deep-chat-temporary-message">
+        <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
+          <img
+            :style="`width:32px;height:32px;object-fit:cover;`"
+            :src="introMessageAiAzionLogo"
           />
+          <div
+            :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
+          >
+            <AzionAiChatSuggestion
+              v-for="(suggestionOption, suggestionIndex) in suggestionsOptions"
+              :key="suggestionIndex"
+              @click="handleSubmitSuggestion(suggestionOption.prompt)"
+              :text="suggestionOption.title"
+              :iconSrc="calculateIconBySuggestionIndex(suggestionIndex)"
+            />
+          </div>
         </div>
+        <div v-html="introMessageWithResetStyles.html" />
       </div>
-      <div v-html="introMessageWithResetStyles.html" />
-    </div>
-  </deep-chat>
+    </deep-chat>
+
+    <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 mx-2">
+      Azion Copilot may make mistakes. Consider verifying important information.
+    </small>
+  </div>
 </template>
 <script setup>
   import 'deep-chat'
@@ -46,36 +46,40 @@
   import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
-  import { requestInterceptorService } from './services/request-interceptor-service'
+  import {
+    requestInterceptorService,
+    responseInterceptorService
+  } from './services/interceptor-service'
   import { loadPromptSuggestion } from './services/load-prompt-suggestions'
-  import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
   import azionLogoProfile from '@/modules/azion-ai-chat/assets/azion-logo.svg?url'
   import { onMounted, ref, watchEffect } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+
   const { currentRoute } = useRouter()
-  const { account } = useAccountStore()
 
   defineOptions({
     name: 'azion-ai-chat-block'
   })
 
+  const props = defineProps({
+    insertDeepChatStyles: {
+      type: Object,
+      default: () => ({})
+    }
+  })
+
   onMounted(() => {
     generateChatSessionId()
-    getUserNameInfo()
   })
-
+  const accountStore = ref(null)
   const deepChatRef = ref(null)
-
-  defineExpose({
-    deepChatRef
-  })
-
-  const currentRouteFullPath = currentRoute.value.path
+  const DEEP_CHAT_CONFIG_REQUEST = {
+    url: 'https://stage-ai.azion.com/copilot/chat/completions'
+  }
   const aiAskAzionSessionId = ref('')
-  const accountName = ref('')
-
+  const promptOrigin = ref(null)
   const errorMessages = ref({
     overrides: {
       default: 'Connection failed. Try sending your message again.'
@@ -84,12 +88,12 @@
   const deepChatStyles = ref({
     fontFamily: 'var(--font-family)',
     width: '100%',
-    height: 'calc(100svh - 113px)',
+    height: 'calc(95svh - 113px)',
     position: 'sticky',
-    top: '56px',
     backgroundColor: 'var(--surface-section)',
-    border: '1px solid var(--surface-border)',
-    overflow: 'hidden'
+    border: '0',
+    overflow: 'hidden',
+    ...props.insertDeepChatStyles
   })
   const messageStyles = ref({
     default: {
@@ -181,7 +185,7 @@
         border: '1px solid var(--surface-400)',
         backgroundColor: 'var(--surface-section)',
         boxShadow: 'none',
-        margin: '16px'
+        margin: '16px 16px 10px'
       },
       focus: {
         outline: '0 none',
@@ -195,7 +199,7 @@
       text: 'Ask Copilot for help',
       style: { color: 'var(--text-color)' }
     },
-    characterLimit: 300
+    characterLimit: 16000
   })
   const submitButtonStyles = ref({
     position: 'inside-right',
@@ -208,7 +212,6 @@
           objectFit: 'cover',
           width: '32px',
           height: '32px',
-          bottom: '20px',
           right: '26px',
           margin: '0'
         }
@@ -238,7 +241,6 @@
           objectFit: 'cover',
           width: '28px',
           height: '28px',
-          bottom: '22px',
           right: '28px',
           margin: '0'
         }
@@ -298,15 +300,32 @@
   const handleSubmitSuggestion = (promptText) => {
     deepChatRef.value.submitUserMessage({ text: promptText })
   }
+
   const generateChatSessionId = () => {
     aiAskAzionSessionId.value = makeSessionId()
   }
-  const getUserNameInfo = () => {
-    accountName.value = account.name
+
+  const submitUserMessageGetHelp = ({ user, system }) => {
+    promptOrigin.value = {
+      user_prompt: user,
+      system_prompt: system
+    }
+    deepChatRef.value.submitUserMessage({ text: user })
   }
 
   const calculateIconBySuggestionIndex = (index) => {
     return index === 0 ? suggestionIconMetrics : suggestionIconSecurity
+  }
+
+  const interceptor = (requestDetails) => {
+    requestInterceptorService(requestDetails, {
+      sessionId: aiAskAzionSessionId.value,
+      url: currentRoute.value.path,
+      userName: accountStore.value.name,
+      clientId: accountStore.value.client_id,
+      prompt: promptOrigin.value,
+      allMessage: deepChatRef.value.getMessages()
+    })
   }
 
   const loadPromptSuggestionWithRoleDecorator = (role) => {
@@ -314,10 +333,21 @@
   }
 
   watchEffect(() => {
-    const {
-      account: { jobRole }
-    } = useAccountStore()
+    const { account } = useAccountStore()
 
-    loadPromptSuggestionWithRoleDecorator(jobRole)
+    accountStore.value = account
+
+    loadPromptSuggestionWithRoleDecorator(accountStore.value.jobRole)
+  })
+
+  const clearMessages = () => {
+    deepChatRef.value.clearMessages()
+    promptOrigin.value = null
+  }
+
+  defineExpose({
+    deepChatRef,
+    clearMessages,
+    submitUserMessageGetHelp
   })
 </script>
