@@ -10,8 +10,7 @@
   defineProps({
     certificateSelection: String,
     isDrawer: {
-      type: Boolean,
-      default: false
+      type: Boolean
     }
   })
   const emit = defineEmits(['update:certificateSelection'])
