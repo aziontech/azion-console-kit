@@ -13,6 +13,6 @@ describe('makeRequestConfig', () => {
 
     const result = sut()
 
-    expect(result).toEqual({ url: '/ai' })
+    expect(result).toEqual({ url: '/copilot/chat/completions' })
   })
 })

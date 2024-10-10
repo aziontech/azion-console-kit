@@ -1,38 +1,44 @@
 <template>
-  <deep-chat
-    :stream="true"
-    ref="deepChatRef"
-    :errorMessages="errorMessages"
-    :chatStyle="deepChatStyles"
-    :messageStyles="messageStyles"
-    :avatars="avatarStyles"
-    :textInput="textInputStyles"
-    :submitButtonStyles="submitButtonStyles"
-    :request="makeRequestConfig()"
-    :requestInterceptor="interceptor"
-    :responseInterceptor="responseInterceptorService"
-  >
-    <div class="deep-chat-temporary-message">
-      <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
-        <img
-          :style="`width:32px;height:32px;object-fit:cover;`"
-          :src="introMessageAiAzionLogo"
-        />
-        <div
-          :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
-        >
-          <AzionAiChatSuggestion
-            v-for="(suggestionOption, suggestionIndex) in suggestionsOptions"
-            :key="suggestionIndex"
-            @click="handleSubmitSuggestion(suggestionOption.prompt)"
-            :text="suggestionOption.title"
-            :iconSrc="calculateIconBySuggestionIndex(suggestionIndex)"
+  <div class="flex flex-col w-full h-full">
+    <deep-chat
+      :stream="true"
+      ref="deepChatRef"
+      :errorMessages="errorMessages"
+      :chatStyle="deepChatStyles"
+      :messageStyles="messageStyles"
+      :avatars="avatarStyles"
+      :textInput="textInputStyles"
+      :submitButtonStyles="submitButtonStyles"
+      :request="DEEP_CHAT_CONFIG_REQUEST"
+      :requestInterceptor="interceptor"
+      :responseInterceptor="responseInterceptorService"
+    >
+      <div class="deep-chat-temporary-message">
+        <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
+          <img
+            :style="`width:32px;height:32px;object-fit:cover;`"
+            :src="introMessageAiAzionLogo"
           />
+          <div
+            :style="`display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem`"
+          >
+            <AzionAiChatSuggestion
+              v-for="(suggestionOption, suggestionIndex) in suggestionsOptions"
+              :key="suggestionIndex"
+              @click="handleSubmitSuggestion(suggestionOption.prompt)"
+              :text="suggestionOption.title"
+              :iconSrc="calculateIconBySuggestionIndex(suggestionIndex)"
+            />
+          </div>
         </div>
+        <div v-html="introMessageWithResetStyles.html" />
       </div>
-      <div v-html="introMessageWithResetStyles.html" />
-    </div>
-  </deep-chat>
+    </deep-chat>
+
+    <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 mx-2">
+      Azion Copilot may make mistakes. Consider verifying important information.
+    </small>
+  </div>
 </template>
 <script setup>
   import 'deep-chat'
@@ -45,16 +51,23 @@
     responseInterceptorService
   } from './services/interceptor-service'
   import { loadPromptSuggestion } from './services/load-prompt-suggestions'
-  import { makeRequestConfig } from './services/make-request-config'
   import { makeSessionId } from './services/make-session-id'
   import azionLogoProfile from '@/modules/azion-ai-chat/assets/azion-logo.svg?url'
   import { onMounted, ref, watchEffect } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+
   const { currentRoute } = useRouter()
 
   defineOptions({
     name: 'azion-ai-chat-block'
+  })
+
+  const props = defineProps({
+    insertDeepChatStyles: {
+      type: Object,
+      default: () => ({})
+    }
   })
 
   onMounted(() => {
@@ -62,7 +75,9 @@
   })
   const accountStore = ref(null)
   const deepChatRef = ref(null)
-
+  const DEEP_CHAT_CONFIG_REQUEST = {
+    url: 'https://stage-ai.azion.com/copilot/chat/completions'
+  }
   const aiAskAzionSessionId = ref('')
   const promptOrigin = ref(null)
   const errorMessages = ref({
@@ -73,12 +88,12 @@
   const deepChatStyles = ref({
     fontFamily: 'var(--font-family)',
     width: '100%',
-    height: 'calc(100svh - 113px)',
+    height: 'calc(95svh - 113px)',
     position: 'sticky',
-    top: '56px',
     backgroundColor: 'var(--surface-section)',
-    border: '1px solid var(--surface-border)',
-    overflow: 'hidden'
+    border: '0',
+    overflow: 'hidden',
+    ...props.insertDeepChatStyles
   })
   const messageStyles = ref({
     default: {
@@ -170,7 +185,7 @@
         border: '1px solid var(--surface-400)',
         backgroundColor: 'var(--surface-section)',
         boxShadow: 'none',
-        margin: '16px'
+        margin: '16px 16px 10px'
       },
       focus: {
         outline: '0 none',
@@ -184,7 +199,7 @@
       text: 'Ask Copilot for help',
       style: { color: 'var(--text-color)' }
     },
-    characterLimit: 300
+    characterLimit: 16000
   })
   const submitButtonStyles = ref({
     position: 'inside-right',
@@ -197,7 +212,6 @@
           objectFit: 'cover',
           width: '32px',
           height: '32px',
-          bottom: '20px',
           right: '26px',
           margin: '0'
         }
@@ -227,7 +241,6 @@
           objectFit: 'cover',
           width: '28px',
           height: '28px',
-          bottom: '22px',
           right: '28px',
           margin: '0'
         }
@@ -338,4 +351,3 @@
     submitUserMessageGetHelp
   })
 </script>
-./services/interceptor-service

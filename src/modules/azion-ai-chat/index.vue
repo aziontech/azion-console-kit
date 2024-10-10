@@ -32,12 +32,13 @@
     </AzionAiChatHeader>
 
     <div
-      class="h-full flex justify-between flex-col"
+      class="overflow-y-auto sticky top-12 h-[calc(100vh-5rem)] flex flex-col justify-between"
       v-if="isChatMobile"
     >
       <AzionAiChat
         :key="renderCount"
         ref="azionAiChatRef"
+        :insert-deep-chat-styles="styleViewDeepChat"
       />
     </div>
     <Sidebar
@@ -130,6 +131,9 @@
   const { width } = useWindowSize()
   const currentWidth = ref(width.value)
   const SCREEN_BREAKPOINT_MD = 768
+  const styleViewDeepChat = {
+    border: 'none'
+  }
 
   onMounted(() => {
     window.addEventListener('message', aiCustomPromptListenerHandler)

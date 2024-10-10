@@ -3,6 +3,6 @@
  */
 export const makeRequestConfig = () => {
   return {
-    url: '/ai'
+    url: '/copilot/chat/completions'
   }
 }

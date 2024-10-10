@@ -69,10 +69,9 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
-        '/ai': {
-          target: 'https://ivg5gk272b.map.azionedge.net',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/ai/, '/chat-completions')
+        '/copilot/chat/completions': {
+          target: 'https://stage-ai.azion.com',
+          changeOrigin: true
         },
         '/webpagetest': {
           target: `https://www.azion.com/api/webpagetest`,
@@ -83,7 +82,7 @@ const getConfig = () => {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        },
+        }
       }
     }
   }
