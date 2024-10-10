@@ -17,10 +17,11 @@
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
             :domainName="domainName"
-            :hasDomainName="true"
+            hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
             :updateDigitalCertificates="updateDigitalCertificates"
+            @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -105,12 +106,24 @@
   const loadingEdgeApplications = ref(true)
 
   const requestEdgeApplications = async () => {
-    edgeApplicationsData.value = await props.listEdgeApplicationsService({})
+    loadingEdgeApplications.value = true
+    try {
+      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      loadingEdgeApplications.value = false
+    }
   }
 
   const requestDigitalCertificates = async () => {
     digitalCertificates.value = await props.listDigitalCertificatesService({})
   }
+
+  const handleEdgeApplicationCreated = async () => {
+    await requestEdgeApplications()
+  }
+
   const showToast = (severity, summary) => {
     toast.add({
       closable: true,

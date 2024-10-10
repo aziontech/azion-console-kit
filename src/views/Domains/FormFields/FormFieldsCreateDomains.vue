@@ -6,9 +6,10 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeButton from 'primevue/button'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import Drawer from '@/views/EdgeApplications/Drawer'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
@@ -39,7 +40,7 @@
   })
 
   const digitalCertificateDrawerRef = ref('')
-  const openDrawer = () => {
+  const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
   const edgeCertificate = ref(0)
@@ -50,6 +51,15 @@
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+  const drawerRef = ref('')
+
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeApplicationCreated = () => {
+    emit('edgeApplicationCreated')
+  }
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -106,6 +116,8 @@
   const onDigitalCertificateSuccess = () => {
     props.updateDigitalCertificates()
   }
+
+  const emit = defineEmits(['edgeApplicationCreated'])
 </script>
 
 <template>
@@ -133,6 +145,10 @@
   >
     <template #title> Settings </template>
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
       <DigitalCertificatesDrawer
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
@@ -152,7 +168,27 @@
           filter
           appendTo="self"
           placeholder="Select an edge application"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
       <FieldSwitchBlock
         data-testid="domains-form__cname-access-only-field"
@@ -193,7 +229,7 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDrawer"
+                  @click="openDigitalCertificateDrawer"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"

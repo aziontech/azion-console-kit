@@ -11,6 +11,7 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import Drawer from '@/views/EdgeApplications/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
@@ -102,8 +103,20 @@
     return props.loadingEdgeApplications
   })
 
-  const digitalCertificateDrawerRef = ref('')
+  const drawerRef = ref('')
+
   const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeApplicationCreated = () => {
+    emit('edgeApplicationCreated')
+  }
+
+  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName'])
+
+  const digitalCertificateDrawerRef = ref('')
+  const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
@@ -178,6 +191,10 @@
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
       <DigitalCertificatesDrawer
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
@@ -196,7 +213,27 @@
           filter
           appendTo="self"
           placeholder="Select an edge application"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-edge-application-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
 
       <FieldSwitchBlock
@@ -238,7 +275,7 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDrawer"
+                  @click="openDigitalCertificateDrawer"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
