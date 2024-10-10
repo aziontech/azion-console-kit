@@ -27,9 +27,9 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  // Novo método para lidar com o sucesso do drawer
-  const handleDrawerSuccess = () => {
+  const handleDrawerSuccess = (response) => {
     props.reloadEdgeFunctions()
+    edgeFunctionID.value = response.functionId
   }
 
   const store = useAccountStore()

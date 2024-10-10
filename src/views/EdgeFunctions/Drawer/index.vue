@@ -83,10 +83,9 @@
   const openCreateDrawer = () => {
     showCreateEdgeFunctionsDrawer.value = true
   }
-  const handleCreateWithSuccess = () => {
+  const handleCreateWithSuccess = (id) => {
     handleTrackCreation()
-    emit('onSuccess')
-    emit('onEdgeApplicationCreated')
+    emit('onSuccess', id)
     closeCreateDrawer()
   }
   defineExpose({

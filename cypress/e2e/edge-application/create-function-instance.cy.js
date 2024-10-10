@@ -77,10 +77,6 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
-    cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
-    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
