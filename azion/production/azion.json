@@ -3,7 +3,7 @@
   "bucket": "console-poc-v4",
   "preset": "vue",
   "env": "production",
-  "prefix": "20241009090559",
+  "prefix": "20241009165003",
   "not-first-run": true,
   "function": {
     "id": 30192,

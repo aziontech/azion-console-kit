@@ -27,7 +27,7 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       :totalRecords="totalRecords"
-      :first="firstItem"
+      :first="firstItemIndex"
       @rowReorder="onRowReorder"
       @row-click="editItemSelected"
       @page="changeNumberOfLinesPerPage"
@@ -429,7 +429,9 @@
   const sortOrderValue = ref(null)
 
   const totalRecords = ref()
-  const firstItem = ref(1)
+  const firstItemIndex = ref(1)
+  const savedSearch = ref('')
+  const savedOrdering = ref('')
 
   const selectedItems = computed({
     get: () => {
@@ -591,7 +593,14 @@
   }
 
   const reload = async (query = {}) => {
-    loadData({ page: 1, pageSize: itemsByPage.value, fields: props.apiFields, ...query })
+    loadData({
+      page: 1,
+      pageSize: itemsByPage.value,
+      fields: props.apiFields,
+      search: savedSearch.value,
+      ordering: savedOrdering.value,
+      ...query
+    })
   }
 
   defineExpose({ reload, handleExportTableDataToCSV })
@@ -613,7 +622,7 @@
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
 
-    firstItem.value = event.first
+    firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
 
@@ -630,12 +639,15 @@
 
     await reload({ ordering })
 
+    savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
 
   const fetchOnSearch = () => {
     const search = filters.value.global.value
+
+    savedSearch.value = search
     reload({ search: search })
   }
 
@@ -643,12 +655,4 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
-
-  watch(
-    itemsByPage,
-    (pageSize) => {
-      reload({ pageSize })
-    },
-    { deep: true }
-  )
 </script>
