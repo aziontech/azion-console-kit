@@ -4,7 +4,7 @@ import * as Errors from '@/services/axios/errors'
 
 export const deleteWafRulesAllowedService = async ({ wafId, allowedId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules/${allowedId}`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions/${allowedId}`,
     method: 'DELETE'
   })
 
