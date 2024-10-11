@@ -14,6 +14,7 @@
   import Drawer from '@/views/EdgeApplications/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
+  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
 
   const props = defineProps({
     digitalCertificates: {
@@ -31,6 +32,10 @@
     },
     loadingEdgeApplications: {
       type: Boolean
+    },
+    updateDigitalCertificates: {
+      type: Function,
+      required: true
     }
   })
 
@@ -104,11 +109,22 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleEdgeApplicationCreated = () => {
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
     emit('edgeApplicationCreated')
   }
 
   const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName'])
+
+  const digitalCertificateDrawerRef = ref('')
+  const openDigitalCertificateDrawer = () => {
+    digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
+
+  const onDigitalCertificateSuccess = (id) => {
+    props.updateDigitalCertificates()
+    edgeCertificate.value = id
+  }
 </script>
 
 <template>
@@ -181,6 +197,10 @@
         ref="drawerRef"
         @onEdgeApplicationCreated="handleEdgeApplicationCreated"
       />
+      <DigitalCertificatesDrawer
+        ref="digitalCertificateDrawerRef"
+        @onSuccess="onDigitalCertificateSuccess"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -252,7 +272,27 @@
           filter
           appendTo="self"
           placeholder="Select a certificate"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
     </template>
   </form-horizontal>

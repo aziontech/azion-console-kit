@@ -74,7 +74,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your edge application has been created',
-        urlToEditView: `/edge-applications/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/edge-applications/edit/${httpResponse.body.results.id}`,
+        applicationId: httpResponse.body.results.id
       }
     case 400:
       const apiError = extractApiError(httpResponse)

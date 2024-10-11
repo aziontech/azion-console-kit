@@ -30,6 +30,8 @@ export default {
   ruleCriteriaVariableDropdown:
     '[data-testid="edge-firewall-rules-form__variable[0]"] > .p-dropdown-label',
   ruleCriteriaVariableDropdownNetworkLists: '#criteria\\[0\\]\\[0\\]\\.variable_8',
+  createFunctionButton: '[data-testid="edge-firewall-functions-form__create-function-button"]',
+  edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
   ruleCriteriaVariableDropdownRequestUri: '#criteria\\[0\\]\\[0\\]\\.variable_11',
   ruleCriteriaOperatorDropdown: '[data-testid="edge-firewall-rules-form__operator[0]__dropdown"]',
   ruleCriteriaOperatorStartsWith: '#criteria\\[0\\]\\[0\\]\\.operator_2',

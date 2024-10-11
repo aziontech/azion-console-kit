@@ -10,6 +10,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import Drawer from '@/views/EdgeApplications/Drawer'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   import { useField } from 'vee-validate'
@@ -31,9 +32,17 @@
     },
     isLoadingRequests: {
       type: Boolean
+    },
+    updateDigitalCertificates: {
+      type: Function,
+      required: true
     }
   })
 
+  const digitalCertificateDrawerRef = ref('')
+  const openDigitalCertificateDrawer = () => {
+    digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -48,7 +57,8 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleEdgeApplicationCreated = () => {
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
     emit('edgeApplicationCreated')
   }
 
@@ -104,6 +114,11 @@
     setEdgeCertificate(newEdgeCertificate)
   })
 
+  const onDigitalCertificateSuccess = (domainId) => {
+    edgeCertificate.value = domainId
+    props.updateDigitalCertificates()
+  }
+
   const emit = defineEmits(['edgeApplicationCreated'])
 </script>
 
@@ -135,6 +150,10 @@
       <Drawer
         ref="drawerRef"
         @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
+      <DigitalCertificatesDrawer
+        ref="digitalCertificateDrawerRef"
+        @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
@@ -207,7 +226,27 @@
           filter
           appendTo="self"
           placeholder="Select a certificate"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
     </template>
   </form-horizontal>
