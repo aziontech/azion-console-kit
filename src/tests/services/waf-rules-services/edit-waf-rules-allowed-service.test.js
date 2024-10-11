@@ -32,7 +32,7 @@ describe('WafRulesServices', () => {
     await sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/wafs/4040/allowed_rules/10',
+      url: 'v4/edge_firewall/wafs/4040/exceptions/10',
       method: 'PUT',
       body: {
         match_zones: fixtures.wafRulesMock.matchZones,
