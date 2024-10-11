@@ -35,7 +35,7 @@ jobs:
           wait-on: 'http://localhost:5173/'
           wait-on-timeout: 120
           config-file: cypress.config.prod.js
-          env: environment=prod,grepTags='--@xfail --@dont_run_prod'
+          env: environment=prod,grepTags=--@xfail--@dont_run_prod
 
       - name: Check E2E Test Coverage
         if: ${{ always() }}
