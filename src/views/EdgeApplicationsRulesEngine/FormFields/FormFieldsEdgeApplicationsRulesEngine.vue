@@ -12,7 +12,9 @@
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+  import { createOriginService } from '@/services/edge-application-origins-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
+  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
@@ -115,7 +117,7 @@
     }
   ]
 
-  const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings'])
+  const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings', 'refreshOrigins'])
 
   const props = defineProps({
     functionsInstanceOptions: {
@@ -161,10 +163,19 @@
     },
     errors: {
       type: Object
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    isLoadBalancerEnabled: {
+      type: Boolean,
+      required: true
     }
   })
 
   const drawerRef = ref('')
+  const drawerOriginRef = ref('')
   const activeAccordions = ref([0])
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
@@ -320,6 +331,10 @@
     drawerRef.value.openCreateDrawer()
   }
 
+  const openDrawerOrigin = () => {
+    drawerOriginRef.value.openDrawerCreate()
+  }
+
   const addNewCriteria = () => {
     activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
@@ -427,6 +442,13 @@
   )
 
   watch(
+    () => drawerOriginRef.value.showCreateOriginDrawer,
+    () => {
+      emit('toggleDrawer', drawerOriginRef.value.showCreateOriginDrawer)
+    }
+  )
+
+  watch(
     () => props.errors,
     () => {
       openAccordionWithFormErrors()
@@ -435,6 +457,10 @@
 
   const handleSuccess = () => {
     emit('refreshCacheSettings')
+  }
+
+  const handleSuccessOrigin = () => {
+    emit('refreshOrigins')
   }
 </script>
 
@@ -453,6 +479,14 @@
         :edgeApplicationId="edgeApplicationId"
         :createService="createCacheSettingsService"
         :showTieredCache="isTieredCacheEnabled"
+      />
+      <DrawerOrigin
+        ref="drawerOriginRef"
+        @onSuccess="handleSuccessOrigin"
+        :edgeApplicationId="edgeApplicationId"
+        :createService="createOriginService"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -716,6 +750,7 @@
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
+              {{ createOriginService }}
               <FieldDropdown
                 :loading="loadingOrigins"
                 :name="`behaviors[${behaviorIndex}].originId`"
@@ -725,7 +760,27 @@
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.originId"
                 :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-applications-rules-engine-form__create-origin-button"
+                        text
+                        @click="openDrawerOrigin"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Origin"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdown>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown

@@ -24,12 +24,10 @@
       required: true
     },
     editOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     loadOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     documentationService: {
       type: Function,
@@ -238,6 +236,8 @@
   }
 
   const handleFailedCreateOrigin = (error) => {
+    console.log(error)
+    console.log('deu RUIM')
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
@@ -257,6 +257,7 @@
   }
 
   defineExpose({
+    showCreateOriginDrawer,
     openDrawerCreate,
     openDrawerEdit
   })

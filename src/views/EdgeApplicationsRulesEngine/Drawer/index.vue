@@ -61,6 +61,14 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    isLoadBalancerEnabled: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -136,8 +144,8 @@
     )
   })
 
-  const handleToggleDrawer = (isOpen) => {
-    isOverlapped.value = isOpen
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
   }
 
   const createService = async (payload) => {
@@ -293,6 +301,10 @@
     await listCacheSettingsOptions()
   }
 
+  const handleRefreshOrigins = async () => {
+    await listOriginsOptions()
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -331,9 +343,12 @@
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
+        @refreshOrigins="handleRefreshOrigins"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -362,6 +377,8 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isLoadingRequests="isLoadingRequests"
         @toggleDrawer="handleToggleDrawer"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
