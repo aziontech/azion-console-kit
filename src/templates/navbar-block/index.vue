@@ -29,8 +29,6 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
-        <AiChatButton />
-
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
@@ -77,7 +75,6 @@
   import Create from './create'
   import ConsoleFeedback from './feedback'
   import Help from './help'
-  import AiChatButton from './ai-chat-button.vue'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
   import { openDocumentation } from '@/helpers'
