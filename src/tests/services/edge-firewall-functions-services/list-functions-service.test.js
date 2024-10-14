@@ -74,4 +74,51 @@ describe('EdgeFirewallFunctionsServices', () => {
       }
     ])
   })
+
+  it('should call the API with custom query parameters.', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [] }
+    })
+    const { sut } = makeSut()
+
+    await sut({ orderBy: 'name', sort: 'desc', page: 2, pageSize: 50 })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${API_VERSION}/edge_functions?order_by=name&sort=desc&page=2&page_size=50`,
+      method: 'GET'
+    })
+  })
+
+  it('should correctly handle an empty response.', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [] }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({ id: EDGE_FIREWALL_ID })
+
+    expect(result).toEqual([])
+  })
+
+  it('should correctly handle null json_args.', async () => {
+    const functionWithNullArgs = { ...fixtures.functionsInstance, json_args: null }
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [functionWithNullArgs] }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({ id: EDGE_FIREWALL_ID })
+
+    expect(result[0].args).toBe('null')
+  })
+
+  it('should throw an error if the request fails.', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockRejectedValueOnce(new Error('Erro de rede'))
+    const { sut } = makeSut()
+
+    await expect(sut({ id: EDGE_FIREWALL_ID })).rejects.toThrow('Erro de rede')
+  })
 })

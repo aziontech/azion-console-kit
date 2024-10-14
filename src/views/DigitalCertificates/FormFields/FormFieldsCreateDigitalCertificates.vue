@@ -8,7 +8,10 @@
   import { computed, watch } from 'vue'
 
   defineProps({
-    certificateSelection: String
+    certificateSelection: String,
+    isDrawer: {
+      type: Boolean
+    }
   })
   const emit = defineEmits(['update:certificateSelection'])
 
@@ -77,6 +80,7 @@
 
 <template>
   <FormHorizontal
+    :isDrawer="isDrawer"
     title="General"
     description="Create a digital certificate entry to secure HTTPS edge applications."
   >
@@ -95,6 +99,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    :isDrawer="isDrawer"
     title="Import or Request Certificate"
     description="Choose between importing a certificate into your account or creating a request for a certificate."
   >
@@ -112,6 +117,7 @@
 
   <FormHorizontal
     v-if="isCertificateType.uploadCertificate"
+    :isDrawer="isDrawer"
     title="Import a Server Certificate"
     description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields."
   >

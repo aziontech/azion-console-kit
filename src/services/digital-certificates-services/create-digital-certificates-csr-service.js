@@ -45,7 +45,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your digital certificate has been created!',
-        urlToEditView: `/digital-certificates/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/digital-certificates/edit/${httpResponse.body.results.id}`,
+        domainId: httpResponse.body.results.id
       }
     case 400:
       throw new Error(extractApiError(httpResponse.body)).message

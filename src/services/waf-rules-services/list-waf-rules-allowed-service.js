@@ -3,7 +3,7 @@ import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 import { optionsRuleIds } from './ruleIdOptions'
 export const listWafRulesAllowedService = async ({ wafId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules?page=1&page_size=200`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions?page=1&page_size=200`,
     method: 'GET'
   })
 
