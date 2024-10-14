@@ -792,7 +792,7 @@
                     <li>
                       <PrimeButton
                         class="w-full whitespace-nowrap flex"
-                        data-testid="edge-applications-rules-engine-form__create-function-button"
+                        data-testid="edge-applications-rules-engine-form__create-function-instance-button"
                         text
                         @click="openDrawerFunction"
                         size="small"

@@ -3,6 +3,7 @@
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
     :createService="props.createFunctionService"
+    drawerId="create-function-instance-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"

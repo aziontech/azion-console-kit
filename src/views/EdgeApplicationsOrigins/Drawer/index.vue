@@ -263,6 +263,7 @@
     v-if="loadCreateOriginDrawer"
     v-model:visible="showCreateOriginDrawer"
     :createService="createOriginService"
+    drawerId="create-origin-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
