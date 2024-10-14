@@ -4,10 +4,7 @@
       class="h-full flex"
       :key="renderCount"
     >
-      <AzionAiChat
-        ref="azionAiChatRef"
-        :insert-deep-chat-styles="styleViewDeepChat"
-      />
+      <AzionAiChat ref="azionAiChatRef" />
     </div>
   </div>
 </template>
@@ -29,10 +26,7 @@
 
   const renderCount = ref(1)
   const azionAiChatRef = ref(null)
-  const styleViewDeepChat = {
-    height: 'calc(80svh - 113px)',
-    top: 'none'
-  }
+
   const addSupportToHljs = () => {
     if (!window.hljs) {
       window.hljs = hljs
