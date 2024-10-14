@@ -12,6 +12,7 @@
       :request="DEEP_CHAT_CONFIG_REQUEST"
       :requestInterceptor="interceptor"
       :responseInterceptor="responseInterceptorService"
+      :onComponentRender="updateChatRenderInstance"
     >
       <div class="deep-chat-temporary-message">
         <div :style="`display:flex;align-items:center;flex-direction:column;gap:2rem;`">
@@ -35,6 +36,14 @@
       </div>
     </deep-chat>
 
+    <PrimeButton
+      icon="pi pi-pen-to-square"
+      outlined
+      class="surface-border h-8 w-8"
+      aria-label="New Chat"
+      v-tooltip.bottom="'New Chat'"
+      @click="handleClearChat"
+    />
     <small class="text-xs text-color-secondary font-normal leading-5 text-center mb-2 mx-2">
       Azion Copilot may make mistakes. Consider verifying important information.
     </small>
@@ -46,6 +55,7 @@
   import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
+  import PrimeButton from 'primevue/button'
   import {
     requestInterceptorService,
     responseInterceptorService
@@ -343,6 +353,18 @@
   const clearMessages = () => {
     deepChatRef.value.clearMessages()
     promptOrigin.value = null
+  }
+
+  const updateChatRenderInstance = () => {
+    deepChatRef.value.appendComponent({
+      component: PrimeButton,
+      props: {
+        icon: 'pi pi-refresh',
+        label: 'Refresh Chat',
+        class: 'p-button-text',
+        onClick: () => clearMessages()
+      }
+    })
   }
 
   defineExpose({
