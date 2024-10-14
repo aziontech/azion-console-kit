@@ -215,6 +215,7 @@
   onMounted(loadEdgeFunctions)
 
   defineExpose({
+    showCreateFunctionDrawer,
     openDrawerCreate,
     openDrawerEdit,
     loadEdgeFunctions

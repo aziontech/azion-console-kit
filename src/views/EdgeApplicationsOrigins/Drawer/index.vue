@@ -4,6 +4,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
+  import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -17,10 +18,6 @@
   const props = defineProps({
     edgeApplicationId: {
       type: String,
-      required: true
-    },
-    createOriginService: {
-      type: Function,
       required: true
     },
     editOriginService: {
@@ -236,8 +233,6 @@
   }
 
   const handleFailedCreateOrigin = (error) => {
-    console.log(error)
-    console.log('deu RUIM')
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
@@ -267,7 +262,7 @@
   <CreateDrawerBlock
     v-if="loadCreateOriginDrawer"
     v-model:visible="showCreateOriginDrawer"
-    :createService="props.createOriginService"
+    :createService="createOriginService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
