@@ -14,8 +14,19 @@
 
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
-  defineProps(['previewData'])
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    previewData: {
+      type: Object
+    }
+  })
+
   const emit = defineEmits(['update:previewData'])
+
   const SPLITTER_PROPS = {
     height: '50vh',
     layout: 'horizontal',
@@ -71,6 +82,7 @@
     <TabPanel header="Main Settings">
       <FormHorizontal
         class="mt-8"
+        :isDrawer="isDrawer"
         title="General"
         description="Create edge functions that run closer to users to use with Edge Application or Edge Firewall."
       >
@@ -91,6 +103,7 @@
       <FormHorizontal
         class="mt-8"
         title="Language"
+        :isDrawer="isDrawer"
         description="The language the edge function is written in."
       >
         <template #inputs>
@@ -108,6 +121,7 @@
       </FormHorizontal>
 
       <FormHorizontal
+        v-if="!isDrawer"
         class="mt-8"
         title="Initiator Type"
         description="Define the source or trigger that executes the edge function."
@@ -127,6 +141,7 @@
       <FormHorizontal
         class="mt-8"
         title="Status"
+        :isDrawer="isDrawer"
       >
         <template #inputs>
           <div class="flex w-full sm:max-w-lg gap-2">

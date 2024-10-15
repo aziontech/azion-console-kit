@@ -106,6 +106,7 @@
             <BigNumbers
               :report="bigNumberReport"
               :clipboardWrite="clipboardWrite"
+              :groupData="groupData"
             />
           </template>
         </div>

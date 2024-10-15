@@ -7,14 +7,15 @@ let fixtures = {}
  * Creates a new edge function.
  */
 const createFunctionCase = () => {
-  cy.openProduct('Edge Functions')
-
   // Act
-  cy.get(selectors.functions.createButton).click()
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.get(selectors.functions.saveButton).click()
+  cy.intercept('GET', 'api/v3/edge_functions*').as('getFunctions')
+  cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
+    .find(selectors.functions.saveButton)
+    .click()
   cy.verifyToast('success', 'Your edge function has been created')
+  cy.wait('@getFunctions')
 }
 
 /**
@@ -58,7 +59,6 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
   })
 
   it('should create a function instance', () => {
-    createFunctionCase()
     cy.openProduct('Edge Application')
 
     // Act - Create an edge application
@@ -75,9 +75,8 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
       fixtures.functionInstanceName
     )
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
-    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
+    cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
+    createFunctionCase()
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
