@@ -5,12 +5,18 @@
     :createService="props.createFunctionService"
     :schema="validationSchema"
     :initialValues="initialValues"
+    :isOverlapped="isOverlapped"
     @onSuccess="handleCreateFunction"
+    @onError="handleFailedToCreate"
     :showBarGoBack="true"
     title="Create Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        :edgeFunctionsList="filteredEdgeFunctions"
+        :reloadEdgeFunctions="loadEdgeFunctions"
+      />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -18,15 +24,20 @@
     :id="selectedFunctionToEdit"
     v-model:visible="showEditFunctionDrawer"
     :loadService="loadService"
+    :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="handleSuccessEdit"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedToEdit"
     title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
+      <FormFieldsDrawerFunction
+        @toggleDrawer="handleToggleDrawer"
+        :edgeFunctionsList="filteredEdgeFunctions"
+        :reloadEdgeFunctions="loadEdgeFunctions"
+      />
     </template>
   </EditDrawerBlock>
 </template>
@@ -75,6 +86,7 @@
   const loadCreateFunctionDrawer = refDebounced(showCreateFunctionDrawer, debouncedDrawerAnimate)
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
+  const isOverlapped = ref(false)
   const edgeFunctionsList = ref([])
   const filteredEdgeFunctions = computed(() =>
     edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_firewall')
@@ -96,10 +108,58 @@
       .label('Edge Function')
   })
 
-  onMounted(async () => {
-    const response = await props.listEdgeFunctionsService({})
-    edgeFunctionsList.value = response
-  })
+  const handleCreateFunction = () => {
+    closeDrawerCreate()
+    handleTrackSuccessCreate()
+    emit('onSuccess')
+    loadEdgeFunctions()
+  }
+
+  const handleSuccessEdit = () => {
+    showEditFunctionDrawer.value = false
+    emit('onSuccess')
+    handleTrackSuccessEdit()
+    loadEdgeFunctions()
+  }
+
+  const handleTrackSuccessCreate = () => {
+    tracker.product
+      .productCreated({
+        productName: 'Edge Firewall Functions',
+        tab: 'functions'
+      })
+      .track()
+  }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Firewall',
+        tab: 'functions'
+      })
+      .track()
+  }
+
+  const handleFailedToCreate = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge Firewall Functions',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleFailedToEdit = (error) => {
+    handleFailedEditEdgeFirewallFunctions(error)
+    closeDrawerEdit()
+  }
+
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
+  }
 
   const editService = async (payload) => {
     return await props.editFunctionService({
@@ -114,21 +174,6 @@
       functionID: selectedFunctionToEdit.value
     })
     return functions
-  }
-
-  const handleSuccessEdit = () => {
-    showEditFunctionDrawer.value = false
-    emit('onSuccess')
-    handleTrackSuccessEdit()
-  }
-
-  const handleTrackSuccessEdit = () => {
-    tracker.product
-      .productEdited({
-        productName: 'Edge Firewall',
-        tab: 'functions'
-      })
-      .track()
   }
 
   const openDrawerCreate = () => {
@@ -158,18 +203,20 @@
       .track()
   }
 
-  const closeDrawerEdit = (error) => {
-    handleFailedEditEdgeFirewallFunctions(error)
+  const closeDrawerEdit = () => {
+    showEditFunctionDrawer.value = false
   }
 
-  const handleCreateFunction = () => {
-    closeDrawerCreate()
-    handleTrackSuccessEdit()
-    emit('onSuccess')
+  const loadEdgeFunctions = async () => {
+    const response = await props.listEdgeFunctionsService({})
+    edgeFunctionsList.value = response
   }
+
+  onMounted(loadEdgeFunctions)
 
   defineExpose({
     openDrawerCreate,
-    openDrawerEdit
+    openDrawerEdit,
+    loadEdgeFunctions
   })
 </script>

@@ -22,6 +22,19 @@ const adapt = (payload) => {
 }
 
 /**
+ * @param {Object} body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (body) => {
+  for (const keyError of Object.keys(body)) {
+    const errorValue = Array.isArray(body[keyError]) ? body[keyError][0] : body[keyError]
+    if (typeof errorValue === 'string') return errorValue
+    if (typeof errorValue === 'object' && errorValue.message) return errorValue.message[0]
+  }
+  return ''
+}
+
+/**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
@@ -36,7 +49,7 @@ const parseHttpResponse = (httpResponse) => {
         urlToEditView: `/network-lists/edit/${httpResponse.body.results.id}`
       }
     case 400:
-      const apiError = httpResponse.body.results[0]
+      const apiError = extractApiError(httpResponse.body)
       throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message

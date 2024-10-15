@@ -55,11 +55,7 @@ describe('EdgeNodeServices', () => {
 
     expect(result).toEqual({
       id: fixtures.mockIds.id,
-      service: {
-        id: fixtures.mockResponse.id,
-        name: fixtures.mockResponse.service_name,
-        serviceId: fixtures.mockResponse.service_id
-      },
+      serviceId: fixtures.mockResponse.service_id,
       variables: 'var1=value1'
     })
   })

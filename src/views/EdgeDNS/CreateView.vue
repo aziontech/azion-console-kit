@@ -22,6 +22,8 @@
         :createService="props.createEdgeDNSService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
       >
         <template #form>
           <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
@@ -47,6 +49,11 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createEdgeDNSService: {
@@ -58,6 +65,7 @@
       required: true
     }
   })
+
   const toast = useToast()
 
   const validationSchema = yup.object({
@@ -85,5 +93,23 @@
       severity: 'success',
       summary: 'Successfully copied!'
     })
+  }
+
+  const handleResponse = () => {
+    tracker.product.productCreated({
+      productName: 'Edge DNS Zone'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge DNS Zone',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 </script>

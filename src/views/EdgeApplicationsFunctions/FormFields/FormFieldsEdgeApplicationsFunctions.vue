@@ -3,16 +3,34 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import PrimeButton from 'primevue/button'
+  import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
 
   import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, ref, watch } from 'vue'
+
+  const emit = defineEmits(['toggleDrawer'])
 
   const props = defineProps({
     edgeFunctionsList: {
       required: true,
       type: Array
+    },
+    reloadEdgeFunctions: {
+      type: Function,
+      required: true
     }
   })
+
+  const drawerRef = ref('')
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleDrawerSuccess = (response) => {
+    props.reloadEdgeFunctions()
+    edgeFunctionID.value = response.functionId
+  }
 
   const store = useAccountStore()
 
@@ -38,6 +56,13 @@
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
+
+  watch(
+    () => drawerRef.value.showCreateDrawer,
+    () => {
+      emit('toggleDrawer', drawerRef.value.showCreateDrawer)
+    }
+  )
 </script>
 
 <template>
@@ -68,6 +93,10 @@
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
+        <Drawer
+          ref="drawerRef"
+          @onSuccess="handleDrawerSuccess"
+        />
         <FieldDropdown
           data-testid="edge-application-function-instance-form__edge-function"
           label="Edge Function"
@@ -81,7 +110,27 @@
           @change="changeArgs"
           filter
           :optionDisabled="(option) => option.disabled"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="edge-applications-functions-form__create-function-button"
+                  text
+                  @click="openDrawer"
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Function"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
 
       <div class="flex flex-col gap-2 w-full">

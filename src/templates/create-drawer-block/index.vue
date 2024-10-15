@@ -9,6 +9,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
 
   import { useScrollToError } from '@/composables/useScrollToError'
+
   defineOptions({
     name: 'create-drawer-block'
   })
@@ -16,6 +17,14 @@
   const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     visible: {
+      type: Boolean,
+      default: false
+    },
+    drawerId: {
+      type: String,
+      default: 'create-drawer-block'
+    },
+    isOverlapped: {
       type: Boolean,
       default: false
     },
@@ -135,7 +144,11 @@
     :update:visible="toggleDrawerVisibility"
     position="right"
     :pt="{
-      root: { class: 'max-w-4xl w-full' },
+      root: {
+        class: `w-full transition-all duration-300 ease-in-out ${
+          props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+        }`
+      },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
@@ -173,6 +186,7 @@
         />
         <ActionBarBlock
           v-else
+          :data-testid="`${drawerId}__action-bar`"
           @onCancel="closeDrawer"
           @onSubmit="onSubmit"
           :inDrawer="true"

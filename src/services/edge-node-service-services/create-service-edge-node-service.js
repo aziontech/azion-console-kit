@@ -29,7 +29,7 @@ const parseCodeToVariables = (code) => {
 const adapt = (payload) => {
   const variables = parseCodeToVariables(payload.variables)
   return {
-    service_id: payload.service.serviceId,
+    service_id: payload.serviceId,
     variables
   }
 }

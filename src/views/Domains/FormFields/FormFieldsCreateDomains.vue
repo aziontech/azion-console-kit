@@ -6,8 +6,11 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import Drawer from '@/views/EdgeApplications/Drawer'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   import { useField } from 'vee-validate'
@@ -29,9 +32,17 @@
     },
     isLoadingRequests: {
       type: Boolean
+    },
+    updateDigitalCertificates: {
+      type: Function,
+      required: true
     }
   })
 
+  const digitalCertificateDrawerRef = ref('')
+  const openDigitalCertificateDrawer = () => {
+    digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -40,6 +51,16 @@
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+  const drawerRef = ref('')
+
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
+    emit('edgeApplicationCreated')
+  }
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -92,12 +113,18 @@
   watch(edgeCertificate, async (newEdgeCertificate) => {
     setEdgeCertificate(newEdgeCertificate)
   })
+
+  const onDigitalCertificateSuccess = (domainId) => {
+    edgeCertificate.value = domainId
+    props.updateDigitalCertificates()
+  }
+
+  const emit = defineEmits(['edgeApplicationCreated'])
 </script>
 
 <template>
   <form-horizontal
-    description=" Create a domain with Azion to launch an edge application and set up security with digital
-      certificates."
+    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
   >
     <template #title> General </template>
     <template #inputs>
@@ -120,6 +147,14 @@
   >
     <template #title> Settings </template>
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
+      <DigitalCertificatesDrawer
+        ref="digitalCertificateDrawerRef"
+        @onSuccess="onDigitalCertificateSuccess"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -135,7 +170,27 @@
           filter
           appendTo="self"
           placeholder="Select an edge application"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
       <FieldSwitchBlock
         data-testid="domains-form__cname-access-only-field"
@@ -171,7 +226,27 @@
           filter
           appendTo="self"
           placeholder="Select a certificate"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
       </div>
     </template>
   </form-horizontal>

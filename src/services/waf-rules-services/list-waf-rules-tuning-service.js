@@ -1,5 +1,6 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
+import * as Errors from '@/services/axios/errors'
 
 export const listWafRulesTuningService = async ({ wafId, domains, network, hourRange, filter }) => {
   if (!wafId) {
@@ -19,6 +20,15 @@ export const listWafRulesTuningService = async ({ wafId, domains, network, hourR
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  return httpResponse.body.errors[0].message
 }
 
 const middleware = (filter) => {
@@ -54,9 +64,9 @@ const adapt = (httpResponse) => {
    * like other andpoints.
    */
 
-  // eslint-disable-next-line no-console
-  const isArray = Array.isArray(httpResponse.body.results)
+  if (httpResponse.statusCode !== 200) return httpResponse
 
+  const isArray = Array.isArray(httpResponse.body.results)
   const parsedWafRulesTuning = isArray
     ? httpResponse.body.results.map((event) => {
         const values = {
@@ -93,4 +103,20 @@ const makeSearchParams = ({ domains, network, countries, ipsList, hourRange }) =
   hourRange && searchParams.set('hour_range', hourRange)
 
   return searchParams
+}
+
+const parseHttpResponse = (httpResponse) => {
+  switch (httpResponse.statusCode) {
+    case 200:
+      return httpResponse.body
+    case 400:
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
+  }
 }

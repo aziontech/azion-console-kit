@@ -11,6 +11,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
+  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+  import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
@@ -113,6 +115,8 @@
     }
   ]
 
+  const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings'])
+
   const props = defineProps({
     functionsInstanceOptions: {
       type: Array,
@@ -121,6 +125,9 @@
     cacheSettingsOptions: {
       type: Array,
       required: true
+    },
+    isLoadingRequests: {
+      type: Boolean
     },
     originsOptions: {
       type: Array,
@@ -157,6 +164,7 @@
     }
   })
 
+  const drawerRef = ref('')
   const activeAccordions = ref([0])
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
@@ -189,6 +197,10 @@
   }
 
   const isDefaultPhase = computed(() => props.initialPhase === 'default')
+
+  const isLoadingRequestsData = computed(() => {
+    return props.isLoadingRequests
+  })
 
   const behaviorsRequestOptions = ref([
     {
@@ -304,6 +316,10 @@
     criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
   const addNewCriteria = () => {
     activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
@@ -404,11 +420,22 @@
   )
 
   watch(
+    () => drawerRef.value.showCreateDrawer,
+    () => {
+      emit('toggleDrawer', drawerRef.value.showCreateDrawer)
+    }
+  )
+
+  watch(
     () => props.errors,
     () => {
       openAccordionWithFormErrors()
     }
   )
+
+  const handleSuccess = () => {
+    emit('refreshCacheSettings')
+  }
 </script>
 
 <template>
@@ -419,6 +446,14 @@
     data-testid="rule-form-general"
   >
     <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onSuccess="handleSuccess"
+        :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
+        :edgeApplicationId="edgeApplicationId"
+        :createService="createCacheSettingsService"
+        :showTieredCache="isTieredCacheEnabled"
+      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name"
@@ -694,7 +729,7 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
-                :loading="loadingCacheSettings"
+                :loading="isLoadingRequestsData"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
                 :options="cacheSettingsOptions"
                 optionLabel="name"
@@ -702,7 +737,27 @@
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.cacheId"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
+                        text
+                        @click="openDrawer"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Cache Policy"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdown>
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
               <div class="flex flex-col w-full">

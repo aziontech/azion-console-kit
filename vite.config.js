@@ -78,7 +78,7 @@ const getConfig = () => {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        },
+        }
       }
     }
   }

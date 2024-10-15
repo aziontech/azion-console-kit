@@ -60,12 +60,27 @@ describe('NetworkListsServices', () => {
     expect(data.feedback).toBe('Your network list has been created')
   })
 
-  it('Should return an API error for an 40 error status', async () => {
+  it('Should return an API error for an 400 error status with a array of errors', async () => {
     const apiErrorMock = 'Network name "IP" is already in use on this account'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
         results: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.networkMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it('Should return an API error for an 400 error status with a single string error', async () => {
+    const apiErrorMock = 'Network name "IP" is already in use on this account'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        error: apiErrorMock
       }
     })
     const { sut } = makeSut()

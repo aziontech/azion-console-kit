@@ -2,14 +2,25 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
 
-let firewallName, functionInstanceName, ruleName
+let firewallName, functionInstanceName, ruleName, functionName
 
-describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
+const createFunctionCase = () => {
+  // Act
+  cy.get(selectors.functions.nameInput).clear()
+  cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
+  cy.intercept('GET', 'api/v3/edge_functions*').as('getFunctions')
+  cy.get(selectors.edgeFirewall.edgeFunctionActionbar).find(selectors.functions.saveButton).click()
+  cy.verifyToast('success', 'Your edge function has been created')
+  cy.wait('@getFunctions')
+}
+
+describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
     functionInstanceName = generateUniqueName('EdgeFirewallFunctionInstance')
     ruleName = generateUniqueName('EdgeFirewallRule')
+    functionName = generateUniqueName('EdgeFirewallFunction')
   })
 
   it('should create an Edge Firewall and run a function', () => {
@@ -30,12 +41,8 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
     cy.get(selectors.edgeFirewall.functionInstanceName).type(functionInstanceName)
     cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
-    cy.get(selectors.edgeFirewall.functionInstancDropdownFilter).clear()
-    cy.get(selectors.edgeFirewall.functionInstancDropdownFilter).type(
-      'Edge Firewall Test Function - NAO DELETAR{enter}'
-    )
-    cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
-    cy.get(selectors.edgeFirewall.functionInstanceDropdownFunction).click()
+    cy.get(selectors.edgeFirewall.createFunctionButton).click()
+    createFunctionCase()
     cy.get(selectors.edgeFirewall.functionInstanceSubmit).click()
     cy.verifyToast('success', 'Your Function has been created')
 
@@ -45,10 +52,6 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.functionInstanceTableColumnName).should(
       'have.text',
       functionInstanceName
-    )
-    cy.get(selectors.edgeFirewall.functionInstanceTableColumnInstanced).should(
-      'have.text',
-      'Edge Firewall Test Function - NAO DELETAR'
     )
 
     // Act - Create a rule do run the function

@@ -18,6 +18,8 @@
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
             :isLoadingRequests="isLoadingRequests"
+            :updateDigitalCertificates="updateDigitalCertificates"
+            @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -141,7 +143,18 @@
   }
 
   const requestEdgeApplications = async () => {
-    edgeApplicationsData.value = await props.listEdgeApplicationsService({})
+    isLoadingRequests.value = true
+    try {
+      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      isLoadingRequests.value = false
+    }
+  }
+
+  const handleEdgeApplicationCreated = async () => {
+    await requestEdgeApplications()
   }
 
   const requestDigitalCertificates = async () => {
@@ -221,4 +234,15 @@
       .label('Trusted CA Certificate'),
     active: yup.boolean()
   })
+
+  const updateDigitalCertificates = async () => {
+    try {
+      isLoadingRequests.value = true
+      digitalCertificates.value = await props.listDigitalCertificatesService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      isLoadingRequests.value = false
+    }
+  }
 </script>

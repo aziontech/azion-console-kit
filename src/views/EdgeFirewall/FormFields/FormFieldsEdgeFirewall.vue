@@ -73,7 +73,8 @@
       nameField: 'ddosProtectionUnmetered',
       disabled: true,
       value: true,
-      subtitle: 'Mitigate large and complex network and transport-layer DDoS attacks.',
+      subtitle:
+        'Mitigate large and complex network, transport, presentation, and application-layer DDoS attacks.',
       tag: {
         value: 'Automatically enabled in all accounts',
         icon: 'pi pi-lock'

@@ -56,7 +56,7 @@ describe('WafRulesServices', () => {
     await sut({ attackEvents: bodyRequest, wafId: 10, description: fixtures.description })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/wafs/10/allowed_rules',
+      url: 'v4/edge_firewall/wafs/10/exceptions',
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,

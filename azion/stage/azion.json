@@ -68,6 +68,11 @@
       "origin-id": 153761,
       "origin-key": "f1f976fb-0558-4592-a930-dcad70ab2e7c",
       "name": "origin-console-feedback"
+    },
+    {
+      "origin-id": 157340,
+      "origin-key": "6c3fcf0c-f4b7-46d4-99fa-d61fa3860804",
+      "name": "origin-console-ai"
     }
   ],
   "rules-engine": {
@@ -151,6 +156,11 @@
       {
         "id": 296641,
         "name": "Route Send Feedback",
+        "phase": "request"
+      },
+      {
+        "id": 305832,
+        "name": "Route Send Message to Copilot",
         "phase": "request"
       }
     ]

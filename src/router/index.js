@@ -1,3 +1,4 @@
+import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { azionAiRoutes } from '@routes/azion-ai-routes'
@@ -40,7 +41,6 @@ import { billingRoutes } from '@/router/routes/billing-routes'
 import { createRouter, createWebHistory } from 'vue-router'
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
-import redirectToManager from './hooks/redirectToManager'
 import { useAccountStore } from '@/stores/account'
 import { loadContractServicePlan } from '@/services/contract-services'
 
@@ -87,17 +87,19 @@ const router = createRouter({
   ].concat(errorRoutes)
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore()
-  const routeHandler = { to, from, next }
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
-  const guardDependency = {
+  await beforeEachRoute({
+    to,
+    from,
+    next,
     accountStore,
-    loadContractServicePlan
-  }
-
-  beforeEachRoute(routeHandler, guardDependency)
-  redirectToManager(routeHandler, guardDependency)
+    loadContractServicePlan,
+    tracker
+  })
 })
 
 router.afterEach(afterEachRouteGuard)

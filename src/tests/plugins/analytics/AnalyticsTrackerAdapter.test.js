@@ -8,7 +8,8 @@ const fixtures = {
 const makeSut = () => {
   const analyticsClientSpy = {
     track: vi.fn(),
-    identify: vi.fn()
+    identify: vi.fn(),
+    reset: vi.fn()
   }
   const sut = new AnalyticsTrackerAdapter(analyticsClientSpy)
 
@@ -43,6 +44,18 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledTimes(3)
+  })
+
+  it('should reset the analytics client and clear stored events', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    sut.identify('test-user-id')
+    sut.product.pageLoad({ url: 'test-url-1' })
+    sut.product.pageLoad({ url: 'test-url-2' })
+    sut.reset()
+    sut.track()
+
+    expect(analyticsClientSpy.reset).toHaveBeenCalled()
+    expect(sut.track).toHaveLength(0)
   })
 
   it('should be able to track page load event with correct params', () => {
@@ -589,5 +602,37 @@ describe('AnalyticsTrackerAdapter', () => {
       fieldName: fieldName,
       origin: originName
     })
+  })
+
+  it('should be able to track a Clicked on event', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Purge'
+    const purgeType = 'cache key'
+
+    sut.product.clickedOnEvent(productNameMock, {
+      purgeType
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked on Purge', {
+      purgeType,
+      application: fixtures.application
+    })
+  })
+
+  it('should be able to track a realTimeMetrics', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const eventName = 'Clicked on More Options on Real-Time Metrics'
+    const payload = {
+      chart: 'map chart',
+      application: fixtures.application
+    }
+
+    sut.realTimeMetrics.clickedToRealTimeMetrics({ eventName, payload })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(eventName, payload)
   })
 })

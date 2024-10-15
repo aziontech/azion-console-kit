@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, inject, onMounted } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
@@ -14,7 +14,6 @@
   import * as yup from 'yup'
 
   defineOptions({ name: 'add-payment-method-block' })
-  const stripePlugin = inject('stripe')
 
   const accountStore = useAccountStore()
   const stripe = ref(null)
@@ -42,6 +41,10 @@
     createService: {
       type: Function,
       required: true
+    },
+    stripeClientService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -60,31 +63,46 @@
     initialValue: ''
   })
 
+  const showToast = (severity, summary) => {
+    const options = {
+      closable: true,
+      severity: severity,
+      summary: severity,
+      detail: summary
+    }
+
+    toast.add(options)
+  }
+
   const initializeStripeComponents = async () => {
-    stripe.value = await stripePlugin
-    stripeComponents.value = stripe.value.elements()
-    const theme = accountStore.currentTheme
-    const inputStyles = {
-      style: {
-        base: {
-          fontFamily: "'Roboto', sans-serif",
-          color: theme === 'dark' ? '#ffffff' : '#000000'
-        },
-        '::placeholder': {
-          color: '#ededed'
-        },
-        invalid: {
-          color: '#fa755a',
-          iconColor: '#fa755a'
+    try {
+      stripe.value = await props.stripeClientService()
+      stripeComponents.value = stripe.value.elements()
+      const theme = accountStore.currentTheme
+      const inputStyles = {
+        style: {
+          base: {
+            fontFamily: "'Roboto', sans-serif",
+            color: theme === 'dark' ? '#ffffff' : '#000000'
+          },
+          '::placeholder': {
+            color: '#ededed'
+          },
+          invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
+          }
         }
       }
+      cardNumber.value = stripeComponents.value.create('cardNumber', {
+        ...inputStyles,
+        showIcon: true
+      })
+      cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
+      cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
+    } catch (error) {
+      showToast('error', error)
     }
-    cardNumber.value = stripeComponents.value.create('cardNumber', {
-      ...inputStyles,
-      showIcon: true
-    })
-    cardExpiry.value = stripeComponents.value.create('cardExpiry', inputStyles)
-    cardCvc.value = stripeComponents.value.create('cardCvc', inputStyles)
   }
 
   const handleError = (event, errorType) => {
@@ -108,17 +126,17 @@
   }
 
   const addStripeComponentsToTemplate = () => {
-    cardNumber.value.mount('#card-number-element')
-    cardNumber.value.on('change', (event) => handleError(event, 'cardNumber'))
-    cardNumber.value.on('blur', handleBlur)
+    cardNumber.value?.mount('#card-number-element')
+    cardNumber.value?.on('change', (event) => handleError(event, 'cardNumber'))
+    cardNumber.value?.on('blur', handleBlur)
 
-    cardExpiry.value.mount('#card-expiry-element')
-    cardExpiry.value.on('change', (event) => handleError(event, 'cardExpiry'))
-    cardExpiry.value.on('blur', handleBlur)
+    cardExpiry.value?.mount('#card-expiry-element')
+    cardExpiry.value?.on('change', (event) => handleError(event, 'cardExpiry'))
+    cardExpiry.value?.on('blur', handleBlur)
 
-    cardCvc.value.mount('#card-cvc-element')
-    cardCvc.value.on('change', (event) => handleError(event, 'cardCvc'))
-    cardCvc.value.on('blur', handleBlur)
+    cardCvc.value?.mount('#card-cvc-element')
+    cardCvc.value?.on('change', (event) => handleError(event, 'cardCvc'))
+    cardCvc.value?.on('blur', handleBlur)
   }
 
   const visibleDrawer = computed({
@@ -146,17 +164,6 @@
     if (errorCardholderName.value) {
       displayError.value.cardholderName = errorCardholderName.value
     }
-  }
-
-  const showToast = (severity, summary) => {
-    const options = {
-      closable: true,
-      severity: severity,
-      summary: severity,
-      detail: summary
-    }
-
-    toast.add(options)
   }
 
   const handleSubmit = async () => {
