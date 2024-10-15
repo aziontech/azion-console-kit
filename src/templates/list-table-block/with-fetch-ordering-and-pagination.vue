@@ -401,6 +401,10 @@
     apiFields: {
       type: Array,
       default: () => []
+    },
+    defaultOrderingFieldName: {
+      type: String,
+      default: () => 'id'
     }
   })
 
@@ -444,7 +448,12 @@
 
   onMounted(() => {
     if (!props.lazyLoad) {
-      loadData({ page: 1, pageSize: itemsByPage.value, fields: props.apiFields })
+      loadData({
+        page: 1,
+        pageSize: itemsByPage.value,
+        fields: props.apiFields,
+        ordering: props.defaultOrderingFieldName
+      })
     }
     selectedColumns.value = props.columns
   })
@@ -635,7 +644,8 @@
 
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
-    const ordering = sortOrder === -1 ? `-${sortField}` : sortField
+    let ordering = sortOrder === -1 ? `-${sortField}` : sortField
+    ordering = ordering === null ? props.defaultOrderingFieldName : ordering
 
     await reload({ ordering })
 

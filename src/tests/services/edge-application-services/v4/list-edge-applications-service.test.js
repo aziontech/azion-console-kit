@@ -68,7 +68,7 @@ describe('EdgeApplicationServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications?ordering=name&page=1&page_size=200&fields=&search=`,
+      url: `${version}/edge_application/applications?ordering=&page=1&page_size=200&fields=&search=`,
       method: 'GET'
     })
   })

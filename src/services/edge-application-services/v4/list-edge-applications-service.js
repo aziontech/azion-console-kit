@@ -2,16 +2,13 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
-const DEFAULT_ORDERING_FIELD = 'name'
-
 export const listEdgeApplicationsService = async ({
   fields = '',
   search = '',
-  ordering = DEFAULT_ORDERING_FIELD,
+  ordering = '',
   page = 1,
   pageSize = 200
 }) => {
-  ordering = ordering === null ? DEFAULT_ORDERING_FIELD : ordering
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({

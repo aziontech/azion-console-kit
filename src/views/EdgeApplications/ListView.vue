@@ -44,6 +44,7 @@
       productName: 'Edge Application'
     })
   }
+
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
       productName: 'Edge Application'
@@ -94,6 +95,7 @@
         emptyListMessage="No edge applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
+        :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
