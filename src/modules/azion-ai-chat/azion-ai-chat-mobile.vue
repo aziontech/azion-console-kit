@@ -26,14 +26,6 @@
         </h2>
         <div class="gap-4 flex">
           <PrimeButton
-            icon="pi pi-external-link"
-            outlined
-            class="surface-border h-8 w-8"
-            aria-label="Open a chat in new tab"
-            v-tooltip.bottom="'Open a chat in new tab'"
-            @click="openChatInNewTab"
-          />
-          <PrimeButton
             icon="pi pi-times"
             @click="azionAiChatStore.close()"
             size="small"
@@ -45,7 +37,7 @@
     </template>
 
     <div class="h-full w-full justify-between flex flex-col">
-      <AzionAiChat ref="azionAiChatMobileRef" />
+      <AzionAiChat />
     </div>
   </Sidebar>
 </template>
@@ -55,8 +47,8 @@
   import PrimeTag from 'primevue/tag'
   import PrimeButton from 'primevue/button'
   import AzionAiChat from './azion-ai-chat-block.vue'
-  import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import { computed } from 'vue'
+  import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   const azionAiChatStore = useAzionAiChatStore()
 
   const isChatAiOpen = computed(() => azionAiChatStore.isOpen)
