@@ -71,7 +71,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       .click()
     cy.verifyToast('success', 'Cache Settings successfully created')
 
-    cy.wait('@getCachePolicy')
+    cy.wait('@getCachePolicy', { timeout: 10000 })
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
       .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))

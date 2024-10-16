@@ -2,7 +2,6 @@ import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
@@ -75,7 +74,7 @@ export const edgeApplicationRoutes = {
           clipboardWrite: Helpers.clipboardWrite
         },
         cacheSettingsServices: {
-          listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
+          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
           deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
           createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
           loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
@@ -112,7 +111,7 @@ export const edgeApplicationRoutes = {
           reorderRulesEngine: RulesEngineService.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
-          listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
+          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
         },
         clipboardWrite: Helpers.clipboardWrite
