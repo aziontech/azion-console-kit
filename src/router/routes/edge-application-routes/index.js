@@ -8,7 +8,6 @@ import * as FunctionsService from '@/services/edge-application-functions-service
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
-import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -105,7 +104,7 @@ export const edgeApplicationRoutes = {
           editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         rulesEngineServices: {
-          listRulesEngineService: RulesEngineServiceV4.listRulesEngineService,
+          listRulesEngineService: RulesEngineService.listRulesEngineService,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
           editRulesEngineService: RulesEngineService.editRulesEngineService,
           createRulesEngineService: RulesEngineService.createRulesEngineService,
