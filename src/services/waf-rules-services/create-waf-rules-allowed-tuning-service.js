@@ -37,7 +37,7 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
     }
 
     const httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules`,
+      url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
       method: 'POST',
       body: payload
     })

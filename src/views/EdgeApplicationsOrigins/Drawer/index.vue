@@ -4,6 +4,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
+  import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -19,17 +20,11 @@
       type: String,
       required: true
     },
-    createOriginService: {
-      type: Function,
-      required: true
-    },
     editOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     loadOriginService: {
-      type: Function,
-      required: true
+      type: Function
     },
     documentationService: {
       type: Function,
@@ -257,6 +252,7 @@
   }
 
   defineExpose({
+    showCreateOriginDrawer,
     openDrawerCreate,
     openDrawerEdit
   })
@@ -266,7 +262,8 @@
   <CreateDrawerBlock
     v-if="loadCreateOriginDrawer"
     v-model:visible="showCreateOriginDrawer"
-    :createService="props.createOriginService"
+    :createService="createOriginService"
+    drawerId="create-origin-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"

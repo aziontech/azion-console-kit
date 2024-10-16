@@ -21,7 +21,7 @@ describe('WafRulesServices', () => {
     await sut({ wafId: wafRuleIdMock, allowedId: 10 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge/wafs/765678/allowed_rules/10`,
+      url: `v4/edge_firewall/wafs/765678/exceptions/10`,
       method: 'DELETE'
     })
   })

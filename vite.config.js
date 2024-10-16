@@ -69,10 +69,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
-        '/copilot/chat/completions': {
-          target: 'https://stage-ai.azion.com',
-          changeOrigin: true
-        },
         '/webpagetest': {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,

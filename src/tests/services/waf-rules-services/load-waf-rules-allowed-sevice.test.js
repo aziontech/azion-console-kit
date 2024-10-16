@@ -37,7 +37,7 @@ describe('WafRulesService', () => {
     await sut({ id: 4044, allowedId: { id: 10 } })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/wafs/4044/allowed_rules/10',
+      url: 'v4/edge_firewall/wafs/4044/exceptions/10',
       method: 'GET'
     })
   })
