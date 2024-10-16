@@ -49,7 +49,6 @@
   import suggestionIconMetrics from './assets/suggestion-icon-metrics.svg?url'
   import suggestionIconSecurity from './assets/suggestion-icon-security.svg?url'
   import AzionAiChatSuggestion from './azion-ai-chat-suggestion.vue'
-
   import {
     requestInterceptorService,
     responseInterceptorService
@@ -63,6 +62,7 @@
   import hljs from 'highlight.js'
   import { AZION_MESSAGE_TYPE } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
   import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
+  import { getEnvironment } from '@/helpers'
 
   defineOptions({
     name: 'azion-ai-chat-block'
@@ -79,8 +79,11 @@
   const azionAiChatStore = useAzionAiChatStore()
   const accountStore = ref(null)
   const deepChatRef = ref(null)
+  const environment = getEnvironment()
   const DEEP_CHAT_CONFIG_REQUEST = {
-    url: 'https://stage-ai.azion.com/copilot/chat/completions'
+    url: `https://${
+      environment === 'production' ? '' : 'stage-'
+    }ai.azion.com/copilot/chat/completions`
   }
   const aiAskAzionSessionId = ref('')
   const promptOrigin = ref(null)
