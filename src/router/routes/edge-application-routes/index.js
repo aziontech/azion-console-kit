@@ -1,8 +1,10 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
+import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
+import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
@@ -17,7 +19,7 @@ export const edgeApplicationRoutes = {
       name: 'list-edge-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
-        listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
+        listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
         deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
@@ -89,7 +91,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
         },
         deviceGroupsServices: {
-          listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
+          listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
           deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
           createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,

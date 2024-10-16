@@ -4,8 +4,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   defineOptions({ name: 'list-edge-applications' })
@@ -45,6 +44,7 @@
       productName: 'Edge Application'
     })
   }
+
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
       productName: 'Edge Application'
@@ -58,27 +58,18 @@
         header: 'Name'
       },
       {
-        field: 'origins',
-        header: 'Origins',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'expand-column'
-          })
-        }
-      },
-      {
         field: 'lastEditor',
         header: 'Last Editor'
       },
       {
         field: 'lastModify',
-        sortField: 'lastModifyDate',
+        sortField: 'lastModified',
         header: 'Last Modified'
       }
     ]
   })
+
+  const EDGE_APPLICATION_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified']
 </script>
 
 <template>
@@ -90,19 +81,21 @@
       />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Edge Application"
         createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
         :listService="listEdgeApplicationsService"
         :columns="getColumns"
+        :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
+        :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
