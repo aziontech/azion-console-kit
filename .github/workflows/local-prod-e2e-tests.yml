@@ -4,9 +4,6 @@ on:
   schedule:
     - cron: '0 9,15,21 * * 1-5' # Runs at 6:00, 12:00, and 18:00 in UTC-3 
   workflow_dispatch:
-  push:
-    branches:
-      - e2e-tests-periodic-fix
 
 jobs:
   run-local-prod-e2e-tests:
