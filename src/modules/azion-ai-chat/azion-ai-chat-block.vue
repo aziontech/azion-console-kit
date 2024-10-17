@@ -83,7 +83,8 @@
   const DEEP_CHAT_CONFIG_REQUEST = {
     url: `https://${
       environment === 'production' ? '' : 'stage-'
-    }ai.azion.com/copilot/chat/completions`
+    }ai.azion.com/copilot/chat/completions`,
+    credentials: 'include'
   }
   const aiAskAzionSessionId = ref('')
   const promptOrigin = ref(null)
