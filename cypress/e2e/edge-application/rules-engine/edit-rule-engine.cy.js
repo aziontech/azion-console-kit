@@ -17,7 +17,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
-  cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
+  cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
   cy.get(selectors.list.filteredRow.column('name')).should(
     'have.text',
     fixtures.edgeApplicationName
@@ -60,7 +60,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
+    cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
     cy.get(selectors.list.filteredRow.column('name')).should(
       'have.text',
       fixtures.edgeApplicationName

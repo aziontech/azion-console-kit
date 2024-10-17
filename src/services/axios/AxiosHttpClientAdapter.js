@@ -11,11 +11,7 @@ import {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      const { count = 0, body = null } = httpResponse
-
-      if (!count) return body
-
-      return { count, body }
+      return httpResponse?.body || null
     case 201:
       return 'Resource successfully created'
     case 202:
