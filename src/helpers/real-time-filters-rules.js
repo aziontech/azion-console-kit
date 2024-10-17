@@ -24,7 +24,15 @@ const FILTER_WHITELIST = {
 
 const MOST_RELEVANT_FIELDS = {
   httpMetrics: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
+  httpEvents: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
   l2CacheMetrics: [
+    'Upstream Bytes Received',
+    'Status',
+    'Upstream Status',
+    'Upstream Cache Status',
+    'Request Time'
+  ],
+  l2CacheEvents: [
     'Upstream Bytes Received',
     'Status',
     'Upstream Status',
@@ -38,6 +46,13 @@ const MOST_RELEVANT_FIELDS = {
     'Invocations',
     'Edge Functions Instance Id List'
   ],
+  edgeFunctionsEvents: [
+    'Domain',
+    'Edge Function Id',
+    'Compute Time',
+    'Invocations',
+    'Edge Functions Instance Id List'
+  ],
   imagesProcessedMetrics: [
     'Domain',
     'Status',
@@ -45,7 +60,16 @@ const MOST_RELEVANT_FIELDS = {
     'Upstream Cache Status',
     'Request Time'
   ],
+  imagesProcessedEvents: [
+    'Domain',
+    'Status',
+    'Upstream Status',
+    'Upstream Cache Status',
+    'Request Time'
+  ],
+  idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
   idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+  dataStreamedEvents: ['Domain', 'Data Streamed', 'Endpoint Type', 'Requests', 'Configuration Id'],
   dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
 }
 
