@@ -16,12 +16,11 @@
         <h2 class="flex items-center gap-2">
           Copilot
           <PrimeTag
-            class="ml-2"
-            value="Experimental"
             v-tooltip.bottom="
-              'Copilot is in experimental mode and can give you some wrong answers. Please, always validate your answers.'
+              'Copilot is in preview mode and can give you some wrong answers. Please, always validate your answers.'
             "
-            severity="info"
+            value="Preview"
+            class="ml-2"
           />
         </h2>
         <div class="gap-4 flex">
