@@ -29,7 +29,13 @@ describe('RealTimeMetricsModule', () => {
             'FloatRange',
             'GenericScalar'
           ],
-          FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn', 'challengeSolvedEq']
+          FIELDS_LIKE: [
+            'configurationIdIn',
+            'zoneIdIn',
+            'edgeFunctionIdIn',
+            'botCategoryIn',
+            'challengeSolvedEq'
+          ]
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [

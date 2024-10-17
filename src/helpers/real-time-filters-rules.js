@@ -11,7 +11,13 @@ const FILTER_BLACK_LIST = [
 ]
 
 const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']
-const FIELDS_LIKE = ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn', 'challengeSolvedEq']
+const FIELDS_LIKE = [
+  'configurationIdIn',
+  'zoneIdIn',
+  'edgeFunctionIdIn',
+  'botCategoryIn',
+  'challengeSolvedEq'
+]
 
 const ALIAS_MAPPING = {
   configurationId: 'domain'
