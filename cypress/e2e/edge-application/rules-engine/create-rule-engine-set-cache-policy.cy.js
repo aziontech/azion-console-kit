@@ -17,7 +17,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
-  cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
+  cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
   cy.get(selectors.list.filteredRow.column('name')).should(
     'have.text',
     fixtures.edgeApplicationName
@@ -71,7 +71,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       .click()
     cy.verifyToast('success', 'Cache Settings successfully created')
 
-    cy.wait('@getCachePolicy')
+    cy.wait('@getCachePolicy', { timeout: 10000 })
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
       .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))

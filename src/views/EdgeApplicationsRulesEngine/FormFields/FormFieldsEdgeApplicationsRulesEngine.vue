@@ -9,10 +9,16 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+  import {
+    listEdgeFunctionsService,
+    createFunctionService
+  } from '@/services/edge-application-functions-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
+  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
+  import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
@@ -115,7 +121,12 @@
     }
   ]
 
-  const emit = defineEmits(['toggleDrawer', 'refreshCacheSettings'])
+  const emit = defineEmits([
+    'toggleDrawer',
+    'refreshCacheSettings',
+    'refreshOrigins',
+    'refreshFunctions'
+  ])
 
   const props = defineProps({
     functionsInstanceOptions: {
@@ -161,10 +172,28 @@
     },
     errors: {
       type: Object
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    isLoadBalancerEnabled: {
+      type: Boolean,
+      required: true
+    },
+    loadingOrigins: {
+      type: Boolean,
+      default: false
+    },
+    loadingFunctionsInstance: {
+      type: Boolean,
+      default: false
     }
   })
 
   const drawerRef = ref('')
+  const drawerOriginRef = ref('')
+  const drawerFunctionRef = ref('')
   const activeAccordions = ref([0])
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
@@ -320,6 +349,14 @@
     drawerRef.value.openCreateDrawer()
   }
 
+  const openDrawerOrigin = () => {
+    drawerOriginRef.value.openDrawerCreate()
+  }
+
+  const openDrawerFunction = () => {
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
   const addNewCriteria = () => {
     activeAccordions.value.push(0)
     pushCriteria([DEFAULT_OPERATOR])
@@ -418,11 +455,24 @@
       }
     }
   )
-
   watch(
     () => drawerRef.value.showCreateDrawer,
     () => {
       emit('toggleDrawer', drawerRef.value.showCreateDrawer)
+    }
+  )
+
+  watch(
+    () => drawerOriginRef.value.showCreateOriginDrawer,
+    () => {
+      emit('toggleDrawer', drawerOriginRef.value.showCreateOriginDrawer)
+    }
+  )
+
+  watch(
+    () => drawerFunctionRef.value.showCreateFunctionDrawer,
+    () => {
+      emit('toggleDrawer', drawerFunctionRef.value.showCreateFunctionDrawer)
     }
   )
 
@@ -435,6 +485,14 @@
 
   const handleSuccess = () => {
     emit('refreshCacheSettings')
+  }
+
+  const handleSuccessOrigin = () => {
+    emit('refreshOrigins')
+  }
+
+  const handleSuccessFunction = () => {
+    emit('refreshFunctions')
   }
 </script>
 
@@ -450,9 +508,24 @@
         ref="drawerRef"
         @onSuccess="handleSuccess"
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
-        :edgeApplicationId="edgeApplicationId"
         :createService="createCacheSettingsService"
+        :edgeApplicationId="edgeApplicationId"
         :showTieredCache="isTieredCacheEnabled"
+      />
+      <DrawerOrigin
+        ref="drawerOriginRef"
+        @onSuccess="handleSuccessOrigin"
+        :edgeApplicationId="edgeApplicationId"
+        :createService="createOriginService"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
+      />
+      <DrawerFunction
+        ref="drawerFunctionRef"
+        @onSuccess="handleSuccessFunction"
+        :edgeApplicationId="edgeApplicationId"
+        :createFunctionService="createFunctionService"
+        :listEdgeFunctionsService="listEdgeFunctionsService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -713,7 +786,27 @@
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.functionId"
                 :data-testid="`edge-application-rule-form__function-instance-item[${behaviorIndex}]`"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-applications-rules-engine-form__create-function-instance-button"
+                        text
+                        @click="openDrawerFunction"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Function Instance"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdown>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
@@ -725,7 +818,27 @@
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.originId"
                 :data-testid="`edge-application-rule-form__origin-item[${behaviorIndex}]`"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-applications-rules-engine-form__create-origin-button"
+                        text
+                        @click="openDrawerOrigin"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Origin"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdown>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
