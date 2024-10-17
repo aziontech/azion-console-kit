@@ -32,8 +32,20 @@ describe('RealTimeMetricsModule', () => {
           FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn']
         },
         MOST_RELEVANT_FIELDS: {
-          httpMetrics: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
-          httpEvents: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
+          httpMetrics: [
+            'Domain',
+            'Status',
+            'Upstream Status',
+            'Upstream Cache Status',
+            'Request Time'
+          ],
+          httpEvents: [
+            'Domain',
+            'Status',
+            'Upstream Status',
+            'Upstream Cache Status',
+            'Request Time'
+          ],
           l2CacheMetrics: [
             'Upstream Bytes Received',
             'Status',
@@ -78,7 +90,13 @@ describe('RealTimeMetricsModule', () => {
           ],
           idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
-          dataStreamedEvents: ['Domain', 'Data Streamed', 'Endpoint Type', 'Requests', 'Configuration Id'],
+          dataStreamedEvents: [
+            'Domain',
+            'Data Streamed',
+            'Endpoint Type',
+            'Requests',
+            'Configuration Id'
+          ],
           dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
         },
         FILTER_LIKE_TYPE: {

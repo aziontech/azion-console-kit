@@ -168,7 +168,7 @@
   const sortByMostRelevantFilters = (filters) => {
     const { dataset } = tabPanels[tabSelectIndex.value]
     const newOptions = filters.map(({ label, operator, value }) => {
-    const mostRelevant = GetRelevantField(label, dataset)
+      const mostRelevant = GetRelevantField(label, dataset)
       return {
         label,
         value,
