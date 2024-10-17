@@ -251,8 +251,6 @@
         isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
         isEdgeFunctionEnabled: isModuleEnabled('edgeFunctions').value,
         edgeApplicationId: edgeApplicationId.value,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
-        clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
       })
     }
