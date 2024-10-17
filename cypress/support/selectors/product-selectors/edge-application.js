@@ -12,18 +12,8 @@ export default {
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     createCachePolicyButton:
       '[data-testid="edge-applications-rules-engine-form__create-cache-policy-button"]',
-    createOriginButton: '[data-testid="edge-applications-rules-engine-form__create-origin-button"]',
-    optionRunFunction: '#behaviors[0].name_16',
-    loadingIcon:
-      '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
-    createFunctionInstanceButton:
-      '[data-testid="edge-applications-rules-engine-form__create-function-instance-button"]',
     setCachePolicySelect: (behaviorIndex) =>
       `[data-testid="edge-application-rule-form__cache-settings-item[${behaviorIndex}]__dropdown"]`,
-    setOriginSelect: (behaviorIndex) =>
-      `[data-testid="edge-application-rule-form__origin-item[${behaviorIndex}]__dropdown"]`,
-    setFunctionInstanceSelect: (behaviorIndex) =>
-      `[data-testid="edge-application-rule-form__function-instance-item[${behaviorIndex}]__dropdown"]`,
     criteriaVariableSelect: (criteriaIdx, position) =>
       `[data-testid="edge-application-rule-form__criteria-variable[${criteriaIdx}][${position}]__autocomplete"] > .p-autocomplete-input`,
     criteriaOperatorDropdown: (criteriaIdx, position) =>
@@ -36,11 +26,7 @@ export default {
     behaviorsOption: (option) => `li[aria-label="${option}"]`,
     cachePolicyOptions: '#behaviors[0].cacheId_list',
     cachePolicyOption: (option) => `li[aria-label="${option}"]`,
-    originOption: (option) => `li[aria-label="${option}"]`,
-    functionInstanceOption: (option) => `li[aria-label="${option}"]`,
     cachePolicyActionBar: '[data-testid="create-cache-settings-drawer__action-bar"]',
-    originActionBar: '[data-testid="create-origin-drawer__action-bar"]',
-    functionInstanceActionBar: '[data-testid="create-function-instance-drawer__action-bar"]',
     criteriaConditionalButton: (type) =>
       `[data-testid="rule-form-criteria-item-conditional-add-button"] button[aria-label="${type}"]`,
     criteriaAddButton: '[data-testid="rule-form-criteria-add-button"]',
@@ -49,7 +35,7 @@ export default {
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown-filter-input"]',
     behaviorFunctionValue:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown"] > .p-dropdown-label',
-    firstBehaviorValueOption: '#behaviors\\[0\\]\\.functionId_0',
+    firstBehaviorValueOption: '#behaviors\\[0\\]\\.target_0',
     dropdownLoadingIcon:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
     phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]'
