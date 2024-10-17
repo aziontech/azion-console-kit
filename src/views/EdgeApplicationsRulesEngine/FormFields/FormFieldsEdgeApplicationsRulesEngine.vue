@@ -514,6 +514,7 @@
       />
       <DrawerOrigin
         ref="drawerOriginRef"
+        :showBarGoBack="false"
         @onSuccess="handleSuccessOrigin"
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"

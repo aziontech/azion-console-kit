@@ -16,6 +16,10 @@
   const emit = defineEmits(['onSuccess'])
 
   const props = defineProps({
+    showBarGoBack: {
+      type: Boolean,
+      default: true
+    },
     edgeApplicationId: {
       type: String,
       required: true
@@ -268,7 +272,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
     @onError="handleFailedCreateOrigin"
-    showBarGoBack
+    :showBarGoBack="showBarGoBack"
     title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
