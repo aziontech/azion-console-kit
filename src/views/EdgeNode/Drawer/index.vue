@@ -34,6 +34,7 @@
 
   const showEditServiceDrawer = ref(false)
   const showCreateServiceDrawer = ref(false)
+  const isOverlapped = ref(false)
   const debouncedDrawerAnimate = 300
   const selectedServiceToEdit = ref('0')
   const loadCreateServiceDrawer = refDebounced(showCreateServiceDrawer, debouncedDrawerAnimate)
@@ -74,6 +75,10 @@
     return edgeNode
   }
 
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
+  }
+
   const openDrawerCreate = () => {
     showCreateServiceDrawer.value = true
   }
@@ -97,6 +102,7 @@
     v-model:visible="showCreateServiceDrawer"
     :createService="createServiceEdgeNodeService"
     :schema="validationSchema"
+    :isOverlapped="isOverlapped"
     :initialValues="initialValues"
     @onSuccess="emit('onSuccess')"
     title="Bind Service"
@@ -104,6 +110,7 @@
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
         :edgeNodeId="edgeNodeId"
+        @toggleDrawer="handleToggleDrawer"
         :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
         :bound="false"
@@ -124,6 +131,7 @@
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerService
         :edgeNodeId="edgeNodeId"
+        @toggleDrawer="handleToggleDrawer"
         :listServicesHandle="listServiceEdgeNodeService"
         :disabledFields="disabledFields"
         bound
