@@ -29,7 +29,7 @@ describe('RealTimeMetricsModule', () => {
             'FloatRange',
             'GenericScalar'
           ],
-          FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn']
+          FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn', 'challengeSolvedEq']
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [
@@ -67,7 +67,8 @@ describe('RealTimeMetricsModule', () => {
           configurationIdIn: 'ArrayObject',
           zoneIdIn: 'ArrayObject',
           edgeFunctionIdIn: 'ArrayObject',
-          botCategoryIn: 'ArrayObject'
+          botCategoryIn: 'ArrayObject',
+          challengeSolvedEq: 'Boolean'
         },
         FILTER_LIKE_ALIAS: {
           configurationIdIn: 'Domain'

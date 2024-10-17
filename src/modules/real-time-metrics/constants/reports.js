@@ -1181,7 +1181,7 @@ const REPORTS = [
       }
     ],
     filters: {},
-    limit: 5,
+    limit: 10,
     groupBy: ['remoteAddr'],
     fields: ['remoteAddr'],
     orderDirection: 'DESC',
@@ -1209,7 +1209,7 @@ const REPORTS = [
       }
     ],
     filters: {},
-    limit: 5,
+    limit: 10,
     groupBy: ['requestUrl'],
     fields: ['requestUrl'],
     orderDirection: 'DESC',
