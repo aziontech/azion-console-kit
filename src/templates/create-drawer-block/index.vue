@@ -139,64 +139,66 @@
 </script>
 
 <template>
-  <Sidebar
-    v-model:visible="visibleDrawer"
-    :update:visible="toggleDrawerVisibility"
-    position="right"
-    :pt="{
-      root: {
-        class: `w-full transition-all duration-300 ease-in-out ${
-          props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
-        }`
-      },
-      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
-      content: { class: 'p-8' }
-    }"
-  >
-    <template #header>
-      <h2>{{ title }}</h2>
-      <ConsoleFeedback />
-    </template>
+  <Teleport to="body">
+    <Sidebar
+      v-model:visible="visibleDrawer"
+      :update:visible="toggleDrawerVisibility"
+      position="right"
+      :pt="{
+        root: {
+          class: `w-full transition-all duration-300 ease-in-out ${
+            props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+          }`
+        },
+        headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
+        content: { class: 'p-8' }
+      }"
+    >
+      <template #header>
+        <h2>{{ title }}</h2>
+        <ConsoleFeedback />
+      </template>
 
-    <div class="flex w-full">
-      <form
-        @submit.prevent="handleSubmit"
-        class="pb-16 w-full space-y-8"
-      >
+      <div class="flex w-full">
+        <form
+          @submit.prevent="handleSubmit"
+          class="pb-16 w-full space-y-8"
+        >
+          <slot
+            name="formFields"
+            :errors="errors"
+            :disabledFields="isSubmitting"
+            :closeDrawer="closeDrawer"
+          />
+        </form>
+      </div>
+      <div class="fixed w-full left-0 bottom-0">
         <slot
-          name="formFields"
-          :errors="errors"
-          :disabledFields="isSubmitting"
-          :closeDrawer="closeDrawer"
-        />
-      </form>
-    </div>
-    <div class="fixed w-full left-0 bottom-0">
-      <slot
-        name="actionBar"
-        :goBack="handleGoBack"
-        :closeDrawer="closeDrawer"
-        :onSubmit="onSubmit"
-        :isSubmitting="isSubmitting"
-      >
-        <GoBack
+          name="actionBar"
           :goBack="handleGoBack"
-          v-if="showGoBack"
-          :inDrawer="true"
-        />
-        <ActionBarBlock
-          v-else
-          :data-testid="`${drawerId}__action-bar`"
-          @onCancel="closeDrawer"
-          @onSubmit="onSubmit"
-          :inDrawer="true"
-          :loading="isSubmitting"
-        />
-      </slot>
-    </div>
-  </Sidebar>
-  <DialogUnsavedBlock
-    :blockRedirectUnsaved="formHasChanges"
-    :isDrawer="true"
-  />
+          :closeDrawer="closeDrawer"
+          :onSubmit="onSubmit"
+          :isSubmitting="isSubmitting"
+        >
+          <GoBack
+            :goBack="handleGoBack"
+            v-if="showGoBack"
+            :inDrawer="true"
+          />
+          <ActionBarBlock
+            v-else
+            :data-testid="`${drawerId}__action-bar`"
+            @onCancel="closeDrawer"
+            @onSubmit="onSubmit"
+            :inDrawer="true"
+            :loading="isSubmitting"
+          />
+        </slot>
+      </div>
+    </Sidebar>
+    <DialogUnsavedBlock
+      :blockRedirectUnsaved="formHasChanges"
+      :isDrawer="true"
+    />
+  </Teleport>
 </template>

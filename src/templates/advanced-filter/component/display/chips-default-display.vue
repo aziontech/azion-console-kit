@@ -21,9 +21,13 @@
   })
 
   const formattedValue = (filter) => {
-    const isEmptyString = !filter?.value && filter?.type === 'String'
+    let newFilter = { ...filter }
+    if (filter?.type === 'Boolean')
+      newFilter = { ...filter, value: filter?.value?.label.toLowerCase() }
 
-    return `${filter.format} ${isEmptyString ? '""' : filter.value}`
+    const isEmptyString = !newFilter?.value && newFilter?.type === 'String'
+
+    return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value}`
   }
 </script>
 <template>

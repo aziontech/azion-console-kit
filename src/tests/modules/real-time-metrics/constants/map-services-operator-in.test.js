@@ -13,7 +13,8 @@ describe('RealTimeMetricsModule', () => {
         configurationIdIn: services.searchDomainsService,
         zoneIdIn: services.searchEdgeDnsService,
         edgeFunctionIdIn: services.searchEdgeFunctionsService,
-        botCategoryIn: services.searchBotCategoryService
+        botCategoryIn: services.searchBotCategoryService,
+        challengeSolvedEq: services.searchClassifiedService
       }
 
       expect(MAP_SERVICE_OPERATION).toEqual(mapServiceOperation)
