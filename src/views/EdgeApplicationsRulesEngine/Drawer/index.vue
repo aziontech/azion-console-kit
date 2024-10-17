@@ -61,6 +61,14 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    isLoadBalancerEnabled: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -136,8 +144,8 @@
     )
   })
 
-  const handleToggleDrawer = (isOpen) => {
-    isOverlapped.value = isOpen
+  const handleToggleDrawer = (value) => {
+    isOverlapped.value = value
   }
 
   const createService = async (payload) => {
@@ -154,10 +162,14 @@
     })
   }
 
+  const loadingOrigins = ref(false)
+  const loadingFunctionsInstance = ref(false)
+
   const listFunctionsInstanceOptions = async () => {
     if (!props.isEdgeFunctionEnabled) return
 
     try {
+      loadingFunctionsInstance.value = true
       functionsInstanceOptions.value = await props.listEdgeApplicationFunctionsService(
         props.edgeApplicationId
       )
@@ -167,6 +179,8 @@
         severity: 'error',
         summary: error
       })
+    } finally {
+      loadingFunctionsInstance.value = false
     }
   }
 
@@ -189,6 +203,7 @@
 
   const listOriginsOptions = async () => {
     try {
+      loadingOrigins.value = true
       originsOptions.value = await props.listOriginsService({ id: props.edgeApplicationId })
     } catch (error) {
       toast.add({
@@ -196,6 +211,8 @@
         severity: 'error',
         summary: error
       })
+    } finally {
+      loadingOrigins.value = false
     }
   }
 
@@ -293,6 +310,14 @@
     await listCacheSettingsOptions()
   }
 
+  const handleRefreshOrigins = async () => {
+    await listOriginsOptions()
+  }
+
+  const handleRefreshFunctions = async () => {
+    await listFunctionsInstanceOptions()
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -325,15 +350,21 @@
     <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
         :isLoadingRequests="isLoadingRequests"
+        :loadingOrigins="loadingOrigins"
+        :loadingFunctionsInstance="loadingFunctionsInstance"
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
+        @refreshOrigins="handleRefreshOrigins"
+        @refreshFunctions="handleRefreshFunctions"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -361,7 +392,11 @@
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
         :isLoadingRequests="isLoadingRequests"
+        :loadingOrigins="loadingOrigins"
+        :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
+        :clipboardWrite="clipboardWrite"
+        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"

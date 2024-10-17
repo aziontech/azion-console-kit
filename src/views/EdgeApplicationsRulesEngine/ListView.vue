@@ -74,6 +74,14 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    isLoadBalancerEnabled: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -204,6 +212,8 @@
     :isImageOptimizationEnabled="isImageOptimizationEnabled"
     :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
     :listOriginsService="listOriginsService"
+    :clipboardWrite="clipboardWrite"
+    :isLoadBalancerEnabled="isLoadBalancerEnabled"
     :listCacheSettingsService="listCacheSettingsService"
     :edgeApplicationId="edgeApplicationId"
     :createRulesEngineService="createRulesEngineService"
