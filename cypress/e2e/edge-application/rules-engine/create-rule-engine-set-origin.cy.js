@@ -76,8 +76,6 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .find(selectors.form.actionsSubmitButton)
       .click()
     cy.verifyToast('success', 'Your origin has been created')
-    cy.get(selectors.actionBar.backButton).click()
-    cy.get(selectors.form.leavePageButton).click()
     cy.wait('@getOrigin')
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0))
