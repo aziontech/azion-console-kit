@@ -20,12 +20,5 @@ export default {
   deleteDialog: {
     confirmationInputField: '[data-testid="delete-dialog-confirmation-input-field"]',
     deleteButton: '[data-testid="delete-dialog-footer-delete-button"]'
-  },
-  rowsPerPage: {
-    dropdown: '.p-paginator-rpp-options',
-    option: (size) => `li.p-dropdown-item[aria-label="${size}"]`
-  },
-  orderingHeader: {
-    firstColumn: ':nth-child(1) > .p-column-header-content > [data-pc-section="sort"] > .p-icon'
   }
 }
