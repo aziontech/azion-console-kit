@@ -85,6 +85,32 @@ const FILTER_LIKE_ALIAS = {
 }
 
 /**
+ * Order by more relevant
+ *
+ * @param {array} fields - List to be sorted.
+ * @return {array} Sorted list.
+ */
+
+const sortFields = (fields) => {
+  const notRelevant = -1
+  fields.sort((fieldA, fieldB) => {
+    if (fieldA.mostRelevant === notRelevant && fieldB.mostRelevant !== notRelevant) {
+      return 1
+    }
+
+    if (fieldA.mostRelevant !== notRelevant && fieldB.mostRelevant === notRelevant) {
+      return -1
+    }
+
+    if (fieldA.mostRelevant !== fieldB.mostRelevant) {
+      return fieldA.mostRelevant - fieldB.mostRelevant
+    }
+
+    return fieldA.label.localeCompare(fieldB.label)
+  })
+}
+
+/**
  * Verify if the provided name is blacklisted.
  *
  * @param {object} name - The name to be verified.
@@ -114,6 +140,7 @@ const FILTERS_RULES = {
   FILTER_WHITELIST,
   verifyWhiteListFields,
   verifyBlackListFields,
+  sortFields,
   MOST_RELEVANT_FIELDS,
   FILTER_LIKE_TYPE,
   FILTER_LIKE_ALIAS,
