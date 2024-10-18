@@ -304,7 +304,7 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
@@ -437,6 +437,8 @@
   const savedSearch = ref('')
   const savedOrdering = ref('')
 
+  const firstLoadData = ref(true)
+
   const selectedItems = computed({
     get: () => {
       return props.selectedItensData
@@ -562,6 +564,11 @@
         })
       } finally {
         isLoading.value = false
+        if (firstLoadData.value) {
+          const hasData = data.value?.length > 0
+          emit('on-load-data', !!hasData)
+        }
+        firstLoadData.value = false
       }
     }
   }
@@ -660,9 +667,4 @@
     savedSearch.value = search
     reload({ search: search })
   }
-
-  watch(data, (currentState) => {
-    const hasData = currentState?.length > 0
-    emit('on-load-data', !!hasData)
-  })
 </script>
