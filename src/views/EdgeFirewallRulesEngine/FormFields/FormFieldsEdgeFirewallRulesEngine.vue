@@ -65,6 +65,10 @@
       case 'header_origin':
       case 'header_referer':
       case 'header_user_agent':
+        return [
+          { label: 'matches', value: 'matches' },
+          { label: 'does not match', value: 'does_not_match' }
+        ]
       case 'network':
         return [
           { label: 'matches', value: 'is_in_list' },

@@ -53,7 +53,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Service has been created',
-        urlToEditView: `/edge-services/edit/${httpResponse.body.id}`
+        urlToEditView: `/edge-services/edit/${httpResponse.body.id}`,
+        id: httpResponse.body.id
       }
     case 400:
       throw new Errors.NotFoundError().message

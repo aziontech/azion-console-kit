@@ -2,14 +2,16 @@ import {
   searchEdgeFunctionsService,
   searchDomainsService,
   searchEdgeDnsService,
-  searchBotCategoryService
+  searchBotCategoryService,
+  searchClassifiedService
 } from '@/services/real-time-metrics-services'
 
 const MAP_SERVICE_OPERATION = {
   configurationIdIn: searchDomainsService,
   zoneIdIn: searchEdgeDnsService,
   edgeFunctionIdIn: searchEdgeFunctionsService,
-  botCategoryIn: searchBotCategoryService
+  botCategoryIn: searchBotCategoryService,
+  challengeSolvedEq: searchClassifiedService
 }
 
 export default MAP_SERVICE_OPERATION

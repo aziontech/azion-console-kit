@@ -209,7 +209,7 @@
 
       createAndFilter({
         [field]: {
-          value: item.value,
+          value: item.type !== 'Boolean' ? item.value : item.value.value,
           meta: {
             inputType: item.type
           }

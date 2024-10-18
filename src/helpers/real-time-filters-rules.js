@@ -11,7 +11,13 @@ const FILTER_BLACK_LIST = [
 ]
 
 const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']
-const FIELDS_LIKE = ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn']
+const FIELDS_LIKE = [
+  'configurationIdIn',
+  'zoneIdIn',
+  'edgeFunctionIdIn',
+  'botCategoryIn',
+  'challengeSolvedEq'
+]
 
 const ALIAS_MAPPING = {
   configurationId: 'domain'
@@ -53,7 +59,8 @@ const FILTER_LIKE_TYPE = {
   configurationIdIn: 'ArrayObject',
   zoneIdIn: 'ArrayObject',
   edgeFunctionIdIn: 'ArrayObject',
-  botCategoryIn: 'ArrayObject'
+  botCategoryIn: 'ArrayObject',
+  challengeSolvedEq: 'Boolean'
 }
 
 const FILTER_LIKE_ALIAS = {
