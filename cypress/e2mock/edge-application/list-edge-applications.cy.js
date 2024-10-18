@@ -30,6 +30,25 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', 'foo 1')
   })
 
+  it('Should display empty state when filters result in no data', function () {
+    cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      if (req.url.includes('search=no+data')) {
+        req.reply({
+          count: 0,
+          results: []
+        })
+      }
+    }).as('filteredEdgeApplicationsListApi')
+
+    cy.get(selectors.list.searchInput).clear()
+    cy.get(selectors.list.searchInput).type('no data{enter}')
+
+    cy.wait('@filteredEdgeApplicationsListApi')
+      .its('response.body')
+      .should('have.property', 'count', 0)
+    cy.get(selectors.list.filteredRow.empty).should('have.text', 'No edge applications found.')
+  })
+
   it('should ordering edge applications list', function () {
     cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
       if (req.url.includes('ordering=name')) {
