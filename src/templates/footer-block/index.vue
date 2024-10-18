@@ -1,111 +1,118 @@
-<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
-  <!-- Footer -->
-  <footer
-    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-section surface-border gap-6 place-items-stretch items-center"
-    :class="dynamicClassesByRouteMeta.footer"
-  >
-    <span
-      class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
-      >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
+  <footer>
+    <Toolbar
+      class="gap-6 border-noround w-full m-0 md:px-8 md:py-3 px-3 py-6 z-10 md:flex-row flex-col max-sm:justify-center border-bottom-none"
+      :class="{ '!gap-3': route.meta.hideLinksFooter }"
     >
-    <div
-      class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center"
-      v-if="!route.meta.hideLinksFooter"
-    >
-      <div class="flex gap-1">
-        <PrimeButton
-          label="About"
-          link
-          @click="openAzionSite"
-        />
-        <PrimeButton
-          label="Blog"
-          link
-          @click="openAzionBlog"
-        />
-        <PrimeButton
-          label="Legal"
-          link
-          @click="azionPrivacyPolicyWindowOpener"
-        />
-        <PrimeButton
-          label="Docs"
-          link
-          @click="openDocumentation"
-        />
-      </div>
-      <!-- Social Buttons -->
-      <div class="flex gap-2">
-        <PrimeButton
-          icon="pi pi-github"
-          outlined
-          size="small"
-          v-tooltip.top="{ value: 'Github', showDelay: 200 }"
-          @click="openAzionGithub"
-        />
-        <PrimeButton
-          icon="pi pi-discord"
-          outlined
-          size="small"
-          v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
-          @click="openAzionDiscord"
-        />
-        <PrimeButton
-          icon="ai ai-x"
-          outlined
-          size="small"
-          v-tooltip.top="{ value: 'X', showDelay: 200 }"
-          @click="openAzionX"
-        />
-      </div>
-    </div>
-    <div
-      class="w-full flex flex-wrap gap-2 items-center"
-      :class="dynamicClassesByRouteMeta.optionButton"
-    >
-      <!-- System Status -->
-      <SystemStatusBarBlock
-        v-tooltip.top="{ value: 'System status', showDelay: 200 }"
-        v-if="!route.meta.hideLinksFooter"
-      />
-      <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
-        <Dropdown
-          appendTo="self"
-          :modelValue="selectedTheme"
-          @update:modelValue="selectTheme"
-          optionValue="value"
-          optionLabel="name"
-          :loading="!selectedTheme?.value"
-          :options="themeOptions"
-          :autoOptionFocus="false"
-          :pt="{
-            root: {
-              class: 'w-32',
-              style: 'background: var(--surface-section) !important'
-            },
-            item: { class: 'w-full text-sm' },
-            input: { class: 'w-auto text-sm' }
-          }"
+      <template #start>
+        <span
+          class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
+          >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
         >
-          <template #value="slotProps">
-            <div
-              v-if="slotProps.value"
-              class="flex gap-2 align-items-center"
+      </template>
+
+      <template
+        #center
+        v-if="!route.meta.hideLinksFooter"
+      >
+        <div
+          class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center"
+        >
+          <div class="flex gap-1">
+            <PrimeButton
+              label="About"
+              link
+              @click="openAzionSite"
+            />
+            <PrimeButton
+              label="Blog"
+              link
+              @click="openAzionBlog"
+            />
+            <PrimeButton
+              label="Legal"
+              link
+              @click="azionPrivacyPolicyWindowOpener"
+            />
+            <PrimeButton
+              label="Docs"
+              link
+              @click="openDocumentation"
+            />
+          </div>
+          <!-- Social Buttons -->
+          <div class="flex gap-2">
+            <PrimeButton
+              icon="pi pi-github"
+              outlined
+              size="small"
+              v-tooltip.top="{ value: 'Github', showDelay: 200 }"
+              @click="openAzionGithub"
+            />
+            <PrimeButton
+              icon="pi pi-discord"
+              outlined
+              size="small"
+              v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
+              @click="openAzionDiscord"
+            />
+            <PrimeButton
+              icon="ai ai-x"
+              outlined
+              size="small"
+              v-tooltip.top="{ value: 'X', showDelay: 200 }"
+              @click="openAzionX"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #end>
+        <div class="w-full flex flex-wrap gap-2 items-center">
+          <!-- System Status -->
+          <SystemStatusBarBlock
+            v-tooltip.top="{ value: 'System status', showDelay: 200 }"
+            v-if="!route.meta.hideLinksFooter"
+          />
+          <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
+            <Dropdown
+              appendTo="self"
+              :modelValue="selectedTheme"
+              @update:modelValue="selectTheme"
+              optionValue="value"
+              optionLabel="name"
+              :loading="!selectedTheme?.value"
+              :options="themeOptions"
+              :autoOptionFocus="false"
+              :pt="{
+                root: {
+                  class: 'w-32',
+                  style: 'background: var(--surface-section) !important'
+                },
+                item: { class: 'w-full text-sm' },
+                input: { class: 'w-auto text-sm' }
+              }"
             >
-              <i :class="slotProps.value.icon"></i>
-              <div>{{ slotProps.value.name }}</div>
-            </div>
-          </template>
-          <template #option="slotProps">
-            <div class="flex gap-2 align-items-center">
-              <i :class="slotProps.option.icon"></i>
-              <div>{{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Dropdown>
-      </div>
-    </div>
+              <template #value="slotProps">
+                <div
+                  v-if="slotProps.value"
+                  class="flex gap-2 align-items-center"
+                >
+                  <i :class="slotProps.value.icon"></i>
+                  <div>{{ slotProps.value.name }}</div>
+                </div>
+              </template>
+              <template #option="slotProps">
+                <div class="flex gap-2 align-items-center">
+                  <i :class="slotProps.option.icon"></i>
+                  <div>{{ slotProps.option.name }}</div>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
+        </div>
+      </template>
+    </Toolbar>
   </footer>
 </template>
 
@@ -121,6 +128,7 @@
   } from '@/helpers'
 
   import { ref, computed } from 'vue'
+  import Toolbar from 'primevue/toolbar'
   import { useAccountStore } from '@/stores/account'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import PrimeButton from 'primevue/button'
@@ -144,15 +152,6 @@
   const selectedTheme = computed(() =>
     themeOptions.value.find((option) => option.value === currentTheme.value)
   )
-
-  const dynamicClassesByRouteMeta = computed(() => ({
-    footer: route.meta.hideLinksFooter
-      ? 'flex max-md:flex-col'
-      : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3',
-    optionButton: route.meta.hideLinksFooter
-      ? 'md:justify-end justify-center'
-      : 'justify-center md:justify-start xl:justify-end'
-  }))
 
   const selectTheme = (theme) => {
     setTheme(theme)
