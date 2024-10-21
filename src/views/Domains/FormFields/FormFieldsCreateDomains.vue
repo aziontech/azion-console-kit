@@ -106,6 +106,17 @@
     }
   ])
 
+  const environmentOptionsRadios = ref([
+    {
+      title: 'Global Edge Network',
+      inputValue: 'production'
+    },
+    {
+      title: 'Staging Network',
+      inputValue: 'preview'
+    }
+  ])
+
   const isLoadingRequestsData = computed(() => {
     return props.isLoadingRequests
   })
@@ -123,6 +134,19 @@
 </script>
 
 <template>
+  <form-horizontal description="Environment">
+    <template #title> Environment </template>
+    <template #inputs>
+      <div class="flex flex-col gap-3">
+        <FieldGroupRadio
+          isCard
+          nameField="environment"
+          label="Environment"
+          :options="environmentOptionsRadios"
+        />
+      </div>
+    </template>
+  </form-horizontal>
   <form-horizontal
     description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
   >
