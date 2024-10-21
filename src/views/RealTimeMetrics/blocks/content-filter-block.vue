@@ -207,6 +207,18 @@
         return
       }
 
+      if (item.type === 'StringObject') {
+        createAndFilter({
+          [field]: {
+            value: item.value.value,
+            meta: {
+              inputType: 'String'
+            }
+          }
+        })
+        return
+      }
+
       createAndFilter({
         [field]: {
           value: item.type !== 'Boolean' ? item.value : item.value.value,
