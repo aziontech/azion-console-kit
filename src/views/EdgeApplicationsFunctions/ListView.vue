@@ -181,14 +181,14 @@
   const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
-        productName: 'Functions Instances'
+        productName: 'Function Instances'
       })
       .track()
   }
   const handleTrackClickToEdit = () => {
     tracker.product
       .clickToEdit({
-        productName: 'Functions Instances'
+        productName: 'Function Instances'
       })
       .track()
   }
