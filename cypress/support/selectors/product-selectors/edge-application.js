@@ -7,6 +7,11 @@ export default {
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
   },
+  deviceGroups: {
+    createButton: '[data-testid="create-device-group-button"]',
+    nameInput: '[data-testid="field-text__input"]',
+    userAgentInput: '[data-testid="field-text__textarea"]'
+  },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
