@@ -1,5 +1,6 @@
 import { h } from 'vue'
 import multiselectFilter from './fields/multiselect-filter'
+import selectFilter from './fields/select-filter'
 import textFilter from './fields/text-filter'
 import numberFilter from './fields/number-filter'
 import floatFilter from './fields/float-filter'
@@ -14,6 +15,8 @@ export const FIELDS_MAPPING = {
   IntRange: h(numberRangeFilter),
   FloatRange: h(floatRangeFilter),
   ArrayObject: h(multiselectFilter),
+  Boolean: h(selectFilter),
+  StringObject: h(selectFilter),
   ArrayString: h(chipsFilter),
   GenericScalar: h(textFilter)
 }

@@ -34,6 +34,9 @@
   import { useRoute, useRouter } from 'vue-router'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import { GetRelevantField } from '@/modules/real-time-events/filters'
+  import { FILTERS_RULES } from '@/helpers'
+
   import TabPanelBlock from '@/views/RealTimeEvents/Blocks/tab-panel-block.vue'
   import TABS_EVENTS from '@/views/RealTimeEvents/Blocks/constants/tabs-events'
   import {
@@ -144,6 +147,22 @@
     await fetchFieldsWithOperator(tabPanels[tabSelectIndex.value])
   }
 
+  const sortByMostRelevantFilters = (filters) => {
+    const { dataset } = tabPanels[tabSelectIndex.value]
+    const newOptions = filters.map(({ label, operator, value }) => {
+      const mostRelevant = GetRelevantField(label, dataset)
+      return {
+        label,
+        value,
+        mostRelevant,
+        operator
+      }
+    })
+
+    FILTERS_RULES.sortFields(newOptions)
+    return newOptions
+  }
+
   let abortController = null
   const fetchFieldsWithOperator = async (tabSelected) => {
     if (abortController) abortController.abort()
@@ -158,7 +177,8 @@
         signal: abortController.signal
       })
 
-      generatedFilterFields.value = adapterFields(fieldAllDataset.value, operatorsData, dataset)
+      const filters = adapterFields(fieldAllDataset.value, operatorsData, dataset)
+      generatedFilterFields.value = sortByMostRelevantFilters(filters)
     } catch (error) {
       if (error.name !== 'AbortError') {
         generatedFilterFields.value = []

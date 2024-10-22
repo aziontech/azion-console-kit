@@ -1441,7 +1441,7 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       botManagerBreakdownMetrics (
-        limit: 5
+        limit: 10
         aggregate: {sum: badBotRequests 
 }
         groupBy: [remoteAddr]
@@ -1471,7 +1471,7 @@ sum
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       botManagerBreakdownMetrics (
-        limit: 5
+        limit: 10
         aggregate: {sum: botRequests 
 }
         groupBy: [requestUrl]

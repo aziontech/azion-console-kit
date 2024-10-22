@@ -125,7 +125,7 @@ describe('RealTimeMetricsModule', () => {
             },
             {
               id: 9,
-              label: 'Bot Manager Advanced',
+              label: 'Bot Manager',
               path: 'bot-manager-advanced',
               groupId: 2,
               dashboards: [

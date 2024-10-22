@@ -2,11 +2,14 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
 
   import { useField } from 'vee-validate'
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
+  const emit = defineEmits(['toggleDrawer'])
 
   const props = defineProps({
     listServicesHandle: {
@@ -23,10 +26,15 @@
     },
     bound: {
       type: Boolean
+    },
+    reloadServices: {
+      type: Function,
+      required: true
     }
   })
 
   const listService = ref([])
+  const drawerRef = ref('')
   const loadingOptionsServices = ref(false)
   const toast = useToast()
 
@@ -64,10 +72,26 @@
     }
   })
 
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
   const store = useAccountStore()
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
+
+  watch(
+    () => drawerRef.value.showCreateDrawer,
+    () => {
+      emit('toggleDrawer', drawerRef.value.showCreateDrawer)
+    }
+  )
+
+  const handleDrawerSuccess = (id) => {
+    getServices()
+    serviceId.value = id
+  }
 
   onMounted(() => {
     getServices()
@@ -81,6 +105,10 @@
     description="Provision services created in the Edge Service library and customize variables."
   >
     <template #inputs>
+      <CreateEdgeServiceDrawer
+        ref="drawerRef"
+        @onSuccess="handleDrawerSuccess"
+      />
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">
           <div class="flex w-80 sm:max-w-lg flex-col items-start gap-2">
@@ -98,7 +126,27 @@
               appendTo="self"
               class="w-full"
               description="Select the service to be provisioned."
-            />
+            >
+              <template #footer>
+                <ul class="p-2">
+                  <li>
+                    <PrimeButton
+                      class="w-full whitespace-nowrap flex"
+                      data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
+                      text
+                      @click="openDrawer"
+                      size="small"
+                      icon="pi pi-plus-circle"
+                      :pt="{
+                        label: { class: 'w-full text-left' },
+                        root: { class: 'p-2' }
+                      }"
+                      label="Create Edge Service"
+                    />
+                  </li>
+                </ul>
+              </template>
+            </FieldDropdown>
           </div>
         </div>
       </div>

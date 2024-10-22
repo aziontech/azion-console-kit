@@ -18,7 +18,17 @@ describe('RealTimeMetricsModule', () => {
           'naxsiAttackFamilyEq',
           'naxsiAttackFamilyNe',
           'naxsiAttackFamilyLike',
-          'naxsiAttackFamilyIlike'
+          'naxsiAttackFamilyIlike',
+          'classifiedLike',
+          'classifiedIlike',
+          'classifiedIn',
+          'classifiedNotIn',
+          'classifiedIsNull',
+          'actionLike',
+          'actionIlike',
+          'actionIn',
+          'actionNotIn',
+          'actionIsNull'
         ],
         FILTER_WHITELIST: {
           SUPPORTED_FILTER_TYPE: [
@@ -29,10 +39,23 @@ describe('RealTimeMetricsModule', () => {
             'FloatRange',
             'GenericScalar'
           ],
-          FIELDS_LIKE: ['configurationIdIn', 'zoneIdIn', 'edgeFunctionIdIn', 'botCategoryIn']
+          FIELDS_LIKE: [
+            'configurationIdIn',
+            'zoneIdIn',
+            'edgeFunctionIdIn',
+            'botCategoryIn',
+            'challengeSolvedEq'
+          ]
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [
+            'Domain',
+            'Status',
+            'Upstream Status',
+            'Upstream Cache Status',
+            'Request Time'
+          ],
+          httpEvents: [
             'Domain',
             'Status',
             'Upstream Status',
@@ -46,7 +69,21 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
+          l2CacheEvents: [
+            'Upstream Bytes Received',
+            'Status',
+            'Upstream Status',
+            'Upstream Cache Status',
+            'Request Time'
+          ],
           edgeFunctionsMetrics: [
+            'Domain',
+            'Edge Function Id',
+            'Compute Time',
+            'Invocations',
+            'Edge Functions Instance Id List'
+          ],
+          edgeFunctionsEvents: [
             'Domain',
             'Edge Function Id',
             'Compute Time',
@@ -60,17 +97,39 @@ describe('RealTimeMetricsModule', () => {
             'Upstream Cache Status',
             'Request Time'
           ],
+          imagesProcessedEvents: [
+            'Domain',
+            'Status',
+            'Upstream Status',
+            'Upstream Cache Status',
+            'Request Time'
+          ],
+          idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+          dataStreamedEvents: [
+            'Domain',
+            'Data Streamed',
+            'Endpoint Type',
+            'Requests',
+            'Configuration Id'
+          ],
           dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
         },
         FILTER_LIKE_TYPE: {
           configurationIdIn: 'ArrayObject',
           zoneIdIn: 'ArrayObject',
           edgeFunctionIdIn: 'ArrayObject',
-          botCategoryIn: 'ArrayObject'
+          botCategoryIn: 'ArrayObject',
+          challengeSolvedEq: 'Boolean',
+          classifiedEq: 'StringObject',
+          classifiedNe: 'StringObject',
+          actionEq: 'StringObject',
+          actionNe: 'StringObject',
         },
         FILTER_LIKE_ALIAS: {
-          configurationIdIn: 'Domain'
+          configurationIdIn: 'Domain',
+          classifiedEq: 'Classified',
+          classifiedNe: 'Classified',
         },
         ALIAS_MAPPING: { configurationId: 'domain' }
       }
@@ -106,6 +165,136 @@ describe('RealTimeMetricsModule', () => {
       const unsupportedField = { name: 'unsupportedField', type: { name: 'UnsupportedType' } }
       const result = FILTERS_RULES.verifyWhiteListFields(unsupportedField)
       expect(result).toBe(false)
+    })
+
+    it('should order by the most relevant ', () => {
+      const filters = [
+        {
+          label: 'Server Protocol',
+          value: 'serverProtocol',
+          mostRelevant: -1,
+          operator: []
+        },
+        {
+          label: 'Version',
+          value: 'version',
+          mostRelevant: -1,
+          operator: []
+        },
+        {
+          label: 'Solution',
+          value: 'solution',
+          mostRelevant: -1,
+          operator: []
+        },
+        {
+          label: 'Host',
+          value: 'host',
+          mostRelevant: -1,
+          operator: []
+        },
+        {
+          label: 'Request Time',
+          value: 'requestTime',
+          mostRelevant: 4,
+          operator: []
+        },
+        {
+          label: 'Request Method',
+          value: 'requestMethod',
+          mostRelevant: -1,
+          operator: []
+        },
+        {
+          label: 'Upstream Cache Status',
+          value: 'upstreamCacheStatus',
+          mostRelevant: 3,
+          operator: []
+        },
+        {
+          label: 'Upstream Status',
+          value: 'upstreamStatus',
+          mostRelevant: 2,
+          operator: []
+        },
+        {
+          label: 'Status',
+          value: 'status',
+          mostRelevant: 1,
+          operator: []
+        },
+        {
+          label: 'Upstream Response Time',
+          value: 'upstreamResponseTime',
+          mostRelevant: -1,
+          operator: []
+        }
+      ]
+
+      FILTERS_RULES.sortFields(filters)
+
+      expect(filters).toEqual([
+        {
+          label: 'Status',
+          mostRelevant: 1,
+          operator: [],
+          value: 'status'
+        },
+        {
+          label: 'Upstream Status',
+          mostRelevant: 2,
+          operator: [],
+          value: 'upstreamStatus'
+        },
+        {
+          label: 'Upstream Cache Status',
+          mostRelevant: 3,
+          operator: [],
+          value: 'upstreamCacheStatus'
+        },
+        {
+          label: 'Request Time',
+          mostRelevant: 4,
+          operator: [],
+          value: 'requestTime'
+        },
+        {
+          label: 'Host',
+          mostRelevant: -1,
+          operator: [],
+          value: 'host'
+        },
+        {
+          label: 'Request Method',
+          mostRelevant: -1,
+          operator: [],
+          value: 'requestMethod'
+        },
+        {
+          label: 'Server Protocol',
+          mostRelevant: -1,
+          operator: [],
+          value: 'serverProtocol'
+        },
+        {
+          label: 'Solution',
+          mostRelevant: -1,
+          operator: [],
+          value: 'solution'
+        },
+        {
+          label: 'Upstream Response Time',
+          mostRelevant: -1,
+          operator: [],
+          value: 'upstreamResponseTime'
+        },
+        {
+          label: 'Version',
+          mostRelevant: -1,
+          operator: [],
+          value: 'version'
+        }
+      ])
     })
   })
 })

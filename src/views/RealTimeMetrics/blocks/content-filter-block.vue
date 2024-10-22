@@ -4,6 +4,7 @@
   import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
   import { GetRelevantField } from '@/modules/real-time-metrics/filters'
+  import { FILTERS_RULES } from '@/helpers'
 
   const {
     getDatasetAvailableFilters,
@@ -87,7 +88,7 @@
         }))
       }
     })
-    sortFields(newOptions)
+    FILTERS_RULES.sortFields(newOptions)
     return newOptions
   })
 
@@ -139,25 +140,6 @@
     }
   })
 
-  const sortFields = (fields) => {
-    const notRelevant = -1
-    fields.sort((fieldA, fieldB) => {
-      if (fieldA.mostRelevant === notRelevant && fieldB.mostRelevant !== notRelevant) {
-        return 1
-      }
-
-      if (fieldA.mostRelevant !== notRelevant && fieldB.mostRelevant === notRelevant) {
-        return -1
-      }
-
-      if (fieldA.mostRelevant !== fieldB.mostRelevant) {
-        return fieldA.mostRelevant - fieldB.mostRelevant
-      }
-
-      return fieldA.label.localeCompare(fieldB.label)
-    })
-  }
-
   const clickedAppliedFilterOnRealTimeMetrics = () => {
     const payload = {
       section: props.groupData.current.value,
@@ -207,9 +189,21 @@
         return
       }
 
+      if (item.type === 'StringObject') {
+        createAndFilter({
+          [field]: {
+            value: item.value.value,
+            meta: {
+              inputType: 'String'
+            }
+          }
+        })
+        return
+      }
+
       createAndFilter({
         [field]: {
-          value: item.value,
+          value: item.type !== 'Boolean' ? item.value : item.value.value,
           meta: {
             inputType: item.type
           }
