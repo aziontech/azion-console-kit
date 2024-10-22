@@ -192,7 +192,6 @@
               :icon="item.tag.icon"
               severity="info"
               class="mt-3"
-              data-testid="form-horizontal-modules-default-switch-tag"
             />
           </template>
         </FieldGroupRadio>
