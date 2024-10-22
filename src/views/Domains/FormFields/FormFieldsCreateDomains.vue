@@ -134,19 +134,6 @@
 </script>
 
 <template>
-  <form-horizontal description="Environment">
-    <template #title> Environment </template>
-    <template #inputs>
-      <div class="flex flex-col gap-3">
-        <FieldGroupRadio
-          isCard
-          nameField="environment"
-          label="Environment"
-          :options="environmentOptionsRadios"
-        />
-      </div>
-    </template>
-  </form-horizontal>
   <form-horizontal
     description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
   >
@@ -161,6 +148,21 @@
           data-testid="domains-form__name-field"
           :value="name"
           description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
+        />
+      </div>
+    </template>
+  </form-horizontal>
+  <form-horizontal
+    title="Environment Type"
+    description="Select Global Edge Network to set this domain as a production domain, and select Staging Network to set this domain as a domain for tests. Domain for tests doesn't impact the production environment."
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-3">
+        <FieldGroupRadio
+          isCard
+          nameField="environment"
+          label=""
+          :options="environmentOptionsRadios"
         />
       </div>
     </template>

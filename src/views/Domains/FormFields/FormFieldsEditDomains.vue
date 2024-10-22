@@ -7,6 +7,7 @@
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InputText from 'primevue/inputtext'
+  import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
@@ -45,7 +46,7 @@
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
-
+  const { value: environment } = useField('environment')
   const { value: domainName } = useField('domainName')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
@@ -99,16 +100,32 @@
     }
   ])
 
-  const environmentOptionsRadios = ref([
-    {
-      title: 'Global Edge Network',
-      inputValue: 'production'
-    },
-    {
-      title: 'Staging Network',
-      inputValue: 'preview'
+  const environmentOptions = computed(() => {
+    const tag = {
+      value: 'The environment type cannot be changed after the domain is created',
+      icon: 'pi pi-lock'
     }
-  ])
+    const environmentOptionsRadios = [
+      {
+        title: 'Global Edge Network',
+        inputValue: 'production',
+        disabled: true
+      },
+      {
+        title: 'Staging Network',
+        inputValue: 'preview',
+        disabled: true
+      }
+    ]
+
+    if (environment.value === 'production') {
+      environmentOptionsRadios[0].tag = tag
+    } else if (environment.value === 'preview') {
+      environmentOptionsRadios[1].tag = tag
+    }
+
+    return environmentOptionsRadios
+  })
 
   const isLoadingEdgeApplications = computed(() => {
     return props.loadingEdgeApplications
@@ -139,20 +156,6 @@
 </script>
 
 <template>
-  <form-horizontal description="Environment">
-    <template #title> Environment </template>
-    <template #inputs>
-      <div class="flex flex-col gap-3">
-        <FieldGroupRadio
-          isCard
-          disabled
-          nameField="environment"
-          label="Environment"
-          :options="environmentOptionsRadios"
-        />
-      </div>
-    </template>
-  </form-horizontal>
   <form-horizontal
     title="General"
     description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
@@ -167,6 +170,32 @@
           :value="name"
           description="Give a unique and descriptive name to identify the domain."
         />
+      </div>
+    </template>
+  </form-horizontal>
+
+  <form-horizontal
+    title="Environment Type"
+    description="Select Global Edge Network to set this domain as a production domain, and select Staging Network to set this domain as a domain for tests. Domain for tests doesn't impact the production environment."
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-3">
+        <FieldGroupRadio
+          isCard
+          nameField="environment"
+          :options="environmentOptions"
+        >
+          <template #footer="{ item }">
+            <PrimeTag
+              v-if="item?.tag"
+              :value="item.tag.value"
+              :icon="item.tag.icon"
+              severity="info"
+              class="mt-3"
+              data-testid="form-horizontal-modules-default-switch-tag"
+            />
+          </template>
+        </FieldGroupRadio>
       </div>
     </template>
   </form-horizontal>

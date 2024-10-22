@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Domain"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +9,7 @@
         :loadService="loadDomainService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setDomainName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
@@ -16,7 +17,6 @@
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
-            :domainName="domainName"
             hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
@@ -104,6 +104,7 @@
   const digitalCertificates = ref([])
   const toast = useToast()
   const loadingEdgeApplications = ref(true)
+  const domainName = ref()
 
   const requestEdgeApplications = async () => {
     loadingEdgeApplications.value = true
@@ -142,6 +143,10 @@
 
   const scrollToTop = () => {
     window.scrollTo(0, 0)
+  }
+
+  const setDomainName = async (domain) => {
+    domainName.value = domain.name
   }
 
   onMounted(async () => {
