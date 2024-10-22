@@ -5,39 +5,27 @@
     :listTypeAccountService="listTypeAccountService"
     :accountHandler="accountHandler"
   />
+
   <PageLoadingBlock :showLoading="showLoading" />
 
-  <main
-    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-384px)] mt-14"
-    :class="[
-      styleHelper,
-      { 'flex align-items-center': !props.isLogged },
-      {
-        '[&>.active]:md:w-[calc(100%-500px)]': aiChatIsOpen
-      }
-    ]"
+  <div
+    class="flex flex-col w-full h-full"
+    :class="[styleHelper]"
   >
-    <slot :customClass="customClass" />
-
-    <HelpBlock
-      class="z-10"
-      :class="customClassHelper"
-    />
-    <AzionAiChatBlock
-      class="z-20"
-      :class="aiChatIsOpen"
-    />
-  </main>
-
-  <FooterBlock />
+    <main
+      class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-384px)] mt-14"
+      :class="{ 'flex align-items-center': props.isLogged }"
+    >
+      <slot :customClass="customClass" />
+    </main>
+    <FooterBlock />
+  </div>
 </template>
 
 <script setup>
   import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
-  import AzionAiChatBlock from '@modules/azion-ai-chat/index.vue'
   import FooterBlock from '@/templates/footer-block'
-  import HelpBlock from '@/templates/help-center-block'
   import PageLoadingBlock from '@/templates/loading-block'
   import MainMenuBlock from '@/templates/main-menu-block'
   import ToastBlock from '@/templates/toast-block'
