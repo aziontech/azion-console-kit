@@ -30,7 +30,7 @@ describe('EdgeApplicationDeviceGroupsServicesV4', () => {
     await sut({ id: edgeApplicationId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${edgeApplicationId}/device_groups?ordering=name&page=1&page_size=200&fields=&search=undefined`,
+      url: `${version}/edge_application/applications/${edgeApplicationId}/device_groups?ordering=name&page=1&page_size=200&fields=&search=`,
       method: 'GET'
     })
   })

@@ -4,12 +4,13 @@ import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-pa
 
 export const listDeviceGroupsService = async ({
   id,
+  search = '',
   fields = '',
   ordering = 'name',
   page = 1,
   pageSize = 200
 }) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize })
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationV4BaseUrl()}/${id}/device_groups?${searchParams.toString()}`,
     method: 'GET'
@@ -32,7 +33,10 @@ const adapt = (httpResponse) => {
     }
   })
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: parsedDeviceGroups,
     statusCode: httpResponse.statusCode
   }

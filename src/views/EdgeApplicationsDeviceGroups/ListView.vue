@@ -2,9 +2,9 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import ListTableBlock from '@/templates/list-table-block'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import PrimeButton from 'primevue/button'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -112,6 +112,8 @@
     return await props.deleteDeviceGroupService(id, props.edgeApplicationId)
   }
 
+  const DEVICE_GROUP_API_FIELDS = ['id', 'name', 'user_agent']
+
   const actions = [
     {
       type: 'delete',
@@ -148,11 +150,13 @@
     :documentationService="documentationService"
   />
   <div v-if="hasContentToList">
-    <ListTableBlock
+    <FetchListTableBlock
       ref="listDeviceGroupsEdgeApplicationsRef"
       :listService="listDeviceGroupsWithDecorator"
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
+      :defaultOrderingFieldName="'name'"
+      :apiFields="DEVICE_GROUP_API_FIELDS"
       @on-load-data="handleLoadData"
       @on-before-go-to-edit="handleTrackClickToEdit"
       emptyListMessage="No device groups found."
@@ -166,7 +170,7 @@
           label="Device Group"
         />
       </template>
-    </ListTableBlock>
+    </FetchListTableBlock>
   </div>
   <EmptyResultsBlock
     v-else
@@ -179,6 +183,7 @@
     <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
+        data-testid="create-device-group-button"
         @click="openCreateDeviceGroupDrawer"
         severity="secondary"
         icon="pi pi-plus"
