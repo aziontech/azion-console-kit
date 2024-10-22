@@ -154,7 +154,8 @@
   </form-horizontal>
   <form-horizontal
     title="Environment Type"
-    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment" >
+    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
+  >
     <template #inputs>
       <div class="flex flex-col gap-3">
         <FieldGroupRadio
