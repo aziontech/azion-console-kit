@@ -122,7 +122,7 @@
                   <template #button>
                     <PrimeButton
                       label="Copy"
-                      class="items-center"
+                      class="items-center min-w-min"
                       icon="pi pi-copy"
                       @click="copyCacheKey"
                       outlined
@@ -165,7 +165,7 @@
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
-                sufix="ms"
+                sufix="s"
                 :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
@@ -179,7 +179,7 @@
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
-                sufix="ms"
+                sufix="s"
                 :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
@@ -243,7 +243,7 @@
               </BigNumber>
               <BigNumber
                 label="Upstream Bytes Received"
-                sufix="ms"
+                sufix="s"
                 class="flex-1"
                 :tooltipMessage="upstreamBytesReceivedTooltip"
               >
