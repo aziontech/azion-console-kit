@@ -18,7 +18,17 @@ describe('RealTimeMetricsModule', () => {
           'naxsiAttackFamilyEq',
           'naxsiAttackFamilyNe',
           'naxsiAttackFamilyLike',
-          'naxsiAttackFamilyIlike'
+          'naxsiAttackFamilyIlike',
+          'classifiedLike',
+          'classifiedIlike',
+          'classifiedIn',
+          'classifiedNotIn',
+          'classifiedIsNull',
+          'actionLike',
+          'actionIlike',
+          'actionIn',
+          'actionNotIn',
+          'actionIsNull'
         ],
         FILTER_WHITELIST: {
           SUPPORTED_FILTER_TYPE: [
@@ -110,10 +120,16 @@ describe('RealTimeMetricsModule', () => {
           zoneIdIn: 'ArrayObject',
           edgeFunctionIdIn: 'ArrayObject',
           botCategoryIn: 'ArrayObject',
-          challengeSolvedEq: 'Boolean'
+          challengeSolvedEq: 'Boolean',
+          classifiedEq: 'StringObject',
+          classifiedNe: 'StringObject',
+          actionEq: 'StringObject',
+          actionNe: 'StringObject',
         },
         FILTER_LIKE_ALIAS: {
-          configurationIdIn: 'Domain'
+          configurationIdIn: 'Domain',
+          classifiedEq: 'Classified',
+          classifiedNe: 'Classified',
         },
         ALIAS_MAPPING: { configurationId: 'domain' }
       }

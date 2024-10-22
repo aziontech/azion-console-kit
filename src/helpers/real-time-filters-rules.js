@@ -7,7 +7,17 @@ const FILTER_BLACK_LIST = [
   'naxsiAttackFamilyEq',
   'naxsiAttackFamilyNe',
   'naxsiAttackFamilyLike',
-  'naxsiAttackFamilyIlike'
+  'naxsiAttackFamilyIlike',
+  'classifiedLike',
+  'classifiedIlike',
+  'classifiedIn',
+  'classifiedNotIn',
+  'classifiedIsNull',
+  'actionLike',
+  'actionIlike',
+  'actionIn',
+  'actionNotIn',
+  'actionIsNull'
 ]
 
 const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']
@@ -84,11 +94,17 @@ const FILTER_LIKE_TYPE = {
   zoneIdIn: 'ArrayObject',
   edgeFunctionIdIn: 'ArrayObject',
   botCategoryIn: 'ArrayObject',
-  challengeSolvedEq: 'Boolean'
+  challengeSolvedEq: 'Boolean',
+  classifiedEq: 'StringObject',
+  classifiedNe: 'StringObject',
+  actionEq: 'StringObject',
+  actionNe: 'StringObject',
 }
 
 const FILTER_LIKE_ALIAS = {
-  configurationIdIn: 'Domain'
+  configurationIdIn: 'Domain',
+  classifiedEq: 'Classified',
+  classifiedNe: 'Classified',
 }
 
 /**

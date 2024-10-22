@@ -3,7 +3,9 @@ import {
   searchDomainsService,
   searchEdgeDnsService,
   searchBotCategoryService,
-  searchClassifiedService
+  searchChallengeSolvedService,
+  searchClassifiedService,
+  searchActionService
 } from '@/services/real-time-metrics-services'
 
 const MAP_SERVICE_OPERATION = {
@@ -11,7 +13,11 @@ const MAP_SERVICE_OPERATION = {
   zoneIdIn: searchEdgeDnsService,
   edgeFunctionIdIn: searchEdgeFunctionsService,
   botCategoryIn: searchBotCategoryService,
-  challengeSolvedEq: searchClassifiedService
+  challengeSolvedEq: searchChallengeSolvedService,
+  classifiedEq: searchClassifiedService,
+  classifiedNe: searchClassifiedService,
+  actionEq: searchActionService,
+  actionNe: searchActionService
 }
 
 export default MAP_SERVICE_OPERATION
