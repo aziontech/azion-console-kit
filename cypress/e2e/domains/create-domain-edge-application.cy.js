@@ -50,7 +50,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.login()
   })
 
-  it('should not be possible to set a pending certificate to a domain', () => {
+  it('should create and delete a domain using a edge application', () => {
     domainName = generateUniqueName('domain')
 
     // Arrange
