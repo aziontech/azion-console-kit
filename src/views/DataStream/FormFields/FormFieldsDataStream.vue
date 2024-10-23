@@ -397,7 +397,14 @@
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
             data-testid="data-stream-form__destination__access-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="!hasPermissionDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__access-key-field__description"
@@ -429,7 +436,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__secret-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="!hasPermissionDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__secret-key-field__description"
@@ -461,7 +475,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__object-key-prefix-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="!hasPermissionDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__object-key-prefix-field__description"
@@ -978,6 +999,7 @@
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
@@ -1145,6 +1167,8 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const hasPermissionDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {
