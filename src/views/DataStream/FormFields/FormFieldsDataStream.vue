@@ -400,7 +400,7 @@
           >
             <template
               #showicon
-              v-if="!hasPermissionToEditDataStream"
+              v-if="hasNoPermissionToEditDataStream"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -439,7 +439,7 @@
           >
             <template
               #showicon
-              v-if="!hasPermissionToEditDataStream"
+              v-if="hasNoPermissionToEditDataStream"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -478,7 +478,7 @@
           >
             <template
               #showicon
-              v-if="!hasPermissionToEditDataStream"
+              v-if="hasNoPermissionToEditDataStream"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -1168,7 +1168,7 @@
   // Using the store
   const store = useAccountStore()
 
-  const hasPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
+  const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {

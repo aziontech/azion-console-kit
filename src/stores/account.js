@@ -29,10 +29,8 @@ export const useAccountStore = defineStore({
     },
     hasPermissionToEditDataStream(state) {
       const permissionToEditDataStream = 'Edit Data Stream'
-      return (
-        state.account.permissions?.some(
-          (permission) => permission.name === permissionToEditDataStream
-        ) || false
+      return !!state.account.permissions?.some(
+        (permission) => permission.name === permissionToEditDataStream
       )
     },
     metricsOnlyAccessRestriction(state) {
