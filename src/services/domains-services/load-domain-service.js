@@ -26,7 +26,8 @@ const adapt = (httpResponse) => {
     mtlsIsEnabled: body?.is_mtls_enabled,
     active: body.is_active,
     mtlsVerification: body?.mtls_verification,
-    mtlsTrustedCertificate: body?.mtls_trusted_ca_certificate_id || undefined
+    mtlsTrustedCertificate: body?.mtls_trusted_ca_certificate_id || undefined,
+    environment: body.environment
   }
 
   return {
