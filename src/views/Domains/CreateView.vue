@@ -187,6 +187,7 @@
 
   const initialValues = {
     name: '',
+    environment: 'production',
     edgeApplication: null,
     cnames: '',
     cnameAccessOnly: true,
@@ -232,7 +233,8 @@
         then: (schema) => schema.required()
       })
       .label('Trusted CA Certificate'),
-    active: yup.boolean()
+    active: yup.boolean(),
+    environment: yup.string()
   })
 
   const updateDigitalCertificates = async () => {
