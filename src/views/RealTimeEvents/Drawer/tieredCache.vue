@@ -165,7 +165,7 @@
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
-                sufix="s"
+                sufix="bytes"
                 :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
@@ -179,7 +179,7 @@
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
-                sufix="s"
+                sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
@@ -243,7 +243,7 @@
               </BigNumber>
               <BigNumber
                 label="Upstream Bytes Received"
-                sufix="s"
+                sufix="bytes"
                 class="flex-1"
                 :tooltipMessage="upstreamBytesReceivedTooltip"
               >
