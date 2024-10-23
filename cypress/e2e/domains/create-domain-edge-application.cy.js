@@ -45,12 +45,12 @@ const createDigitalCertificateCase = () => {
   cy.wait('@getDigitalCertificatesApi')
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
   })
 
-  it('should create and delete a domain using a edge application', () => {
+  it('should not be possible to set a pending certificate to a domain', () => {
     domainName = generateUniqueName('domain')
 
     // Arrange
