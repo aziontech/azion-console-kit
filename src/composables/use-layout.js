@@ -1,15 +1,11 @@
 import { computed, reactive, readonly } from 'vue'
 
 const layoutState = reactive({
-  profileSidebarVisible: false,
-  productSidebarVisible: false,
   sidebarVisible: false
 })
 
 export function useLayout() {
   const resetMenu = () => {
-    layoutState.profileSidebarVisible = false
-    layoutState.productSidebarVisible = false
     layoutState.sidebarVisible = false
   }
 

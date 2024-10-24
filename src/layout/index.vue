@@ -25,7 +25,6 @@
 </template>
 
 <script setup>
-  // import { useLayout } from '@/layout/composables/layout'
   import { computed } from 'vue'
   import AppFooter from '@/layout/app-footer'
   import AppNavbar from './app-navbar.vue'
@@ -35,7 +34,7 @@
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
   import PageLoadingBlock from '@/templates/loading-block'
-  import { useLayout } from '@/composables/useLayout'
+  import { useLayout } from '@/composables/use-layout'
 
   import { useLoadingStore } from '@/stores/loading'
   import { storeToRefs } from 'pinia'

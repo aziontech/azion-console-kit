@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import SelectButton from 'primevue/selectbutton'
-  import { useLayout } from '@/composables/useLayout'
+  import { useLayout } from '@/composables/use-layout'
 
   const value = ref('Azion Copilot')
   const options = ref(['Azion Copilot', 'Documentation'])

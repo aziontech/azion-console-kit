@@ -18,7 +18,7 @@
 <script setup>
   import { computed, inject } from 'vue'
   import PrimeButton from 'primevue/button'
-  import { useLayout } from '@/composables/useLayout'
+  import { useLayout } from '@/composables/use-layout'
 
   defineOptions({ name: 'NavbarHelpBlock' })
   const { isSidebarActive, toggleSidebar } = useLayout()
