@@ -1,6 +1,5 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
-  // import aiAzionAvatar from '@/assets/svg/ai-ask-azion'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
   import { computed, inject, onMounted, ref } from 'vue'
@@ -247,46 +246,6 @@
               />
             </div>
           </div>
-          <!-- <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
-            <div class="flex flex-row justify-start gap-3">
-              <div
-                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
-              >
-                <aiAzionAvatar />
-              </div>
-              <div class="flex flex-col gap-2">
-                <div class="text-lg sm:text-xl font-medium">Ask to Azion Copilot</div>
-                <div class="text-xs sm:text-sm text-color-secondary">
-                  Ask your questions to Azion Copilot, Azion's artificial intelligence trained with
-                  years of learning in Edge.
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
-              <PrimeButton
-                type="button"
-                class="sm:w-auto w-full"
-                label="Go to Azion Copilot"
-                outlined
-                size="small"
-                @click="navigateToRealTimeMetrics"
-              />
-              <PrimeButton
-                type="button"
-                label="How AI Azion works"
-                link
-                class="w-full sm:w-auto"
-                icon="pi pi-external-link"
-                iconPos="right"
-                size="small"
-                @click="openDocsRealTimeMetrics"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-              />
-            </div>
-          </div> -->
         </div>
 
         <div
