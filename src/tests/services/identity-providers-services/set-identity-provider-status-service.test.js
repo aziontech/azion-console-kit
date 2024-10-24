@@ -11,7 +11,7 @@ const fixtures = {
   },
   SAML: {
     id: 1,
-    isActive: true,
+    isActive: false,
     protocol: 'SAML'
   }
 }
@@ -77,7 +77,7 @@ describe('SetIdentityProviderStatusService', () => {
 
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.basic)
+    const feedbackMessage = sut(fixtures.OIDC)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -147,7 +147,7 @@ describe('SetIdentityProviderStatusService', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.basic)
+      const response = sut(fixtures.OIDC)
 
       expect(response).rejects.toBe(expectedError)
     }
