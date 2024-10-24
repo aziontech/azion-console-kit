@@ -9,7 +9,7 @@
       v-if="props.showNavItems"
     >
       <div class="flex items-center gap-3">
-        <SidebarBlock />
+        <ProductionMenuBlock />
 
         <AzionLogo
           class="max-md:hidden cursor-pointer"
@@ -28,14 +28,15 @@
       </div>
       <div class="flex gap-2 items-center ml-auto">
         <Create />
+
         <Help />
-        <AiChatButton />
 
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
         />
-        <ProfileBlock />
+
+        <ProfileMenuBlock />
       </div>
     </div>
 
@@ -66,6 +67,7 @@
 </template>
 
 <script setup>
+  import Help from '@/layout/components/navbar/help'
   import { ref, provide, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useRouter, useRoute } from 'vue-router'
@@ -73,13 +75,11 @@
 
   import AzionLogo from '@assets/svg/logo'
   import AzionMobileLogo from '@assets/svg/mobile-logo'
-  import SidebarBlock from '@templates/sidebar-block'
-  import Create from './create'
-  import ConsoleFeedback from './feedback'
-  import Help from './help'
-  import AiChatButton from './ai-chat-button.vue'
-  import SwitchAccount from './switch-account'
-  import ProfileBlock from '@templates/profile-block'
+  import Create from '@/layout/components/navbar/create'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import SwitchAccount from '@/layout/components/navbar/switch-account'
+  import ProductionMenuBlock from '@/layout/components/menu-production'
+  import ProfileMenuBlock from '@/layout/components/menu-profile'
   import { openDocumentation } from '@/helpers'
 
   defineOptions({ name: 'navbar-block' })

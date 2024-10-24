@@ -75,7 +75,7 @@
   import { computed, inject } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
   import { useRoute } from 'vue-router'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'

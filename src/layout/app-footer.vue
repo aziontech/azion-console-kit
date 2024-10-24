@@ -1,12 +1,12 @@
 <template>
   <footer>
     <Toolbar
-      class="gap-6 border-noround w-full m-0 md:px-8 md:py-3 px-3 py-6 z-10 md:flex-row flex-col max-sm:justify-center border-bottom-none"
-      :class="{ '!gap-3': route.meta.hideLinksFooter }"
+      class="gap-6 border-noround border-x-none w-full m-0 md:px-8 md:py-3 px-3 py-6 z-10 md:flex-row flex-col max-sm:justify-center border-bottom-none"
+      :class="toolbarClass"
     >
       <template #start>
         <span
-          class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
+          class="w-full text-center place-items-start md:text-left text-sm text-normal text-color-secondary"
           >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
         >
       </template>
@@ -68,7 +68,7 @@
       </template>
 
       <template #end>
-        <div class="w-full flex flex-wrap gap-2 items-center">
+        <div class="w-full flex flex-wrap gap-2 items-center justify-center">
           <!-- System Status -->
           <SystemStatusBarBlock
             v-tooltip.top="{ value: 'System status', showDelay: 200 }"
@@ -84,14 +84,7 @@
               :loading="!selectedTheme?.value"
               :options="themeOptions"
               :autoOptionFocus="false"
-              :pt="{
-                root: {
-                  class: 'w-32',
-                  style: 'background: var(--surface-section) !important'
-                },
-                item: { class: 'w-full text-sm' },
-                input: { class: 'w-auto text-sm' }
-              }"
+              :pt="dropdownPt"
             >
               <template #value="slotProps">
                 <div
@@ -156,4 +149,17 @@
   const selectTheme = (theme) => {
     setTheme(theme)
   }
+
+  const toolbarClass = computed(() => ({
+    '!gap-3': route.meta.hideLinksFooter
+  }))
+
+  const dropdownPt = computed(() => ({
+    root: {
+      class: 'w-32',
+      style: 'background: var(--surface-section) !important'
+    },
+    item: { class: 'w-full text-sm' },
+    input: { class: 'w-auto text-sm' }
+  }))
 </script>
