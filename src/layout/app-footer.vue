@@ -81,7 +81,7 @@
               @update:modelValue="selectTheme"
               optionValue="value"
               optionLabel="name"
-              :loading="!selectedTheme?.value"
+              :loading="isThemeNotSelected"
               :options="themeOptions"
               :autoOptionFocus="false"
               :pt="dropdownPt"
@@ -142,9 +142,12 @@
   ])
 
   const currentTheme = computed(() => accountStore.currentTheme)
+
   const selectedTheme = computed(() =>
     themeOptions.value.find((option) => option.value === currentTheme.value)
   )
+
+  const isThemeNotSelected = computed(() => !selectedTheme.value?.value)
 
   const selectTheme = (theme) => {
     setTheme(theme)
@@ -154,12 +157,12 @@
     '!gap-3': route.meta.hideLinksFooter
   }))
 
-  const dropdownPt = computed(() => ({
+  const dropdownPt = {
     root: {
       class: 'w-32',
       style: 'background: var(--surface-section) !important'
     },
     item: { class: 'w-full text-sm' },
     input: { class: 'w-auto text-sm' }
-  }))
+  }
 </script>
