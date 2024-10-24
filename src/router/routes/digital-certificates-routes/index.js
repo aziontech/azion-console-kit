@@ -9,7 +9,7 @@ export const digitalCertificatesRoutes = {
     {
       path: '',
       name: 'list-digital-certificates',
-      component: () => import('@views/SSOManagement/CreateView.vue'),
+      component: () => import('@views/DigitalCertificates/ListView.vue'),
       props: {
         listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
         deleteDigitalCertificatesService:

@@ -15,6 +15,24 @@ export const identityProvidersRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-identity-provider',
+      component: () => import('@views/IdentityProviders/CreateView.vue'),
+      props: {},
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Identity Providers',
+            to: '/identity-providers'
+          },
+          {
+            label: 'Create Identity Provider',
+            to: '/identity-providers/create'
+          }
+        ]
+      }
     }
   ]
 }

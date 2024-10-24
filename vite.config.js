@@ -8,7 +8,7 @@ import istanbul from 'vite-plugin-istanbul'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
-  const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  const URLStartPrefix = env.VITE_ENVIRONMENT !== 'production' ? 'https://' : 'https://stage-'
 
   return {
     plugins: [
@@ -33,11 +33,11 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/(marketplace|script-runner|template-engine)': {
+        '^/api/(marketplace|script-runner|template-engine|iam)': {
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
           rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
+            path.replace(/^\/api\/(marketplace|script-runner|template-engine|iam)/, '/$1/api')
         },
         '^/api/vcs': {
           target: `${URLStartPrefix}vcs-api.azion.net/`,
