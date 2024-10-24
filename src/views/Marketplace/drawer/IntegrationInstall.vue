@@ -14,7 +14,7 @@
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   import PermissionsFieldset from '../components/PermissionsFieldset'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import LabelBlock from '@/templates/label-block'
 
   const router = useRouter()
