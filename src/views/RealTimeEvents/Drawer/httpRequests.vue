@@ -23,7 +23,7 @@
   const upstreamBytesReceivedTooltip =
     'Number of bytes received by the origin’s edge if the content isn’t cached. ´Number of bytes received by the origin’s edge if the content isn’t cached.'
   const upstreamResponseTimeTooltip =
-    'Time it takes for the edge to receive a default response from the origin in milliseconds, including headers and body.'
+    'Time it takes for the edge to receive a default response from the origin in seconds, including headers and body.'
   const upstreamBytesSentTooltip = 'Number of bytes sent to the origin.'
   const wafBlockTooltip =
     'Informs whether WAF blocked the action or not. 0 when action wasn’t blocked; 1 when action was blocked. When in Learning Mode, it won’t be blocked regardless of the return.'
@@ -187,7 +187,7 @@
               >
               <BigNumber
                 label="Upstream Response Time"
-                sufix="ms"
+                sufix="s"
                 :tooltipMessage="upstreamResponseTimeTooltip"
                 >{{ details.upstreamResponseTime }}</BigNumber
               >
