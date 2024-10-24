@@ -6,6 +6,6 @@ export const searchActionService = () => {
     { label: 'Drop', value: 'drop' },
     { label: 'Hold Connection', value: 'hold connection' },
     { label: 'Random Delay', value: 'random delay' },
-    { label: 'Redirect', value: 'redirect' },
+    { label: 'Redirect', value: 'redirect' }
   ]
 }

@@ -106,6 +106,17 @@
     }
   ])
 
+  const environmentOptionsRadios = ref([
+    {
+      title: 'Global Edge Network',
+      inputValue: 'production'
+    },
+    {
+      title: 'Staging Network',
+      inputValue: 'preview'
+    }
+  ])
+
   const isLoadingRequestsData = computed(() => {
     return props.isLoadingRequests
   })
@@ -137,6 +148,21 @@
           data-testid="domains-form__name-field"
           :value="name"
           description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
+        />
+      </div>
+    </template>
+  </form-horizontal>
+  <form-horizontal
+    title="Environment Type"
+    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-3">
+        <FieldGroupRadio
+          isCard
+          nameField="environment"
+          label=""
+          :options="environmentOptionsRadios"
         />
       </div>
     </template>

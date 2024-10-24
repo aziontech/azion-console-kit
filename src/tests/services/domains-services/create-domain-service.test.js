@@ -13,7 +13,8 @@ const fixtures = {
     mtlsIsEnabled: false,
     mtlsVerification: 'enforce',
     name: 'space X',
-    mtlsTrustedCertificate: 'mtls-certf-mock'
+    mtlsTrustedCertificate: 'mtls-certf-mock',
+    environment: 'preview'
   }
 }
 
@@ -51,7 +52,8 @@ describe('DomainsServices', () => {
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
         mtls_verification: fixtures.domainMock.mtlsVerification,
         edge_application_id: fixtures.domainMock.edgeApplication,
-        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate
+        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate,
+        environment: fixtures.domainMock.environment
       }
     })
   })

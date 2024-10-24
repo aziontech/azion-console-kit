@@ -5,7 +5,7 @@ let domainName
 let edgeAppName
 let generatedDomainUrl
 
-describe('Real-time Purge spec', { tags: ['@dev6', '@xfail'] }, () => {
+describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
     cy.login()
   })

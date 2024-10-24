@@ -124,12 +124,12 @@ describe('RealTimeMetricsModule', () => {
           classifiedEq: 'StringObject',
           classifiedNe: 'StringObject',
           actionEq: 'StringObject',
-          actionNe: 'StringObject',
+          actionNe: 'StringObject'
         },
         FILTER_LIKE_ALIAS: {
           configurationIdIn: 'Domain',
           classifiedEq: 'Classified',
-          classifiedNe: 'Classified',
+          classifiedNe: 'Classified'
         },
         ALIAS_MAPPING: { configurationId: 'domain' }
       }

@@ -38,7 +38,12 @@
     }
   })
 
-  const emit = defineEmits(['on-edit-success', 'on-edit-fail', 'on-load-fail'])
+  const emit = defineEmits([
+    'on-edit-success',
+    'on-edit-fail',
+    'on-load-fail',
+    'loaded-service-object'
+  ])
 
   const { scrollToError } = useScrollToError()
   const router = useRouter()
@@ -99,6 +104,7 @@
     try {
       const { id } = route.params
       const initialValues = await props.loadService({ id })
+      emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
       emit('on-load-fail', error)

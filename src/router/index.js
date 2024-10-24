@@ -42,6 +42,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { useAccountStore } from '@/stores/account'
+import { identityProvidersRoutes } from '@routes/identity-providers-routes'
 import { loadContractServicePlan } from '@/services/contract-services'
 
 const router = createRouter({
@@ -53,6 +54,7 @@ const router = createRouter({
     domainsRoutes,
     edgeApplicationRoutes,
     edgeFirewallRoutes,
+    identityProvidersRoutes,
     edgeFunctionsRoutes,
     edgePulseRoutes,
     edgeServicesRoutes,
