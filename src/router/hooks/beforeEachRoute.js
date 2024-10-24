@@ -5,7 +5,8 @@ import {
   themeGuard,
   billingGuard,
   redirectGuard,
-  redirectToManagerGuard
+  redirectToManagerGuard,
+  SSOManagementGuard
 } from '@/router/hooks/guards'
 import { useHelpCenterStore } from '@/stores/help-center'
 import { useRouter } from 'vue-router'
@@ -19,6 +20,7 @@ export default async function beforeEachRoute(guardDependency) {
     logoutGuard,
     loadingGuard,
     accountGuard,
+    SSOManagementGuard,
     themeGuard,
     billingGuard,
     redirectGuard,

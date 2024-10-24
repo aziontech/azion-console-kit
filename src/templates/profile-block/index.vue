@@ -293,7 +293,6 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
-
   import { storeToRefs } from 'pinia'
   import Avatar from 'primevue/avatar'
   import PrimeButton from 'primevue/button'
@@ -307,6 +306,7 @@
   const { startLoading } = useLoadingStore()
   const user = useAccountStore().accountData
   const { currentTheme } = storeToRefs(useAccountStore())
+  const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
   const profile = ref(null)
@@ -331,7 +331,10 @@
     {
       label: 'Teams Permissions',
       to: '/teams-permission'
-    }
+    },
+    ...(hasAccessToSSOManagement.value
+      ? [{ label: 'SSO Management', to: '/identity-providers' }]
+      : [])
   ]
   const profileMenuSettings = [
     {
