@@ -59,33 +59,33 @@ const middleware = (filter) => {
 
 const adapt = (httpResponse) => {
   /**
-   * Necessary until the API gets the common pattern
-   * of returning the array of data inside results property
-   * like other andpoints.
-   */
+ * Necessary until the API gets the common pattern
+ * of returning the array of data inside results property
+ * like other andpoints.
+ */
 
   if (httpResponse.statusCode !== 200) return httpResponse
 
   const isArray = Array.isArray(httpResponse.body.results)
   const parsedWafRulesTuning = isArray
     ? httpResponse.body.results.map((event) => {
-        const values = {
-          hitCount: event.hit_count,
-          topIps: event.top_10_ips[0][1],
-          id: event.rule_id,
-          ruleId: event.rule_id,
-          ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
-          ipCount: event.ip_count,
-          matchZone: event.match_zone,
-          pathCount: event.path_count,
-          topCountries: event.top_10_countries[0][1],
-          matchesOn: event.matches_on,
-          ruleDescription: event.rule_description,
-          countryCount: event.country_count
-        }
+      const values = {
+        hitCount: event.hit_count,
+        topIps: event?.top_10_ips?.[0]?.[1] || '',
+        id: event.rule_id,
+        ruleId: event.rule_id,
+        ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
+        ipCount: event.ip_count,
+        matchZone: event.match_zone,
+        pathCount: event.path_count,
+        topCountries: event.top_10_countries?.[0]?.[1],
+        matchesOn: event.matches_on,
+        ruleDescription: event.rule_description,
+        countryCount: event.country_count
+      }
 
-        return values
-      })
+      return values
+    })
     : []
 
   return {
