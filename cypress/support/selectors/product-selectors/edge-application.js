@@ -7,6 +7,11 @@ export default {
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
   },
+  deviceGroups: {
+    createButton: '[data-testid="create-device-group-button"]',
+    nameInput: '[data-testid="field-text__input"]',
+    userAgentInput: '[data-testid="field-text__textarea"]'
+  },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
@@ -49,7 +54,7 @@ export default {
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown-filter-input"]',
     behaviorFunctionValue:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__dropdown"] > .p-dropdown-label',
-    firstBehaviorValueOption: '#behaviors\\[0\\]\\.target_0',
+    firstBehaviorValueOption: '#behaviors\\[0\\]\\.functionId_0',
     dropdownLoadingIcon:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
     phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]'
