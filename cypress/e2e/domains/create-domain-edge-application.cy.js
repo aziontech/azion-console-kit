@@ -45,7 +45,7 @@ const createDigitalCertificateCase = () => {
   cy.wait('@getDigitalCertificatesApi')
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
   })
