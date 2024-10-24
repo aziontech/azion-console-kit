@@ -108,14 +108,14 @@
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
-                sufix="ms"
+                sufix=""
                 :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
