@@ -576,7 +576,7 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+  defineExpose({ reload, handleExportTableDataToCSV, data })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
