@@ -1,73 +1,59 @@
 import axios from 'axios'
+import { requestInterceptorService } from './interceptor-request'
+import { responseInterceptorService } from './interceptor-response'
 
-export class ChatAPIService {
-  constructor(apiUrl, apiKey) {
-    this.apiUrl = apiUrl
-    this.apiKey = apiKey
-    this.controller = null
-  }
+const environment = process.env.VUE_APP_ENVIRONMENT
 
-  async generateResponse(messages) {
-    if (this.controller) {
-      this.controller.abort()
+const DEEP_CHAT_CONFIG_REQUEST = {
+  url: `https://${
+    environment === 'production' ? '' : 'stage-'
+  }ai.azion.com/copilot/chat/completions`
+}
+
+/**
+ * Chat service for handling API calls to the chat service.
+ */
+export const chatService = {
+  /**
+   * Sends a message to the chat API and returns the response.
+   *
+   * @param {Object} params - Parameters for the API call.
+   * @param {string} params.sessionId - The session ID.
+   * @param {string} params.url - The URL.
+   * @param {string} params.userName - The user name.
+   * @param {string} params.clientId - The client ID.
+   * @param {Array} params.allMessage - The array of messages to send.
+   * @param {Object} params.prompt - The prompt details.
+   * @returns {Promise<Object>} The response from the chat API.
+   * @throws {Error} If the API call fails.
+   */
+  async sendMessage({ sessionId, url, userName, clientId, allMessage, prompt }) {
+    const requestDetails = {
+      body: {} // Inicializa o corpo da requisição
     }
 
-    this.controller = new AbortController()
-    const signal = this.controller.signal
+    // Aplica o interceptor de requisição
+    const modifiedRequestDetails = requestInterceptorService(requestDetails, {
+      sessionId,
+      url,
+      userName,
+      clientId,
+      allMessage,
+      prompt
+    })
 
     try {
-      const response = await axios.post(
-        this.apiUrl,
-        {
-          model: 'gpt-3.5-turbo',
-          messages: messages,
-          max_tokens: 100,
-          stream: true
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.apiKey}`
-          },
-          responseType: 'stream',
-          signal
+      const response = await axios.post(DEEP_CHAT_CONFIG_REQUEST.url, modifiedRequestDetails.body, {
+        headers: {
+          Authorization: `Bearer ${process.env.VUE_APP_API_KEY}`,
+          'Content-Type': 'application/json'
         }
-      )
+      })
 
-      const reader = response.data.getReader()
-      const decoder = new TextDecoder('utf-8')
-      let result = ''
-
-      let reading = true
-      while (reading) {
-        const { done, value } = await reader.read()
-        reading = !done
-
-        if (!done) {
-          const chunk = decoder.decode(value, { stream: true })
-          chunk
-            .split('\n')
-            .map((line) => line.replace(/^data: /, '').trim())
-            .filter((line) => line && line !== '[DONE]')
-            .forEach((line) => {
-              const parsedLine = JSON.parse(line)
-              const content = parsedLine.choices?.[0]?.delta?.content
-              if (content) {
-                result += content
-              }
-            })
-        }
-      }
-
-      return result
-    } catch (error) {
-      throw new Error(error.response?.data?.error || error.message)
-    }
-  }
-
-  cancelRequest() {
-    if (this.controller) {
-      this.controller.abort()
+      // Aplica o interceptor de resposta
+      return responseInterceptorService(response.data)
+    } catch (err) {
+      throw new Error('Erro ao obter a resposta: ' + err.message)
     }
   }
 }

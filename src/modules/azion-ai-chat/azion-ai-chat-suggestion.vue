@@ -1,4 +1,7 @@
 <script setup>
+  import PrimeButton from 'primevue/button'
+  import { defineProps } from 'vue'
+
   const props = defineProps({
     text: {
       type: String,
@@ -10,43 +13,11 @@
     }
   })
 </script>
-<template>
-  <button
-    type="button"
-    class="deep-chat-suggestion-button"
-    :style="`
-    width: 180px;
-    text-align:left;
-    max-width:100%;
-    height: 102px;
-    padding: 16px;
-    gap: 16px; 
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: inherit;
-    font-feature-settings: inherit;
-    font-variation-settings: inherit;
-    font-weight: inherit;
-    text-transform: none;
-    cursor: pointer;
-    border-width: 1px;
-    border-style: solid;
-    background-color: var(--surface-section);
-    outline-color: var(--surface-50);
-    border-color: var(--surface-600);
-    box-sizing: border-box;
-    color: var(--text-color-secondary);
-    font-size: 14px;
-    line-height: 1.25rem;
-    `"
-  >
-    <div :style="`display:flex;flex-direction:column;align-items:flex-start;gap:1rem`">
-      <img
-        :style="`width:16px;height:16px;object-fit:fill;`"
-        :src="iconSrc"
-      />
 
-      {{ props.text }}
-    </div>
-  </button>
+<template>
+  <PrimeButton
+    class="w-45 h-25 p-4 gap-4 rounded-md cursor-pointer font-inherit text-none border-1 bg-surface-section outline-surface-50 border-surface-600 box-border text-text-color-secondary text-sm leading-5 flex flex-col items-start justify-start"
+    :icon="iconSrc"
+    :label="props.text"
+  />
 </template>

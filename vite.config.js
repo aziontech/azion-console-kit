@@ -78,6 +78,11 @@ const getConfig = () => {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
+        },
+        '/chat': {
+          target: `https://api.openai.com/v1`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/chat/, '/chat/completions')
         }
       }
     }

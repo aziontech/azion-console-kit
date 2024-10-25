@@ -1,36 +1,46 @@
 import { ref } from 'vue'
-import { ChatAPIService } from './apiService'
+import { chatService } from '../services/chat-api-service.js'
 
-export function useChatAPI(apiUrl, apiKey) {
-  const chatService = new ChatAPIService(apiUrl, apiKey)
+/**
+ * Composable for managing chat API interactions.
+ *
+ * @param {string} sessionId - The session ID.
+ * @param {string} url - The URL.
+ * @param {string} userName - The user name.
+ * @param {string} clientId - The client ID.
+ * @param {Array} allMessage - The array of messages to send.
+ * @param {Object} prompt - The prompt details.
+ * @returns {Object} The response content, loading state, error state, and function to generate a chat response.
+ */
+export const useChatAPI = (sessionId, url, userName, clientId, allMessage, prompt) => {
   const responseContent = ref('')
   const loading = ref(false)
   const error = ref(null)
 
-  const generateChatResponse = async (messages) => {
+  /**
+   * Generates a chat response by sending a message to the API.
+   */
+  const generateChatResponse = async () => {
     loading.value = true
     error.value = null
 
     try {
-      const result = await chatService.generateResponse(messages)
-      responseContent.value = result
+
+      // Chama o serviço para enviar a mensagem
+      responseContent.value = await chatService.sendMessage({
+        sessionId,
+        url,
+        userName,
+        clientId,
+        allMessage,
+        prompt
+      })
     } catch (err) {
-      error.value = err.message
+      error.value = err.message // A mensagem de erro agora é a mensagem do erro capturado
     } finally {
       loading.value = false
     }
   }
 
-  const stopChatResponse = () => {
-    chatService.cancelRequest()
-    loading.value = false
-  }
-
-  return {
-    responseContent,
-    loading,
-    error,
-    generateChatResponse,
-    stopChatResponse
-  }
+  return { responseContent, loading, error, generateChatResponse }
 }

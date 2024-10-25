@@ -1,25 +1,23 @@
 <template>
-  <div class="min-h-screen">
-    <div :class="containerClass">
-      <ToastBlock />
+  <div class="min-h-screen flex flex-col">
+    <ToastBlock />
 
-      <AppNavbar
-        :showNavItems="showNavItems"
-        :listTypeAccountService="listTypeAccountService"
-        :accountHandler="accountHandler"
-      />
-      <PageLoadingBlock :showLoading="showLoading" />
-      <AppSidebar />
+    <AppNavbar
+      :showNavItems="showNavItems"
+      :listTypeAccountService="listTypeAccountService"
+      :accountHandler="accountHandler"
+    />
+    <PageLoadingBlock :showLoading="showLoading" />
+    <AppSidebar />
 
-      <div
-        class="flex flex-col min-h-screen justify-between transition-margin-right pt-14"
-        :class="{ 'mr-[32rem]': isSidebarActive }"
-        :style="{ transition: 'margin-right 0.2s' }"
-        v-if="!showLoading"
-      >
-        <router-view />
-        <AppFooter />
-      </div>
+    <div
+      class="flex flex-col min-h-screen justify-between transition-margin-right pt-14"
+      :class="{ 'mr-[32rem]': isSidebarActive }"
+      :style="{ transition: 'margin-right 0.2s' }"
+      v-if="!showLoading"
+    >
+      <router-view />
+      <AppFooter />
     </div>
   </div>
 </template>
