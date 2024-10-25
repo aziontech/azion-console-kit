@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="z-0">
     <Toolbar
       class="gap-6 border-noround border-x-none w-full m-0 md:px-8 md:py-3 px-3 py-6 z-10 md:flex-row flex-col max-sm:justify-center border-bottom-none"
       :class="toolbarClass"

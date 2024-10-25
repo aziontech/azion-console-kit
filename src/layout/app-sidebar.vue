@@ -1,10 +1,6 @@
 <script setup>
-  import { ref } from 'vue'
-  import SelectButton from 'primevue/selectbutton'
   import { useLayout } from '@/composables/use-layout'
-
-  const value = ref('Azion Copilot')
-  const options = ref(['Azion Copilot', 'Documentation'])
+  import Helper from './components/sidebar/helper.vue'
 
   const { isSidebarActive } = useLayout()
 </script>
@@ -16,14 +12,6 @@
       isSidebarActive ? 'translate-x-0' : 'translate-x-full'
     ]"
   >
-    <div class="flex flex-col h-full">
-      <div class="card flex mt-3 !border-none px-8">
-        <SelectButton
-          v-model="value"
-          :options="options"
-          aria-labelledby="basic"
-        />
-      </div>
-    </div>
+    <Helper />
   </div>
 </template>

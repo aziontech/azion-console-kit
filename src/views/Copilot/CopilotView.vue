@@ -1,6 +1,6 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  import AzionAiChatFullSizeBlock from '@/modules/azion-ai-chat/azion-ai-chat-full-size-block.vue'
+  import AzionAiChatFullSizeBlock from '@/modules/azion-ai-chat/azion-ai-chat-block.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
 </script>
 
