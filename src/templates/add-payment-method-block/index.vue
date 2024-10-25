@@ -4,7 +4,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
   import { useAccountStore } from '@/stores/account'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'

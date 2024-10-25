@@ -1,11 +1,11 @@
 <script setup>
   import DynamicDialog from 'primevue/dynamicdialog'
   import { computed, inject, watch } from 'vue'
-  import { RouterView, useRoute } from 'vue-router'
-  import ShellBlock from '@/templates/shell-block'
+  import { useRoute } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
+  import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
 
@@ -45,16 +45,6 @@
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <DynamicDialog />
-    <ShellBlock
-      v-slot:default="{ customClass }"
-      :isLogged="isLogged"
-    >
-      <RouterView
-        :class="customClass"
-        class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
-      />
-    </ShellBlock>
-  </div>
+  <DynamicDialog />
+  <Layout :isLogged="isLogged" />
 </template>
