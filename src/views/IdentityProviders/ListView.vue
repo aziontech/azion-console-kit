@@ -80,6 +80,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
+        filterPath: 'name.text',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-with-tag' })
       },
