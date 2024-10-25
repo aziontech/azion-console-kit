@@ -29,7 +29,7 @@
   const requestTimeTooltip =
     'Request processing time elapsed since the first bytes were read from the client with resolution in seconds. This field is the result of a sum.'
   const tcpInfoRttTooltip =
-    'Round-Trip Time (RTT) measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
+    'Round-Trip Time (RTT) in microseconds measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
   const requestLengthTooltip =
     'Request length, including request line, headers, and body. This field is the result of a sum.'
   const bytesSentTooltip = 'Number of bytes sent to a client. This field is the result of a sum.'
