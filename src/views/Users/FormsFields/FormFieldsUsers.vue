@@ -150,7 +150,7 @@
       readonly: accountIsOwner.value,
       disabled: accountIsOwner.value,
       subtitle:
-        'As an Account Owner you can enable/disable the Social Login functionality. When it is enabled, users linked to the account can authenticate to RTM using their social networks. When it is disabled, users authenticate to RTM using their email and password.'
+        'The Account Owner can enable or disable the Social Login functionality. When enabled, users linked to the account can authenticate on Azion using their social networks. When disabled, users must authenticate on Azion with their email and password.'
     },
     {
       title: 'Enforce Multi-Factor Authentication',
@@ -158,7 +158,7 @@
       readonly: isForceMFA.value,
       disabled: isForceMFA.value,
       subtitle:
-        'As an Account Owner you can enable/disable the enforce MFA functionality. MFA will be mandatory for all users of this account when enabling this item.'
+        'The Account Owner can enable or disable the enforce MFA functionality. MFA will be mandatory for all users of this account when enabling this item.'
     }
   ])
 
