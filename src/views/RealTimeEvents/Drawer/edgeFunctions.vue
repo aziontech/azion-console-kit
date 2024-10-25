@@ -17,7 +17,7 @@
   })
 
   const edgeFunctionsTime =
-    'Total execution time, in milliseconds, for the function during its processing. This field is the result of a sum.'
+    'Total execution time, in seconds, for the function during its processing. This field is the result of a sum.'
 
   const details = ref({})
   const showDrawer = ref(false)
@@ -83,7 +83,7 @@
               <BigNumber
                 class="flex-1"
                 label="Edge Functions Time"
-                sufix="ms"
+                sufix="s"
                 :tooltipMessage="edgeFunctionsTime"
                 >{{ details.edgeFunctionsTime }}</BigNumber
               >

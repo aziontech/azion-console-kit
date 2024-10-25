@@ -165,7 +165,7 @@
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
-                sufix=""
+                sufix="µs"
                 :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
