@@ -113,6 +113,11 @@
       scrollToError(errors)
     }
   )
+
+  defineExpose({
+    resetForm,
+    values
+  })
 </script>
 
 <template>
