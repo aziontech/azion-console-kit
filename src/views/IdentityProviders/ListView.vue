@@ -44,6 +44,7 @@
   import { useToast } from 'primevue/usetoast'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { onBeforeRouteLeave } from 'vue-router'
   import { useDialog } from 'primevue/usedialog'
   defineOptions({ name: 'identity-providers-view' })
 
@@ -170,4 +171,11 @@
   const handleEditRedirect = (item) => {
     router.push({ path: `identity-providers/edit/${item.protocol}/${item.id}` })
   }
+
+  onBeforeRouteLeave((to, from, next) => {
+    if (to.params.id === 'azion-default-sso') {
+      return next(false)
+    }
+    return next(true)
+  })
 </script>
