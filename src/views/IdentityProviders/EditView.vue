@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Digital Certificate"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Identity Provider"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

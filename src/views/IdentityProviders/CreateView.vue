@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Open ID Provider Configuration"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Identity Provider"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
