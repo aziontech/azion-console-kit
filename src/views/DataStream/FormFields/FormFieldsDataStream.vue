@@ -706,7 +706,15 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__kinesis-access-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
+
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__kinesis-access-key-field__description"
@@ -738,7 +746,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__kinesis-secret-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__kinesis-secret-key-field__description"
@@ -836,7 +851,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field__description"
