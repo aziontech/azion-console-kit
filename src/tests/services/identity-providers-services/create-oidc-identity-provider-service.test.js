@@ -101,7 +101,7 @@ describe('OIDCIdentityProviderService', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
-      
+
       const { sut } = makeSut()
       const response = sut(fixtures.oidcProviderMock)
 

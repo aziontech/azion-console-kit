@@ -13,7 +13,10 @@
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
-          <FormFieldsCreateIdentityProvider :isEditForm="true" :protocol="protocol" />
+          <FormFieldsCreateIdentityProvider
+            :isEditForm="true"
+            :protocol="protocol"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
