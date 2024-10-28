@@ -17,7 +17,8 @@ export const useAccountStore = defineStore({
     },
     flags: {
       RESTRICT_ACCESS_TO_METRICS_ONLY: 'allow_only_metrics_on_console',
-      FULL_CONSOLE_ACCESS: 'allow_console'
+      FULL_CONSOLE_ACCESS: 'allow_console',
+      SSO_MANAGEMENT: 'federated_auth'
     }
   }),
   getters: {
@@ -40,6 +41,9 @@ export const useAccountStore = defineStore({
         client_flags.includes(flags.RESTRICT_ACCESS_TO_METRICS_ONLY) &&
         !client_flags.includes(flags.FULL_CONSOLE_ACCESS)
       )
+    },
+    hasAccessToSSOManagement(state) {
+      return state.account?.client_flags?.includes(state.flags.SSO_MANAGEMENT)
     },
     hasAccessConsole(state) {
       const { client_flags = [], isDeveloperSupportPlan } = state.account

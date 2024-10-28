@@ -52,16 +52,12 @@
 
   defineOptions({ name: 'identity-providers-view' })
 
-  const hasContentToList = ref(true)
-
-  const refListTable = ref(null)
-
   const loadingStore = useLoadingStore()
-
   const toast = useToast()
-
   const dialog = useDialog()
 
+  const hasContentToList = ref(true)
+  const refListTable = ref(null)
   const actionsRow = ref([
     {
       label: 'Set as active',
@@ -84,6 +80,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
+        filterPath: 'name.text',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'text-with-tag' })
       },
