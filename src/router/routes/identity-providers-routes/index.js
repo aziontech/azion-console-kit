@@ -7,7 +7,7 @@ export const identityProvidersRoutes = {
   children: [
     {
       path: '',
-      name: 'identity-providers',
+      name: 'list-identity-providers',
       component: () => import('@views/IdentityProviders/ListView.vue'),
       meta: {
         breadCrumbs: [
