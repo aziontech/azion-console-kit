@@ -143,7 +143,7 @@
           :tags="upstreamCacheStatusTag"
         >
           <template #body>
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col sm:flex-row gap-4 w-full">
               <BigNumber
                 label="Upstream Response Time"
                 sufix="s"
