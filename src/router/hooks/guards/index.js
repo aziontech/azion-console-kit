@@ -5,6 +5,7 @@ import { themeGuard } from './themeGuard'
 import { billingGuard } from './billingGuard'
 import { redirectGuard } from './redirectGuard'
 import { redirectToManagerGuard } from './redirectToManagerGuard'
+import { ssoManagementGuard } from './SSOManagementGuard'
 
 export {
   logoutGuard,
@@ -13,5 +14,6 @@ export {
   themeGuard,
   billingGuard,
   redirectGuard,
-  redirectToManagerGuard
+  redirectToManagerGuard,
+  ssoManagementGuard
 }
