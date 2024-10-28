@@ -20,10 +20,10 @@ export default async function beforeEachRoute(guardDependency) {
     logoutGuard,
     loadingGuard,
     accountGuard,
-    ssoManagementGuard,
     themeGuard,
     billingGuard,
     redirectGuard,
+    ssoManagementGuard,
     redirectToManagerGuard
   ]
 
