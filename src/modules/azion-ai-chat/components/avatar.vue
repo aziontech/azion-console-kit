@@ -1,15 +1,18 @@
 <!-- src/components/avatar.vue -->
 <template>
-    <component :is="avatarComponent" class="avatar min-h-max min-w-max" />
+  <component
+    :is="avatarComponent"
+    class="avatar min-h-max min-w-max"
+  />
 </template>
 
 <script setup>
-import DefaultAvatar from '../assets/azion-logo.vue';
+  import DefaultAvatar from '../assets/azion-logo.vue'
 
-defineProps({
+  defineProps({
     avatarComponent: {
-        type: [String, Object],
-        default: DefaultAvatar,
-    },
-});
+      type: [String, Object],
+      default: DefaultAvatar
+    }
+  })
 </script>

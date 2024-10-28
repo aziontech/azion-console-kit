@@ -112,13 +112,12 @@ export function useChat(initialConfig = {}) {
     }
   }
 
-  const chatConfig = computed(() => config)
   const getAllMessages = computed(() => state.messages)
 
   return {
     state: readonly(state),
     getAllMessages,
-    chatConfig,
+    chatConfig: readonly(config),
     sendMessage,
     resetChat,
     abortRequest,
