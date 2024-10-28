@@ -8,10 +8,10 @@ import { makeIdentityProvidersBaseUrl } from './make-identity-providers-base-url
  * @returns {Promise<string>} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-export const createOIDCIdentityProviderService = async (payload) => {
+export const createSAMLIdentityProviderService = async (payload) => {
   const adaptPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeIdentityProvidersBaseUrl()}/oidc`,
+    url: `${makeIdentityProvidersBaseUrl()}/saml2`,
     method: 'POST',
     body: adaptPayload
   })
@@ -20,15 +20,12 @@ export const createOIDCIdentityProviderService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const { name, authorizationUrl, userInfoUrl, tokenUrl, clientId, clientSecret, scopes } = payload
+  const { name, entityIdUrl, signInUrl, certificate } = payload
   return {
     name,
-    authorization_url: authorizationUrl,
-    userinfo_url: userInfoUrl,
-    token_url: tokenUrl,
-    client_id: clientId,
-    client_secret: clientSecret,
-    scopes
+    entity_id_url: entityIdUrl,
+    sign_in_url: signInUrl,
+    certificate
   }
 }
 
@@ -43,8 +40,8 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your OIDP has been created',
-        urlToEditView: `/identity-providers/edit/OIDC/${httpResponse.body.uuid}`
+        feedback: 'Your SAML IDP has been created',
+        urlToEditView: `/identity-providers/edit/${httpResponse.body.uuid}`
       }
     case 400:
       const errorMessage = httpResponse.body.detail[0]

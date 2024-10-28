@@ -1,73 +1,73 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Open ID Provider Configuration"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Digital Certificate"></PageHeadingBlock>
     </template>
     <template #content>
-      <CreateFormBlock
-        ref="createFormBlockRef"
-        :createService="createServiceBySelectedType"
-        @on-response="handleTrackCreation"
-        @on-response-fail="handleTrackFailedCreation"
+      <EditFormBlock
+        :editService="editService"
+        :loadService="loadService"
         :schema="validationSchema"
-        :initialValues="initialValues"
+        :updatedRedirect="props.updatedRedirect"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
-          <FormFieldsCreateIdentityProvider
-            v-model:identity-provider-selection="idpTypeSelection"
-          />
+          <FormFieldsCreateIdentityProvider :isEditForm="true" :protocol="protocol" />
         </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
+            v-if="!values.managed"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
           />
         </template>
-      </CreateFormBlock>
+      </EditFormBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
-  import FormFieldsCreateIdentityProvider from './FormFields/FormFieldsCreateIdentityProvider'
-  import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import FormFieldsCreateIdentityProvider from './FormFields/FormFieldsCreateIdentityProvider.vue'
   import * as yup from 'yup'
-  import { inject, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { inject } from 'vue'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
   const props = defineProps({
-    createOIDCIdentityProviderService: Function,
-    createSAMLIdentityProviderService: Function
+    editOIDCIdentityProviderService: {
+      type: Function,
+      required: true
+    },
+    editSAMLIdentityProviderService: {
+      type: Function,
+      required: true
+    },
+    loadOIDCIdentityProviderService: {
+      type: String,
+      required: true
+    },
+    loadSAMLIdentityProviderService: {
+      type: Function,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
+    }
   })
 
   const idpTypes = {
     OPEN_ID: 'OIDC',
     SAML: 'SAML'
-  }
-  const idpTypeSelection = ref(idpTypes.OPEN_ID)
-
-  const initialValues = {
-    // OPEN ID Fields
-    name: '',
-    identityProviderType: idpTypes.OPEN_ID,
-    authorizationUrl: '',
-    userInfoUrl: '',
-    tokenUrl: '',
-    clientId: '',
-    clientSecret: '',
-    scopes: [],
-    responseMode: 'query',
-
-    // SAML Fields
-    entityIdUrl: '',
-    signInUrl: '',
-    certificate: ''
   }
 
   const validationSchema = yup.object({
@@ -108,6 +108,7 @@
     // SAML Fields
     entityIdUrl: yup.string().when('identityProviderType', {
       is: idpTypes.SAML,
+
       then: (schema) =>
         schema.required('Entity ID URL is a required field').url('Enter a valid URL')
     }),
@@ -115,22 +116,33 @@
       is: idpTypes.SAML,
       then: (schema) => schema.required('Sign In URL is a required field').url('Enter a valid URL')
     }),
-    certificate: yup.string().when('identityProviderType', {
-      is: idpTypes.SAML,
-      then: (schema) => schema.required('Certificate is a required field')
-    })
+    certificate: yup.string()
   })
 
-  const handleTrackCreation = () => {
-    tracker.product.productCreated({
-      productName: 'SSO Management'
-    })
-  }
+  const route = useRoute()
+  const protocol = route.params.protocol
 
-  const handleTrackFailedCreation = (error) => {
+  const editService =
+    protocol === 'OIDC'
+      ? props.editOIDCIdentityProviderService
+      : props.editSAMLIdentityProviderService
+
+  const loadService =
+    protocol === 'OIDC'
+      ? props.loadOIDCIdentityProviderService
+      : props.loadSAMLIdentityProviderService
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'SSO Management'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
-      .failedToCreate({
+      .failedToEdit({
         productName: 'SSO Management',
         errorType: 'api',
         fieldName: fieldName.trim(),
@@ -138,22 +150,4 @@
       })
       .track()
   }
-  const createFormBlockRef = ref(null)
-
-  const createOIDCIdentityProviderServiceHandle = props.createOIDCIdentityProviderService
-  const createSAMLIdentityProviderServiceHandle = props.createSAMLIdentityProviderService
-
-  const createServiceBySelectedType = ref(props.createOIDCIdentityProviderService)
-
-  watch(idpTypeSelection, (newType) => {
-    const isOpenIdSelected = idpTypeSelection.value === idpTypes.OPEN_ID
-
-    createFormBlockRef.value.resetForm({
-      values: { ...createFormBlockRef.value.values, identityProviderType: newType }
-    })
-
-    createServiceBySelectedType.value = isOpenIdSelected
-      ? createOIDCIdentityProviderServiceHandle
-      : createSAMLIdentityProviderServiceHandle
-  })
 </script>

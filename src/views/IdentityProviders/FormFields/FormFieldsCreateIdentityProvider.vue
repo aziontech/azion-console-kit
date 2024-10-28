@@ -1,44 +1,3 @@
-<script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import MultiSelect from 'primevue/multiselect'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Password from 'primevue/password'
-  import { useField } from 'vee-validate'
-
-  const { value: name } = useField('name')
-  const { value: identityProviderType } = useField('identityProviderType', null, {
-    initialValue: 'openid'
-  })
-  const { value: authorizationUrl } = useField('authorizationUrl')
-  const { value: userInfoUrl } = useField('userInfoUrl')
-  const { value: tokenUrl } = useField('tokenUrl')
-  const { value: clientId } = useField('clientId')
-  const { value: clientSecret, errorMessage: clientSecretErrorMessage } = useField('clientSecret')
-  const { value: scopes, errorMessage: scopesErrorMessage } = useField('scopes')
-  const { value: responseMode } = useField('responseMode', null, {
-    initialValue: 'Query'
-  })
-
-  const scopesOptions = [
-    { value: 'openid', label: 'Open ID' },
-    { value: 'profile', label: 'Profile' },
-    { value: 'email', label: 'Email' }
-  ]
-  const identityProviderRadioOptions = [
-    {
-      title: 'Open ID Provider Configuration',
-      subtitle: `Configure the Federated Authentication to enable users access to Real-Time Manager with partner's accounts.`,
-      inputValue: 'openid'
-    },
-    {
-      title: 'SAML Configuration',
-      subtitle: `Configure the Federated Authentication to enable users access to Real-Time Manager with partner's accounts.`,
-      inputValue: 'saml'
-    }
-  ]
-</script>
-
 <template>
   <FormHorizontal
     title="General"
@@ -66,6 +25,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
         <FieldGroupRadio
+          :disabled="isEditForm"
           nameField="identityProviderType"
           :isCard="true"
           :options="identityProviderRadioOptions"
@@ -76,11 +36,36 @@
   </FormHorizontal>
 
   <FormHorizontal
-    v-if="identityProviderType === 'openid'"
+    v-if="identityProviderType === 'OIDC'"
     title="Open ID Provider Configuration"
     description="Configure the Federated Authentication."
   >
     <template #inputs>
+      <template v-if="isEditForm">
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            readonly
+            disabled
+            data-testid="sso-management-form__login-url"
+            label="Login URL"
+            description="This URL contains the login page of the Azion RTM application that will perform single sign-on initiated
+              by the service provider. However, that is not needed if you want to perform identity provider-initiated single sign-on."
+            :value="loginUrl"
+            name="loginUrl"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            readonly
+            disabled
+            data-testid="sso-management-form__redirect-url"
+            label="Redirect URL"
+            description="This is the URL to which your IdP will response to the request after authenticating a user."
+            :value="redirectUrl"
+            name="redirectUrl"
+          />
+        </div>
+      </template>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           data-testid="sso-management-form__subject-name"
@@ -155,11 +140,13 @@
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <LabelBlock
-          for="select-01"
-          label="Scopes"
-          isRequired
-        />
+        <label
+          for="scopesList"
+          class="font-semibold text-sm"
+          :class="{ 'p-error': scopesErrorMessage }"
+        >
+          Scopes
+        </label>
         <MultiSelect
           id="scopesList"
           v-model="scopes"
@@ -200,12 +187,154 @@
   </FormHorizontal>
 
   <FormHorizontal
-    v-if="identityProviderType === 'saml'"
+    v-if="identityProviderType === 'SAML'"
     title="SAML Configuration"
     description="Configure the Federated Authentication."
   >
     <template #inputs>
-      <div class="flex flex-col w-full gap-3">saml</div>
+      <template v-if="isEditForm">
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            readonly
+            disabled
+            data-testid="sso-management-form__login-url"
+            label="Login URL"
+            description="This URL contains the login page of the Azion RTM application that will perform single sign-on initiated
+           by the service provider. However, that is not needed if you want to perform identity provider-initiated single sign-on."
+            :value="loginUrl"
+            name="loginUrl"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            readonly
+            disabled
+            data-testid="sso-management-form__assertion-consumer-service-url"
+            label="Assertion Consumer Service URL"
+            description="This is the URL to which your IdP will send Authentication Assertions after authenticating a user.
+           Enter this value where the IdP asks for Assertion Consumer Service URL."
+            :value="acsUrl"
+            name="acsUrl"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            readonly
+            disabled
+            data-testid="sso-management-form__service-providers-entity-id-url"
+            label="Service Provider's Entity ID URI"
+            description="The Entity ID (sometimes referred to as the Issuer) names the Azion RTM within your IdP.
+           Use this value if the Identity Provider asks for Entity ID or SAML Audience."
+            :value="metadataUrl"
+            name="metadataUrl"
+          />
+        </div>
+      </template>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          data-testid="sso-management-form__idp-entity-id-url"
+          label="Identity provider's Entity ID URI"
+          required
+          placeholder="https://authorizationURL.com/authorize"
+          description="A unique URL that identifies your identity
+           provider as the recipient of SAML requests that Azion sends. This entity ID must be the same as the <saml:Issuer> attribute in the SAML assertion."
+          :value="entityIdUrl"
+          name="entityIdUrl"
+        />
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          data-testid="sso-management-form__idp-sign-in-url"
+          label="Sign-in URL"
+          required
+          placeholder="https://tokenURL.com/authorize"
+          description="The URL where Azion sends a SAML request to start the
+           login sequence."
+          :value="signInUrl"
+          name="signInUrl"
+        />
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          data-testid="sso-management-form__certificate-field"
+          label="X-509 Certificate"
+          placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
+          name="certificate"
+          :value="certificate"
+          description="The authentication certificate issued by your identity provider."
+        />
+      </div>
     </template>
   </FormHorizontal>
 </template>
+
+<script setup>
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import MultiSelect from 'primevue/multiselect'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import Password from 'primevue/password'
+  import { useField } from 'vee-validate'
+  import { watch } from 'vue'
+  const emit = defineEmits(['update:idpTypeSelection'])
+  defineOptions({ name: 'identity-providers-create' })
+
+  defineProps({
+    isEditForm: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const { value: name } = useField('name')
+
+  // OIDP fields
+  const { value: identityProviderType } = useField('identityProviderType', null, {
+    initialValue: 'OIDC'
+  })
+
+  const { value: authorizationUrl } = useField('authorizationUrl')
+  const { value: userInfoUrl } = useField('userInfoUrl')
+  const { value: tokenUrl } = useField('tokenUrl')
+  const { value: clientId } = useField('clientId')
+  const { value: clientSecret, errorMessage: clientSecretErrorMessage } = useField('clientSecret')
+  const { value: scopes, errorMessage: scopesErrorMessage } = useField('scopes')
+  const { value: responseMode } = useField('responseMode', null, {
+    initialValue: 'Query'
+  })
+
+  // SAML fields
+  const { value: entityIdUrl } = useField('entityIdUrl')
+  const { value: signInUrl } = useField('signInUrl')
+  const { value: certificate } = useField('certificate')
+
+  // Edit Fields
+  const { value: loginUrl } = useField('loginUrl')
+  const { value: acsUrl } = useField('acsUrl')
+  const { value: metadataUrl } = useField('metadataUrl')
+  const { value: redirectUrl } = useField('redirectUrl')
+
+  const scopesOptions = [
+    { value: 'openid', label: 'Open ID' },
+    { value: 'profile', label: 'Profile' },
+    { value: 'email', label: 'Email' }
+  ]
+  const identityProviderRadioOptions = [
+    {
+      title: 'Open ID Provider Configuration',
+      subtitle: `Configure the Federated Authentication to enable users access to Real-Time Manager with partner's accounts.`,
+      inputValue: 'OIDC'
+    },
+    {
+      title: 'SAML Configuration',
+      subtitle: `Configure the Federated Authentication to enable users access to Real-Time Manager with partner's accounts.`,
+      inputValue: 'SAML'
+    }
+  ]
+
+  watch(identityProviderType, () => {
+    emit('update:identityProviderSelection', identityProviderType.value)
+  })
+</script>

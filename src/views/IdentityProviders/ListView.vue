@@ -12,8 +12,9 @@
         :actions="actionsRow"
         addButtonLabel="Identity Provider"
         createPagePath="identity-providers/create"
-        editPagePath="identity-providers/edit"
         @on-load-data="handleLoadData"
+        @on-row-click-edit-redirect="handleEditRedirect"
+        enableEditCustomRedirect
         emptyListMessage="No identity providers found."
       />
       <EmptyResultsBlock
@@ -39,20 +40,22 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { listIdentityProvidersService } from '@/services/identity-providers-services'
   import { useDialog } from 'primevue/usedialog'
-  import {
-    deleteSAMLIdentityProviderService,
-    deleteOIDCIdentityProviderService,
-    setIdentityProviderStatusService
-  } from '@/services/identity-providers-services'
-
   defineOptions({ name: 'identity-providers-view' })
 
+  const props = defineProps({
+    listIdentityProvidersService: Function,
+    deleteSAMLIdentityProviderService: Function,
+    deleteOIDCIdentityProviderService: Function,
+    setIdentityProviderStatusService: Function
+  })
+
   const hasContentToList = ref(true)
+  const router = useRouter()
 
   const refListTable = ref(null)
 
@@ -108,7 +111,7 @@
       })
     }
     try {
-      const response = await setIdentityProviderStatusService({
+      const response = await props.setIdentityProviderStatusService({
         id: idpId,
         protocol,
         isActive: item.id !== 'azion-default-sso'
@@ -145,8 +148,8 @@
   const handleDeleteIdentityProvider = async (item) => {
     const deleteService =
       item.protocol === 'OIDC'
-        ? deleteOIDCIdentityProviderService
-        : deleteSAMLIdentityProviderService
+        ? props.deleteOIDCIdentityProviderService
+        : props.deleteSAMLIdentityProviderService
 
     const bodyDelete = {
       data: {
@@ -164,5 +167,9 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+
+  const handleEditRedirect = (item) => {
+    router.push({ path: `identity-providers/edit/${item.protocol}/${item.id}` })
   }
 </script>

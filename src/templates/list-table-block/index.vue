@@ -353,6 +353,10 @@
       type: Boolean,
       default: true
     },
+    enableEditCustomRedirect: {
+      type: Boolean,
+      default: false
+    },
     reorderableRows: {
       type: Boolean
     },
@@ -552,8 +556,11 @@
 
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
+
     if (props.editInDrawer) {
       props.editInDrawer(item)
+    } else if (props.enableEditCustomRedirect) {
+      emit('on-row-click-edit-redirect', item)
     } else if (props.enableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }

@@ -8,11 +8,11 @@ import { makeIdentityProvidersBaseUrl } from './make-identity-providers-base-url
  * @returns {Promise<string>} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-export const createOIDCIdentityProviderService = async (payload) => {
+export const editOIDCIdentityProviderService = async (payload) => {
   const adaptPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeIdentityProvidersBaseUrl()}/oidc`,
-    method: 'POST',
+    url: `${makeIdentityProvidersBaseUrl()}/oidc/${payload.uuid}`,
+    method: 'PATCH',
     body: adaptPayload
   })
 
@@ -41,11 +41,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your OIDP has been created',
-        urlToEditView: `/identity-providers/edit/OIDC/${httpResponse.body.uuid}`
-      }
+    case 200:
+      return 'Your OIDP has been updated'
     case 400:
       const errorMessage = httpResponse.body.detail[0]
       throw new Error(errorMessage).message
