@@ -1,15 +1,12 @@
 <template>
-  <section class="w-full min-h-[calc(100vh-120px)] relative">
-    <section class="w-full h-full flex flex-col mx-auto">
-      <div
-        class="mx-3 md:mx-8 mt-4"
-        v-if="hasHeadingSlot"
-      >
-        <slot name="heading"></slot>
+  <section class="w-full flex flex-col flex-1 relative">
+    <section class="w-full flex flex-col flex-1 px-8 pt-4 pb-8">
+      <div  v-if="hasHeadingSlot">
+        <slot name="heading" />
       </div>
       <div
-        class="mx-3 md:mx-8 mb-8 h-full"
-        :class="{ 'mt-4 md:mx-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
+        class="h-full flex flex-1 flex-col"
+        :class="{ 'mt-4': hasHeadingSlot }"
       >
         <slot name="content"></slot>
       </div>

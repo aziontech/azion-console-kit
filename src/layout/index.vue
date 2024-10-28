@@ -11,12 +11,12 @@
     <AppSidebar />
 
     <div
-      class="flex flex-col min-h-screen justify-between transition-margin-right pt-14"
+      class="flex flex-col flex-1 min-h-screen flex-auto transition-margin-right pt-14"
       :class="{ 'mr-[32rem]': isSidebarActive }"
       :style="{ transition: 'margin-right 0.2s' }"
       v-if="!showLoading"
     >
-      <router-view />
+      <router-view class="flex flex-1"/>
       <AppFooter />
     </div>
   </div>

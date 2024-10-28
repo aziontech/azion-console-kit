@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:py-20 pt-4 pb-8 px-3">
+  <div class="flex flex-col sm:py-20 pt-4 pb-8 px-3">
     <SignInBlock
       v-if="!showForgotPasswordStep"
       @goToForgotPassword="(value) => (showForgotPasswordStep = value)"
