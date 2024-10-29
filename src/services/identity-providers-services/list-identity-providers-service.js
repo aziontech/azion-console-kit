@@ -13,49 +13,54 @@ export const listIdentityProvidersService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const results = httpResponse.body || []
+  if (httpResponse.statusCode === 200) {
+    const results = httpResponse.body || []
 
-  let hasActiveProvider = false
+    let hasActiveProvider = false
 
-  const parsed = results.map((item) => {
-    if (item.is_active) {
-      hasActiveProvider = true
-    }
-    return {
+    const parsed = results.map((item) => {
+      if (item.is_active) {
+        hasActiveProvider = true
+      }
+      return {
+        name: {
+          text: item.name,
+          tagProps: item.is_active
+            ? {
+                value: 'Active',
+                severity: 'success'
+              }
+            : {}
+        },
+        protocol: item.protocol,
+        id: item.uuid,
+        isActive: item.is_active
+      }
+    })
+    parsed.push({
       name: {
-        text: item.name,
-        tagProps: item.is_active
+        text: 'Azion SSO',
+        tagProps: !hasActiveProvider
           ? {
               value: 'Active',
               severity: 'success'
             }
           : {}
       },
-      protocol: item.protocol,
-      id: item.uuid,
-      isActive: item.is_active
-    }
-  })
-  parsed.push({
-    name: {
-      text: 'Azion SSO',
-      tagProps: !hasActiveProvider
-        ? {
-            value: 'Active',
-            severity: 'success'
-          }
-        : {}
-    },
-    protocol: 'Internal Identity Source',
-    id: 'azion-default-sso',
-    isActive: !hasActiveProvider
-  })
+      protocol: 'Internal Identity Source',
+      id: 'azion-default-sso',
+      isActive: !hasActiveProvider
+    })
 
-  const responseDataSorted = parsed.sort((currentCard, nextCard) => {
-    return nextCard.isActive - currentCard.isActive
-  })
-  return {
-    body: responseDataSorted,
-    statusCode: httpResponse.statusCode
+    const responseDataSorted = parsed.sort((currentCard, nextCard) => {
+      return nextCard.isActive - currentCard.isActive
+    })
+    return {
+      body: responseDataSorted,
+      statusCode: httpResponse.statusCode
+    }
+  } else {
+    const errorMessage = httpResponse.body.detail
+    throw new Error(errorMessage).message
   }
 }

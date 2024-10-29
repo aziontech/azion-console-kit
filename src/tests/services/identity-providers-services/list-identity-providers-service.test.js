@@ -61,7 +61,10 @@ const fixtures = {
       isActive: false,
       id: 'azion-default-sso'
     }
-  ]
+  ],
+  errorMessageMock: {
+    detail: 'Error message'
+  }
 }
 
 const makeSut = () => {
@@ -109,5 +112,15 @@ describe('IdentityProvidersServices', () => {
     const result = await sut({})
 
     expect(result).toEqual(fixtures.parsedDefaultActiveIdentityProviderMock)
+  })
+  it('should parser error messages', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: fixtures.errorMessageMock
+    })
+    const { sut } = makeSut()
+
+    const result = sut({})
+    expect(result).rejects.toBe(fixtures.errorMessageMock.detail)
   })
 })
