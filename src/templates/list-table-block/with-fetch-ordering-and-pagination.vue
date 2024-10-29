@@ -548,7 +548,7 @@
     if (props.listService) {
       try {
         isLoading.value = true
-        const { count = null, body = 0 } = props.isGraphql
+        const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
 

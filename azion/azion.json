@@ -1,0 +1,36 @@
+{
+  "name": "kind-telescope",
+  "bucket": "",
+  "preset": "Vue",
+  "env": "production",
+  "prefix": "",
+  "not-first-run": false,
+  "function": {
+    "id": 0,
+    "name": "__DEFAULT__",
+    "file": "./out/worker.js",
+    "args": "azion/args.json",
+    "instance-id": 0,
+    "instance-name": "__DEFAULT__",
+    "cache-id": 0
+  },
+  "application": {
+    "id": 0,
+    "name": "__DEFAULT__"
+  },
+  "domain": {
+    "id": 0,
+    "name": "__DEFAULT__",
+    "domain_name": "",
+    "url": ""
+  },
+  "rt-purge": {
+    "purge_on_publish": true
+  },
+  "origin": null,
+  "rules-engine": {
+    "created": false,
+    "rules": null
+  },
+  "cache-settings": null
+}

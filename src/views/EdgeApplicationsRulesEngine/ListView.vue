@@ -2,7 +2,9 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import ListTableBlock from '@/templates/list-table-block'
+  // import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
   import { computed, ref, inject } from 'vue'
@@ -76,6 +78,8 @@
       type: Boolean
     }
   })
+
+  const RULES_ENGINE_API_FIELDS = ['id', 'name', 'description']
 
   const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const PARSE_PHASE = {
@@ -215,7 +219,7 @@
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
-  <ListTableBlock
+  <FetchListTableBlock
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
@@ -232,6 +236,7 @@
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
+    :apiFields="RULES_ENGINE_API_FIELDS"
   >
     <template #addButton>
       <div
@@ -277,5 +282,5 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
 </template>
