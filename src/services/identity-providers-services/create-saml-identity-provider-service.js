@@ -41,7 +41,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your SAML IDP has been created',
-        urlToEditView: `/identity-providers/edit/${httpResponse.body.uuid}`
+        urlToEditView: `/identity-providers/edit/SAML/${httpResponse.body.uuid}`
       }
     case 400:
       const errorMessage = httpResponse.body.detail[0]
