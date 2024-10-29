@@ -10,7 +10,6 @@ import * as ErrorResponsesService from '@/services/edge-application-error-respon
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
   path: '/edge-applications',
