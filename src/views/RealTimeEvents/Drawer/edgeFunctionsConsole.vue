@@ -4,6 +4,7 @@
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+
   defineOptions({ name: 'drawer-events-functions-console' })
 
   const props = defineProps({
@@ -55,7 +56,7 @@
     <template #body>
       <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <InfoSection
-          :title="`Line Source - ${details.lineSource}`"
+          :title="`Line Source - ${details.lineSource ?? ''}`"
           :date="details.ts"
           :tags="tags"
         >
