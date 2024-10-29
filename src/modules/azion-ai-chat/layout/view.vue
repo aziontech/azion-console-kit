@@ -1,13 +1,4 @@
 <template>
-  <Toolbar class="border-noround border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none">
-    <template #start>
-      <h1>Azion Copilot</h1>
-    </template>
-    <template #end>
-      <slot name="chatControls" />
-    </template>
-  </Toolbar>
-
   <div
     class="flex flex-auto flex-col overflow-x-hidden p-6 pt-3"
     :class="{ 'justify-center gap-6': !state.conversationStarted }"
@@ -37,7 +28,6 @@
 </template>
 
 <script setup>
-  import Toolbar from 'primevue/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
   import ChatMessages from '../components/chat-list-messages.vue'

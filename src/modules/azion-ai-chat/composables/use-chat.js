@@ -1,8 +1,12 @@
-// src/composables/use-chat.js
 import { reactive, computed, readonly } from 'vue'
 import { chatService } from '../services/chat-service.js'
+import { makeBaseUrl } from '../services/make-url.js'
+import { makeSessionId } from '../services/make-session-id.js'
+import { useRouter } from 'vue-router'
 
-export function useChat(initialConfig = {}) {
+export function useChat({ api = {}, user = {}, chat = {}, settings = {} } = {}) {
+  const { currentRoute } = useRouter()
+
   const state = reactive({
     messages: [],
     conversationStarted: false,
@@ -10,17 +14,24 @@ export function useChat(initialConfig = {}) {
   })
 
   const config = reactive({
-    server: initialConfig.server || 'https://ai.azion.com/copilot/chat/completions',
-    accessToken: initialConfig.accessToken || 'defaultToken',
-    session_id: initialConfig.session_id || '740c3449-d568-4426-a55e-e4c0f1d604bd',
-    user_name: initialConfig.user_name || 'User',
-    client_id: initialConfig.client_id || '',
-    url: initialConfig.url || '/',
-    stream: initialConfig.stream || true,
-    app: initialConfig.app || 'console',
-    welcome: initialConfig.welcome || 'Welcome to Azion Chat!',
-    errorMessage: initialConfig.errorMessage || 'Sorry, something went wrong.',
-    suggestions: initialConfig.suggestions || []
+    api: {
+      url: api.url || makeBaseUrl(),
+      stream: api.stream || true
+    },
+    user: {
+      id: user.id || '',
+      name: user.name || ''
+    },
+    chat: {
+      // welcome: chat.welcome || 'Welcome to Azion Chat!',
+      errorMessage: chat.errorMessage || 'Sorry, something went wrong.',
+      suggestions: chat.suggestions || [],
+      session: chat.session || makeSessionId()
+    },
+    settings: {
+      path: settings.url || currentRoute.value.path,
+      app: settings.app || 'console'
+    }
   })
 
   const addMessage = (role, content) => {
@@ -42,8 +53,8 @@ export function useChat(initialConfig = {}) {
     addMessage('user', userMessage)
 
     let parsedBody = {
-      messages: [{ role: 'user', content: userMessage }],
-      stream: config.stream
+      messages: state.messages,
+      stream: config.api.stream
     }
 
     try {
@@ -51,58 +62,41 @@ export function useChat(initialConfig = {}) {
 
       const response = await chatService({
         parsedBody,
-        server: config.server,
+        server: config.api.url,
         signal: state.controller.signal
       })
 
       const reader = response.body.getReader()
       const decoder = new TextDecoder('utf-8')
 
-      while (true) {
+      let reading = true
+      while (reading) {
         const { done, value } = await reader.read()
 
-        if (done) {
-          break
-        }
+        reading = !done
+
+        if (!reading) break
 
         const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
-        const parsedLines = lines
-          .map((line) => line.replace(/^data: /, '').trim()) // Remove the "data: " prefix
-          .filter((line) => line !== '' && line !== '[DONE]') // Remove empty lines and "[DONE]"
-          .map((line) => JSON.parse(line)) // Parse the JSON string
-
-        for (const parsedLine of parsedLines) {
-          const { choices } = parsedLine
-          const { delta } = choices[0]
-          const { content } = delta
-          // Update the UI with the new content
-          if (content) {
-            accumulateSystemMessage(content)
-          }
-        }
+        chunk
+          .split('\n')
+          .map((line) => line.replace(/^data: /, '').trim())
+          .filter((line) => line && line !== '[DONE]')
+          .map(JSON.parse)
+          .forEach(({ choices }) => {
+            const content = choices[0]?.delta?.content
+            if (content) accumulateSystemMessage(content)
+          })
       }
     } catch (error) {
-      addMessage('system', config.errorMessage)
+      addMessage('system', config.chat.errorMessage)
     }
   }
 
-  const resetChat = () => {
+  const clearChat = () => {
     state.messages = []
     state.conversationStarted = false
-  }
-
-  const setSessionId = (sessionId) => {
-    config.session_id = sessionId
-  }
-
-  const setUser = (user) => {
-    config.user_name = user.name
-    config.client_id = user.id
-  }
-
-  const setErrorMessage = (errorMessage) => {
-    config.errorMessage = errorMessage
+    state.controller = null
   }
 
   const abortRequest = () => {
@@ -119,10 +113,7 @@ export function useChat(initialConfig = {}) {
     getAllMessages,
     chatConfig: readonly(config),
     sendMessage,
-    resetChat,
-    abortRequest,
-    setSessionId,
-    setUser,
-    setErrorMessage
+    clearChat,
+    abortRequest
   }
 }

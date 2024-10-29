@@ -3,6 +3,5 @@
 </template>
 
 <script setup>
-import AzionAiChatLayout from '@/modules/azion-ai-chat/layout';
-
+  import AzionAiChatLayout from '@/modules/azion-ai-chat/layout'
 </script>

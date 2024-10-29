@@ -16,7 +16,7 @@
       :style="{ transition: 'margin-right 0.2s' }"
       v-if="!showLoading"
     >
-      <router-view class="flex flex-1"/>
+      <router-view class="flex flex-1" />
       <AppFooter />
     </div>
   </div>
@@ -47,8 +47,4 @@
   const accountHandler = new AccountHandler(switchAccountService, listTypeAccountService)
   const { isSidebarActive } = useLayout()
   const showNavItems = computed(() => props.isLogged && !showLoading.value)
-
-  const containerClass = computed(() => {
-    return {}
-  })
 </script>
