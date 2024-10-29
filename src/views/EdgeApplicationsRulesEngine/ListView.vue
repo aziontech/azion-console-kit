@@ -79,7 +79,16 @@
     }
   })
 
-  const RULES_ENGINE_API_FIELDS = ['id', 'name', 'description']
+  const RULES_ENGINE_API_FIELDS = [
+    'id',
+    'name',
+    'description',
+    'phase',
+    'behaviors',
+    'criteria',
+    'active',
+    'order'
+  ]
 
   const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const PARSE_PHASE = {
@@ -145,10 +154,11 @@
     hasContentToList.value = event
   }
 
-  const listRulesEngineWithDecorator = async () => {
+  const listRulesEngineWithDecorator = async (query) => {
     return props.listRulesEngineService({
       id: props.edgeApplicationId,
-      phase: PARSE_PHASE[selectedPhase.value]
+      phase: PARSE_PHASE[selectedPhase.value],
+      ...query
     })
   }
 
@@ -237,6 +247,7 @@
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="'name'"
   >
     <template #addButton>
       <div
