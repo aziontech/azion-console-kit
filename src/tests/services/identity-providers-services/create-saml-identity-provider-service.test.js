@@ -51,7 +51,7 @@ describe('SAMLIdentityProviderService', () => {
     const data = await sut(fixtures.samlProviderMock)
 
     expect(data.feedback).toBe('Your SAML IDP has been created')
-    expect(data.urlToEditView).toBe('/identity-providers/edit/12345')
+    expect(data.urlToEditView).toBe('/identity-providers/edit/SAML/12345')
   })
 
   it('should throw an error with the message from the response body when statusCode is 400', async () => {
