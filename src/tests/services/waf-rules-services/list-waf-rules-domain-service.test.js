@@ -37,7 +37,7 @@ describe('WafRulesServices', () => {
     await sut({ wafId: 100 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/100/domains',
+      url: 'v3/waf/100/domains?page_size=200',
       method: 'GET'
     })
   })

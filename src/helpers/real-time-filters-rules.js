@@ -98,13 +98,13 @@ const FILTER_LIKE_TYPE = {
   classifiedEq: 'StringObject',
   classifiedNe: 'StringObject',
   actionEq: 'StringObject',
-  actionNe: 'StringObject',
+  actionNe: 'StringObject'
 }
 
 const FILTER_LIKE_ALIAS = {
   configurationIdIn: 'Domain',
   classifiedEq: 'Classified',
-  classifiedNe: 'Classified',
+  classifiedNe: 'Classified'
 }
 
 /**
