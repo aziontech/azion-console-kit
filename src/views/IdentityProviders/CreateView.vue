@@ -55,7 +55,6 @@
   const initialValues = {
     // OPEN ID Fields
     name: '',
-    identityProviderType: idpTypes.OPEN_ID,
     authorizationUrl: '',
     userInfoUrl: '',
     tokenUrl: '',

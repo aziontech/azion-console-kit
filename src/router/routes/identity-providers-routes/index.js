@@ -54,7 +54,7 @@ export const identityProvidersRoutes = {
         editSAMLIdentityProviderService: idpService.editSAMLIdentityProviderService,
         loadOIDCIdentityProviderService: idpService.loadOIDCIdentityProviderService,
         loadSAMLIdentityProviderService: idpService.loadSAMLIdentityProviderService,
-        updatedRedirect: 'identity-providers'
+        updatedRedirect: 'list-identity-providers'
       },
       meta: {
         breadCrumbs: [

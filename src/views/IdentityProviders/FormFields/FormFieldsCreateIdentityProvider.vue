@@ -114,13 +114,12 @@
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="clientSecret"
-          class="font-semibold text-sm"
-          :class="{ 'p-error': clientSecretErrorMessage }"
-        >
-          Client Secret
-        </label>
+        <LabelBlock
+          for="scopes"
+          data-testid="sso-management-form__client-secret-label"
+          label="Client Secret"
+          isRequired="true"
+        />
         <Password
           toggleMask
           autocomplete="off"
@@ -140,13 +139,12 @@
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="scopesList"
-          class="font-semibold text-sm"
-          :class="{ 'p-error': scopesErrorMessage }"
-        >
-          Scopes
-        </label>
+        <LabelBlock
+          for="scopes"
+          data-testid="sso-management-form__scopes__multiselect-label"
+          label="Scopes"
+          isRequired="true"
+        />
         <MultiSelect
           id="scopesList"
           v-model="scopes"
@@ -257,6 +255,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
+          :required="!isEditForm"
           data-testid="sso-management-form__certificate-field"
           label="X-509 Certificate"
           placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
@@ -278,10 +277,12 @@
   import Password from 'primevue/password'
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
+  import LabelBlock from '@/templates/label-block'
+
   const emit = defineEmits(['update:idpTypeSelection'])
   defineOptions({ name: 'identity-providers-create' })
 
-  defineProps({
+  const props = defineProps({
     isEditForm: {
       type: Boolean,
       default: false
@@ -291,9 +292,7 @@
   const { value: name } = useField('name')
 
   // OIDP fields
-  const { value: identityProviderType } = useField('identityProviderType', null, {
-    initialValue: 'OIDC'
-  })
+  const { value: identityProviderType } = useField('identityProviderType')
 
   const { value: authorizationUrl } = useField('authorizationUrl')
   const { value: userInfoUrl } = useField('userInfoUrl')
@@ -333,6 +332,10 @@
       inputValue: 'SAML'
     }
   ]
+
+  if (!props.isEditForm) {
+    identityProviderType.value = 'OIDC'
+  }
 
   watch(identityProviderType, () => {
     emit('update:identityProviderSelection', identityProviderType.value)
