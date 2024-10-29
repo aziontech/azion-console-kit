@@ -16,6 +16,7 @@
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
+  import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
 
   const props = defineProps({
     digitalCertificates: {
@@ -37,6 +38,14 @@
     updateDigitalCertificates: {
       type: Function,
       required: true
+    },
+    edgeFirewallsData: {
+      type: Array,
+      required: true
+    },
+    isLoadingEdgeFirewalls: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -50,6 +59,25 @@
   const { value: domainName } = useField('domainName')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+
+  const { value: edgeFirewall } = useField('edgeFirewall')
+  const drawerEdgeFirewallRef = ref('')
+
+  const openDrawerEdgeFirewall = () => {
+    drawerEdgeFirewallRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallCreated = (id) => {
+    edgeFirewall.value = id
+    emit('edgeFirewallCreated')
+  }
+
+  const edgeFirewallOptions = computed(() => {
+    return props.edgeFirewallsData.map((edgeFirewall) => ({
+      name: edgeFirewall.name,
+      value: edgeFirewall.id
+    }))
+  })
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -142,7 +170,7 @@
     emit('edgeApplicationCreated')
   }
 
-  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName'])
+  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName', 'edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
   const openDigitalCertificateDrawer = () => {
@@ -254,6 +282,10 @@
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
       />
+      <DrawerEdgeFirewall
+        ref="drawerEdgeFirewallRef"
+        @onSuccess="handleEdgeFirewallCreated"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -291,6 +323,46 @@
         </FieldDropdown>
       </div>
 
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeFirewall
+          ref="drawerEdgeFirewallRef"
+          @onSuccess="handleEdgeFirewallCreated"
+        />
+        <FieldDropdown
+          label="Edge Firewall"
+          data-testid="domains-form__edge-firewall-field"
+          name="edgeFirewall"
+          :options="edgeFirewallOptions"
+          :loading="isLoadingEdgeFirewalls"
+          :disabled="isLoadingEdgeFirewalls"
+          optionLabel="name"
+          optionValue="value"
+          :value="edgeFirewall"
+          filter
+          appendTo="self"
+          placeholder="Select an edge firewall"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-firewall-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Firewall"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
+      </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"

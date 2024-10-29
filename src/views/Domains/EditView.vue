@@ -17,6 +17,9 @@
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
+            :edgeFirewallsData="edgeFirewallsData"
+            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
+            @edgeFirewallCreated="handleEdgeFirewallCreated"
             hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
@@ -47,6 +50,7 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -105,6 +109,8 @@
   const toast = useToast()
   const loadingEdgeApplications = ref(true)
   const domainName = ref()
+  const edgeFirewallsData = ref([])
+  const isLoadingEdgeFirewalls = ref(true)
 
   const requestEdgeApplications = async () => {
     loadingEdgeApplications.value = true
@@ -149,10 +155,29 @@
     domainName.value = domain.name
   }
 
+  const requestEdgeFirewalls = async () => {
+    isLoadingEdgeFirewalls.value = true
+    try {
+      edgeFirewallsData.value = await listEdgeFirewallService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      isLoadingEdgeFirewalls.value = false
+    }
+  }
+
+  const handleEdgeFirewallCreated = async () => {
+    await requestEdgeFirewalls()
+  }
+
   onMounted(async () => {
     try {
       scrollToTop()
-      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
+      await Promise.all([
+        requestEdgeApplications(),
+        requestDigitalCertificates(),
+        requestEdgeFirewalls()
+      ])
     } catch (error) {
       toastError(error)
     } finally {
