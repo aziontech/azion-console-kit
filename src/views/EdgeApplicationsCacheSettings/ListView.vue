@@ -1,6 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
@@ -50,9 +50,11 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
+  const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
 
-  const listCacheSettingsServiceWithDecorator = async () => {
-    return await props.listCacheSettingsService({ id: props.edgeApplicationId })
+
+  const listCacheSettingsServiceWithDecorator = async (query) => {
+    return await props.listCacheSettingsService({ id: props.edgeApplicationId, ...query })
   }
 
   const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
@@ -137,7 +139,7 @@
     @onSuccess="reloadList"
   />
 
-  <ListTableBlock
+  <FetchListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
     :listService="listCacheSettingsServiceWithDecorator"
@@ -148,6 +150,7 @@
     emptyListMessage="No cache settings found."
     :actions="actions"
     isTabs
+    :apiFields="CACHE_SETTING_API_FIELDS"
   >
     <template #addButton>
       <PrimeButton
@@ -157,7 +160,7 @@
         data-testid="edge-application-cache-settings-list__create-cache-settings__button"
       />
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
 
   <EmptyResultsBlock
     v-else

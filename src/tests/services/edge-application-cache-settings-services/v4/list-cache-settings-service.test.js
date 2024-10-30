@@ -59,7 +59,7 @@ describe('EdgeApplicationCacheSettingsServicesV4', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/edge_application/applications/1920763586747/cache_settings?ordering=name&page=1&page_size=200&fields=&search=undefined`,
+      url: `v4/edge_application/applications/1920763586747/cache_settings?ordering=name&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })
