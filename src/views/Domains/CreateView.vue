@@ -236,7 +236,6 @@
         }
       ),
     edgeApplication: yup.number().label('Edge Application'),
-    edgeFirewall: yup.number().label('Edge Firewall'),
     cnames: yup
       .string()
       .label('CNAME')
