@@ -1,10 +1,10 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import { useLayout } from '@/composables/use-layout'
-  import AzionAIChatBlock from '@/modules/azion-ai-chat/azion-ai-chat-block.vue'
+  import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
 
   defineOptions({
-    name: 'copilot-sidebar'
+    name: 'helper-sidebar'
   })
 
   const { toggleSidebar } = useLayout()
@@ -12,12 +12,8 @@
 
 <template>
   <div class="flex flex-col h-[calc(100vh-3.5rem)]">
-    <Toolbar class="border-noround border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none">
-      <template #start>
-        <h1>Azion Copilot</h1>
-      </template>
-
-      <template #end>
+    <AzionAIChatBlock>
+      <template #chatControls>
         <div class="flex gap-3">
           <PrimeButton
             icon="pi pi-external-link"
@@ -36,9 +32,6 @@
           />
         </div>
       </template>
-    </Toolbar>
-    <div class="flex flex-col flex-auto overflow-auto">
-      <AzionAIChatBlock />
-    </div>
+    </AzionAIChatBlock>
   </div>
 </template>

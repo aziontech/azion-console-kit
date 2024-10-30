@@ -36,7 +36,7 @@
 <script setup>
   import Textarea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
-  import { ref, defineEmits } from 'vue'
+  import { ref } from 'vue'
 
   const isOverflowTextArea = ref('')
   const checkOverflow = (event) => {
