@@ -1,6 +1,11 @@
 <script setup>
   import { useLayout } from '@/composables/use-layout'
   import Helper from './components/sidebar/helper.vue'
+  import AzionCopilot from './components/sidebar/azion-copilot.vue'
+
+  defineOptions({
+    name: 'app-sidebar'
+  })
 
   const { isSidebarActive } = useLayout()
 </script>
@@ -13,5 +18,6 @@
     ]"
   >
     <Helper />
+    <AzionCopilot />
   </div>
 </template>

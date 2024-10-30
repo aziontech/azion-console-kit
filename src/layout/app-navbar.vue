@@ -29,6 +29,7 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
 
+        <AzionCopilot />
         <Help />
 
         <ConsoleFeedback
@@ -68,6 +69,8 @@
 
 <script setup>
   import Help from '@/layout/components/navbar/help'
+  import AzionCopilot from '@/layout/components/navbar/azion-copilot'
+
   import { ref, provide, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useRouter, useRoute } from 'vue-router'

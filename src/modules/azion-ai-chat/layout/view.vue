@@ -4,17 +4,14 @@
     :class="{ 'justify-center gap-6': !state.conversationStarted }"
     ref="chatContainer"
   >
-    <slot
-      name="chatPreview"
-      v-if="!state.conversationStarted"
-    >
+    <template v-if="!state.conversationStarted">
       <Welcome />
 
       <Suggestions
         :suggestions="suggestionsTest"
         @selectSuggestion="sendMessage"
       />
-    </slot>
+    </template>
 
     <ChatMessages
       v-else
@@ -22,9 +19,7 @@
     />
   </div>
 
-  <slot name="chat-input">
-    <ChatInput @sendMessage="sendMessage" />
-  </slot>
+  <ChatInput @sendMessage="sendMessage" />
 </template>
 
 <script setup>

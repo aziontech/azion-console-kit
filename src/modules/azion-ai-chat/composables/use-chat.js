@@ -23,7 +23,6 @@ export function useChat({ api = {}, user = {}, chat = {}, settings = {} } = {}) 
       name: user.name || ''
     },
     chat: {
-      // welcome: chat.welcome || 'Welcome to Azion Chat!',
       errorMessage: chat.errorMessage || 'Sorry, something went wrong.',
       suggestions: chat.suggestions || [],
       session: chat.session || makeSessionId()
@@ -34,8 +33,8 @@ export function useChat({ api = {}, user = {}, chat = {}, settings = {} } = {}) 
     }
   })
 
-  const addMessage = (role, content) => {
-    state.messages.push({ role, content })
+  const addMessage = (role, content, isResponding = false) => {
+    state.messages.push({ role, content, isResponding })
     state.conversationStarted = true
   }
 
@@ -59,7 +58,7 @@ export function useChat({ api = {}, user = {}, chat = {}, settings = {} } = {}) 
 
     try {
       state.controller = new AbortController()
-
+      state.isResponding = true
       const response = await chatService({
         parsedBody,
         server: config.api.url,
@@ -90,6 +89,8 @@ export function useChat({ api = {}, user = {}, chat = {}, settings = {} } = {}) 
       }
     } catch (error) {
       addMessage('system', config.chat.errorMessage)
+    } finally {
+      state.isResponding = false
     }
   }
 

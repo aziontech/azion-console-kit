@@ -1,6 +1,5 @@
 <template>
   <PrimeButton
-    label="Feedback"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
       label: { class: 'max-md:hidden' },
