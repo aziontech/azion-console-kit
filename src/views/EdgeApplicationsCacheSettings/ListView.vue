@@ -52,7 +52,6 @@
   const drawerRef = ref('')
   const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
 
-
   const listCacheSettingsServiceWithDecorator = async (query) => {
     return await props.listCacheSettingsService({ id: props.edgeApplicationId, ...query })
   }
