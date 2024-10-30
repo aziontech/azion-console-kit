@@ -161,8 +161,7 @@ export function getMenuItens(showMarketplaceProductsItens) {
             external: true
           }
         ]
-      },
-
+      }
     ]
 
     menus.push(...marketplaceProductsMenus)
