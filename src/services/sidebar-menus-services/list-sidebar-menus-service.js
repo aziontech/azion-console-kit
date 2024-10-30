@@ -1,6 +1,7 @@
-import { menus } from './menus'
+import { getMenuItens } from './menus'
 
-export const listSidebarMenusService = () => {
+export const listSidebarMenusService = (showMarketplaceProductsItens) => {
+  const menus = getMenuItens(showMarketplaceProductsItens)
   return adapt(menus)
 }
 
