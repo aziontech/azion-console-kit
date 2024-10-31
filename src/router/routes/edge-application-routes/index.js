@@ -8,6 +8,7 @@ import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-group
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
+import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -74,7 +75,7 @@ export const edgeApplicationRoutes = {
           clipboardWrite: Helpers.clipboardWrite
         },
         cacheSettingsServices: {
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
           deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
           createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
           loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
