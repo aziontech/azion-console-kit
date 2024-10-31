@@ -8,13 +8,13 @@
         maxlength="16000"
         @keyup.enter.exact="sendMessage"
         :class="[
-          'w-full min-h-[2.75rem] max-h-[12.5rem] px-2 pr-0 pl-4 align-content-center border-noround border-round-left custom-scroll border-none shadow-none',
+          'w-full min-h-[2.75rem] max-h-[12.5rem] px-2 pr-0 pl-4 align-content-center border-noround border-round-left custom-scroll border-none shadow-none border-round-left-lg',
           isOverflowTextArea
         ]"
         @input="checkOverflow"
       />
       <div
-        class="flex align-items-end pb-1 border-noround border-round-right p-inputnumber-button pr-3"
+        class="flex align-items-end pb-1 border-noround border-round-right p-inputnumber-button pr-3 border-none border-round-right-lg"
       >
         <PrimeButton
           v-if="!isResponding"

@@ -16,7 +16,7 @@
         v-if="!route.meta.hideLinksFooter"
       >
         <div
-          class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center"
+          class="w-full flex flex-col md:flex-row gap-3 xl:justify-center items-center flex-wrap justify-center"
         >
           <div class="flex gap-1">
             <PrimeButton

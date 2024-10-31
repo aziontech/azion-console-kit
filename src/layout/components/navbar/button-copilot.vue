@@ -2,7 +2,7 @@
   <PrimeButton
     :label="currentLabel"
     @click="toggleSidebarComponent('copilot')"
-    class="text-white border-header"
+    class="text-white border-header bg-header hover:bg-header-button-hover"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
       label: { class: 'max-md:hidden' },

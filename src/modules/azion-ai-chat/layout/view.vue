@@ -31,8 +31,6 @@
 </template>
 
 <script setup>
-  import PrimeTag from 'primevue/tag'
-  import Toolbar from 'primevue/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
   import ChatMessages from '../components/chat-list-messages.vue'
@@ -44,7 +42,7 @@
     name: 'AzionAiChatLayout'
   })
 
-  const { sendMessage, state, abortRequest, clearChat } = useChat()
+  const { sendMessage, state, abortRequest } = useChat()
 
   const suggestionsTest = [
     {
@@ -83,7 +81,7 @@
   }
 
   .custom-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--primary-color);
+    background-color: var(--surface-500);
     border-radius: 4px;
   }
 
