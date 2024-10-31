@@ -2,7 +2,6 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  // import ListTableBlock from '@/templates/list-table-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
 
   import PrimeButton from 'primevue/button'
