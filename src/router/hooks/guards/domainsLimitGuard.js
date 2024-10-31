@@ -10,7 +10,7 @@ export async function domainsLimitGuard({ to }) {
   })
 
   const isMaxDomainsReached = workloads.count >= 3000
-  if (to.fullPath.includes('data-stream') && isMaxDomainsReached) {
+  if ((to.name === 'create-data-stream' || to.name === 'edit-data-stream') && isMaxDomainsReached) {
     return '/'
   }
 }
