@@ -1,10 +1,21 @@
 <template>
   <Toolbar class="border-noround border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none">
     <template #start>
-      <h1>Azion Copilot</h1>
+      <h3 class="text-color text-lg font-medium flex gap-3">
+        Azion Copilot
+        <PrimeTag
+          v-tooltip.bottom="
+            'Copilot is in preview mode and can give you some wrong answers. Please, always validate your answers.'
+          "
+          value="Preview"
+        />
+      </h3>
     </template>
     <template #end>
-      <slot name="chatControls" />
+      <slot
+        name="chatControls"
+        :clearChat="clearChat"
+      />
     </template>
   </Toolbar>
 
@@ -29,10 +40,14 @@
     />
   </div>
 
-  <ChatInput @sendMessage="sendMessage" />
+  <ChatInput
+    @sendMessage="sendMessage"
+    @stopResponding="abortRequest"
+  />
 </template>
 
 <script setup>
+  import PrimeTag from 'primevue/tag'
   import Toolbar from 'primevue/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
@@ -45,23 +60,13 @@
     name: 'AzionAiChatLayout'
   })
 
-  const { sendMessage, state } = useChat()
+  const { sendMessage, state, abortRequest, clearChat } = useChat()
 
   const suggestionsTest = [
     {
       icon: 'pi pi-question-circle',
       title: 'How do I build an edge application?',
       context: 'How do I build an edge application?'
-    },
-    {
-      icon: 'pi pi-shield',
-      title: 'How do I protect my application?',
-      context: 'How do I protect my application?'
-    },
-    {
-      icon: 'pi pi-shield',
-      title: 'How do I protect my application?',
-      context: 'How do I protect my application?'
     },
     {
       icon: 'pi pi-shield',

@@ -29,8 +29,8 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
 
-        <AzionCopilot />
-        <Help />
+        <ButtonCopilot />
+        <ButtonHelper />
 
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
@@ -68,8 +68,8 @@
 </template>
 
 <script setup>
-  import Help from '@/layout/components/navbar/help'
-  import AzionCopilot from '@/layout/components/navbar/azion-copilot'
+  import ButtonHelper from '@/layout/components/navbar/button-helper.vue'
+  import ButtonCopilot from '@/layout/components/navbar/button-copilot.vue'
 
   import { ref, provide, watch } from 'vue'
   import PrimeButton from 'primevue/button'

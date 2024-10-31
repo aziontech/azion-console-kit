@@ -1,6 +1,6 @@
 <template>
   <PrimeButton
-    @click="toggleSidebar"
+    @click="toggleSidebarComponent('helper')"
     class="text-white border-header"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
@@ -19,11 +19,11 @@
   import PrimeButton from 'primevue/button'
   import { useLayout } from '@/composables/use-layout'
 
-  defineOptions({ name: 'NavbarHelpBlock' })
-  const { isSidebarActive, toggleSidebar } = useLayout()
+  defineOptions({ name: 'ButtonHelper' })
+  const { isSidebarActive, toggleSidebarComponent, activeComponentKey } = useLayout()
 
   const buttonClasses = computed(() => {
-    return isSidebarActive.value
+    return isSidebarActive.value && activeComponentKey.value === 'helper'
       ? 'bg-header-button-enabled'
       : 'bg-header hover:bg-header-button-hover'
   })

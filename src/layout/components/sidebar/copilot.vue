@@ -2,19 +2,33 @@
   import PrimeButton from 'primevue/button'
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
+  import { useRouter } from 'vue-router'
 
   defineOptions({
-    name: 'helper-sidebar'
+    name: 'copilot-sidebar'
   })
 
-  const { toggleSidebar } = useLayout()
+  const { closeSidebar } = useLayout()
+  const router = useRouter()
+
+  const openChatInNewTab = () => {
+    router.push({ name: 'copilot' })
+  }
 </script>
 
 <template>
   <div class="flex flex-col h-[calc(100vh-3.5rem)]">
     <AzionAIChatBlock>
-      <template #chatControls>
+      <template #chatControls="{ clearChat }">
         <div class="flex gap-3">
+          <PrimeButton
+            icon="pi pi-eraser"
+            outlined
+            class="surface-border h-8 w-8"
+            aria-label="Clear chat"
+            v-tooltip.bottom="'Clear chat'"
+            @click="clearChat"
+          />
           <PrimeButton
             icon="pi pi-external-link"
             outlined
@@ -28,7 +42,8 @@
             outlined
             class="surface-border h-8 w-8"
             aria-label="Close"
-            @click="toggleSidebar"
+            v-tooltip.bottom="'Close'"
+            @click="closeSidebar"
           />
         </div>
       </template>

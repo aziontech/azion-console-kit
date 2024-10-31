@@ -7,11 +7,13 @@ import {
   redirectGuard,
   redirectToManagerGuard
 } from '@/router/hooks/guards'
-import { useHelpCenterStore } from '@/stores/help-center'
+import { useLayout } from '@/composables/use-layout'
 import { useRouter } from 'vue-router'
 
 export default async function beforeEachRoute(guardDependency) {
-  useHelpCenterStore().close()
+  
+  const { closeSidebar } = useLayout()
+  closeSidebar()
   const router = useRouter()
   const { next } = guardDependency
 

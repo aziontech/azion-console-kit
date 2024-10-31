@@ -1,12 +1,12 @@
 <template>
-  <div class="bottom-0 chat-input flex sticky p-6 pt-3 flex flex-col gap-2 text-center">
+  <div class="bottom-0 chat-input flex sticky p-6 pt-3 flex-col gap-2 text-center">
     <div class="flex w-full">
       <Textarea
         v-model="userMessage"
         autoResize
         rows="1"
         maxlength="16000"
-        @keyup.enter="sendMessage"
+        @keyup.enter.exact="sendMessage"
         :class="[
           'w-full min-h-[2.75rem] max-h-[12.5rem] px-2 pr-0 pl-4 align-content-center border-noround border-round-left custom-scroll border-none shadow-none',
           isOverflowTextArea
@@ -17,11 +17,20 @@
         class="flex align-items-end pb-1 border-noround border-round-right p-inputnumber-button pr-3"
       >
         <PrimeButton
+          v-if="!isResponding"
           severity="Primary"
           outlined
           icon="pi pi-fw pi-send"
           aria-label="send"
           @click="sendMessage"
+        />
+        <PrimeButton
+          v-else
+          severity="Primary"
+          outlined
+          icon="pi pi-stop"
+          aria-label="send"
+          @click="emit('stopResponding')"
         />
       </div>
     </div>
@@ -37,6 +46,9 @@
   import Textarea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
   import { ref } from 'vue'
+  import { useChat } from '../composables/use-chat'
+
+  const { isResponding } = useChat()
 
   const isOverflowTextArea = ref('')
   const checkOverflow = (event) => {
@@ -50,11 +62,12 @@
   }
 
   const userMessage = ref('')
-  const emit = defineEmits(['sendMessage'])
+  const emit = defineEmits(['sendMessage', 'stopResponding'])
 
   const sendMessage = () => {
-    if (userMessage.value.trim()) {
-      emit('sendMessage', userMessage.value)
+    const message = userMessage.value.trim()
+    if (message && !isResponding.value) {
+      emit('sendMessage', message)
       userMessage.value = ''
     }
   }

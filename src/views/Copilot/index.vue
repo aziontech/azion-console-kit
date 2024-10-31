@@ -1,10 +1,11 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
-  // import Helper from './components/sidebar/helper.vue'
-  // import helper from '@/layout/components/sidebar/helper.vue'
-  import AzionAIChatBlock from '@/modules/azion-ai-chat/layout/view.vue'
-
+  import copilotView from '@/modules/azion-ai-chat/layout/view'
   import PageHeadingBlock from '@/templates/page-heading-block'
+
+  defineOptions({
+    name: 'Copilot-view'
+  })
 </script>
 
 <template>
@@ -16,7 +17,7 @@
       />
     </template>
     <template #content>
-      <AzionAIChatBlock />
+      <copilotView />
     </template>
   </ContentBlock>
 </template>

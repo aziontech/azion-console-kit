@@ -58,15 +58,13 @@
 </template>
 
 <script setup>
-  import { useHelpCenterStore } from '@/stores/help-center'
-  import { storeToRefs } from 'pinia'
   import InlineMessage from 'primevue/inlinemessage'
   import Skeleton from 'primevue/skeleton'
   import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
   import AggregationInfo from './components/aggregation-info.vue'
   import ChartOwner from './components/chart-owner.vue'
   import MoreOptionsMenu from './components/more-options-menu.vue'
-
+  import { useLayout } from '@/composables/use-layout'
   defineOptions({ name: 'GraphsCardBlock' })
 
   const props = defineProps({
@@ -106,8 +104,7 @@
     'stacked-area': defineAsyncComponent(() => import('./components/chart/stacked-area-chart')),
     'stacked-bar': defineAsyncComponent(() => import('./components/chart/stacked-bar-chart'))
   }
-
-  const { getStatus } = storeToRefs(useHelpCenterStore())
+  const { isSidebarActive } = useLayout()
 
   const shouldRenderChart = ref(true)
 
@@ -145,7 +142,7 @@
     window.removeEventListener('resize', reRenderChart)
   })
 
-  watch(getStatus, () => {
+  watch(isSidebarActive, () => {
     reRenderChart()
   })
 

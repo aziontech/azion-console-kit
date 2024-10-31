@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col h-full">
     <ToastBlock />
 
     <AppNavbar
@@ -10,15 +10,15 @@
     <PageLoadingBlock :showLoading="showLoading" />
     <AppSidebar />
 
-    <div
-      class="flex flex-col flex-1 min-h-screen flex-auto transition-margin-right pt-14"
+    <main
+      class="flex flex-col flex-1 min-h-screen transition-margin-right pt-14 h-full"
       :class="{ 'mr-[32rem]': isSidebarActive }"
       :style="{ transition: 'margin-right 0.2s' }"
       v-if="!showLoading"
     >
       <router-view class="flex flex-1" />
       <AppFooter />
-    </div>
+    </main>
   </div>
 </template>
 

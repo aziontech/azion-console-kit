@@ -1,13 +1,25 @@
 <template>
-  <div
+  <article
     class="chat-message flex gap-3"
     :class="classRole[role]"
   >
-    <ChatAvatar v-if="isSystem" />
+    <div
+      v-if="isSystem"
+      class="flex gap-3 mt-1"
+    >
+      <ChatAvatar />
+
+      <div
+        class="mt-3"
+        v-if="!message"
+      >
+        <div class="animate-blink bg-primary rounded-full w-3 h-3" />
+      </div>
+    </div>
     <div class="message-content">
       <div v-html="message" />
     </div>
-  </div>
+  </article>
 </template>
 
 <script setup>

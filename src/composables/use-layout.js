@@ -1,24 +1,50 @@
-import { computed, reactive, readonly } from 'vue'
+import { computed, reactive, readonly, markRaw } from 'vue'
+import Copilot from '@/layout/components/sidebar/copilot.vue'
+import Helper from '@/layout/components/sidebar/helper.vue'
+
+const componentMapSidebar = {
+  copilot: markRaw(Copilot),
+  helper: markRaw(Helper)
+}
 
 const layoutState = reactive({
-  sidebarVisible: false
+  sidebarVisible: false,
+  currentComponent: null
 })
 
 export function useLayout() {
-  const resetMenu = () => {
+  const toggleSidebarComponent = (componentKey) => {
+    const component = componentMapSidebar[componentKey]
+    if (layoutState.currentComponent === component) {
+      closeSidebar()
+    } else {
+      layoutState.currentComponent = component
+      layoutState.sidebarVisible = true
+    }
+  }
+
+  const closeSidebar = () => {
     layoutState.sidebarVisible = false
+    layoutState.currentComponent = null
   }
 
   const isSidebarActive = computed(() => layoutState.sidebarVisible)
+  const activeComponent = computed(() => layoutState.currentComponent)
 
-  const toggleSidebar = () => {
-    layoutState.sidebarVisible = !layoutState.sidebarVisible
-  }
+  const activeComponentKey = computed(() => {
+    return (
+      Object.keys(componentMapSidebar).find(
+        (key) => componentMapSidebar[key] === layoutState.currentComponent
+      ) || null
+    )
+  })
 
   return {
     layoutState: readonly(layoutState),
     isSidebarActive,
-    toggleSidebar,
-    resetMenu
+    activeComponent,
+    activeComponentKey,
+    toggleSidebarComponent,
+    closeSidebar
   }
 }

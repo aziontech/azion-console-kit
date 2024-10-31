@@ -1,6 +1,6 @@
 <!-- src/components/chat-messages.vue -->
 <template>
-  <div class="custom-scroll ">
+  <div class="flex flex-col text-sm">
     <chat-message
       v-for="(message, index) in messages"
       :key="index"
@@ -17,4 +17,3 @@
     messages: Array
   })
 </script>
-
