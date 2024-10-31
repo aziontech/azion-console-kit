@@ -38,13 +38,13 @@ describe('ParseHttpResponse', () => {
   it('should return null when response is 200 and no content is provided in the response', () => {
     const httpResponseMock = {
       statusCode: 200,
-      body: []
+      body: undefined
     }
     const { sut } = makeSut()
 
     const result = sut(httpResponseMock)
 
-    expect(result).toEqual([])
+    expect(result).toBeNull()
   })
   it('should return a successfully created message on status code 201', () => {
     const httpResponseMock = {

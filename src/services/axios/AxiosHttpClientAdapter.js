@@ -11,7 +11,7 @@ import {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      const { count = 0, body = [] } = httpResponse
+      const { count = 0, body = null } = httpResponse
 
       if (!count) return body
 

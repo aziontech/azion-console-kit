@@ -30,8 +30,9 @@ const listFunctionInstancesAndFunctionData = async (functionsInstances) => {
 
 export const listEdgeApplicationFunctionsService = async (edgeApplicationID, query) => {
   const functionsInstances = await listFunctionInstances(edgeApplicationID, query)
-  count = functionsInstances.count || 0
-  const functionData = functionsInstances.body || functionsInstances
+  count = functionsInstances?.count || 0
+  const functionData = functionsInstances?.body || functionsInstances
+
   const functions = await listFunctionInstancesAndFunctionData(functionData)
   const httpResponse = adapt(functions)
 
