@@ -49,7 +49,7 @@ describe('EdgeApplicationRulesEngineServicesV4', () => {
     await sut({ id: edgeApplicationId, phase: 'request' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_application/applications/${edgeApplicationId}/rules?ordering=name&page=1&page_size=200&fields=&search=undefined`,
+      url: `${version}/edge_application/applications/${edgeApplicationId}/rules?phase=request&ordering=name&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })

@@ -7,7 +7,7 @@ export const listEdgeApplicationsService = async ({
   search = '',
   ordering = '',
   page = 1,
-  pageSize = 200
+  pageSize = 10
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 

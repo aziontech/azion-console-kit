@@ -2,7 +2,8 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
   import { computed, ref, inject } from 'vue'
@@ -77,6 +78,17 @@
     }
   })
 
+  const RULES_ENGINE_API_FIELDS = [
+    'id',
+    'name',
+    'description',
+    'phase',
+    'behaviors',
+    'criteria',
+    'active',
+    'order'
+  ]
+
   const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const PARSE_PHASE = {
     'Request phase': 'request',
@@ -141,10 +153,11 @@
     hasContentToList.value = event
   }
 
-  const listRulesEngineWithDecorator = async () => {
+  const listRulesEngineWithDecorator = async (query) => {
     return props.listRulesEngineService({
       id: props.edgeApplicationId,
-      phase: PARSE_PHASE[selectedPhase.value]
+      phase: PARSE_PHASE[selectedPhase.value],
+      ...query
     })
   }
 
@@ -215,7 +228,7 @@
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
-  <ListTableBlock
+  <FetchListTableBlock
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
@@ -232,6 +245,8 @@
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
+    :apiFields="RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="'name'"
   >
     <template #addButton>
       <div
@@ -277,5 +292,5 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
 </template>

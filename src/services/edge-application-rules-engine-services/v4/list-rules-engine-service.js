@@ -6,13 +6,15 @@ import { capitalizeFirstLetter } from '@/helpers'
 export const listRulesEngineService = async ({
   id,
   fields = '',
+  phase = 'request',
+  search = '',
   ordering = 'name',
   page = 1,
-  pageSize = 200
+  pageSize = 10
 }) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize })
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${id}/rules?${searchParams.toString()}`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${id}/rules?phase=${phase}&${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -63,7 +65,10 @@ const adapt = (httpResponse) => {
     return keepSameOrder
   })
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: sortParsedRulesEgine,
     statusCode: httpResponse.statusCode
   }
