@@ -1,13 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctionsService } from '@/services/edge-functions-services/v4'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-const localeMock = (locale = 'en') => {
-  const DateTimeFormat = Intl.DateTimeFormat
-  vi.spyOn(window.global.Intl, 'DateTimeFormat')
-    .mockImplementationOnce((__, options) => DateTimeFormat(locale, { ...options }))
-    .mockImplementationOnce((__, options) => DateTimeFormat(locale, { ...options }))
-}
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeFunctionMock: {
@@ -17,7 +10,6 @@ const fixtures = {
     initiator_type: 'Initiator',
     id: 1239875,
     last_editor: 'az editor',
-    modified: new Date(2023, 10, 10),
     name: 'AZ firewall',
     reference_count: '2',
     vendor: 'Azion'
@@ -29,7 +21,6 @@ const fixtures = {
     initiator_type: 'Initiator 2',
     id: 852030,
     last_editor: 'az editor 2',
-    modified: new Date(2023, 11, 10),
     name: 'AZ firewall 2',
     reference_count: '3'
   }
@@ -44,13 +35,6 @@ const makeSut = () => {
 }
 
 describe('EdgeFunctionsServices', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -67,8 +51,6 @@ describe('EdgeFunctionsServices', () => {
   })
 
   it('should parsed correctly all returned edge function', async () => {
-    localeMock()
-    vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.edgeFunctionMock, fixtures.disabledEdgeFunctionMock] }
