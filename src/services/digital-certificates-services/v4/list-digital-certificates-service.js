@@ -4,11 +4,11 @@ import { capitalizeFirstLetter } from '@/helpers'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listDigitalCertificatesService = async ({
-    search = '',
-    fields = '',
-    ordering = 'name',
-    page = 1,
-    pageSize = 10
+  search = '',
+  fields = '',
+  ordering = 'name',
+  page = 1,
+  pageSize = 10
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({

@@ -65,7 +65,14 @@
   })
 
   const hasContentToList = ref(true)
-  const DIGITAL_CERTIFICATE_API_FIELDS = ['id', 'name', 'subject_name', 'issuer', 'status', 'validity']
+  const DIGITAL_CERTIFICATE_API_FIELDS = [
+    'id',
+    'name',
+    'subject_name',
+    'issuer',
+    'status',
+    'validity'
+  ]
 
   const actions = [
     {
