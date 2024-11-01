@@ -4,13 +4,14 @@
       <PageHeadingBlock pageTitle="Digital Certificates"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listDigitalCertificatesService"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
+        :apiFields="DIGITAL_CERTIFICATE_API_FIELDS"
         @on-load-data="handleLoadData"
         emptyListMessage="No digital certificates found."
         :actions="actions"
@@ -39,9 +40,9 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -64,6 +65,8 @@
   })
 
   const hasContentToList = ref(true)
+  const DIGITAL_CERTIFICATE_API_FIELDS = ['id', 'name', 'subject_name', 'issuer', 'status', 'validity']
+
   const actions = [
     {
       type: 'delete',
