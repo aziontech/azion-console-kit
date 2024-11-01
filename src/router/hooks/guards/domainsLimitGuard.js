@@ -1,7 +1,12 @@
 import { listWorkloadsService } from '@/services/workloads-services'
 /** @type {import('vue-router').NavigationGuardWithThis} */
 
-export async function domainsLimitGuard({ to }) {
+export async function domainsLimitGuard({ to, accountStore }) {
+  const { hasActiveUserId } = accountStore
+  if (!hasActiveUserId) {
+    return true
+  }
+
   const workloads = await listWorkloadsService({
     fields: 'id',
     ordering: 'id',
@@ -10,7 +15,9 @@ export async function domainsLimitGuard({ to }) {
   })
 
   const isMaxDomainsReached = workloads.count >= 3000
-  if ((to.name === 'create-data-stream' || to.name === 'edit-data-stream') && isMaxDomainsReached) {
+  const isCreateOrEditDataStream =
+    to.name === 'create-data-stream' || to.name === 'edit-data-stream'
+  if (isCreateOrEditDataStream && isMaxDomainsReached) {
     return '/'
   }
 }

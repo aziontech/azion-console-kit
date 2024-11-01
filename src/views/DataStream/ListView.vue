@@ -14,7 +14,7 @@
         </InlineMessage>
         <div class="w-full">
           <ListTableBlock
-            :disabledList="isMaxDomainsReached"
+            :disabledList="disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
@@ -73,11 +73,13 @@
     }
   })
 
-  const domainsCount = ref(3000)
+  const domainsCount = ref(0)
+  const domainsLoading = ref(true)
   const toast = useToast()
 
   const loadWorkloads = async () => {
     try {
+      domainsLoading.value = true
       const response = await listWorkloadsService({
         fields: 'id',
         ordering: 'id',
@@ -87,6 +89,8 @@
       domainsCount.value = response.count
     } catch (error) {
       toastBuilder('error', error)
+    } finally {
+      domainsLoading.value = false
     }
   }
 
@@ -122,6 +126,10 @@
 
   const isMaxDomainsReached = computed(() => {
     return domainsCount.value >= 3000
+  })
+
+  const disabledList = computed(() => {
+    return isMaxDomainsReached.value || domainsLoading.value
   })
 
   const getColumns = computed(() => {
