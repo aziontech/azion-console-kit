@@ -1,4 +1,6 @@
 import * as NetworkListsService from '@/services/network-lists-services'
+import * as NetworkListsServiceV4 from '@/services/network-lists-services/v4'
+
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,7 +13,7 @@ export const networkListsRoutes = {
       name: 'list-network-list',
       component: () => import('@views/NetworkLists/ListView.vue'),
       props: {
-        listNetworkListService: NetworkListsService.listNetworkListService,
+        listNetworkListService: NetworkListsServiceV4.listNetworkListService,
         deleteNetworkListService: NetworkListsService.deleteNetworkListService,
         documentationService: Helpers.documentationCatalog.networkLists
       },
