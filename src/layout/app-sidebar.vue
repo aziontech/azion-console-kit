@@ -24,7 +24,7 @@
     :visible="isSidebarActive && !isVisibleMobileSidebar"
     position="bottom"
     :show-close-icon="false"
-    block-scroll="body"
+    blockScroll
     :pt="{
       root: { class: '!h-[90%] flex' },
       mask: { class: 'flex' },

@@ -10,7 +10,7 @@
       <template #title>
         <span
           class="text-orange-500"
-          :class="suggestion.icon"
+          :class="suggestion.icon || 'pi pi-question-circle'"
         />
       </template>
       <template #content>

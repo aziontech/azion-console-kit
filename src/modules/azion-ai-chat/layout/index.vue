@@ -60,20 +60,17 @@
     name: 'AzionAiChatLayout'
   })
 
-  const { sendMessage, state, abortRequest, clearChat } = useChat()
+  const props = defineProps({
+    user: Object,
+    suggestionsOptions: Array
+  })
 
-  const suggestionsTest = [
-    {
-      icon: 'pi pi-question-circle',
-      title: 'How do I build an edge application?',
-      context: 'How do I build an edge application?'
-    },
-    {
-      icon: 'pi pi-shield',
-      title: 'How do I protect my application?',
-      context: 'How do I protect my application?'
+  const { sendMessage, state, abortRequest, clearChat } = useChat({
+    user: props.user,
+    chat: {
+      suggestions: props.suggestionsOptions
     }
-  ]
+  })
 
   const chatContainer = ref(null)
 

@@ -1,10 +1,10 @@
 /**
- * Serviço de chat que faz uma requisição POST e processa a resposta em stream.
- * @param {Object} params - Parâmetros para a requisição e processamento.
- * @param {Object} params.parsedBody - Corpo da requisição.
- * @param {string} params.server - URL do servidor.
- * @param {AbortSignal} params.signal - Sinal para cancelar a requisição.
- * @param {function(string): void} params.onMessage - Função de callback para processar mensagens do stream.
+ * Chat service that makes a POST request and processes the response in stream.
+ * @param {Object} params - Parameters for the request and processing.
+ * @param {Object} params.parsedBody - Request body.
+ * @param {string} params.server - Server URL.
+ * @param {AbortSignal} params.signal - Signal to cancel the request.
+ * @param {function(string): void} params.onMessage - Callback function to process stream messages.
  * @returns {Promise<void>}
  */
 export async function chatService({ parsedBody, server, signal, onMessage }) {

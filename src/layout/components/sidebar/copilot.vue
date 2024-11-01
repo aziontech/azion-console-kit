@@ -3,7 +3,9 @@
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
   import { useRouter } from 'vue-router'
-  import { watch } from 'vue'
+  import { ref, watch, watchEffect } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'
 
   defineOptions({
     name: 'copilot-sidebar'
@@ -15,6 +17,25 @@
   const openChatInNewTab = () => {
     router.push({ name: 'copilot' })
   }
+
+  const user = ref({
+    name: '',
+    id: ''
+  })
+  const suggestionsOptions = ref([])
+
+  const loadPromptSuggestionWithRoleDecorator = (role) => {
+    suggestionsOptions.value = loadPromptSuggestion(role)
+  }
+
+  watchEffect(() => {
+    const { account } = useAccountStore()
+
+    user.value.name = account.name
+    user.value.id = account.client_id
+
+    loadPromptSuggestionWithRoleDecorator(account.jobRole)
+  })
 
   watch(
     () => router.currentRoute.value.name,
@@ -28,7 +49,10 @@
 
 <template>
   <div class="flex flex-col h-[calc(100vh-3.5rem)]">
-    <AzionAIChatBlock>
+    <AzionAIChatBlock
+      :user="user"
+      :suggestionsOptions="suggestionsOptions"
+    >
       <template #chatControls="{ clearChat }">
         <div class="flex gap-3">
           <PrimeButton
