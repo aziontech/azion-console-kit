@@ -5,7 +5,7 @@
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
       label: { class: 'max-md:hidden' },
-      icon: { class: 'max-md:m-0' }
+      icon: { class: 'max-md:m-0 text-white' }
     }"
     :class="buttonClasses"
     icon="pi pi-question-circle"

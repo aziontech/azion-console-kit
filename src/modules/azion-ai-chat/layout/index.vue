@@ -94,6 +94,15 @@
 </script>
 
 <style>
+  .custom-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--surface-500);
+    border-radius: 4px;
+  }
+
   .chat-message {
     font-size: 16px;
   }

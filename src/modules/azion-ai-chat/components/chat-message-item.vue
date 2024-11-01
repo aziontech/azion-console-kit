@@ -32,6 +32,14 @@
     content: String
   })
 
+  marked.use({
+    renderer: {
+      link(href) {
+        return `<a href="${href.href}" target="_blank" rel="noopener noreferrer">${href.text}</a>`
+      }
+    }
+  })
+
   const message = computed(() => marked(props.content))
   const isSystem = computed(() => props.role === 'system')
 

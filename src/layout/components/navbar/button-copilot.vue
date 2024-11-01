@@ -1,18 +1,18 @@
 <template>
   <PrimeButton
+    v-if="showButton"
     :label="currentLabel"
     @click="toggleSidebarComponent('copilot')"
     class="text-white border-header bg-header hover:bg-header-button-hover"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
       label: { class: 'max-md:hidden' },
-      icon: { class: 'max-md:m-0' }
+      icon: { class: 'max-md:m-0 text-white' }
     }"
     :class="buttonClasses"
-    v-if="showButton"
     icon="ai ai-ask-azion"
     size="small"
-    v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
+    v-tooltip.bottom="{ value: 'Azion Copilot', showDelay: 200 }"
   />
 </template>
 

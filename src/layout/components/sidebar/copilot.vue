@@ -3,6 +3,7 @@
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
   import { useRouter } from 'vue-router'
+  import { watch } from 'vue'
 
   defineOptions({
     name: 'copilot-sidebar'
@@ -14,6 +15,15 @@
   const openChatInNewTab = () => {
     router.push({ name: 'copilot' })
   }
+
+  watch(
+    () => router.currentRoute.value.name,
+    (name) => {
+      if (name === 'copilot') {
+        closeSidebar()
+      }
+    }
+  )
 </script>
 
 <template>
