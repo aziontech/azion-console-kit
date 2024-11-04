@@ -35,7 +35,7 @@ const adapt = (httpResponse) => {
         name: element.name,
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
-        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short') ,
+        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
         lastModifiedDate: element.last_modified
       }))
     : []
