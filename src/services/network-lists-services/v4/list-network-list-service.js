@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-service'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+import { formatExhibitionDate } from '@/helpers/convert-date'
 
 export const listNetworkListService = async ({
   fields = '',
@@ -34,10 +35,7 @@ const adapt = (httpResponse) => {
         name: element.name,
         lastEditor: element.last_editor,
         listType: listTypeMap[element.type],
-        lastModified: new Intl.DateTimeFormat('us', {
-          dateStyle: 'full',
-          timeStyle: 'short'
-        }).format(new Date(element.last_modified)),
+        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short') ,
         lastModifiedDate: element.last_modified
       }))
     : []
