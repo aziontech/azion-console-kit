@@ -53,11 +53,3 @@ const adapt = (httpResponse) => {
     statusCode: httpResponse.statusCode
   }
 }
-
-// const formatExhibitionDate = (dateString) => {
-//   return new Intl.DateTimeFormat('us', {
-//     dateStyle: 'long',
-//     timeStyle: 'short',
-//     timeZone: 'UTC'
-//   }).format(new Date(dateString))
-// }

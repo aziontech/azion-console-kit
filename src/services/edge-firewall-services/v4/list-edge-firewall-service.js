@@ -21,8 +21,6 @@ export const listEdgeFirewallService = async ({
   return parseHttpResponse(httpResponse)
 }
 const adapt = async (httpResponse) => {
-  // new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-  //   new Date(edgeFirewall.last_modified)
   const parsedEdgeFirewalls = await Promise.all(
     httpResponse.body.results?.map(async (edgeFirewall) => {
       return {
