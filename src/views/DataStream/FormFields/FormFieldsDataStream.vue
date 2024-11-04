@@ -163,7 +163,20 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldSwitchBlock
+          nameField="hasSampling"
+          name="hasSampling"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle="Once enabled, you can only have one active stream in your account. If it's later disabled, the Add option will become available again on the creation page."
+          data-testid="data-stream-form__sampling__active-field"
+        />
+
+        <div
+          class="flex flex-col sm:max-w-lg w-full gap-2"
+          v-if="hasSampling"
+        >
           <FieldNumber
             label="Sampling Percentage (%)"
             name="samplingPercentage"
@@ -177,6 +190,7 @@
         <InlineMessage
           class="w-fit"
           severity="warn"
+          v-if="hasSampling"
           data-testid="data-stream-form__sampling__inline-message"
         >
           After activating and saving these settings, all other streams will become inactive.
@@ -1070,6 +1084,7 @@
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
+  const { value: hasSampling } = useField('hasSampling')
   const { value: samplingPercentage } = useField('samplingPercentage')
   // standard
   const { value: endpointUrl } = useField('endpointUrl')
