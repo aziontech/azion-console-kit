@@ -1,9 +1,9 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
 
   defineOptions({ name: 'edge-firewall-view' })
@@ -11,6 +11,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   const tracker = inject('tracker')
+  const EDGE_FIREWALL_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'is_active']
 
   const props = defineProps({
     listEdgeFirewallService: {
@@ -89,7 +90,7 @@
       <PageHeadingBlock pageTitle="Edge Firewall"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
@@ -101,6 +102,7 @@
         emptyListMessage="No edge firewall found."
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
+        :apiFields="EDGE_FIREWALL_API_FIELDS"
       />
       <EmptyResultsBlock
         v-else
