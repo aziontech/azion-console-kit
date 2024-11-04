@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listFunctionsService } from '@/services/edge-firewall-functions-services/v4'
-import {  afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 
 const API_VERSION = 'v4'
@@ -14,7 +14,7 @@ const fixtures = {
     id: 123,
     initiator_type: 'teste',
     last_modified: new Date(2023, 10, 10),
-    last_editor: 'az editor',
+    last_editor: 'az editor'
   },
   functionInstanceWithVersion: {
     version: 2,
@@ -25,7 +25,7 @@ const fixtures = {
     id: 123,
     initiator_type: 'teste',
     last_modified: new Date(2023, 10, 10),
-    last_editor: 'az editor',
+    last_editor: 'az editor'
   }
 }
 
@@ -73,7 +73,7 @@ describe('EdgeFirewallFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        args:  fixtures.functionsInstance.json_args,
+        args: fixtures.functionsInstance.json_args,
         edgeFunctionId: fixtures.functionsInstance.edge_function,
         id: fixtures.functionsInstance.id,
         lastEditor: fixtures.functionsInstance.last_editor,
@@ -81,12 +81,12 @@ describe('EdgeFirewallFunctionsServices', () => {
         name: fixtures.functionsInstance.name
       },
       {
-        args:  fixtures.functionInstanceWithVersion.json_args,
+        args: fixtures.functionInstanceWithVersion.json_args,
         edgeFunctionId: fixtures.functionInstanceWithVersion.edge_function,
         id: fixtures.functionInstanceWithVersion.id,
         lastEditor: fixtures.functionInstanceWithVersion.last_editor,
         lastModified: fixtures.functionInstanceWithVersion.last_modified,
-        name: fixtures.functionInstanceWithVersion.name,
+        name: fixtures.functionInstanceWithVersion.name
       }
     ])
   })
@@ -99,7 +99,13 @@ describe('EdgeFirewallFunctionsServices', () => {
     })
     const { sut } = makeSut()
 
-    await sut({ edgeFirewallID: EDGE_FIREWALL_ID, ordering: 'name', sort: 'desc', page: 2, pageSize: 50 })
+    await sut({
+      edgeFirewallID: EDGE_FIREWALL_ID,
+      ordering: 'name',
+      sort: 'desc',
+      page: 2,
+      pageSize: 50
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${API_VERSION}/edge_firewall/firewalls/123/functions?ordering=name&page=2&page_size=50&fields=&search=`,
