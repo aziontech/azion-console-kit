@@ -20,16 +20,13 @@ export const createEdgeFirewallService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const domains = payload.domains?.map((domain) => domain.id)
-
   return {
     name: payload.name,
     is_active: payload.isActive,
     edge_functions_enabled: payload.edgeFunctionsEnabled,
     network_protection_enabled: payload.networkProtectionEnabled,
     waf_enabled: payload.wafEnabled,
-    debug_rules: payload.debugRules,
-    domains
+    debug_rules: payload.debugRules
   }
 }
 
@@ -71,7 +68,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Firewall has been created',
-        urlToEditView: `/edge-firewall/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/edge-firewall/edit/${httpResponse.body.results.id}`,
+        id: httpResponse.body.results.id
       }
     case 400:
       const apiError400 = extractApiError(httpResponse)

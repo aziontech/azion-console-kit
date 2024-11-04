@@ -35,7 +35,7 @@
     { name: '8080', value: '8080' },
 
     // Custom Ports
-    { name: '8880', value: '8880' },
+    { name: '8880', value: '8880' }
   ]
   const HTTPS_PORT_LIST_OPTIONS = [
     { name: '443 (Default)', value: '443' },

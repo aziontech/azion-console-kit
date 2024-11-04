@@ -1,4 +1,4 @@
-import { makeWorkloadsBaseUrl } from '@/services/workloads-services/makeWorkloadsBaseUrl'
+import { makeWorkloadsBaseUrl } from '@/services/workloads-services/make-workloads-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {

@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeWorkloadsBaseUrl } from './makeWorkloadsBaseUrl'
+import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { convertArrayObjectsToCamelCase } from '@/helpers/convert-array-objects-to-camel-case'
 

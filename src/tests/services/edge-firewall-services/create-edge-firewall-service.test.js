@@ -6,7 +6,6 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   edgeFirewallMock: {
     name: 'test',
-    domains: [{ id: 1 }, { id: 2 }],
     isActive: true,
     debugRules: false,
     edgeFunctionsEnabled: false,
@@ -42,8 +41,7 @@ describe('EdgeFirewallService', () => {
         debug_rules: fixtures.edgeFirewallMock.debugRules,
         edge_functions_enabled: fixtures.edgeFirewallMock.edgeFunctionsEnabled,
         network_protection_enabled: fixtures.edgeFirewallMock.networkProtectionEnabled,
-        waf_enabled: fixtures.edgeFirewallMock.wafEnabled,
-        domains: [1, 2]
+        waf_enabled: fixtures.edgeFirewallMock.wafEnabled
       }
     })
   })
