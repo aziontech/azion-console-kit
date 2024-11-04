@@ -4,6 +4,7 @@
     :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
+    {{ filters.global.value }}
     <DataTable
       scrollable
       removableSort
@@ -56,6 +57,7 @@
                 data-testid="data-table-search-input"
                 placeholder="Search"
                 @keyup.enter="fetchOnSearch"
+                @input="handleSearchValue(false)"
               />
             </span>
 
@@ -662,9 +664,15 @@
   }
 
   const fetchOnSearch = () => {
-    const search = filters.value.global.value
+    handleSearchValue(true)
+    reload()
+  }
 
-    savedSearch.value = search
-    reload({ search: search })
+  const handleSearchValue = (shouldChangeSearchValue = false) => {
+    const search = filters.value.global.value
+    const hasValueInSearch = !!search.length
+    if (shouldChangeSearchValue || !hasValueInSearch) {
+      savedSearch.value = search
+    }
   }
 </script>
