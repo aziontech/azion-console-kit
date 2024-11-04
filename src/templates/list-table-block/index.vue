@@ -15,7 +15,7 @@
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
-      rowHover
+      :rowHover="!disabledList"
       v-model:filters="filters"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -69,6 +69,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -100,7 +101,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        class="hover:cursor-pointer"
+        :class="{ 'hover:cursor-pointer': !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -229,6 +230,7 @@
 
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -262,6 +264,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
@@ -317,6 +320,9 @@
   ])
 
   const props = defineProps({
+    disabledList: {
+      type: Boolean
+    },
     hiddenHeader: {
       type: Boolean
     },

@@ -14,6 +14,7 @@
     description: { type: String, required: true },
     documentationService: { type: Function, required: true },
     createPagePath: { type: String, required: false },
+    disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
     noBorder: { type: Boolean, required: false },
@@ -58,6 +59,7 @@
               v-if="props.createButtonLabel"
               class="max-md:w-full w-fit"
               severity="secondary"
+              :disabled="disabledList"
               icon="pi pi-plus"
               :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"
