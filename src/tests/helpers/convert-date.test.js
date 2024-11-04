@@ -4,7 +4,8 @@ import {
   convertDateToLocalTimezone,
   formatDateToUS,
   formatDateMonthAndYear,
-  formatDateToUSBilling
+  formatDateToUSBilling,
+  formatExhibitionDate
 } from '@/helpers/convert-date'
 
 describe('convertDate', () => {
@@ -89,5 +90,16 @@ describe('convertDate', () => {
 
     expect(actualDateString).toEqual(expectedDateString)
     expect(actualDateStringSecondCheck).toEqual(expectedDateString)
+  })
+
+  it('correctly formats a valid date string with short date and time styles', () => {
+    const dateString = '2023-10-05T15:30:00Z'
+    const result = formatExhibitionDate(dateString, 'short', 'short')
+    expect(result).toBe('10/5/23, 3:30 PM')
+  })
+
+  it('throws an error when given an invalid date string', () => {
+    const dateString = 'invalid-date'
+    expect(() => formatExhibitionDate(dateString, 'short', 'short')).toThrow()
   })
 })

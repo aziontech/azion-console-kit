@@ -1,8 +1,12 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as EdgeFirewallServices from '@/services/edge-firewall-services'
+import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
+
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
 import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
+import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
+
 import * as WafRulesServices from '@/services/waf-rules-services'
 import * as NetworkListsService from '@/services/network-lists-services'
 
@@ -16,7 +20,7 @@ export const edgeFirewallRoutes = {
       name: 'list-edge-firewall',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
-        listEdgeFirewallService: EdgeFirewallServices.listEdgeFirewallService,
+        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         deleteEdgeFirewallService: EdgeFirewallServices.deleteEdgeFirewallService,
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
@@ -74,7 +78,7 @@ export const edgeFirewallRoutes = {
         },
         rulesEngineServices: {
           listEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.listEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.listEdgeFirewallRulesEngineService,
           deleteEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServices.deleteEdgeFirewallRulesEngineService,
           createEdgeFirewallRulesEngineService:
