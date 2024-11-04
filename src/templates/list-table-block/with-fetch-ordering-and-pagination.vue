@@ -4,7 +4,6 @@
     :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
   >
-    {{ filters.global.value }}
     <DataTable
       scrollable
       removableSort
