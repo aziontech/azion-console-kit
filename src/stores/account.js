@@ -19,6 +19,7 @@ export const useAccountStore = defineStore({
       RESTRICT_ACCESS_TO_METRICS_ONLY: 'allow_only_metrics_on_console',
       FULL_CONSOLE_ACCESS: 'allow_console',
       SSO_MANAGEMENT: 'federated_auth',
+      DATA_STREAM_SAMPLING: 'data_streaming_sampling',
       MARKETPLACE_PRODUCTS: 'marketplace_products'
     }
   }),
@@ -34,6 +35,9 @@ export const useAccountStore = defineStore({
       return !!state.account.permissions?.some(
         (permission) => permission.name === permissionToEditDataStream
       )
+    },
+    hasSamplingFlag(state) {
+      return state.account?.client_flags?.includes(state.flags.DATA_STREAM_SAMPLING)
     },
     metricsOnlyAccessRestriction(state) {
       const flags = state.flags

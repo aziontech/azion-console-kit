@@ -93,7 +93,6 @@
           data-testid="data-stream-form__domains__options-field"
         />
       </div>
-
       <div
         v-if="domainOption === '0'"
         class="flex flex-col gap-2"
@@ -157,28 +156,14 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    v-if="domainOption === '1'"
+    v-if="isAllDomainsSelected && hasAccessToSampling"
     title="Sampling"
-    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
     data-testid="data-stream-form__section__sampling"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
-        <FieldSwitchBlock
-          nameField="hasSampling"
-          name="hasSampling"
-          auto
-          :isCard="false"
-          title="Active"
-          subtitle="Once enabled, you can only have one active stream in your account. If it's later disabled, the Add option will become available again on the creation page."
-          data-testid="data-stream-form__sampling__active-field"
-        />
-
-        <div
-          class="flex flex-col sm:max-w-lg w-full gap-2"
-          v-if="hasSampling"
-        >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Sampling Percentage (%)"
             name="samplingPercentage"
@@ -192,7 +177,6 @@
         <InlineMessage
           class="w-fit"
           severity="warn"
-          v-if="hasSampling"
           data-testid="data-stream-form__sampling__inline-message"
         >
           After activating and saving these settings, all other streams will become inactive.
@@ -1048,6 +1032,10 @@
   const MAX_PAYLOAD_SIZE_IN_BYTES = ref(2147483647)
   const MIN_PAYLOAD_SIZE_IN_BYTES = ref(1000000)
 
+  const hasAccessToSampling = computed(() => {
+    return store.hasSamplingFlag
+  })
+
   // Variables
   const listDataSources = ref([
     { label: 'Activity History', value: 'rtm_activity' },
@@ -1082,7 +1070,6 @@
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
-  const { value: hasSampling } = useField('hasSampling')
   const { value: samplingPercentage } = useField('samplingPercentage')
   // standard
   const { value: endpointUrl } = useField('endpointUrl')
@@ -1189,6 +1176,10 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const isAllDomainsSelected = computed(() => {
+    return domainOption.value === '1'
+  })
 
   const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
 
