@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
-
+import { formatExhibitionDate } from '@/helpers/convert-date'
 export const listEdgeFirewallRulesEngineService = async ({
   edgeFirewallId,
   fields = '',
@@ -39,7 +39,7 @@ const adapt = (httpResponse) => {
       id: ruleEngine.id,
       name: ruleEngine.name,
       description: ruleEngine.description || '',
-      lastModified: formatExhibitionDate(ruleEngine.last_modified),
+      lastModified: formatExhibitionDate(ruleEngine.last_modified, 'long', 'short'),
       lastEditor: ruleEngine.last_editor,
       status: parseStatus(ruleEngine.is_active)
     }
@@ -54,10 +54,10 @@ const adapt = (httpResponse) => {
   }
 }
 
-const formatExhibitionDate = (dateString) => {
-  return new Intl.DateTimeFormat('us', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-    timeZone: 'UTC'
-  }).format(new Date(dateString))
-}
+// const formatExhibitionDate = (dateString) => {
+//   return new Intl.DateTimeFormat('us', {
+//     dateStyle: 'long',
+//     timeStyle: 'short',
+//     timeZone: 'UTC'
+//   }).format(new Date(dateString))
+// }

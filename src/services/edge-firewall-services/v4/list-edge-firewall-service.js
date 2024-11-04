@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+import { formatExhibitionDate } from '@/helpers/convert-date'
 
 export const listEdgeFirewallService = async ({
   search = '',
@@ -20,15 +21,15 @@ export const listEdgeFirewallService = async ({
   return parseHttpResponse(httpResponse)
 }
 const adapt = async (httpResponse) => {
+  // new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+  //   new Date(edgeFirewall.last_modified)
   const parsedEdgeFirewalls = await Promise.all(
     httpResponse.body.results?.map(async (edgeFirewall) => {
       return {
         id: edgeFirewall.id,
         name: edgeFirewall.name,
         lastEditor: edgeFirewall.last_editor,
-        lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          new Date(edgeFirewall.last_modified)
-        ),
+        lastModify: formatExhibitionDate(edgeFirewall.last_modified, 'full', undefined),
         lastModifyDate: edgeFirewall.last_modified,
         status: edgeFirewall.is_active
           ? {
