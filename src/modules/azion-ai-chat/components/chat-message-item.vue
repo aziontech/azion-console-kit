@@ -8,16 +8,15 @@
       class="flex gap-3 mt-1"
     >
       <ChatAvatar />
-
-      <div
-        class="mt-3"
-        v-if="!message"
-      >
-        <div class="animate-blink bg-primary rounded-full w-3 h-3" />
-      </div>
     </div>
     <div class="message-content">
       <div v-html="message" />
+      <div
+        class="mt-3"
+        v-if="isInProgress"
+      >
+        <div class="animate-blink bg-primary rounded-full w-3 h-3" />
+      </div>
     </div>
   </article>
 </template>
@@ -29,7 +28,8 @@
 
   const props = defineProps({
     role: String,
-    content: String
+    content: String,
+    isInProgress: Boolean
   })
 
   marked.use({

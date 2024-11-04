@@ -17,6 +17,7 @@ export async function chatService({ parsedBody, server, signal, onMessage }) {
       body: JSON.stringify(parsedBody),
       signal
     })
+
     if (!response.ok) throw new Error('Network response was not ok')
 
     const reader = response.body.getReader()
@@ -30,21 +31,30 @@ export async function chatService({ parsedBody, server, signal, onMessage }) {
       if (done) break
 
       const chunk = decoder.decode(value)
+
       chunk
         .split('\n')
         .map((line) => line.replace(/^data: /, '').trim())
         .filter((line) => line && line !== '[DONE]')
-        .map(JSON.parse)
-        .forEach(({ choices }) => {
-          const content = choices[0]?.delta?.content
-          if (content) onMessage(content)
+        .forEach((line) => {
+          try {
+            const parsedLine = JSON.parse(line)
+            const { choices } = parsedLine
+            const content = choices[0]?.delta?.content
+            if (content) onMessage(content)
+          } catch (error) {
+            console.error('Erro ao analisar JSON:', error, 'Linha:', line)
+          }
         })
     }
   } catch (error) {
+    onMessage('', false)
     if (error.name !== 'AbortError') {
       throw new Error('An error occurred while processing the chat stream')
     } else {
       throw error
     }
+  } finally {
+    onMessage('', false)
   }
 }

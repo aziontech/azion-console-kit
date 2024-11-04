@@ -6,6 +6,7 @@
       :key="index"
       :role="message.role"
       :content="message.content"
+      :isInProgress="message.isInProgress"
     />
   </div>
 </template>

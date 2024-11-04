@@ -72,6 +72,19 @@
     }
   })
 
+  const suggestionsTest = [
+    {
+      icon: 'pi pi-question-circle',
+      title: 'How do I build an edge application?',
+      context: 'How do I build an edge application?'
+    },
+    {
+      icon: 'pi pi-shield',
+      title: 'How do I protect my application?',
+      context: 'How do I protect my application?'
+    }
+  ]
+
   const chatContainer = ref(null)
 
   const scrollToBottom = () => {

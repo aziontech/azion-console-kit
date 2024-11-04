@@ -15,7 +15,7 @@
       'border fixed flex flex-col min-h-screen pt-14 right-0 surface-border w-[32rem] transition-all duration-200 ease-in-out',
       isSidebarActive && isVisibleMobileSidebar ? 'translate-x-0' : 'translate-x-full'
     ]"
-    v-if="isSidebarActive && isVisibleMobileSidebar"
+    v-show="isSidebarActive && isVisibleMobileSidebar"
   >
     <component :is="activeComponent" />
   </div>
