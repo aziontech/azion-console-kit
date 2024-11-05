@@ -33,7 +33,10 @@ const adapt = (httpResponse) => {
         }))
       : []
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: edgeNodes,
     statusCode: httpResponse.statusCode
   }
