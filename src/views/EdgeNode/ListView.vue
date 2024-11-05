@@ -1,7 +1,9 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
+  // import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
@@ -58,6 +60,8 @@
     hasContentToList.value = event
   }
 
+  const EDGE_NODE_API_FIELDS = ['id', 'name', 'hash_id', 'status']
+
   const actions = [
     {
       type: 'delete',
@@ -89,10 +93,11 @@
       <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listEdgeNodeService"
         :columns="getColumns"
+        :apiFields="EDGE_NODE_API_FIELDS"
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge nodes found."
