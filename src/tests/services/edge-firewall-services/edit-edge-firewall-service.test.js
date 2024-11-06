@@ -7,7 +7,6 @@ const fixtures = {
   mock: {
     id: '123',
     name: 'test',
-    domains: [{ id: 1 }, { id: 2 }],
     isActive: true,
     debugRules: false,
     edgeFunctionsEnabled: false,
@@ -41,8 +40,7 @@ describe('EdgeFirewallServices', () => {
         debug_rules: fixtures.mock.debugRules,
         edge_functions_enabled: fixtures.mock.edgeFunctionsEnabled,
         network_protection_enabled: fixtures.mock.networkProtectionEnabled,
-        waf_enabled: fixtures.mock.wafEnabled,
-        domains: [1, 2]
+        waf_enabled: fixtures.mock.wafEnabled
       }
     })
   })

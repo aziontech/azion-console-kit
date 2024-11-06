@@ -14,9 +14,11 @@
     description: { type: String, required: true },
     documentationService: { type: Function, required: true },
     createPagePath: { type: String, required: false },
+    disabledList: { type: Boolean, required: false },
     createButtonLabel: { type: String, required: false },
     inTabs: { type: Boolean, required: false },
-    noBorder: { type: Boolean, required: false }
+    noBorder: { type: Boolean, required: false },
+    noShowBorderTop: { type: Boolean, required: false, default: false }
   })
   function openDocumentation() {
     props.documentationService()
@@ -36,7 +38,7 @@
   >
     <div
       class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
-      :class="{ 'border surface-border': !noBorder }"
+      :class="{ 'border surface-border': !noBorder, 'rounded-t-none': noShowBorderTop }"
     >
       <slot name="illustration">
         <Illustration />
@@ -57,6 +59,7 @@
               v-if="props.createButtonLabel"
               class="max-md:w-full w-fit"
               severity="secondary"
+              :disabled="disabledList"
               icon="pi pi-plus"
               :data-testid="`create_${createButtonLabel}_button`"
               :label="createButtonLabel"

@@ -199,9 +199,9 @@ const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
 const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
   return metricsGrouped.reduce((list, metric) => {
     if (metric.productSlug === product.productSlug) {
-      const unit = METRIC_SLUGS[metric.metricSlug].unit
+      const unit = METRIC_SLUGS[metric.metricSlug]?.unit
       list.push({
-        service: METRIC_SLUGS[metric.metricSlug].title,
+        service: METRIC_SLUGS[metric.metricSlug]?.title,
         slug: metric.metricSlug,
         quantity: formatUnitValue(metric.accounted, unit),
         price: formatCurrencyString(product.currency, metric.value),

@@ -13,7 +13,8 @@ const fixtures = {
     digital_certificate_id: '862026',
     is_mtls_enabled: true,
     edge_application_id: 'ea1234',
-    mtls_trusted_ca_certificate_id: '862026'
+    mtls_trusted_ca_certificate_id: '862026',
+    environment: 'preview'
   },
   domainWithoutCertificateMock: {
     id: 4321,
@@ -24,7 +25,8 @@ const fixtures = {
     is_mtls_enabled: false,
     activeSort: true,
     digital_certificate_id: null,
-    edge_application_id: 'ea1234'
+    edge_application_id: 'ea1234',
+    environment: 'preview'
   }
 }
 
@@ -77,7 +79,8 @@ describe('DomainServices', () => {
       mtlsIsEnabled: fixtures.domainMock.is_mtls_enabled,
       active: fixtures.domainMock.is_active,
       mtlsVerification: fixtures.domainMock.mtls_verification,
-      mtlsTrustedCertificate: fixtures.domainMock.mtls_trusted_ca_certificate_id
+      mtlsTrustedCertificate: fixtures.domainMock.mtls_trusted_ca_certificate_id,
+      environment: fixtures.domainMock.environment
     })
   })
 
@@ -102,7 +105,8 @@ describe('DomainServices', () => {
       edgeCertificate: 0,
       mtlsIsEnabled: fixtures.domainWithoutCertificateMock.is_mtls_enabled,
       active: fixtures.domainWithoutCertificateMock.is_active,
-      mtlsVerification: fixtures.domainWithoutCertificateMock.mtls_verification
+      mtlsVerification: fixtures.domainWithoutCertificateMock.mtls_verification,
+      environment: fixtures.domainMock.environment
     })
   })
 })

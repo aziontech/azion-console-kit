@@ -4,8 +4,10 @@ import generateUniqueName from '../../support/utils'
 let domainName
 let edgeAppName
 let digitalCertificateName
+let firewallName
 const createEdgeApplicationCase = () => {
   edgeAppName = generateUniqueName('EdgeApp')
+  firewallName = generateUniqueName('EdgeFirewall')
   // Arrange
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
   cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
@@ -15,6 +17,14 @@ const createEdgeApplicationCase = () => {
 
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
+}
+
+const createEdgeFirewallCase = () => {
+  cy.get(selectors.edgeFirewall.nameInput).clear()
+  cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+  cy.intercept('GET', '/api/v3/edge_firewall*').as('getEdgeFirewallApi')
+  cy.get(selectors.domains.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
+  cy.wait('@getEdgeFirewallApi')
 }
 
 const createDigitalCertificateCase = () => {
@@ -45,7 +55,7 @@ const createDigitalCertificateCase = () => {
   cy.wait('@getDigitalCertificatesApi')
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
   })
@@ -60,8 +70,10 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
-
+    cy.get(selectors.domains.edgeFirewallField).click()
+    cy.get(selectors.domains.createEdgeFirewallButton).click()
+    createEdgeFirewallCase()
+    cy.get(selectors.domains.cnameAccessOnlyField).click()
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.createDigitalCertificateButton).click()
     createDigitalCertificateCase()

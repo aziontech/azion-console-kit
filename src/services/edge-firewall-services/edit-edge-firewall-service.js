@@ -15,16 +15,13 @@ export const editEdgeFirewallService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const domains = payload.domains?.map((domain) => domain.id)
-
   return {
     name: payload.name,
     is_active: payload.isActive,
     edge_functions_enabled: payload.edgeFunctionsEnabled,
     network_protection_enabled: payload.networkProtectionEnabled,
     waf_enabled: payload.wafEnabled,
-    debug_rules: payload.debugRules,
-    domains
+    debug_rules: payload.debugRules
   }
 }
 
