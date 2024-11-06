@@ -1,5 +1,5 @@
 import { listEdgeApplicationsService } from './list-edge-applications-service'
-
+import { cloneEdgeApplicationService } from './clone-edge-application-service'
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
  * @property {typeof listEdgeApplicationsService} listEdgeApplicationsService - The listEdgeApplicationsService reference
@@ -8,4 +8,4 @@ import { listEdgeApplicationsService } from './list-edge-applications-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listEdgeApplicationsService }
+export { listEdgeApplicationsService, cloneEdgeApplicationService }
