@@ -7,22 +7,22 @@ const fixtures = {
     data: {
       accountingDetail: [
         {
-          billId: "123",
-          periodTo: "2024-03-20",
+          billId: '123',
+          periodTo: '2024-03-20',
           accounted: 848506,
-          invoiceNumber: "INV-001",
-          regionName: "Brazil",
-          productSlug: "edge_application",
-          metricSlug: "requests"
+          invoiceNumber: 'INV-001',
+          regionName: 'Brazil',
+          productSlug: 'edge_application',
+          metricSlug: 'requests'
         },
         {
-          billId: "123",
-          periodTo: "2024-03-20",
+          billId: '123',
+          periodTo: '2024-03-20',
           accounted: 1.726767336,
-          invoiceNumber: "INV-001",
-          regionName: "Brazil",
-          productSlug: "edge_application",
-          metricSlug: "data_transferred"
+          invoiceNumber: 'INV-001',
+          regionName: 'Brazil',
+          productSlug: 'edge_application',
+          metricSlug: 'data_transferred'
         }
       ]
     }

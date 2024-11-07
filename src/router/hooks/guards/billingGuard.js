@@ -7,11 +7,7 @@ const BILLING_REDIRECT_OPTIONS = {
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function billingGuard({ to, accountStore }) {
-  const {
-    hasActiveUserId,
-    billingAccessPermitted,
-    paymentReviewPending
-  } = accountStore
+  const { hasActiveUserId, billingAccessPermitted, paymentReviewPending } = accountStore
 
   const isPrivateRoute = !to.meta.isPublic
   const isCurrentRouteBilling = to.fullPath.includes(billingRoutes.path)

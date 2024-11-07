@@ -43,8 +43,9 @@ const adapt = (httpResponse) => {
   let yourServicePlan = 'Developer'
 
   if (!isDeveloperSupportPlan) {
-    const contractProduct = products.find(product =>
-      product.slug.includes(KEYWORDS.CONTRACT) || product.slug.includes(KEYWORDS.SUPPORT)
+    const contractProduct = products.find(
+      (product) =>
+        product.slug.includes(KEYWORDS.CONTRACT) || product.slug.includes(KEYWORDS.SUPPORT)
     )
 
     if (contractProduct) {

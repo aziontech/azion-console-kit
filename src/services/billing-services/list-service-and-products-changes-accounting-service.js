@@ -24,7 +24,7 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
     }`
 
   const graphQLPayload = {
-    query: BILL_DETAIL_QUERY,
+    query: BILL_DETAIL_QUERY
   }
 
   let httpResponse = await AxiosHttpClientAdapter.request(
@@ -42,10 +42,11 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
 }
 
 const groupBy = (data, groupParams) => {
-  const shouldFilter = groupParams.length === 2 &&
+  const shouldFilter =
+    groupParams.length === 2 &&
     groupParams.includes('productSlug') &&
     groupParams.includes('metricSlug')
-  const filteredData = shouldFilter ? data.filter(item => item.accounted) : data
+  const filteredData = shouldFilter ? data.filter((item) => item.accounted) : data
 
   const groupedMap = filteredData.reduce((groupedData, item) => {
     const key = groupParams.map((param) => item[param]).join('_')
@@ -63,10 +64,7 @@ const groupBy = (data, groupParams) => {
 const adapt = ({ body, statusCode }) => {
   const { accountingDetail } = body.data
 
-  const productsGrouped = groupBy(accountingDetail, [
-    'productSlug',
-    'metricSlug',
-  ])
+  const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
 
   const productsGroupedByRegion = groupBy(accountingDetail, [
     'productSlug',
@@ -136,10 +134,14 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
   const uniqueProducts = []
 
   productsGrouped.forEach((product) => {
-    const existingProduct = uniqueProducts.find(uProduct => uProduct.slug === product.productSlug)
+    const existingProduct = uniqueProducts.find((uProduct) => uProduct.slug === product.productSlug)
 
     if (existingProduct) {
-      existingProduct.descriptions = mapDescriptions(product, productsGrouped, productsGroupedByRegion)
+      existingProduct.descriptions = mapDescriptions(
+        product,
+        productsGrouped,
+        productsGroupedByRegion
+      )
     } else {
       uniqueProducts.push({
         service: PRODUCT_NAMES[product.productSlug],

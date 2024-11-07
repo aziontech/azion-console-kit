@@ -32,7 +32,12 @@ const adapt = (httpResponse, accountIsNotRegular) => {
   } = httpResponse
 
   const invoiceData = accountIsNotRegular ? data?.billDetail?.[0] : data?.accountingDetail?.[0]
-  const billingPeriod = invoiceData?.periodFrom && invoiceData?.periodTo ? `${formatDateToUSBilling(invoiceData.periodFrom)} - ${formatDateToUSBilling(invoiceData.periodTo)}` : emptyDefaultValue
+  const billingPeriod =
+    invoiceData?.periodFrom && invoiceData?.periodTo
+      ? `${formatDateToUSBilling(invoiceData.periodFrom)} - ${formatDateToUSBilling(
+          invoiceData.periodTo
+        )}`
+      : emptyDefaultValue
   const parseInvoice = {
     billId: invoiceData?.billId || emptyDefaultValue,
     total: invoiceData?.totalValue || emptyDefaultValue,

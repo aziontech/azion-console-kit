@@ -137,11 +137,12 @@ describe('BillingServices', () => {
     const { sut } = makeSut()
     await sut()
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: 'accounting',
-      method: 'POST',
-      body: {
-        query: `
+    expect(requestSpy).toHaveBeenCalledWith(
+      {
+        url: 'accounting',
+        method: 'POST',
+        body: {
+          query: `
         query {
           accountingDetail (
             filter: {
@@ -160,8 +161,10 @@ describe('BillingServices', () => {
             metricSlug
           }
         }`
-      }
-    }, graphQLApi)
+        }
+      },
+      graphQLApi
+    )
   })
 
   it('should parse correctly payment history for regular accounts', async () => {

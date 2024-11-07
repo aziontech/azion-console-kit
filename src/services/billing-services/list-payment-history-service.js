@@ -27,7 +27,9 @@ const STATUS_AS_TAG = {
 
 export const listPaymentHistoryService = async () => {
   const { accountIsNotRegular } = useAccountStore()
-  let httpResponse = accountIsNotRegular ? await listPaymentHistoryForNotRegularAccounts() : await listPaymentHistoryForRegularAccounts()
+  let httpResponse = accountIsNotRegular
+    ? await listPaymentHistoryForNotRegularAccounts()
+    : await listPaymentHistoryForRegularAccounts()
 
   return parseHttpResponse(httpResponse)
 }
@@ -64,11 +66,14 @@ const listPaymentHistoryForRegularAccounts = async () => {
         }`
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountingBaseUrl()}`,
-    method: 'POST',
-    body: payload
-  }, graphQLApi)
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: `${makeAccountingBaseUrl()}`,
+      method: 'POST',
+      body: payload
+    },
+    graphQLApi
+  )
 
   return adaptPaymentHistoryForRegularAccounts(httpResponse)
 }
