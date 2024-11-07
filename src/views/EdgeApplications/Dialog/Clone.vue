@@ -14,7 +14,7 @@
         <label
           for="name"
           class="text-color text-sm font-medium leading-5 flex gap-1 align-items-center"
-          >To confirm, type new name to the edge application in the box below:</label
+          >To confirm, type a unique and easy-to-remember name for the new Edge Application::</label
         >
         <InputText
           id="name"
