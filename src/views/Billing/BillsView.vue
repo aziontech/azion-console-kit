@@ -451,30 +451,30 @@
           }
         }
       ]
-    } else {
-      return [
-        {
-          field: 'paymentDate',
-          header: 'Payment Date'
-        },
-        {
-          field: 'invoiceNumber',
-          header: 'Invoice ID',
-          filterPath: 'invoiceNumber.content',
-          sortField: 'invoiceNumber.content',
-          type: 'component',
-          component: (columnData) => {
-            return columnBuilder({
-              data: columnData,
-              columnAppearance: 'text-full-with-clipboard',
-              dependencies: {
-                copyContentService: props.clipboardWrite
-              }
-            })
-          }
-        }
-      ]
     }
+
+    return [
+      {
+        field: 'paymentDate',
+        header: 'Payment Date'
+      },
+      {
+        field: 'invoiceNumber',
+        header: 'Invoice ID',
+        filterPath: 'invoiceNumber.content',
+        sortField: 'invoiceNumber.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-full-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
+      }
+    ]
   })
 
   onMounted(async () => {

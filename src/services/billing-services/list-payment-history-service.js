@@ -44,24 +44,24 @@ const listPaymentHistoryForNotRegularAccounts = async () => {
 const listPaymentHistoryForRegularAccounts = async () => {
   const payload = {
     query: `
-      query {
-        accountingDetail (
-          filter: {
-            periodToLt: "${getLastDayMonth()}"
-          },
-          limit: ${ACCOUNTING_LIST_LIMIT},
-          groupBy: [billId],
-          orderBy: [periodTo_DESC]
-        ) {
-          billId,
-          periodTo,
-          accounted,
-          invoiceNumber,
-          regionName,
-          productSlug,
-          metricSlug
-        }
-      }`
+        query {
+          accountingDetail (
+            filter: {
+              periodToLt: "${getLastDayMonth()}"
+            },
+            limit: ${ACCOUNTING_LIST_LIMIT},
+            groupBy: [billId],
+            orderBy: [periodTo_DESC]
+          ) {
+            billId,
+            periodTo,
+            accounted,
+            invoiceNumber,
+            regionName,
+            productSlug,
+            metricSlug
+          }
+        }`
   }
 
   let httpResponse = await AxiosHttpClientAdapter.request({
