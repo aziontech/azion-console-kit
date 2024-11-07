@@ -45,7 +45,8 @@ import beforeEachRoute from './hooks/beforeEachRoute'
 import { useAccountStore } from '@/stores/account'
 import { identityProvidersRoutes } from '@routes/identity-providers-routes'
 import { loadContractServicePlan } from '@/services/contract-services'
-
+import { groupManagementRoutes } from '@routes/group-management-routes'
+import { clientManagementRoutes } from '@routes/client-management-routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -87,7 +88,9 @@ const router = createRouter({
     importGithubRoutes,
     azionAiRoutes,
     compareWithAzionRoutes,
-    resellerManagementRoutes
+    resellerManagementRoutes,
+    groupManagementRoutes,
+    clientManagementRoutes
   ].concat(errorRoutes)
 })
 

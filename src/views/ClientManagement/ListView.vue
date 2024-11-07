@@ -1,25 +1,25 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Reseller Management" />
+      <PageHeadingBlock pageTitle="Client Management" />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listAccountsResellerDecorator"
+        :listService="listAccountsClientDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        addButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
-        emptyListMessage="No reseller accounts found."
+        addButtonLabel="Client"
+        createPagePath="client/management/create"
+        emptyListMessage="No clients found."
       />
 
       <EmptyResultsBlock
         v-if="!hasContentToList"
-        title="No resellers have been created"
-        description="Click the button below to create your first reseller account."
-        createButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
+        title="No clients have been created"
+        description="Click the button below to create your first client account."
+        createButtonLabel="Client"
+        createPagePath="client/management/create"
       >
         <template #illustration>
           <Illustration />
@@ -39,7 +39,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref } from 'vue'
 
-  defineOptions({ name: 'reseller-management-view' })
+  defineOptions({ name: 'client-management-view' })
 
   const hasContentToList = ref(true)
 
@@ -73,7 +73,7 @@
     hasContentToList.value = event
   }
 
-  const listAccountsResellerDecorator = async (params) => {
-    return await listAccountsService({ account_type: 'reseller', ...params })
+  const listAccountsClientDecorator = async (params) => {
+    return await listAccountsService({ account_type: 'client', ...params })
   }
 </script>
