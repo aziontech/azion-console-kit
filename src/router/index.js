@@ -13,6 +13,7 @@ import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
+import { resellerManagementRoutes } from '@routes/reseller-management-routes'
 import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { errorRoutes } from '@routes/error-routes'
@@ -85,7 +86,8 @@ const router = createRouter({
     billingRoutes,
     importGithubRoutes,
     azionAiRoutes,
-    compareWithAzionRoutes
+    compareWithAzionRoutes,
+    resellerManagementRoutes
   ].concat(errorRoutes)
 })
 
