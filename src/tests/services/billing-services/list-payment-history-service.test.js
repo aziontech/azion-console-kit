@@ -5,6 +5,7 @@ import { localeMock } from '@/tests/utils/localeMock'
 import { getStaticUrlsByEnvironment } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
 import graphQLApi from '@/services/axios/makeGraphQl'
+import { getLastDayMonth } from '@/helpers/payment-history'
 
 const fixtures = {
   paymentMockIsDefault: {
@@ -25,16 +26,6 @@ const fixtures = {
     productSlug: 'product-1',
     metricSlug: 'metric-1'
   }
-}
-
-const getLastDayMonth = () => {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
-
-  const dateFinal = new Date(year, month + 1, 0)
-
-  return dateFinal.toISOString().split('T')[0]
 }
 
 const makeSut = () => {

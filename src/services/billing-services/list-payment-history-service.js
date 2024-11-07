@@ -4,6 +4,7 @@ import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { formatDateToUS, getStaticUrlsByEnvironment } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
 import graphQLApi from '../axios/makeGraphQl'
+import { getLastDayMonth } from '@/helpers/payment-history'
 
 const PAGE_SIZE = 200
 const ACCOUNTING_LIST_LIMIT = 12
@@ -121,14 +122,4 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
     body: parseBilling || [],
     statusCode: httpResponse.statusCode
   }
-}
-
-const getLastDayMonth = () => {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
-
-  const dateFinal = new Date(year, month + 1, 0)
-
-  return dateFinal.toISOString().split('T')[0]
 }
