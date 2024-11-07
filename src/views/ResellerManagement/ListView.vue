@@ -36,12 +36,21 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
+  import { useAccountStore } from '@/stores/account'
+  import { useRouter } from 'vue-router'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { computed, ref } from 'vue'
+  import { computed, ref, onBeforeMount } from 'vue'
 
   defineOptions({ name: 'reseller-management-view' })
 
   const hasContentToList = ref(true)
+  const accountType = useAccountStore().accountData.kind
+  const router = useRouter()
+  onBeforeMount(() => {
+    if (accountType !== 'brand') {
+      router.push('/')
+    }
+  })
 
   const getColumns = computed(() => {
     return [
