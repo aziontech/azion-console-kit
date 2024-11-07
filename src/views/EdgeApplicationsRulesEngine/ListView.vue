@@ -97,10 +97,11 @@
     'order'
   ]
 
-  const PHASE_OPTIONS = ['Request phase', 'Response phase']
+  const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
   const PARSE_PHASE = {
     'Request phase': 'request',
-    'Response phase': 'response'
+    'Response phase': 'response',
+    Default: 'default'
   }
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
@@ -117,7 +118,7 @@
         field: 'phase',
         header: 'Phase',
         type: 'component',
-        filterPath: 'phase.content',
+        filterPath: 'phase',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -129,8 +130,8 @@
         field: 'status',
         header: 'Status',
         type: 'component',
-        filterPath: 'status.content',
-        sortField: 'status.content',
+        filterPath: 'active',
+        sortField: 'active',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

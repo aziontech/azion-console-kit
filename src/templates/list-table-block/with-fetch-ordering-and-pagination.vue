@@ -663,15 +663,11 @@
   }
 
   const fetchOnSearch = () => {
-    handleSearchValue(true)
     reload()
   }
 
-  const handleSearchValue = (shouldChangeSearchValue = false) => {
+  const handleSearchValue = () => {
     const search = filters.value.global.value
-    const hasValueInSearch = !!search.length
-    if (shouldChangeSearchValue || !hasValueInSearch) {
-      savedSearch.value = search
-    }
+    savedSearch.value = search
   }
 </script>
