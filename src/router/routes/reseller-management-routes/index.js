@@ -46,7 +46,7 @@ export const resellerManagementRoutes = {
     {
       path: 'edit/:id',
       name: 'edit-reseller',
-      component: () => import('@views/ResellersManagement/EditView.vue'),
+      component: () => import('@views/ResellersManagement/CreateView.vue'),
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
