@@ -33,10 +33,10 @@ const fixtures = {
     name: 'edge app AZ 2',
     modules: {
       edge_cache_enabled: true,
-      edge_functions_enabled: false,
-      application_accelerator_enabled: false,
-      image_processor_enabled: false,
-      tiered_cache_enabled: false
+      edge_functions_enabled: true,
+      application_accelerator_enabled: true,
+      image_processor_enabled: true,
+      tiered_cache_enabled: true
     },
     debug: false
   }
@@ -87,16 +87,22 @@ describe('EdgeApplicationServices', () => {
       {
         id: fixtures.edgeApplicationsMock.id,
         name: fixtures.edgeApplicationsMock.name,
+        active: fixtures.edgeApplicationsMock.active,
+        debug: fixtures.edgeApplicationsMock.debug,
         lastEditor: 'az editor',
         lastModified: new Date('2023-11-10T00:00:00.000Z'),
-        lastModify: 'Friday, November 10, 2023'
+        lastModify: 'Friday, November 10, 2023',
+        modules: fixtures.edgeApplicationsMock.modules
       },
       {
         id: fixtures.disabledEdgeApplicationsMock.id,
         name: fixtures.disabledEdgeApplicationsMock.name,
+        active: fixtures.disabledEdgeApplicationsMock.active,
+        debug: fixtures.disabledEdgeApplicationsMock.debug,
         lastEditor: 'az editor 2',
         lastModify: 'Sunday, December 10, 2023',
-        lastModified: new Date('2023-12-10T00:00:00.000Z')
+        lastModified: new Date('2023-12-10T00:00:00.000Z'),
+        modules: fixtures.disabledEdgeApplicationsMock.modules
       }
     ])
   })
