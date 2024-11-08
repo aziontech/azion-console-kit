@@ -78,7 +78,12 @@ const getConfig = () => {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        }
+        },
+        '/graphql/accounting': {
+          target: `${URLStartPrefix}manager.azion.com`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
+        },
       }
     }
   }
