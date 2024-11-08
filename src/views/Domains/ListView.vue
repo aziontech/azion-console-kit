@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="Domains"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         addButtonLabel="Domain"
         :createPagePath="createDomainPath"
@@ -16,6 +16,8 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No domains found."
         :actions="actions"
+        :apiFields="DOMAINS_API_FIELDS"
+        :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
@@ -38,8 +40,9 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
 
@@ -66,6 +69,14 @@
   })
 
   const createDomainPath = 'domains/create?origin=list'
+  const DOMAINS_API_FIELDS = [
+    'id',
+    'name',
+    'edge_application',
+    'active',
+    'alternate_domains',
+    'domains'
+  ]
 
   const hasContentToList = ref(true)
   const actions = [
