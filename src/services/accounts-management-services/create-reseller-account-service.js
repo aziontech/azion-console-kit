@@ -4,52 +4,12 @@ import { makeAccountsManagementBaseUrl } from './make-accounts-management-base-u
 
 export const createResellerAccountService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountsManagementBaseUrl()}`, // Se der errado, trocar o make para o da raiz
+    url: `${makeAccountsManagementBaseUrl()}`,
     method: 'POST',
     body: adapt(payload)
   })
   return parseHttpResponse(httpResponse)
 }
-
-// const adapt = (payload) => {
-//   const fieldMappings = {
-//     address: 'address',
-//     city: 'city',
-//     clientId: 'client_id',
-//     country: 'country',
-//     id: 'id',
-//     isDeleted: 'is_deleted',
-//     name: 'name',
-//     parentId: 'parent_id',
-//     region: 'region',
-//     companyName: 'company_name',
-//     isActive: 'is_active',
-//     uniqueIdentifier: 'unique_identifier',
-//     isSocialLoginEnabled: 'is_social_login_enabled',
-//     isEnabledMfaToAllUsers: 'is_enabled_mfa_to_all_users',
-//     companySize: 'company_size',
-//     jobFunction: 'job_function',
-//     firstLogin: 'first_login',
-//     complement: 'complement',
-//     postalCode: 'postal_code',
-//     role: 'role',
-//     billingEmails: 'billing_emails',
-//     status: 'status',
-//     isTrustworthy: 'is_trustworthy',
-//     mapGroupId: 'map_group_id'
-//   }
-
-//   const adaptedPayload = Object.keys(fieldMappings).reduce((acc, key) => {
-//     if (payload[key]) {
-//       acc[fieldMappings[key]] = payload[key]
-//     }
-//     return acc
-//   }, {})
-
-//   adaptedPayload.account_type = 'reseller'
-
-//   return adaptedPayload
-// }
 
 const adapt = (payload) => {
   const parsedBody = {
@@ -79,10 +39,6 @@ const adapt = (payload) => {
     parent_id: payload.parentId
   }
 
-  if (payload.parent_id) {
-    parsedBody.parent_id = payload.parentId
-  }
-
   parsedBody.account_type = 'reseller'
   parsedBody.terms_of_service_url = 'https://test.com'
   parsedBody.currency_iso_code = 'BRL'
@@ -101,9 +57,13 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Account saved'
+      return {
+        feedback: 'Account saved.',
+        urlToEditView: `/reseller/management`
+      }
     case 400:
-      throw new Errors.InvalidApiRequestError().message
+      const errorMessage = getUserEmailErrorMessage(httpResponse)
+      throw new Error(errorMessage).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
@@ -113,4 +73,19 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+/**
+ * Returns the error message for the email field if it exists in the response
+ * body, otherwise returns 'Invalid request'.
+ *
+ * @param {Object} httpResponse - The HTTP response object.
+ *
+ * @returns {String} The error message for the email field, or 'Invalid request'
+ * if no error message is present.
+ */
+const getUserEmailErrorMessage = (httpResponse) => {
+  const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
+  const errorMessage = hasErrorInEmail ? httpResponse.body.user.email[0] : 'Invalid request'
+  return errorMessage
 }
