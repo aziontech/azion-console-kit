@@ -126,7 +126,8 @@
   const getColumns = computed(() => [
     {
       field: 'name',
-      header: 'Name'
+      header: 'Name',
+      disabledSort: true
     },
     {
       field: 'status',
@@ -139,7 +140,8 @@
           data: columnData,
           columnAppearance: 'tag'
         })
-      }
+      },
+      disabledSort: true
     },
     {
       field: 'description',
@@ -147,15 +149,18 @@
       filterPath: 'description.value',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
+      disabledSort: true
     },
     {
       field: 'lastModified',
-      header: 'Last Modified'
+      header: 'Last Modified',
+      disabledSort: true
     },
     {
       field: 'lastEditor',
-      header: 'Last Editor'
+      header: 'Last Editor',
+      disabledSort: true
     }
   ])
 
