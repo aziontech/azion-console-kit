@@ -101,13 +101,13 @@
       />
 
       <Column
-        sortable
+        :sortable="!col.disableSort"
         v-for="col of selectedColumns"
         :key="col.field"
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        class="hover:cursor-pointer"
+        :class="{ 'hover:cursor-pointer': !col.disableSort }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -233,7 +233,6 @@
         </slot>
       </template>
     </DataTable>
-
     <DataTable
       v-else
       :value="Array(10)"
@@ -294,7 +293,6 @@
     </DataTable>
   </div>
 </template>
-
 <script setup>
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
@@ -322,7 +320,6 @@
     'on-before-go-to-edit',
     'update:selectedItensData'
   ])
-
   const props = defineProps({
     hiddenHeader: {
       type: Boolean
@@ -448,7 +445,6 @@
       emit('update:selectedItensData', value)
     }
   })
-
   onMounted(() => {
     if (!props.lazyLoad) {
       loadData({
@@ -460,7 +456,6 @@
     }
     selectedColumns.value = props.columns
   })
-
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -471,21 +466,18 @@
     const columnMapper = props.csvMapper(rowData)
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
-
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
   }
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
-
   const onRowReorder = async (event) => {
     try {
       const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
       data.value = event.value
       await props.onReorderService(tableData)
       reload()
-
       toast.add({
         closable: true,
         severity: 'success',
@@ -552,7 +544,6 @@
         const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
-
         data.value = body
         totalRecords.value = count
       } catch (error) {
@@ -573,12 +564,10 @@
       }
     }
   }
-
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
-
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -586,7 +575,6 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
-
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
@@ -595,12 +583,10 @@
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
-
   const executeCommand = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     firstAction?.command()
   }
-
   const optionsOneAction = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     return {
@@ -608,7 +594,6 @@
       disabled: firstAction?.disabled
     }
   }
-
   const reload = async (query = {}) => {
     loadData({
       page: 1,
@@ -633,7 +618,6 @@
       }
     }
   }
-
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
@@ -661,7 +645,6 @@
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
-
   const fetchOnSearch = () => {
     reload()
   }
