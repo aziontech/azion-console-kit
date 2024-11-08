@@ -54,7 +54,7 @@ export const createResellerAccountService = async (payload) => {
 const adapt = (payload) => {
   const parsedBody = {
     address: payload.address,
-    name: payload.name,
+    name: payload.accountName,
     user: {
       email: payload.email,
       first_name: payload.firstName,
@@ -84,6 +84,8 @@ const adapt = (payload) => {
   }
 
   parsedBody.account_type = 'reseller'
+  parsedBody.terms_of_service_url = 'https://test.com'
+  parsedBody.currency_iso_code = 'BRL'
 
   return parsedBody
 }
@@ -98,7 +100,7 @@ const adapt = (payload) => {
 
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 201:
       return 'Account saved'
     case 400:
       throw new Errors.InvalidApiRequestError().message

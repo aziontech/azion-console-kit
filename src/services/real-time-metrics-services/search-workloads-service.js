@@ -48,4 +48,3 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.UnexpectedError().message
   }
 }
-
