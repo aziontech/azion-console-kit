@@ -314,19 +314,19 @@
       case 'brand':
         profileMenuDefault.push({
           label: 'Resellers Management',
-          to: '/resellers'
+          to: '/reseller/management'
         })
         break
       case 'company':
         profileMenuDefault.push({
           label: 'Groups Management',
-          to: '/groups'
+          to: '/group/management'
         })
         break
       case 'reseller':
         profileMenuDefault.push({
           label: 'Clients Management',
-          to: '/clients'
+          to: '/client/management'
         })
         break
     }
