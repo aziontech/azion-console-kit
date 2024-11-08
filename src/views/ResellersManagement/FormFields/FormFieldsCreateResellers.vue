@@ -142,7 +142,7 @@
           name="firstName"
           :label="'First Name'"
           :required="true"
-          data-testid="reseller-form__company-name"
+          data-testid="reseller-form__first-name"
         />
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -151,7 +151,7 @@
           name="lastName"
           :label="'Last Name'"
           :required="true"
-          data-testid="reseller-form__company-name"
+          data-testid="reseller-form__last-name"
         />
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -160,7 +160,7 @@
           name="email"
           :label="'Email Identifier'"
           :required="true"
-          data-testid="reseller-form__company-name"
+          data-testid="reseller-form__email"
         />
       </div>
     </template>

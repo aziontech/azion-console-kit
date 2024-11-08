@@ -138,6 +138,41 @@
       </div>
     </template>
   </FormHorizontal>
+
+  <FormHorizontal
+    title="Account Owner"
+    description="Information about Account Owner"
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="firstName"
+          name="firstName"
+          :label="'First Name'"
+          :required="true"
+          data-testid="client-form__first-name"
+        />
+      </div>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="lastName"
+          name="lastName"
+          :label="'Last Name'"
+          :required="true"
+          data-testid="client-form__last-name"
+        />
+      </div>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="email"
+          name="email"
+          :label="'Email Identifier'"
+          :required="true"
+          data-testid="client-form__email"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
 </template>
 
 <script setup>

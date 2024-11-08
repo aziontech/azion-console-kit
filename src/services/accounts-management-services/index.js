@@ -1,4 +1,4 @@
 import { listAccountsService } from './list-accounts-service'
-import { createResellerAccountService } from './create-reseller-account-service'
+import { createAccountByTypeService } from './create-account-by-type-service'
 
-export { listAccountsService, createResellerAccountService }
+export { listAccountsService, createAccountByTypeService }

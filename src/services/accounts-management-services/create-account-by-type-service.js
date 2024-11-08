@@ -2,11 +2,14 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAccountsManagementBaseUrl } from './make-accounts-management-base-url'
 
-export const createResellerAccountService = async (payload) => {
+export const createAccountByTypeService = async (payload, accountType) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountsManagementBaseUrl()}`,
     method: 'POST',
-    body: adapt(payload)
+    body: {
+      ...adapt(payload),
+      account_type: accountType
+    }
   })
   return parseHttpResponse(httpResponse)
 }
@@ -39,8 +42,7 @@ const adapt = (payload) => {
     parent_id: payload.parentId
   }
 
-  parsedBody.account_type = 'reseller'
-  parsedBody.terms_of_service_url = 'https://test.com'
+  parsedBody.terms_of_service_url = 'https://www.azion.com/en/documentation/agreements/tos/'
   parsedBody.currency_iso_code = 'BRL'
 
   return parsedBody
