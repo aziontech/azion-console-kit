@@ -9,7 +9,7 @@ export const resellerManagementRoutes = {
     {
       path: '',
       name: 'reseller-management',
-      component: () => import('@views/ResellerManagement/ListView.vue'),
+      component: () => import('@views/ResellersManagement/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
@@ -34,39 +34,39 @@ export const resellerManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Reseller Management',
-            to: '/reseller'
+            to: '/reseller/management'
           },
           {
             label: 'Create Reseller Management',
-            to: '/reseller/create'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id',
-      name: 'edit-reseller',
-      component: () => import('@views/ResellersManagement/CreateView.vue'),
-      props: {
-        listCountriesService: AccountSettingsServices.listCountriesService,
-        listRegionsService: AccountSettingsServices.listRegionsService,
-        listCitiesService: AccountSettingsServices.listCitiesService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Reseller Management',
-            to: '/reseller'
-          },
-          {
-            label: 'Create Reseller Management',
-            to: '/reseller/create'
-          },
-          {
-            label: 'Edit Reseller Management'
+            to: '/reseller/management/create'
           }
         ]
       }
     }
+    // {
+    //   path: 'edit/:id',
+    //   name: 'edit-reseller',
+    //   component: () => import('@views/ResellersManagement/CreateView.vue'),
+    //   props: {
+    //     listCountriesService: AccountSettingsServices.listCountriesService,
+    //     listRegionsService: AccountSettingsServices.listRegionsService,
+    //     listCitiesService: AccountSettingsServices.listCitiesService
+    //   },
+    //   meta: {
+    //     breadCrumbs: [
+    //       {
+    //         label: 'Reseller Management',
+    //         to: '/reseller/management'
+    //       },
+    //       {
+    //         label: 'Create Reseller Management',
+    //         to: '/reseller/management/create'
+    //       },
+    //       {
+    //         label: 'Edit Reseller Management'
+    //       }
+    //     ]
+    //   }
+    // }
   ]
 }

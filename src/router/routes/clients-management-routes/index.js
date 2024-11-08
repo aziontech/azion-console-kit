@@ -1,6 +1,6 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const clientManagementRoutes = {
-  path: '/client',
+  path: '/client/management',
   name: 'client-management',
   children: [
     {
@@ -11,7 +11,7 @@ export const clientManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Client Management',
-            to: '/client-management'
+            to: '/client/management'
           }
         ]
       },
@@ -26,35 +26,35 @@ export const clientManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Client Management',
-            to: '/client'
+            to: '/client/management'
           },
           {
             label: 'Create Client Management',
-            to: '/client/create'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id',
-      name: 'edit-client',
-      component: () => import('@views/ClientManagement/EditView.vue'),
-      props: {},
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Client Management',
-            to: '/client'
-          },
-          {
-            label: 'Create Client Management',
-            to: '/client/create'
-          },
-          {
-            label: 'Edit Client Management'
+            to: '/client/management/create'
           }
         ]
       }
     }
+    // {
+    //   path: 'edit/:id',
+    //   name: 'edit-client',
+    //   component: () => import('@views/ClientsManagement/EditView.vue'),
+    //   props: {},
+    //   meta: {
+    //     breadCrumbs: [
+    //       {
+    //         label: 'Client Management',
+    //         to: '/client/management'
+    //       },
+    //       {
+    //         label: 'Create Client Management',
+    //         to: '/client/management/create'
+    //       },
+    //       {
+    //         label: 'Edit Client Management'
+    //       }
+    //     ]
+    //   }
+    // }
   ]
 }

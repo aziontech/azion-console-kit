@@ -1,6 +1,6 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const groupsManagementRoutes = {
-  path: '/groups',
+  path: '/groups/management',
   name: 'groups-management',
   children: [
     {
@@ -26,35 +26,35 @@ export const groupsManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Groups Management',
-            to: '/groups'
+            to: '/groups/management'
           },
           {
             label: 'Create Groups Management',
-            to: '/groups/create'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id',
-      name: 'edit-groups',
-      component: () => import('@views/GroupsManagement/EditView.vue'),
-      props: {},
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Groups Management',
-            to: '/groups'
-          },
-          {
-            label: 'Create Groups Management',
-            to: '/groups/create'
-          },
-          {
-            label: 'Edit Groups Management'
+            to: '/groups/management/create'
           }
         ]
       }
     }
+    // {
+    //   path: 'edit/:id',
+    //   name: 'edit-groups',
+    //   component: () => import('@views/GroupsManagement/EditView.vue'),
+    //   props: {},
+    //   meta: {
+    //     breadCrumbs: [
+    //       {
+    //         label: 'Groups Management',
+    //         to: '/groups/management'
+    //       },
+    //       {
+    //         label: 'Create Groups Management',
+    //         to: '/groups/create'
+    //       },
+    //       {
+    //         label: 'Edit Groups Management'
+    //       }
+    //     ]
+    //   }
+    // }
   ]
 }
