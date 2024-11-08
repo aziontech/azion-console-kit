@@ -13,6 +13,7 @@ import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
+import { resellerManagementRoutes } from '@routes/reseller-management-routes'
 import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { errorRoutes } from '@routes/error-routes'
@@ -42,8 +43,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { useAccountStore } from '@/stores/account'
+import { identityProvidersRoutes } from '@routes/identity-providers-routes'
 import { loadContractServicePlan } from '@/services/contract-services'
-
+import { groupManagementRoutes } from '@routes/group-management-routes'
+import { clientManagementRoutes } from '@routes/client-management-routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -53,6 +56,7 @@ const router = createRouter({
     domainsRoutes,
     edgeApplicationRoutes,
     edgeFirewallRoutes,
+    identityProvidersRoutes,
     edgeFunctionsRoutes,
     edgePulseRoutes,
     edgeServicesRoutes,
@@ -83,7 +87,10 @@ const router = createRouter({
     billingRoutes,
     importGithubRoutes,
     azionAiRoutes,
-    compareWithAzionRoutes
+    compareWithAzionRoutes,
+    resellerManagementRoutes,
+    groupManagementRoutes,
+    clientManagementRoutes
   ].concat(errorRoutes)
 })
 

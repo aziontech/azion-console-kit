@@ -19,17 +19,17 @@
   })
 
   const upstreamConnectTimeTooltip =
-    'Time it takes for the edge to establish a connection with the origin in milliseconds. In the case of TLS, it includes time spent on handshake.'
+    'Time it takes for the edge to establish a connection with the origin in seconds. In the case of TLS, it includes time spent on handshake.'
   const upstreamHeaderTimeTooltip =
-    'Time it takes for the edge to receive the response header from the origin in milliseconds.'
+    'Time it takes for the edge to receive the response header from the origin in seconds.'
   const upstreamResponseTimeTooltip =
-    'Time it takes for the edge to receive a default response from the origin in milliseconds, including headers and body.'
+    'Time it takes for the edge to receive a default response from the origin in seconds, including headers and body.'
   const upstreamBytesReceivedTooltip =
     'Number of bytes received by the origin’s edge if the content isn’t cached.'
   const requestTimeTooltip =
-    'Request processing time elapsed since the first bytes were read from the client with resolution in milliseconds. This field is the result of a sum.'
+    'Request processing time elapsed since the first bytes were read from the client with resolution in seconds. This field is the result of a sum.'
   const tcpInfoRttTooltip =
-    'Round-Trip Time (RTT) measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
+    'Round-Trip Time (RTT) in microseconds measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
   const requestLengthTooltip =
     'Request length, including request line, headers, and body. This field is the result of a sum.'
   const bytesSentTooltip = 'Number of bytes sent to a client. This field is the result of a sum.'
@@ -122,7 +122,7 @@
                   <template #button>
                     <PrimeButton
                       label="Copy"
-                      class="items-center"
+                      class="items-center min-w-min"
                       icon="pi pi-copy"
                       @click="copyCacheKey"
                       outlined
@@ -158,14 +158,14 @@
             <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
-                sufix="ms"
+                sufix="s"
                 :tooltipMessage="requestTimeTooltip"
               >
                 {{ details.requestTime }}
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
-                sufix="ms"
+                sufix="µs"
                 :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
@@ -179,7 +179,7 @@
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
@@ -219,7 +219,7 @@
             <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Upstream Connect Time"
-                sufix="ms"
+                sufix="s"
                 class="flex-1"
                 :tooltipMessage="upstreamConnectTimeTooltip"
               >
@@ -227,7 +227,7 @@
               </BigNumber>
               <BigNumber
                 label="Upstream Header Time"
-                sufix="ms"
+                sufix="s"
                 class="flex-1"
                 :tooltipMessage="upstreamHeaderTimeTooltip"
               >
@@ -235,7 +235,7 @@
               </BigNumber>
               <BigNumber
                 label="Upstream Response Time"
-                sufix="ms"
+                sufix="s"
                 class="flex-1"
                 :tooltipMessage="upstreamResponseTimeTooltip"
               >
@@ -243,7 +243,7 @@
               </BigNumber>
               <BigNumber
                 label="Upstream Bytes Received"
-                sufix="ms"
+                sufix="bytes"
                 class="flex-1"
                 :tooltipMessage="upstreamBytesReceivedTooltip"
               >

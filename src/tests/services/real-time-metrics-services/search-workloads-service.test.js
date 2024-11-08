@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { searchDomainsService } from '@/services/real-time-metrics-services'
+import { searchWorkloadsService } from '@/services/real-time-metrics-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@services/axios/errors'
 
 const makeSut = () => {
-  const sut = searchDomainsService
+  const sut = searchWorkloadsService
 
   return {
     sut
@@ -32,11 +32,11 @@ describe('RealTimeMetricsServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+    const version = 'v4'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/domains?order_by=name&sort=asc&page=1&page_size=200`,
+      url: `${version}/workspace/workloads?ordering=name&page=1&page_size=50000&fields=id%2C+name&search=`,
       method: 'GET'
     })
   })
@@ -56,64 +56,34 @@ describe('RealTimeMetricsServices', () => {
   it.each([
     {
       statusCode: 400,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 1,
-        pageSize: 100
-      },
       expectedError: new Errors.InvalidApiRequestError().message
     },
     {
       statusCode: 403,
-      params: {
-        orderBy: 'name',
-        sort: 'desc',
-        page: 1,
-        pageSize: 100
-      },
       expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 2,
-        pageSize: 100
-      },
       expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 500,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 1,
-        pageSize: 200
-      },
       expectedError: new Errors.InternalServerError().message
     },
     {
       statusCode: 'unmappedStatusCode',
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 2,
-        pageSize: 100
-      },
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, params, expectedError }) => {
+    async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
         body: []
       })
       const { sut } = makeSut()
 
-      const response = sut(params)
+      const response = sut()
 
       expect(response).rejects.toBe(expectedError)
     }

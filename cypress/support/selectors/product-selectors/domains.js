@@ -4,12 +4,14 @@ export default {
   edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
   edgeApplicationDropdownFilter:
     '[data-testid="domains-form__edge-application-field__dropdown-filter-input"]',
+  edgeFirewallField: '[data-testid="domains-form__edge-firewall-field__dropdown"]',
   mtlsTrustedCADropdownFilter:
     '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown-filter-input"]',
   edgeApplicationOption: '#edgeApplication_0',
   edgeCertificateOption: '#edgeCertificate_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
   createEdgeApplicationButton: '[data-testid="domains-form__create-edge-application-button"]',
+  createEdgeFirewallButton: '[data-testid="domains-form__create-edge-firewall-button"]',
   edgeApplicationDrawer: '.p-sidebar-content',
   dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
@@ -17,6 +19,8 @@ export default {
     '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
   createDigitalCertificateButton: '[data-testid="domains-form__create-digital-certificate-button"]',
   digitalCertificateActionBar: '[data-testid="digital-certificates-drawer__action-bar"]',
+  edgeFirewallActionBar: '[data-testid="edge-firewall-drawer__action-bar"]',
+  cnameAccessOnlyField: '[data-testid="domains-form__cname-access-only-field"]',
   copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
   confirmButton: '[data-testid="domains-dialog__confirm__button"]',
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,

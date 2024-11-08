@@ -71,14 +71,14 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.results.map((event) => {
         const values = {
           hitCount: event.hit_count,
-          topIps: event.top_10_ips[0][1],
+          topIps: event?.top_10_ips?.[0]?.[1] || '',
           id: event.rule_id,
           ruleId: event.rule_id,
           ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
           ipCount: event.ip_count,
           matchZone: event.match_zone,
           pathCount: event.path_count,
-          topCountries: event.top_10_countries[0][1],
+          topCountries: event?.top_10_countries?.[0]?.[1],
           matchesOn: event.matches_on,
           ruleDescription: event.rule_description,
           countryCount: event.country_count

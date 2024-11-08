@@ -3,6 +3,7 @@
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
     :createService="props.createFunctionService"
+    drawerId="create-function-instance-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"
@@ -111,7 +112,7 @@
 
   const handleTrackSuccessEdit = () => {
     tracker.product.productEdited({
-      productName: 'Functions Instances'
+      productName: 'Function Instances'
     })
     tracker.product
       .productEdited({
@@ -124,7 +125,7 @@
   const handleTrackCreation = () => {
     tracker.product
       .productCreated({
-        productName: 'Functions Instances'
+        productName: 'Function Instances'
       })
       .track()
   }
@@ -133,7 +134,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
-        productName: 'Functions Instances',
+        productName: 'Function Instances',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -149,7 +150,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Functions Instances',
+        productName: 'Function Instances',
         errorMessage: message,
         fieldName: fieldName,
         errorType: 'api'
@@ -215,6 +216,7 @@
   onMounted(loadEdgeFunctions)
 
   defineExpose({
+    showCreateFunctionDrawer,
     openDrawerCreate,
     openDrawerEdit,
     loadEdgeFunctions
