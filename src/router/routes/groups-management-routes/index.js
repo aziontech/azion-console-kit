@@ -38,7 +38,7 @@ export const groupsManagementRoutes = {
     {
       path: 'edit/:id',
       name: 'edit-groups',
-      component: () => import('@views/GroupsManagement/EditView.vue'),
+      component: () => import('@views/GroupsManagement/CreateView.vue'),
       props: {},
       meta: {
         breadCrumbs: [
