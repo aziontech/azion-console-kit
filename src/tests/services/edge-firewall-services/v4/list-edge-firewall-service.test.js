@@ -9,14 +9,26 @@ const fixtures = {
     name: 'AZ firewall',
     last_editor: 'az editor',
     last_modified: new Date(2023, 10, 10),
-    is_active: true
+    is_active: true,
+    debug_rules: false,
+    modules: {
+      edge_functions_enabled: false,
+      network_protection_enabled: true,
+      waf_enabled: true
+    }
   },
   edgeFirewallWithDomainsMock: {
     id: 1239875,
     name: 'AZ firewall 2',
     last_editor: 'az editor 2',
     last_modified: new Date(2023, 10, 10),
-    is_active: false
+    is_active: false,
+    debug_rules: true,
+    modules: {
+      edge_functions_enabled: true,
+      network_protection_enabled: false,
+      waf_enabled: true
+    }
   },
   domainFactory: (id) => ({ id, name: `Domain ${id}` })
 }
@@ -58,6 +70,7 @@ describe('EdgeFirewallServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
+      count: 1,
       body: { results: [fixtures.edgeFirewallMock] }
     })
     const { sut } = makeSut()
@@ -69,6 +82,8 @@ describe('EdgeFirewallServices', () => {
         id: fixtures.edgeFirewallMock.id,
         name: fixtures.edgeFirewallMock.name,
         lastEditor: fixtures.edgeFirewallMock.last_editor,
+        modules: fixtures.edgeFirewallMock.modules,
+        debugRules: fixtures.edgeFirewallMock.debug_rules,
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         status: {
@@ -84,6 +99,7 @@ describe('EdgeFirewallServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
+      count: 1,
       body: { results: [fixtures.edgeFirewallWithDomainsMock] }
     })
 
@@ -95,7 +111,9 @@ describe('EdgeFirewallServices', () => {
       {
         id: fixtures.edgeFirewallWithDomainsMock.id,
         name: fixtures.edgeFirewallWithDomainsMock.name,
+        debugRules: fixtures.edgeFirewallWithDomainsMock.debug_rules,
         lastEditor: fixtures.edgeFirewallWithDomainsMock.last_editor,
+        modules: fixtures.edgeFirewallWithDomainsMock.modules,
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         status: {

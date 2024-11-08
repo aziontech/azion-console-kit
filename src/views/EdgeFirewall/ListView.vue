@@ -3,6 +3,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import CloneEdgeFirewall from './Dialog/Clone.vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
 
@@ -11,7 +12,15 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   const tracker = inject('tracker')
-  const EDGE_FIREWALL_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'is_active']
+  const EDGE_FIREWALL_API_FIELDS = [
+    'id',
+    'name',
+    'debug_rules',
+    'last_editor',
+    'modules',
+    'last_modified',
+    'is_active'
+  ]
 
   const props = defineProps({
     listEdgeFirewallService: {
@@ -31,6 +40,18 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      type: 'dialog',
+      label: 'Clone',
+      icon: 'pi pi-fw pi-copy',
+      dialog: {
+        component: CloneEdgeFirewall,
+        body: (item) => ({
+          data: item
+        })
+      }
+    },
+    {
+      label: 'Delete',
       type: 'delete',
       title: 'edge firewall',
       icon: 'pi pi-trash',
