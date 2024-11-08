@@ -63,8 +63,8 @@ const listEdgeApplications = async () => {
 const getEdgeApplication = (edgeApplications, edge_application_id) => {
   const edgeApplication = edgeApplications.filter((edgeapp) => edgeapp.id === edge_application_id)
 
-  if (edgeApplication.length > 0) {
-    return edgeApplication[0].name
+  if (edgeApplication.length) {
+    return edgeApplication[0]?.name
   }
   return ''
 }
