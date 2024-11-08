@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createResellerService"
+        :createService="props.createResellerAccountService"
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
@@ -43,10 +43,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    createResellerService: {
-      type: Function,
-      required: true
-    },
     listCountriesService: {
       type: Function,
       required: true
@@ -58,13 +54,17 @@
     listCitiesService: {
       type: Function,
       required: true
+    },
+    createResellerAccountService: {
+      type: Function,
+      required: true
     }
   })
 
   const validationSchema = yup.object({
     accountName: yup.string().required().label('Account Name'),
     companyName: yup.string().required().label('Company Name'),
-    uniqueIdentifier: yup.string().required().label('Unique Identifier'),
+    uniqueIdentifier: yup.string().label('Unique Identifier'),
     active: yup.boolean().required().default(false),
 
     country: yup.string().required().label('Country'),

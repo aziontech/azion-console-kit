@@ -1,19 +1,20 @@
 import * as AccountSettingsServices from '@/services/account-settings-services'
+import * as ResellerManagementServices from '@/services/accounts-management-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const resellerManagementRoutes = {
-  path: '/reseller',
+  path: '/reseller/management',
   name: 'reseller-management',
   children: [
     {
       path: '',
-      name: 'list-reseller-management',
-      component: () => import('@views/ResellersManagement/ListView.vue'),
+      name: 'reseller-management',
+      component: () => import('@views/ResellerManagement/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
             label: 'Reseller Management',
-            to: '/reseller-management'
+            to: '/reseller/management'
           }
         ]
       },
@@ -26,7 +27,8 @@ export const resellerManagementRoutes = {
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
-        listCitiesService: AccountSettingsServices.listCitiesService
+        listCitiesService: AccountSettingsServices.listCitiesService,
+        createResellerAccountService: ResellerManagementServices.createResellerAccountService
       },
       meta: {
         breadCrumbs: [

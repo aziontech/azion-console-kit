@@ -27,7 +27,6 @@
           name="uniqueIdentifier"
           placeholder="00.000.000/0001-00"
           :label="'Unique Identifier'"
-          :required="true"
           data-testid="reseller-form__company-name"
         />
       </div>
