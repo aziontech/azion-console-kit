@@ -38,7 +38,7 @@ export const clientManagementRoutes = {
     {
       path: 'edit/:id',
       name: 'edit-client',
-      component: () => import('@views/ClientManagement/EditView.vue'),
+      component: () => import('@views/ClientsManagement/EditView.vue'),
       props: {},
       meta: {
         breadCrumbs: [
