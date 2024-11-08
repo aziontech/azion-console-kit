@@ -96,6 +96,7 @@ describe('WafRulesServices', () => {
           severity: 'success'
         },
         name: fixtures.wafRulesMock.name,
+        threatsConfigurationWithoutFormat: fixtures.wafRulesMock.threats_configuration,
         threatsConfiguration: [
           'File upload',
           'Evading Tricks',
@@ -121,7 +122,9 @@ describe('WafRulesServices', () => {
           'Directory Traversal',
           'Remote File Inclusions (RFI)',
           'SQL Injection'
-        ]
+        ],
+        threatsConfigurationWithoutFormat:
+          fixtures.wafRulesMockWithFalseActive.threats_configuration
       }
     ])
   })

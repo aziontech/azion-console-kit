@@ -1,4 +1,5 @@
 import { listWafRulesService } from './list-waf-rules-service'
+import { cloneWafRulesService } from './clone-waf-rules-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +9,4 @@ import { listWafRulesService } from './list-waf-rules-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listWafRulesService }
+export { listWafRulesService, cloneWafRulesService }

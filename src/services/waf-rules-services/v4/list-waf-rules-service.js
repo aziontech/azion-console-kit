@@ -72,7 +72,8 @@ const adapt = (httpResponse) => {
           active: parseStatusData(waf.active),
           id: waf.id,
           name: waf.name,
-          threatsConfiguration: threatTypes
+          threatsConfiguration: threatTypes,
+          threatsConfigurationWithoutFormat: waf.threats_configuration
         }
         return parser
       })
