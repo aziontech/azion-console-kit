@@ -9,7 +9,7 @@ export const resellerManagementRoutes = {
     {
       path: '',
       name: 'reseller-management',
-      component: () => import('@views/ResellerManagement/ListView.vue'),
+      component: () => import('@views/ResellersManagement/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
@@ -34,11 +34,11 @@ export const resellerManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Reseller Management',
-            to: '/reseller'
+            to: '/reseller/management'
           },
           {
             label: 'Create Reseller Management',
-            to: '/reseller/create'
+            to: '/reseller/management/create'
           }
         ]
       }
@@ -56,11 +56,11 @@ export const resellerManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Reseller Management',
-            to: '/reseller'
+            to: '/reseller/management'
           },
           {
             label: 'Create Reseller Management',
-            to: '/reseller/create'
+            to: '/reseller/management/create'
           },
           {
             label: 'Edit Reseller Management'

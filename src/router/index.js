@@ -45,8 +45,8 @@ import { useAccountStore } from '@/stores/account'
 import { identityProvidersRoutes } from '@routes/identity-providers-routes'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { resellerManagementRoutes } from '@routes/reseller-management-routes'
-import { groupManagementRoutes } from '@routes/group-management-routes'
-import { clientManagementRoutes } from '@routes/client-management-routes'
+import { groupsManagementRoutes } from '@routes/groups-management-routes'
+import { clientManagementRoutes } from '@routes/clients-management-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,7 +90,7 @@ const router = createRouter({
     azionAiRoutes,
     compareWithAzionRoutes,
     resellerManagementRoutes,
-    groupManagementRoutes,
+    groupsManagementRoutes,
     clientManagementRoutes
   ].concat(errorRoutes)
 })

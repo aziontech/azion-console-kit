@@ -1,6 +1,6 @@
 /** @type {import('vue-router').RouteRecordRaw} */
 export const clientManagementRoutes = {
-  path: '/client',
+  path: '/client/management',
   name: 'client-management',
   children: [
     {
@@ -11,7 +11,7 @@ export const clientManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Client Management',
-            to: '/client-management'
+            to: '/client/management'
           }
         ]
       },
@@ -26,11 +26,11 @@ export const clientManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Client Management',
-            to: '/client'
+            to: '/client/management'
           },
           {
             label: 'Create Client Management',
-            to: '/client/create'
+            to: '/client/management/create'
           }
         ]
       }
@@ -44,11 +44,11 @@ export const clientManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Client Management',
-            to: '/client'
+            to: '/client/management'
           },
           {
             label: 'Create Client Management',
-            to: '/client/create'
+            to: '/client/management/create'
           },
           {
             label: 'Edit Client Management'
