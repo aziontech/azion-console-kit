@@ -46,8 +46,8 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
+      sortField: 'is_active',
+      filterPath: 'is_active',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({

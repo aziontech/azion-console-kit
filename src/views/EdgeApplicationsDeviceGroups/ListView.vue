@@ -64,7 +64,8 @@
         field: 'deviceId',
         header: 'ID',
         type: 'component',
-        filterPath: 'deviceId.content',
+        filterPath: 'id',
+        sortField: 'id',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

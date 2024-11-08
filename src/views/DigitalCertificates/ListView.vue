@@ -115,7 +115,8 @@
       },
       {
         field: 'type',
-        header: 'Type'
+        header: 'Type',
+        sortField: 'certificate_type'
       },
       {
         field: 'validity',
@@ -124,7 +125,7 @@
       {
         field: 'status',
         header: 'Status',
-        sortField: 'status.content',
+        sortField: 'status',
         type: 'component',
         component: (columnData) =>
           columnBuilder({

@@ -1,5 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
+import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
+
 import { listCountriesService } from '@/services/network-lists-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -12,7 +14,7 @@ export const wafRulesRoutes = {
       name: 'list-waf-rules',
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
-        listWafRulesService: WafRulesService.listWafRulesService,
+        listWafRulesService: WafRulesServiceV4.listWafRulesService,
         deleteWafRulesService: WafRulesService.deleteWafRulesService,
         documentationService: Helpers.documentationCatalog.waf
       },

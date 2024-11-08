@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="WAF Rules" />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listWafRulesService"
         :columns="getColumns"
@@ -15,6 +15,8 @@
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
+        :apiFields="WAF_API_FIELDS"
+        :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
@@ -35,8 +37,7 @@
 
 <script setup>
   import { ref, computed, inject } from 'vue'
-
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
@@ -91,6 +92,8 @@
     hasContentToList.value = event
   }
 
+  const WAF_API_FIELDS = []
+
   const getColumns = computed(() => {
     return [
       {
@@ -98,9 +101,11 @@
         header: 'Name'
       },
       {
-        field: 'threatTypes',
+        field: 'threatsConfiguration',
         header: 'Threat Type Configuration',
         type: 'component',
+        sortField: 'threats_configuration',
+        filterPath: 'threats_configuration',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
@@ -108,6 +113,8 @@
         field: 'active',
         header: 'Status',
         type: 'component',
+        sortField: 'active',
+        filterPath: 'active',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
