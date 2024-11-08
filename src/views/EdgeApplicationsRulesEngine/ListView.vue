@@ -111,7 +111,8 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        disabledSort: true
       },
       {
         field: 'phase',
@@ -123,7 +124,8 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-        }
+        },
+        disabledSort: true
       },
       {
         field: 'status',
@@ -136,11 +138,13 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-        }
+        },
+        disabledSort: true
       },
       {
         field: 'description',
-        header: 'Description'
+        header: 'Description',
+        disabledSort: true
       }
     ]
   })
