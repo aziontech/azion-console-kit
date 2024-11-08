@@ -48,7 +48,7 @@ describe('EdgeFirewallService', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully cloned', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,
       body: { data: { id: fixtures.edgeFirewallMock.id } }
