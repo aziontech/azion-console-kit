@@ -34,27 +34,27 @@ export const groupsManagementRoutes = {
           }
         ]
       }
-    },
-    {
-      path: 'edit/:id',
-      name: 'edit-groups',
-      component: () => import('@views/GroupsManagement/CreateView.vue'),
-      props: {},
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Groups Management',
-            to: '/groups/management'
-          },
-          {
-            label: 'Create Groups Management',
-            to: '/groups/management/create'
-          },
-          {
-            label: 'Edit Groups Management'
-          }
-        ]
-      }
     }
+    // {
+    //   path: 'edit/:id',
+    //   name: 'edit-groups',
+    //   component: () => import('@views/GroupsManagement/EditView.vue'),
+    //   props: {},
+    //   meta: {
+    //     breadCrumbs: [
+    //       {
+    //         label: 'Groups Management',
+    //         to: '/groups/management'
+    //       },
+    //       {
+    //         label: 'Create Groups Management',
+    //         to: '/groups/create'
+    //       },
+    //       {
+    //         label: 'Edit Groups Management'
+    //       }
+    //     ]
+    //   }
+    // }
   ]
 }

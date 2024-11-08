@@ -42,31 +42,31 @@ export const resellerManagementRoutes = {
           }
         ]
       }
-    },
-    {
-      path: 'edit/:id',
-      name: 'edit-reseller',
-      component: () => import('@views/ResellersManagement/CreateView.vue'),
-      props: {
-        listCountriesService: AccountSettingsServices.listCountriesService,
-        listRegionsService: AccountSettingsServices.listRegionsService,
-        listCitiesService: AccountSettingsServices.listCitiesService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Reseller Management',
-            to: '/reseller/management'
-          },
-          {
-            label: 'Create Reseller Management',
-            to: '/reseller/management/create'
-          },
-          {
-            label: 'Edit Reseller Management'
-          }
-        ]
-      }
     }
+    // {
+    //   path: 'edit/:id',
+    //   name: 'edit-reseller',
+    //   component: () => import('@views/ResellersManagement/CreateView.vue'),
+    //   props: {
+    //     listCountriesService: AccountSettingsServices.listCountriesService,
+    //     listRegionsService: AccountSettingsServices.listRegionsService,
+    //     listCitiesService: AccountSettingsServices.listCitiesService
+    //   },
+    //   meta: {
+    //     breadCrumbs: [
+    //       {
+    //         label: 'Reseller Management',
+    //         to: '/reseller/management'
+    //       },
+    //       {
+    //         label: 'Create Reseller Management',
+    //         to: '/reseller/management/create'
+    //       },
+    //       {
+    //         label: 'Edit Reseller Management'
+    //       }
+    //     ]
+    //   }
+    // }
   ]
 }
