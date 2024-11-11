@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createResellerService"
+        :createService="createGroupAccountService"
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
@@ -43,7 +43,7 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    createResellerService: {
+    createAccountByTypeService: {
       type: Function,
       required: true
     },
@@ -61,6 +61,10 @@
     }
   })
 
+  const createGroupAccountService = async (data) => {
+    return await props.createAccountByTypeService(data, 'group')
+  }
+
   const validationSchema = yup.object({
     accountName: yup.string().required().label('Account Name'),
     companyName: yup.string().label('Company Name'),
@@ -73,7 +77,11 @@
     city: yup.string().required().label('City'),
     address: yup.string().required().label('Address'),
     complement: yup.string(),
-    postalCode: yup.string().required().label('Postal Code')
+    postalCode: yup.string().required().label('Postal Code'),
+
+    firstName: yup.string().required().label('First Name'),
+    lastName: yup.string().required().label('Last Name'),
+    email: yup.string().required().email().label('User Email')
   })
 
   const handleResponse = () => {

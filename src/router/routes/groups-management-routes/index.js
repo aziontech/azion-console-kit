@@ -1,3 +1,6 @@
+import * as AccountSettingsServices from '@/services/account-settings-services'
+import * as AccountManagementServices from '@/services/accounts-management-services'
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const groupsManagementRoutes = {
   path: '/groups/management',
@@ -21,7 +24,12 @@ export const groupsManagementRoutes = {
       path: 'create',
       name: 'create-groups',
       component: () => import('@views/GroupsManagement/CreateView.vue'),
-      props: {},
+      props: {
+        listCountriesService: AccountSettingsServices.listCountriesService,
+        listRegionsService: AccountSettingsServices.listRegionsService,
+        listCitiesService: AccountSettingsServices.listCitiesService,
+        createAccountByTypeService: AccountManagementServices.createAccountByTypeService
+      },
       meta: {
         breadCrumbs: [
           {
