@@ -1,0 +1,130 @@
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@/services/axios/errors'
+import { editAccountService } from '@/services/accounts-management-services'
+import { describe, expect, it, vi } from 'vitest'
+
+const fixtures = {
+  accountMock: {
+    id: 123,
+    address: '123 Test Street',
+    accountName: 'Test Account',
+    email: 'test@example.com',
+    firstName: 'Test',
+    lastName: 'User',
+    companyName: 'Test Company',
+    isActive: true,
+    uniqueIdentifier: '1234567890',
+    complement: 'Suite 100',
+    city: 'Test City',
+    postalCode: '12345',
+    role: 'admin'
+  },
+  emailErrorMock: {
+    user: {
+      email: ['Email already in use']
+    }
+  }
+}
+const makeSut = () => {
+  const sut = editAccountService
+
+  return {
+    sut
+  }
+}
+
+describe('AccountManagementServices', () => {
+  it('should call API with correct params with type', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+    await sut(fixtures.accountMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'PATCH',
+      url: `iam/accounts/${fixtures.accountMock.id}`,
+      body: {
+        address: '123 Test Street',
+        billing_emails: undefined,
+        city: 'Test City',
+        company_name: 'Test Company',
+        company_size: undefined,
+        complement: 'Suite 100',
+        currency_iso_code: 'BRL',
+        first_login: undefined,
+        is_active: true,
+        is_enabled_mfa_to_all_users: undefined,
+        is_social_login_enabled: undefined,
+        is_trustworthy: undefined,
+        job_function: undefined,
+        map_group_id: undefined,
+        name: 'Test Account',
+        parent_id: undefined,
+        postal_code: '12345',
+        role: 'admin',
+        status: undefined,
+        terms_of_service_url: 'https://www.azion.com/en/documentation/agreements/tos/',
+        unique_identifier: '1234567890'
+      }
+    })
+  })
+
+  it('should return a feedback message on successfully created', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+
+    const response = await sut(fixtures.accountMock)
+
+    expect(response).toBe('Your account has been edited')
+  })
+
+  it('should parse correctly the feedback message when the error is a string inside an object', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: fixtures.emailErrorMock
+    })
+    const { sut } = makeSut()
+    const accountType = 'client'
+
+    const response = sut(fixtures.accountMock, accountType)
+
+    expect(response).rejects.toThrow(fixtures.emailErrorMock.user.email[0])
+  })
+
+  it.each([
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+      const accountType = 'client'
+
+      const response = sut(fixtures.accountMock, accountType)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
+})

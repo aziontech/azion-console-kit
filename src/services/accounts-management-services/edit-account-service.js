@@ -47,7 +47,7 @@ const adapt = (payload) => {
  */
 const extractApiError = (httpResponse) => {
   const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
-  if (!hasErrorInEmail) {
+  if (hasErrorInEmail) {
     return httpResponse.body.user.email[0]
   }
 
