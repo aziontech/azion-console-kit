@@ -2,6 +2,13 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAccountsManagementBaseUrl } from './make-accounts-management-base-url'
 
+/**
+ * @function createAccountByTypeService
+ * @description Send a request to the /accounts endpoint to create a new account by type.
+ * @param {Object} payload Payload to be sent in the request body.
+ * @param {String} accountType ('Client'|'Reseller'|'Group') The type of the account to be created.
+ * @returns {Promise<Object | Error>} The response from the server or an error if the request fails.
+ */
 export const createAccountByTypeService = async (payload, accountType) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountsManagementBaseUrl()}`,
@@ -55,7 +62,7 @@ const adapt = (payload) => {
  */
 const extractApiError = (httpResponse) => {
   const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
-  if (!hasErrorInEmail) {
+  if (hasErrorInEmail) {
     return httpResponse.body.user.email[0]
   }
 
