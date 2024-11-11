@@ -32,9 +32,10 @@
       </div>
       <div class="w-full flex flex-col gap-2">
         <FieldSwitchBlock
-          data-testid="reseller-form__active-field"
-          nameField="active"
-          name="active"
+          data-testid="reseller-form__isActive-field"
+          nameField="isActive"
+          name="isActive"
+          :value="isActive"
           auto
           :isCard="false"
           title="Active"
@@ -132,6 +133,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    v-if="!props.isEdit"
     title="Account Owner"
     description="Information about Account Owner"
   >
@@ -191,6 +193,10 @@
     listCitiesService: {
       type: Function,
       required: true
+    },
+    isEdit: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -212,7 +218,7 @@
   const { value: accountName } = useField('accountName')
   const { value: companyName } = useField('companyName')
   const { value: uniqueIdentifier } = useField('uniqueIdentifier')
-  const { value: active } = useField('active')
+  const { value: isActive } = useField('isActive')
   const { value: country } = useField('country')
   const { value: region } = useField('region')
   const { value: city } = useField('city')

@@ -8,7 +8,6 @@ export const editAccountService = async (payload) => {
     method: 'PATCH',
     body: adapt(payload)
   })
-
   return parseHttpResponse(httpResponse)
 }
 

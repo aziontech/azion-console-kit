@@ -37,32 +37,34 @@ export const clientManagementRoutes = {
             to: '/client/management'
           },
           {
-            label: 'Create Client Management',
+            label: 'Create Client',
             to: '/client/management/create'
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-client',
+      component: () => import('@views/ClientsManagement/EditView.vue'),
+      props: {
+        listCountriesService: AccountSettingsServices.listCountriesService,
+        listRegionsService: AccountSettingsServices.listRegionsService,
+        listCitiesService: AccountSettingsServices.listCitiesService,
+        loadAccountService: AccountManagementServices.loadAccountService,
+        editAccountService: AccountManagementServices.editAccountService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Client Management',
+            to: '/client/management'
+          },
+          {
+            label: 'Edit Client'
+          }
+        ]
+      }
     }
-    // {
-    //   path: 'edit/:id',
-    //   name: 'edit-client',
-    //   component: () => import('@views/ClientsManagement/EditView.vue'),
-    //   props: {},
-    //   meta: {
-    //     breadCrumbs: [
-    //       {
-    //         label: 'Client Management',
-    //         to: '/client/management'
-    //       },
-    //       {
-    //         label: 'Create Client Management',
-    //         to: '/client/management/create'
-    //       },
-    //       {
-    //         label: 'Edit Client Management'
-    //       }
-    //     ]
-    //   }
-    // }
   ]
 }
