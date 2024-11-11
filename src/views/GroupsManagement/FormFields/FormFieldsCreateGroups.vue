@@ -140,6 +140,7 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
+    v-if="!isEdit"
     title="Account Owner"
     description="Information about Account Owner"
   >
@@ -189,6 +190,9 @@
   import { onMounted, ref, watch, computed } from 'vue'
 
   const props = defineProps({
+    isEdit: {
+      type: Boolean
+    },
     listCountriesService: {
       type: Function,
       required: true

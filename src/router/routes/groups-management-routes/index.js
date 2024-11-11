@@ -3,7 +3,7 @@ import * as AccountManagementServices from '@/services/accounts-management-servi
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const groupsManagementRoutes = {
-  path: '/groups/management',
+  path: '/group/management',
   name: 'groups-management',
   children: [
     {
@@ -34,35 +34,38 @@ export const groupsManagementRoutes = {
         breadCrumbs: [
           {
             label: 'Groups Management',
-            to: '/groups/management'
+            to: '/group/management'
           },
           {
-            label: 'Create Groups Management',
-            to: '/groups/management/create'
+            label: 'Create Group',
+            to: '/group/management/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-groups',
+      component: () => import('@views/GroupsManagement/EditView.vue'),
+      props: {
+        listCountriesService: AccountSettingsServices.listCountriesService,
+        listRegionsService: AccountSettingsServices.listRegionsService,
+        listCitiesService: AccountSettingsServices.listCitiesService,
+        createAccountByTypeService: AccountManagementServices.createAccountByTypeService,
+        loadAccountService: AccountManagementServices.loadAccountService,
+        editAccountService: AccountManagementServices.editAccountService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Groups Management',
+            to: '/group/management'
+          },
+          {
+            label: 'Edit Group'
           }
         ]
       }
     }
-    // {
-    //   path: 'edit/:id',
-    //   name: 'edit-groups',
-    //   component: () => import('@views/GroupsManagement/EditView.vue'),
-    //   props: {},
-    //   meta: {
-    //     breadCrumbs: [
-    //       {
-    //         label: 'Groups Management',
-    //         to: '/groups/management'
-    //       },
-    //       {
-    //         label: 'Create Groups Management',
-    //         to: '/groups/create'
-    //       },
-    //       {
-    //         label: 'Edit Groups Management'
-    //       }
-    //     ]
-    //   }
-    // }
   ]
 }
