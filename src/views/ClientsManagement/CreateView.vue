@@ -81,7 +81,7 @@
 
     firstName: yup.string().required().label('First Name'),
     lastName: yup.string().required().label('Last Name'),
-    email: yup.string().required().email().label('User Email'),
+    email: yup.string().required().email().label('User Email')
   })
 
   const handleResponse = () => {

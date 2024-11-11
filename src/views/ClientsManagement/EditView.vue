@@ -82,7 +82,7 @@
     city: yup.string().required().label('City'),
     address: yup.string().required().label('Address'),
     complement: yup.string(),
-    postalCode: yup.string().required().label('Postal Code'),
+    postalCode: yup.string().required().label('Postal Code')
   })
 
   const handleTrackSuccessEdit = () => {

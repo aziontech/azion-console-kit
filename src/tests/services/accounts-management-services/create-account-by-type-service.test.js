@@ -35,8 +35,7 @@ const makeSut = () => {
 describe('AccountManagementServices', () => {
   it('should call API with correct params with type', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: { id: '123' }
+      statusCode: 201
     })
 
     const { sut } = makeSut()
@@ -80,8 +79,7 @@ describe('AccountManagementServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: { id: '123' }
+      statusCode: 201
     })
 
     const { sut } = makeSut()
