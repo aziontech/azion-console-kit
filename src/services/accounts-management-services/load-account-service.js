@@ -12,7 +12,7 @@ export const loadAccountService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
-  const body = httpResponse.body.results
+  const body = httpResponse.body.data
 
   const parsedBody = {
     id: body.id,

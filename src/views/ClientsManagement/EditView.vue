@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.loadAccountService"
+        :editService="props.editAccountService"
         :loadService="props.loadAccountService"
         :schema="validationSchema"
         :updatedRedirect="props.updatedRedirect"
@@ -14,8 +14,10 @@
       >
         <template #form>
           <FormFieldsCreateClients
-            :clipboardWrite="clipboardWrite"
-            :documentationService="documentationService"
+            :listCountriesService="listCountriesService"
+            :listRegionsService="listRegionsService"
+            :listCitiesService="listCitiesService"
+            isEdit
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -50,35 +52,41 @@
       type: Function,
       required: true
     },
-    editDigitalCertificateService: {
+    editAccountService: {
       type: Function,
       required: true
     },
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
-    clipboardWrite: {
+    listCountriesService: {
       type: Function,
       required: true
     },
-    documentationService: {
-      required: true,
-      type: Function
+    listRegionsService: {
+      type: Function,
+      required: true
+    },
+    listCitiesService: {
+      type: Function,
+      required: true
     }
   })
 
   const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field.'),
-    certificateType: yup.string(),
-    csr: yup.string(),
-    certificate: yup.string(),
-    privateKey: yup.string(),
-    managed: yup
-      .boolean()
-      .isFalse(
-        `This is a Let's Encrypt™ certificate automatically created and managed by Azion and can't be edited.`
-      )
+    accountName: yup.string().required().label('Account Name'),
+    companyName: yup.string().label('Company Name'),
+    uniqueIdentifier: yup.string().label('Unique Identifier'),
+    billingEmails: yup.string().label('Billing Emails'),
+    active: yup.boolean().required().default(false),
+
+    country: yup.string().required().label('Country'),
+    region: yup.string().required().label('State/Region'),
+    city: yup.string().required().label('City'),
+    address: yup.string().required().label('Address'),
+    complement: yup.string(),
+    postalCode: yup.string().required().label('Postal Code'),
+
+    firstName: yup.string().required().label('First Name'),
+    lastName: yup.string().required().label('Last Name'),
+    email: yup.string().required().email().label('User Email')
   })
 
   const handleTrackSuccessEdit = () => {
