@@ -31,6 +31,10 @@ const parsedBehavior = (behaviors) => {
       behaviorItem = { ...behavior.target }
     }
 
+    if (behavior.name === 'set_origin' && typeof behavior.target === 'number') {
+      behaviorItem = { target: behavior.target.toString() }
+    }
+
     return {
       name: behavior.name,
       ...behaviorItem
