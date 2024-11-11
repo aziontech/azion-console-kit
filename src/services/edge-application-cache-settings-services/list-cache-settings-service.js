@@ -19,7 +19,8 @@ export const listCacheSettingsService = async ({ id }) => {
 const formatCacheSettings = (value) => {
   const CACHE_SETTINGS_OPTIONS = {
     honor: 'Honor Origin Cache Headers',
-    override: 'Override Cache Settings'
+    override: 'Override Cache Settings',
+    'no-cache': 'No Cache'
   }
 
   return CACHE_SETTINGS_OPTIONS[value]
