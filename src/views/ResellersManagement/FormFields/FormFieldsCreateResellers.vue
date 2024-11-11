@@ -35,6 +35,7 @@
           data-testid="reseller-form__isActive-field"
           nameField="isActive"
           name="isActive"
+          :value="isActive"
           auto
           :isCard="false"
           title="Active"

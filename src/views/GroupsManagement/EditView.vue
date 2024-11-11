@@ -1,49 +1,57 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Group" />
+      <PageHeadingBlock pageTitle="Edit Group"></PageHeadingBlock>
     </template>
     <template #content>
-      <CreateFormBlock
-        :createService="createGroupAccountService"
+      <EditFormBlock
+        :editService="editAccountService"
+        :loadService="loadAccountService"
         :schema="validationSchema"
-        @on-response="handleResponse"
-        @on-response-fail="handleTrackFailedCreation"
+        :updatedRedirect="updatedRedirect"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
           <FormFieldsCreateGroups
+            isEdit
             :listCountriesService="listCountriesService"
             :listRegionsService="listRegionsService"
             :listCitiesService="listCitiesService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
+          <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
           />
         </template>
-      </CreateFormBlock>
+      </EditFormBlock>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCreateGroups from './FormFields/FormFieldsCreateGroups.vue'
+
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
-  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    createAccountByTypeService: {
+  defineProps({
+    loadAccountService: {
+      type: Function,
+      required: true
+    },
+    editAccountService: {
       type: Function,
       required: true
     },
@@ -61,15 +69,11 @@
     }
   })
 
-  const createGroupAccountService = async (data) => {
-    return await props.createAccountByTypeService(data, 'group')
-  }
-
   const validationSchema = yup.object({
     accountName: yup.string().required().label('Account Name'),
     companyName: yup.string().label('Company Name'),
     uniqueIdentifier: yup.string().label('Unique Identifier'),
-    billingEmails: yup.string().label('Billing Emailsa'),
+    billingEmails: yup.string().label('Billing Emails'),
     active: yup.boolean().required().default(false),
 
     country: yup.string().required().label('Country'),
@@ -77,24 +81,21 @@
     city: yup.string().required().label('City'),
     address: yup.string().required().label('Address'),
     complement: yup.string(),
-    postalCode: yup.string().required().label('Postal Code'),
-
-    firstName: yup.string().required().label('First Name'),
-    lastName: yup.string().required().label('Last Name'),
-    email: yup.string().required().email().label('User Email')
+    postalCode: yup.string().required().label('Postal Code')
   })
 
-  const handleResponse = () => {
-    tracker.product.productCreated({
-      productName: 'Resellers'
-    })
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Groups Management'
+      })
+      .track()
   }
-
-  const handleTrackFailedCreation = (error) => {
+  const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
-      .failedToCreate({
-        productName: 'Resellers',
+      .failedToEdit({
+        productName: 'Groups Management',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message

@@ -320,7 +320,7 @@
       case 'company':
         profileMenuDefault.push({
           label: 'Groups Management',
-          to: '/groups/management'
+          to: '/group/management'
         })
         break
       case 'reseller':

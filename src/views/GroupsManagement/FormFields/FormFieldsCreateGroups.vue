@@ -41,8 +41,9 @@
       <div class="w-full flex flex-col gap-2">
         <FieldSwitchBlock
           data-testid="group-form__active-field"
-          nameField="active"
-          name="active"
+          nameField="isActive"
+          name="isActive"
+          :value="isActive"
           auto
           :isCard="false"
           title="Active"
@@ -138,6 +139,42 @@
       </div>
     </template>
   </FormHorizontal>
+  <FormHorizontal
+    v-if="!isEdit"
+    title="Account Owner"
+    description="Information about Account Owner"
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="firstName"
+          name="firstName"
+          :label="'First Name'"
+          :required="true"
+          data-testid="client-form__first-name"
+        />
+      </div>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="lastName"
+          name="lastName"
+          :label="'Last Name'"
+          :required="true"
+          data-testid="client-form__last-name"
+        />
+      </div>
+      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+        <FieldText
+          :value="email"
+          name="email"
+          placeholder="email@domain.com"
+          :label="'Email Identifier'"
+          :required="true"
+          data-testid="client-form__email"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
 </template>
 
 <script setup>
@@ -153,6 +190,9 @@
   import { onMounted, ref, watch, computed } from 'vue'
 
   const props = defineProps({
+    isEdit: {
+      type: Boolean
+    },
     listCountriesService: {
       type: Function,
       required: true
@@ -186,13 +226,16 @@
   const { value: companyName } = useField('companyName')
   const { value: uniqueIdentifier } = useField('uniqueIdentifier')
   const { value: billingEmails } = useField('billingEmails')
-  const { value: active } = useField('active')
+  const { value: isActive } = useField('isActive')
   const { value: country } = useField('country')
   const { value: region } = useField('region')
   const { value: city } = useField('city')
   const { value: address } = useField('address')
   const { value: complement } = useField('complement')
   const { value: postalCode } = useField('postalCode')
+  const { value: firstName } = useField('firstName')
+  const { value: lastName } = useField('lastName')
+  const { value: email } = useField('email')
 
   const setCountriesOptions = async () => {
     countriesOptions.value.done = false

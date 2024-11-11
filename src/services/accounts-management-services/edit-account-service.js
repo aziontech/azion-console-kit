@@ -39,6 +39,21 @@ const adapt = (payload) => {
 
   return parsedBody
 }
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
+  if (!hasErrorInEmail) {
+    return httpResponse.body.user.email[0]
+  }
+
+  const [firstKey] = Object.keys(httpResponse.body)
+  return httpResponse.body[firstKey]
+}
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
@@ -50,8 +65,9 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return 'Your account has been edited'
-    case 409:
-      throw new Error(Object.keys(httpResponse.body)[0]).message
+    case 400:
+      const message = extractApiError(httpResponse)
+      throw new Error(message).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

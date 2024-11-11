@@ -51,6 +51,21 @@ const adapt = (payload) => {
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
+  if (!hasErrorInEmail) {
+    return httpResponse.body.user.email[0]
+  }
+
+  const [firstKey] = Object.keys(httpResponse.body)
+  return httpResponse.body[firstKey]
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
  * @returns {Object} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
@@ -64,7 +79,7 @@ const parseHttpResponse = (httpResponse, accountType) => {
         urlToEditView: `/${accountType}/management`
       }
     case 400:
-      const errorMessage = getUserEmailErrorMessage(httpResponse)
+      const errorMessage = extractApiError(httpResponse)
       throw new Error(errorMessage).message
     case 403:
       throw new Errors.PermissionError().message
@@ -75,19 +90,4 @@ const parseHttpResponse = (httpResponse, accountType) => {
     default:
       throw new Errors.UnexpectedError().message
   }
-}
-
-/**
- * Returns the error message for the email field if it exists in the response
- * body, otherwise returns 'Invalid request'.
- *
- * @param {Object} httpResponse - The HTTP response object.
- *
- * @returns {String} The error message for the email field, or 'Invalid request'
- * if no error message is present.
- */
-const getUserEmailErrorMessage = (httpResponse) => {
-  const hasErrorInEmail = httpResponse.body.user && httpResponse.body.user.email
-  const errorMessage = hasErrorInEmail ? httpResponse.body.user.email[0] : 'Invalid request'
-  return errorMessage
 }
