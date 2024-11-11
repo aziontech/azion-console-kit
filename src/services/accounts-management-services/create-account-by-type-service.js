@@ -11,7 +11,7 @@ export const createAccountByTypeService = async (payload, accountType) => {
       account_type: accountType
     }
   })
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(httpResponse, accountType)
 }
 
 const adapt = (payload) => {
@@ -56,12 +56,12 @@ const adapt = (payload) => {
  * @throws {Error} If there is an error with the response.
  */
 
-const parseHttpResponse = (httpResponse) => {
+const parseHttpResponse = (httpResponse, accountType) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
         feedback: 'Account saved.',
-        urlToEditView: `/reseller/management`
+        urlToEditView: `/${accountType}/management`
       }
     case 400:
       const errorMessage = getUserEmailErrorMessage(httpResponse)

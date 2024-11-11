@@ -140,6 +140,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    v-if="!props.isEdit"
     title="Account Owner"
     description="Information about Account Owner"
   >
@@ -176,138 +177,142 @@
 </template>
 
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+import FormHorizontal from "@/templates/create-form-block/form-horizontal";
+import FieldText from "@/templates/form-fields-inputs/fieldText";
+import FieldDropdown from "@/templates/form-fields-inputs/fieldDropdown";
+import FieldSwitchBlock from "@/templates/form-fields-inputs/fieldSwitchBlock";
 
-  defineOptions({ name: 'form-fields-create-clients' })
+defineOptions({ name: "form-fields-create-clients" });
 
-  import { useToast } from 'primevue/usetoast'
-  import { useField } from 'vee-validate'
-  import { onMounted, ref, watch, computed } from 'vue'
+import { useToast } from "primevue/usetoast";
+import { useField } from "vee-validate";
+import { onMounted, ref, watch, computed } from "vue";
 
-  const props = defineProps({
-    listCountriesService: {
-      type: Function,
-      required: true
-    },
-    listRegionsService: {
-      type: Function,
-      required: true
-    },
-    listCitiesService: {
-      type: Function,
-      required: true
-    }
-  })
+const props = defineProps({
+  listCountriesService: {
+    type: Function,
+    required: true,
+  },
+  listRegionsService: {
+    type: Function,
+    required: true,
+  },
+  listCitiesService: {
+    type: Function,
+    required: true,
+  },
+  isEdit: {
+    type: Boolean,
+    required: true,
+  },
+});
 
-  const toast = useToast()
-  const showToast = (summary, severity) => {
-    const options = {
-      severity,
-      summary,
-      closable: true
-    }
+const toast = useToast();
+const showToast = (summary, severity) => {
+  const options = {
+    severity,
+    summary,
+    closable: true,
+  };
 
-    return toast.add(options)
+  return toast.add(options);
+};
+
+const countriesOptions = ref({ options: [], done: true });
+const regionsOptions = ref({ options: [], done: true });
+const citiesOptions = ref({ options: [], done: true });
+
+const { value: accountName } = useField("accountName");
+const { value: companyName } = useField("companyName");
+const { value: uniqueIdentifier } = useField("uniqueIdentifier");
+const { value: billingEmails } = useField("billingEmails");
+const { value: active } = useField("active");
+const { value: country } = useField("country");
+const { value: region } = useField("region");
+const { value: city } = useField("city");
+const { value: address } = useField("address");
+const { value: complement } = useField("complement");
+const { value: postalCode } = useField("postalCode");
+
+const setCountriesOptions = async () => {
+  countriesOptions.value.done = false;
+  try {
+    const response = await props.listCountriesService();
+    countriesOptions.value.options = response;
+  } catch (error) {
+    showToast(error, "error");
+  } finally {
+    countriesOptions.value.done = true;
   }
+};
 
-  const countriesOptions = ref({ options: [], done: true })
-  const regionsOptions = ref({ options: [], done: true })
-  const citiesOptions = ref({ options: [], done: true })
-
-  const { value: accountName } = useField('accountName')
-  const { value: companyName } = useField('companyName')
-  const { value: uniqueIdentifier } = useField('uniqueIdentifier')
-  const { value: billingEmails } = useField('billingEmails')
-  const { value: active } = useField('active')
-  const { value: country } = useField('country')
-  const { value: region } = useField('region')
-  const { value: city } = useField('city')
-  const { value: address } = useField('address')
-  const { value: complement } = useField('complement')
-  const { value: postalCode } = useField('postalCode')
-
-  const setCountriesOptions = async () => {
-    countriesOptions.value.done = false
-    try {
-      const response = await props.listCountriesService()
-      countriesOptions.value.options = response
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      countriesOptions.value.done = true
-    }
+const setRegionsOptions = async (countryId) => {
+  regionsOptions.value.done = false;
+  if (!countryId) {
+    return;
   }
-
-  const setRegionsOptions = async (countryId) => {
-    regionsOptions.value.done = false
-    if (!countryId) {
-      return
-    }
-    try {
-      const response = await props.listRegionsService(countryId)
-      regionsOptions.value.options = response
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      regionsOptions.value.done = true
-    }
+  try {
+    const response = await props.listRegionsService(countryId);
+    regionsOptions.value.options = response;
+  } catch (error) {
+    showToast(error, "error");
+  } finally {
+    regionsOptions.value.done = true;
   }
+};
 
-  const setCitiesOptions = async (regionId) => {
-    citiesOptions.value.done = false
-    if (!regionId) {
-      return
-    }
-    try {
-      const response = await props.listCitiesService(regionId)
-      citiesOptions.value.options = response
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      citiesOptions.value.done = true
-    }
+const setCitiesOptions = async (regionId) => {
+  citiesOptions.value.done = false;
+  if (!regionId) {
+    return;
   }
-
-  const resetRegionAndCity = () => {
-    region.value = ''
-    city.value = ''
+  try {
+    const response = await props.listCitiesService(regionId);
+    citiesOptions.value.options = response;
+  } catch (error) {
+    showToast(error, "error");
+  } finally {
+    citiesOptions.value.done = true;
   }
+};
 
-  watch(
-    [country, countriesOptions.value],
-    (value) => {
-      const countryId = value[0]
+const resetRegionAndCity = () => {
+  region.value = "";
+  city.value = "";
+};
 
-      if (countryId && countriesOptions.value.options.length) {
-        setRegionsOptions(countryId)
-      }
-    },
-    { deep: true }
-  )
+watch(
+  [country, countriesOptions.value],
+  (value) => {
+    const countryId = value[0];
 
-  watch(
-    [region, regionsOptions.value],
-    (value) => {
-      const regionId = value[0]
+    if (countryId && countriesOptions.value.options.length) {
+      setRegionsOptions(countryId);
+    }
+  },
+  { deep: true }
+);
 
-      if (regionId && regionsOptions.value.options.length) {
-        setCitiesOptions(regionId)
-      }
-    },
-    { deep: true }
-  )
+watch(
+  [region, regionsOptions.value],
+  (value) => {
+    const regionId = value[0];
 
-  const hasNoCountryListOrNotSelected = computed(
-    () => !countriesOptions.value.options.length || !country.value
-  )
-  const hasNoRegionListOrNotSelected = computed(
-    () => !citiesOptions.value.options.length || !region.value
-  )
+    if (regionId && regionsOptions.value.options.length) {
+      setCitiesOptions(regionId);
+    }
+  },
+  { deep: true }
+);
 
-  onMounted(() => {
-    setCountriesOptions()
-  })
+const hasNoCountryListOrNotSelected = computed(
+  () => !countriesOptions.value.options.length || !country.value
+);
+const hasNoRegionListOrNotSelected = computed(
+  () => !citiesOptions.value.options.length || !region.value
+);
+
+onMounted(() => {
+  setCountriesOptions();
+});
 </script>

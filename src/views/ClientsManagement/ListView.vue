@@ -10,8 +10,10 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         addButtonLabel="Client"
-        createPagePath="client/management/create"
+        createPagePath="management/create"
         emptyListMessage="No clients found."
+        editPagePath="management/edit"
+        enableEditClick
       />
 
       <EmptyResultsBlock
@@ -19,7 +21,7 @@
         title="No clients have been created"
         description="Click the button below to create your first client account."
         createButtonLabel="Client"
-        createPagePath="client/management/create"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />
