@@ -22,10 +22,7 @@ export const cloneEdgeFirewallService = async ({ edgeFirewallName, payload }) =>
 const adapt = (edgeFirewallName, payload) => {
   return {
     name: edgeFirewallName,
-    is_active: payload.isActive,
-    modules: payload.modules,
-    id: payload.id,
-    debug_rules: payload.debugRules
+    id: payload.id
   }
 }
 

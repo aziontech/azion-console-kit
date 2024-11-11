@@ -11,14 +11,11 @@
       </template>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5 flex gap-1 align-items-center"
-          >To confirm, type a unique and easy-to-remember name for the new Edge Firewall::</label
-        >
-        <InputText
-          id="name"
-          v-model="edgeFirewallName"
+        <FieldText
+          label="To confirm, type a unique and easy-to-remember name for the new Edge Firewall:"
+          name="edgeFirewallName"
+          :value="edgeFirewallName"
+          placeholder="Name"
         />
       </div>
 
@@ -56,9 +53,11 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+
   import { useRouter } from 'vue-router'
   import * as EdgeFirewallService from '@/services/edge-firewall-services/v4'
+  import * as yup from 'yup'
 
   defineOptions({ name: 'Clone-Dialog' })
 
@@ -68,8 +67,16 @@
   const toast = useToast()
   const edgeFirewall = dialogRef.value.data
   const loading = ref(false)
-  const edgeFirewallName = ref('')
   const router = useRouter()
+  import { useField, useForm } from 'vee-validate'
+
+  const validationSchema = yup.object({
+    edgeFirewallName: yup.string().required().label('Name')
+  })
+
+  const initialValues = {
+    edgeFirewallName: ''
+  }
 
   const showFeedback = (feedback = 'cloned successfully') => {
     const feedbackMessage = feedback
@@ -80,6 +87,13 @@
     })
   }
 
+  const { handleSubmit } = useForm({
+    initialValues,
+    validationSchema
+  })
+
+  const { value: edgeFirewallName } = useField('edgeFirewallName')
+
   const feedbackEdgeFirewallCloned = (response) => {
     showFeedback(response.feedback)
     router.push({ path: response.urlToEditView })
@@ -89,7 +103,7 @@
     return loading.value ? 'pi pi-spin pi-spinner' : ''
   })
 
-  const cloneEdgeFirewall = async () => {
+  const cloneEdgeFirewall = handleSubmit(async () => {
     try {
       loading.value = true
       const response = await EdgeFirewallService.cloneEdgeFirewallService({
@@ -108,7 +122,7 @@
       loading.value = false
       closeDialog()
     }
-  }
+  })
 
   const closeDialog = () => {
     dialogRef.value.close()

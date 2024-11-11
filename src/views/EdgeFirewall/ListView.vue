@@ -19,7 +19,7 @@
     'last_editor',
     'modules',
     'last_modified',
-    'is_active'
+    'active'
   ]
 
   const props = defineProps({
@@ -67,8 +67,8 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
+      sortField: 'active',
+      filterPath: 'active',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({

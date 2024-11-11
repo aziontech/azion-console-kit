@@ -5,14 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeFirewallMock: {
-    id: 10,
-    isActive: true,
-    debugRules: false,
-    modules: {
-      edge_functions_enabled: false,
-      network_protection_enabled: true,
-      waf_enabled: true
-    }
+    id: 10
   },
   edgeFirewallName: 'Cloned'
 }
@@ -40,10 +33,7 @@ describe('EdgeFirewallService', () => {
       url: `${version}/edge_firewall/firewalls/${fixtures.edgeFirewallMock.id}/clone`,
       body: {
         id: fixtures.edgeFirewallMock.id,
-        name: fixtures.edgeFirewallName,
-        is_active: fixtures.edgeFirewallMock.isActive,
-        debug_rules: fixtures.edgeFirewallMock.debugRules,
-        modules: fixtures.edgeFirewallMock.modules
+        name: fixtures.edgeFirewallName
       }
     })
   })
