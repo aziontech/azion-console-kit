@@ -40,9 +40,9 @@
       </div>
       <div class="w-full flex flex-col gap-2">
         <FieldSwitchBlock
-          data-testid="client-form__active-field"
-          nameField="active"
-          name="active"
+          data-testid="client-form__isActive-field"
+          nameField="isActive"
+          name="isActive"
           auto
           :isCard="false"
           title="Active"
@@ -226,7 +226,7 @@ const { value: accountName } = useField("accountName");
 const { value: companyName } = useField("companyName");
 const { value: uniqueIdentifier } = useField("uniqueIdentifier");
 const { value: billingEmails } = useField("billingEmails");
-const { value: active } = useField("active");
+const { value: isActive } = useField("isActive");
 const { value: country } = useField("country");
 const { value: region } = useField("region");
 const { value: city } = useField("city");

@@ -12,6 +12,8 @@
         addButtonLabel="Reseller"
         createPagePath="reseller/management/create"
         emptyListMessage="No reseller accounts found."
+        editPagePath="management/edit"
+        enableEditClick
       />
 
       <EmptyResultsBlock
@@ -19,7 +21,7 @@
         title="No resellers have been created"
         description="Click the button below to create your first reseller account."
         createButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />

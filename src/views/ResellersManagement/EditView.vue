@@ -13,7 +13,7 @@
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
-          <FormFieldsCreateClients
+          <FormFieldsCreateResellers
             :listCountriesService="listCountriesService"
             :listRegionsService="listRegionsService"
             :listCitiesService="listCitiesService"
@@ -38,7 +38,7 @@
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsCreateClients from './FormFields/FormFieldsCreateClients.vue'
+  import FormFieldsCreateResellers from './FormFields/FormFieldsCreateResellers.vue'
 
   import * as yup from 'yup'
   import { inject } from 'vue'
@@ -72,9 +72,8 @@
 
   const validationSchema = yup.object({
     accountName: yup.string().required().label('Account Name'),
-    companyName: yup.string().label('Company Name'),
+    companyName: yup.string().required().label('Company Name'),
     uniqueIdentifier: yup.string().label('Unique Identifier'),
-    billingEmails: yup.string().label('Billing Emails'),
     active: yup.boolean().required().default(false),
 
     country: yup.string().required().label('Country'),
@@ -82,13 +81,13 @@
     city: yup.string().required().label('City'),
     address: yup.string().required().label('Address'),
     complement: yup.string(),
-    postalCode: yup.string().required().label('Postal Code'),
+    postalCode: yup.string().required().label('Postal Code')
   })
 
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
-        productName: 'Clients Management'
+        productName: 'Resellers'
       })
       .track()
   }
@@ -96,7 +95,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Clients Management',
+        productName: 'Resellers',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message

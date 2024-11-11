@@ -37,7 +37,7 @@ export const clientManagementRoutes = {
             to: '/client/management'
           },
           {
-            label: 'Create Client Management',
+            label: 'Create Client',
             to: '/client/management/create'
           }
         ]
@@ -51,7 +51,6 @@ export const clientManagementRoutes = {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
         listCitiesService: AccountSettingsServices.listCitiesService,
-        createAccountByTypeService: AccountManagementServices.createAccountByTypeService,
         loadAccountService: AccountManagementServices.loadAccountService,
         editAccountService: AccountManagementServices.editAccountService
       },
@@ -62,11 +61,7 @@ export const clientManagementRoutes = {
             to: '/client/management'
           },
           {
-            label: 'Create Client Management',
-            to: '/client/management/create'
-          },
-          {
-            label: 'Edit Client Management'
+            label: 'Edit Client'
           }
         ]
       }
