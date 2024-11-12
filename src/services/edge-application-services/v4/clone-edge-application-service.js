@@ -15,10 +15,7 @@ export const cloneEdgeApplicationService = async ({ edgeApplicationName, payload
 const adapt = (payload, edgeApplicationName) => {
   return {
     id: payload.id,
-    name: edgeApplicationName,
-    modules: payload.modules,
-    active: payload.active,
-    debug: payload.debug
+    name: edgeApplicationName
   }
 }
 

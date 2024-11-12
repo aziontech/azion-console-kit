@@ -5,19 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeApplicationMock: {
-    id: 1700594990,
-    name: 'test',
-    last_editor: 'paulo.ferreira+teste1@azion.com',
-    last_modified: '2024-07-01T14:22:46.401053Z',
-    modules: {
-      edge_cache_enabled: true,
-      edge_functions_enabled: true,
-      application_accelerator_enabled: true,
-      image_processor_enabled: true,
-      tiered_cache_enabled: false
-    },
-    active: true,
-    debug: true
+    id: 1700594990
   },
   edgeApplicationName: 'test cloned'
 }
@@ -54,10 +42,7 @@ describe('EdgeApplicationServices', () => {
       method: 'POST',
       body: {
         id: fixtures.edgeApplicationMock.id,
-        name: fixtures.edgeApplicationName,
-        modules: fixtures.edgeApplicationMock.modules,
-        active: fixtures.edgeApplicationMock.active,
-        debug: fixtures.edgeApplicationMock.debug
+        name: fixtures.edgeApplicationName
       }
     })
   })

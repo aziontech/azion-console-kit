@@ -29,8 +29,6 @@ const adapt = (httpResponse) => {
       lastEditor: edgeApplication.last_editor,
       lastModify: dateFormat(edgeApplication.last_modified),
       lastModified: edgeApplication.last_modified,
-      modules: edgeApplication.modules,
-      debug: edgeApplication.debug,
       active: edgeApplication.active
     }
   })
