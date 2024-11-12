@@ -86,7 +86,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.mainSettingsTab).click()
     cy.get(selectors.edgeFirewall.cancelButton).click()
     cy.get(selectors.edgeFirewall.searchInput).clear()
-    cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.searchInput).type(`${firewallName}{enter}`)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })
