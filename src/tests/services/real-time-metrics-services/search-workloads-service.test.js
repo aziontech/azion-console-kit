@@ -36,7 +36,7 @@ describe('RealTimeMetricsServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/workspace/workloads?fields=id%2C+name&ordering=name&page=1&page_size=50000`,
+      url: `${version}/workspace/workloads?ordering=name&page=1&page_size=50000&fields=id%2C+name&search=`,
       method: 'GET'
     })
   })

@@ -53,8 +53,10 @@ describe('WafRulesServices', () => {
     const { sut } = makeSut()
     await sut({ wafId: 4040 })
 
+    const version = 'v4'
+
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge_firewall/wafs/4040/exceptions?page=1&page_size=200',
+      url: `${version}/edge_firewall/wafs/4040/exceptions?ordering=&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })

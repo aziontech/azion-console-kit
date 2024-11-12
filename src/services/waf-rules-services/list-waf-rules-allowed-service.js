@@ -1,9 +1,20 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 import { optionsRuleIds } from './ruleIdOptions'
-export const listWafRulesAllowedService = async ({ wafId }) => {
+import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+
+export const listWafRulesAllowedService = async ({
+  wafId,
+  fields = '',
+  search = '',
+  ordering = '',
+  page = 1,
+  pageSize = 10
+}) => {
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions?page=1&page_size=200`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -94,7 +105,10 @@ const adapt = (httpResponse) => {
       })
     : []
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: parsedWafRulesAllowed,
     statusCode: httpResponse.statusCode
   }
