@@ -2,19 +2,19 @@ import * as AccountSettingsServices from '@/services/account-settings-services'
 import * as AccountManagementServices from '@/services/accounts-management-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const resellerManagementRoutes = {
-  path: '/reseller/management',
-  name: 'reseller-management',
+export const clientManagementRoutes = {
+  path: '/client/management',
+  name: 'client-management',
   children: [
     {
       path: '',
-      name: 'list-reseller-management',
-      component: () => import('@views/ResellersManagement/ListView.vue'),
+      name: 'list-client-management',
+      component: () => import('@views/ClientsManagement/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Client Management',
+            to: '/client/management'
           }
         ]
       },
@@ -22,8 +22,8 @@ export const resellerManagementRoutes = {
     },
     {
       path: 'create',
-      name: 'create-reseller',
-      component: () => import('@views/ResellersManagement/CreateView.vue'),
+      name: 'create-client',
+      component: () => import('@views/ClientsManagement/CreateView.vue'),
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
@@ -33,20 +33,20 @@ export const resellerManagementRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Client Management',
+            to: '/client/management'
           },
           {
-            label: 'Create Reseller',
-            to: '/reseller/management/create'
+            label: 'Create Client',
+            to: '/client/management/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edit-reseller',
-      component: () => import('@views/ResellersManagement/EditView.vue'),
+      name: 'edit-client',
+      component: () => import('@views/ClientsManagement/EditView.vue'),
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
@@ -57,11 +57,11 @@ export const resellerManagementRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Client Management',
+            to: '/client/management'
           },
           {
-            label: 'Edit Reseller'
+            label: 'Edit Client'
           }
         ]
       }

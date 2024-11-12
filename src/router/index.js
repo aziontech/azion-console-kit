@@ -13,7 +13,6 @@ import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
-import { resellerManagementRoutes } from '@routes/reseller-management-routes'
 import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { errorRoutes } from '@routes/error-routes'
@@ -45,8 +44,10 @@ import beforeEachRoute from './hooks/beforeEachRoute'
 import { useAccountStore } from '@/stores/account'
 import { identityProvidersRoutes } from '@routes/identity-providers-routes'
 import { loadContractServicePlan } from '@/services/contract-services'
-import { groupManagementRoutes } from '@routes/group-management-routes'
-import { clientManagementRoutes } from '@routes/client-management-routes'
+import { resellerManagementRoutes } from '@routes/reseller-management-routes'
+import { groupsManagementRoutes } from '@routes/groups-management-routes'
+import { clientManagementRoutes } from '@routes/clients-management-routes'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -89,7 +90,7 @@ const router = createRouter({
     azionAiRoutes,
     compareWithAzionRoutes,
     resellerManagementRoutes,
-    groupManagementRoutes,
+    groupsManagementRoutes,
     clientManagementRoutes
   ].concat(errorRoutes)
 })
