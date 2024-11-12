@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
+import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
 import * as EdgeApplicationServices from '@/services/edge-application-services'
 
@@ -13,7 +14,7 @@ export const domainsRoutes = {
       name: 'list-domains',
       component: () => import('@views/Domains/ListView.vue'),
       props: {
-        listDomainsService: DomainServices.listDomainsService,
+        listDomainsService: DomainServicesV4.listDomainsService,
         deleteDomainService: DomainServices.deleteDomainService,
         documentationService: Helpers.documentationCatalog.domains,
         clipboardWrite: Helpers.clipboardWrite

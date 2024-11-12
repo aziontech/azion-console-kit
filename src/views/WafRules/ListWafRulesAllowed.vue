@@ -1,5 +1,5 @@
 <template>
-  <ListTableBlock
+  <FetchListTableBlock
     ref="listAllowedRef"
     v-if="hasContentToList"
     addButtonLabel="Allowed Rule"
@@ -10,6 +10,7 @@
     emptyListMessage="No allowed rules found."
     isTabs
     :actions="actions"
+    :apiFields="ALLOWED_RULES_API_FIELDS"
   >
     <template #addButton>
       <PrimeButton
@@ -19,7 +20,7 @@
         data-testid="create_Allowed Rule_button"
       />
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
 
   <EmptyResultsBlock
     v-else
@@ -92,7 +93,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import ListTableBlock from '@templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PrimeButton from 'primevue/button'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
@@ -108,6 +109,15 @@
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
+  const ALLOWED_RULES_API_FIELDS = [
+    'id',
+    'last_modified',
+    'rule_id',
+    'description',
+    'path',
+    'match_zones',
+    'active'
+  ]
 
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
@@ -275,8 +285,8 @@
   const goToWafRulesTuning = () => {
     emit('handle-go-to-tuning', { index: 1 })
   }
-  const handleListWafRulesAllowedService = async () => {
-    return await props.listWafRulesAllowedService({ wafId: wafRuleId.value })
+  const handleListWafRulesAllowedService = async (query) => {
+    return await props.listWafRulesAllowedService({ wafId: wafRuleId.value, ...query })
   }
 
   const handleDeleteWafRulesAllowedService = async (id) => {
