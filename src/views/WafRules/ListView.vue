@@ -43,6 +43,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import CloneDialog from './Dialog/Clone.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -65,7 +66,19 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      type: 'dialog',
+      label: 'Clone',
+      icon: 'pi pi-fw pi-clone',
+      dialog: {
+        component: CloneDialog,
+        body: (item) => ({
+          data: item
+        })
+      }
+    },
+    {
       type: 'delete',
+      label: 'Delete',
       title: 'WAF rule',
       icon: 'pi pi-trash',
       service: props.deleteWafRulesService
