@@ -12,6 +12,7 @@ import { loadPaymentMethodDefaultService } from './load-payment-method-default-s
 import { listServiceAndProductsChangesService } from './list-service-and-products-changes'
 import { loadInvoiceLastUpdatedService } from './load-invoice-last-updated-service'
 import { getStripeClientService } from './get-stripe-client-service'
+import { listServiceAndProductsChangesAccountingService } from './list-service-and-products-changes-accounting-service'
 
 export {
   listPaymentMethodsService,
@@ -27,5 +28,6 @@ export {
   loadPaymentMethodDefaultService,
   listServiceAndProductsChangesService,
   loadInvoiceLastUpdatedService,
-  getStripeClientService
+  getStripeClientService,
+  listServiceAndProductsChangesAccountingService
 }

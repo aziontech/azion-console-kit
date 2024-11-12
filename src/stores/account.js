@@ -80,7 +80,8 @@ export const useAccountStore = defineStore({
         state.accountStatuses.BLOCKED,
         state.accountStatuses.DEFAULTING,
         state.accountStatuses.TRIAL,
-        state.accountStatuses.ONLINE
+        state.accountStatuses.ONLINE,
+        state.accountStatuses.REGULAR
       ].includes(state.account?.status)
     },
     paymentReviewPending(state) {
@@ -91,6 +92,9 @@ export const useAccountStore = defineStore({
     hasAccessToMarketplaceProducts(state) {
       const { flags, account } = state
       return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
+    },
+    accountIsNotRegular(state) {
+      return state.account?.status !== state.accountStatuses.REGULAR
     }
   },
   actions: {

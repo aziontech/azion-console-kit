@@ -15,7 +15,7 @@
                 outlined
                 size="small"
                 label="Export"
-                :disabled="invoiceData.temporaryBill"
+                :disabled="invoiceData?.temporaryBill || !accountIsNotRegular"
               />
             </div>
             <div class="flex justify-between mt-4">
@@ -37,7 +37,16 @@
                 width="10rem"
                 class="flex gap-3 items-center"
               >
-                <span class="font-medium text-color text-sm">{{ invoiceData.billDetailId }}</span>
+                <span
+                  class="font-medium text-color text-sm"
+                  v-if="accountIsNotRegular"
+                  >{{ invoiceData?.billDetailId }}</span
+                >
+                <span
+                  class="font-medium text-color text-sm"
+                  v-else
+                  >{{ invoiceData?.billId }}</span
+                >
                 <PrimeButton
                   icon="pi pi-copy"
                   outlined
@@ -46,7 +55,10 @@
                 />
               </SkeletonBlock>
             </div>
-            <div class="flex justify-between">
+            <div
+              class="flex justify-between"
+              v-if="accountIsNotRegular"
+            >
               <span class="text-color-secondary text-sm">Payment Method</span>
               <SkeletonBlock
                 :isLoaded="isCardDefaultLoaded"
@@ -72,30 +84,39 @@
                 :isLoaded="isInvoiceDataLoaded"
                 class="font-medium text-color text-sm"
               >
-                {{ invoiceData.billingPeriod }}
+                {{ invoiceData?.billingPeriod }}
               </SkeletonBlock>
             </div>
-            <div class="flex justify-between">
+            <div
+              class="flex justify-between"
+              v-if="accountIsNotRegular"
+            >
               <span class="text-color-secondary text-sm">Products Charges</span>
               <SkeletonBlock
                 :isLoaded="isInvoiceDataLoaded"
                 class="text-color text-sm"
               >
-                {{ invoiceData.productChanges }}
+                {{ invoiceData?.productChanges }}
               </SkeletonBlock>
             </div>
-            <div class="flex justify-between">
+            <div
+              class="flex justify-between"
+              v-if="accountIsNotRegular"
+            >
               <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
               <SkeletonBlock
                 :isLoaded="isInvoiceDataLoaded"
                 class="text-color text-sm"
               >
-                {{ invoiceData.servicePlan }}
+                {{ invoiceData?.servicePlan }}
               </SkeletonBlock>
             </div>
           </div>
 
-          <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
+          <div
+            class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border"
+            v-if="accountIsNotRegular"
+          >
             <div class="flex justify-between">
               <span class="text-color-secondary text-sm">Credit Used for Payment</span>
               <SkeletonBlock
@@ -103,7 +124,7 @@
                 class="text-color"
               >
                 <span class="text-color-secondary text-sm">$</span>
-                {{ invoiceData.creditUsedForPayment }}
+                {{ invoiceData?.creditUsedForPayment }}
               </SkeletonBlock>
             </div>
             <div class="flex justify-between">
@@ -119,7 +140,7 @@
               >
                 <span class="text-sm">$</span>
                 <span class="text-2xl">
-                  {{ invoiceData.total }}
+                  {{ invoiceData?.total }}
                 </span>
               </SkeletonBlock>
             </div>
@@ -134,12 +155,15 @@
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
   import ContentBlock from '@/templates/content-block'
   import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
+  import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -162,6 +186,9 @@
 
   const route = useRoute()
   const toast = useToast()
+  const accountStore = useAccountStore()
+
+  const { accountIsNotRegular } = storeToRefs(accountStore)
 
   const invoiceData = ref({})
   const cardDefault = ref({})
@@ -188,9 +215,9 @@
 
   const listServiceAndProductsChanges = async () => {
     try {
-      listServiceProducts.value = await props.listServiceAndProductsChangesService(
-        route.params.billId
-      )
+      listServiceProducts.value = accountIsNotRegular.value
+        ? await props.listServiceAndProductsChangesService(route.params.billId)
+        : await listServiceAndProductsChangesAccountingService(route.params.billId)
     } catch {
       listServiceProducts.value = []
     }

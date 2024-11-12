@@ -14,15 +14,20 @@
 
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
 
   const route = useRoute()
   const router = useRouter()
+  const accountStore = useAccountStore()
+
+  const { paymentReviewPending, accountIsNotRegular } = storeToRefs(accountStore)
+
   const activeTab = ref(0)
   const drawerAddCreditRef = ref(null)
   const drawerPaymentMethodRef = ref(null)
   const listPaymentMethodsRef = ref(null)
   const viewBillsRef = ref(null)
-  const accountBlocked = useAccountStore().paymentReviewPending
+  const accountBlocked = paymentReviewPending
 
   provide('drawersMethods', {
     openDrawerPaymentMethod: () => {
@@ -112,7 +117,9 @@
   const loadInvoiceLastUpdated = async () => {
     try {
       loadingLastUpdated.value = true
-      invoiceLastUpdated.value = await props.billsServices.loadInvoiceLastUpdatedService()
+      invoiceLastUpdated.value = accountIsNotRegular.value
+        ? await props.billsServices.loadInvoiceLastUpdatedService()
+        : ''
     } finally {
       loadingLastUpdated.value = false
     }
@@ -139,6 +146,7 @@
           <SkeletonBlock
             width="10rem"
             :isLoaded="!loadingLastUpdated"
+            v-if="invoiceLastUpdated"
           >
             <Tag
               severity="info"
@@ -186,6 +194,7 @@
           />
         </TabPanel>
         <TabPanel
+          v-if="accountIsNotRegular"
           header="Payment Methods"
           :pt="{
             headerAction: {

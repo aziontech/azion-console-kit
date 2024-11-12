@@ -316,6 +316,8 @@
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"
               name="httpsPort"
+              filter
+              autoFilterFocus
               optionLabel="name"
               display="chip"
               :class="{ 'p-invalid': httpsPortError }"

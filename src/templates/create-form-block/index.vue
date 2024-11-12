@@ -94,7 +94,7 @@
     emit('on-response', response)
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
-    redirectToUrl(response.urlToEditView)
+    redirectToUrl(response?.urlToEditView)
   }
 
   const onSubmit = handleSubmit(

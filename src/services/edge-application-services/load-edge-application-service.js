@@ -15,6 +15,7 @@ const adapt = (httpResponse) => {
   const body = httpResponse.body.results
   const httpPorts = []
   const httpsPorts = []
+
   body.http_port.forEach((port) => {
     httpPorts.push(HTTP_PORT_LIST_OPTIONS.find((el) => el.value == port))
   })
@@ -66,5 +67,11 @@ const HTTPS_PORT_LIST_OPTIONS = [
   { name: '9440', value: '9440' },
   { name: '9441', value: '9441' },
   { name: '9442', value: '9442' },
-  { name: '9443', value: '9443' }
+  { name: '9443', value: '9443' },
+  { name: '7777', value: '7777' },
+  { name: '8888', value: '8888' },
+  { name: '9553', value: '9553' },
+  { name: '9653', value: '9653' },
+  { name: '8035', value: '8035' },
+  { name: '8090', value: '8090' }
 ]

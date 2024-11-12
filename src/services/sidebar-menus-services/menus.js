@@ -151,7 +151,7 @@ function createMarketplaceProductsItems() {
     {
       label: 'Bot Manager',
       icon: 'pi pi-wrench',
-      to: 'https://portal.radwarebotmanager.com/account/login',
+      to: 'https://radware.eu.auth0.com/authorize?client_id=KnZSRL3CSoahL0ymcqfwsmt55EHxXxgS&response_type=code&connection=caixa-sso&prompt=login&scope=openid%20profile&redirect_uri=https://console.radwarecloud.com?connection=caixa-sso',
       id: 'bot-manager',
       external: true
     },

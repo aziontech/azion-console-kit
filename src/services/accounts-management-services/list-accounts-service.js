@@ -7,10 +7,9 @@ export const listAccountsService = async ({
   search = '',
   account_type = '',
   page = 1,
-  pageSize = 10,
-  fields = ''
+  pageSize = 10
 }) => {
-  const searchParams = makeListServiceQueryParams({ ordering, page, pageSize, search, fields })
+  const searchParams = makeListServiceQueryParams({ ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountsManagementBaseUrl()}?account_type=${account_type}&${searchParams.toString()}`,
     method: 'GET'
