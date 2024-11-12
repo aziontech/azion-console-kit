@@ -8,6 +8,10 @@ const parsedBehavior = [
     target: 'add request cookie'
   },
   {
+    name: 'set_origin',
+    originId: '157432'
+  },
+  {
     name: 'capture_match_groups',
     captured_array: 'capture_array',
     subject: 'test',
@@ -33,6 +37,10 @@ const fixtures = {
     phase: { content: 'request' },
     behaviors: [
       { name: 'add_request_cookie', target: 'add request cookie' },
+      {
+        name: 'set_origin',
+        target: 157432
+      },
       {
         name: 'capture_match_groups',
         target: {
