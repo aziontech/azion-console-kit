@@ -5,28 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   wafRulesMock: {
-    id: 4099,
-    active: {
-      content: 'Active'
-    },
-    threatsConfigurationWithoutFormat: {
-      cross_site_scripting: true,
-      cross_site_scripting_sensitivity: 'medium',
-      directory_traversal: true,
-      directory_traversal_sensitivity: 'medium',
-      evading_tricks: true,
-      evading_tricks_sensitivity: 'medium',
-      file_upload: true,
-      file_upload_sensitivity: 'medium',
-      identified_attack: true,
-      identified_attack_sensitivity: 'medium',
-      remote_file_inclusion: true,
-      remote_file_inclusion_sensitivity: 'medium',
-      sql_injection: true,
-      sql_injection_sensitivity: 'medium',
-      unwanted_access: true,
-      unwanted_access_sensitivity: 'medium'
-    }
+    id: 4099
   },
   wafRulesName: 'Cloned'
 }
@@ -55,8 +34,6 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         name: fixtures.wafRulesName,
-        active: true,
-        threats_configuration: fixtures.wafRulesMock.threatsConfigurationWithoutFormat,
         id: fixtures.wafRulesMock.id
       }
     })

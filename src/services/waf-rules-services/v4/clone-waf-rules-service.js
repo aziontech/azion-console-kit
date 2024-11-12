@@ -13,13 +13,9 @@ export const cloneWafRulesService = async ({ wafRulesName, payload }) => {
 }
 
 const adapt = (payload, wafRulesName) => {
-  const isActive = payload.active.content === 'Active'
-
   return {
     id: payload.id,
-    name: wafRulesName,
-    active: isActive,
-    threats_configuration: payload.threatsConfigurationWithoutFormat
+    name: wafRulesName
   }
 }
 

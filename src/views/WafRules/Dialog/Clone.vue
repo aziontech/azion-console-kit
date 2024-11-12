@@ -11,14 +11,11 @@
       </template>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5 flex gap-1 align-items-center"
-          >To confirm, type a unique and easy-to-remember name for the new Waf Rules:</label
-        >
-        <InputText
-          id="name"
-          v-model="wafRulesName"
+        <FieldText
+          label="To confirm, type a unique and easy-to-remember name for the new Waf:"
+          name="wafRulesName"
+          :value="wafRulesName"
+          placeholder="Name"
         />
       </div>
 
@@ -56,9 +53,11 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
   import { useRouter } from 'vue-router'
   import * as WafRulesService from '@/services/waf-rules-services/v4'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import * as yup from 'yup'
+  import { useField, useForm } from 'vee-validate'
 
   defineOptions({ name: 'Clone-Dialog' })
 
@@ -68,8 +67,14 @@
   const toast = useToast()
   const wafRules = dialogRef.value.data
   const loading = ref(false)
-  const wafRulesName = ref('')
   const router = useRouter()
+
+  const validationSchema = yup.object({
+    wafRulesName: yup.string().required().label('Name')
+  })
+  const initialValues = {
+    wafRulesName: ''
+  }
 
   const showFeedback = (feedback = 'cloned successfully') => {
     const feedbackMessage = feedback
@@ -89,7 +94,14 @@
     return loading.value ? 'pi pi-spin pi-spinner' : ''
   })
 
-  const cloneWafRules = async () => {
+  const { handleSubmit } = useForm({
+    initialValues,
+    validationSchema
+  })
+
+  const { value: wafRulesName } = useField('wafRulesName')
+
+  const cloneWafRules = handleSubmit(async () => {
     try {
       loading.value = true
       const response = await WafRulesService.cloneWafRulesService({
@@ -108,7 +120,7 @@
       loading.value = false
       closeDialog()
     }
-  }
+  })
 
   const closeDialog = () => {
     dialogRef.value.close()
