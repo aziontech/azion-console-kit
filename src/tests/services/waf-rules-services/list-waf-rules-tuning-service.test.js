@@ -64,14 +64,14 @@ describe('WafRulesService', () => {
     expect(result).toEqual([
       {
         hitCount: fixtures.wafRulesMock.hit_count,
-        topIps: '100.100.10',
+        topIps: fixtures?.wafRulesMock?.top_10_ips?.[0]?.[1] || '',
         ruleId: fixtures.wafRulesMock.rule_id,
         id: fixtures.wafRulesMock.rule_id,
         ruleIdDescription: `${fixtures.wafRulesMock.rule_id} - ${fixtures.wafRulesMock.rule_description}`,
         ipCount: fixtures.wafRulesMock.ip_count,
         matchZone: fixtures.wafRulesMock.match_zone,
         pathCount: fixtures.wafRulesMock.path_count,
-        topCountries: 'Brazil',
+        topCountries: fixtures?.wafRulesMock?.top_10_countries?.[0]?.[1] || '',
         matchesOn: fixtures.wafRulesMock.matches_on,
         ruleDescription: fixtures.wafRulesMock.rule_description,
         countryCount: fixtures.wafRulesMock.country_count

@@ -16,6 +16,7 @@ export const FIELDS_MAPPING = {
   FloatRange: h(floatRangeFilter),
   ArrayObject: h(multiselectFilter),
   Boolean: h(selectFilter),
+  StringObject: h(selectFilter),
   ArrayString: h(chipsFilter),
   GenericScalar: h(textFilter)
 }

@@ -22,7 +22,7 @@
 
   const formattedValue = (filter) => {
     let newFilter = { ...filter }
-    if (filter?.type === 'Boolean')
+    if (['Boolean', 'StringObject'].includes(filter?.type))
       newFilter = { ...filter, value: filter?.value?.label.toLowerCase() }
 
     const isEmptyString = !newFilter?.value && newFilter?.type === 'String'

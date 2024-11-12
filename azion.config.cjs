@@ -244,6 +244,19 @@ const backRules = [
     }
   },
   {
+    name: 'Route GraphQL Accounting Queries to Manager Origin',
+    description: 'Routes GraphQL Accounting queries to the Manager, updating the URI accordingly',
+    match: '^/graphql/accounting',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      rewrite: '/accounting/graphql'
+    }
+  },
+  {
     name: 'Route Send Feedback',
     description: 'this route will send user feedback to jira',
     match: '^/api/webhook/console_feedback',
@@ -254,6 +267,24 @@ const backRules = [
         type: 'single_origin'
       },
       rewrite: '/webhook/console_feedback'
+    }
+  },
+  {
+    name: 'Route API Identity Providers',
+    description: 'Routes API requests for identity providers',
+    match: '^/api/iam',
+    behavior: {
+      forwardCookies: true,
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      capture: {
+        match: '/api/iam/(.*)',
+        captured: 'captured',
+        subject: 'request_uri'
+      },
+      rewrite: `/iam/api/%{captured[1]}`
     }
   }
 ]
@@ -295,14 +326,14 @@ const AzionConfig = {
         type: 'single_origin',
         hostHeader: `api.azion.com`,
         addresses: [`api.azion.com`]
-      },
+      }
     ]),
     {
       name: 'origin-console-feedback',
       type: 'single_origin',
       hostHeader: `automate.azion.net`,
       addresses: [`automate.azion.net`]
-    },
+    }
   ],
   rules: {
     request: [...commonRules, ...frontRules, ...backRules],

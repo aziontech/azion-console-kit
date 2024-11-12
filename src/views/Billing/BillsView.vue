@@ -13,6 +13,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
+            :disabled="currentInvoice.billId"
           />
         </div>
         <div class="flex justify-between mt-4">
@@ -25,7 +26,10 @@
             {{ currentInvoice.billingPeriod }}
           </SkeletonBlock>
         </div>
-        <div class="flex justify-between">
+        <div
+          class="flex justify-between"
+          v-if="accountIsNotRegular"
+        >
           <span class="text-color-secondary text-sm">Product Charges</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
@@ -34,7 +38,10 @@
             {{ currentInvoice.productChanges }}
           </SkeletonBlock>
         </div>
-        <div class="flex justify-between">
+        <div
+          class="flex justify-between"
+          v-if="accountIsNotRegular"
+        >
           <span class="text-color-secondary text-sm">Professional Services Plan Charges</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
@@ -45,7 +52,10 @@
         </div>
       </div>
 
-      <div class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border">
+      <div
+        class="p-3 md:p-6 flex flex-col gap-4 border-t surface-border"
+        v-if="accountIsNotRegular"
+      >
         <div class="flex justify-between">
           <span class="text-color-secondary text-sm">Credit Used for Payment</span>
           <SkeletonBlock
@@ -113,7 +123,10 @@
             {{ yourServicePlan.paymentDate }}
           </SkeletonBlock>
         </div>
-        <div class="flex justify-between">
+        <div
+          class="flex justify-between"
+          v-if="accountIsNotRegular"
+        >
           <span class="text-color-secondary text-sm">Payment Method</span>
           <SkeletonBlock
             class="font-medium text-color text-sm"
@@ -133,7 +146,10 @@
           </SkeletonBlock>
         </div>
 
-        <div class="flex justify-between">
+        <div
+          class="flex justify-between"
+          v-if="accountIsNotRegular"
+        >
           <span class="text-color-secondary text-sm">Payment Currency</span>
           <SkeletonBlock
             :isLoaded="isYourServicePlanLoaded"
@@ -144,7 +160,10 @@
           </SkeletonBlock>
         </div>
 
-        <div class="flex justify-between">
+        <div
+          class="flex justify-between"
+          v-if="accountIsNotRegular"
+        >
           <span class="text-color-secondary text-sm">Credit Balance</span>
           <SkeletonBlock
             :isLoaded="isYourServicePlanLoaded"
@@ -157,7 +176,10 @@
         </div>
       </div>
 
-      <div class="p-3 md:p-6 border-t surface-border flex flex-col gap-4">
+      <div
+        class="p-3 md:p-6 border-t surface-border flex flex-col gap-4"
+        v-if="accountIsNotRegular"
+      >
         <p class="text-sm text-color-secondary">
           This invoice includes all consumption up to the last day of the month. Change
           <span
@@ -186,7 +208,7 @@
     ref="listPaymentHistoryRef"
     isTabs
     :enableEditClick="false"
-    :columns="paymentsColumns"
+    :columns="loaderPaymentHistoryColumns"
     :listService="props.listPaymentHistoryService"
     @on-load-data="handleLoadData"
     @on-before-go-to-edit="goToEnvoiceDetails"
@@ -233,6 +255,7 @@
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
   import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
 
   import { ref, computed, onMounted, inject } from 'vue'
 
@@ -241,8 +264,11 @@
   const yourServicePlan = ref({})
   const servicePlan = ref(null)
   const emit = defineEmits(['changeTab'])
-  const user = useAccountStore().accountData
+  const accountStore = useAccountStore()
 
+  const { accountData, accountIsNotRegular } = storeToRefs(accountStore)
+
+  const user = accountData
   const drawersMethods = inject('drawersMethods')
 
   const props = defineProps({
@@ -289,55 +315,6 @@
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
   const listPaymentHistoryRef = ref('')
-
-  const paymentsColumns = ref([
-    {
-      field: 'paymentDate',
-      header: 'Payment Date'
-    },
-    {
-      field: 'invoiceNumber',
-      header: 'Invoice ID',
-      filterPath: 'invoiceNumber.content',
-      sortField: 'invoiceNumber.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'text-full-with-clipboard',
-          dependencies: {
-            copyContentService: props.clipboardWrite
-          }
-        })
-      }
-    },
-    {
-      field: 'paymentMethod',
-      header: 'Payment Method',
-      filterPath: 'paymentMethod.value',
-      sortField: 'paymentMethod.value',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'credit-card-column' })
-    },
-    {
-      field: 'amount',
-      header: 'Amount'
-    },
-    {
-      field: 'status',
-      header: 'Status',
-      type: 'component',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      }
-    }
-  ])
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -391,7 +368,9 @@
   const getYourServicePlan = async () => {
     isYourServicePlanLoaded.value = false
     try {
-      yourServicePlan.value = await props.loadYourServicePlanService(user.disclaimer)
+      yourServicePlan.value = accountIsNotRegular.value
+        ? await props.loadYourServicePlanService(user.value.disclaimer)
+        : {}
     } finally {
       isYourServicePlanLoaded.value = true
     }
@@ -399,7 +378,7 @@
 
   const getLoadContractService = async () => {
     const { yourServicePlan } = await props.loadContractServicePlan({
-      clientId: user.client_id
+      clientId: user.value.client_id
     })
     servicePlan.value = `${yourServicePlan} Plan`
   }
@@ -412,7 +391,7 @@
     await Promise.all([getLoadContractService(), getYourServicePlan()])
   }
 
-  const isTrail = computed(() => user.status === 'TRIAL')
+  const isTrail = computed(() => user.value.status === 'TRIAL')
 
   const reloadList = () => {
     if (hasContentToList.value) {
@@ -421,6 +400,82 @@
     }
     hasContentToList.value = true
   }
+
+  const loaderPaymentHistoryColumns = computed(() => {
+    if (accountIsNotRegular.value) {
+      return [
+        {
+          field: 'paymentDate',
+          header: 'Payment Date'
+        },
+        {
+          field: 'invoiceNumber',
+          header: 'Invoice ID',
+          filterPath: 'invoiceNumber.content',
+          sortField: 'invoiceNumber.content',
+          type: 'component',
+          component: (columnData) => {
+            return columnBuilder({
+              data: columnData,
+              columnAppearance: 'text-full-with-clipboard',
+              dependencies: {
+                copyContentService: props.clipboardWrite
+              }
+            })
+          }
+        },
+        {
+          field: 'paymentMethod',
+          header: 'Payment Method',
+          filterPath: 'paymentMethod.value',
+          sortField: 'paymentMethod.value',
+          type: 'component',
+          component: (columnData) =>
+            columnBuilder({ data: columnData, columnAppearance: 'credit-card-column' })
+        },
+        {
+          field: 'amount',
+          header: 'Amount'
+        },
+        {
+          field: 'status',
+          header: 'Status',
+          type: 'component',
+          sortField: 'status.content',
+          filterPath: 'status.content',
+          component: (columnData) => {
+            return columnBuilder({
+              data: columnData,
+              columnAppearance: 'tag'
+            })
+          }
+        }
+      ]
+    }
+
+    return [
+      {
+        field: 'paymentDate',
+        header: 'Payment Date'
+      },
+      {
+        field: 'invoiceNumber',
+        header: 'Invoice ID',
+        filterPath: 'invoiceNumber.content',
+        sortField: 'invoiceNumber.content',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-full-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
+      }
+    ]
+  })
 
   onMounted(async () => {
     getAllInfos()

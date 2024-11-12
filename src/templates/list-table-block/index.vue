@@ -15,7 +15,7 @@
       :value="data"
       dataKey="id"
       @row-click="editItemSelected"
-      rowHover
+      :rowHover="!disabledList"
       v-model:filters="filters"
       :paginator="true"
       :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -69,6 +69,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -94,13 +95,13 @@
       />
 
       <Column
-        sortable
+        :sortable="!col.disabledSort"
         v-for="col of selectedColumns"
         :key="col.field"
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        class="hover:cursor-pointer"
+        :class="{ 'hover:cursor-pointer': !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -229,6 +230,7 @@
 
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -262,6 +264,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledList"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
@@ -273,7 +276,7 @@
         </slot>
       </template>
       <Column
-        sortable
+        :sortable="!col.disabledSort"
         v-for="col of columns"
         :key="col.field"
         :field="col.field"
@@ -317,6 +320,9 @@
   ])
 
   const props = defineProps({
+    disabledList: {
+      type: Boolean
+    },
     hiddenHeader: {
       type: Boolean
     },
@@ -352,6 +358,10 @@
     enableEditClick: {
       type: Boolean,
       default: true
+    },
+    enableEditCustomRedirect: {
+      type: Boolean,
+      default: false
     },
     reorderableRows: {
       type: Boolean
@@ -552,8 +562,11 @@
 
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
+
     if (props.editInDrawer) {
       props.editInDrawer(item)
+    } else if (props.enableEditCustomRedirect) {
+      emit('on-row-click-edit-redirect', item)
     } else if (props.enableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
@@ -576,7 +589,7 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+  defineExpose({ reload, handleExportTableDataToCSV, data })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]

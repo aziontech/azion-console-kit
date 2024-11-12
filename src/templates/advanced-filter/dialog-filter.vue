@@ -169,7 +169,8 @@
         type: operatorSelected.type
       }
 
-      if (filterSelected.operator[0].value.type === 'Boolean') {
+      const operatorType = filterSelected.operator[0].value.type
+      if (['Boolean', 'StringObject'].includes(operatorType)) {
         data.value = selectedValue
       } else {
         data.value = selectedValue ?? { begin, end }

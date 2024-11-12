@@ -56,6 +56,7 @@
                 data-testid="data-table-search-input"
                 placeholder="Search"
                 @keyup.enter="fetchOnSearch"
+                @input="handleSearchValue(false)"
               />
             </span>
 
@@ -100,13 +101,13 @@
       />
 
       <Column
-        sortable
+        :sortable="!col.disableSort"
         v-for="col of selectedColumns"
         :key="col.field"
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        class="hover:cursor-pointer"
+        :class="{ 'hover:cursor-pointer': !col.disableSort }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -232,7 +233,6 @@
         </slot>
       </template>
     </DataTable>
-
     <DataTable
       v-else
       :value="Array(10)"
@@ -293,7 +293,6 @@
     </DataTable>
   </div>
 </template>
-
 <script setup>
   import { FilterMatchMode } from 'primevue/api'
   import PrimeButton from 'primevue/button'
@@ -407,9 +406,7 @@
       default: () => 'id'
     }
   })
-
   const tableDefinitions = useTableDefinitionsStore()
-
   const itemsByPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
@@ -431,12 +428,10 @@
 
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
-
   const totalRecords = ref()
   const firstItemIndex = ref(1)
   const savedSearch = ref('')
   const savedOrdering = ref('')
-
   const firstLoadData = ref(true)
 
   const selectedItems = computed({
@@ -484,7 +479,6 @@
       data.value = event.value
       await props.onReorderService(tableData)
       reload()
-
       toast.add({
         closable: true,
         severity: 'success',
@@ -536,22 +530,18 @@
         }
       }
     }
-
     const actions = props.actions
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
-
     return actions
   }
-
   const loadData = async ({ page, ...query }) => {
     if (props.listService) {
       try {
         isLoading.value = true
-        const { count = null, body = 0 } = props.isGraphql
+        const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
-
         data.value = body
         totalRecords.value = count
       } catch (error) {
@@ -572,12 +562,10 @@
       }
     }
   }
-
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
-
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -585,7 +573,6 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
-
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
@@ -594,12 +581,10 @@
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
-
   const executeCommand = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     firstAction?.command()
   }
-
   const optionsOneAction = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     return {
@@ -607,7 +592,6 @@
       disabled: firstAction?.disabled
     }
   }
-
   const reload = async (query = {}) => {
     loadData({
       page: 1,
@@ -632,7 +616,6 @@
       }
     }
   }
-
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
@@ -660,11 +643,16 @@
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
-
   const fetchOnSearch = () => {
-    const search = filters.value.global.value
+    handleSearchValue(true)
+    reload()
+  }
 
-    savedSearch.value = search
-    reload({ search: search })
+  const handleSearchValue = (shouldChangeSearchValue = false) => {
+    const search = filters.value.global.value
+    const hasValueInSearch = !!search.length
+    if (shouldChangeSearchValue || !hasValueInSearch) {
+      savedSearch.value = search
+    }
   }
 </script>

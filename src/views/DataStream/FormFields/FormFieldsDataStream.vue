@@ -93,7 +93,6 @@
           data-testid="data-stream-form__domains__options-field"
         />
       </div>
-
       <div
         v-if="domainOption === '0'"
         class="flex flex-col gap-2"
@@ -157,9 +156,8 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    v-if="domainOption === '1'"
+    v-if="isAllDomainsSelected && hasAccessToSampling"
     title="Sampling"
-    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
     data-testid="data-stream-form__section__sampling"
   >
@@ -397,7 +395,14 @@
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
             data-testid="data-stream-form__destination__access-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__access-key-field__description"
@@ -429,7 +434,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__secret-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__secret-key-field__description"
@@ -461,7 +473,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__object-key-prefix-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__object-key-prefix-field__description"
@@ -685,7 +704,15 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__kinesis-access-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
+
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__kinesis-access-key-field__description"
@@ -717,7 +744,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__kinesis-secret-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__kinesis-secret-key-field__description"
@@ -815,7 +849,14 @@
             :feedback="false"
             toggleMask
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"
-          />
+          >
+            <template
+              #showicon
+              v-if="hasNoPermissionToEditDataStream"
+            >
+              <i class="pi pi-eye-slash"></i>
+            </template>
+          </PrimePassword>
           <small
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field__description"
@@ -978,6 +1019,7 @@
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
@@ -1003,6 +1045,10 @@
 
   const MAX_PAYLOAD_SIZE_IN_BYTES = ref(2147483647)
   const MIN_PAYLOAD_SIZE_IN_BYTES = ref(1000000)
+
+  const hasAccessToSampling = computed(() => {
+    return store.hasSamplingFlag
+  })
 
   // Variables
   const listDataSources = ref([
@@ -1145,6 +1191,12 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const isAllDomainsSelected = computed(() => {
+    return domainOption.value === '1'
+  })
+
+  const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {

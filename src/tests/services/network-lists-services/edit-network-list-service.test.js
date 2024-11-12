@@ -9,6 +9,13 @@ const fixtures = {
     name: 'Az network',
     networkListType: 'ip_cidr',
     itemsValues: '123.123.123.123'
+  },
+  networkTypeCountryMock: {
+    id: 56782,
+    itemsValues: '',
+    networkListType: 'countries',
+    name: 'My New update. dd',
+    itemsValuesCountry: ['BR']
   }
 }
 
@@ -36,6 +43,25 @@ describe('NetworkListsServices', () => {
         name: fixtures.networkMock.name,
         list_type: fixtures.networkMock.networkListType,
         items_values: [fixtures.networkMock.itemsValues]
+      }
+    })
+  })
+
+  it('should call the API with the correct parameters when the type value is countries', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 202
+    })
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut(fixtures.networkTypeCountryMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/network_lists/${fixtures.networkTypeCountryMock.id}`,
+      method: 'PUT',
+      body: {
+        name: fixtures.networkTypeCountryMock.name,
+        list_type: fixtures.networkTypeCountryMock.networkListType,
+        items_values: fixtures.networkTypeCountryMock.itemsValuesCountry
       }
     })
   })

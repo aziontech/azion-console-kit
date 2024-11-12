@@ -40,9 +40,7 @@ const adapt = (filter) => {
     and: {
       configurationIdEq: filter.configurationId,
       sourceEq: filter.source,
-      lineEq: filter.line,
-      idEq: filter.id,
-      tsEq: filter.ts
+      lineEq: filter.line
     }
   }
   return convertGQL(formatFilter, table)

@@ -7,6 +7,7 @@
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InputText from 'primevue/inputtext'
+  import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
@@ -15,6 +16,7 @@
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
+  import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
 
   const props = defineProps({
     digitalCertificates: {
@@ -36,6 +38,14 @@
     updateDigitalCertificates: {
       type: Function,
       required: true
+    },
+    edgeFirewallsData: {
+      type: Array,
+      required: true
+    },
+    isLoadingEdgeFirewalls: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -45,10 +55,29 @@
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
-
+  const { value: environment } = useField('environment')
   const { value: domainName } = useField('domainName')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+
+  const { value: edgeFirewall } = useField('edgeFirewall')
+  const drawerEdgeFirewallRef = ref('')
+
+  const openDrawerEdgeFirewall = () => {
+    drawerEdgeFirewallRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallCreated = (id) => {
+    edgeFirewall.value = id
+    emit('edgeFirewallCreated')
+  }
+
+  const edgeFirewallOptions = computed(() => {
+    return props.edgeFirewallsData.map((edgeFirewall) => ({
+      name: edgeFirewall.name,
+      value: edgeFirewall.id
+    }))
+  })
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -99,6 +128,33 @@
     }
   ])
 
+  const environmentOptions = computed(() => {
+    const tag = {
+      value: 'The environment type cannot be changed after the domain is created',
+      icon: 'pi pi-lock'
+    }
+    const environmentOptionsRadios = [
+      {
+        title: 'Global Edge Network',
+        inputValue: 'production',
+        disabled: true
+      },
+      {
+        title: 'Staging Network',
+        inputValue: 'preview',
+        disabled: true
+      }
+    ]
+
+    if (environment.value === 'production') {
+      environmentOptionsRadios[0].tag = tag
+    } else if (environment.value === 'preview') {
+      environmentOptionsRadios[1].tag = tag
+    }
+
+    return environmentOptionsRadios
+  })
+
   const isLoadingEdgeApplications = computed(() => {
     return props.loadingEdgeApplications
   })
@@ -114,7 +170,7 @@
     emit('edgeApplicationCreated')
   }
 
-  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName'])
+  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName', 'edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
   const openDigitalCertificateDrawer = () => {
@@ -142,6 +198,31 @@
           :value="name"
           description="Give a unique and descriptive name to identify the domain."
         />
+      </div>
+    </template>
+  </form-horizontal>
+
+  <form-horizontal
+    title="Environment Type"
+    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-3">
+        <FieldGroupRadio
+          isCard
+          nameField="environment"
+          :options="environmentOptions"
+        >
+          <template #footer="{ item }">
+            <PrimeTag
+              v-if="item?.tag"
+              :value="item.tag.value"
+              :icon="item.tag.icon"
+              severity="info"
+              class="mt-3"
+            />
+          </template>
+        </FieldGroupRadio>
       </div>
     </template>
   </form-horizontal>
@@ -201,6 +282,10 @@
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
       />
+      <DrawerEdgeFirewall
+        ref="drawerEdgeFirewallRef"
+        @onSuccess="handleEdgeFirewallCreated"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Edge Application"
@@ -238,6 +323,46 @@
         </FieldDropdown>
       </div>
 
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeFirewall
+          ref="drawerEdgeFirewallRef"
+          @onSuccess="handleEdgeFirewallCreated"
+        />
+        <FieldDropdown
+          label="Edge Firewall"
+          data-testid="domains-form__edge-firewall-field"
+          name="edgeFirewall"
+          :options="edgeFirewallOptions"
+          :loading="isLoadingEdgeFirewalls"
+          :disabled="isLoadingEdgeFirewalls"
+          optionLabel="name"
+          optionValue="value"
+          :value="edgeFirewall"
+          filter
+          appendTo="self"
+          placeholder="Select an edge firewall"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-firewall-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Firewall"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdown>
+      </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"
