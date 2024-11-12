@@ -10,7 +10,7 @@ describe('RealTimeMetricsModule', () => {
 
     it('should have the correct key:value pairs', () => {
       const mapServiceOperation = {
-        configurationIdIn: services.searchDomainsService,
+        configurationIdIn: services.searchWorkloadsService,
         zoneIdIn: services.searchEdgeDnsService,
         edgeFunctionIdIn: services.searchEdgeFunctionsService,
         botCategoryIn: services.searchBotCategoryService,

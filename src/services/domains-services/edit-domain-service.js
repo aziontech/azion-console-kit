@@ -18,6 +18,7 @@ const adapt = (payload) => {
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
     cname_access_only: payload.cnameAccessOnly,
     edge_application_id: payload.edgeApplication,
+    edge_firewall_id: payload.edgeFirewall,
     digital_certificate_id: payload.edgeCertificate || null,
     is_mtls_enabled: payload.mtlsIsEnabled,
     is_active: payload.active,

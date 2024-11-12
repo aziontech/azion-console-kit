@@ -6,7 +6,7 @@ import { billingGuard } from './billingGuard'
 import { redirectGuard } from './redirectGuard'
 import { redirectToManagerGuard } from './redirectToManagerGuard'
 import { ssoManagementGuard } from './SSOManagementGuard'
-
+import { domainsLimitGuard } from './domainsLimitGuard'
 export {
   logoutGuard,
   loadingGuard,
@@ -15,5 +15,6 @@ export {
   billingGuard,
   redirectGuard,
   redirectToManagerGuard,
-  ssoManagementGuard
+  ssoManagementGuard,
+  domainsLimitGuard
 }

@@ -93,7 +93,6 @@
           data-testid="data-stream-form__domains__options-field"
         />
       </div>
-
       <div
         v-if="domainOption === '0'"
         class="flex flex-col gap-2"
@@ -157,9 +156,8 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    v-if="domainOption === '1'"
+    v-if="isAllDomainsSelected && hasAccessToSampling"
     title="Sampling"
-    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
     data-testid="data-stream-form__section__sampling"
   >
@@ -1048,6 +1046,10 @@
   const MAX_PAYLOAD_SIZE_IN_BYTES = ref(2147483647)
   const MIN_PAYLOAD_SIZE_IN_BYTES = ref(1000000)
 
+  const hasAccessToSampling = computed(() => {
+    return store.hasSamplingFlag
+  })
+
   // Variables
   const listDataSources = ref([
     { label: 'Activity History', value: 'rtm_activity' },
@@ -1189,6 +1191,10 @@
 
   // Using the store
   const store = useAccountStore()
+
+  const isAllDomainsSelected = computed(() => {
+    return domainOption.value === '1'
+  })
 
   const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
 

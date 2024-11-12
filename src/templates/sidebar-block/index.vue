@@ -41,7 +41,7 @@
         <a
           class="flex h-9"
           v-bind="props.action"
-          @click="redirectToRoute(item.to)"
+          @click="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
         >
@@ -74,29 +74,32 @@
 
   defineOptions({ name: 'sidebar-block' })
 
+  const router = useRouter()
   const accountStore = useAccountStore()
   const TYPE_CLIENT = 'client'
   const isAccountTypeClient = computed(() => accountStore.account.kind === TYPE_CLIENT)
-
-  const router = useRouter()
-
   const showSidebar = ref(false)
 
   const sidebarToggle = () => {
     showSidebar.value = !showSidebar.value
   }
 
-  const redirectToRoute = (route) => {
+  const redirectToRoute = (item) => {
+    const { to: route, external = false } = item
     sidebarToggle()
-    if (meta.value || control.value) {
+
+    const shouldOpenInNewWindow = meta.value || control.value || external
+    if (shouldOpenInNewWindow) {
       windowOpen(route)
-      return
+    } else {
+      router.push(route)
     }
-    router.push(route)
   }
 
+  const showMarketplaceProductsInMenu = computed(() => accountStore.hasAccessToMarketplaceProducts)
+
   const menus = computed(() => {
-    const response = listSidebarMenusService()
+    const response = listSidebarMenusService(showMarketplaceProductsInMenu.value)
 
     return response.body.menus
   })

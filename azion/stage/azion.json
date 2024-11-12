@@ -157,6 +157,11 @@
         "id": 312030,
         "name": "Route API Identity Providers",
         "phase": "request"
+      },
+      {
+        "id": 317377,
+        "name": "Route GraphQL Accounting Queries to Manager Origin",
+        "phase": "request"
       }
     ]
   },
