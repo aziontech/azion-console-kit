@@ -28,7 +28,7 @@ describe('AccountsManagementServices', () => {
     await sut({ account_type: 'reseller' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/accounts?account_type=reseller&ordering=id&page=1&page_size=10`,
+      url: `iam/accounts?account_type=reseller&ordering=name&page=1&page_size=10`,
       method: 'GET'
     })
   })
