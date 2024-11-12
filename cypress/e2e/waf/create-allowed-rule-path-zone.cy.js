@@ -44,7 +44,7 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your waf rule allowed has been created')
 
-    cy.get(selectors.list.searchInput).type(fixtures.ruleId)
+    cy.get(selectors.list.searchInput).type(`${fixtures.ruleId}{enter}`)
     cy.get(selectors.wafs.listRow('ruleId')).should('have.text', fixtures.ruleId)
     cy.get(selectors.wafs.listRow('description')).should('have.text', fixtures.description)
     cy.get(selectors.wafs.listRow('path')).should('have.text', fixtures.path)
@@ -53,7 +53,7 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.wafs.listRow('lastModified')).should('not.be.empty')
 
     cy.get(selectors.wafs.breadcrumbToList).click()
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
   })
 
   afterEach(() => {

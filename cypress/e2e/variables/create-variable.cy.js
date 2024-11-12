@@ -25,7 +25,7 @@ describe('Variables spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.form.actionsCancelButton).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
     cy.get(selectors.variables.listRow('value')).find('button').should('be.visible')
   })

@@ -26,7 +26,7 @@ describe('Variables spec', { tags: ['@dev2'] }, () => {
     cy.verifyToast('success', 'Your variable has been created')
 
     // Assert
-    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
     cy.get(selectors.variables.listRow('value')).should('have.text', secretValue)
     cy.get(selectors.variables.listRow('value')).find('button').should('not.exist')

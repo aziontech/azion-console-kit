@@ -58,7 +58,7 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Cache Settings successfully created')
 
-    cy.get(selectors.list.searchInput).type(fixtures.cacheSettingName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.cacheSettingName}{enter}`)
 
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheSettingName)
     cy.get(selectors.list.filteredRow.column('browserCache')).should(
