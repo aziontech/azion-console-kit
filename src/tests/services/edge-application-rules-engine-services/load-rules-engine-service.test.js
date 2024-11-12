@@ -9,7 +9,7 @@ const parsedBehavior = [
   },
   {
     name: 'set_origin',
-    target: '157432'
+    originId: '157432'
   },
   {
     name: 'capture_match_groups',
