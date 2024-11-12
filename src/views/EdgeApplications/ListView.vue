@@ -6,6 +6,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import CloneDialog from './Dialog/Clone.vue'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -29,7 +30,19 @@
   const hasContentToList = ref(true)
   const actions = [
     {
+      type: 'dialog',
+      label: 'Clone',
+      icon: 'pi pi-fw pi-clone',
+      dialog: {
+        component: CloneDialog,
+        body: (item) => ({
+          data: item
+        })
+      }
+    },
+    {
       type: 'delete',
+      label: 'Delete',
       title: 'edge application',
       icon: 'pi pi-trash',
       service: props.deleteEdgeApplicationService
@@ -69,7 +82,7 @@
     ]
   })
 
-  const EDGE_APPLICATION_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified']
+  const EDGE_APPLICATION_API_FIELDS = []
 </script>
 
 <template>
