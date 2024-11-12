@@ -10,14 +10,14 @@
  * @returns {URLSearchParams}
  */
 export const makeListServiceQueryParams = ({ fields, ordering, page, pageSize, search }) => {
-  const params = new URLSearchParams()
-  params.set('ordering', toSnakeCase(ordering))
-  params.set('page', page)
-  params.set('page_size', pageSize)
-  params.set('fields', fields)
-  params.set('search', search)
+  const searchParams = new URLSearchParams()
 
-  return params
+  if (fields) searchParams.append('fields', fields)
+  if (ordering) searchParams.append('ordering', ordering)
+  if (page) searchParams.append('page', page.toString())
+  if (pageSize) searchParams.append('page_size', pageSize.toString())
+  if (search) searchParams.append('search', search)
+  return searchParams
 }
 
 const toSnakeCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase()

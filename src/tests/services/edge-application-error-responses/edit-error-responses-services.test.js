@@ -16,6 +16,19 @@ const fixtures = {
         uri: '/teste/'
       }
     ]
+  },
+  errorResponsePayloadAnyCodeValue: {
+    edgeApplicationId: '123',
+    id: '123',
+    originId: '12',
+    errorResponses: [
+      {
+        code: 'any',
+        timeout: 2,
+        customStatusCode: '',
+        uri: ''
+      }
+    ]
   }
 }
 
@@ -48,6 +61,33 @@ describe('EdgeApplicationErrorResponsesServices', () => {
             custom_status_code: errorResponse.customStatusCode,
             timeout: errorResponse.timeout,
             uri: errorResponse.uri
+          }
+        ],
+        origin_id: fixtures.errorResponsePayload.originId
+      }
+    })
+  })
+
+  it('should call the API with the correct parameters when the code value is any', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 202
+    })
+
+    const { sut } = makeSut()
+
+    await sut(fixtures.errorResponsePayloadAnyCodeValue)
+    const errorResponse = fixtures.errorResponsePayloadAnyCodeValue.errorResponses[0]
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v4/edge_application/applications/${fixtures.errorResponsePayloadAnyCodeValue.edgeApplicationId}/error_responses/${fixtures.errorResponsePayload.id}`,
+      method: 'PATCH',
+      body: {
+        error_responses: [
+          {
+            code: errorResponse.code,
+            custom_status_code: null,
+            timeout: errorResponse.timeout,
+            uri: null
           }
         ],
         origin_id: fixtures.errorResponsePayload.originId
