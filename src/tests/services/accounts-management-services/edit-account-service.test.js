@@ -23,6 +23,10 @@ const fixtures = {
     user: {
       email: ['Email already in use']
     }
+  },
+  errorMock: {
+    firstKey: 'First Error Message',
+    secondKey: 'Second Error Message'
   }
 }
 const makeSut = () => {
@@ -96,7 +100,24 @@ describe('AccountManagementServices', () => {
     expect(response).rejects.toThrow(fixtures.emailErrorMock.user.email[0])
   })
 
+  it('should parse correctly the feedback message when the error is the first key', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: fixtures.errorMock
+    })
+    const { sut } = makeSut()
+    const accountType = 'client'
+
+    const response = sut(fixtures.accountMock, accountType)
+
+    expect(response).rejects.toThrow(fixtures.errorMock.firstKey)
+  })
+
   it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
     {
       statusCode: 403,
       expectedError: new Errors.PermissionError().message
