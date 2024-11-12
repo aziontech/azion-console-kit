@@ -56,7 +56,7 @@
                 data-testid="data-table-search-input"
                 placeholder="Search"
                 @keyup.enter="fetchOnSearch"
-                @input="handleSearchValue(false)"
+                @input="handleSearchValue()"
               />
             </span>
 
@@ -622,32 +622,35 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
+
     firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
+
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
+
     return [...filters, ...filtersPath]
   })
+
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
+
     await reload({ ordering })
+
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
   const fetchOnSearch = () => {
-    handleSearchValue(true)
     reload()
   }
-  const handleSearchValue = (shouldChangeSearchValue = false) => {
+
+  const handleSearchValue = () => {
     const search = filters.value.global.value
-    const hasValueInSearch = !!search.length
-    if (shouldChangeSearchValue || !hasValueInSearch) {
-      savedSearch.value = search
-    }
+    savedSearch.value = search
   }
 </script>

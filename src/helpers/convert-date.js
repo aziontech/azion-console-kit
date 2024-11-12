@@ -147,7 +147,7 @@ const getCurrentMonthStartEnd = () => {
 }
 
 const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
-  return new Intl.DateTimeFormat('us', {
+  return new Intl.DateTimeFormat('US', {
     dateStyle,
     timeStyle,
     timeZone: 'UTC'
