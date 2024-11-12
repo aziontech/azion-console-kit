@@ -95,6 +95,7 @@ describe('convertDate', () => {
 
   it('correctly formats a valid date string with short date and time styles', () => {
     localeMock()
+
     const dateString = '2023-10-05T15:30:00Z'
     const result = formatExhibitionDate(dateString, 'short', 'short')
     expect(result).toBe('10/5/23, 3:30 PM')
@@ -102,6 +103,7 @@ describe('convertDate', () => {
 
   it('throws an error when given an invalid date string', () => {
     localeMock()
+
     const dateString = 'invalid-date'
     expect(() => formatExhibitionDate(dateString, 'short', 'short')).toThrow()
   })
