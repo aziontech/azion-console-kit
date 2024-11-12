@@ -2,19 +2,19 @@ import * as AccountSettingsServices from '@/services/account-settings-services'
 import * as AccountManagementServices from '@/services/accounts-management-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const resellerManagementRoutes = {
-  path: '/reseller/management',
-  name: 'reseller-management',
+export const groupsManagementRoutes = {
+  path: '/group/management',
+  name: 'groups-management',
   children: [
     {
       path: '',
-      name: 'list-reseller-management',
-      component: () => import('@views/ResellersManagement/ListView.vue'),
+      name: 'list-groups-management',
+      component: () => import('@views/GroupsManagement/ListView.vue'),
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Groups Management',
+            to: '/groups-management'
           }
         ]
       },
@@ -22,8 +22,8 @@ export const resellerManagementRoutes = {
     },
     {
       path: 'create',
-      name: 'create-reseller',
-      component: () => import('@views/ResellersManagement/CreateView.vue'),
+      name: 'create-groups',
+      component: () => import('@views/GroupsManagement/CreateView.vue'),
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
@@ -33,35 +33,36 @@ export const resellerManagementRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Groups Management',
+            to: '/group/management'
           },
           {
-            label: 'Create Reseller',
-            to: '/reseller/management/create'
+            label: 'Create Group',
+            to: '/group/management/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edit-reseller',
-      component: () => import('@views/ResellersManagement/EditView.vue'),
+      name: 'edit-groups',
+      component: () => import('@views/GroupsManagement/EditView.vue'),
       props: {
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
         listCitiesService: AccountSettingsServices.listCitiesService,
+        createAccountByTypeService: AccountManagementServices.createAccountByTypeService,
         loadAccountService: AccountManagementServices.loadAccountService,
         editAccountService: AccountManagementServices.editAccountService
       },
       meta: {
         breadCrumbs: [
           {
-            label: 'Reseller Management',
-            to: '/reseller/management'
+            label: 'Groups Management',
+            to: '/group/management'
           },
           {
-            label: 'Edit Reseller'
+            label: 'Edit Group'
           }
         ]
       }

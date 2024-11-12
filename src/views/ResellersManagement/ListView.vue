@@ -1,25 +1,27 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Client Management" />
+      <PageHeadingBlock pageTitle="Reseller Management" />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listAccountsClientDecorator"
+        :listService="listAccountsResellerDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        addButtonLabel="Client"
-        createPagePath="client/management/create"
-        emptyListMessage="No clients found."
+        addButtonLabel="Reseller"
+        createPagePath="reseller/management/create"
+        emptyListMessage="No reseller accounts found."
+        editPagePath="management/edit"
+        enableEditClick
       />
 
       <EmptyResultsBlock
         v-if="!hasContentToList"
-        title="No clients have been created"
-        description="Click the button below to create your first client account."
-        createButtonLabel="Client"
-        createPagePath="client/management/create"
+        title="No resellers have been created"
+        description="Click the button below to create your first reseller account."
+        createButtonLabel="Reseller"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />
@@ -36,19 +38,18 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { listAccountsService } from '@/services/accounts-management-services/list-accounts-service'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useAccountStore } from '@/stores/account'
   import { useRouter } from 'vue-router'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, onBeforeMount } from 'vue'
 
-  defineOptions({ name: 'client-management-view' })
+  defineOptions({ name: 'reseller-management-view' })
 
   const hasContentToList = ref(true)
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
-
   onBeforeMount(() => {
-    if (accountType !== 'reseller') {
+    if (accountType !== 'brand') {
       router.push('/')
     }
   })
@@ -83,7 +84,7 @@
     hasContentToList.value = event
   }
 
-  const listAccountsClientDecorator = async (params) => {
-    return await listAccountsService({ account_type: 'client', ...params })
+  const listAccountsResellerDecorator = async (params) => {
+    return await listAccountsService({ account_type: 'reseller', ...params })
   }
 </script>
