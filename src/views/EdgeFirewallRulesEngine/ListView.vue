@@ -138,7 +138,7 @@
     {
       field: 'name',
       header: 'Name',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'status',
@@ -152,7 +152,7 @@
           columnAppearance: 'tag'
         })
       },
-      disabledSort: true
+      disableSort: true,
     },
     {
       field: 'description',
@@ -161,17 +161,17 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      disabledSort: true
+      disableSort: true
     }
   ])
 
