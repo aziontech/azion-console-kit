@@ -123,7 +123,8 @@
       },
       {
         field: 'validity',
-        header: 'Expiration Date'
+        header: 'Expiration Date',
+        disableSort: true
       },
       {
         field: 'status',
