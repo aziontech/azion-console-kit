@@ -10,8 +10,8 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         addButtonLabel="Group"
-        createPagePath="/group/management/create"
-        editPagePath="/group/management/edit"
+        createPagePath="management/create"
+        editPagePath="management/edit"
         emptyListMessage="No groups found."
       />
 
@@ -20,7 +20,7 @@
         title="No groups have been created"
         description="Click the button below to create your first group account."
         createButtonLabel="Group"
-        createPagePath="/group/management/create"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />

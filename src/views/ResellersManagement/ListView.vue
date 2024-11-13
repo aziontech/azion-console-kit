@@ -10,7 +10,7 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         addButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
+        createPagePath="management/create"
         emptyListMessage="No reseller accounts found."
         editPagePath="management/edit"
         enableEditClick
