@@ -71,7 +71,8 @@
     'subject_name',
     'issuer',
     'status',
-    'validity'
+    'validity',
+    'type'
   ]
 
   const actions = [
@@ -107,16 +108,18 @@
       },
       {
         field: 'subjectName',
-        header: 'Subject Names'
+        header: 'Subject Names',
+        disableSort: true
       },
       {
         field: 'issuer',
-        header: 'Issuer'
+        header: 'Issuer',
+        disableSort: true
       },
       {
         field: 'type',
         header: 'Type',
-        sortField: 'certificate_type'
+        sortField: 'type'
       },
       {
         field: 'validity',
@@ -127,6 +130,7 @@
         header: 'Status',
         sortField: 'status',
         type: 'component',
+        disableSort: true,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
