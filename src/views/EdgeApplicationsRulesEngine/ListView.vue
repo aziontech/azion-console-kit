@@ -5,7 +5,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
 
   import PrimeButton from 'primevue/button'
-  import SelectButton from 'primevue/selectbutton'
+  // import SelectButton from 'primevue/selectbutton'
   import { computed, ref, inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -97,7 +97,7 @@
     'order'
   ]
 
-  const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
+  // const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
   const PARSE_PHASE = {
     'Request phase': 'request',
     'Response phase': 'response',
@@ -250,6 +250,7 @@
     :onReorderService="reorderRulesEngineWithDecorator"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
+    :rowsPerPageOptions="[500]"
     @on-load-data="handleLoadData"
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
@@ -268,13 +269,6 @@
         class="flex gap-4"
         data-testid="rules-engine-add-button"
       >
-        <SelectButton
-          v-model="selectedPhase"
-          @change="reloadList"
-          :options="PHASE_OPTIONS"
-          :unselectable="true"
-          data-testid="rules-engine-select-phase"
-        />
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
@@ -283,7 +277,6 @@
         />
       </div>
     </template>
-
     <template #noRecordsFound>
       <EmptyResultsBlock
         v-if="!hasContentToList"

@@ -19,7 +19,7 @@
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
       :paginator="true"
-      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rowsPerPageOptions="props.rowsPerPageOptions"
       :rows="itemsByPage"
       :globalFilterFields="filterBy"
       :selection="selectedItems"
@@ -323,6 +323,10 @@
   const props = defineProps({
     hiddenHeader: {
       type: Boolean
+    },
+    rowsPerPageOptions: {
+      type: Array,
+      default: () => [10, 20, 50, 100]
     },
     columns: {
       type: Array,
