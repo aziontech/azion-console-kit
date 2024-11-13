@@ -136,7 +136,6 @@
         header: 'Status',
         filterPath: 'active',
         type: 'component',
-        disableSort: true,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -145,7 +144,8 @@
       },
       {
         field: 'edgeApplicationName',
-        header: 'Edge Application'
+        header: 'Edge Application',
+        disableSort: true
       }
     ]
   })
