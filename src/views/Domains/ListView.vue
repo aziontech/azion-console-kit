@@ -109,6 +109,7 @@
         field: 'domainName',
         header: 'Domain Name',
         filterPath: 'domainName.content',
+        disableSort: true,
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
@@ -125,15 +126,17 @@
         header: 'CNAME',
         filterPath: 'description.value',
         type: 'component',
+        disableSort: true,
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
         field: 'active',
-        sortField: 'activeSort',
+        sortField: 'active',
         header: 'Status',
-        filterPath: 'active.content',
+        filterPath: 'active',
         type: 'component',
+        disableSort: true,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
