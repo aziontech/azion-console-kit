@@ -7,7 +7,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
   const isPrivateRoute = !to.meta.isPublic
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
 
-  if (userNotIsLoggedIn && isPrivateRoute) {
+  if (userNotIsLoggedIn) {
     try {
       const [accountInfo, userInfo, accountJobRole] = await Promise.all([
         getAccountInfoService(),
@@ -26,7 +26,12 @@ export async function accountGuard({ to, accountStore, tracker }) {
       accountInfo.jobRole = accountJobRole.jobRole
 
       accountStore.setAccountData(accountInfo)
+
+      if (!isPrivateRoute) {
+        return '/'
+      }
     } catch {
+      if (!isPrivateRoute) return
       setRedirectRoute(to)
       await tracker.reset()
       return '/login'
