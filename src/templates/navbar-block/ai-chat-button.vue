@@ -6,7 +6,7 @@
     v-tooltip.bottom="{ value: 'Copilot', showDelay: 200 }"
   >
     <div
-      class="special-button-content shadow !shadow-[#ffffff50]"
+      class="special-button-content shadow !shadow-[#ffffff50] md:w-auto w-8 justify-center"
       :class="{
         'bg-header/80 hover:bg-[#00000025]': !aiChatIsOpen,
         'bg-header/40': aiChatIsOpen
