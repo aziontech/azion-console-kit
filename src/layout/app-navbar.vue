@@ -30,12 +30,13 @@
         <Create />
 
         <ButtonCopilot />
-        <ButtonHelper />
 
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
         />
+
+        <ButtonHelper />
 
         <ProfileMenuBlock />
       </div>

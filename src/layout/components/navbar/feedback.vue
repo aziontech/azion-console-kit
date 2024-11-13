@@ -7,6 +7,7 @@
     }"
     icon="pi pi-flag"
     size="small"
+    label="Feedback"
     :outlined="props.outlined"
     :class="props.class"
     @click="visible = true"

@@ -4,9 +4,7 @@
       <h3 class="text-color text-lg font-medium flex gap-3">
         Azion Copilot
         <PrimeTag
-          v-tooltip.bottom="
-            'Copilot is in preview mode and can give you some wrong answers. Please, always validate your answers.'
-          "
+          v-tooltip.bottom="tooltipMessage"
           value="Preview"
         />
       </h3>
@@ -18,32 +16,29 @@
       />
     </template>
   </Toolbar>
-
   <div
     class="flex flex-auto flex-col overflow-x-hidden p-6 pt-3 custom-scroll"
-    :class="{ 'justify-center gap-6': !state.conversationStarted }"
+    :class="{ 'justify-center gap-6': !getStartConversation }"
     ref="chatContainer"
   >
-    <template v-if="!state.conversationStarted">
+    <div
+      class="self-stretch py-3 flex-col justify-start items-center gap-10 flex"
+      v-if="!getStartConversation"
+      :class="{ 'justify-center': !getStartConversation }"
+    >
       <Welcome />
 
-      <Suggestions
-        :suggestions="suggestionsTest"
-        @selectSuggestion="sendMessage"
-      />
-    </template>
+      <div class="w-[548px] justify-center items-start gap-3 inline-flex">
+        <Suggestions />
+      </div>
 
-    <ChatMessages
-      v-else
-      :messages="state.messages"
-      :loading="state.isResponding"
-    />
+      <slot name="chatSuggestions" />
+    </div>
+
+    <ChatMessages v-else />
   </div>
 
-  <ChatInput
-    @sendMessage="sendMessage"
-    @stopResponding="abortRequest"
-  />
+  <ChatInput class="p-6" />
 </template>
 
 <script setup>
@@ -65,25 +60,15 @@
     suggestionsOptions: Array
   })
 
-  const { sendMessage, state, abortRequest, clearChat } = useChat({
-    user: props.user,
-    chat: {
-      suggestions: props.suggestionsOptions
-    }
-  })
+  const tooltipMessage = [
+    'Copilot is in preview mode and can give you some wrong answers.',
+    'Please, always validate your answers.'
+  ].join(' ')
 
-  const suggestionsTest = [
-    {
-      icon: 'pi pi-question-circle',
-      title: 'How do I build an edge application?',
-      context: 'How do I build an edge application?'
-    },
-    {
-      icon: 'pi pi-shield',
-      title: 'How do I protect my application?',
-      context: 'How do I protect my application?'
-    }
-  ]
+  const { messages, getStartConversation, clearChat } = useChat({
+    ...props.user,
+    suggestions: props.suggestionsOptions
+  })
 
   const chatContainer = ref(null)
 
@@ -94,7 +79,7 @@
   }
 
   watch(
-    () => state.messages,
+    () => messages,
     async () => {
       await nextTick()
       scrollToBottom()
@@ -111,80 +96,5 @@
   .custom-scroll::-webkit-scrollbar-thumb {
     background-color: var(--surface-500);
     border-radius: 4px;
-  }
-
-  .chat-message {
-    font-size: 16px;
-  }
-
-  .chat-message .message-content {
-    width: auto;
-    overscroll-behavior: none;
-    max-width: 100%;
-    overflow: hidden;
-    background-color: transparent;
-  }
-
-  .chat-message h3 {
-    font-size: 1.17em !important;
-    line-height: 1.75 !important;
-    font-weight: 500 !important;
-    margin-top: 1.25em !important;
-    margin-bottom: 1.25em !important;
-  }
-
-  .chat-message div p:first-child {
-    margin-top: 0 !important;
-  }
-
-  .chat-message p {
-    tab-size: 4;
-    font-feature-settings: normal;
-    font-variation-settings: normal;
-    box-sizing: border-box;
-    color: var(--text-color) !important;
-    margin-top: 1.25em !important;
-    word-break: break-word;
-  }
-
-  .chat-message ul,
-  .chat-message ol {
-    tab-size: 4;
-    font-feature-settings: normal;
-    font-variation-settings: normal;
-    font-size: 1rem;
-    line-height: 1.75;
-    border-width: 0;
-    border-style: solid;
-    border-color: var(--text-color);
-    list-style: none;
-    box-sizing: border-box;
-    color: var(--text-color) !important;
-    overscroll-behavior: contain !important;
-    list-style-type: disc;
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
-    padding-left: 1.625em;
-  }
-
-  .chat-message a {
-    color: var(--text-color-link) !important;
-    text-decoration: underline;
-    font-weight: 500;
-  }
-
-  .chat-message pre {
-    overflow: auto;
-    display: block;
-    word-break: break-all;
-    overflow-wrap: break-word;
-    border-radius: 7px;
-    background: rgb(43, 43, 43);
-    color: rgb(248, 248, 242);
-    margin-top: 0.8em;
-    margin-bottom: 0.8em;
-    padding: 0.6em;
-    font-size: 0.9em;
-    line-height: 1.5em;
   }
 </style>

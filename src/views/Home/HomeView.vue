@@ -11,6 +11,7 @@
   import { removeHtmlTagFromText } from '@/helpers'
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
   import CreateFormBlock from '@/templates/create-form-block'
+  import { useLayout } from '@/composables/use-layout'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -43,6 +44,7 @@
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
+  const { toggleSidebarComponent } = useLayout()
 
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
@@ -81,7 +83,7 @@
   }
 
   const openContactSupport = () => {
-    props.windowManager.openContactSupport()
+    toggleSidebarComponent('copilot')
   }
 
   const validationSchema = yup.object({
@@ -246,6 +248,33 @@
               />
             </div>
           </div>
+
+          <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+            <div class="flex flex-row justify-start gap-3">
+              <div
+                class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+              >
+                <span class="ai ai-ask-azion"></span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="text-lg sm:text-xl font-medium">Ask Azion Copilot</div>
+                <div class="text-xs sm:text-sm text-color-secondary">
+                  Ask your questions to Azion Copilot, Azion's artificial intelligence trained with
+                  years of edge computing expertise.
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+              <PrimeButton
+                type="button"
+                class="sm:w-auto w-full"
+                label="Go to AI Azion"
+                outlined
+                size="small"
+                @click="toggleSidebarComponent('copilot')"
+              />
+            </div>
+          </div>
         </div>
 
         <div
@@ -294,7 +323,7 @@
           </CreateFormBlock>
         </div>
 
-        <div class="w-full flex flex-col lg:flex-row gap-6 justify-between">
+        <div class="flex flex-col xl:flex-row gap-6">
           <!-- Product -->
           <button
             type="button"
@@ -323,9 +352,9 @@
             class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
             @click="openContactSupport"
           >
-            <div class="text-lg font-medium">Contact Support</div>
+            <div class="text-lg font-medium">Get Assistance (Support)</div>
             <div class="text-sm text-color-secondary">
-              Send queries, suggestions, or report incidents to the specialized support team.
+              Access personalized assistance for your queries, suggestions, or incident reports
             </div>
           </button>
         </div>

@@ -1,114 +1,142 @@
-import { reactive, computed, readonly } from 'vue'
+import { reactive, computed } from 'vue'
 import { chatService } from '../services/chat-service.js'
-import { makeBaseUrl } from '../services/make-url.js'
-import { makeSessionId } from '../services/make-session-id.js'
-import { useRouter } from 'vue-router'
+
+const generateSessionId = () => crypto.randomUUID()
 
 const state = reactive({
-  messages: [],
-  conversationStarted: false,
-  loading: false,
+  config: {
+    apiUrl: '/ai',
+    userId: '',
+    userName: '',
+    errorMessage: 'Sorry, something went wrong.',
+    stream: true
+  },
+  chat: {
+    sessionId: generateSessionId(),
+    suggestions: [],
+    messages: []
+  },
+  isLoading: false,
+  startConversation: false,
   controller: null
 })
 
-function createDefaultConfig({ api = {}, user = {}, chat = {}, settings = {} }) {
-  const { currentRoute } = useRouter()
-
-  return reactive({
-    api: {
-      url: api.url || makeBaseUrl(),
-      stream: api.stream || true
-    },
-    user: {
-      id: user.id || '',
-      name: user.name || ''
-    },
-    chat: {
-      errorMessage: chat.errorMessage || 'Sorry, something went wrong.',
-      suggestions: chat.suggestions || []
-    },
-    settings: {
-      path: settings.url || currentRoute.value.path,
-      app: settings.app || 'console'
-    }
-  })
+const initializeConfig = (config) => {
+  state.config.apiUrl = config.apiUrl || state.config.apiUrl
+  state.config.userId = config.userId || state.config.userId
+  state.config.userName = config.userName || state.config.userName
+  state.config.errorMessage = config.errorMessage || state.config.errorMessage
+  state.config.stream = config.stream ?? state.config.stream
+  state.chat.suggestions = config.suggestions || state.chat.suggestions
 }
 
-export function useChat(options = {}) {
-  const config = createDefaultConfig(options)
-
-  const addMessage = (role, content, isInProgress) => {
-    state.messages.push({ role, content, isInProgress })
-    state.conversationStarted = true
+export function useChat(config) {
+  if (config) {
+    initializeConfig(config)
   }
 
-  const handleError = ({ name }) => {
-    const lastMessage = state.messages[state.messages.length - 1]
-    if (name === 'AbortError') {
-      if (lastMessage && !lastMessage.content) {
-        state.messages.pop()
-      }
-    } else {
-      lastMessage.content = config.chat.errorMessage
-      lastMessage.isInProgress = false
+  const setApiUrl = (url) => {
+    state.config.apiUrl = url
+  }
+
+  const setUser = ({ userId, userName }) => {
+    state.config.userId = userId
+    state.config.userName = userName
+  }
+
+  const setStream = (enable) => {
+    state.config.stream = !!enable
+  }
+
+  const setSuggestions = (suggestions) => {
+    state.chat.suggestions = suggestions.map(({ icon, title, context }) => ({
+      icon: icon || 'pi pi-question-circle',
+      title,
+      context
+    }))
+  }
+
+  const setErrorMessage = (message) => {
+    state.config.errorMessage = message
+  }
+
+  const addMessage = (role, content, status = false) => {
+    const message = {
+      id: generateSessionId(),
+      role,
+      content,
+      timestamp: new Date().toISOString(),
+      status
     }
+    state.chat.messages.push(message)
+    return message
   }
 
-  const formatParsedBody = (config, messages) => {
-    const formatMessages = messages.map(({ role, content }) => ({ role, content }))
+  const constructPayload = () => ({
+    azion: {
+      session_id: state.chat.sessionId,
+      user_name: state.config.userName,
+      client_id: state.config.userId,
+      url: window.location.pathname,
+      app: 'console'
+    },
+    messages: state.chat.messages.map(({ role, content }) => ({ role, content })),
+    stream: state.config.stream
+  })
 
-    return {
-      azion: {
-        session_id: makeSessionId(),
-        user_name: config.user.name,
-        client_id: config.user.id,
-        url: config.settings.path,
-        app: config.settings.app
-      },
-      messages: [...formatMessages],
-      stream: config.api.stream
-    }
-  }
+  const sendMessage = async (content) => {
+    if (state.isLoading) return
 
-  const sendMessage = async (userMessage) => {
-    if (state.loading) return
+    state.isLoading = true
+    addMessage('user', content)
+    state.startConversation = true
+    const parsedBody = constructPayload()
 
-    state.loading = true
-    addMessage('user', userMessage)
-
-    const parsedBody = formatParsedBody(config, [...state.messages])
-
-    addMessage('system', '', true)
+    const systemMessage = addMessage('system', '', true)
 
     try {
       state.controller = new AbortController()
+
       await chatService({
         parsedBody,
-        server: config.api.url,
+        server: state.config.apiUrl,
         signal: state.controller.signal,
-        onMessage: accumulateSystemMessage
+        onMessage: (data, status) => {
+          accumulateSystemMessage(data, status)
+        }
       })
+
+      systemMessage.status = false
     } catch (error) {
-      handleError(error)
+      handleError(error, systemMessage)
     } finally {
-      state.loading = false
+      state.isLoading = false
     }
   }
 
   const accumulateSystemMessage = (content, status = true) => {
-    if (state.messages.length > 0) {
-      const lastMessageIndex = state.messages.length - 1
-      state.messages[lastMessageIndex].content += content
-      state.messages[lastMessageIndex].isInProgress = status
+    if (state.chat.messages.length > 0) {
+      const lastMessageIndex = state.chat.messages.length - 1
+      state.chat.messages[lastMessageIndex].content += content
+      state.chat.messages[lastMessageIndex].status = status
+    }
+  }
+
+  const handleError = (error, message) => {
+    if (error.name === 'AbortError') {
+      state.chat.messages.pop()
+    } else {
+      message.content = state.config.errorMessage
+      message.status = false
     }
   }
 
   const clearChat = () => {
     abortRequest()
-    state.messages = []
-    state.conversationStarted = false
-    state.controller = null
-    state.loading = false
+    state.chat.sessionId = generateSessionId()
+    state.isLoading = false
+    state.startConversation = false
+    state.chat.messages = []
   }
 
   const abortRequest = () => {
@@ -118,16 +146,18 @@ export function useChat(options = {}) {
     }
   }
 
-  const getAllMessages = computed(() => state.messages)
-  const isResponding = computed(() => state.loading)
-
   return {
-    isResponding,
-    state: readonly(state),
-    getAllMessages,
-    chatConfig: readonly(config),
+    messages: computed(() => state.chat.messages),
+    isLoading: computed(() => state.isLoading),
+    suggestions: computed(() => state.chat.suggestions),
+    getStartConversation: computed(() => state.startConversation),
     sendMessage,
     clearChat,
-    abortRequest
+    setSuggestions,
+    setApiUrl,
+    setUser,
+    setStream,
+    abortRequest,
+    setErrorMessage
   }
 }

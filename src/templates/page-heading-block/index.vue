@@ -36,6 +36,8 @@
   const hasDefaultSlot = computed(() => {
     return !!slots.default
   })
+
+  const hasContent = computed(() => props.pageTitle || props.description || hasDefaultSlot.value)
 </script>
 
 <template>
@@ -54,6 +56,7 @@
     <div
       class="flex w-full py-4 items-center flex-wrap gap-3"
       :class="{ 'justify-between': !props.isRightAlignment }"
+      v-if="hasContent"
     >
       <div
         class="flex flex-col gap-3 max-md:w-full"

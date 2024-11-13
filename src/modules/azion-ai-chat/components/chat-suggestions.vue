@@ -1,9 +1,8 @@
-<!-- src/components/suggestions.vue -->
 <template>
   <div class="flex flex-wrap justify-center gap-3">
     <Card
       class="p-4 w-52 cursor-pointer select-none"
-      v-for="(suggestion, index) in props.suggestions"
+      v-for="(suggestion, index) in suggestions"
       :key="index"
       @click="selectSuggestion(suggestion)"
     >
@@ -15,7 +14,7 @@
       </template>
       <template #content>
         <p class="text-xs sm:text-sm text-color-secondary">
-          {{ suggestion.context }}
+          {{ suggestion.title }}
         </p>
       </template>
     </Card>
@@ -24,13 +23,11 @@
 
 <script setup>
   import Card from 'primevue/card'
-  const props = defineProps({
-    suggestions: Array
-  })
+  import { useChat } from '../composables/use-chat'
 
-  const emit = defineEmits(['selectSuggestion'])
+  const { suggestions, sendMessage } = useChat()
 
   function selectSuggestion(suggestion) {
-    emit('selectSuggestion', suggestion.context)
+    sendMessage(suggestion.context)
   }
 </script>

@@ -59,8 +59,8 @@
             icon="pi pi-eraser"
             outlined
             class="surface-border h-8 w-8"
-            aria-label="Clear chat"
-            v-tooltip.bottom="'Clear chat'"
+            aria-label="New chat"
+            v-tooltip.bottom="'New chat'"
             @click="clearChat"
           />
           <PrimeButton
@@ -80,6 +80,15 @@
             @click="closeSidebar"
           />
         </div>
+      </template>
+      <template #chatSuggestions>
+        <PrimeButton
+          label="Open a support ticket"
+          @click="openDocumentation"
+          iconPos="right"
+          link
+          icon="pi pi-external-link"
+        />
       </template>
     </AzionAIChatBlock>
   </div>

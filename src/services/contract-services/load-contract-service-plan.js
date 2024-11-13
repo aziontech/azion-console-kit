@@ -33,8 +33,10 @@ function extractWordFromSlug(str) {
 
 const adapt = (httpResponse) => {
   let yourServicePlan = 'Developer'
+
   const products = httpResponse.body || []
   const slugs = products?.map((product) => product.slug)
+
   const isDeveloperSupportPlan = slugs.every((slug) => {
     return !slug.includes('plan_') && !slug.includes('support_')
   })

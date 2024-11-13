@@ -19,6 +19,8 @@ export async function accountGuard({ to, accountStore, tracker }) {
       accountInfo.client_id = userInfo.results.client_id
       accountInfo.timezone = userInfo.results.timezone
       accountInfo.utc_offset = userInfo.results.utc_offset
+      accountInfo.first_name = userInfo.results.first_name
+      accountInfo.last_name = userInfo.results.last_name
       accountInfo.permissions = userInfo.results.permissions
       accountInfo.email = userInfo.results.email
       accountInfo.user_id = userInfo.results.id

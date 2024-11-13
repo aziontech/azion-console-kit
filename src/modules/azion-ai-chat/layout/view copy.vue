@@ -1,33 +1,44 @@
 <template>
-  <div class="max-h-[calc(100vh-15.5rem)] pb-8 px-8 h-full">
-    <div class="border h-full rounded-md surface-border">
-      <div class="flex-1 overflow-hidden overflow-y-auto">
-        <div
-          class=""
-          v-if="!getStartConversation"
-          :class="{ '': !getStartConversation }"
-        >
-          <Welcome />
-          <Suggestions />
-          <slot name="chatSuggestions" />
-        </div>
-        <div v-else>
-          <div class="">
-            <PrimeButton
-              icon="pi pi-eraser"
-              outlined
-              label="Clear chat"
-              class="surface-border"
-              aria-label="Clear chat"
-              v-tooltip.bottom="'Clear chat'"
-              @click="clearChat"
-            />
+  <div
+    class="custom-scroll flex-1 flex-col max-h-[calc(100vh-15.5rem)] overflow-x-hidden pb-8 px-8"
+  >
+    <div class="h-full rounded-md border surface-border">
+      <div class="flex flex-1 flex-col h-full">
+        <div class="flex w-full flex-1 overflow-x-hidden custom-scroll">
+          <div
+            class="self-stretch py-3 flex-col justify-start items-center gap-10 flex"
+            v-if="!getStartConversation"
+            :class="{ 'justify-center': !getStartConversation }"
+          >
+            <Welcome />
+
+            <div class="w-[548px] justify-center items-start gap-3 inline-flex">
+              <Suggestions />
+            </div>
+
+            <slot name="chatSuggestions" />
           </div>
-          <ChatMessages class="" />
+          <div
+            class="h-fit"
+            v-else
+          >
+            <div class="flex justify-end p-3 sticky top-0 surface-section">
+              <PrimeButton
+                icon="pi pi-eraser"
+                outlined
+                label="Clear chat"
+                class="surface-border"
+                aria-label="Clear chat"
+                v-tooltip.bottom="'Clear chat'"
+                @click="clearChat"
+              />
+            </div>
+            <ChatMessages class="w-full pb-3" />
+          </div>
         </div>
-      </div>
-      <div class="">
-        <ChatInput class="" />
+        <div class="self-stretch flex-col justify-start items-center gap-4 flex">
+          <ChatInput class="w-full pb-3" />
+        </div>
       </div>
     </div>
   </div>
