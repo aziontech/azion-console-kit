@@ -152,7 +152,7 @@
           columnAppearance: 'tag'
         })
       },
-      disableSort: true,
+      disableSort: true
     },
     {
       field: 'description',
