@@ -59,7 +59,8 @@ const adapt = (httpResponse) => {
 const HTTP_PORT_LIST_OPTIONS = [
   { name: '80 (Default)', value: '80' },
   { name: '8008', value: '8008' },
-  { name: '8080', value: '8080' }
+  { name: '8080', value: '8080' },
+  { name: '8880', value: '8880' }
 ]
 const HTTPS_PORT_LIST_OPTIONS = [
   { name: '443 (Default)', value: '443' },
