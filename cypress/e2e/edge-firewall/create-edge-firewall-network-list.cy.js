@@ -71,7 +71,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
     // Assert - Find the created rule
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(`${ruleName}{enter}`)
     cy.get(selectors.edgeFirewall.rulesTableColumnName).should('have.text', ruleName)
     cy.get(selectors.edgeFirewall.rulesTableColumnDescriptionShowMore).click()
     cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should(

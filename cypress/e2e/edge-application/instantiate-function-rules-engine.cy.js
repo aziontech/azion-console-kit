@@ -83,7 +83,7 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     // Assert - Verify the instance was created
     cy.verifyToast('success', 'Your Function has been created')
     cy.get(selectors.list.searchInput).clear()
-    cy.get(selectors.list.searchInput).type(fixtures.functionInstanceName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.functionInstanceName}{enter}`)
     cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
       'have.text',
       fixtures.functionInstanceName
@@ -117,7 +117,7 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
 
     // Assert - Rules engine was created
     cy.verifyToast('success', 'Your Rules Engine has been created.')
-    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
 
     // Cleanup - Remove the rule engine

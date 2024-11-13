@@ -51,7 +51,7 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
     //service
-    cy.get(selectors.list.searchInput).type(fixtures.edgeServiceName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('name')).should('have.text', fixtures.edgeServiceName)
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Inactive')
     cy.get(selectors.edgeServices.listRow('name')).click()
@@ -69,7 +69,7 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
     // edit resource
     cy.get(selectors.edgeServices.resoucesTab).click()
 
-    cy.get(selectors.list.searchInput).type(fixtures.path)
+    cy.get(selectors.list.searchInput).type(`${fixtures.path}{enter}`)
     cy.get(selectors.edgeServices.listRow('name')).click()
     cy.wait('@loadResource')
     cy.get(selectors.edgeServices.typeDropdownTrigger).click()
@@ -85,7 +85,7 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
 
     // Prepare for cleanup
     cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
-    cy.get(selectors.list.searchInput).type(fixtures.edgeServiceName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
   })
 

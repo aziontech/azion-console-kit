@@ -67,7 +67,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.form.leavePageButton).click()
 
     //Assert
-    cy.get(selectors.list.searchInput).type(fixtures.originName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
   })
 

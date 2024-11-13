@@ -29,7 +29,7 @@ describe('Variables spec', { tags: ['@dev7', '@xfail'] }, () => {
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
 
     // Edit Flow
@@ -49,7 +49,7 @@ describe('Variables spec', { tags: ['@dev7', '@xfail'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your variable has been updated')
 
-    cy.get(selectors.list.searchInput).type(variableKey)
+    cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
   })
 
