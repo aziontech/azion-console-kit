@@ -55,7 +55,7 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.list.searchInput).type(`${recordTypeFixtures.name}{enter}`)
     cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',

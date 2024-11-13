@@ -83,7 +83,7 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     // Assert - Verify the instance was created
     cy.verifyToast('success', 'Your Function has been created')
     cy.get(selectors.list.searchInput).clear()
-    cy.get(selectors.list.searchInput).type(fixtures.functionInstanceName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.functionInstanceName}{enter}`)
     cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
       'have.text',
       fixtures.functionInstanceName

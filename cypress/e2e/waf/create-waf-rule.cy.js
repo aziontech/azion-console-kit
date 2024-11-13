@@ -28,7 +28,7 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
 
     cy.get(selectors.list.searchInput).clear()
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     // Assert
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)

@@ -90,7 +90,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your Rules Engine has been created.')
 
-    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
 
     // Edit the rule

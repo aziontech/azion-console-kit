@@ -43,7 +43,7 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
       fixtures.edgeServiceName
     )
     cy.get(selectors.form.actionsCancelButton).click()
-    cy.get(selectors.list.searchInput).type(fixtures.edgeServiceName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('name')).should('have.text', fixtures.edgeServiceName)
 
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
