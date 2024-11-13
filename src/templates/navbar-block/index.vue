@@ -28,13 +28,12 @@
       </div>
       <div class="flex gap-2 items-center ml-auto">
         <Create />
-        <Help />
         <AiChatButton />
-
         <ConsoleFeedback
           class="text-white border-header bg-header hover:bg-header-button-hover"
           :outlined="false"
         />
+        <Help />
         <ProfileBlock />
       </div>
     </div>

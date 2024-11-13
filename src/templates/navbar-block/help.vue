@@ -1,6 +1,5 @@
 <template>
   <PrimeButton
-    :label="currentLabel"
     @click="openHelpCenter()"
     :pt="{
       label: { class: 'text-white' },
@@ -18,7 +17,7 @@
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed } from 'vue'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { useAzionAiChatStore } from '@/stores/azion-ai-chat-store'
   import PrimeButton from 'primevue/button'
@@ -27,20 +26,11 @@
 
   const helpCenterStore = useHelpCenterStore()
   const askAzionAiChatStore = useAzionAiChatStore()
-  const currentWidth = inject('currentWidth')
-  const SCREEN_BREAKPOINT_MD = 768
 
   const openHelpCenter = () => {
     helpCenterStore.toggle()
     askAzionAiChatStore.close()
   }
-
-  const currentLabel = computed(() => {
-    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Help'
-    }
-    return ''
-  })
 
   const helpCenterIsOpen = computed(() => {
     return helpCenterStore.isOpen
