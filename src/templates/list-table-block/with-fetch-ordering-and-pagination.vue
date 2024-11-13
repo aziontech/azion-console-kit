@@ -474,9 +474,9 @@
   }
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
-      data.value = event.value
-      await props.onReorderService(tableData)
+      const tableData = getArrayChangedIndexes(data.value, event.dragIndex, event.dropIndex)
+      await props.onReorderService(tableData, data.value, savedOrdering.value, savedSearch.value)
+      data.value = tableData
       reload()
       toast.add({
         closable: true,

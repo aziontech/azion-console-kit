@@ -88,8 +88,19 @@
     })
   }
 
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
+  const reorderRulesEngineWithDecorator = async (
+    newOrderData,
+    currentOrderData,
+    ordering,
+    search
+  ) => {
+    return props.reorderEdgeFirewallRulesEngine(
+      newOrderData,
+      currentOrderData,
+      props.edgeFirewallId,
+      ordering,
+      search
+    )
   }
 
   const handleTrackEditEvent = () => {
@@ -203,6 +214,7 @@
     :actions="actions"
     isTabs
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="''"
   >
     <template #addButton>
       <PrimeButton
