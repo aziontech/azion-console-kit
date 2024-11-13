@@ -63,7 +63,7 @@
       {
         sortField: 'company_name',
         field: 'company',
-        header: 'Company'
+        header: 'Company Name'
       },
       {
         disableSort: true,
