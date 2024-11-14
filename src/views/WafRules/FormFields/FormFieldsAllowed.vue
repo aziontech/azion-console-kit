@@ -26,8 +26,9 @@
   })
   const { value: matchZones } = useField('matchZones')
   const { value: path } = useField('path')
-  const { value: reason } = useField('reason')
+  const { value: name } = useField('name')
   const { value: ruleId } = useField('ruleId')
+  const { value: status } = useField('status')
 
   const matchZonesOptions = ref([
     { name: 'Conditional Query String', value: 'conditional_query_string' },
@@ -129,12 +130,12 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Description"
+          label="Name"
           required
-          name="reason"
+          name="name"
           placeholder="This rule was allowed because the path is being used in internal tests."
           description="Add a short description or comment to explain the reason this rule was allowed."
-          :value="reason"
+          :value="name"
           data-testid="allowed-rules-form__description-field"
         />
       </div>
@@ -282,6 +283,7 @@
         <FieldSwitchBlock
           nameField="status"
           name="status"
+          :value="status"
           auto
           :isCard="false"
           title="Active"
