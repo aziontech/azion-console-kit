@@ -1,5 +1,7 @@
 <template>
-  <div class="bottom-0 chat-input flex sticky flex-col gap-2 text-center mx-auto md:max-w-3xl w-full">
+  <div
+    class="bottom-0 chat-input flex sticky flex-col gap-2 text-center mx-auto md:max-w-3xl w-full"
+  >
     <div class="flex w-full">
       <Textarea
         v-model="userMessage"

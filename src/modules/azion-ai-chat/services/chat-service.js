@@ -43,7 +43,7 @@ export async function chatService({ parsedBody, server, signal, onMessage }) {
             const content = choices[0]?.delta?.content
             if (content) onMessage(content, true)
           } catch (error) {
-            console.error('Erro ao analisar JSON:', error, 'Linha:', line)
+            throw new Error('An error occurred while processing the chat stream')
           }
         })
     }

@@ -3,26 +3,43 @@ import { useLayout } from '../../composables/use-layout'
 
 describe('useLayout', () => {
   it('should ensure resetMenu sets sidebarVisible to false', () => {
-    const { layoutState, resetMenu } = useLayout()
+    const { layoutState, closeSidebar } = useLayout()
     layoutState.sidebarVisible = true
-    resetMenu()
+    closeSidebar()
     expect(layoutState.sidebarVisible).toBeFalsy()
   })
 
   it('should verify toggleSidebar toggles sidebarVisible state', () => {
-    const { layoutState, toggleSidebar } = useLayout()
+    const { layoutState, toggleSidebarComponent } = useLayout()
     layoutState.sidebarVisible = false
-    toggleSidebar()
+    toggleSidebarComponent('helper', {})
     expect(layoutState.sidebarVisible).toBeTruthy()
-    toggleSidebar()
+    toggleSidebarComponent('helper', {})
     expect(layoutState.sidebarVisible).toBeFalsy()
   })
 
   it('should confirm isSidebarActive is readonly and reflects the sidebarVisible state accurately, blocking direct modifications', () => {
-    const { layoutState, toggleSidebar, isSidebarActive } = useLayout()
+    const { layoutState, toggleSidebarComponent, isSidebarActive } = useLayout()
     layoutState.sidebarVisible = true
     expect(isSidebarActive.value).toBeFalsy()
-    toggleSidebar()
+    toggleSidebarComponent('helper', {})
     expect(isSidebarActive.value).toBeTruthy()
+  })
+
+  it('should open the sidebar with the correct component', () => {
+    const { layoutState, OpenSidebarComponent } = useLayout()
+    OpenSidebarComponent('helper', { someProp: 'value' })
+    expect(layoutState.sidebarVisible).toBeTruthy()
+    expect(layoutState.currentComponent.component.name).toBe('helper-sidebar')
+    expect(layoutState.currentComponent.props.someProp).toBe('value')
+  })
+
+  it('should close the sidebar', () => {
+    const { layoutState, closeSidebar } = useLayout()
+    layoutState.sidebarVisible = true
+    closeSidebar()
+    expect(layoutState.sidebarVisible).toBeFalsy()
+    expect(layoutState.currentComponent.component).toBeNull()
+    expect(layoutState.currentComponent.props).toEqual({})
   })
 })
