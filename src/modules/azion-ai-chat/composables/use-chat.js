@@ -22,9 +22,8 @@ const state = reactive({
 })
 
 const initializeConfig = (config) => {
-  state.config.apiUrl = config.apiUrl || state.config.apiUrl
-  state.config.userId = config.userId || state.config.userId
-  state.config.userName = config.userName || state.config.userName
+  state.config.apiUrl = config.apiUrl ?? state.config.apiUrl
+  state.config.user = config.user ?? state.config.user
   state.config.errorMessage = config.errorMessage || state.config.errorMessage
   state.config.stream = config.stream ?? state.config.stream
   state.chat.suggestions = config.suggestions || state.chat.suggestions
@@ -39,9 +38,8 @@ export function useChat(config) {
     state.config.apiUrl = url
   }
 
-  const setUser = ({ userId, userName }) => {
-    state.config.userId = userId
-    state.config.userName = userName
+  const setUser = (user) => {
+    state.config.user = user
   }
 
   const setStream = (enable) => {
@@ -74,9 +72,8 @@ export function useChat(config) {
 
   const constructPayload = () => ({
     azion: {
+      ...state.config.user,
       session_id: state.chat.sessionId,
-      user_name: state.config.userName,
-      client_id: state.config.userId,
       url: window.location.pathname,
       app: 'console'
     },

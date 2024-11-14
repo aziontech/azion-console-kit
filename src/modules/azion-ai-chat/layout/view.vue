@@ -1,161 +1,75 @@
 <template>
   <div class="max-h-[calc(100vh-15.5rem)] pb-8 px-8 h-full">
-    <div class="border h-full rounded-md surface-border">
-      <div class="flex-1 overflow-hidden overflow-y-auto">
-        <div
-          class=""
-          v-if="!getStartConversation"
-          :class="{ '': !getStartConversation }"
-        >
-          <Welcome />
-          <Suggestions />
-          <slot name="chatSuggestions" />
-        </div>
-        <div v-else>
-          <div class="">
-            <PrimeButton
-              icon="pi pi-eraser"
-              outlined
-              label="Clear chat"
-              class="surface-border"
-              aria-label="Clear chat"
-              v-tooltip.bottom="'Clear chat'"
-              @click="clearChat"
-            />
+    <div class="flex flex-col border h-full rounded-md surface-border p-3">
+      <div class="overflow-hidden overflow-y-auto h-full custom-scroll" ref="chatContainer">
+        <template v-if="!getStartConversation">
+          <div class="flex flex-col gap-6 h-full justify-center">
+            <Welcome />
+            <Suggestions />
+            <slot name="chatSuggestions" />
           </div>
-          <ChatMessages class="" />
-        </div>
+        </template>
+        <template v-else>
+          <div class="sticky w-full flex justify-end px-3 top-0 surface-section">
+            <PrimeButton icon="pi pi-eraser" outlined label="Clear chat" class="surface-border" aria-label="Clear chat"
+              v-tooltip.bottom="'Clear chat'" @click="clearChat" />
+          </div>
+          <ChatMessages class="pb-6" />
+        </template>
       </div>
-      <div class="">
-        <ChatInput class="" />
-      </div>
+      <ChatInput />
     </div>
   </div>
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import Welcome from '../components/chat-welcome.vue'
-  import ChatInput from '../components/chat-input.vue'
-  import ChatMessages from '../components/chat-list-messages.vue'
-  import Suggestions from '../components/chat-suggestions.vue'
-  import { useChat } from '../composables/use-chat.js'
-  import { nextTick, ref, watch } from 'vue'
+import PrimeButton from 'primevue/button'
+import Welcome from '../components/chat-welcome.vue'
+import ChatInput from '../components/chat-input.vue'
+import ChatMessages from '../components/chat-list-messages.vue'
+import Suggestions from '../components/chat-suggestions.vue'
+import { useChat } from '../composables/use-chat.js'
+import { nextTick, ref, watch } from 'vue'
 
-  defineOptions({
-    name: 'AzionAiChatLayout'
-  })
+defineOptions({
+  name: 'AzionAiChatLayout'
+})
 
-  const props = defineProps({
-    user: Object,
-    suggestionsOptions: Array
-  })
+const props = defineProps({
+  user: Object,
+  suggestionsOptions: Array
+})
 
-  const { messages, getStartConversation, clearChat } = useChat({
-    ...props.user,
-    suggestions: props.suggestionsOptions
-  })
+const { messages, getStartConversation, clearChat } = useChat({
+  user: props.user,
+  suggestions: props.suggestionsOptions
+})
 
-  const chatContainer = ref(null)
+const chatContainer = ref(null)
 
-  const scrollToBottom = () => {
-    if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-    }
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   }
+}
 
-  watch(
-    () => messages,
-    async () => {
-      await nextTick()
-      scrollToBottom()
-    },
-    { deep: true, flush: 'post' }
-  )
+watch(
+  () => messages,
+  async () => {
+    await nextTick()
+    scrollToBottom()
+  },
+  { deep: true, flush: 'post' }
+)
 </script>
 
 <style>
-  .custom-scroll::-webkit-scrollbar {
-    width: 8px;
-  }
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .custom-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--surface-500);
-    border-radius: 4px;
-  }
-
-  .chat-message {
-    font-size: 16px;
-  }
-
-  .chat-message .message-content {
-    width: auto;
-    overscroll-behavior: none;
-    max-width: 100%;
-    overflow: hidden;
-    background-color: transparent;
-  }
-
-  .chat-message h3 {
-    font-size: 1.17em !important;
-    line-height: 1.75 !important;
-    font-weight: 500 !important;
-    margin-top: 1.25em !important;
-    margin-bottom: 1.25em !important;
-  }
-
-  .chat-message div d:first-child {
-    margin-top: 0 !important;
-  }
-
-  .chat-message p {
-    tab-size: 4;
-    font-feature-settings: normal;
-    font-variation-settings: normal;
-    box-sizing: border-box;
-    color: var(--text-color) !important;
-    margin-top: 1.25em !important;
-    word-break: break-word;
-  }
-
-  .chat-message ul,
-  .chat-message ol {
-    tab-size: 4;
-    font-feature-settings: normal;
-    font-variation-settings: normal;
-    font-size: 1rem;
-    line-height: 1.75;
-    border-width: 0;
-    border-style: solid;
-    border-color: var(--text-color);
-    list-style: none;
-    box-sizing: border-box;
-    color: var(--text-color) !important;
-    overscroll-behavior: contain !important;
-    list-style-type: disc;
-    margin-top: 1.25em;
-    margin-bottom: 1.25em;
-    padding-left: 1.625em;
-  }
-
-  .chat-message a {
-    color: var(--text-color-link) !important;
-    text-decoration: underline;
-    font-weight: 500;
-  }
-
-  .chat-message pre {
-    overflow: auto;
-    display: block;
-    word-break: break-all;
-    overflow-wrap: break-word;
-    border-radius: 7px;
-    background: rgb(43, 43, 43);
-    color: rgb(248, 248, 242);
-    margin-top: 0.8em;
-    margin-bottom: 0.8em;
-    padding: 0.6em;
-    font-size: 0.9em;
-    line-height: 1.5em;
-  }
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--surface-500);
+  border-radius: 4px;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col text-sm">
+  <div class="flex flex-col text-sm mx-auto flex-1 gap-4 md:max-w-3xl">
     <chat-message
       v-for="(message, index) in messages"
       :key="index"
