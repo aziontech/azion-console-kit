@@ -8,6 +8,12 @@ const fixtures = {
     name: 'teste',
     is_active: true,
     company_name: 'teste'
+  },
+  inactiveAccountSample: {
+    id: 123,
+    name: 'teste',
+    is_active: false,
+    company_name: 'teste'
   }
 }
 
@@ -28,7 +34,7 @@ describe('AccountsManagementServices', () => {
     await sut({ account_type: 'reseller' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/accounts?account_type=reseller&ordering=id&page=1&page_size=10`,
+      url: `iam/accounts?account_type=reseller&ordering=name&page=1&page_size=10&fields=undefined&search=`,
       method: 'GET'
     })
   })
@@ -52,6 +58,30 @@ describe('AccountsManagementServices', () => {
         status: {
           content: 'Active',
           severity: 'success'
+        }
+      }
+    ])
+  })
+
+  it('should parse correctly inactive each returned item', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.inactiveAccountSample]
+      }
+    })
+
+    const { sut } = makeSut()
+    const result = await sut({ account_type: 'reseller' })
+
+    expect(result).toEqual([
+      {
+        id: fixtures.accountSample.id,
+        name: fixtures.accountSample.name,
+        company: fixtures.accountSample.company_name,
+        status: {
+          content: 'Inactive',
+          severity: 'error'
         }
       }
     ])

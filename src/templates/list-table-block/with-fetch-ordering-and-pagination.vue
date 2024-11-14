@@ -311,7 +311,9 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+
   defineOptions({ name: 'list-table-block-new' })
+
   const emit = defineEmits([
     'on-load-data',
     'on-before-go-to-add-page',
@@ -403,7 +405,9 @@
       default: () => 'id'
     }
   })
+
   const tableDefinitions = useTableDefinitionsStore()
+
   const itemsByPage = ref(tableDefinitions.getNumberOfLinesPerPage)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
@@ -418,16 +422,21 @@
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
+
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
+
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
+
   const totalRecords = ref()
   const firstItemIndex = ref(1)
   const savedSearch = ref('')
   const savedOrdering = ref('')
+
   const firstLoadData = ref(true)
+
   const selectedItems = computed({
     get: () => {
       return props.selectedItensData
@@ -465,9 +474,9 @@
   }
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
-      data.value = event.value
-      await props.onReorderService(tableData)
+      const tableData = getArrayChangedIndexes(data.value, event.dragIndex, event.dropIndex)
+      await props.onReorderService(tableData, data.value, savedOrdering.value, savedSearch.value)
+      data.value = tableData
       reload()
       toast.add({
         closable: true,
@@ -482,9 +491,11 @@
       })
     }
   }
+
   const openDialog = (dialogComponent, body) => {
     dialog.open(dialogComponent, body)
   }
+
   const actionOptions = (rowData) => {
     const createActionOption = (action) => {
       return {
@@ -518,11 +529,14 @@
         }
       }
     }
+
     const actions = props.actions
       .filter((action) => !action.visibleAction || action.visibleAction(rowData))
       .map(createActionOption)
+
     return actions
   }
+
   const loadData = async ({ page, ...query }) => {
     if (props.listService) {
       try {
@@ -590,10 +604,13 @@
       ...query
     })
   }
+
   defineExpose({ reload, handleExportTableDataToCSV })
+
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
   }
+
   const setMenuRefForRow = (rowDataID) => {
     return (document) => {
       if (document !== null) {
@@ -605,32 +622,35 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
+
     firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
+
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
+
     return [...filters, ...filtersPath]
   })
+
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
+
     await reload({ ordering })
+
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
   const fetchOnSearch = () => {
-    handleSearchValue(true)
     reload()
   }
-  const handleSearchValue = (shouldChangeSearchValue = false) => {
+
+  const handleSearchValue = () => {
     const search = filters.value.global.value
-    const hasValueInSearch = !!search.length
-    if (shouldChangeSearchValue || !hasValueInSearch) {
-      savedSearch.value = search
-    }
+    savedSearch.value = search
   }
 </script>

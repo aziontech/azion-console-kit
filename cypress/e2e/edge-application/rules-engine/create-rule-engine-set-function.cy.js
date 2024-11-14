@@ -18,7 +18,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
-  cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
+  cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
   cy.get(selectors.list.filteredRow.column('name')).should(
     'have.text',
     fixtures.edgeApplicationName
@@ -40,7 +40,8 @@ const createFunctionCase = () => {
   cy.wait('@getEdgeFunctions')
 }
 
-describe('Edge Application', { tags: ['@dev3'] }, () => {
+// TODO: remove xfail tag when the API v4 is fixed
+describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -106,7 +107,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.verifyToast('success', 'Your Rules Engine has been created.')
 
     // Assert
-    cy.get(selectors.list.searchInput).type(fixtures.rulesEngineName)
+    cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
 
     // Cleanup - Remove the rule engine

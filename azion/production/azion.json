@@ -68,6 +68,11 @@
       "origin-id": 154233,
       "origin-key": "8c16e835-20af-41d5-a688-cac8e6aefa94",
       "name": "origin-console-feedback"
+    },
+    {
+      "origin-id": 162902,
+      "origin-key": "8b4c7f0a-6496-4a4d-8369-b39809903069",
+      "name": "maintaince-origin"
     }
   ],
   "rules-engine": {
@@ -156,6 +161,16 @@
       {
         "id": 313139,
         "name": "Route API Identity Providers",
+        "phase": "request"
+      },
+      {
+        "id": 316429,
+        "name": "maintaince page",
+        "phase": "request"
+      },
+      {
+        "id": 318350,
+        "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
       }
     ]

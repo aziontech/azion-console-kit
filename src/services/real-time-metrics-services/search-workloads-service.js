@@ -7,9 +7,10 @@ export const searchWorkloadsService = async ({
   fields = 'id, name',
   ordering = 'name',
   page = 1,
-  pageSize = 50000
+  pageSize = 50000,
+  search = ''
 } = {}) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize })
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeWorkloadsBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'

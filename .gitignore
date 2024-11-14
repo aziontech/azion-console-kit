@@ -45,12 +45,6 @@ cypress.env.*
 
 azion/
 
-
-!azion/production
-!azion/stage
-
-azion/
-
 src/views/Playground/PlaygroundView.vue
 /cypress/downloads
 #Paths added by Azion CLI

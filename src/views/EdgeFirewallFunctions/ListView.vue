@@ -9,7 +9,7 @@
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
-    <ListTableBlock
+    <FetchListTableBlock
       ref="listFunctionsEdgeFirewallRef"
       addButtonLabel="Function Instance"
       :listService="listFunctionsInstance"
@@ -18,6 +18,7 @@
       @on-load-data="handleLoadData"
       :actions="actions"
       isTabs
+      :apiFields="EDGE_FIREWALL_FUNCTIONS_API_FIELDS"
     >
       <template #addButton>
         <PrimeButton
@@ -26,7 +27,7 @@
           @click="openCreateFunctionDrawer"
         />
       </template>
-    </ListTableBlock>
+    </FetchListTableBlock>
   </div>
   <EmptyResultsBlock
     v-else
@@ -56,8 +57,9 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block'
   import DrawerFunction from './Drawer'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -101,6 +103,14 @@
 
   const drawerFunctionRef = ref('')
   const listFunctionsEdgeFirewallRef = ref('')
+  const EDGE_FIREWALL_FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'last_editor',
+    'last_modified',
+    'version',
+    'edge_function'
+  ]
 
   const getColumns = computed(() => {
     return [
@@ -110,26 +120,25 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Function Instanced'
-      },
-      {
-        field: 'version',
-        header: 'Version'
+        header: 'Edge Function',
+        sortField: 'edge_function',
+        disableSort: true
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor'
+        header: 'Last Editor',
+        sortField: 'last_editor'
       },
       {
         field: 'modified',
-        sortField: 'lastModifiedDate',
-        header: 'Last Modified'
+        header: 'Last Modified',
+        sortField: 'last_modified'
       }
     ]
   })
 
-  const listFunctionsInstance = async () => {
-    return await props.listEdgeFirewallFunctionService(props.edgeFirewallID)
+  const listFunctionsInstance = async (query) => {
+    return await props.listEdgeFirewallFunctionService(props.edgeFirewallID, query)
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {

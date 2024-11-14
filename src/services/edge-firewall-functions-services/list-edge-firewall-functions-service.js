@@ -1,10 +1,11 @@
-import * as FunctionsInstanceService from '@/services/edge-firewall-functions-services/list-functions-service'
+import * as FunctionsInstanceServiceV4 from '@/services/edge-firewall-functions-services/v4'
 import * as EdgeFunctionsService from '@/services/edge-functions-services'
 import { parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-
-const listFunctionInstances = async (edgeFirewallID) => {
-  return FunctionsInstanceService.listFunctionsService({
-    edgeFirewallID
+let count = 0
+const listFunctionInstances = async (edgeFirewallID, query) => {
+  return FunctionsInstanceServiceV4.listFunctionsService({
+    edgeFirewallID,
+    ...query
   })
 }
 
@@ -15,6 +16,9 @@ const getFunctionData = async (edgeFirewallFunction) => {
 }
 
 const listFunctionInstancesAndFunctionData = async (functionsInstances) => {
+  if (!functionsInstances.length) {
+    return []
+  }
   return Promise.all(
     functionsInstances?.map(async (edgeFirewallFunction) => {
       let functionData = await getFunctionData(edgeFirewallFunction)
@@ -23,9 +27,12 @@ const listFunctionInstancesAndFunctionData = async (functionsInstances) => {
   )
 }
 
-export const listEdgeFirewallFunctionsService = async (edgeFirewallID) => {
-  const functionsInstances = await listFunctionInstances(edgeFirewallID)
-  const functions = await listFunctionInstancesAndFunctionData(functionsInstances)
+export const listEdgeFirewallFunctionsService = async (edgeFirewallID, query) => {
+  const functionsInstances = await listFunctionInstances(edgeFirewallID, query)
+  count = functionsInstances?.count || 0
+  const functionData = functionsInstances?.body || functionsInstances
+
+  const functions = await listFunctionInstancesAndFunctionData(functionData)
   const httpResponse = adapt(functions)
 
   return parseHttpResponse(httpResponse)
@@ -46,6 +53,7 @@ const mapFunctionData = (edgeFirewallFunction, functionData) => {
 
 const adapt = (functions) => {
   return {
+    count,
     body: functions,
     statusCode: 200
   }

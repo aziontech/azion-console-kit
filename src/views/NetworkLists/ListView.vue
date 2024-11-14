@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listNetworkListService"
         :columns="getColumns"
@@ -16,6 +16,7 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No network lists found."
         :actions="actions"
+        :apiFields="NETWORK_LIST_API_FIELDS"
       />
       <EmptyResultsBlock
         v-else
@@ -39,7 +40,8 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -63,6 +65,8 @@
   })
 
   const hasContentToList = ref(true)
+  const NETWORK_LIST_API_FIELDS = ['id', 'name', 'type', 'last_editor', 'last_modified']
+
   const actions = [
     {
       type: 'delete',
@@ -96,7 +100,8 @@
       },
       {
         field: 'listType',
-        header: 'List Type'
+        header: 'List Type',
+        sortField: 'type'
       },
       {
         field: 'lastEditor',
@@ -104,7 +109,7 @@
       },
       {
         field: 'lastModified',
-        sortField: 'lastModifiedDate',
+        sortField: 'last_modified',
         header: 'Last Modified'
       }
     ]
