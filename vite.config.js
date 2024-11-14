@@ -33,11 +33,11 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/(marketplace|script-runner|template-engine)': {
+        '^/api/(marketplace|script-runner|template-engine|iam)': {
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
           rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
+            path.replace(/^\/api\/(marketplace|script-runner|template-engine|iam)/, '/$1/api')
         },
         '^/api/vcs': {
           target: `${URLStartPrefix}vcs-api.azion.net/`,
@@ -83,7 +83,12 @@ const getConfig = () => {
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '')
-        }
+        },
+        '/graphql/accounting': {
+          target: `${URLStartPrefix}manager.azion.com`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
+        },
       }
     }
   }

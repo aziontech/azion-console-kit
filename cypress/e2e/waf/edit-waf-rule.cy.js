@@ -35,7 +35,7 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
     cy.get(selectors.wafs.seeMore('threatTypes')).click()
@@ -69,7 +69,7 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
 
     // Assert
-    cy.get(selectors.list.searchInput).type(wafName)
+    cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
 
     cy.get(selectors.wafs.listRow('name')).should('have.text', wafName)
     cy.get(selectors.wafs.seeMore('threatTypes')).click()

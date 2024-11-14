@@ -97,6 +97,7 @@
   const searchFilter = () => {
     const adaptFilter = adapterApply(displayFilter.value)
     lastFilter.value = !displayFilter.value.length
+
     emit('applyFilter', adaptFilter)
     emit('update:filterAdvanced', adaptFilter)
     updateHash(adaptFilter, props.externalFilter)

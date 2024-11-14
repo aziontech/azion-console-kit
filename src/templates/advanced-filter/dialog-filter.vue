@@ -159,15 +159,24 @@
 
   const onSubmit = handleSubmit(
     async ({ filterSelected, operatorSelected, selectedValue, begin, end }) => {
-      emit('applyFilter', {
+      const data = {
         field: filterSelected.label,
         valueField: filterSelected.value,
         operator: operatorSelected.value,
-        value: selectedValue ?? { begin, end },
+        value: selectedValue,
         format: operatorSelected.format,
         edit: editFilter.value,
         type: operatorSelected.type
-      })
+      }
+
+      const operatorType = filterSelected.operator[0].value.type
+      if (['Boolean', 'StringObject'].includes(operatorType)) {
+        data.value = selectedValue
+      } else {
+        data.value = selectedValue ?? { begin, end }
+      }
+
+      emit('applyFilter', data)
       toggle()
     }
   )

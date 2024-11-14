@@ -5,7 +5,7 @@ export const listTeamPermissionService = async ({
   orderBy = 'id',
   sort = 'asc',
   page = 1,
-  pageSize = 200
+  pageSize = 10
 } = {}) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({

@@ -6,7 +6,7 @@ import { inject } from 'vue'
 /** @type {import('vue-router').NavigationHookAfter} */
 export default function afterEachRoute(to, from, failure) {
   const loadingStore = useLoadingStore()
-  const { hasActiveUserId } = useAccountStore()
+  const { hasActiveUserId, userId } = useAccountStore()
   loadingStore.finishLoading()
 
   if (failure || !hasActiveUserId) return
@@ -17,4 +17,5 @@ export default function afterEachRoute(to, from, failure) {
       url: to.fullPath
     })
     .track()
+  tracker.identify(userId)
 }

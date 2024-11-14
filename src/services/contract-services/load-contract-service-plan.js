@@ -16,37 +16,41 @@ const PLAN_MAP = {
   mission_critical: 'Mission Critical'
 }
 
-function extractWordFromSlug(str) {
-  const keyword = 'contract_'
-  const index = str.indexOf(keyword)
+const KEYWORDS = {
+  CONTRACT: 'contract_',
+  SUPPORT: 'support_',
+  PLAN: 'plan_'
+}
 
-  if (index !== -1) {
-    const start = index + keyword.length
-    const remainingStr = str.substring(start)
-    const extractedWord =
-      remainingStr !== 'mission_critical' ? remainingStr.split('_')[0] : remainingStr
-    return extractedWord
+function extractWordFromSlug(slug) {
+  for (const keyword of Object.values(KEYWORDS)) {
+    if (slug.includes(keyword)) {
+      const extractedWord = slug.replace(keyword, '').split('_')[0]
+      return extractedWord === 'mission' ? 'mission_critical' : extractedWord
+    }
   }
-
   return ''
 }
 
 const adapt = (httpResponse) => {
-  let yourServicePlan = 'Developer'
-
   const products = httpResponse.body || []
   const slugs = products?.map((product) => product.slug)
 
   const isDeveloperSupportPlan = slugs.every((slug) => {
-    return !slug.includes('plan_') && !slug.includes('support_')
+    return !slug.includes(KEYWORDS.PLAN) && !slug.includes(KEYWORDS.SUPPORT)
   })
 
+  let yourServicePlan = 'Developer'
+
   if (!isDeveloperSupportPlan) {
-    for (const product of products) {
-      if (product.slug.includes('contract_')) {
-        yourServicePlan = PLAN_MAP[extractWordFromSlug(product.slug)]
-        break
-      }
+    const contractProduct = products.find(
+      (product) =>
+        product.slug.includes(KEYWORDS.CONTRACT) || product.slug.includes(KEYWORDS.SUPPORT)
+    )
+
+    if (contractProduct) {
+      const planType = extractWordFromSlug(contractProduct.slug)
+      yourServicePlan = PLAN_MAP[planType] || 'Developer'
     }
   }
 

@@ -97,7 +97,7 @@
       'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
     const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
 
-    return [
+    const options = [
       {
         title: 'Honor cache policies',
         subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
@@ -106,6 +106,12 @@
       },
       { title: 'Override cache settings', inputValue: 'override' }
     ]
+
+    if (isBrowser) {
+      options.push({ title: 'No cache', inputValue: 'no-cache' })
+    }
+
+    return options
   }
 
   const layerFileOptimizationRadioOptions = computed(() => [

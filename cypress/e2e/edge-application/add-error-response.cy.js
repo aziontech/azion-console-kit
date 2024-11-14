@@ -17,7 +17,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
-  cy.get(selectors.list.searchInput).type(fixtures.edgeApplicationName)
+  cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
   cy.get(selectors.list.filteredRow.column('name')).should(
     'have.text',
     fixtures.edgeApplicationName
@@ -27,7 +27,8 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4'] }, () => {
+// TODO: remove xfail tag when the API v4 is fixed
+describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login

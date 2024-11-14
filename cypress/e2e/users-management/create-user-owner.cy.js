@@ -48,7 +48,7 @@ describe('Users Management spec', { tags: ['@dev7'] }, () => {
 
     cy.verifyToast('success', 'Your user has been created')
 
-    cy.get(selectors.list.searchInput).type(userFirstName)
+    cy.get(selectors.list.searchInput).type(`${userFirstName}{enter}`)
 
     cy.get(selectors.usersManagement.listRow('firstName')).should('have.text', userFirstName)
     cy.get(selectors.usersManagement.listRow('lastName')).should('have.text', userLastName)

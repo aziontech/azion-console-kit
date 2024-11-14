@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Domain"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -9,6 +9,7 @@
         :loadService="loadDomainService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setDomainName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
@@ -16,7 +17,9 @@
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
-            :domainName="domainName"
+            :edgeFirewallsData="edgeFirewallsData"
+            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
+            @edgeFirewallCreated="handleEdgeFirewallCreated"
             hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
@@ -47,6 +50,7 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -104,6 +108,9 @@
   const digitalCertificates = ref([])
   const toast = useToast()
   const loadingEdgeApplications = ref(true)
+  const domainName = ref()
+  const edgeFirewallsData = ref([])
+  const isLoadingEdgeFirewalls = ref(true)
 
   const requestEdgeApplications = async () => {
     loadingEdgeApplications.value = true
@@ -144,10 +151,33 @@
     window.scrollTo(0, 0)
   }
 
+  const setDomainName = async (domain) => {
+    domainName.value = domain.name
+  }
+
+  const requestEdgeFirewalls = async () => {
+    isLoadingEdgeFirewalls.value = true
+    try {
+      edgeFirewallsData.value = await listEdgeFirewallService({})
+    } catch (error) {
+      toastError(error)
+    } finally {
+      isLoadingEdgeFirewalls.value = false
+    }
+  }
+
+  const handleEdgeFirewallCreated = async () => {
+    await requestEdgeFirewalls()
+  }
+
   onMounted(async () => {
     try {
       scrollToTop()
-      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
+      await Promise.all([
+        requestEdgeApplications(),
+        requestDigitalCertificates(),
+        requestEdgeFirewalls()
+      ])
     } catch (error) {
       toastError(error)
     } finally {
@@ -193,7 +223,8 @@
         then: (schema) => schema.required()
       })
       .label('Trusted CA Certificate'),
-    active: yup.boolean()
+    active: yup.boolean(),
+    environment: yup.string()
   })
 
   const updateDigitalCertificates = async () => {

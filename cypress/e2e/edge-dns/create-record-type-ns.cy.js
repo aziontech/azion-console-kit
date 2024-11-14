@@ -31,7 +31,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.saveButton).click()
     cy.verifyToast('success', 'Your Edge DNS has been created')
     cy.get(selectors.edgeDns.cancelButton).click()
-    cy.get(selectors.edgeDns.searchInput).type(zoneName)
+    cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)
       .should('contain', zoneName)
       .then(() => {
@@ -56,7 +56,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
     // Assert
     cy.verifyToast('success', 'Edge DNS Record has been created')
 
-    cy.get(selectors.list.searchInput).type(recordTypeFixtures.name)
+    cy.get(selectors.list.searchInput).type(`${recordTypeFixtures.name}{enter}`)
     cy.get(selectors.edgeDns.list.columnName('name')).should('have.text', recordTypeFixtures.name)
     cy.get(selectors.edgeDns.list.columnName('type')).should(
       'have.text',
@@ -78,7 +78,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
         cy.verifyToast('Edge DNS Record successfully deleted')
       })
     })
-  
+
     afterEach(() => {
       cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
         cy.verifyToast('Your Edge DNS has been deleted')
