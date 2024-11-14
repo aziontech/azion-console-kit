@@ -270,19 +270,6 @@ const backRules = [
     }
   },
   {
-    name: 'Route Send Message to Copilot',
-    description: 'this router will send the user message to the chatbot',
-    match: '^/ai',
-    behavior: {
-      forwardCookies: true,
-      setOrigin: {
-        name: 'origin-console-ai',
-        type: 'single_origin'
-      },
-      rewrite: '/copilot/chat/completions'
-    }
-  },
-  {
     name: 'Route API Identity Providers',
     description: 'Routes API requests for identity providers',
     match: '^/api/iam',
@@ -339,12 +326,6 @@ const AzionConfig = {
         type: 'single_origin',
         hostHeader: `api.azion.com`,
         addresses: [`api.azion.com`]
-      }
-      {
-        name: 'origin-console-ai',
-        type: 'single_origin',
-        hostHeader: `ai.azion.com`,
-        addresses: [`ai.azion.com`]
       }
     ]),
     {
