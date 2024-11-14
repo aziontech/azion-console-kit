@@ -3,7 +3,7 @@
     v-if="showButton"
     :label="currentLabel"
     @click="toggleSidebarComponent('copilot')"
-    class="text-white border-header bg-header hover:bg-header-button-hover"
+    class="special-button text-white border-header bg-header hover:bg-header-button-hover"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
       label: { class: 'max-md:hidden' },
@@ -12,8 +12,14 @@
     :class="buttonClasses"
     icon="ai ai-ask-azion"
     size="small"
+    outlined
     v-tooltip.bottom="{ value: 'Azion Copilot', showDelay: 200 }"
-  />
+  >
+    <div class="special-button-content">
+      <i class="ai ai-ask-azion"> </i>
+      {{ currentLabel }}
+    </div>
+  </PrimeButton>
 </template>
 
 <script setup>

@@ -3,7 +3,7 @@ import { loadAccountJobRoleService } from '@/services/account-settings-services'
 import { setRedirectRoute } from '@/helpers'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
-export async function accountGuard({ to, accountStore, tracker }) {
+export async function accountGuard({ to, accountStore, tracker, loadContractServicePlan }) {
   const isPrivateRoute = !to.meta.isPublic
   const userNotIsLoggedIn = !accountStore.hasActiveUserId
 
@@ -26,6 +26,14 @@ export async function accountGuard({ to, accountStore, tracker }) {
       accountInfo.user_id = userInfo.results.id
       accountInfo.colorTheme = accountStore.theme
       accountInfo.jobRole = accountJobRole.jobRole
+
+      if (accountInfo.client_id) {
+        const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
+          clientId: accountInfo.client_id
+        })
+        accountStore.isDeveloperSupportPlan = isDeveloperSupportPlan
+        accountStore.yourServicePlan = yourServicePlan
+      }
 
       accountStore.setAccountData(accountInfo)
     } catch {

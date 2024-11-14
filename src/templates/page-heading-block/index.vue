@@ -22,7 +22,7 @@
       type: Boolean
     },
     tag: {
-      type: String
+      type: Object
     }
   })
 
@@ -73,7 +73,12 @@
           :class="{ 'flex gap-3 align-items-center': props.tag }"
         >
           {{ props.pageTitle }}
-          <PrimeTag :value="props.tag" v-if="props.tag" class="h-max" />
+          <PrimeTag
+            v-if="props.tag"
+            class="h-max"
+            v-bind="props.tag"
+            v-tooltip.bottom="props.tag?.tooltip"
+          />
         </div>
         <div
           class="text-[var(--text-color-secondary)] text-lg font-normal leading-7 max-md:text-base"

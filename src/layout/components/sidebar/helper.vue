@@ -1,5 +1,5 @@
 <script setup>
-  import { getStaticUrlsByEnvironment, openSearchResult, windowOpen } from '@/helpers'
+  import { openSearchResult, windowOpen } from '@/helpers'
   import DiscordLogo from '@assets/svg/discord-logo'
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
@@ -13,7 +13,7 @@
     name: 'helper-sidebar'
   })
 
-  const { closeSidebar, isSidebarActive } = useLayout()
+  const { closeSidebar, isSidebarActive, OpenSidebarComponent } = useLayout()
   const { getters, actions } = useHelperCenter()
 
   const route = useRoute()
@@ -33,14 +33,22 @@
       isLinkExternal: true
     },
     {
-      label: 'Contact Support',
-      link: `${getStaticUrlsByEnvironment('manager')}/tickets/`,
+      label: 'Get Assistance (Support)',
+      open: 'copilot',
       isLinkExternal: true
     }
   ])
 
   const searchDocumentation = () => {
     openSearchResult(search.value)
+  }
+
+  const clickMenuItem = (item) => {
+    if (item.link) {
+      windowOpen(item.link)
+    } else if (item.open) {
+      OpenSidebarComponent(item.open)
+    }
   }
 
   const currentArticleContent = computed(() => {
@@ -153,7 +161,7 @@
               <template #item="{ item }">
                 <a
                   class="flex items-center h-[35px] cursor-pointer px-2"
-                  @click="windowOpen(item.link)"
+                  @click="clickMenuItem(item)"
                 >
                   <i
                     v-if="!item.isLinkExternal"

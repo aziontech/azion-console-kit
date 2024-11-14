@@ -1,8 +1,10 @@
+import { getStaticUrlsByEnvironment } from './get-static-urls-by-environment'
+
 export const AZION_SEARCH_RESULT = 'https://www.azion.com/en/search-result'
 export const AZION_DOCUMENTATION = 'https://www.azion.com/en/documentation'
 export const AZION_DOCUMENTATION_PRODUCTS = 'https://www.azion.com/en/documentation/products'
 export const AZION_API_DOCUMENTATION = 'https://api.azion.com/'
-export const AZION_CONTACT_SUPPORT = 'https://tickets.azion.com/en/support/home'
+export const AZION_CONTACT_SUPPORT = `${getStaticUrlsByEnvironment('manager')}/tickets/`
 export const GOOGLE_AUTHENTICATOR_DOCUMENTATION =
   'https://support.google.com/accounts/answer/1066447'
 export const AZION_SITE = 'https://www.azion.com/'

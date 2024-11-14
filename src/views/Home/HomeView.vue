@@ -44,7 +44,7 @@
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
-  const { toggleSidebarComponent } = useLayout()
+  const { OpenSidebarComponent } = useLayout()
 
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
@@ -80,10 +80,6 @@
 
   const openAPIDocumentation = () => {
     props.windowManager.openAPIDocumentation()
-  }
-
-  const openContactSupport = () => {
-    toggleSidebarComponent('copilot')
   }
 
   const validationSchema = yup.object({
@@ -268,10 +264,10 @@
               <PrimeButton
                 type="button"
                 class="sm:w-auto w-full"
-                label="Go to AI Azion"
+                label="Go to Azion Copilot"
                 outlined
                 size="small"
-                @click="toggleSidebarComponent('copilot')"
+                @click="OpenSidebarComponent('copilot')"
               />
             </div>
           </div>
@@ -350,7 +346,7 @@
           <button
             type="button"
             class="sm:h-auto lg:h-40 hover:border-primary w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
-            @click="openContactSupport"
+            @click="OpenSidebarComponent('copilot', { clearChat: true })"
           >
             <div class="text-lg font-medium">Get Assistance (Support)</div>
             <div class="text-sm text-color-secondary">

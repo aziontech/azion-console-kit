@@ -17,7 +17,7 @@
     ]"
     v-show="isSidebarActive && isVisibleMobileSidebar"
   >
-    <component :is="activeComponent" />
+    <component :is="activeComponent.component" />
   </div>
 
   <Sidebar
@@ -32,7 +32,7 @@
     }"
   >
     <template #container>
-      <component :is="activeComponent" />
+      <component :is="activeComponent.component" />
     </template>
   </Sidebar>
 </template>

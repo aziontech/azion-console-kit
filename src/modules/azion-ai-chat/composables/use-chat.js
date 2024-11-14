@@ -1,11 +1,12 @@
 import { reactive, computed } from 'vue'
 import { chatService } from '../services/chat-service.js'
+import { makeBaseUrl } from '../services/make-url.js'
 
 const generateSessionId = () => crypto.randomUUID()
 
 const state = reactive({
   config: {
-    apiUrl: '/ai',
+    apiUrl: makeBaseUrl(),
     userId: '',
     userName: '',
     errorMessage: 'Sorry, something went wrong.',
