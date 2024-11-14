@@ -77,14 +77,16 @@
     }
   })
 
-  const PAGE_SIZE_INCREMENT = 100
-  const INITIAL_PAGE_SIZE = 100
+  const PAGE_INCREMENT = 1
+  const PAGE_SIZE = 100
+  const INITIAL_PAGE = 1
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
 
   const items = ref([])
   const loading = ref(false)
-  const pageSize = ref(INITIAL_PAGE_SIZE)
+  const page = ref(INITIAL_PAGE)
+  const totalCount = ref(0)
   const search = ref('')
 
   const { value: selectedValue, errorMessage } = useField(
@@ -101,8 +103,10 @@
 
   const handleLazyLoad = (event) => {
     const { last } = event
-    if (last >= pageSize.value) {
-      pageSize.value += PAGE_SIZE_INCREMENT
+    const pageSizeCount = PAGE_SIZE * page.value
+
+    if (last >= pageSizeCount) {
+      page.value += PAGE_INCREMENT
       loadDomains()
     }
   }
@@ -110,17 +114,52 @@
   const loadDomains = async () => {
     try {
       loading.value = true
+      if (page.value === INITIAL_PAGE) {
+        items.value = []
+      }
+
       const response = await listWorkloadsService({
-        pageSize: pageSize.value,
-        page: 1,
+        pageSize: PAGE_SIZE,
+        page: page.value,
         fields: 'id,name',
         search: search.value
       })
-      items.value = response.results.map((el) => {
+
+      totalCount.value = response.count
+      let results = response.results.map((el) => {
         return { label: el.name, value: el.id }
       })
+
+      checkItemsDuplicatedList()
+
+      if (page.value === INITIAL_PAGE) {
+        items.value = results
+      } else {
+        items.value = [...items.value, ...results]
+      }
+
+      setSelectedItemsToArray()
     } finally {
       loading.value = false
+    }
+  }
+
+  const setSelectedItemsToArray = () => {
+    if (Array.isArray(selectedValue.value) && Array.isArray(items.value)) {
+      selectedValue.value.forEach((selectedElement) => {
+        const existId = items.value.find((item) => item.value === selectedElement.value)
+        if (existId) return
+
+        items.value.push(selectedElement)
+      })
+    }
+  }
+
+  const checkItemsDuplicatedList = () => {
+    if (Array.isArray(selectedValue.value)) {
+      items.value = items.value.filter(
+        (result) => !selectedValue.value.some((selected) => selected.value === result.value)
+      )
     }
   }
 
@@ -135,7 +174,7 @@
   watchDebounced(
     search,
     () => {
-      pageSize.value = INITIAL_PAGE_SIZE
+      page.value = INITIAL_PAGE
       loadDomains()
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
