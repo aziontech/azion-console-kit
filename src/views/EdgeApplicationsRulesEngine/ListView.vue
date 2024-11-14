@@ -97,11 +97,10 @@
     'order'
   ]
 
-  const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
+  const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const PARSE_PHASE = {
     'Request phase': 'request',
-    'Response phase': 'response',
-    Default: 'default'
+    'Response phase': 'response'
   }
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
