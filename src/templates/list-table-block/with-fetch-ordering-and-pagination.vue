@@ -634,17 +634,9 @@
     return [...filters, ...filtersPath]
   })
 
-  const handleStatusOrder = (sortOrder) => {
-    if (sortOrder > 0) {
-      return 'status=active'
-    }
-    return 'status=pending'
-  }
-
   const fetchOnSort = async (event) => {
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
-    if (sortField === 'status') ordering = handleStatusOrder(sortOrder)
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
 
     await reload({ ordering })

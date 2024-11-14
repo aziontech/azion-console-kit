@@ -109,12 +109,12 @@
       {
         field: 'subjectName',
         header: 'Subject Names',
-        disableSort: true
+        sortField: 'subject_name'
       },
       {
         field: 'issuer',
         header: 'Issuer',
-        disableSort: true
+        sortField: 'issuer'
       },
       {
         field: 'type',
@@ -124,7 +124,7 @@
       {
         field: 'validity',
         header: 'Expiration Date',
-        disableSort: true
+        sortField: 'validity'
       },
       {
         field: 'status',
