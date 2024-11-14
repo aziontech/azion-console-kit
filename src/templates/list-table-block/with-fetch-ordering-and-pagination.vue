@@ -450,6 +450,7 @@
     }
   })
   onMounted(() => {
+    itemsByPage.value = showEspecificCountPage.value
     if (!props.lazyLoad) {
       loadData({
         page: 1,
@@ -495,6 +496,13 @@
       })
     }
   }
+
+  const showEspecificCountPage = computed(() => {
+    if (props.rowsPerPageOptions.length === 1) {
+      return 500
+    }
+    return tableDefinitions.getNumberOfLinesPerPage
+  })
 
   const openDialog = (dialogComponent, body) => {
     dialog.open(dialogComponent, body)
