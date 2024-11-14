@@ -9,14 +9,14 @@ const fixtures = {
     name: 'AZ firewall',
     last_editor: 'az editor',
     last_modified: new Date(2023, 10, 10),
-    is_active: true
+    active: true
   },
   edgeFirewallWithDomainsMock: {
     id: 1239875,
     name: 'AZ firewall 2',
     last_editor: 'az editor 2',
     last_modified: new Date(2023, 10, 10),
-    is_active: false
+    active: false
   },
   domainFactory: (id) => ({ id, name: `Domain ${id}` })
 }
@@ -58,6 +58,7 @@ describe('EdgeFirewallServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
+      count: 1,
       body: { results: [fixtures.edgeFirewallMock] }
     })
     const { sut } = makeSut()
@@ -84,6 +85,7 @@ describe('EdgeFirewallServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
+      count: 1,
       body: { results: [fixtures.edgeFirewallWithDomainsMock] }
     })
 

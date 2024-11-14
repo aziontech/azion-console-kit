@@ -3,14 +3,13 @@ import { makeAccountsManagementBaseUrl } from './make-accounts-management-base-u
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listAccountsService = async ({
-  ordering = 'id',
+  ordering = 'name',
   search = '',
   account_type = '',
   page = 1,
-  pageSize = 10,
-  fields = ''
+  pageSize = 10
 }) => {
-  const searchParams = makeListServiceQueryParams({ ordering, page, pageSize, search, fields })
+  const searchParams = makeListServiceQueryParams({ ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountsManagementBaseUrl()}?account_type=${account_type}&${searchParams.toString()}`,
     method: 'GET'
@@ -21,7 +20,8 @@ export const listAccountsService = async ({
 
 const adapt = (httpResponse) => {
   const count = httpResponse.body.count
-  const parsedBody = httpResponse.body.results.map((item) => {
+  const filteredList = httpResponse.body.results.filter((item) => !item.is_deleted)
+  const parsedBody = filteredList.map((item) => {
     return {
       id: item.id,
       name: item.name,

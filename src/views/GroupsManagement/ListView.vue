@@ -1,25 +1,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Reseller Management" />
+      <PageHeadingBlock pageTitle="Group Management" />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listAccountsResellerDecorator"
+        :listService="listAccountsGroupDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        addButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
-        emptyListMessage="No reseller accounts found."
+        addButtonLabel="Group"
+        createPagePath="management/create"
+        editPagePath="management/edit"
+        emptyListMessage="No groups found."
       />
 
       <EmptyResultsBlock
         v-if="!hasContentToList"
-        title="No resellers have been created"
-        description="Click the button below to create your first reseller account."
-        createButtonLabel="Reseller"
-        createPagePath="reseller/management/create"
+        title="No groups have been created"
+        description="Click the button below to create your first group account."
+        createButtonLabel="Group"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />
@@ -41,13 +42,14 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, onBeforeMount } from 'vue'
 
-  defineOptions({ name: 'reseller-management-view' })
+  defineOptions({ name: 'group-management-view' })
 
   const hasContentToList = ref(true)
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
+
   onBeforeMount(() => {
-    if (accountType !== 'brand') {
+    if (accountType !== 'company') {
       router.push('/')
     }
   })
@@ -61,7 +63,7 @@
       {
         sortField: 'company_name',
         field: 'company',
-        header: 'Company'
+        header: 'Company Name'
       },
       {
         disableSort: true,
@@ -82,7 +84,7 @@
     hasContentToList.value = event
   }
 
-  const listAccountsResellerDecorator = async (params) => {
-    return await listAccountsService({ account_type: 'reseller', ...params })
+  const listAccountsGroupDecorator = async (params) => {
+    return await listAccountsService({ account_type: 'group', ...params })
   }
 </script>

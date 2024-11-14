@@ -29,7 +29,7 @@ describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your data stream has been created')
 
-    cy.get(selectors.list.searchInput).type(dataStreamName)
+    cy.get(selectors.list.searchInput).type(`${dataStreamName}{enter}`)
     cy.get(selectors.dataStream.list.columnName('name')).should('have.text', dataStreamName)
     cy.get(selectors.dataStream.list.columnName('dataSource')).should(
       'have.text',

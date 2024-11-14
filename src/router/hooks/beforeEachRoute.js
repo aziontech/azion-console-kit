@@ -5,7 +5,6 @@ import {
   themeGuard,
   billingGuard,
   redirectGuard,
-  redirectToManagerGuard,
   ssoManagementGuard,
   domainsLimitGuard
 } from '@/router/hooks/guards'
@@ -25,8 +24,7 @@ export default async function beforeEachRoute(guardDependency) {
     billingGuard,
     redirectGuard,
     ssoManagementGuard,
-    domainsLimitGuard,
-    redirectToManagerGuard
+    domainsLimitGuard
   ]
 
   for (const executeGuard of guards) {

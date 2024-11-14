@@ -1,25 +1,27 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Group Management" />
+      <PageHeadingBlock pageTitle="Reseller Management" />
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listAccountsGroupDecorator"
+        :listService="listAccountsResellerDecorator"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        addButtonLabel="Group"
-        createPagePath="group/management/create"
-        emptyListMessage="No groups found."
+        addButtonLabel="Reseller"
+        createPagePath="management/create"
+        emptyListMessage="No reseller accounts found."
+        editPagePath="management/edit"
+        enableEditClick
       />
 
       <EmptyResultsBlock
         v-if="!hasContentToList"
-        title="No groups have been created"
-        description="Click the button below to create your first group account."
-        createButtonLabel="Group"
-        createPagePath="group/management/create"
+        title="No resellers have been created"
+        description="Click the button below to create your first reseller account."
+        createButtonLabel="Reseller"
+        createPagePath="management/create"
       >
         <template #illustration>
           <Illustration />
@@ -41,14 +43,13 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, onBeforeMount } from 'vue'
 
-  defineOptions({ name: 'group-management-view' })
+  defineOptions({ name: 'reseller-management-view' })
 
   const hasContentToList = ref(true)
   const accountType = useAccountStore().accountData.kind
   const router = useRouter()
-
   onBeforeMount(() => {
-    if (accountType !== 'company') {
+    if (accountType !== 'brand') {
       router.push('/')
     }
   })
@@ -62,7 +63,7 @@
       {
         sortField: 'company_name',
         field: 'company',
-        header: 'Company'
+        header: 'Company Name'
       },
       {
         disableSort: true,
@@ -83,7 +84,7 @@
     hasContentToList.value = event
   }
 
-  const listAccountsGroupDecorator = async (params) => {
-    return await listAccountsService({ account_type: 'group', ...params })
+  const listAccountsResellerDecorator = async (params) => {
+    return await listAccountsService({ account_type: 'reseller', ...params })
   }
 </script>

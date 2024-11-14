@@ -27,9 +27,10 @@ const adapt = async (httpResponse) => {
         id: edgeFirewall.id,
         name: edgeFirewall.name,
         lastEditor: edgeFirewall.last_editor,
+        debugRules: edgeFirewall.debug_rules,
         lastModify: formatExhibitionDate(edgeFirewall.last_modified, 'full', undefined),
         lastModifyDate: edgeFirewall.last_modified,
-        status: edgeFirewall.is_active
+        status: edgeFirewall.active
           ? {
               content: 'Active',
               severity: 'success'

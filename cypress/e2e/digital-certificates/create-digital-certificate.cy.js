@@ -23,7 +23,7 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
     cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
-    cy.get(selectors.list.searchInput).type(digitalCertificateName)
+    cy.get(selectors.list.searchInput).type(`${digitalCertificateName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', digitalCertificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
