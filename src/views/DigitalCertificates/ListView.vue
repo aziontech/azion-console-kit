@@ -131,7 +131,6 @@
         header: 'Status',
         sortField: 'status',
         type: 'component',
-        disableSort: true,
         component: (columnData) =>
           columnBuilder({
             data: columnData,
