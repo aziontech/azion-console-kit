@@ -71,7 +71,8 @@
     'subject_name',
     'issuer',
     'status',
-    'validity'
+    'validity',
+    'type'
   ]
 
   const actions = [
@@ -107,20 +108,23 @@
       },
       {
         field: 'subjectName',
-        header: 'Subject Names'
+        header: 'Subject Names',
+        sortField: 'subject_name'
       },
       {
         field: 'issuer',
-        header: 'Issuer'
+        header: 'Issuer',
+        sortField: 'issuer'
       },
       {
         field: 'type',
         header: 'Type',
-        sortField: 'certificate_type'
+        sortField: 'type'
       },
       {
         field: 'validity',
-        header: 'Expiration Date'
+        header: 'Expiration Date',
+        sortField: 'validity'
       },
       {
         field: 'status',
