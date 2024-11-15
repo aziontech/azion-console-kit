@@ -112,7 +112,7 @@
       {
         field: 'name',
         header: 'Name',
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'phase',
@@ -125,7 +125,7 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'status',
@@ -139,12 +139,12 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'description',
         header: 'Description',
-        disabledSort: true
+        disableSort: true
       }
     ]
   })
@@ -260,7 +260,7 @@
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
-    :defaultOrderingFieldName="'name'"
+    :defaultOrderingFieldName="''"
   >
     <template #addButton>
       <div

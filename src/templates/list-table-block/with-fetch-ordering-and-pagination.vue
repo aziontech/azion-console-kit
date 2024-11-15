@@ -279,7 +279,6 @@
         </slot>
       </template>
       <Column
-        sortable
         v-for="col of columns"
         :key="col.field"
         :field="col.field"
@@ -445,6 +444,7 @@
       emit('update:selectedItensData', value)
     }
   })
+
   onMounted(() => {
     if (!props.lazyLoad) {
       loadData({
