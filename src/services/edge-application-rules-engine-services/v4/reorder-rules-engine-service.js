@@ -6,11 +6,9 @@ import * as Errors from '@/services/axios/errors'
 export const reorderEdgeFirewallRulesEngine = async (
   newOrderData,
   currentOrderData,
-  edgeFirewallId,
-  ordering = '',
-  search = ''
+  edgeFirewallId
 ) => {
-  const edgeFirewallIds = await allEdgeFirewallToReorder(edgeFirewallId, ordering, search)
+  const edgeFirewallIds = await allEdgeFirewallToReorder(edgeFirewallId)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules/order`,
     method: 'PUT',
@@ -20,19 +18,9 @@ export const reorderEdgeFirewallRulesEngine = async (
   return parseHttpResponse(httpResponse)
 }
 
-const allEdgeFirewallToReorder = async (edgeFirewallId, ordering, search) => {
-  const fields = ['id']
-  const pageSize = 100
-  const searchParams = makeListServiceQueryParams({
-    fields,
-    ordering,
-    page: 1,
-    pageSize,
-    search
-  })
-
+const allEdgeFirewallToReorder = async (edgeFirewallId) => {
   const httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules?${searchParams.toString()}`,
+    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules`,
     method: 'GET'
   })
 

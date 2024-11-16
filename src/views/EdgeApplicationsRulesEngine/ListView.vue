@@ -7,6 +7,7 @@
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
   import { computed, ref, inject } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -106,6 +107,7 @@
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
+  const toast = useToast()
 
   const getColumns = computed(() => {
     return [
@@ -184,10 +186,6 @@
     })
   }
 
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderRulesEngine(tableData, props.edgeApplicationId)
-  }
-
   const reloadList = () => {
     listRulesEngineRef.value.reload()
   }
@@ -219,6 +217,82 @@
       service: deleteRulesEngineWithDecorator
     }
   ]
+
+  /**
+   * Moves an item within the original array based on updated positions in a reference array.
+   *
+   * @param {Array} originalArray - The array to be modified.
+   * @param {Array} referenceArray - The reference array with the new order.
+   * @param {number} fromIndex - The index of the item to move in the reference array.
+   * @param {number} toIndex - The target index  in the reference array.
+   * @returns {Array} The updated array with the item moved.
+   */
+  const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
+    const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
+    const itemToMoveId = referenceArray[toIndex]
+    const targetItemId = referenceArray[oldItemMove]
+
+    const originalItemIndex = originalArray.findIndex((item) => item.id === itemToMoveId.id)
+    const targetItemIndex = originalArray.findIndex((item) => item.id === targetItemId.id)
+
+    const [itemToMove] = originalArray.splice(originalItemIndex, 1)
+    originalArray.splice(targetItemIndex, 0, itemToMove)
+
+    return originalArray
+  }
+
+  const checkOrderRules = async ({ event, data }) => {
+    const tableTypeRequest = PARSE_PHASE[selectedPhase.value] === 'request'
+    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
+    const alterFirstItem = originIndex === 0 || destinationIndex === 0
+
+    if (tableTypeRequest && alterFirstItem) {
+      const firstItem = updatedTable[originIndex]
+      const secondItem = updatedTable[destinationIndex]
+      const isDefaultRuleMoved =
+        firstItem.name === 'Default Rule' || secondItem.name === 'Default Rule'
+      if (isDefaultRuleMoved) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'The default rule cannot be reordered'
+        })
+        return
+      }
+    }
+
+    const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
+
+    data.value = reorderedData
+
+    // import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
+
+    // try {
+    //   const tableData = getArrayChangedIndexes(data.value, event.dragIndex, event.dropIndex)
+    //   await props.onReorderService(tableData, data.value, savedOrdering.value, savedSearch.value)
+    //   data.value = tableData
+    //   reload()
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'success',
+    //     summary: 'Reorder saved'
+    //   })
+    // } catch (error) {
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'error',
+    //     summary: error
+    //   })
+    // }
+  }
+
+  const updateRulesOrder = async ({ data, reload }) => {
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'success',
+    //     summary: 'Reorder saved'
+    //   })
+  }
 </script>
 
 <template>
@@ -243,10 +317,10 @@
     data-testid="rules-engine-drawer"
   />
   <FetchListTableBlock
+    :lazy="false"
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
-    :onReorderService="reorderRulesEngineWithDecorator"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
     @on-load-data="handleLoadData"
@@ -255,14 +329,16 @@
     }"
     emptyListMessage="No rules found."
     @on-before-go-to-edit="handleTrackEditEvent"
+    @onReorder="checkOrderRules"
     :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
+    :rowsPerPageOptions="[2000]"
   >
-    <template #addButton>
+    <template #addButton="{ reload, data }">
       <div
         class="flex gap-4"
         data-testid="rules-engine-add-button"
@@ -279,6 +355,14 @@
           label="Rule"
           @click="openCreateRulesEngineDrawerByPhase"
           data-testid="rules-engine-create-button"
+        />
+        <PrimeButton
+          icon="pi pi-save"
+          disabled
+          label="Save order"
+          data-testid="rules-engine-save-order-button"
+          @click="updateRulesOrder({ data, reload })"
+          v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
         />
       </div>
     </template>

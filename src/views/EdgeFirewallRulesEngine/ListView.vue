@@ -206,7 +206,6 @@
     :onReorderService="reorderRulesEngineWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
-    :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
     @on-before-go-to-edit="handleTrackEditEvent"
     emptyListMessage="No rules found."
