@@ -3,12 +3,7 @@ import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-servic
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { capitalizeFirstLetter } from '@/helpers'
 
-export const listRulesEngineServiceAll = async ({
-  id,
-  phase = 'request',
-  fields = '',
-  search = ''
-}) => {
+export const listRulesEngineServiceAll = async ({ id, fields = '', search = '' }) => {
   let allData = []
   let currentPage = 1
   let httpResponse = null
@@ -24,7 +19,7 @@ export const listRulesEngineServiceAll = async ({
     })
 
     httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeEdgeApplicationV4BaseUrl()}/${id}/rules?phase=${phase}&${searchParams.toString()}`,
+      url: `${makeEdgeApplicationV4BaseUrl()}/${id}/rules?${searchParams.toString()}`,
       method: 'GET'
     })
 
@@ -51,6 +46,7 @@ const STATUS_AS_TAG = {
     severity: 'danger'
   }
 }
+
 const phaseAsTag = (phase) => {
   return {
     content: capitalizeFirstLetter(phase),
@@ -72,16 +68,6 @@ const adapt = (results, statusCode) => {
       description: rules.description || '-'
     }
   })
-
-  // const keepSameOrder = 0
-  // const putItAfter = 1
-  // const putIfBefore = -1
-
-  // const sortedParsedRulesEngine = parsedRulesEngine.sort((currentItem, nextItem) => {
-  //   if (currentItem.name === 'Default Rule') return putIfBefore
-  //   if (nextItem.name === 'Default Rule') return putItAfter
-  //   return keepSameOrder
-  // })
 
   const count = results.length
 

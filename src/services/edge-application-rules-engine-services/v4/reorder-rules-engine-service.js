@@ -2,12 +2,9 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-services/v4/make-edge-application-v4-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const reorderEdgeApplicationRulesEngine = async (
-  newOrderData,
-  edgeApplication
-) => {
+export const reorderRulesEngine = async (newOrderData, edgeApplicationId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${edgeApplication}/rules/order`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${edgeApplicationId}/rules/order`,
     method: 'PUT',
     body: adapt(newOrderData)
   })

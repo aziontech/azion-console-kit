@@ -486,7 +486,6 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  
   /**
    * Moves an item within the original array based on updated positions in a reference array.
    *
@@ -496,7 +495,7 @@
    * @param {number} toIndex - The target index  in the reference array.
    * @returns {Array} The updated array with the item moved.
    */
-   const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
+  const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
     const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
     const itemToMoveId = referenceArray[toIndex]
     const targetItemId = referenceArray[oldItemMove]

@@ -1,7 +1,7 @@
 .markdown {
   max-width: unset;
   font-size: 16px;
-  color: #333;
+  color: var(--text-color);
 }
 
 .markdown pre {
