@@ -1,7 +1,7 @@
 .markdown {
   max-width: unset;
   font-size: 16px;
-  color: #333;
+  color: var(--text-color);
 }
 
 .markdown pre {
@@ -19,11 +19,11 @@
   line-height: 1.5em;
 }
 
-*::-webkit-scrollbar {
+.markdown *::-webkit-scrollbar {
   width: 8px;
 }
 
-*::-webkit-scrollbar-thumb {
+.markdown *::-webkit-scrollbar-thumb {
   background-color: #7a7a7a;
   border-radius: 4px;
 }

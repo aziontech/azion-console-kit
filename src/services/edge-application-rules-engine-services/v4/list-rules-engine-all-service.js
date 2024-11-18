@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
+import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-services/v4/make-edge-application-v4-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { capitalizeFirstLetter } from '@/helpers'
 
-export const listEdgeFirewallRulesEngineService = async ({ id, fields = '', search = '' }) => {
+export const listRulesEngineServiceAll = async ({ id, fields = '', search = '' }) => {
   let allData = []
   let currentPage = 1
   let httpResponse = null
@@ -19,7 +19,7 @@ export const listEdgeFirewallRulesEngineService = async ({ id, fields = '', sear
     })
 
     httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeEdgeFirewallBaseUrl()}/${id}/rules?${searchParams.toString()}`,
+      url: `${makeEdgeApplicationV4BaseUrl()}/${id}/rules?${searchParams.toString()}`,
       method: 'GET'
     })
 
@@ -47,15 +47,25 @@ const STATUS_AS_TAG = {
   }
 }
 
+const phaseAsTag = (phase) => {
+  return {
+    content: capitalizeFirstLetter(phase),
+    outlined: true,
+    severity: 'info'
+  }
+}
+
 const adapt = (results, statusCode) => {
   const parsedRulesEngine = results.map((rules) => {
     return {
       id: rules.id,
       name: rules.name,
-      description: rules.description || '',
-      lastModified: formatExhibitionDate(rules.last_modified, 'long', 'short'),
-      lastEditor: rules.last_editor,
-      status: STATUS_AS_TAG[rules.is_active]
+      phase: phaseAsTag(rules.phase),
+      behaviors: rules.behaviors,
+      criteria: rules.criteria,
+      status: STATUS_AS_TAG[rules.active],
+      order: rules.order,
+      description: rules.description || '-'
     }
   })
 
