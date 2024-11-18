@@ -331,12 +331,12 @@
             <PrimeButton
               outlined
               icon="pi pi-save"
-              class="bg-primary !text-black"
+              class="bg-primary"
               :disabled="disabledOrdering"
               :pt="{
-                label: { class: 'text-black' },
-                icon: { class: 'text-black' },
-                loadingIcon: { class: 'text-black' }
+                label: { class: 'text-[var(--surface-section)]' },
+                icon: { class: 'text-[var(--surface-section)]' },
+                loadingIcon: { class: 'text-[var(--surface-section)]' }
               }"
               label="Save order"
               :loading="isLoadingButtonOrder"
