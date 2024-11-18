@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateToUS,
   formatDateMonthAndYear,
   formatDateToUSBilling,
-  formatExhibitionDate
+  formatExhibitionDate,
+  getCurrentMonthStartEnd
 } from '@/helpers/convert-date'
 import { localeMock } from '../utils/localeMock'
 
@@ -106,5 +107,19 @@ describe('convertDate', () => {
 
     const dateString = 'invalid-date'
     expect(() => formatExhibitionDate(dateString, 'short', 'short')).toThrow()
+  })
+
+  it('should return the correct start and end dates for the current month', () => {
+    const mockDate = new Date('2023-11-15T10:00:00Z') // Example date
+    vi.setSystemTime(mockDate)
+
+    const result = getCurrentMonthStartEnd()
+
+    expect(result).toEqual({
+      dateInitial: '2023-11-01',
+      dateFinal: '2023-11-30'
+    })
+
+    vi.useRealTimers()
   })
 })
