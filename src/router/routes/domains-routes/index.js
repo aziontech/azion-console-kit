@@ -3,6 +3,7 @@ import * as DomainServices from '@/services/domains-services'
 import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
 import * as EdgeApplicationServices from '@/services/edge-application-services'
+import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -58,7 +59,7 @@ export const domainsRoutes = {
       props: {
         editDomainService: DomainServices.editDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
-        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
         updatedRedirect: 'list-domains',
         clipboardWrite: Helpers.clipboardWrite

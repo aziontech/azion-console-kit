@@ -10,6 +10,7 @@
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import Drawer from '@/views/EdgeApplications/Drawer'
@@ -23,8 +24,8 @@
       type: Array,
       required: true
     },
-    edgeApplicationsData: {
-      type: Array,
+    listEdgeApplicationsService: {
+      type: Function,
       required: true
     },
     hasDomainName: {
@@ -87,10 +88,6 @@
     return props.digitalCertificates.filter(
       (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
     )
-  })
-
-  const edgeApplicationOptions = computed(() => {
-    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
   })
 
   const edgeCertificatesOptions = computed(() => {
@@ -286,18 +283,18 @@
         ref="drawerEdgeFirewallRef"
         @onSuccess="handleEdgeFirewallCreated"
       />
+
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Application"
           required
           name="edgeApplication"
-          :options="edgeApplicationOptions"
+          :service="listEdgeApplicationsService"
           :loading="isLoadingEdgeApplications"
           :disabled="isLoadingEdgeApplications"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          filter
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -320,7 +317,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

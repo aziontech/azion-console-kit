@@ -1,0 +1,291 @@
+<template>
+  <LabelBlock
+    :for="props.name"
+    :label="props.label"
+    :isRequired="$attrs.required"
+    :data-testid="customTestId.label"
+  />
+  <Dropdown
+    appendTo="self"
+    :id="name"
+    :name="props.name"
+    :loading="loading"
+    v-model="inputValue"
+    :options="data"
+    :optionLabel="props.optionLabel"
+    :optionDisabled="props.optionDisabled"
+    :optionValue="props.optionValue"
+    :placeholder="props.placeholder"
+    @change="emitChange"
+    @blur="emitBlur"
+    :class="errorMessage ? 'p-invalid' : ''"
+    v-bind="$attrs"
+    :disabled="props.disabled"
+    class="w-full"
+    :pt="{
+      filterInput: {
+        class: 'w-full',
+        'data-testid': customTestId.filterInput
+      },
+      trigger: {
+        'data-testid': customTestId.trigger
+      },
+      loadingIcon: {
+        'data-testid': customTestId.loadingIcon
+      }
+    }"
+    :data-testid="customTestId.dropdown"
+    :virtualScrollerOptions="VIRTUAL_SCROLLER_CONFIG"
+  >
+    <template
+      v-if="enableCustomLabel"
+      #value="slotProps"
+    >
+      <span :data-testid="customTestId.value">
+        {{ getLabelBySelectedValue(slotProps.value) }}
+      </span>
+    </template>
+
+    <template #header>
+      <div class="p-2 flex">
+        <InputText
+          type="text"
+          v-model="search"
+          placeholder="Search"
+          class="w-full rounded-r-none"
+          ref="focusSearch"
+        />
+        <PrimeButton
+          outlined
+          severity="secondary"
+          icon="pi pi-search"
+          aria-label="search"
+          class="rounded-l-none"
+          @click="searchFilter"
+        />
+      </div>
+    </template>
+
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </Dropdown>
+
+  <small
+    v-if="errorMessage"
+    :data-testid="customTestId.error"
+    class="p-error text-xs font-normal leading-tight"
+  >
+    {{ errorMessage }}
+  </small>
+  <small
+    class="text-xs text-color-secondary font-normal leading-5"
+    :data-testid="customTestId.description"
+    v-if="props.description || hasDescriptionSlot"
+  >
+    <slot name="description">
+      {{ props.description }}
+    </slot>
+  </small>
+</template>
+
+<script setup>
+  import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
+  import PrimeButton from 'primevue/button'
+  import { useField } from 'vee-validate'
+  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect } from 'vue'
+  import { watchDebounced } from '@vueuse/core'
+  import LabelBlock from '@/templates/label-block'
+
+  const props = defineProps({
+    value: {
+      type: [String, Number],
+      default: ''
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      default: ''
+    },
+    placeholder: {
+      type: String,
+      default: ''
+    },
+    description: {
+      type: String,
+      default: ''
+    },
+    optionLabel: {
+      type: String,
+      default: ''
+    },
+    optionValue: {
+      type: String,
+      default: ''
+    },
+    optionDisabled: {
+      type: [String, Function],
+      default: ''
+    },
+    service: {
+      type: Function
+    },
+    enableWorkaroundLabelToDisabledOptions: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
+
+  const PAGE_INCREMENT = 1
+  const PAGE_SIZE = 100
+  const INITIAL_PAGE = 1
+  const SEARCH_DEBOUNCE = 500
+  const SEARCH_MAX_WAIT = 1000
+
+  const name = toRef(props, 'name')
+  const slots = useSlots()
+  const data = ref([])
+  const loading = ref(false)
+  const totalCount = ref(0)
+  const page = ref(INITIAL_PAGE)
+  const search = ref('')
+  const focusSearch = ref(null)
+
+  onMounted(() => {
+    listEdgeApplications()
+  })
+
+  const hasDescriptionSlot = !!slots.description
+  const { value: inputValue, errorMessage } = useField(name, undefined, {
+    initialValue: props.value
+  })
+
+  const handleLazyLoad = (event) => {
+    const { last } = event
+    const pageSizeCount = PAGE_SIZE * page.value
+
+    if (last >= pageSizeCount) {
+      page.value += PAGE_INCREMENT
+      listEdgeApplications()
+    }
+  }
+
+  const emitBlur = () => {
+    emit('onBlur')
+  }
+
+  const emitChange = () => {
+    const selectedOption = props.options.find(
+      (option) => option[props.optionValue] === inputValue.value
+    )
+
+    emit('onChange', inputValue.value)
+
+    if (selectedOption) {
+      emit('onSelectOption', selectedOption)
+    }
+  }
+
+  /**
+   * Workaround to resolve the issue described in https://github.com/primefaces/primevue/issues/4431
+   * This should be remove from this field component as soon as the
+   * primevue team fixes the issue.
+   * When we select a disabled value, the label  is not showing
+   * @param {*} selectedValue The selected value in the Dropdown component.
+   * @returns {string | null} The selected value if it corresponds to a disabled option, or null otherwise.
+   */
+  const getLabelBySelectedValue = (selectedValue) => {
+    const result = props.options.find((option) => option.value === selectedValue)
+    return result?.label
+  }
+
+  const listEdgeApplications = async () => {
+    try {
+      loading.value = true
+
+      const response = await props.service({
+        pageSize: PAGE_SIZE,
+        page: page.value,
+        search: search.value
+      })
+
+      totalCount.value = response.count
+      let results = response.body.map((item) => {
+        return {
+          [props.optionLabel]: item.name,
+          [props.optionValue]: item.id
+        }
+      })
+
+      if (page.value === INITIAL_PAGE) {
+        data.value = results
+      } else {
+        data.value = [...data.value, ...results]
+      }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const searchFilter = () => {
+    page.value = INITIAL_PAGE
+    listEdgeApplications()
+  }
+
+  const enableCustomLabel = computed(() => {
+    return props.enableWorkaroundLabelToDisabledOptions && !!inputValue.value
+  })
+  /**
+   * end of primevue workaround
+   */
+
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-dropdown'
+
+    return {
+      label: `${id}__label`,
+      dropdown: `${id}__dropdown`,
+      value: `${id}__value`,
+      description: `${id}__description`,
+      error: `${id}__error-message`,
+      filterInput: `${id}__dropdown-filter-input`,
+      trigger: `${id}__dropdown-trigger`,
+      loadingIcon: `${id}__loading-icon`
+    }
+  })
+
+  watchDebounced(
+    search,
+    () => {
+      page.value = INITIAL_PAGE
+      listEdgeApplications()
+    },
+    { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
+  )
+
+  watchEffect(() => {
+    if (focusSearch.value) {
+      focusSearch.value.$el.focus()
+    }
+  })
+
+  const VIRTUAL_SCROLLER_CONFIG = {
+    lazy: true,
+    onLazyLoad: handleLazyLoad,
+    itemSize: 38,
+    showLoader: true,
+    loading
+  }
+</script>

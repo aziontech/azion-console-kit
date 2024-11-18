@@ -16,7 +16,7 @@
         <template #form>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
             :edgeFirewallsData="edgeFirewallsData"
             :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
             @edgeFirewallCreated="handleEdgeFirewallCreated"
