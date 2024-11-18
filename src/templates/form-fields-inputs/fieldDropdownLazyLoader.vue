@@ -162,7 +162,7 @@
   const focusSearch = ref(null)
 
   onMounted(() => {
-    listEdgeApplications()
+    fetchData()
   })
 
   const hasDescriptionSlot = !!slots.description
@@ -176,7 +176,7 @@
 
     if (last >= pageSizeCount) {
       page.value += PAGE_INCREMENT
-      listEdgeApplications()
+      fetchData()
     }
   }
 
@@ -209,9 +209,13 @@
     return result?.label
   }
 
-  const listEdgeApplications = async () => {
+  const fetchData = async () => {
     try {
       loading.value = true
+
+      if (page.value === INITIAL_PAGE) {
+        data.value = []
+      }
 
       const response = await props.service({
         pageSize: PAGE_SIZE,
@@ -239,7 +243,7 @@
 
   const searchFilter = () => {
     page.value = INITIAL_PAGE
-    listEdgeApplications()
+    fetchData()
   }
 
   const enableCustomLabel = computed(() => {
@@ -269,8 +273,7 @@
   watchDebounced(
     search,
     () => {
-      page.value = INITIAL_PAGE
-      listEdgeApplications()
+      searchFilter()
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
