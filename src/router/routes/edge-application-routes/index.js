@@ -110,7 +110,7 @@ export const edgeApplicationRoutes = {
           editRulesEngineService: RulesEngineService.editRulesEngineService,
           createRulesEngineService: RulesEngineService.createRulesEngineService,
           loadRulesEngineService: RulesEngineService.loadRulesEngineService,
-          reorderRulesEngine: RulesEngineService.reorderRulesEngine,
+          reorderRulesEngine: RulesEngineServiceV4.reorderEdgeApplicationRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
           listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,

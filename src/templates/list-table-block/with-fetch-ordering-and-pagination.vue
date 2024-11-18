@@ -486,8 +486,32 @@
     columnSelectorPanel.value.toggle(event)
   }
 
+  
+  /**
+   * Moves an item within the original array based on updated positions in a reference array.
+   *
+   * @param {Array} originalArray - The array to be modified.
+   * @param {Array} referenceArray - The reference array with the new order.
+   * @param {number} fromIndex - The index of the item to move in the reference array.
+   * @param {number} toIndex - The target index  in the reference array.
+   * @returns {Array} The updated array with the item moved.
+   */
+   const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
+    const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
+    const itemToMoveId = referenceArray[toIndex]
+    const targetItemId = referenceArray[oldItemMove]
+
+    const originalItemIndex = originalArray.findIndex((item) => item.id === itemToMoveId.id)
+    const targetItemIndex = originalArray.findIndex((item) => item.id === targetItemId.id)
+
+    const [itemToMove] = originalArray.splice(originalItemIndex, 1)
+    originalArray.splice(targetItemIndex, 0, itemToMove)
+
+    return originalArray
+  }
+
   const onRowReorder = async (event) => {
-    emit('on-reorder', { event, data })
+    emit('on-reorder', { event, data, moveItem })
   }
 
   const openDialog = (dialogComponent, body) => {

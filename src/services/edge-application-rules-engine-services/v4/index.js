@@ -1,3 +1,3 @@
 import { listRulesEngineServiceAll } from './list-rules-engine-all-service'
-
-export { listRulesEngineServiceAll }
+import { reorderEdgeApplicationRulesEngine } from './reorder-rules-engine-service'
+export { listRulesEngineServiceAll, reorderEdgeApplicationRulesEngine }
