@@ -50,7 +50,8 @@ export default {
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
-        slideDown: 'slideDown 220ms ease-in-out'
+        slideDown: 'slideDown 220ms ease-in-out',
+        blink: 'blink 1.4s infinite both'
       },
       keyframes: {
         fadeIn: {
@@ -64,6 +65,10 @@ export default {
         slideDown: {
           '0%': { height: '0' },
           '100%': { height: 'auto' }
+        },
+        blink: {
+          '0%, 100% ': { opacity: '0.2' },
+          '20%': { opacity: '1' }
         }
       }
     }

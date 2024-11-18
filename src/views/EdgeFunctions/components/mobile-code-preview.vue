@@ -42,7 +42,7 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import CodePreview from './code-preview.vue'
-  import ConsoleFeedback from '@/templates/navbar-block/feedback'
+  import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
   const props = defineProps({
     updateObject: {
