@@ -62,7 +62,7 @@ const parseHttpResponse = (httpResponse) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    certificate: payload.certificate,
+    certificate: payload.certificate === '' ? undefined : payload.certificate,
     private_key: payload.privateKey === '' ? undefined : payload.privateKey
   }
 }

@@ -22,7 +22,7 @@ const adapt = (httpResponse) => {
     type: certificate.type,
     managed: certificate.managed,
     csr: certificate.csr ?? undefined,
-    certificate: certificate.certificate
+    certificate: certificate.certificate || ''
   }
 
   return {
