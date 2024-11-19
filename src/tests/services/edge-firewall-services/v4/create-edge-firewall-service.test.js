@@ -24,7 +24,7 @@ const makeSut = () => {
 describe('EdgeFirewallService', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
+      statusCode: 202,
       body: { data: { id: '123' } }
     })
 
@@ -64,7 +64,7 @@ describe('EdgeFirewallService', () => {
 
   it('should throw parsing api error when request fails', async () => {
     const apiErrorMock = {
-      detail: 'api error message'
+      detail: 'error message'
     }
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -76,17 +76,13 @@ describe('EdgeFirewallService', () => {
 
     const apiErrorResponse = sut(fixtures.edgeFirewallMock)
 
-    expect(apiErrorResponse).rejects.toBe('api error message')
+    await expect(apiErrorResponse).rejects.toThrow('error message')
   })
 
   it('should throw internal server error when request fails with 500 status code', async () => {
-    const apiErrorMock = {
-      detail: 'api error message'
-    }
-
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
-      body: apiErrorMock
+      body: { data: { id: '123' } }
     })
 
     const { sut } = makeSut()
@@ -94,6 +90,6 @@ describe('EdgeFirewallService', () => {
     const apiErrorResponse = sut(fixtures.edgeFirewallMock)
     const expectedError = new Errors.InternalServerError().message
 
-    expect(apiErrorResponse).rejects.toBe(expectedError)
+    await expect(apiErrorResponse).rejects.toThrow(expectedError)
   })
 })
