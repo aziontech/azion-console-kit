@@ -7,8 +7,8 @@ const fixtures = {
     match_zones: [{ matches_on: null, zone: 'path', zone_input: null }],
     path: '/tmp',
     rule_id: 0,
-    description: 'test',
-    status: false,
+    name: 'test',
+    active: true,
     use_regex: false
   }
 }
@@ -54,9 +54,9 @@ describe('WafRulesService', () => {
     expect(result).toEqual({
       matchZones: fixtures.wafRulesMock.match_zones,
       path: fixtures.wafRulesMock.path,
-      reason: fixtures.wafRulesMock.description,
+      name: fixtures.wafRulesMock.name,
       ruleId: fixtures.wafRulesMock.rule_id,
-      status: fixtures.wafRulesMock.status,
+      status: fixtures.wafRulesMock.active,
       useRegex: fixtures.wafRulesMock.use_regex
     })
   })

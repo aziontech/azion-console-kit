@@ -5,6 +5,7 @@
   import Drawer from './Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref, inject } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -47,7 +48,7 @@
       required: true
     },
     edgeFirewallId: {
-      type: Number || String,
+      type: String || Number,
       required: true
     },
     edgeFirewallModules: {
@@ -58,7 +59,7 @@
       type: Function,
       required: true
     },
-    reorderEdgeFirewallRulesEngine: {
+    reorderRulesEngine: {
       type: Function,
       required: true
     }
@@ -66,6 +67,8 @@
   const hasContentToList = ref(true)
   const drawerRef = ref('')
   const listTableBlockRef = ref('')
+  const toast = useToast()
+
   const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
     'id',
     'name',
@@ -77,7 +80,7 @@
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
     return await props.listEdgeFirewallRulesEngineService({
-      edgeFirewallId: props.edgeFirewallId,
+      id: props.edgeFirewallId,
       ...query
     })
   }
@@ -86,10 +89,6 @@
       edgeFirewallId: props.edgeFirewallId,
       ruleEngineId
     })
-  }
-
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
   }
 
   const handleTrackEditEvent = () => {
@@ -116,9 +115,11 @@
     handleCreateTrackEvent()
     drawerRef.value.openCreateDrawer()
   }
+
   const openEditDrawer = (item) => {
     drawerRef.value.openEditDrawer(item.id)
   }
+
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
@@ -127,7 +128,7 @@
     {
       field: 'name',
       header: 'Name',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'status',
@@ -141,7 +142,7 @@
           columnAppearance: 'tag'
         })
       },
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'description',
@@ -150,17 +151,17 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      disabledSort: true
+      disableSort: true
     }
   ])
 
@@ -172,6 +173,50 @@
       service: deleteEdgeFirewallRulesEngineServiceWithDecorator
     }
   ]
+
+  const disabledOrdering = ref(true)
+
+  const checkOrderRules = async ({ event, data, moveItem }) => {
+    if (isLoadingButtonOrder.value) {
+      toast.add({
+        closable: true,
+        severity: 'info',
+        summary: 'info',
+        detail: 'Please wait until the current operation is completed.'
+      })
+      return
+    }
+    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
+    const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
+
+    data.value = reorderedData
+    disabledOrdering.value = false
+  }
+
+  const isLoadingButtonOrder = ref(false)
+  const updateRulesOrder = async (data, reload) => {
+    disabledOrdering.value = true
+    try {
+      isLoadingButtonOrder.value = true
+      await props.reorderRulesEngine(data, props.edgeFirewallId)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'success',
+        detail: 'Reorder saved'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    } finally {
+      await reload()
+      isLoadingButtonOrder.value = false
+    }
+  }
 </script>
 <template>
   <Drawer
@@ -189,27 +234,59 @@
 
   <FetchListTableBlock
     v-if="hasContentToList"
+    :lazy="false"
     ref="listTableBlockRef"
     :reorderableRows="true"
     :listService="listEdgeFirewallRulesEngineServiceWithDecorator"
-    :onReorderService="reorderRulesEngineWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
-    :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
     @on-before-go-to-edit="handleTrackEditEvent"
     emptyListMessage="No rules found."
     addButtonLabel="Rules Engine"
+    :pt="{
+      thead: { class: !hasContentToList && 'hidden' }
+    }"
     :actions="actions"
+    @onReorder="checkOrderRules"
     isTabs
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="''"
+    :rowsPerPageOptions="[2000]"
   >
-    <template #addButton>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Rule"
-        @click="openCreateDrawer"
-      />
+    <template #addButton="{ reload, data }">
+      <div
+        class="flex gap-4"
+        data-testid="rules-engine-add-button"
+      >
+        <PrimeButton
+          icon="pi pi-plus"
+          label="Rule"
+          @click="openCreateDrawer"
+        />
+        <teleport to="#action-bar">
+          <div
+            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+          >
+            <PrimeButton
+              outlined
+              icon="pi pi-save"
+              class="bg-primary"
+              :disabled="disabledOrdering"
+              :pt="{
+                label: { class: 'text-[var(--surface-section)]' },
+                icon: { class: 'text-[var(--surface-section)]' },
+                loadingIcon: { class: 'text-[var(--surface-section)]' }
+              }"
+              label="Save order"
+              :loading="isLoadingButtonOrder"
+              data-testid="rules-engine-save-order-button"
+              @click="updateRulesOrder(data, reload)"
+              v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
+            />
+          </div>
+        </teleport>
+      </div>
     </template>
   </FetchListTableBlock>
   <EmptyResultsBlock
@@ -228,6 +305,15 @@
         label="Rules Engine"
         data-testid="create_Rules Engine_button"
         @click="openCreateDrawer"
+      />
+      <PrimeButton
+        icon="pi pi-save"
+        :disabled="disabledOrdering"
+        label="Save order"
+        :loading="isLoadingButtonOrder"
+        data-testid="rules-engine-save-order-button"
+        @click="updateRulesOrder(data, reload)"
+        v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
       />
     </template>
   </EmptyResultsBlock>

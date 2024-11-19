@@ -65,7 +65,7 @@ const adapt = (httpResponse) => {
       name: item.name,
       issuer: item.issuer || '-',
       subjectName: subjectNames === '' ? '-' : subjectNames,
-      type: typeMap[item.certificate_type] || '-',
+      type: typeMap[item.type] || '-',
       validity: item.validity === null ? '-' : parseValidityDate(item.validity),
       status: parseStatusData(item.status)
     }

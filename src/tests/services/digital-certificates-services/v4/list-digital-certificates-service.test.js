@@ -10,7 +10,7 @@ const fixtures = {
     name: 'Certificate 1',
     issuer: 'Issuer 1',
     subject_name: ['Subject 1', 'Subject 2'],
-    certificate_type: 'edge_certificate',
+    type: 'edge_certificate',
     validity: new Date(2023, 10, 10),
     status: 'active'
   },
@@ -19,7 +19,7 @@ const fixtures = {
     name: 'Certificate 3',
     issuer: 'Issuer 3',
     subject_name: ['Subject 1', 'Subject 2'],
-    certificate_type: 'trusted_ca_certificate',
+    type: 'trusted_ca_certificate',
     validity: new Date(2023, 10, 10),
     status: 'active'
   },
@@ -27,7 +27,7 @@ const fixtures = {
     id: 2,
     name: 'Certificate 2',
     subject_name: [],
-    certificate_type: null,
+    type: null,
     validity: null,
     status: 'pending'
   }
