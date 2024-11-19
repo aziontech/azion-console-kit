@@ -21,7 +21,8 @@
 </template>
 
 <script setup>
-  import { useHelpCenterStore } from '@/stores/help-center'
+  import { useHelperCenter } from '@/composables/use-helper-center'
+  import { useLayout } from '@/composables/use-layout'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import { computed, ref, toRef, inject } from 'vue'
@@ -29,7 +30,8 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const helpCenterStore = useHelpCenterStore()
+  const { toggleSidebarComponent } = useLayout()
+  const { actions } = useHelperCenter()
 
   const props = defineProps({
     report: { type: Object, required: true },
@@ -84,7 +86,8 @@
 
   const openHelpCenter = async () => {
     clickedToRealTimeMetrics('helpCenter')
-    await helpCenterStore.setArticleContent({ url: reportData.value.helpCenterPath })
+    await actions.setArticleContent({ url: reportData.value.helpCenterPath })
+    toggleSidebarComponent('helper')
   }
 
   const exportCSV = () => {

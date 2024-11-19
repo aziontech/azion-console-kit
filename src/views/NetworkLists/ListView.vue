@@ -100,7 +100,8 @@
       },
       {
         field: 'listType',
-        header: 'List Type'
+        header: 'List Type',
+        sortField: 'type'
       },
       {
         field: 'lastEditor',
@@ -108,7 +109,7 @@
       },
       {
         field: 'lastModified',
-        sortField: 'lastModifiedDate',
+        sortField: 'last_modified',
         header: 'Last Modified'
       }
     ]
