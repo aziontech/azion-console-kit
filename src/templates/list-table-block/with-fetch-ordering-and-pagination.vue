@@ -32,6 +32,7 @@
       @row-click="editItemSelected"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
+      :first="firstItemIndex"
     >
       <template
         #header
@@ -451,6 +452,7 @@
   const totalRecords = ref()
   const savedSearch = ref('')
   const savedOrdering = ref('')
+  const firstItemIndex = ref(0)
 
   const firstLoadData = ref(true)
 
@@ -672,6 +674,10 @@
   }
 
   const fetchOnSearch = () => {
+    if (!props.lazy) return
+
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     reload()
   }
 
