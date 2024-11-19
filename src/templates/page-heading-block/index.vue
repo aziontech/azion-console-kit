@@ -72,8 +72,8 @@
           v-if="props.pageTitle"
           :class="{ 'flex gap-3 align-items-center': props.tag }"
         >
-          {{ props.pageTitle }}
-          <PrimeTag
+          {{ props.pageTitle
+          }}<PrimeTag
             v-if="props.tag"
             class="h-max"
             v-bind="props.tag"
