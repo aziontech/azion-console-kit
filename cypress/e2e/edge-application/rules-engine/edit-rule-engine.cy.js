@@ -27,7 +27,8 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4'] }, () => {
+// TODO: remove xfail tag when the API v4 is fixed
+describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login

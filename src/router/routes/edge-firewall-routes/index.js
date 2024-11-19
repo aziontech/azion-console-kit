@@ -91,8 +91,7 @@ export const edgeFirewallRoutes = {
           listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
           listWafRulesService: WafRulesServices.listWafRulesService,
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine,
-          reorderEdgeFirewallRulesEngine:
-            EdgeFirewallRulesEngineServices.reorderEdgeFirewallRulesEngine
+          reorderRulesEngine: EdgeFirewallRulesEngineServicesV4.reorderRulesEngine
         }
       },
       meta: {

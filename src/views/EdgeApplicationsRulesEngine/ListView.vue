@@ -5,8 +5,8 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
 
   import PrimeButton from 'primevue/button'
-  import SelectButton from 'primevue/selectbutton'
   import { computed, ref, inject } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -97,23 +97,23 @@
     'order'
   ]
 
-  const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
   const PARSE_PHASE = {
     'Request phase': 'request',
-    'Response phase': 'response',
-    Default: 'default'
+    'Response phase': 'response'
   }
+  const disabledOrdering = ref(true)
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
+  const toast = useToast()
 
   const getColumns = computed(() => {
     return [
       {
         field: 'name',
         header: 'Name',
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'phase',
@@ -126,7 +126,7 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'status',
@@ -140,12 +140,12 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'description',
         header: 'Description',
-        disabledSort: true
+        disableSort: true
       }
     ]
   })
@@ -169,7 +169,6 @@
   const listRulesEngineWithDecorator = async (query) => {
     return props.listRulesEngineService({
       id: props.edgeApplicationId,
-      phase: PARSE_PHASE[selectedPhase.value],
       ...query
     })
   }
@@ -185,17 +184,12 @@
     })
   }
 
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderRulesEngine(tableData, props.edgeApplicationId)
-  }
-
   const reloadList = () => {
     listRulesEngineRef.value.reload()
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
     handleCreateTrackEvent()
-    PARSE_PHASE[selectedPhase.value]
     drawerRulesEngineRef.value.openDrawerCreate(PARSE_PHASE[selectedPhase.value])
   }
 
@@ -208,10 +202,6 @@
     () => `Click the button below to create your first ${selectedPhase.value} rule.`
   )
 
-  const removeReorderForRequestPhaseFirstItem = computed(
-    () => selectedPhase.value === 'Response phase'
-  )
-
   const actions = [
     {
       type: 'delete',
@@ -220,6 +210,65 @@
       service: deleteRulesEngineWithDecorator
     }
   ]
+
+  const checkOrderRules = async ({ event, data, moveItem }) => {
+    if (isLoadingButtonOrder.value) {
+      toast.add({
+        closable: true,
+        severity: 'info',
+        summary: 'info',
+        detail: 'Please wait until the current operation is completed'
+      })
+      return
+    }
+    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
+    const alterFirstItem = originIndex === 0 || destinationIndex === 0
+
+    if (alterFirstItem) {
+      const firstItem = updatedTable[originIndex]
+      const secondItem = updatedTable[destinationIndex]
+      const isDefaultRuleMoved =
+        firstItem.name === 'Default Rule' || secondItem.name === 'Default Rule'
+      if (isDefaultRuleMoved) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'The default rule cannot be reordered'
+        })
+        return
+      }
+    }
+
+    const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
+    data.value = reorderedData
+    disabledOrdering.value = false
+  }
+
+  const isLoadingButtonOrder = ref(false)
+
+  const updateRulesOrder = async (data, reload) => {
+    disabledOrdering.value = true
+    try {
+      isLoadingButtonOrder.value = true
+      await props.reorderRulesEngine(data, props.edgeApplicationId)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'success',
+        detail: 'Reorder saved'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    } finally {
+      await reload()
+      isLoadingButtonOrder.value = false
+    }
+  }
 </script>
 
 <template>
@@ -244,10 +293,10 @@
     data-testid="rules-engine-drawer"
   />
   <FetchListTableBlock
+    :lazy="false"
     ref="listRulesEngineRef"
     :reorderableRows="true"
     :columns="getColumns"
-    :onReorderService="reorderRulesEngineWithDecorator"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
     @on-load-data="handleLoadData"
@@ -256,31 +305,47 @@
     }"
     emptyListMessage="No rules found."
     @on-before-go-to-edit="handleTrackEditEvent"
-    :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
+    @onReorder="checkOrderRules"
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
-    :defaultOrderingFieldName="'name'"
+    :defaultOrderingFieldName="''"
+    :rowsPerPageOptions="[2000]"
   >
-    <template #addButton>
+    <template #addButton="{ reload, data }">
       <div
         class="flex gap-4"
         data-testid="rules-engine-add-button"
       >
-        <SelectButton
-          v-model="selectedPhase"
-          @change="reloadList"
-          :options="PHASE_OPTIONS"
-          :unselectable="true"
-          data-testid="rules-engine-select-phase"
-        />
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
           @click="openCreateRulesEngineDrawerByPhase"
           data-testid="rules-engine-create-button"
         />
+        <teleport to="#action-bar">
+          <div
+            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+          >
+            <PrimeButton
+              outlined
+              icon="pi pi-save"
+              class="bg-primary"
+              :disabled="disabledOrdering"
+              :pt="{
+                label: { class: 'text-[var(--surface-section)]' },
+                icon: { class: 'text-[var(--surface-section)]' },
+                loadingIcon: { class: 'text-[var(--surface-section)]' }
+              }"
+              label="Save order"
+              :loading="isLoadingButtonOrder"
+              data-testid="rules-engine-save-order-button"
+              @click="updateRulesOrder(data, reload)"
+              v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
+            />
+          </div>
+        </teleport>
       </div>
     </template>
 

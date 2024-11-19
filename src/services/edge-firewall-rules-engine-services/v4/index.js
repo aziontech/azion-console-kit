@@ -1,4 +1,5 @@
 import { listEdgeFirewallRulesEngineService } from './list-edge-firewall-rules-engine-service'
+import { reorderRulesEngine } from './reorder-rules-engine-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +9,4 @@ import { listEdgeFirewallRulesEngineService } from './list-edge-firewall-rules-e
 /**
  * @type {ExportedServicesType}
  */
-export { listEdgeFirewallRulesEngineService }
+export { listEdgeFirewallRulesEngineService, reorderRulesEngine }

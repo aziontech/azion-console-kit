@@ -8,11 +8,9 @@ import {
   ssoManagementGuard,
   domainsLimitGuard
 } from '@/router/hooks/guards'
-import { useHelpCenterStore } from '@/stores/help-center'
 import { useRouter } from 'vue-router'
 
 export default async function beforeEachRoute(guardDependency) {
-  useHelpCenterStore().close()
   const router = useRouter()
   const { next } = guardDependency
 

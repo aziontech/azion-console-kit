@@ -7,7 +7,7 @@ const fixtures = {
   wafRulesMock: {
     matchZones: [],
     path: '',
-    reason: '',
+    name: '',
     ruleId: '',
     status: true,
     useRegex: false
@@ -40,9 +40,9 @@ describe('WafRulesServices', () => {
         zone: fixtures.wafRulesMock.zone,
         zone_input: fixtures.wafRulesMock.zoneInput,
         path: fixtures.wafRulesMock.path,
-        description: fixtures.wafRulesMock.reason,
+        name: fixtures.wafRulesMock.name,
         rule_id: fixtures.wafRulesMock.ruleId,
-        status: fixtures.wafRulesMock.status,
+        active: fixtures.wafRulesMock.status,
         use_regex: fixtures.wafRulesMock.useRegex
       }
     })

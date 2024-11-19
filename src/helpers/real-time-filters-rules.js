@@ -90,7 +90,7 @@ const MOST_RELEVANT_FIELDS = {
 }
 
 const FILTER_LIKE_TYPE = {
-  configurationIdIn: 'ArrayObject',
+  configurationIdIn: 'ArrayObjectDomain',
   zoneIdIn: 'ArrayObject',
   edgeFunctionIdIn: 'ArrayObject',
   botCategoryIn: 'ArrayObject',
