@@ -778,11 +778,11 @@
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
               <FieldDropdown
-                :filter="true"
+                filter
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
                 :options="functionsInstanceOptions"
-                optionLabel="name.text"
+                optionLabel="functionInstanced"
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.functionId"
@@ -811,6 +811,7 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
+                filter
                 :loading="loadingOrigins"
                 :name="`behaviors[${behaviorIndex}].originId`"
                 :options="originsOptions"
@@ -843,6 +844,7 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
+                filter
                 :loading="isLoadingRequestsData"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
                 :options="cacheSettingsOptions"

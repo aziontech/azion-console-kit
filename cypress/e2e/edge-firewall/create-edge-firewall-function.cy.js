@@ -48,7 +48,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
     // Assert - Find created function
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(functionInstanceName)
+    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(`${functionInstanceName}{enter}`)
     cy.get(selectors.edgeFirewall.functionInstanceTableColumnName).should(
       'have.text',
       functionInstanceName
@@ -76,7 +76,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
     // Assert - Find the created rule
     cy.get(selectors.edgeFirewall.rulesTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(ruleName)
+    cy.get(selectors.edgeFirewall.rulesTableSearchInput).type(`${ruleName}{enter}`)
     cy.get(selectors.edgeFirewall.rulesTableColumnName).should('have.text', ruleName)
     cy.get(selectors.edgeFirewall.rulesTableColumnDescriptionShowMore).click()
     cy.get(selectors.edgeFirewall.rulesTableColumnDescription).should(
@@ -92,7 +92,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     // Cleanup - Remove the created function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(functionInstanceName)
+    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(`${functionInstanceName}{enter}`)
     cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Function successfully deleted')
     })
@@ -101,7 +101,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.edgeFirewall.mainSettingsTab).click()
     cy.get(selectors.edgeFirewall.cancelButton).click()
     cy.get(selectors.edgeFirewall.searchInput).clear()
-    cy.get(selectors.edgeFirewall.searchInput).type(firewallName)
+    cy.get(selectors.edgeFirewall.searchInput).type(`${firewallName}{enter}`)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })

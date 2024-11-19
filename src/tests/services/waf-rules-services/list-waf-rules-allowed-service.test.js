@@ -10,7 +10,7 @@ const fixtures = {
     last_modified: '2024-01-12T14:24:52.957488Z',
     match_zones: [{ zone: 'file_name', zone_input: null, matches_on: null }],
     path: '/test/te',
-    description: 'hello, it is just a test',
+    name: 'hello, it is just a test',
     rule_id: 0,
     active: true,
     use_regex: false
@@ -21,7 +21,7 @@ const fixtures = {
     last_modified: '2024-01-12T14:24:52.957488Z',
     match_zones: [{ zone: 'file_name', zone_input: null, matches_on: null }],
     path: '/test/te',
-    description: 'hello, it is just a test',
+    name: 'hello, it is just a test',
     rule_id: 0,
     active: false,
     use_regex: false
@@ -53,8 +53,10 @@ describe('WafRulesServices', () => {
     const { sut } = makeSut()
     await sut({ wafId: 4040 })
 
+    const version = 'v4'
+
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge_firewall/wafs/4040/exceptions?page=1&page_size=200',
+      url: `${version}/edge_firewall/wafs/4040/exceptions?ordering=&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })
@@ -76,7 +78,7 @@ describe('WafRulesServices', () => {
         lastModified: 'Friday, January 12, 2024',
         matchZones: ['File Name (Multipart Body)'],
         path: fixtures.wafRulesMock.path,
-        description: fixtures.wafRulesMock.description,
+        name: fixtures.wafRulesMock.name,
         ruleId: '0 - All Rules',
         status: {
           content: 'Active',
@@ -90,7 +92,7 @@ describe('WafRulesServices', () => {
         lastModified: 'Friday, January 12, 2024',
         matchZones: ['File Name (Multipart Body)'],
         path: fixtures.wafRulesMock.path,
-        description: fixtures.wafRulesMock.description,
+        name: fixtures.wafRulesMock.name,
         ruleId: '0 - All Rules',
         status: {
           content: 'Inactive',

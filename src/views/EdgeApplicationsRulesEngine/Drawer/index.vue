@@ -170,9 +170,10 @@
 
     try {
       loadingFunctionsInstance.value = true
-      functionsInstanceOptions.value = await props.listEdgeApplicationFunctionsService(
+      const responseFunctions = await props.listEdgeApplicationFunctionsService(
         props.edgeApplicationId
       )
+      functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
       toast.add({
         closable: true,

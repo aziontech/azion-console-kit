@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="Edge Functions" />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listEdgeFunctionsService"
         :columns="getColumns"
@@ -16,6 +16,7 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge functions found."
         :actions="actions"
+        :apiFields="EDGE_FUNCTIONS_API_FIELDS"
       />
       <EmptyResultsBlock
         v-else
@@ -38,7 +39,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -62,6 +63,15 @@
   })
 
   let hasContentToList = ref(true)
+  const EDGE_FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'language',
+    'initiator_type',
+    'reference_count',
+    'last_editor'
+  ]
   const actions = [
     {
       type: 'delete',
@@ -123,11 +133,6 @@
     {
       field: 'lastEditor',
       header: 'Last Editor'
-    },
-    {
-      field: 'lastModified',
-      sortField: 'lastModifiedDate',
-      header: 'Last Modified'
     },
     {
       field: 'status',

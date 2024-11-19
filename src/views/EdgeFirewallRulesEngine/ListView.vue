@@ -1,7 +1,7 @@
 <script setup>
   import EmptyResultsBlock from '@templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import Drawer from './Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref, inject } from 'vue'
@@ -66,9 +66,20 @@
   const hasContentToList = ref(true)
   const drawerRef = ref('')
   const listTableBlockRef = ref('')
+  const EDGE_FIREWALL_RULES_ENGINE_API_FIELDS = [
+    'id',
+    'name',
+    'description',
+    'last_modified',
+    'last_editor',
+    'is_active'
+  ]
 
-  const listEdgeFirewallRulesEngineServiceWithDecorator = async () => {
-    return await props.listEdgeFirewallRulesEngineService({ edgeFirewallId: props.edgeFirewallId })
+  const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
+    return await props.listEdgeFirewallRulesEngineService({
+      edgeFirewallId: props.edgeFirewallId,
+      ...query
+    })
   }
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
     return await props.deleteEdgeFirewallRulesEngineService({
@@ -77,8 +88,19 @@
     })
   }
 
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
+  const reorderRulesEngineWithDecorator = async (
+    newOrderData,
+    currentOrderData,
+    ordering,
+    search
+  ) => {
+    return props.reorderEdgeFirewallRulesEngine(
+      newOrderData,
+      currentOrderData,
+      props.edgeFirewallId,
+      ordering,
+      search
+    )
   }
 
   const handleTrackEditEvent = () => {
@@ -116,7 +138,7 @@
     {
       field: 'name',
       header: 'Name',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'status',
@@ -130,7 +152,7 @@
           columnAppearance: 'tag'
         })
       },
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'description',
@@ -139,17 +161,17 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      disabledSort: true
+      disableSort: true
     }
   ])
 
@@ -176,7 +198,7 @@
     @onSuccess="reloadList"
   />
 
-  <ListTableBlock
+  <FetchListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
     :reorderableRows="true"
@@ -191,6 +213,8 @@
     addButtonLabel="Rules Engine"
     :actions="actions"
     isTabs
+    :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="''"
   >
     <template #addButton>
       <PrimeButton
@@ -199,7 +223,7 @@
         @click="openCreateDrawer"
       />
     </template>
-  </ListTableBlock>
+  </FetchListTableBlock>
   <EmptyResultsBlock
     v-else
     title="No rule has been created"
