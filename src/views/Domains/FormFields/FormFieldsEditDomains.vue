@@ -28,6 +28,10 @@
       type: Function,
       required: true
     },
+    loadEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
     hasDomainName: {
       type: Boolean,
       required: false,
@@ -290,6 +294,7 @@
           required
           name="edgeApplication"
           :service="listEdgeApplicationsService"
+          :loadService="loadEdgeApplicationsService"
           :loading="isLoadingEdgeApplications"
           :disabled="isLoadingEdgeApplications"
           optionLabel="name"

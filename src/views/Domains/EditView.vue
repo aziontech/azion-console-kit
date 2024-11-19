@@ -17,6 +17,7 @@
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :edgeFirewallsData="edgeFirewallsData"
             :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
             @edgeFirewallCreated="handleEdgeFirewallCreated"
@@ -65,6 +66,10 @@
       required: true
     },
     listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
       type: Function,
       required: true
     },

@@ -94,7 +94,7 @@
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
-  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect } from 'vue'
+  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import LabelBlock from '@/templates/label-block'
 
@@ -132,7 +132,12 @@
       default: ''
     },
     service: {
-      type: Function
+      type: Function,
+      required: true
+    },
+    loadService: {
+      type: Function,
+      required: true
     },
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
@@ -185,7 +190,7 @@
   }
 
   const emitChange = () => {
-    const selectedOption = props.options.find(
+    const selectedOption = data.value.find(
       (option) => option[props.optionValue] === inputValue.value
     )
 
@@ -234,8 +239,31 @@
       if (page.value === INITIAL_PAGE) {
         data.value = results
       } else {
-        data.value = [...data.value, ...results]
+        const uniqueResults = results.filter(
+          (newItem) =>
+            !data.value.some(
+              (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
+            )
+        )
+        data.value = [...data.value, ...uniqueResults]
       }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const loadSelectedValue = async (globalId) => {
+    if (!globalId) return
+    try {
+      loading.value = true
+      const results = await props.loadService(globalId)
+      if (!results) return
+
+      const newOption = {
+        [props.optionLabel]: results.name,
+        [props.optionValue]: results.id
+      }
+      data.value = [newOption, ...data.value]
     } finally {
       loading.value = false
     }
@@ -269,6 +297,16 @@
       loadingIcon: `${id}__loading-icon`
     }
   })
+
+  watch(
+    () => props.value,
+    (newValue) => {
+      const existitemInList = data.value.some((item) => item[props.optionValue] === newValue)
+      if (!existitemInList) {
+        loadSelectedValue(newValue)
+      }
+    }
+  )
 
   watchDebounced(
     search,

@@ -60,6 +60,7 @@ export const domainsRoutes = {
         editDomainService: DomainServices.editDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
+        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
         updatedRedirect: 'list-domains',
         clipboardWrite: Helpers.clipboardWrite
