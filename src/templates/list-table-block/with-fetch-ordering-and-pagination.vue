@@ -681,6 +681,9 @@
 
   const fetchOnSearch = () => {
     if (!props.lazy) return
+
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     reload()
   }
 
