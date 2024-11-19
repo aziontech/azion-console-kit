@@ -23,7 +23,7 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
 
     // Assert
     cy.get(selectors.edgeDns.searchInput).clear()
-    cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
+    cy.get(selectors.edgeDns.searchInput).type(zoneName)
     cy.get(selectors.edgeDns.nameRow).should('have.text', zoneName)
     cy.get(selectors.edgeDns.showMore).click()
     cy.get(selectors.edgeDns.domainRow).should('contain', zoneName.toLowerCase())

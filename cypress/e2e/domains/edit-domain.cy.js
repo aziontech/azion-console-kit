@@ -4,8 +4,6 @@ import generateUniqueName from '../../support/utils'
 let domainName
 let edgeAppName
 
-let domainEditedName
-
 const createEdgeApplicationCase = () => {
   // Arrange
   edgeAppName = generateUniqueName('edgeApp')
@@ -54,12 +52,10 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'The domain is now available in the Domain management section.'
     )
 
-    domainEditedName = `${domainName}-edit`
-
     // Act
     cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
     cy.get(selectors.domains.fieldTextInput).clear()
-    cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
+    cy.get(selectors.domains.fieldTextInput).type(`${domainName}-edit`)
     cy.get(selectors.domains.cnamesField).clear()
     cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.edge.app`)
     cy.get(selectors.domains.domainUri).should('be.disabled')
@@ -70,8 +66,8 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your domain has been edited')
     cy.get(selectors.domains.dataTableSearchInput).clear()
-    cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
-    cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
+    cy.get(selectors.domains.dataTableSearchInput).type(`${domainName}-edit`)
+    cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', `${domainName}-edit`)
     cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
   })
 

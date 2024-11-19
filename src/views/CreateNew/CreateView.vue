@@ -262,7 +262,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { inject, onMounted, ref, watchEffect } from 'vue'

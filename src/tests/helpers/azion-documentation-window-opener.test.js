@@ -65,7 +65,10 @@ describe('AzionDocumentationWindowOpener', () => {
 
     sut.openContactSupport()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(expect.stringContaining('tickets'), '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      'https://tickets.azion.com/en/support/home',
+      '_blank'
+    )
   })
 
   it('should open a new window with Google Authenticator documentation link', () => {

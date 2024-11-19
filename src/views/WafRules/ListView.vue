@@ -119,7 +119,6 @@
         type: 'component',
         sortField: 'threats_configuration',
         filterPath: 'threats_configuration',
-        disableSort: true,
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },

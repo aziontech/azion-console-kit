@@ -3,7 +3,7 @@ import { makeAccountsManagementBaseUrl } from './make-accounts-management-base-u
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listAccountsService = async ({
-  ordering = 'name',
+  ordering = 'id',
   search = '',
   account_type = '',
   page = 1,
@@ -20,8 +20,7 @@ export const listAccountsService = async ({
 
 const adapt = (httpResponse) => {
   const count = httpResponse.body.count
-  const filteredList = httpResponse.body.results.filter((item) => !item.is_deleted)
-  const parsedBody = filteredList.map((item) => {
+  const parsedBody = httpResponse.body.results.map((item) => {
     return {
       id: item.id,
       name: item.name,

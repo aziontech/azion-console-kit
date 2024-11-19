@@ -83,7 +83,7 @@
     },
     {
       field: 'lastModify',
-      sortField: 'last_modified',
+      sortField: 'lastModifyDate',
       header: 'Last Modified'
     }
   ])

@@ -113,7 +113,7 @@
     'id',
     'last_modified',
     'rule_id',
-    'name',
+    'description',
     'path',
     'match_zones',
     'active'
@@ -155,7 +155,7 @@
 
   const validationSchemaAllowed = yup.object({
     ruleId: yup.string().required().label('rule id'),
-    name: yup.string().required(),
+    reason: yup.string().required(),
     path: yup.string(),
     matchZones: yup.array(),
     status: yup.boolean(),
@@ -165,7 +165,7 @@
   const initialValues = {
     matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
     path: '',
-    name: '',
+    reason: '',
     ruleId: 0,
     status: true,
     useRegex: false
@@ -224,8 +224,8 @@
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
     {
-      field: 'name',
-      header: 'Name',
+      field: 'description',
+      header: 'Description',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
@@ -239,7 +239,6 @@
       field: 'matchZones',
       header: 'Match Zones',
       type: 'component',
-      disableSort: true,
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
@@ -251,7 +250,6 @@
       field: 'status',
       header: 'Status',
       type: 'component',
-      sortField: 'active',
       component: (columnData) =>
         columnBuilder({
           data: columnData,

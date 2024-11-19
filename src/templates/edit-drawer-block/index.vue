@@ -5,7 +5,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useScrollToError } from '@/composables/useScrollToError'
 

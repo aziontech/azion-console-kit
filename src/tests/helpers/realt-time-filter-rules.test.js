@@ -116,7 +116,7 @@ describe('RealTimeMetricsModule', () => {
           dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
         },
         FILTER_LIKE_TYPE: {
-          configurationIdIn: 'ArrayObjectDomain',
+          configurationIdIn: 'ArrayObject',
           zoneIdIn: 'ArrayObject',
           edgeFunctionIdIn: 'ArrayObject',
           botCategoryIn: 'ArrayObject',

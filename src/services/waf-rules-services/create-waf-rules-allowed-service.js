@@ -22,9 +22,9 @@ const adapt = (payload) => {
   return {
     match_zones: matchValidationValues,
     path: payload.path,
-    name: payload.name,
+    description: payload.reason,
     rule_id: payload.ruleId,
-    active: payload.status,
+    status: payload.status,
     use_regex: payload.useRegex
   }
 }

@@ -95,7 +95,7 @@ const adapt = (httpResponse) => {
           ),
           matchZones: parseMatchZone(waf.match_zones),
           path: waf.path,
-          name: waf.name,
+          description: waf.description,
           ruleId,
           status: parseStatusData(waf.active),
           useRegex: waf.use_regex

@@ -95,7 +95,7 @@
       />
 
       <Column
-        :sortable="!col.disableSort"
+        :sortable="!col.disabledSort"
         v-for="col of selectedColumns"
         :key="col.field"
         :field="col.field"
@@ -276,6 +276,7 @@
         </slot>
       </template>
       <Column
+        :sortable="!col.disabledSort"
         v-for="col of columns"
         :key="col.field"
         :field="col.field"

@@ -105,12 +105,12 @@ export const edgeApplicationRoutes = {
           editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         rulesEngineServices: {
-          listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
+          listRulesEngineService: RulesEngineServiceV4.listRulesEngineService,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
           editRulesEngineService: RulesEngineService.editRulesEngineService,
           createRulesEngineService: RulesEngineService.createRulesEngineService,
           loadRulesEngineService: RulesEngineService.loadRulesEngineService,
-          reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
+          reorderRulesEngine: RulesEngineService.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
           listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,

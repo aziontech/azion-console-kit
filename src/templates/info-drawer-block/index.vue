@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])

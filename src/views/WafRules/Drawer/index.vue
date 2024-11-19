@@ -8,7 +8,7 @@
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
   import InputText from 'primevue/inputtext'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
 
   defineOptions({
     name: 'more-details'

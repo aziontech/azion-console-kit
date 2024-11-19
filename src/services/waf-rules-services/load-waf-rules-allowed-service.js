@@ -15,9 +15,9 @@ const adapt = (httpResponse) => {
   const parsedWafRules = {
     matchZones: httpResponse.body.data.match_zones,
     path: httpResponse.body.data.path,
-    name: httpResponse.body.data.name,
+    reason: httpResponse.body.data.description,
     ruleId: httpResponse.body.data.rule_id,
-    status: httpResponse.body.data.active,
+    status: httpResponse.body.data.status,
     useRegex: httpResponse.body.data.use_regex
   }
 

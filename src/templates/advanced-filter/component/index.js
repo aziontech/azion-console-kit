@@ -7,7 +7,6 @@ import floatFilter from './fields/float-filter'
 import chipsFilter from './fields/chips-filter'
 import floatRangeFilter from './fields/float-range-filter'
 import numberRangeFilter from './fields/number-range-filter'
-import MultiSelectLazyLoaderFilter from './fields/multiselect-lazy-loader-filter.vue'
 
 export const FIELDS_MAPPING = {
   Int: h(numberFilter),
@@ -16,7 +15,6 @@ export const FIELDS_MAPPING = {
   IntRange: h(numberRangeFilter),
   FloatRange: h(floatRangeFilter),
   ArrayObject: h(multiselectFilter),
-  ArrayObjectDomain: h(MultiSelectLazyLoaderFilter),
   Boolean: h(selectFilter),
   StringObject: h(selectFilter),
   ArrayString: h(chipsFilter),

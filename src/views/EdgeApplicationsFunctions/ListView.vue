@@ -126,17 +126,19 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Edge Function',
-        disableSort: true
+        header: 'Function Instanced'
+      },
+      {
+        field: 'version',
+        header: 'Version'
       },
       {
         field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor'
+        header: 'Last Editor'
       },
       {
         field: 'modified',
-        sortField: 'last_modified',
+        sortField: 'lastModifiedDate',
         header: 'Last Modified'
       }
     ]

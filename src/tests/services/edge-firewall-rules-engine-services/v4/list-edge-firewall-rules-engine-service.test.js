@@ -40,16 +40,17 @@ describe('EdgeFirewallRulesEngineServices', () => {
 
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      count: 0,
       statusCode: 200,
-      body: { results: [], count: 0 }
+      body: { results: [] }
     })
     const { sut } = makeSut()
-    await sut({ id: 123 })
+    await sut({ edgeFirewallId: 123 })
 
     const version = 'v4'
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_firewall/firewalls/123/rules?ordering=&page=1&page_size=100&fields=&search=`,
+      url: `${version}/edge_firewall/firewalls/123/rules?ordering=&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })
@@ -60,28 +61,25 @@ describe('EdgeFirewallRulesEngineServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       count: 1,
       statusCode: 200,
-      body: { results: [fixtures.edgeFirewallRulesEngineMock], count: 1 }
+      body: { results: [fixtures.edgeFirewallRulesEngineMock] }
     })
     const { sut } = makeSut()
 
     const result = await sut({ edgeFirewallId: 123 })
 
-    expect(result).toEqual({
-      body: [
-        {
-          id: fixtures.edgeFirewallRulesEngineMock.id,
-          name: fixtures.edgeFirewallRulesEngineMock.name,
-          description: fixtures.edgeFirewallRulesEngineMock.description,
-          lastModified: 'November 10, 2023 at 12:00 AM',
-          lastEditor: fixtures.edgeFirewallRulesEngineMock.last_editor,
-          status: {
-            content: 'Active',
-            severity: 'success'
-          }
+    expect(result).toEqual([
+      {
+        id: fixtures.edgeFirewallRulesEngineMock.id,
+        name: fixtures.edgeFirewallRulesEngineMock.name,
+        description: fixtures.edgeFirewallRulesEngineMock.description,
+        lastModified: 'November 10, 2023 at 12:00 AM',
+        lastEditor: fixtures.edgeFirewallRulesEngineMock.last_editor,
+        status: {
+          content: 'Active',
+          severity: 'success'
         }
-      ],
-      count: 1
-    })
+      }
+    ])
   })
 
   it('should parse correctly inactive rules engines', async () => {
@@ -89,27 +87,25 @@ describe('EdgeFirewallRulesEngineServices', () => {
     vi.setSystemTime(new Date(2023, 10, 11, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [fixtures.edgeFirewallRulesEngineInactiveMock], count: 1 }
+      count: 1,
+      body: { results: [fixtures.edgeFirewallRulesEngineInactiveMock] }
     })
     const { sut } = makeSut()
 
     const result = await sut({ edgeFirewallId: 123 })
 
-    expect(result).toEqual({
-      body: [
-        {
-          id: fixtures.edgeFirewallRulesEngineInactiveMock.id,
-          name: fixtures.edgeFirewallRulesEngineInactiveMock.name,
-          description: fixtures.edgeFirewallRulesEngineInactiveMock.description,
-          lastModified: 'November 11, 2023 at 12:00 AM',
-          lastEditor: fixtures.edgeFirewallRulesEngineInactiveMock.last_editor,
-          status: {
-            content: 'Inactive',
-            severity: 'danger'
-          }
+    expect(result).toEqual([
+      {
+        id: fixtures.edgeFirewallRulesEngineInactiveMock.id,
+        name: fixtures.edgeFirewallRulesEngineInactiveMock.name,
+        description: fixtures.edgeFirewallRulesEngineInactiveMock.description,
+        lastModified: 'November 11, 2023 at 12:00 AM',
+        lastEditor: fixtures.edgeFirewallRulesEngineInactiveMock.last_editor,
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
         }
-      ],
-      count: 1
-    })
+      }
+    ])
   })
 })

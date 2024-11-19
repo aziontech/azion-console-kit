@@ -5,10 +5,9 @@
     icon="pi pi-circle-fill"
     size="small"
     :label="label"
-    :loading="!label"
     :pt="{
       root: { class: 'h-8 flex-row items-center' },
-      label: { class: 'font-normal text-sm min-w-[9rem]' },
+      label: { class: 'font-normal text-sm' },
       icon: { style: colorStatus, class: 'text-xs' }
     }"
     @click="redirectToLink"

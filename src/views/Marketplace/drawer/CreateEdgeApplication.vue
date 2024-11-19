@@ -1,6 +1,6 @@
 <script setup>
   import Sidebar from 'primevue/sidebar'
-  import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import ConsoleFeedback from '@/templates/navbar-block/feedback'
   const emit = defineEmits(['update:visible'])
 
   const props = defineProps({

@@ -2,68 +2,54 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { formatExhibitionDate } from '@/helpers/convert-date'
+export const listEdgeFirewallRulesEngineService = async ({
+  edgeFirewallId,
+  fields = '',
+  search = '',
+  ordering = '',
+  page = 1,
+  pageSize = 10
+}) => {
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules?${searchParams.toString()}`,
+    method: 'GET'
+  })
 
-export const listEdgeFirewallRulesEngineService = async ({ id, fields = '', search = '' }) => {
-  let allData = []
-  let currentPage = 1
-  let httpResponse = null
-  let hasMoreData = true
+  httpResponse = adapt(httpResponse)
 
-  while (hasMoreData) {
-    const searchParams = makeListServiceQueryParams({
-      fields,
-      ordering: '',
-      page: currentPage,
-      pageSize: 100,
-      search
-    })
-
-    httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeEdgeFirewallBaseUrl()}/${id}/rules?${searchParams.toString()}`,
-      method: 'GET'
-    })
-
-    const { count, results } = httpResponse.body
-    allData = [...allData, ...results]
-
-    hasMoreData = !(allData.length >= count)
-
-    currentPage++
-  }
-
-  const allDataAdapt = adapt(allData, httpResponse.statusCode)
-
-  return parseHttpResponse(allDataAdapt)
+  return parseHttpResponse(httpResponse)
 }
 
-const STATUS_AS_TAG = {
-  true: {
-    content: 'Active',
-    severity: 'success'
-  },
-  false: {
-    content: 'Inactive',
-    severity: 'danger'
-  }
+const parseStatus = (isActive) => {
+  return isActive
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
 }
 
-const adapt = (results, statusCode) => {
-  const parsedRulesEngine = results.map((rules) => {
+const adapt = (httpResponse) => {
+  const parsedRulesEngine = httpResponse.body.results?.map((ruleEngine) => {
     return {
-      id: rules.id,
-      name: rules.name,
-      description: rules.description || '',
-      lastModified: formatExhibitionDate(rules.last_modified, 'long', 'short'),
-      lastEditor: rules.last_editor,
-      status: STATUS_AS_TAG[rules.is_active]
+      id: ruleEngine.id,
+      name: ruleEngine.name,
+      description: ruleEngine.description || '',
+      lastModified: formatExhibitionDate(ruleEngine.last_modified, 'long', 'short'),
+      lastEditor: ruleEngine.last_editor,
+      status: parseStatus(ruleEngine.is_active)
     }
   })
 
-  const count = results.length
+  const count = httpResponse.body?.count ?? 0
 
   return {
     count,
     body: parsedRulesEngine,
-    statusCode
+    statusCode: httpResponse.statusCode
   }
 }
