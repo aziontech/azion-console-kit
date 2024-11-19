@@ -62,83 +62,38 @@ describe('EdgeFirewallService', () => {
     expect(feedback).toBe('Your Edge Firewall has been created')
   })
 
-  it.each([
-    {
-      error: 'duplicated_edge_firewall_name',
-      key: 'results',
-      expectedError: 'Edge Firewall cannot be created because it already exists'
-    },
-    {
-      error: 'no_modules_enabled',
-      key: 'results',
-      expectedError: 'Edge Firewall cannot be created because no modules are enabled'
-    },
-    {
-      error: 'domains_already_in_use',
-      key: 'results',
-      expectedError: 'Edge Firewall cannot be created because the domains are already in use'
-    },
-    {
-      error: 'unmappedError',
-      key: 'results',
-      expectedError: new Errors.UnexpectedError().message
-    },
-    {
-      error: 'name is required',
-      key: 'name',
-      expectedError: 'name is required'
+  it('should throw parsing api error when request fails', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
     }
-  ])(
-    'should throw an error if the API returns a $error in status code 400',
-    async ({ error, key, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode: 400,
-        body: { [key]: [error] }
-      })
-      const { sut } = makeSut()
 
-      const feedbackMessage = sut(fixtures.edgeFirewallMock)
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: apiErrorMock
+    })
 
-      expect(feedbackMessage).rejects.toThrow(expectedError)
+    const { sut } = makeSut()
+
+    const apiErrorResponse = sut(fixtures.edgeFirewallMock)
+
+    expect(apiErrorResponse).rejects.toBe('api error message')
+  })
+
+  it('should throw internal server error when request fails with 500 status code', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
     }
-  )
 
-  it.each([
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
-      statusCode: 422,
-      expectedError: new Errors.InvalidApiRequestError().message
-    },
-    {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with status code $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
-      })
-      const { sut } = makeSut()
+      body: apiErrorMock
+    })
 
-      const response = sut(fixtures.edgeFirewallMock)
+    const { sut } = makeSut()
 
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
+    const apiErrorResponse = sut(fixtures.edgeFirewallMock)
+    const expectedError = new Errors.InternalServerError().message
+
+    expect(apiErrorResponse).rejects.toBe(expectedError)
+  })
 })

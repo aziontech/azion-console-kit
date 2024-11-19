@@ -1,6 +1,7 @@
 import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 /**
  * @param {Object} payload - The HTTP request payload.
@@ -33,38 +34,10 @@ const adapt = (payload) => {
   }
 }
 
-const mapErrorToMessage = (error) => {
-  switch (error) {
-    case 'duplicated_edge_firewall_name':
-      return 'Edge Firewall cannot be created because it already exists'
-    case 'no_modules_enabled':
-      return 'Edge Firewall cannot be created because no modules are enabled'
-    case 'domains_already_in_use':
-      return 'Edge Firewall cannot be created because the domains are already in use'
-    default:
-      return new Errors.UnexpectedError().message
-  }
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Array} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const apiKeyError = Object.keys(httpResponse.body)[0]
-  if (apiKeyError === 'results') {
-    return mapErrorToMessage(httpResponse.body[apiKeyError][0])
-  }
-  return `${httpResponse.body[apiKeyError]}`
-}
-
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
- * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {string} The result message based on the status code.
- * @throws {Error} If there is an error with the response.
+ * @returns {string} The formatted error message.
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
@@ -75,20 +48,9 @@ const parseHttpResponse = (httpResponse) => {
         urlToEditView: `/edge-firewall/edit/${id}`,
         id
       }
-    case 400:
-      const apiError400 = extractApiError(httpResponse)
-      throw new Error(apiError400).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 422:
-      throw new Errors.InvalidApiRequestError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
 }
