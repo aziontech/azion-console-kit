@@ -48,21 +48,21 @@
 
     <template #header>
       <div class="p-2 flex">
-        <InputText
-          type="text"
-          v-model="search"
-          placeholder="Search"
-          class="w-full rounded-r-none"
-          ref="focusSearch"
-        />
-        <PrimeButton
-          outlined
-          severity="secondary"
-          icon="pi pi-search"
-          aria-label="search"
-          class="rounded-l-none"
-          @click="searchFilter"
-        />
+        <div class="p-inputgroup">
+          <InputText
+            type="text"
+            v-model="search"
+            placeholder="Search"
+            class="w-full rounded-r-none"
+            ref="focusSearch"
+          />
+          <span
+            class="p-inputgroup-addon"
+            @click="searchFilter"
+          >
+            <i class="pi pi-search"></i>
+          </span>
+        </div>
       </div>
     </template>
 
@@ -92,7 +92,6 @@
 <script setup>
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
@@ -156,6 +155,8 @@
   const INITIAL_PAGE = 1
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
+  const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
+  const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
 
   const name = toRef(props, 'name')
   const slots = useSlots()
@@ -229,7 +230,7 @@
       })
 
       totalCount.value = response.count
-      let results = response.body.map((item) => {
+      let results = response.body?.map((item) => {
         return {
           [props.optionLabel]: item.name,
           [props.optionValue]: item.id
@@ -311,7 +312,12 @@
   watchDebounced(
     search,
     () => {
-      searchFilter()
+      if (
+        search.value.length >= NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH ||
+        search.value.length === NUMBER_OF_CHARACTERS_TO_RESET_SEARCH
+      ) {
+        searchFilter()
+      }
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
