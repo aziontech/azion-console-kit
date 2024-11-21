@@ -39,7 +39,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/CreateView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
-        createEdgeFirewallService: EdgeFirewallServices.createEdgeFirewallService
+        createEdgeFirewallService: EdgeFirewallServicesV4.createEdgeFirewallService
       },
       meta: {
         breadCrumbs: [
@@ -62,7 +62,6 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService,
         listNetworkListService: NetworkListsService.listNetworkListService,
         edgeFirewallServices: {
-          createEdgeFirewallService: EdgeFirewallServices.createEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServices.loadEdgeFirewallService,
           editEdgeFirewallService: EdgeFirewallServices.editEdgeFirewallService,
 
