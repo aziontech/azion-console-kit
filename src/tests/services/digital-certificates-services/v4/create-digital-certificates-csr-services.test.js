@@ -1,11 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import {
-  InternalServerError,
-  InvalidApiTokenError,
-  NotFoundError,
-  PermissionError,
-  UnexpectedError
-} from '@/services/axios/errors'
+import { InternalServerError } from '@/services/axios/errors'
 import { createDigitalCertificatesCSRService } from '@/services/digital-certificates-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -90,24 +84,8 @@ describe('DigitalCertificatesServices', () => {
       expectedError: fixture.errorMock[0]
     },
     {
-      statusCode: 401,
-      expectedError: new InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new NotFoundError().message
-    },
-    {
       statusCode: 500,
       expectedError: new InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',

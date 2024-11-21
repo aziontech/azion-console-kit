@@ -20,20 +20,12 @@ const parseHttpResponse = (httpResponse) => {
       return {
         feedback: 'Your digital certificate has been created!',
         urlToEditView: `/digital-certificates/edit/${httpResponse.body.data.id}`,
-        domainId: httpResponse.body.data.id
+        digitalCertificateId: httpResponse.body.data.id
       }
-    case 400:
-      throw new Error(extractApiError(httpResponse)).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
 }
 
