@@ -16,12 +16,12 @@
         <template #form>
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :edgeFirewallsData="edgeFirewallsData"
             :isLoadingRequests="isLoadingRequests"
             :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
             :updateDigitalCertificates="updateDigitalCertificates"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
             @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
@@ -73,6 +73,10 @@
     listEdgeApplicationsService: {
       type: Function,
       required: true
+    },
+    loadEdgeApplicationsService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -81,7 +85,6 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const edgeApplicationsData = ref([])
   const edgeFirewallsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
@@ -148,17 +151,6 @@
       .track()
   }
 
-  const requestEdgeApplications = async () => {
-    isLoadingRequests.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  }
-
   const requestEdgeFirewalls = async () => {
     isLoadingEdgeFirewalls.value = true
     try {
@@ -168,10 +160,6 @@
     } finally {
       isLoadingEdgeFirewalls.value = false
     }
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
   }
 
   const handleEdgeFirewallCreated = async () => {
@@ -198,11 +186,7 @@
 
   onMounted(async () => {
     try {
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
+      await Promise.all([requestDigitalCertificates(), requestEdgeFirewalls()])
     } catch (error) {
       toastError(error)
     } finally {

@@ -5,6 +5,7 @@
   } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -21,8 +22,12 @@
       type: Array,
       required: true
     },
-    edgeApplicationsData: {
-      type: Array,
+    listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
+      type: Function,
       required: true
     },
     edgeFirewallsData: {
@@ -86,9 +91,6 @@
     return props.digitalCertificates.filter(
       (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
     )
-  })
-  const edgeApplicationOptions = computed(() => {
-    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
   })
 
   const edgeFirewallOptions = computed(() => {
@@ -210,18 +212,16 @@
         @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :options="edgeApplicationOptions"
-          :loading="isLoadingRequestsData"
-          :disabled="isLoadingRequestsData"
+          :service="listEdgeApplicationsService"
+          :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          filter
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -244,7 +244,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
