@@ -81,4 +81,25 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
       .its('response.body')
       .should('have.property', 'count', 100)
   })
+
+  it('should paginate correctly list', function () {
+    cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      if (req.url.includes('page_size=10')) {
+        req.reply({
+          fixture: '/edge-application/edge-applications-paginated.json'
+        })
+      }
+    }).as('paginatedEdgeApplicationsListApi')
+
+    cy.get(selectors.list.rowsPerPage.dropdown).click()
+    cy.get(selectors.list.rowsPerPage.option('10')).click()
+    cy.get(selectors.list.pageNumber.option('5')).click()
+    cy.wait('@paginatedEdgeApplicationsListApi')
+    cy.get(selectors.list.pageNumber.option('6')).should('be.visible')
+    cy.get(selectors.list.pageNumber.option('5')).should('have.class', 'p-highlight')
+
+    cy.get(selectors.list.searchInput).type('foo 1{enter}')
+    cy.get(selectors.list.pageNumber.option('1')).should('be.visible')
+    cy.get(selectors.list.pageNumber.option('1')).should('have.class', 'p-highlight')
+  })
 })
