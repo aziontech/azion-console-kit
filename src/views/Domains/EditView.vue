@@ -23,9 +23,7 @@
             @edgeFirewallCreated="handleEdgeFirewallCreated"
             hasDomainName
             @copyDomainName="copyDomainName"
-            :loadingEdgeApplications="loadingEdgeApplications"
             :updateDigitalCertificates="updateDigitalCertificates"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -109,31 +107,14 @@
       .track()
   }
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
-  const loadingEdgeApplications = ref(true)
   const domainName = ref()
   const edgeFirewallsData = ref([])
   const isLoadingEdgeFirewalls = ref(true)
 
-  const requestEdgeApplications = async () => {
-    loadingEdgeApplications.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
-
   const requestDigitalCertificates = async () => {
     digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
   }
 
   const showToast = (severity, summary) => {
@@ -178,15 +159,9 @@
   onMounted(async () => {
     try {
       scrollToTop()
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
+      await Promise.all([requestDigitalCertificates(), requestEdgeFirewalls()])
     } catch (error) {
       toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
     }
   })
 
@@ -234,12 +209,9 @@
 
   const updateDigitalCertificates = async () => {
     try {
-      loadingEdgeApplications.value = true
       digitalCertificates.value = await props.listDigitalCertificatesService({})
     } catch (error) {
       toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
     }
   }
 </script>

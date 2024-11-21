@@ -20,7 +20,6 @@
     @blur="emitBlur"
     :class="errorMessage ? 'p-invalid' : ''"
     v-bind="$attrs"
-    :disabled="props.disabled"
     class="w-full"
     :pt="{
       filterInput: {
@@ -139,10 +138,6 @@
       required: true
     },
     enableWorkaroundLabelToDisabledOptions: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
       type: Boolean,
       default: false
     }

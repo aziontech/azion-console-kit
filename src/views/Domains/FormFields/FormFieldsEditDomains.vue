@@ -37,9 +37,6 @@
       required: false,
       default: false
     },
-    loadingEdgeApplications: {
-      type: Boolean
-    },
     updateDigitalCertificates: {
       type: Function,
       required: true
@@ -156,10 +153,6 @@
     return environmentOptionsRadios
   })
 
-  const isLoadingEdgeApplications = computed(() => {
-    return props.loadingEdgeApplications
-  })
-
   const drawerRef = ref('')
 
   const openDrawer = () => {
@@ -168,10 +161,9 @@
 
   const handleEdgeApplicationCreated = (id) => {
     edgeApplication.value = id
-    emit('edgeApplicationCreated')
   }
 
-  const emit = defineEmits(['edgeApplicationCreated', 'copyDomainName', 'edgeFirewallCreated'])
+  const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
 
   const digitalCertificateDrawerRef = ref('')
   const openDigitalCertificateDrawer = () => {
@@ -295,8 +287,6 @@
           name="edgeApplication"
           :service="listEdgeApplicationsService"
           :loadService="loadEdgeApplicationsService"
-          :loading="isLoadingEdgeApplications"
-          :disabled="isLoadingEdgeApplications"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
