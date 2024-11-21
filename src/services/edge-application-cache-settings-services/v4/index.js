@@ -1,4 +1,5 @@
 import { listCacheSettingsService } from './list-cache-settings-service'
+import { createCacheSettingsService } from './create-cache-settings-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +9,4 @@ import { listCacheSettingsService } from './list-cache-settings-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listCacheSettingsService }
+export { listCacheSettingsService, createCacheSettingsService }
