@@ -40,7 +40,8 @@ const createFunctionCase = () => {
   cy.wait('@getEdgeFunctions')
 }
 
-describe('Edge Application', { tags: ['@dev3'] }, () => {
+// TODO: remove xfail tag when the API v4 is fixed
+describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login

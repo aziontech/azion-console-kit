@@ -88,8 +88,19 @@
     })
   }
 
-  const reorderRulesEngineWithDecorator = async (tableData) => {
-    return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
+  const reorderRulesEngineWithDecorator = async (
+    newOrderData,
+    currentOrderData,
+    ordering,
+    search
+  ) => {
+    return props.reorderEdgeFirewallRulesEngine(
+      newOrderData,
+      currentOrderData,
+      props.edgeFirewallId,
+      ordering,
+      search
+    )
   }
 
   const handleTrackEditEvent = () => {
@@ -127,7 +138,7 @@
     {
       field: 'name',
       header: 'Name',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'status',
@@ -141,7 +152,7 @@
           columnAppearance: 'tag'
         })
       },
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'description',
@@ -150,17 +161,17 @@
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastModified',
       header: 'Last Modified',
-      disabledSort: true
+      disableSort: true
     },
     {
       field: 'lastEditor',
       header: 'Last Editor',
-      disabledSort: true
+      disableSort: true
     }
   ])
 
@@ -203,6 +214,7 @@
     :actions="actions"
     isTabs
     :apiFields="EDGE_FIREWALL_RULES_ENGINE_API_FIELDS"
+    :defaultOrderingFieldName="''"
   >
     <template #addButton>
       <PrimeButton

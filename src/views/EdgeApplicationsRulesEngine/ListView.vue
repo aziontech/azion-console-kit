@@ -97,11 +97,10 @@
     'order'
   ]
 
-  const PHASE_OPTIONS = ['Request phase', 'Response phase', 'Default']
+  const PHASE_OPTIONS = ['Request phase', 'Response phase']
   const PARSE_PHASE = {
     'Request phase': 'request',
-    'Response phase': 'response',
-    Default: 'default'
+    'Response phase': 'response'
   }
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
@@ -113,7 +112,7 @@
       {
         field: 'name',
         header: 'Name',
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'phase',
@@ -126,7 +125,7 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'status',
@@ -140,12 +139,12 @@
             columnAppearance: 'tag'
           })
         },
-        disabledSort: true
+        disableSort: true
       },
       {
         field: 'description',
         header: 'Description',
-        disabledSort: true
+        disableSort: true
       }
     ]
   })
@@ -261,7 +260,7 @@
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
-    :defaultOrderingFieldName="'name'"
+    :defaultOrderingFieldName="''"
   >
     <template #addButton>
       <div

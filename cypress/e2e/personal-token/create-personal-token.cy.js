@@ -26,7 +26,7 @@ describe('Personal Token spec', { tags: ['@dev6', '@xfail'] }, () => {
     cy.get(selectors.personalTokens.closeCopyDialogButton).click()
 
     // Assert
-    cy.get(selectors.personalTokens.searchInput).type(personalTokenName)
+    cy.get(selectors.personalTokens.searchInput).type(`${personalTokenName}{enter}`)
     cy.get(selectors.personalTokens.filteredRecordNameColumn).should('have.text', personalTokenName)
   })
 

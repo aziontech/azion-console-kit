@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Client"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Reseller" />
     </template>
     <template #content>
       <EditFormBlock
