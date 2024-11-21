@@ -61,7 +61,7 @@
       :invokeClearChat="activeComponent.props?.clearChat"
     >
       <template #chatControls="{ clearChat }">
-        <div class="flex gap-3">
+        <div class="flex gap-2">
           <PrimeButton
             icon="pi pi-eraser"
             outlined
