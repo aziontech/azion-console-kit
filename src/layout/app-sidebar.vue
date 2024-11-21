@@ -32,7 +32,10 @@
     }"
   >
     <template #container>
-      <component :is="activeComponent.component" />
+      <component
+        :is="activeComponent.component"
+        class="h-full"
+      />
     </template>
   </Sidebar>
 </template>
