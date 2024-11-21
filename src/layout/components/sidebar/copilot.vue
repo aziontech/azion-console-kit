@@ -71,11 +71,11 @@
             @click="clearChat"
           />
           <PrimeButton
-            icon="pi pi-external-link"
+            icon="pi pi-window-maximize"
             outlined
             class="surface-border h-8 w-8"
-            aria-label="Open a chat in new tab"
-            v-tooltip.bottom="'Open a chat in new tab'"
+            aria-label="Expand chat to full page"
+            v-tooltip.bottom="'Expand chat to full page'"
             @click="openChatInNewTab"
           />
           <PrimeButton
