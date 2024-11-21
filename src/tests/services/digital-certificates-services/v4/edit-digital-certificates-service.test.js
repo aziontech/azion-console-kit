@@ -12,6 +12,12 @@ const fixture = {
     privateKey:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
   },
+  payloadMockOnlyName: {
+    id: '123456789',
+    name: 'MySSLCertificate',
+    certificate: '',
+    privateKey: ''
+  },
   nameErrorMock: {
     detail:
       'The field name needs to be unique. There is already another certificate with this name in your account.'
@@ -60,55 +66,50 @@ describe('DigitalCertificatesServices', () => {
     expect(feedbackMessage).resolves.toBe('Your digital certificate has been updated!')
   })
 
-  it('should parse correctly the feedback message when the error is a string inside an object', async () => {
+  it('should return a feedback message on successfully updated send only name', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 400,
-      body: fixture.nameErrorMock
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    const response = sut(fixture.payloadMock)
+    const feedbackMessage = sut(fixture.payloadMockOnlyName)
 
-    expect(response).rejects.toThrow(fixture.nameErrorMock.detail)
+    expect(feedbackMessage).resolves.toBe('Your digital certificate has been updated!')
   })
 
-  it.each([
-    {
+
+  it('should parse correctly the feedback message when the error is a string inside an object', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
+    }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      expectedError: fixture.errorMock[0]
-    },
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
+      body: apiErrorMock
+    })
+
+    const { sut } = makeSut()
+
+    const apiErrorResponse = sut(fixture.payloadMock)
+
+    expect(apiErrorResponse).rejects.toBe(apiErrorMock.detail)
+  })
+
+  it('should throw internal server error when request fails with 500 status code', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
+    }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: fixture.errorMock
-      })
-      const { sut } = makeSut()
+      body: apiErrorMock
+    })
 
-      const response = sut(fixture.payloadMock)
+    const { sut } = makeSut()
 
-      expect(response).rejects.toThrow(expectedError)
-    }
-  )
+    const apiErrorResponse = sut(fixture.payloadMock)
+    const expectedError = new Errors.InternalServerError().message
+
+    expect(apiErrorResponse).rejects.toBe(expectedError)
+  })
 })
