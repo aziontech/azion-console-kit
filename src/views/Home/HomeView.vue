@@ -37,6 +37,9 @@
     }
   })
 
+  const { isSidebarActive, isVisibleMobileSidebar } = useLayout();
+  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value);
+
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
@@ -163,7 +166,10 @@
           </div>
         </div>
 
-        <div class="flex flex-col xl:flex-row gap-6">
+        <div
+            :class="showSidebar ? 'flex-col' : 'flex-col xl:flex-row'"
+            class="flex gap-6"
+          >
           <!-- Manage Applications -->
           <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
             <div class="flex flex-row justify-start gap-3">
@@ -219,7 +225,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+            <div class="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
               <PrimeButton
                 type="button"
                 class="sm:w-auto w-full"
