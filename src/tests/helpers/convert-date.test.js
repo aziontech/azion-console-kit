@@ -110,7 +110,7 @@ describe('convertDate', () => {
   })
 
   it('should return the correct start and end dates for the current month', () => {
-    const mockDate = new Date('2023-11-15T10:00:00Z') // Example date
+    const mockDate = new Date('2023-11-15T10:00:00Z')
     vi.setSystemTime(mockDate)
 
     const result = getCurrentMonthStartEnd()
