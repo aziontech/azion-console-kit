@@ -32,6 +32,7 @@
       @row-click="editItemSelected"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
+      :first="firstItemIndex"
     >
       <template
         #header
@@ -451,6 +452,7 @@
   const totalRecords = ref()
   const savedSearch = ref('')
   const savedOrdering = ref('')
+  const firstItemIndex = ref(0)
 
   const firstLoadData = ref(true)
 
@@ -489,13 +491,14 @@
   /**
    * Moves an item within the original array based on updated positions in a reference array.
    *
-   * @param {Array} originalArray - The array to be modified.
+   * @param {Array} originalData - The array to be modified.
    * @param {Array} referenceArray - The reference array with the new order.
    * @param {number} fromIndex - The index of the item to move in the reference array.
    * @param {number} toIndex - The target index  in the reference array.
    * @returns {Array} The updated array with the item moved.
    */
-  const moveItem = (originalArray, referenceArray, fromIndex, toIndex) => {
+  const moveItem = (originalData, referenceArray, fromIndex, toIndex) => {
+    const originalArray = [...originalData]
     const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
     const itemToMoveId = referenceArray[toIndex]
     const targetItemId = referenceArray[oldItemMove]
@@ -622,14 +625,19 @@
   }
 
   const reload = async (query = {}) => {
-    loadData({
+    const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
       fields: props.apiFields,
-      search: savedSearch.value,
       ordering: savedOrdering.value,
       ...query
-    })
+    }
+
+    if (props.lazy) {
+      commonParams.search = savedSearch.value
+    }
+
+    loadData(commonParams)
   }
 
   const extractFieldValue = (rowData, field) => {
@@ -648,7 +656,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
-
+    firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
 
@@ -672,6 +680,10 @@
   }
 
   const fetchOnSearch = () => {
+    if (!props.lazy) return
+
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     reload()
   }
 

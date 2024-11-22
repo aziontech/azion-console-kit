@@ -221,25 +221,22 @@
       })
       return
     }
-    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
-    const alterFirstItem = originIndex === 0 || destinationIndex === 0
 
-    if (alterFirstItem) {
-      const firstItem = updatedTable[originIndex]
-      const secondItem = updatedTable[destinationIndex]
-      const isDefaultRuleMoved =
-        firstItem.name === 'Default Rule' || secondItem.name === 'Default Rule'
-      if (isDefaultRuleMoved) {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'The default rule cannot be reordered'
-        })
-        return
-      }
-    }
+    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
 
     const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
+
+    const isFirstRuleNotDefault = reorderedData[0].name !== 'Default Rule'
+
+    if (isFirstRuleNotDefault) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'The default rule cannot be reordered'
+      })
+      return
+    }
+
     data.value = reorderedData
     disabledOrdering.value = false
   }
