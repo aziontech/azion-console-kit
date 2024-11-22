@@ -1,4 +1,3 @@
-import * as DigitalCertificatesService from '@/services/digital-certificates-services'
 import * as DigitalCertificatesServiceV4 from '@/services/digital-certificates-services/v4'
 
 import * as Helpers from '@/helpers'
