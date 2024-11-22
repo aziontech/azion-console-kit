@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 
 export const loadDigitalCertificateService = async ({ id }) => {
-  const fields = ['id', 'name', 'type', 'csr', 'managed', 'certificate']
+  const fields = ['id', 'name', 'type', 'csr', 'managed']
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDigitalCertificatesBaseUrl()}/${id}?fields=${fields}`,
@@ -21,8 +21,7 @@ const adapt = (httpResponse) => {
     name: certificate.name,
     type: certificate.type,
     managed: certificate.managed,
-    csr: certificate.csr ?? undefined,
-    certificate: certificate.certificate || ''
+    csr: certificate.csr ?? undefined
   }
 
   return {

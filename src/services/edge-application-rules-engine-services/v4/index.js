@@ -1,11 +1,3 @@
-import { listRulesEngineService } from './list-rules-engine-service'
-
-/**
- * @typedef {Object} ExportedServicesType - The type of the exported services
- * @property {typeof listRulesEngineService} listRulesEngineService - The listRulesEngineService reference
- */
-
-/**
- * @type {ExportedServicesType}
- */
-export { listRulesEngineService }
+import { listRulesEngineServiceAll } from './list-rules-engine-all-service'
+import { reorderRulesEngine } from './reorder-rules-engine-service'
+export { listRulesEngineServiceAll, reorderRulesEngine }

@@ -1,20 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@services/axios/errors'
-import { loadDigitalCertificateService } from '@/services/digital-certificates-services/v4/'
+import * as Errors from '@/services/axios/errors'
+import { deleteDigitalCertificatesService } from '@/services/digital-certificates-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
-const fixtures = {
-  certificateMock: {
-    id: 72395,
-    name: 'Cert_A.pem',
-    type: 'trusted_ca_certificate',
-    managed: false,
-    csr: null
-  }
-}
-
 const makeSut = () => {
-  const sut = loadDigitalCertificateService
+  const sut = deleteDigitalCertificatesService
 
   return {
     sut
@@ -24,42 +14,35 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: fixtures.certificateMock }
+      statusCode: 200
     })
-
-    const { sut } = makeSut()
+    const idMock = 123321
+    const { sut } = makeSut(idMock)
     const version = 'v4'
-    await sut({ id: fixtures.certificateMock.id })
+    await sut(idMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/digital_certificates/certificates/${fixtures.certificateMock.id}?fields=id,name,type,csr,managed`,
-      method: 'GET'
+      url: `${version}/digital_certificates/certificates/${idMock}`,
+      method: 'DELETE'
     })
   })
 
-  it('should parse correctly the api response', async () => {
+  it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: fixtures.certificateMock }
+      statusCode: 200
     })
-    const { sut } = makeSut()
+    const idStub = 123
+    const { sut } = makeSut(idStub)
 
-    const result = await sut({ id: fixtures.certificateMock.id })
+    const feedbackMessage = await sut(idStub)
 
-    expect(result).toEqual({
-      id: fixtures.certificateMock.id,
-      name: fixtures.certificateMock.name,
-      type: fixtures.certificateMock.type,
-      managed: fixtures.certificateMock.managed,
-      csr: undefined
-    })
+    expect(feedbackMessage).toBe('Digital certificate successfully deleted!')
   })
 
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: 'Resource not found.'
     },
     {
       statusCode: 401,
@@ -85,14 +68,29 @@ describe('DigitalCertificatesServices', () => {
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: { data: fixtures.certificateMock }
+        statusCode
       })
+      const stubId = '123'
       const { sut } = makeSut()
 
-      const response = sut({ id: fixtures.certificateMock.id })
+      const response = sut(stubId)
 
       expect(response).rejects.toBe(expectedError)
     }
   )
+
+  it('should throw when try to delete a digital certificate that is being used', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 409,
+      body: {
+        detail: `Digital Certificate can't be deleted because it is being used.`
+      }
+    })
+    const stubId = '123'
+    const { sut } = makeSut()
+
+    const response = sut(stubId)
+
+    expect(response).rejects.toBe(`Digital Certificate can't be deleted because it is being used.`)
+  })
 })
