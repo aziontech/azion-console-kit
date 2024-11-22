@@ -2,6 +2,7 @@ import { listDigitalCertificatesService } from './list-digital-certificates-serv
 import { createDigitalCertificatesCSRService } from './create-digital-certificates-csr-service'
 import { createDigitalCertificatesService } from './create-digital-certificates-services'
 import { loadDigitalCertificateService } from './load-digital-certificates-service'
+import { editDigitalCertificateService } from './edit-digital-certificates-service'
 import { deleteDigitalCertificatesService } from './delete-digital-certificates-service'
 
 /**
@@ -10,6 +11,7 @@ import { deleteDigitalCertificatesService } from './delete-digital-certificates-
  * @property {typeof createDigitalCertificatesCSRService} createDigitalCertificatesCSRService - The createDigitalCertificatesCSRService reference
  * @property {typeof createDigitalCertificatesService} createDigitalCertificatesService - The createDigitalCertificatesService reference
  * @property {typeof loadDigitalCertificateService} loadDigitalCertificateService - The loadDigitalCertificateService reference
+ * @property {typeof editDigitalCertificateService} editDigitalCertificateService - The editDigitalCertificateService reference
  * @property {typeof deleteDigitalCertificatesService} deleteDigitalCertificatesService - The deleteDigitalCertificatesService reference
 
 /**
@@ -20,5 +22,6 @@ export {
   createDigitalCertificatesCSRService,
   createDigitalCertificatesService,
   loadDigitalCertificateService,
+  editDigitalCertificateService,
   deleteDigitalCertificatesService
 }
