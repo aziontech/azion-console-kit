@@ -28,7 +28,7 @@
   const { value: name } = useField('name')
   const { value: certificate } = useField('certificate')
   const { value: csr } = useField('csr')
-  const { value: certificateType } = useField('certificateType')
+  const { value: certificateType } = useField('type')
   const { value: managed } = useField('managed')
   const { value: privateKey } = useField('privateKey')
 
@@ -83,6 +83,7 @@
             disabled
             :value="name"
             placeholder="My digital certificate"
+            data-testid="digital-certificate__name-field"
           />
         </div>
       </template>
@@ -102,6 +103,7 @@
             name="name"
             placeholder="My digital certificate"
             :value="name"
+            data-testid="digital-certificate__name-field"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -110,6 +112,7 @@
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
             name="certificate"
             :value="certificate"
+            data-testid="digital-certificate__certificate-field"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -152,6 +155,7 @@
             name="name"
             :value="name"
             placeholder="My digital certificate"
+            data-testid="digital-certificate__name-field"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -159,6 +163,7 @@
             label="Certificate"
             name="certificate"
             :value="certificate"
+            data-testid="digital-certificate__certificate-field"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           />
         </div>
@@ -186,6 +191,7 @@
             name="name"
             placeholder="My digital certificate"
             :value="name"
+            data-testid="digital-certificate__name-field"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
