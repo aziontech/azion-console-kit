@@ -15,7 +15,7 @@ export const digitalCertificatesRoutes = {
       props: {
         listDigitalCertificatesService: DigitalCertificatesServiceV4.listDigitalCertificatesService,
         deleteDigitalCertificatesService:
-          DigitalCertificatesService.deleteDigitalCertificatesService,
+          DigitalCertificatesServiceV4.deleteDigitalCertificatesService,
         documentationService: Helpers.documentationCatalog.digitalCertificates
       },
       meta: {

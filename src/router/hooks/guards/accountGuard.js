@@ -26,13 +26,14 @@ export async function accountGuard({ to, accountStore, tracker, loadContractServ
       accountInfo.user_id = userInfo.results.id
       accountInfo.colorTheme = accountStore.theme
       accountInfo.jobRole = accountJobRole.jobRole
+      accountInfo.isDeveloperSupportPlan = true
 
       if (accountInfo.client_id) {
         const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
           clientId: accountInfo.client_id
         })
-        accountStore.isDeveloperSupportPlan = isDeveloperSupportPlan
-        accountStore.yourServicePlan = yourServicePlan
+        accountInfo.isDeveloperSupportPlan = isDeveloperSupportPlan
+        accountInfo.yourServicePlan = yourServicePlan
       }
 
       accountStore.setAccountData(accountInfo)

@@ -28,7 +28,7 @@
     >
       <Welcome />
 
-      <div class="w-[548px] justify-center items-start gap-3 inline-flex">
+      <div class="justify-center items-start gap-3 inline-flex">
         <Suggestions />
       </div>
 
