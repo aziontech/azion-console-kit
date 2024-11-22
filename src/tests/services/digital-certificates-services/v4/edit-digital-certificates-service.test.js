@@ -77,7 +77,6 @@ describe('DigitalCertificatesServices', () => {
     expect(feedbackMessage).resolves.toBe('Your digital certificate has been updated!')
   })
 
-
   it('should parse correctly the feedback message when the error is a string inside an object', async () => {
     const apiErrorMock = {
       detail: 'api error message'
