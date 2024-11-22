@@ -79,8 +79,8 @@ export const edgeApplicationRoutes = {
           listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
           deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
           createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService,
-          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
-          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
+          loadCacheSettingsService: CacheSettingsServicesV4.loadCacheSettingsService,
+          editCacheSettingsService: CacheSettingsServicesV4.editCacheSettingsService,
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
