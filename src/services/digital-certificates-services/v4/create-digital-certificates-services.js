@@ -55,7 +55,7 @@ const validateCertificateFields = ({ certificate, privateKey }) => {
 const adapt = (payload) => {
   return {
     name: payload.digitalCertificateName,
-    certificate_type: payload.certificateType,
+    type: payload.certificateType,
     ...validateCertificateFields({
       certificate: payload.certificate,
       privateKey: payload.privateKey

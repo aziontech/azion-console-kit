@@ -29,7 +29,7 @@ const fixture = {
   },
   requestBodyMock: {
     name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS',
+    type: 'SSL/TLS',
     certificate:
       '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
     private_key:
@@ -37,19 +37,19 @@ const fixture = {
   },
   requestBodyMockWithoutPrivateKey: {
     name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS',
+    type: 'SSL/TLS',
     certificate:
       '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----'
   },
   requestBodyMockWithoutCertificate: {
     name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS',
+    type: 'SSL/TLS',
     private_key:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
   },
   requestBodyMockWithoutCertificateAndPrivateKey: {
     name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS'
+    type: 'SSL/TLS'
   },
   nameErrorMock: {
     detail:
