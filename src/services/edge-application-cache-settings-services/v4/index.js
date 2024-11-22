@@ -18,6 +18,5 @@ export {
   createCacheSettingsService,
   loadCacheSettingsService,
   editCacheSettingsService,
-  deleteCacheSettingsService 
+  deleteCacheSettingsService
 }
-
