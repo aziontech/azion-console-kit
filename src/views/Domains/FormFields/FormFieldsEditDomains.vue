@@ -284,6 +284,7 @@
         <FieldDropdownLazyLoader
           label="Edge Application"
           required
+          data-testid="domains-form__edge-application-field"
           name="edgeApplication"
           :service="listEdgeApplicationsService"
           :loadService="loadEdgeApplicationsService"

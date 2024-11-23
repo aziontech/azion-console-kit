@@ -54,6 +54,7 @@
             placeholder="Search"
             class="w-full rounded-r-none"
             ref="focusSearch"
+            :data-testid="customTestId.search"
           />
           <span
             class="p-inputgroup-addon"
@@ -162,8 +163,8 @@
   const search = ref('')
   const focusSearch = ref(null)
 
-  onMounted(() => {
-    fetchData()
+  onMounted(async () => {
+    await fetchData()
   })
 
   const hasDescriptionSlot = !!slots.description
@@ -290,7 +291,8 @@
       error: `${id}__error-message`,
       filterInput: `${id}__dropdown-filter-input`,
       trigger: `${id}__dropdown-trigger`,
-      loadingIcon: `${id}__loading-icon`
+      loadingIcon: `${id}__loading-icon`,
+      search: `${id}__dropdown-search`
     }
   })
 
