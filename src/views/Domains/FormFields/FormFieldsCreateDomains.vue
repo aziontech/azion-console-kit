@@ -49,6 +49,14 @@
     updateDigitalCertificates: {
       type: Function,
       required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -93,12 +101,6 @@
     )
   })
 
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
@@ -247,17 +249,15 @@
         </FieldDropdownLazyLoader>
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
           placeholder="Select an edge firewall"
         >
@@ -280,7 +280,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         data-testid="domains-form__cname-access-only-field"
@@ -303,7 +303,7 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           data-testid="domains-form__edge-certificate-field"
           label="Digital Certificate"
           name="edgeCertificate"
@@ -336,7 +336,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>

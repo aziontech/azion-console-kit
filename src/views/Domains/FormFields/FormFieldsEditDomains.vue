@@ -41,12 +41,12 @@
       type: Function,
       required: true
     },
-    edgeFirewallsData: {
-      type: Array,
+    listEdgeFirewallService: {
+      type: Function,
       required: true
     },
-    isLoadingEdgeFirewalls: {
-      type: Boolean,
+    loadEdgeFirewallService: {
+      type: Function,
       required: true
     }
   })
@@ -73,13 +73,6 @@
     edgeFirewall.value = id
     emit('edgeFirewallCreated')
   }
-
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -321,17 +314,15 @@
           ref="drawerEdgeFirewallRef"
           @onSuccess="handleEdgeFirewallCreated"
         />
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
           placeholder="Select an edge firewall"
         >
@@ -354,7 +345,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
