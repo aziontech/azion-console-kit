@@ -12,7 +12,7 @@
             class="max-md:w-full"
             label="Copy Nameserver Values"
             @click="handleCopyNameServers"
-          ></PrimeButton>
+          />
         </template>
       </PageHeadingBlock>
     </template>
@@ -24,7 +24,7 @@
         editPagePath="edge-dns/edit"
         :listService="listEdgeDNSServiceV4"
         :columns="getColumns"
-        :apiFields="[]"
+        :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
@@ -102,6 +102,12 @@
     }
   })
 
+  const EDGE_DNS_API_FIELDS = [
+    'id',
+    'name',
+    'domain',
+    'active'
+  ]
   const toast = useToast()
   const hasContentToList = ref(true)
   const actions = [
