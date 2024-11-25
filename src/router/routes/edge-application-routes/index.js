@@ -77,10 +77,10 @@ export const edgeApplicationRoutes = {
         },
         cacheSettingsServices: {
           listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
-          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
+          deleteCacheSettingsService: CacheSettingsServicesV4.deleteCacheSettingsService,
           createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService,
-          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
-          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
+          loadCacheSettingsService: CacheSettingsServicesV4.loadCacheSettingsService,
+          editCacheSettingsService: CacheSettingsServicesV4.editCacheSettingsService,
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
@@ -105,12 +105,12 @@ export const edgeApplicationRoutes = {
           editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         rulesEngineServices: {
-          listRulesEngineService: RulesEngineServiceV4.listRulesEngineService,
+          listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
           editRulesEngineService: RulesEngineService.editRulesEngineService,
           createRulesEngineService: RulesEngineService.createRulesEngineService,
           loadRulesEngineService: RulesEngineService.loadRulesEngineService,
-          reorderRulesEngine: RulesEngineService.reorderRulesEngine,
+          reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
           listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,

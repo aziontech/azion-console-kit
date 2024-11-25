@@ -7,8 +7,8 @@
     <DataTable
       scrollable
       removableSort
+      :lazy="props.lazy"
       rowHover
-      lazy
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       dataKey="id"
@@ -16,10 +16,11 @@
       v-if="!isLoading"
       :pt="props.pt"
       :value="data"
+      v-model:filters="filtersDynamically"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
-      :paginator="true"
-      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :paginator="havePagination"
+      :rowsPerPageOptions="props.rowsPerPageOptions"
       :rows="itemsByPage"
       :globalFilterFields="filterBy"
       :selection="selectedItems"
@@ -27,11 +28,11 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       :totalRecords="totalRecords"
-      :first="firstItemIndex"
       @rowReorder="onRowReorder"
       @row-click="editItemSelected"
       @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
+      :first="firstItemIndex"
     >
       <template
         #header
@@ -73,6 +74,8 @@
             <slot
               name="addButton"
               data-testid="data-table-add-button"
+              :reload="reload"
+              :data="data"
             >
               <PrimeButton
                 class="max-sm:w-full"
@@ -107,7 +110,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        :class="{ 'hover:cursor-pointer': !col.disableSort }"
+        :class="col.disableSort ? '' : 'hover:cursor-pointer'"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -308,17 +311,18 @@
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
-  import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'list-table-block-new' })
 
   const emit = defineEmits([
     'on-load-data',
+    'on-reorder',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
     'update:selectedItensData'
   ])
+
   const props = defineProps({
     hiddenHeader: {
       type: Boolean
@@ -327,7 +331,7 @@
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
     },
-    lazyLoad: {
+    loadDisabled: {
       type: Boolean
     },
     isGraphql: {
@@ -402,16 +406,32 @@
     defaultOrderingFieldName: {
       type: String,
       default: () => 'id'
+    },
+    rowsPerPageOptions: {
+      type: Array,
+      default: () => [10, 20, 50, 100]
+    },
+    lazy: {
+      type: Boolean,
+      default: true
     }
   })
 
   const tableDefinitions = useTableDefinitionsStore()
+  const havePagination = ref(true)
+  const getSpecificPageCount = computed(() => {
+    if (props.rowsPerPageOptions.length === 1) {
+      return props.rowsPerPageOptions[0]
+    }
+    return tableDefinitions.getNumberOfLinesPerPage
+  })
 
-  const itemsByPage = ref(tableDefinitions.getNumberOfLinesPerPage)
+  const itemsByPage = ref(getSpecificPageCount.value)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
+
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
@@ -430,11 +450,15 @@
   const sortOrderValue = ref(null)
 
   const totalRecords = ref()
-  const firstItemIndex = ref(1)
   const savedSearch = ref('')
   const savedOrdering = ref('')
+  const firstItemIndex = ref(0)
 
   const firstLoadData = ref(true)
+
+  const filtersDynamically = computed(() => {
+    return props.lazy ? {} : filters.value
+  })
 
   const selectedItems = computed({
     get: () => {
@@ -445,17 +469,6 @@
     }
   })
 
-  onMounted(() => {
-    if (!props.lazyLoad) {
-      loadData({
-        page: 1,
-        pageSize: itemsByPage.value,
-        fields: props.apiFields,
-        ordering: props.defaultOrderingFieldName
-      })
-    }
-    selectedColumns.value = props.columns
-  })
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -466,30 +479,41 @@
     const columnMapper = props.csvMapper(rowData)
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
+
   const handleExportTableDataToCSV = () => {
     dataTableRef.value.exportCSV()
   }
+
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
+
+  /**
+   * Moves an item within the original array based on updated positions in a reference array.
+   *
+   * @param {Array} originalData - The array to be modified.
+   * @param {Array} referenceArray - The reference array with the new order.
+   * @param {number} fromIndex - The index of the item to move in the reference array.
+   * @param {number} toIndex - The target index  in the reference array.
+   * @returns {Array} The updated array with the item moved.
+   */
+  const moveItem = (originalData, referenceArray, fromIndex, toIndex) => {
+    const originalArray = [...originalData]
+    const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
+    const itemToMoveId = referenceArray[toIndex]
+    const targetItemId = referenceArray[oldItemMove]
+
+    const originalItemIndex = originalArray.findIndex((item) => item.id === itemToMoveId.id)
+    const targetItemIndex = originalArray.findIndex((item) => item.id === targetItemId.id)
+
+    const [itemToMove] = originalArray.splice(originalItemIndex, 1)
+    originalArray.splice(targetItemIndex, 0, itemToMove)
+
+    return originalArray
+  }
+
   const onRowReorder = async (event) => {
-    try {
-      const tableData = getArrayChangedIndexes(data.value, event.dragIndex, event.dropIndex)
-      await props.onReorderService(tableData, data.value, savedOrdering.value, savedSearch.value)
-      data.value = tableData
-      reload()
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Reorder saved'
-      })
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    }
+    emit('on-reorder', { event, data, moveItem })
   }
 
   const openDialog = (dialogComponent, body) => {
@@ -564,10 +588,12 @@
       }
     }
   }
+
   const navigateToAddPage = () => {
     emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
+
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
       throw new Error('Please provide an id for each data item through the service adapter')
@@ -575,6 +601,7 @@
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
   }
+
   const editItemSelected = ({ data: item }) => {
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
@@ -583,10 +610,12 @@
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
+
   const executeCommand = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     firstAction?.command()
   }
+
   const optionsOneAction = (rowData) => {
     const [firstAction] = actionOptions(rowData)
     return {
@@ -594,18 +623,22 @@
       disabled: firstAction?.disabled
     }
   }
+
   const reload = async (query = {}) => {
-    loadData({
+    const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
       fields: props.apiFields,
-      search: savedSearch.value,
       ordering: savedOrdering.value,
       ...query
-    })
-  }
+    }
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+    if (props.lazy) {
+      commonParams.search = savedSearch.value
+    }
+
+    loadData(commonParams)
+  }
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -618,11 +651,11 @@
       }
     }
   }
+
   const changeNumberOfLinesPerPage = (event) => {
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     itemsByPage.value = numberOfLinesPerPage
-
     firstItemIndex.value = event.first
     reload({ page: event.page + 1 })
   }
@@ -645,7 +678,12 @@
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
   }
+
   const fetchOnSearch = () => {
+    if (!props.lazy) return
+
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     reload()
   }
 
@@ -653,4 +691,18 @@
     const search = filters.value.global.value
     savedSearch.value = search
   }
+
+  onMounted(() => {
+    if (!props.loadDisabled) {
+      loadData({
+        page: 1,
+        pageSize: itemsByPage.value,
+        fields: props.apiFields,
+        ordering: props.defaultOrderingFieldName
+      })
+    }
+    selectedColumns.value = props.columns
+  })
+
+  defineExpose({ reload, handleExportTableDataToCSV })
 </script>
