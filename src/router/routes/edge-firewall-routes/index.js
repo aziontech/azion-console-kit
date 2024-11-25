@@ -21,7 +21,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        deleteEdgeFirewallService: EdgeFirewallServices.deleteEdgeFirewallService,
+        deleteEdgeFirewallService: EdgeFirewallServicesV4.deleteEdgeFirewallService,
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
       meta: {
