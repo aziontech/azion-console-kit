@@ -248,7 +248,7 @@
   })
 
   watch(sliceConfigurationEnabled, (value) => {
-    isSliceEdgeCachingEnabled.value = Boolean(value)
+    isSliceEdgeCachingEnabled.value = value
   })
 </script>
 
