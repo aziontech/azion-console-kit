@@ -18,9 +18,9 @@
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :edgeFirewallsData="edgeFirewallsData"
+            :listEdgeFirewallService="listEdgeFirewallService"
+            :loadEdgeFirewallService="loadEdgeFirewallService"
             :isLoadingRequests="isLoadingRequests"
-            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
             :updateDigitalCertificates="updateDigitalCertificates"
             @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
@@ -48,7 +48,6 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -77,6 +76,14 @@
     loadEdgeApplicationsService: {
       type: Function,
       required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -85,11 +92,9 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const edgeFirewallsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
   const isLoadingRequests = ref(true)
-  const isLoadingEdgeFirewalls = ref(true)
 
   const handleResponse = (value) => {
     domainName.value = value?.domainName
@@ -151,21 +156,6 @@
       .track()
   }
 
-  const requestEdgeFirewalls = async () => {
-    isLoadingEdgeFirewalls.value = true
-    try {
-      edgeFirewallsData.value = await listEdgeFirewallService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingEdgeFirewalls.value = false
-    }
-  }
-
-  const handleEdgeFirewallCreated = async () => {
-    await requestEdgeFirewalls()
-  }
-
   const requestDigitalCertificates = async () => {
     digitalCertificates.value = await props.listDigitalCertificatesService({})
   }
@@ -186,7 +176,7 @@
 
   onMounted(async () => {
     try {
-      await Promise.all([requestDigitalCertificates(), requestEdgeFirewalls()])
+      await Promise.all([requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
     } finally {
