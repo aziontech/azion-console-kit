@@ -45,7 +45,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.wait('@getEdgeApplicationListFilter')
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}2.edge.app`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
