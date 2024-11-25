@@ -38,7 +38,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`wwww.${domainName}.com`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -61,7 +61,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.fieldTextInput).clear()
     cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
     cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`wwww.${domainName}.com`)
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
     cy.get(selectors.domains.activeSwitchEditForm).click()
