@@ -89,7 +89,6 @@
 
   const handleEdgeFirewallCreated = (id) => {
     edgeFirewall.value = id
-    emit('edgeFirewallCreated')
   }
 
   const edgeCertificates = computed(() => {

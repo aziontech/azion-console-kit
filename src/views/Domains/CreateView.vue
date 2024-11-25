@@ -22,7 +22,6 @@
             :loadEdgeFirewallService="loadEdgeFirewallService"
             :isLoadingRequests="isLoadingRequests"
             :updateDigitalCertificates="updateDigitalCertificates"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
