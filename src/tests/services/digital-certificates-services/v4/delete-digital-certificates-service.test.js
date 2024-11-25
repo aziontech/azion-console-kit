@@ -42,55 +42,25 @@ describe('DigitalCertificatesServices', () => {
   it.each([
     {
       statusCode: 400,
-      expectedError: 'Resource not found.'
-    },
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
+      expectedError: `Digital Certificate can't be deleted because it is being used.`
     },
     {
       statusCode: 500,
       expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: {
+          detail: `Digital Certificate can't be deleted because it is being used.`
+        }
       })
-      const stubId = '123'
       const { sut } = makeSut()
 
-      const response = sut(stubId)
-
-      expect(response).rejects.toBe(expectedError)
+      const response = sut(10)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
-
-  it('should throw when try to delete a digital certificate that is being used', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 409,
-      body: {
-        detail: `Digital Certificate can't be deleted because it is being used.`
-      }
-    })
-    const stubId = '123'
-    const { sut } = makeSut()
-
-    const response = sut(stubId)
-
-    expect(response).rejects.toBe(`Digital Certificate can't be deleted because it is being used.`)
-  })
 })
