@@ -248,7 +248,7 @@
   })
 
   watch(sliceConfigurationEnabled, (value) => {
-    isSliceEdgeCachingEnabled.value = value
+    isSliceEdgeCachingEnabled.value = Boolean(value)
   })
 </script>
 
@@ -405,9 +405,8 @@
         title="Active"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
       />
-
       <FieldGroupCheckbox
-        v-if="showSliceConfigurationRange"
+        :class="{ hidden: !sliceConfigurationEnabled }"
         label="Layer"
         :options="layerFileOptimizationRadioOptions"
         :isCard="false"
