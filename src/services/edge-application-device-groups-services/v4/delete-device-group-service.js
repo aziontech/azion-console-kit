@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '../../axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-services/v4/make-edge-application-v4-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
 import * as Errors from '@/services/axios/errors'
