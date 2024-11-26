@@ -1,4 +1,6 @@
 import { listDeviceGroupsService } from './list-device-groups-service'
+import { editDeviceGroupService } from './edit-device-groups-service'
+import { loadDeviceGroupService } from './load-device-group-service'
 import { createDeviceGroupService } from './create-device-groups-service'
 
 /**
@@ -9,4 +11,4 @@ import { createDeviceGroupService } from './create-device-groups-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listDeviceGroupsService, createDeviceGroupService }
+export { listDeviceGroupsService, editDeviceGroupService, loadDeviceGroupService, createDeviceGroupService }
