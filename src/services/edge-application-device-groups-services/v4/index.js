@@ -12,4 +12,10 @@ import { createDeviceGroupService } from './create-device-groups-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listDeviceGroupsService, editDeviceGroupService, loadDeviceGroupService, createDeviceGroupService, deleteDeviceGroupService }
+export {
+  listDeviceGroupsService,
+  editDeviceGroupService,
+  loadDeviceGroupService,
+  createDeviceGroupService,
+  deleteDeviceGroupService
+}
