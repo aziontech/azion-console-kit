@@ -108,7 +108,7 @@
     v-model:visible="showDialogAllowRule"
     :isLoading="isLoadingAllowed"
     @closeDialog="closeDialog"
-    @reason="handleSubmitAllowRules"
+    @name="handleSubmitAllowRules"
   >
   </DialogAllowRule>
 </template>
@@ -358,7 +358,7 @@
     router.push({ name: 'list-domains' })
   }
 
-  const handleSubmitAllowRules = async (reasonAttack) => {
+  const handleSubmitAllowRules = async (nameAttack) => {
     let attackEvents = []
     if (allowedByAttacks.value.length) {
       attackEvents = [...allowedByAttacks.value]
@@ -370,7 +370,7 @@
       const [{ status, reason, value }] = await props.createWafRulesAllowedTuningService({
         attackEvents,
         wafId: wafRuleId.value,
-        description: reasonAttack
+        name: nameAttack
       })
 
       if (status === 'rejected') {

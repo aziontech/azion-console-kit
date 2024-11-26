@@ -2,38 +2,53 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, description }) => {
-  const MAP_MATCH_ZONES = {
+export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, name }) => {
+  const MAP_MATCH_ZONES_CONDITIONAL = {
     query_string: 'conditional_query_string',
     request_body: 'conditional_request_body',
     request_header: 'conditional_request_header',
     body: 'conditional_request_body',
     file_name: 'file_name',
     path: 'path',
-    raw_body: 'raw_body'
+    raw_body: 'raw_body',
+    cookie: 'conditional_request_header'
   }
 
-  function checkAndReturnDefault(zone) {
+  const MAP_MATCH_ZONES = {
+    query_string: 'query_string',
+    request_body: 'request_body',
+    request_header: 'request_header',
+    body: 'request_body',
+    file_name: 'file_name',
+    path: 'path',
+    raw_body: 'raw_body',
+    cookie: 'request_header'
+  }
+
+  function checkAndReturnDefault(zone, hasMatchValue) {
     const defaultZone = 'conditional_request_header'
-    return MAP_MATCH_ZONES[zone] || defaultZone
+    const ZONES = hasMatchValue ? MAP_MATCH_ZONES_CONDITIONAL : MAP_MATCH_ZONES
+
+    return ZONES[zone] || defaultZone
   }
   const requestsAllowedRules = attackEvents.map(async (attack) => {
+    const hasMatchValue = !!attack.matchValue
+
     let matchZones = {
-      zone: checkAndReturnDefault(attack.matchZone),
+      zone: checkAndReturnDefault(attack.matchZone, hasMatchValue),
       matches_on: attack.matchesOn
     }
 
-    if (attack.matchValue) {
+    if (hasMatchValue) {
       const isCookieZone = attack.matchZone === 'cookie'
 
       matchZones.zone_input = isCookieZone ? 'cookie' : attack.matchValue
-      matchZones.zone = checkAndReturnDefault(attack.matchZone)
     }
 
     const payload = {
       rule_id: attack.ruleId,
       match_zones: [matchZones],
-      description
+      name
     }
 
     const httpResponse = await AxiosHttpClientAdapter.request({
