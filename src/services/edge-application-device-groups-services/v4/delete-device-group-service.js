@@ -19,7 +19,7 @@ export const deleteDeviceGroupService = async (deviceGroupKey, id) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Device group successfully deleted'
     case 500:
       throw new Errors.InternalServerError().message
