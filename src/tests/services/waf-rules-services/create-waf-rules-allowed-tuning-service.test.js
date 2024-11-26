@@ -117,7 +117,7 @@ describe('WafRulesServices', () => {
         match_zones: [
           {
             matches_on: 'value',
-            zone: 'path',
+            zone: 'path'
           }
         ]
       }
@@ -143,7 +143,7 @@ describe('WafRulesServices', () => {
           {
             matches_on: 'value',
             zone: 'conditional_request_header',
-            zone_input: "arg"
+            zone_input: 'arg'
           }
         ]
       }
