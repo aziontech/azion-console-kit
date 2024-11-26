@@ -19,7 +19,7 @@ export const deleteEdgeFirewallService = async (id) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 204:
+    case 202:
       return 'Edge Firewall successfully deleted'
     case 500:
       throw new Errors.InternalServerError().message
