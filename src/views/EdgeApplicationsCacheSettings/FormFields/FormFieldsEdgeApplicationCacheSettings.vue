@@ -249,6 +249,9 @@
 
   watch(sliceConfigurationEnabled, (value) => {
     isSliceEdgeCachingEnabled.value = value
+    if (!value) {
+      isSliceL2CachingEnabled.value = false
+    }
   })
 </script>
 
