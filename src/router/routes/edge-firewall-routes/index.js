@@ -63,7 +63,7 @@ export const edgeFirewallRoutes = {
         listNetworkListService: NetworkListsService.listNetworkListService,
         edgeFirewallServices: {
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-          editEdgeFirewallService: EdgeFirewallServices.editEdgeFirewallService,
+          editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,
 
           listEdgeFunctionsService: EdgeFirewallFunctionsServices.listEdgeFunctionsService,
           listEdgeFirewallFunctionService:
