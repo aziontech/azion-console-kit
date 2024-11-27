@@ -155,7 +155,7 @@
         field: 'active',
         header: 'Status',
         type: 'component',
-        filterPath: 'active.content',
+        sortField: 'active',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
