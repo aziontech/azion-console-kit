@@ -302,7 +302,7 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
+        <FieldDropdown
           data-testid="domains-form__edge-certificate-field"
           label="Digital Certificate"
           name="edgeCertificate"
@@ -335,7 +335,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdownLazyLoader>
+        </FieldDropdown>
       </div>
     </template>
   </form-horizontal>

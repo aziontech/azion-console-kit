@@ -172,13 +172,14 @@
     initialValue: props.value
   })
 
-  const handleLazyLoad = (event) => {
+  const handleLazyLoad = async (event) => {
     const { last } = event
-    const pageSizeCount = PAGE_SIZE * page.value
+    const numberOfPage = Math.ceil(totalCount.value / PAGE_SIZE)
+    const goRequest = last >= data.value.length
 
-    if (last >= pageSizeCount) {
+    if (page.value < numberOfPage && goRequest && !loading.value) {
       page.value += PAGE_INCREMENT
-      fetchData()
+      await fetchData(page.value)
     }
   }
 
@@ -211,18 +212,19 @@
     return result?.label
   }
 
-  const fetchData = async () => {
+  const fetchData = async (currentPage = 1) => {
     try {
       loading.value = true
 
-      if (page.value === INITIAL_PAGE) {
+      if (currentPage === INITIAL_PAGE) {
         data.value = []
       }
 
       const response = await props.service({
         pageSize: PAGE_SIZE,
-        page: page.value,
-        search: search.value
+        page: currentPage,
+        search: search.value,
+        ordering: 'name'
       })
 
       totalCount.value = response.count
@@ -233,7 +235,7 @@
         }
       })
 
-      if (page.value === INITIAL_PAGE) {
+      if (currentPage === INITIAL_PAGE) {
         data.value = results
       } else {
         const uniqueResults = results.filter(
@@ -242,6 +244,7 @@
               (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
             )
         )
+
         data.value = [...data.value, ...uniqueResults]
       }
     } finally {
@@ -299,7 +302,7 @@
   watch(
     () => props.value,
     (newValue) => {
-      const existitemInList = data.value.some((item) => item[props.optionValue] === newValue)
+      const existitemInList = data.value?.some((item) => item[props.optionValue] === newValue)
       if (!existitemInList) {
         loadSelectedValue(newValue)
       }
