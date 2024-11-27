@@ -3,12 +3,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { extractApiError } from '@/helpers/extract-api-error'
 import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
 
-/**
- * @param {Object} payload - The HTTP request payload.
- * @param {String} payload.name
- * @returns {Promise<string>} The result message based on the status code.
- * @throws {Error} If there is an error with the response.
- */
 export const createFunctionService = async (payload) => {
   const edgeFirewallID = payload.id
   const newPayload = adapt(payload)
@@ -30,11 +24,6 @@ const adapt = (payload) => {
   }
 }
 
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The formatted error message.
- */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
