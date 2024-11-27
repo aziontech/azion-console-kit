@@ -171,7 +171,10 @@
     try {
       loadingFunctionsInstance.value = true
       const responseFunctions = await props.listEdgeApplicationFunctionsService(
-        props.edgeApplicationId
+        props.edgeApplicationId,
+        {
+          pageSize: 100
+        }
       )
       functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
