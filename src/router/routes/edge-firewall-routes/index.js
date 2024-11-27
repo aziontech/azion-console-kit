@@ -1,9 +1,11 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
-import * as EdgeFirewallServices from '@/services/edge-firewall-services'
+
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
+import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-functions-services/v4'
+
 import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
@@ -62,16 +64,17 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService,
         listNetworkListService: NetworkListsService.listNetworkListService,
         edgeFirewallServices: {
-          loadEdgeFirewallService: EdgeFirewallServices.loadEdgeFirewallService,
-          editEdgeFirewallService: EdgeFirewallServices.editEdgeFirewallService,
+          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
+          editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,
 
           listEdgeFunctionsService: EdgeFirewallFunctionsServices.listEdgeFunctionsService,
           listEdgeFirewallFunctionService:
             EdgeFirewallFunctionsServices.listEdgeFirewallFunctionsService,
-          createFunctionService: EdgeFirewallFunctionsServices.createFunctionService,
+          createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,
           editFunctionService: EdgeFirewallFunctionsServices.editFunctionService,
           deleteFunctionService: EdgeFirewallFunctionsServices.deleteFunctionService,
           loadFunctionService: EdgeFirewallFunctionsServices.loadFunctionService,
+
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'
         },
