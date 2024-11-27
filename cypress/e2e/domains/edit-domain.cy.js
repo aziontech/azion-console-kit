@@ -33,8 +33,8 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', `/api/v4/edge_application/applications?ordering=&page=1&page_size=100&fields=&search=${edgeAppName}`).as('getEdgeApplicationListFilter')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
@@ -45,7 +45,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.wait('@getEdgeApplicationListFilter')
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -68,7 +68,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.fieldTextInput).clear()
     cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
     cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
     cy.get(selectors.domains.activeSwitchEditForm).click()

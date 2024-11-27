@@ -67,7 +67,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', '/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
 
     cy.get(selectors.domains.createButton).click()
