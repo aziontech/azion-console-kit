@@ -2,6 +2,7 @@ import { listEdgeFirewallService } from './list-edge-firewall-service'
 import { cloneEdgeFirewallService } from './clone-edge-firewall-service'
 import { createEdgeFirewallService } from './create-edge-firewall-service'
 import { deleteEdgeFirewallService } from './delete-edge-firewall-service'
+import { loadEdgeFirewallService } from './load-edge-firewall-service'
 import { editEdgeFirewallService } from './edit-edge-firewall-service'
 
 /**
@@ -19,5 +20,6 @@ export {
   cloneEdgeFirewallService,
   createEdgeFirewallService,
   deleteEdgeFirewallService,
+  loadEdgeFirewallService,
   editEdgeFirewallService
 }
