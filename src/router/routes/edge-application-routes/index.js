@@ -22,7 +22,7 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
+        deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
@@ -98,7 +98,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
           editDeviceGroupService: DeviceGroupsServiceV4.editDeviceGroupService,
           loadDeviceGroupService: DeviceGroupsServiceV4.loadDeviceGroupService,
-          createDeviceGroupService: DeviceGroupsServiceV4.createDeviceGroupService,
+          createDeviceGroupService: DeviceGroupsServiceV4.createDeviceGroupService
         },
         errorResponsesServices: {
           loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
