@@ -152,10 +152,10 @@
         }
       },
       {
-        field: 'status',
+        field: 'active',
         header: 'Status',
         type: 'component',
-        filterPath: 'status.content',
+        filterPath: 'active.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,

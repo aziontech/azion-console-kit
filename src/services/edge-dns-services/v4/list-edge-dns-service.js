@@ -19,8 +19,8 @@ export const listEdgeDNSServiceV4 = async ({
   
     return params
   }
-
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+  
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeDNSBaseUrl()}/zones?${searchParams.toString()}`,
     method: 'GET'
@@ -55,7 +55,7 @@ const adapt = (httpResponse) => {
         domain: {
           content: edgeDNS.domain
         },
-        status: parseStatusData(edgeDNS.active)
+        active: parseStatusData(edgeDNS.active)
       }))
     : []
 
