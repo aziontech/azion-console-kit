@@ -4,7 +4,11 @@ import { createWafRulesAllowedTuningService } from '@/services/waf-rules-service
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  name: 'Allowed Rules created to allow the attack',
+  name: `Allowed Rules
+created to
+allow the
+attack`,
+  expectName: 'Allowed Rules created to allow the attack',
   wafRulesMock: [
     {
       hitCount: 3,
@@ -87,7 +91,7 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,
-        name: fixtures.name,
+        name: fixtures.expectName,
         match_zones: [
           {
             matches_on: 'value',
@@ -113,7 +117,7 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[1].ruleId,
-        name: fixtures.name,
+        name: fixtures.expectName,
         match_zones: [
           {
             matches_on: 'value',
@@ -138,7 +142,7 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[3].ruleId,
-        name: fixtures.name,
+        name: fixtures.expectName,
         match_zones: [
           {
             matches_on: 'value',

@@ -31,6 +31,15 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
 
     return ZONES[zone] || defaultZone
   }
+
+  const removeEmptyLinesAndSpaces = (name) => {
+    return name
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .join(' ')
+      .trim()
+  }
+
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     const hasMatchValue = !!attack.matchValue
 
@@ -49,7 +58,7 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
     const payload = {
       rule_id: attack.ruleId,
       match_zones: [matchZones],
-      name
+      name: removeEmptyLinesAndSpaces(name)
     }
 
     const httpResponse = await AxiosHttpClientAdapter.request({
