@@ -5,7 +5,6 @@ import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
-import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
@@ -94,7 +93,7 @@ export const edgeApplicationRoutes = {
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
-          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
+          deleteDeviceGroupService: DeviceGroupsServiceV4.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
           editDeviceGroupService: DeviceGroupsServiceV4.editDeviceGroupService,
           loadDeviceGroupService: DeviceGroupsServiceV4.loadDeviceGroupService,
