@@ -27,7 +27,7 @@ export const deleteEdgeApplicationService = async (edgeApplicationId) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Edge Application successfully deleted'
+      return 'Resource successfully deleted'
     case 500:
       throw new Errors.InternalServerError().message
     default:

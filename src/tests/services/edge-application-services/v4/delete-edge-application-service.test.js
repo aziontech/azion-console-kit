@@ -36,7 +36,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     const { sut } = makeSut()
     const feedback = await sut(fixtures.edgeApplicationId)
 
-    expect(feedback).toBe('Edge Application successfully deleted')
+    expect(feedback).toBe('Resource successfully deleted')
   })
 
   it('should throw parsing api error when request fails', async () => {
