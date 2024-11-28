@@ -1,23 +1,21 @@
 <template>
   <PrimeButton
     v-if="showButton"
-    :label="currentLabel"
     @click="toggleSidebarComponent('copilot')"
-    class="special-button text-white border-header bg-header hover:bg-header-button-hover"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
-      label: { class: 'max-md:hidden' },
-      icon: { class: 'max-md:m-0 text-white' }
+      label: { class: 'max-md:hidden' }
     }"
     :class="buttonClasses"
-    icon="ai ai-ask-azion"
     size="small"
-    outlined
+    class="special-button"
     v-tooltip.bottom="{ value: 'Azion Copilot', showDelay: 200 }"
   >
-    <div class="special-button-content">
-      <i class="ai ai-ask-azion"> </i>
-      {{ currentLabel }}
+    <div
+      class="special-button-content shadow !shadow-[#ffffff50] w-8 md:w-auto justify-center md:justify-start"
+      :class="aiChatIsOpen"
+    >
+      <i class="ai ai-ask-azion"></i>{{ currentLabel }}
     </div>
   </PrimeButton>
 </template>
@@ -44,6 +42,12 @@
 
   const showButton = computed(() => {
     return route.name !== 'copilot'
+  })
+
+  const aiChatIsOpen = computed(() => {
+    return isSidebarActive.value && activeComponentKey.value === 'copilot'
+      ? 'bg-header/40'
+      : 'bg-header/80 hover:bg-[#00000025]'
   })
 
   const buttonClasses = computed(() => {

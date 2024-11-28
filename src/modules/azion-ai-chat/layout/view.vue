@@ -2,6 +2,20 @@
   <div class="min-h-[calc(100vh-15.5rem)] max-h-[calc(100vh-15.5rem)] pb-8 px-8 h-full">
     <div class="flex flex-col border h-full rounded-md surface-border p-3">
       <div
+        class="sticky w-full flex justify-end px-3 top-0 surface-section"
+        v-if="getStartConversation"
+      >
+        <PrimeButton
+          icon="pi pi-eraser"
+          outlined
+          label="New chat"
+          class="surface-border"
+          aria-label="New chat"
+          v-tooltip.bottom="'New chat'"
+          @click="clearChat"
+        />
+      </div>
+      <div
         class="overflow-hidden overflow-y-auto h-full custom-scroll"
         ref="chatContainer"
       >
@@ -14,17 +28,6 @@
         </template>
         <template v-else>
           <div class="h-full px-3">
-            <div class="sticky w-full flex justify-end px-3 top-0 surface-section">
-              <PrimeButton
-                icon="pi pi-eraser"
-                outlined
-                label="New chat"
-                class="surface-border"
-                aria-label="New chat"
-                v-tooltip.bottom="'New chat'"
-                @click="clearChat"
-              />
-            </div>
             <ChatMessages class="pb-6" />
           </div>
         </template>
