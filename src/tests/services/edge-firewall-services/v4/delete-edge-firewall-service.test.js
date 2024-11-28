@@ -14,7 +14,7 @@ const makeSut = () => {
 describe('EdgeFirewallServicesV4', () => {
   it('should call Api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 202
     })
     const mockId = 12387555
     const { sut } = makeSut()
@@ -28,7 +28,7 @@ describe('EdgeFirewallServicesV4', () => {
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 202
     })
     const mockId = 123
 
