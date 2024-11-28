@@ -1,6 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
-import * as EdgeFirewallServices from '@/services/edge-firewall-services'
+
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
@@ -23,7 +23,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        deleteEdgeFirewallService: EdgeFirewallServices.deleteEdgeFirewallService,
+        deleteEdgeFirewallService: EdgeFirewallServicesV4.deleteEdgeFirewallService,
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
       meta: {
