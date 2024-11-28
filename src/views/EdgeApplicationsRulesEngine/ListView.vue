@@ -2,7 +2,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import FetchListTableBlock from '@/templates/list-table-block/with-group.vue'
 
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
@@ -116,16 +116,8 @@
         disableSort: true
       },
       {
-        field: 'phase',
-        header: 'Phase',
-        type: 'component',
-        filterPath: 'phase',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        },
+        field: 'description',
+        header: 'Description',
         disableSort: true
       },
       {
@@ -140,11 +132,6 @@
             columnAppearance: 'tag'
           })
         },
-        disableSort: true
-      },
-      {
-        field: 'description',
-        header: 'Description',
         disableSort: true
       }
     ]
@@ -326,20 +313,21 @@
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
           >
             <PrimeButton
+              class="bg-secondary"
               outlined
-              icon="pi pi-save"
+              label="Cancel"
+              @click="reload"
+              data-testid="rules-engine-cancel-order-button"
+            />
+
+            <PrimeButton
+              outlined
               class="bg-primary"
-              :disabled="disabledOrdering"
-              :pt="{
-                label: { class: 'text-[var(--surface-section)]' },
-                icon: { class: 'text-[var(--surface-section)]' },
-                loadingIcon: { class: 'text-[var(--surface-section)]' }
-              }"
-              label="Save order"
+              :pt="{}"
+              label="Review Changes"
               :loading="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
               @click="updateRulesOrder(data, reload)"
-              v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
             />
           </div>
         </teleport>
