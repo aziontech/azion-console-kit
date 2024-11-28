@@ -1,69 +1,21 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
-import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import * as Errors from '@/services/axios/errors'
 
-export const reorderEdgeFirewallRulesEngine = async (
-  newOrderData,
-  currentOrderData,
-  edgeFirewallId,
-  ordering = '',
-  search = ''
-) => {
-  const edgeFirewallIds = await allEdgeFirewallToReorder(edgeFirewallId, ordering, search)
+export const reorderRulesEngine = async (newOrderData, edgeFirewallId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules/order`,
     method: 'PUT',
-    body: adapt(newOrderData, currentOrderData, edgeFirewallIds)
+    body: adapt(newOrderData)
   })
 
   return parseHttpResponse(httpResponse)
 }
 
-const allEdgeFirewallToReorder = async (edgeFirewallId, ordering, search) => {
-  const fields = ['id']
-  const pageSize = 100
-  const searchParams = makeListServiceQueryParams({
-    fields,
-    ordering,
-    page: 1,
-    pageSize,
-    search
-  })
-
-  const httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules?${searchParams.toString()}`,
-    method: 'GET'
-  })
-
-  return httpResponse.body.results
-}
-
-function replaceIntervalWithSortedList(currentList, allIdsList, sortedList) {
-  const startIndex = allIdsList.indexOf(currentList[0])
-  const endIndex = allIdsList.indexOf(currentList[currentList.length - 1])
-
-  const updatedAllIdsList = [
-    ...allIdsList.slice(0, startIndex),
-    ...sortedList,
-    ...allIdsList.slice(endIndex + 1)
-  ]
-
-  return updatedAllIdsList
-}
-
-const adapt = (newOrderData, currentOrderData, edgeFirewallIds) => {
+const adapt = (newOrderData) => {
   const listNewOrderDataIds = newOrderData.map((data) => data.id)
-  const listCurrentOrderDataIds = currentOrderData.map((data) => data.id)
-  const listEdgeFirewallIds = edgeFirewallIds.map((data) => data.id)
 
-  const result = replaceIntervalWithSortedList(
-    listCurrentOrderDataIds,
-    listEdgeFirewallIds,
-    listNewOrderDataIds
-  )
-
-  return { order: result }
+  return { order: listNewOrderDataIds }
 }
 
 /**
