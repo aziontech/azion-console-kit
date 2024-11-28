@@ -20,8 +20,9 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="listEdgeFirewallService"
             :loadEdgeFirewallService="loadEdgeFirewallService"
+            :listDigitalCertificatesService="listDigitalCertificatesService"
+            :loadDigitalCertificatesService="loadDigitalCertificatesService"
             :isLoadingRequests="isLoadingRequests"
-            :updateDigitalCertificates="updateDigitalCertificates"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -37,7 +38,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   import CreateFormBlock from '@/templates/create-form-block'
@@ -61,6 +62,10 @@
       required: true
     },
     listDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
+    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },
@@ -155,34 +160,6 @@
       .track()
   }
 
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const showToast = (severity, summary) => {
-    const options = {
-      closable: true,
-      severity,
-      summary
-    }
-
-    toast.add(options)
-  }
-
-  const toastError = (error) => {
-    showToast('error', error)
-  }
-
-  onMounted(async () => {
-    try {
-      await Promise.all([requestDigitalCertificates()])
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  })
-
   const initialValues = {
     name: '',
     environment: 'production',
@@ -235,15 +212,4 @@
     active: yup.boolean(),
     environment: yup.string()
   })
-
-  const updateDigitalCertificates = async () => {
-    try {
-      isLoadingRequests.value = true
-      digitalCertificates.value = await props.listDigitalCertificatesService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  }
 </script>

@@ -20,10 +20,11 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="listEdgeFirewallService"
             :loadEdgeFirewallService="loadEdgeFirewallService"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
+            :listDigitalCertificatesService="listDigitalCertificatesService"
+            :loadDigitalCertificatesService="loadDigitalCertificatesService"
             hasDomainName
             @copyDomainName="copyDomainName"
-            :updateDigitalCertificates="updateDigitalCertificates"
+            @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -39,7 +40,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -59,6 +60,10 @@
       required: true
     },
     listDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
+    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },
@@ -118,10 +123,6 @@
   const toast = useToast()
   const domainName = ref()
 
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
   const showToast = (severity, summary) => {
     toast.add({
       closable: true,
@@ -130,30 +131,14 @@
     })
   }
 
-  const toastError = (error) => {
-    showToast('error', error)
-  }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
     showToast('success', 'Successfully copied!')
   }
 
-  const scrollToTop = () => {
-    window.scrollTo(0, 0)
-  }
-
   const setDomainName = async (domain) => {
     domainName.value = domain.name
   }
-
-  onMounted(async () => {
-    try {
-      scrollToTop()
-      await Promise.all([requestDigitalCertificates()])
-    } catch (error) {
-      toastError(error)
-    }
-  })
 
   const validationSchema = yup.object({
     id: yup.string().required(),
@@ -196,12 +181,4 @@
     active: yup.boolean(),
     environment: yup.string()
   })
-
-  const updateDigitalCertificates = async () => {
-    try {
-      digitalCertificates.value = await props.listDigitalCertificatesService({})
-    } catch (error) {
-      toastError(error)
-    }
-  }
 </script>

@@ -30,7 +30,9 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=').as('searchDigitalCertificatesApi')
+    cy.intercept('GET', `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=${domainName}`).as('searchDigitalCertificatesApiByDomain')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -40,7 +42,9 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
+
+    cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.letsEncryptDropdownOption).click()
 
@@ -53,9 +57,14 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
+
+    cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
     cy.get(selectors.domains.digitalCertificateDropdownSearch).clear()
     cy.get(selectors.domains.digitalCertificateDropdownSearch).type(domainName)
+
+    cy.wait('@searchDigitalCertificatesApiByDomain')
+    cy.get(selectors.domains.edgeCertificateOption).click()
     cy.get(selectors.domains.edgeCertificateOption).should('be.visible')
   })
 

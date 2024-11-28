@@ -1,15 +1,10 @@
 <script setup>
-  import {
-    EDGE_CERTIFICATE,
-    TRUSTED_CA_CERTIFICATE
-  } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -37,10 +32,6 @@
       required: false,
       default: false
     },
-    updateDigitalCertificates: {
-      type: Function,
-      required: true
-    },
     listEdgeFirewallService: {
       type: Function,
       required: true
@@ -48,8 +39,19 @@
     loadEdgeFirewallService: {
       type: Function,
       required: true
+    },
+    listDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
+    loadDigitalCertificatesService: {
+      type: Function,
+      required: true
     }
   })
+
+  const EDGE_CERTIFICATE = 'edge_certificate'
+  const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
 
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -73,36 +75,6 @@
     edgeFirewall.value = id
     emit('edgeFirewallCreated')
   }
-
-  const edgeCertificates = computed(() => {
-    return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
-  })
-
-  const trustedCACertificates = computed(() => {
-    return props.digitalCertificates.filter(
-      (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
-    )
-  })
-
-  const edgeCertificatesOptions = computed(() => {
-    const defaultCertificate = [
-      { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt", value: 'lets_encrypt' }
-    ]
-    const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-
-    return [...defaultCertificate, ...parsedCertificates]
-  })
-
-  const trustedCACertificatesOptions = computed(() => {
-    return trustedCACertificates.value.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-  })
 
   const mtlsModeRadioOptions = ref([
     {
@@ -164,8 +136,23 @@
   }
 
   const onDigitalCertificateSuccess = (id) => {
-    props.updateDigitalCertificates()
     edgeCertificate.value = id
+  }
+
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return await props.listDigitalCertificatesService({
+      type: EDGE_CERTIFICATE,
+      fields: 'id,name',
+      ...queryParams
+    })
+  }
+
+  const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
+    return await props.listDigitalCertificatesService({
+      type: TRUSTED_CA_CERTIFICATE,
+      fields: 'id,name',
+      ...queryParams
+    })
   }
 </script>
 
@@ -369,16 +356,15 @@
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Digital Certificate"
           name="edgeCertificate"
-          :options="edgeCertificatesOptions"
-          :loading="!edgeCertificatesOptions.length"
-          :disabled="!edgeCertificatesOptions.length"
+          data-testid="domains-form__digital-certificates-field"
+          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
-          filter
           appendTo="self"
           placeholder="Select a certificate"
         >
@@ -401,7 +387,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>
@@ -434,17 +420,16 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           required
           name="mtlsTrustedCertificate"
-          :options="trustedCACertificatesOptions"
-          :loading="!trustedCACertificatesOptions.length"
+          :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"
           :value="mtlsTrustedCertificate"
-          filter
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
         />
