@@ -26,17 +26,19 @@ export default {
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
   digitalCertificateFieldSelectedValue:
     ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+  digitalCertificateDropdownSearch: '[data-testid="field-dropdown__dropdown-filter-input"]',
   digitalCertificateDropdown:
     '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
+  digitalCertificatesDropdownLetsEncrypt: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   letsEncryptDropdownOption: '#edgeCertificate_1',
-  editPageTitle: '[data-testid="page_title_Edit Domain"]',
+  editPageTitle: '[data-testid="page-heading-block__breadcrumb__Edit Domain"] > .p-menuitem-link > .p-menuitem-text',
   enableMtlsSwitch:
     '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
   dropdownTrustedCA:
     '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown"] > .p-dropdown-label',
   trustedCAFirstDropdownOption: '#mtlsTrustedCertificate_0',
   mtlsTrustedCAFieldSelectedValue:
-    ':nth-child(4) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+    ':nth-child(5) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   fieldTextInput: '[data-testid="field-text__input"]',
   domainUri: '[data-testid="edit-domains-form__domain-field__input"]',
   editFormCopyDomainButton: '[data-testid="edit-domains-form__domain-field__copy-button"]',
@@ -45,5 +47,8 @@ export default {
   dataTableSearchInput: '[data-testid="data-table-search-input"]',
   listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',
   listTableBlockColumnActiveRow:
-    '[data-testid="list-table-block__column__active__row"] > .p-tag-value'
+    '[data-testid="list-table-block__column__active__row"] > .p-tag-value',
+  edgeApplicationSaveButton: '[data-testid="create-drawer-block__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
+  edgeFirewallSaveButton: '[data-testid="edge-firewall-drawer__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
+  edgeApplicationDropdownSearch: '[data-testid="domains-form__edge-application-field__dropdown-search"]'
 }

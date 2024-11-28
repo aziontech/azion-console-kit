@@ -16,15 +16,14 @@
         <template #form>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
-            :edgeFirewallsData="edgeFirewallsData"
-            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
+            :listEdgeFirewallService="listEdgeFirewallService"
+            :loadEdgeFirewallService="loadEdgeFirewallService"
             @edgeFirewallCreated="handleEdgeFirewallCreated"
             hasDomainName
             @copyDomainName="copyDomainName"
-            :loadingEdgeApplications="loadingEdgeApplications"
             :updateDigitalCertificates="updateDigitalCertificates"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -50,7 +49,6 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -68,7 +66,19 @@
       type: Function,
       required: true
     },
+    loadEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
     loadDomainService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
       type: Function,
       required: true
     },
@@ -104,31 +114,12 @@
       .track()
   }
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
-  const loadingEdgeApplications = ref(true)
   const domainName = ref()
-  const edgeFirewallsData = ref([])
-  const isLoadingEdgeFirewalls = ref(true)
-
-  const requestEdgeApplications = async () => {
-    loadingEdgeApplications.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
 
   const requestDigitalCertificates = async () => {
     digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
   }
 
   const showToast = (severity, summary) => {
@@ -155,33 +146,12 @@
     domainName.value = domain.name
   }
 
-  const requestEdgeFirewalls = async () => {
-    isLoadingEdgeFirewalls.value = true
-    try {
-      edgeFirewallsData.value = await listEdgeFirewallService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingEdgeFirewalls.value = false
-    }
-  }
-
-  const handleEdgeFirewallCreated = async () => {
-    await requestEdgeFirewalls()
-  }
-
   onMounted(async () => {
     try {
       scrollToTop()
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
+      await Promise.all([requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
     }
   })
 
@@ -229,12 +199,9 @@
 
   const updateDigitalCertificates = async () => {
     try {
-      loadingEdgeApplications.value = true
       digitalCertificates.value = await props.listDigitalCertificatesService({})
     } catch (error) {
       toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
     }
   }
 </script>
