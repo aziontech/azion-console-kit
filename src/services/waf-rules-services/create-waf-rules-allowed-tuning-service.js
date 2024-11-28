@@ -41,8 +41,9 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
 
     if (hasMatchValue) {
       const isCookieZone = attack.matchZone === 'cookie'
+      const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
 
-      matchZones.zone_input = isCookieZone ? 'cookie' : attack.matchValue
+      matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
     }
 
     const payload = {
