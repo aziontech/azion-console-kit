@@ -1,4 +1,3 @@
-import * as DigitalCertificatesService from '@/services/digital-certificates-services'
 import * as DigitalCertificatesServiceV4 from '@/services/digital-certificates-services/v4'
 
 import * as Helpers from '@/helpers'
@@ -33,9 +32,9 @@ export const digitalCertificatesRoutes = {
       component: () => import('@views/DigitalCertificates/CreateView.vue'),
       props: {
         createDigitalCertificatesCSRService:
-          DigitalCertificatesService.createDigitalCertificatesCSRService,
+          DigitalCertificatesServiceV4.createDigitalCertificatesCSRService,
         createDigitalCertificatesService:
-          DigitalCertificatesService.createDigitalCertificatesService
+          DigitalCertificatesServiceV4.createDigitalCertificatesService
       },
       meta: {
         breadCrumbs: [
