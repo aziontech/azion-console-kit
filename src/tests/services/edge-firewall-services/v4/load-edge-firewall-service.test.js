@@ -10,7 +10,7 @@ const fixtures = {
     modules: {
       edge_functions_enabled: true,
       network_protection_enabled: true,
-      waf_enabled: true,
+      waf_enabled: true
     },
     debug_rules: true,
     domains: [],
