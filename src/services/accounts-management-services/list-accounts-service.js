@@ -19,7 +19,7 @@ export const listAccountsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  if (!httpResponse.body.count) {
+  if (!httpResponse.body?.count) {
     return {
       count: 0,
       body: [],
