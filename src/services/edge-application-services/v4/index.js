@@ -1,6 +1,7 @@
 import { listEdgeApplicationsService } from './list-edge-applications-service'
 import { cloneEdgeApplicationService } from './clone-edge-application-service'
 import { deleteEdgeApplicationService } from './delete-edge-application-service'
+import { loadEdgeApplicationsService } from './load-edge-application-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -10,4 +11,9 @@ import { deleteEdgeApplicationService } from './delete-edge-application-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listEdgeApplicationsService, cloneEdgeApplicationService, deleteEdgeApplicationService }
+export {
+  listEdgeApplicationsService,
+  cloneEdgeApplicationService,
+  deleteEdgeApplicationService,
+  loadEdgeApplicationsService
+}
