@@ -108,7 +108,7 @@
     v-model:visible="showDialogAllowRule"
     :isLoading="isLoadingAllowed"
     @closeDialog="closeDialog"
-    @name="handleSubmitAllowRules"
+    @handleDescriptionOfAttack="handleSubmitAllowRules"
   >
   </DialogAllowRule>
 </template>

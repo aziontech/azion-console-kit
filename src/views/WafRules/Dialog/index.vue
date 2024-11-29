@@ -6,7 +6,7 @@
 
   defineOptions({ name: 'dialog-allow-rule' })
 
-  const emit = defineEmits(['update:visible', 'closeDialog'])
+  const emit = defineEmits(['update:visible', 'closeDialog', 'handleDescriptionOfAttack'])
   const name = ref('')
 
   const props = defineProps({
@@ -29,7 +29,7 @@
 
   const handleAllowRule = () => {
     if (!name.value) return
-    emit('name', name.value)
+    emit('handleDescriptionOfAttack', name.value)
     loading.value = true
   }
 
