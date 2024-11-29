@@ -5,7 +5,6 @@ import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
-import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
@@ -22,7 +21,7 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
+        deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
@@ -77,10 +76,10 @@ export const edgeApplicationRoutes = {
         },
         cacheSettingsServices: {
           listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
-          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
-          createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
-          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
-          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
+          deleteCacheSettingsService: CacheSettingsServicesV4.deleteCacheSettingsService,
+          createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService,
+          loadCacheSettingsService: CacheSettingsServicesV4.loadCacheSettingsService,
+          editCacheSettingsService: CacheSettingsServicesV4.editCacheSettingsService,
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
@@ -94,11 +93,11 @@ export const edgeApplicationRoutes = {
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
-          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
+          deleteDeviceGroupService: DeviceGroupsServiceV4.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
-          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
-          editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
-          loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
+          editDeviceGroupService: DeviceGroupsServiceV4.editDeviceGroupService,
+          loadDeviceGroupService: DeviceGroupsServiceV4.loadDeviceGroupService,
+          createDeviceGroupService: DeviceGroupsServiceV4.createDeviceGroupService
         },
         errorResponsesServices: {
           loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,

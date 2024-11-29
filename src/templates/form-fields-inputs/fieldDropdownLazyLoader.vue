@@ -252,11 +252,11 @@
     }
   }
 
-  const loadSelectedValue = async (globalId) => {
-    if (!globalId) return
+  const loadSelectedValue = async (id) => {
+    if (!id) return
     try {
       loading.value = true
-      const results = await props.loadService(globalId)
+      const results = await props.loadService({ id })
       if (!results) return
 
       const newOption = {
