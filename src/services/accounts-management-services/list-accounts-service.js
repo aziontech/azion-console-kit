@@ -19,6 +19,13 @@ export const listAccountsService = async ({
 }
 
 const adapt = (httpResponse) => {
+  if (!httpResponse.body.count) {
+    return {
+      count: 0,
+      body: [],
+      statusCode: httpResponse.statusCode
+    }
+  }
   const count = httpResponse.body.count
   const filteredList = httpResponse.body.results.filter((item) => !item.is_deleted)
   const parsedBody = filteredList.map((item) => {

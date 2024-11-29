@@ -27,7 +27,7 @@ describe('AccountsManagementServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [] }
+      body: { count: 0, results: [] }
     })
 
     const { sut } = makeSut()
@@ -43,14 +43,14 @@ describe('AccountsManagementServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
+        count: 1,
         results: [fixtures.accountSample]
       }
     })
 
     const { sut } = makeSut()
     const result = await sut({ account_type: 'reseller' })
-
-    expect(result).toEqual([
+    expect(result.body).toEqual([
       {
         id: fixtures.accountSample.id,
         name: fixtures.accountSample.name,
@@ -67,6 +67,7 @@ describe('AccountsManagementServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
+        count: 1,
         results: [fixtures.inactiveAccountSample]
       }
     })
@@ -74,7 +75,7 @@ describe('AccountsManagementServices', () => {
     const { sut } = makeSut()
     const result = await sut({ account_type: 'reseller' })
 
-    expect(result).toEqual([
+    expect(result.body).toEqual([
       {
         id: fixtures.accountSample.id,
         name: fixtures.accountSample.name,
