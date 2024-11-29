@@ -45,7 +45,7 @@ describe('DigitalCertificatesServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/digital_certificates/certificates?ordering=name&page=1&page_size=10&fields=&search=',
+      url: 'v4/digital_certificates/certificates?ordering=name&page=1&page_size=10&fields=&search=&type=',
       method: 'GET'
     })
   })
