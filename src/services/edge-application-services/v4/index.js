@@ -11,4 +11,9 @@ import { loadEdgeApplicationsService } from './load-edge-application-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listEdgeApplicationsService, cloneEdgeApplicationService, deleteEdgeApplicationService, loadEdgeApplicationsService }
+export {
+  listEdgeApplicationsService,
+  cloneEdgeApplicationService,
+  deleteEdgeApplicationService,
+  loadEdgeApplicationsService
+}
