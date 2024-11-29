@@ -10,7 +10,6 @@
       expandableRowGroups
       v-model:expandedRowGroups="expandedRowGroups"
       scrollable
-      :lazy="props.lazy"
       rowHover
       ref="dataTableRef"
       class="overflow-clip rounded-md"
@@ -20,20 +19,13 @@
       v-model:filters="filtersDynamically"
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
-      :paginator="havePagination"
-      :rowsPerPageOptions="props.rowsPerPageOptions"
-      :rows="itemsByPage"
       :globalFilterFields="filterBy"
       :selection="selectedItems"
       :exportFilename="exportFileName"
       :exportFunction="exportFunctionMapper"
-      :loading="isLoading"
-      :totalRecords="totalRecords"
       @rowReorder="onRowReorder"
       @row-click="editItemSelected"
-      @page="changeNumberOfLinesPerPage"
       @sort="fetchOnSort"
-      :first="firstItemIndex"
     >
       <template
         #header
@@ -97,7 +89,7 @@
       />
 
       <Column
-        v-if="reorderableRows"
+        v-if="orderableRows"
         rowReorder
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
@@ -315,7 +307,7 @@
       type: Boolean,
       default: true
     },
-    reorderableRows: {
+    orderableRows: {
       type: Boolean
     },
     onReorderService: {
@@ -360,7 +352,7 @@
     },
     defaultOrderingFieldName: {
       type: String,
-      default: () => 'id'
+      default: () => ''
     },
     rowsPerPageOptions: {
       type: Array,
@@ -373,7 +365,7 @@
   })
 
   const tableDefinitions = useTableDefinitionsStore()
-  const havePagination = ref(true)
+
   const getSpecificPageCount = computed(() => {
     if (props.rowsPerPageOptions.length === 1) {
       return props.rowsPerPageOptions[0]
@@ -385,7 +377,7 @@
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
-  const expandedRowGroups = ref(null)
+  const expandedRowGroups = ref(['Request', 'Response'])
   const dataTableRef = ref(null)
 
   const filters = ref({
@@ -606,14 +598,6 @@
         menuRef.value[rowDataID] = document
       }
     }
-  }
-
-  const changeNumberOfLinesPerPage = (event) => {
-    const numberOfLinesPerPage = event.rows
-    tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
-    itemsByPage.value = numberOfLinesPerPage
-    firstItemIndex.value = event.first
-    reload({ page: event.page + 1 })
   }
 
   const filterBy = computed(() => {

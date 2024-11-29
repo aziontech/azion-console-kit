@@ -111,6 +111,11 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'order',
+        header: 'Order',
+        disableSort: true
+      },
+      {
         field: 'name',
         header: 'Name',
         disableSort: true
@@ -211,20 +216,20 @@
 
     const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
 
-    const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
+    // const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
 
-    const isFirstRuleNotDefault = reorderedData[0].name !== 'Default Rule'
+    // const isFirstRuleNotDefault = reorderedData[0].name !== 'Default Rule'
 
-    if (isFirstRuleNotDefault) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'The default rule cannot be reordered'
-      })
-      return
-    }
+    // if (isFirstRuleNotDefault) {
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'error',
+    //     summary: 'The default rule cannot be reordered'
+    //   })
+    //   return
+    // }
 
-    data.value = reorderedData
+    data.value = updatedTable
     disabledOrdering.value = false
   }
 
@@ -279,7 +284,7 @@
   <FetchListTableBlock
     :lazy="false"
     ref="listRulesEngineRef"
-    :reorderableRows="true"
+    :orderableRows="true"
     :columns="getColumns"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
@@ -295,7 +300,6 @@
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
-    :rowsPerPageOptions="[2000]"
   >
     <template #addButton="{ reload, data }">
       <div
@@ -321,13 +325,15 @@
             />
 
             <PrimeButton
-              outlined
-              class="bg-primary"
-              :pt="{}"
               label="Review Changes"
+              badgeClass="p-badge-lg text-color bg-transparent h-5 min-w-[20px] !text-xl"
               :loading="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
+              size="small"
+              type="button"
               @click="updateRulesOrder(data, reload)"
+              :disabled="disabledOrdering"
+              badge="4"
             />
           </div>
         </teleport>
