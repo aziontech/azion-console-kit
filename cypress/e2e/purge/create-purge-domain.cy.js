@@ -28,12 +28,17 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
+
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.domain.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()

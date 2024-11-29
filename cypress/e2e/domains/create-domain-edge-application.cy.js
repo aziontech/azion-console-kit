@@ -22,9 +22,11 @@ const createEdgeApplicationCase = () => {
 const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).clear()
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
-  cy.intercept('GET', '/api/v3/edge_firewall*').as('getEdgeFirewallApi')
+
   cy.get(selectors.domains.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
-  cy.wait('@getEdgeFirewallApi')
+
+  cy.verifyToast('success', 'Your Edge Firewall has been created')
+
 }
 
 const createDigitalCertificateCase = () => {
@@ -65,14 +67,22 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
+    cy.intercept('GET', '/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
+
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
+
+    cy.wait('@getEdgeFirewallList')
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
+
     cy.get(selectors.domains.cnameAccessOnlyField).click()
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.createDigitalCertificateButton).click()

@@ -5,6 +5,7 @@
   } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -21,8 +22,12 @@
       type: Array,
       required: true
     },
-    edgeApplicationsData: {
-      type: Array,
+    listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
+      type: Function,
       required: true
     },
     edgeFirewallsData: {
@@ -42,6 +47,14 @@
       type: Boolean
     },
     updateDigitalCertificates: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
       type: Function,
       required: true
     }
@@ -76,7 +89,6 @@
 
   const handleEdgeFirewallCreated = (id) => {
     edgeFirewall.value = id
-    emit('edgeFirewallCreated')
   }
 
   const edgeCertificates = computed(() => {
@@ -87,16 +99,7 @@
       (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
     )
   })
-  const edgeApplicationOptions = computed(() => {
-    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
-  })
 
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
@@ -210,18 +213,16 @@
         @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :options="edgeApplicationOptions"
-          :loading="isLoadingRequestsData"
-          :disabled="isLoadingRequestsData"
+          :service="listEdgeApplicationsService"
+          :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          filter
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -244,20 +245,18 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
           placeholder="Select an edge firewall"
         >
@@ -280,7 +279,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         data-testid="domains-form__cname-access-only-field"
