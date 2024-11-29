@@ -142,7 +142,7 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await props.listDigitalCertificatesService({
       type: EDGE_CERTIFICATE,
-      fields: 'id,name',
+      fields: ['id,name'],
       ...queryParams
     })
   }
@@ -150,7 +150,7 @@
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return await props.listDigitalCertificatesService({
       type: TRUSTED_CA_CERTIFICATE,
-      fields: 'id,name',
+      fields: ['id,name'],
       ...queryParams
     })
   }

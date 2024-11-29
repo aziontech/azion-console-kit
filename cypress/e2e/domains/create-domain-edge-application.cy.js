@@ -69,7 +69,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Domains')
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
-    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=azion').as('searchDigitalCertificatesApi')
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=azion&type=*').as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)

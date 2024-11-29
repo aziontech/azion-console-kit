@@ -12,7 +12,7 @@ export const listDigitalCertificatesServiceDropdown = async ({
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDigitalCertificatesBaseUrl()}?${searchParams.toString()}`,
+    url: `${makeDigitalCertificatesBaseUrl()}?${searchParams.toString()}&type=${type}`,
     method: 'GET'
   })
 
@@ -32,15 +32,16 @@ const adapt = (httpResponse, certificateType, search) => {
   let count = httpResponse.body?.count ?? 0
 
   if (certificateType === 'edge_certificate') {
-    const defaultCertificate = [
+    const DEFAULT_CERTIFICATES = [
       { id: 0, name: 'Azion (SAN)' },
       { id: 'lets_encrypt', name: "Let's Encrypt" }
     ]
+
     const filteredDefaultCertificates = search
-      ? defaultCertificate.filter(cert =>
+      ? DEFAULT_CERTIFICATES.filter(cert =>
         cert.name.toLowerCase().includes(search.toLowerCase())
       )
-      : defaultCertificate
+      : DEFAULT_CERTIFICATES
 
     parsedDigitalCertificates = [...filteredDefaultCertificates, ...parsedDigitalCertificates]
     count += filteredDefaultCertificates.length
