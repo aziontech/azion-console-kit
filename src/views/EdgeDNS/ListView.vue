@@ -12,23 +12,26 @@
             class="max-md:w-full"
             label="Copy Nameserver Values"
             @click="handleCopyNameServers"
-          ></PrimeButton>
+          />
         </template>
       </PageHeadingBlock>
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeDNSService"
-        :columns="getColumns"
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
+        :listService="listEdgeDNSServiceV4"
+        :columns="getColumns"
+        :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No zone found."
+        data-testid="edge-dns-list-table-block"
         :actions="actions"
+        :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
@@ -52,7 +55,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
@@ -64,6 +67,10 @@
 
   const props = defineProps({
     listEdgeDNSService: {
+      required: true,
+      type: Function
+    },
+    listEdgeDNSServiceV4: {
       required: true,
       type: Function
     },
@@ -81,6 +88,12 @@
     }
   })
 
+  const EDGE_DNS_API_FIELDS = [
+    'id',
+    'name',
+    'domain',
+    'active'
+  ]
   const toast = useToast()
   const hasContentToList = ref(true)
   const actions = [
@@ -139,10 +152,10 @@
         }
       },
       {
-        field: 'status',
+        field: 'active',
         header: 'Status',
         type: 'component',
-        filterPath: 'status.content',
+        sortField: 'active',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
