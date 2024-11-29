@@ -7,17 +7,15 @@
  * @param {number} opts.page - Page number (1-indexed).
  * @param {number} opts.pageSize - Number of results per page.
  * @param {number} opts.search - String to filter results.
- * @param {string} opts.type - String to filter results.
  * @returns {URLSearchParams}
  */
-export const makeListServiceQueryParams = ({ fields, ordering, page, pageSize, search, type }) => {
+export const makeListServiceQueryParams = ({ fields, ordering, page, pageSize, search }) => {
   const params = new URLSearchParams()
   params.set('ordering', toSnakeCase(ordering))
   params.set('page', page)
   params.set('page_size', pageSize)
   params.set('fields', fields)
   params.set('search', search)
-  if (type) params.set('type', type)
 
   return params
 }
