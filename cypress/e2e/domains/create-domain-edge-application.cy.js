@@ -45,7 +45,7 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v3/digital_certificates*').as('getDigitalCertificatesApi')
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=id,name').as('getDigitalCertificatesApi')
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -67,8 +67,9 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=azion&type=*').as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -92,7 +93,11 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
 
     cy.get(selectors.domains.digitalCertificateDropdown).click()
-    cy.get(selectors.domains.digitalCertificateDropdownFilter).clear()
+
+    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).clear()
+    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).type('azion')
+
+    cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.edgeCertificateOption).click()
     cy.get(selectors.form.actionsSubmitButton).click()
 

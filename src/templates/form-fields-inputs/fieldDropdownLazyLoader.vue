@@ -175,7 +175,7 @@
   const handleLazyLoad = async (event) => {
     const { last } = event
     const numberOfPage = Math.ceil(totalCount.value / PAGE_SIZE)
-    const goRequest = last >= data.value.length
+    const goRequest = last >= data.value?.length
 
     if (page.value < numberOfPage && goRequest && !loading.value) {
       page.value += PAGE_INCREMENT

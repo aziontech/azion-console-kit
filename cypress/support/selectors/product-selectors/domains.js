@@ -6,7 +6,7 @@ export default {
     '[data-testid="domains-form__edge-application-field__dropdown-filter-input"]',
   edgeFirewallField: '[data-testid="domains-form__edge-firewall-field__dropdown"]',
   mtlsTrustedCADropdownFilter:
-    '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown-filter-input"]',
+    '[data-testid="domains-form__mtls-trusted-certificate-field__dropdown-search"]',
   edgeApplicationOption: '#edgeApplication_0',
   edgeCertificateOption: '#edgeCertificate_0',
   cnamesField: '[data-testid="domains-form__cnames-field__textarea"]',
@@ -26,10 +26,11 @@ export default {
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
   digitalCertificateFieldSelectedValue:
     ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-  digitalCertificateDropdownSearch: '[data-testid="field-dropdown__dropdown-filter-input"]',
+  digitalCertificateDropdownSearch: '[data-testid="domains-form__digital-certificates-field__dropdown-search"]',
   digitalCertificateDropdown:
     '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
-  digitalCertificatesDropdownLetsEncrypt: '[data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
+  digitalCertificateDropdownFilterSearch: '[data-testid="domains-form__edge-certificate-field__dropdown-search"]',
+  digitalCertificatesDropdownLetsEncrypt: '[data-testid="domains-form__digital-certificates-field__dropdown"] > .p-dropdown-label',
   letsEncryptDropdownOption: '#edgeCertificate_1',
   editPageTitle: '[data-testid="page-heading-block__breadcrumb__Edit Domain"] > .p-menuitem-link > .p-menuitem-text',
   enableMtlsSwitch:
