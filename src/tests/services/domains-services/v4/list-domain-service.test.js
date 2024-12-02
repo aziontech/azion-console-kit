@@ -39,12 +39,10 @@ const makeSut = () => {
 
 describe('DomainsServices', () => {
   it('should call api with correct params', async () => {
-    const requestSpy = vi
-      .spyOn(AxiosHttpClientAdapter, 'request')
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: [] }
-      })
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [] }
+    })
 
     const { sut } = makeSut()
     const version = 'v4'
@@ -57,11 +55,10 @@ describe('DomainsServices', () => {
   })
 
   it('should parsed correctly all returned domains', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request')
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
-      })
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
+    })
 
     const { sut } = makeSut()
 

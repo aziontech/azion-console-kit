@@ -57,6 +57,8 @@
     return selectedExpiration.value === 'custom' ? tomorrow : null
   })
 
+  const maximumAllowedDate = new Date('02/09/2038')
+
   const disabledFields = computed(() => {
     return !!props.personalTokenKey
   })
@@ -110,6 +112,7 @@
     data-testid="personal-token-form__section__general"
   >
     <template #inputs>
+      {{ maxDate }}
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name"
@@ -179,6 +182,7 @@
               v-model="customExpiration"
               placeholder="Select date from calendar"
               :minDate="minExpirationDate"
+              :maxDate="maximumAllowedDate"
               :class="{ 'p-invalid': errorCustom }"
               showIcon
               :disabled="disabledFields"
