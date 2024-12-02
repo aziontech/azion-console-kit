@@ -7,6 +7,7 @@ export const loadEdgeFirewallService = async ({ id }) => {
     url: `${makeEdgeFirewallBaseUrl()}/${id}`,
     method: 'GET'
   })
+
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)

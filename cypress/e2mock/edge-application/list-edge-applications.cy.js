@@ -50,6 +50,8 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
   })
 
   it('should ordering edge applications list', function () {
+    cy.get(selectors.list.pageNumber.option('5')).click()    
+
     cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
       if (req.url.includes('ordering=name')) {
         req.reply({
@@ -57,12 +59,16 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
         })
       }
     }).as('filteredEdgeApplicationsListApi')
-
+  
+    
     cy.get(selectors.list.orderingHeader.firstColumn).click()
 
     cy.wait('@filteredEdgeApplicationsListApi').then((interception) => {
-      expect(interception.response.body.results[0].name).to.eq('foo 4')
+      expect(interception.response.body.results[0].name).to.eq('foo 10')
     })
+
+    cy.get(selectors.list.pageNumber.option('1')).should('be.visible')
+    cy.get(selectors.list.pageNumber.option('1')).should('have.class', 'p-highlight')
   })
 
   it('should change page size of edge applications list', function () {
