@@ -1,3 +1,4 @@
+import { listDigitalCertificatesServiceDropdown } from './list-digital-certificates-dropdown-service'
 import { listDigitalCertificatesService } from './list-digital-certificates-service'
 import { createDigitalCertificatesCSRService } from './create-digital-certificates-csr-service'
 import { createDigitalCertificatesService } from './create-digital-certificates-services'
@@ -23,5 +24,6 @@ export {
   createDigitalCertificatesService,
   loadDigitalCertificateService,
   editDigitalCertificateService,
-  deleteDigitalCertificatesService
+  deleteDigitalCertificatesService,
+  listDigitalCertificatesServiceDropdown
 }

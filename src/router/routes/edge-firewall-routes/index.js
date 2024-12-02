@@ -73,7 +73,7 @@ export const edgeFirewallRoutes = {
           createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,
           editFunctionService: EdgeFirewallFunctionsServices.editFunctionService,
           deleteFunctionService: EdgeFirewallFunctionsServicesV4.deleteFunctionService,
-          loadFunctionService: EdgeFirewallFunctionsServices.loadFunctionService,
+          loadFunctionService: EdgeFirewallFunctionsServicesV4.loadFunctionService,
 
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'
