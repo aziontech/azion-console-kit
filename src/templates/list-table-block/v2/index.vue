@@ -3,29 +3,28 @@
     class="max-w-full"
     :class="{ 'mt-4': isTabs }"
     data-testid="data-table-container"
-  >
-    <DataTable
+  >  
+    <DataTable    
+      ref="dataTableRef"
+      class="overflow-clip rounded-md"      
+      v-model:expandedRowGroups="expandedRowGroups"
+      @rowReorder="onRowReorder"
+      scrollable      
+      removableSort
+      :value="data"
+      dataKey="id"
+      @row-click="editItemSelected"
+      rowHover
+      v-model:filters="filters"
+      :globalFilterFields="filterBy"
+      v-model:selection="selectedItems"
+      :loading="isLoading"
+      data-testid="data-table"
+      expandableRowGroups
       rowGroupMode="subheader"
       groupRowsBy="phase.content"
-      expandableRowGroups
-      v-model:expandedRowGroups="expandedRowGroups"
-      scrollable
-      rowHover
-      ref="dataTableRef"
-      class="overflow-clip rounded-md"
-      dataKey="id"
-      data-testid="data-table"
-      :value="data"
-      v-model:filters="filtersDynamically"
-      v-model:sortField="sortFieldValue"
-      v-model:sortOrder="sortOrderValue"
-      :globalFilterFields="filterBy"
-      :selection="selectedItems"
-      :exportFilename="exportFileName"
-      :exportFunction="exportFunctionMapper"
-      @rowReorder="onRowReorder"
-      @row-click="editItemSelected"
-      @sort="fetchOnSort"
+      sortField="phase.content"
+      sortMode="single"
     >
       <template
         #header
@@ -33,7 +32,6 @@
       >
         <slot
           name="header"
-          :exportTableCSV="handleExportTableDataToCSV"
         >
           <div
             class="flex flex-wrap justify-between gap-2 w-full"
@@ -49,20 +47,8 @@
                 v-model.trim="filters.global.value"
                 data-testid="data-table-search-input"
                 placeholder="Search"
-                @keyup.enter="fetchOnSearch"
-                @input="handleSearchValue(false)"
               />
             </span>
-
-            <PrimeButton
-              v-if="hasExportToCsvMapper"
-              @click="handleExportTableDataToCSV"
-              outlined
-              class="max-sm:w-full ml-auto"
-              icon="pi pi-download"
-              :data-testid="`export_button`"
-              v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-            />
 
             <slot
               name="addButton"
@@ -84,16 +70,17 @@
       </template>
 
       <Column
-        field="phase.content"
-        header="phase"
-      />
-
-      <Column
         v-if="orderableRows"
         rowReorder
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
       />
+
+      <template #groupheader="slotProps">
+        <span class="vertical-align-middle ml-2 font-bold line-height-3">
+          {{ slotProps.data.phase.content }}
+        </span>
+      </template>
 
       <Column
         v-if="showSelectionMode"
@@ -219,12 +206,6 @@
         </template>
       </Column>
 
-      <template #groupheader="slotProps">
-        <span class="vertical-align-middle ml-2 font-bold line-height-3">
-          {{ slotProps.data.phase.content }}
-        </span>
-      </template>
-
       <template #empty>
         <slot
           name="noRecordsFound"
@@ -254,11 +235,9 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import DeleteDialog from '../dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
-  import { getCsvCellContentFromRowData } from '@/helpers'
-  import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -270,6 +249,7 @@
     'update:selectedItensData'
   ])
 
+
   const props = defineProps({
     hiddenHeader: {
       type: Boolean
@@ -277,9 +257,6 @@
     columns: {
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
-    },
-    loadDisabled: {
-      type: Boolean
     },
     isGraphql: {
       type: Boolean
@@ -310,13 +287,6 @@
     orderableRows: {
       type: Boolean
     },
-    onReorderService: {
-      type: Function
-    },
-    isReorderAllEnabled: {
-      type: Boolean,
-      default: false
-    },
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
@@ -336,9 +306,6 @@
       type: Array,
       default: () => []
     },
-    csvMapper: {
-      type: Function
-    },
     exportFileName: {
       type: String
     },
@@ -353,27 +320,10 @@
     defaultOrderingFieldName: {
       type: String,
       default: () => ''
-    },
-    rowsPerPageOptions: {
-      type: Array,
-      default: () => [10, 20, 50, 100]
-    },
-    lazy: {
-      type: Boolean,
-      default: true
     }
   })
 
-  const tableDefinitions = useTableDefinitionsStore()
 
-  const getSpecificPageCount = computed(() => {
-    if (props.rowsPerPageOptions.length === 1) {
-      return props.rowsPerPageOptions[0]
-    }
-    return tableDefinitions.getNumberOfLinesPerPage
-  })
-
-  const itemsByPage = ref(getSpecificPageCount.value)
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
@@ -383,30 +333,21 @@
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
+  
   const isLoading = ref(false)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
-  const hasExportToCsvMapper = ref(!!props.csvMapper)
 
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
 
-  const sortFieldValue = ref(null)
-  const sortOrderValue = ref(null)
-
   const totalRecords = ref()
   const savedSearch = ref('')
-  const savedOrdering = ref('')
-  const firstItemIndex = ref(0)
 
   const firstLoadData = ref(true)
-
-  const filtersDynamically = computed(() => {
-    return props.lazy ? {} : filters.value
-  })
 
   const selectedItems = computed({
     get: () => {
@@ -417,34 +358,10 @@
     }
   })
 
-  /**
-   * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
-   */
-  const exportFunctionMapper = (rowData) => {
-    if (!hasExportToCsvMapper.value) {
-      return
-    }
-    const columnMapper = props.csvMapper(rowData)
-    return getCsvCellContentFromRowData({ columnMapper, rowData })
-  }
-
-  const handleExportTableDataToCSV = () => {
-    dataTableRef.value.exportCSV()
-  }
-
   const toggleColumnSelector = (event) => {
     columnSelectorPanel.value.toggle(event)
   }
 
-  /**
-   * Moves an item within the original array based on updated positions in a reference array.
-   *
-   * @param {Array} originalData - The array to be modified.
-   * @param {Array} referenceArray - The reference array with the new order.
-   * @param {number} fromIndex - The index of the item to move in the reference array.
-   * @param {number} toIndex - The target index  in the reference array.
-   * @returns {Array} The updated array with the item moved.
-   */
   const moveItem = (originalData, referenceArray, fromIndex, toIndex) => {
     const originalArray = [...originalData]
     const oldItemMove = toIndex + Math.sign(fromIndex - toIndex)
@@ -461,7 +378,7 @@
   }
 
   const onRowReorder = async (event) => {
-    emit('on-reorder', { event, data, moveItem })
+    
   }
 
   const openDialog = (dialogComponent, body) => {
@@ -574,10 +491,7 @@
 
   const reload = async (query = {}) => {
     const commonParams = {
-      page: 1,
-      pageSize: itemsByPage.value,
       fields: props.apiFields,
-      ordering: savedOrdering.value,
       ...query
     }
 
@@ -607,42 +521,13 @@
     return [...filters, ...filtersPath]
   })
 
-  const fetchOnSort = async (event) => {
-    const { sortField, sortOrder } = event
-    let ordering = sortOrder === -1 ? `-${sortField}` : sortField
-    ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-
-    await reload({ ordering })
-
-    savedOrdering.value = ordering
-    sortFieldValue.value = sortField
-    sortOrderValue.value = sortOrder
-  }
-
-  const fetchOnSearch = () => {
-    if (!props.lazy) return
-
-    const firstPage = 1
-    firstItemIndex.value = firstPage
-    reload()
-  }
-
-  const handleSearchValue = () => {
-    const search = filters.value.global.value
-    savedSearch.value = search
-  }
-
   onMounted(() => {
-    if (!props.loadDisabled) {
-      loadData({
-        page: 1,
-        pageSize: itemsByPage.value,
-        fields: props.apiFields,
-        ordering: props.defaultOrderingFieldName
-      })
-    }
+    loadData({
+      fields: props.apiFields,
+      ordering: props.defaultOrderingFieldName
+    })
     selectedColumns.value = props.columns
   })
 
-  defineExpose({ reload, handleExportTableDataToCSV })
+  defineExpose({ reload })
 </script>

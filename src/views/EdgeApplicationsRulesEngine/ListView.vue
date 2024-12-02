@@ -2,7 +2,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import FetchListTableBlock from '@/templates/list-table-block/with-group.vue'
+  import TableBlock from '@/templates/list-table-block/v2/index.vue'
 
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
@@ -101,6 +101,7 @@
     'Request phase': 'request',
     'Response phase': 'response'
   }
+
   const disabledOrdering = ref(true)
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
@@ -110,6 +111,11 @@
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'phase.content',
+        header: 'phase',
+        disableSort: true
+      },
       {
         field: 'order',
         header: 'Order',
@@ -203,60 +209,39 @@
     }
   ]
 
-  const checkOrderRules = async ({ event, data, moveItem }) => {
-    if (isLoadingButtonOrder.value) {
-      toast.add({
-        closable: true,
-        severity: 'info',
-        summary: 'info',
-        detail: 'Please wait until the current operation is completed'
-      })
-      return
-    }
-
-    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
-
-    // const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
-
-    // const isFirstRuleNotDefault = reorderedData[0].name !== 'Default Rule'
-
-    // if (isFirstRuleNotDefault) {
-    //   toast.add({
-    //     closable: true,
-    //     severity: 'error',
-    //     summary: 'The default rule cannot be reordered'
-    //   })
-    //   return
-    // }
-
-    data.value = updatedTable
+  const checkOrderRules = async ({ event, data }) => {
+    
+    console.log('event', event)
+    console.log('data', data.value)
+    data.value = event.value
     disabledOrdering.value = false
   }
 
   const isLoadingButtonOrder = ref(false)
 
   const updateRulesOrder = async (data, reload) => {
-    disabledOrdering.value = true
-    try {
-      isLoadingButtonOrder.value = true
-      await props.reorderRulesEngine(data, props.edgeApplicationId)
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'success',
-        detail: 'Reorder saved'
-      })
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
-      })
-    } finally {
-      await reload()
-      isLoadingButtonOrder.value = false
-    }
+    console.log('🚀 ~ updateRulesOrder ~ data:', data);
+    // disabledOrdering.value = true
+    // try {
+    //   isLoadingButtonOrder.value = true
+    //   await props.reorderRulesEngine(data, props.edgeApplicationId)
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'success',
+    //     summary: 'success',
+    //     detail: 'Reorder saved'
+    //   })
+    // } catch (error) {
+    //   toast.add({
+    //     closable: true,
+    //     severity: 'error',
+    //     summary: 'error',
+    //     detail: error
+    //   })
+    // } finally {
+    //   await reload()
+    //   isLoadingButtonOrder.value = false
+    // }
   }
 </script>
 
@@ -281,8 +266,7 @@
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
-  <FetchListTableBlock
-    :lazy="false"
+  <TableBlock
     ref="listRulesEngineRef"
     :orderableRows="true"
     :columns="getColumns"
@@ -363,5 +347,5 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </FetchListTableBlock>
+  </TableBlock>
 </template>
