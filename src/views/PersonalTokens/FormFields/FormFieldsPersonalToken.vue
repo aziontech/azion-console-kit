@@ -112,7 +112,6 @@
     data-testid="personal-token-form__section__general"
   >
     <template #inputs>
-      {{ maxDate }}
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name"
