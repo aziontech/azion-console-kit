@@ -8,6 +8,7 @@ export const loadDigitalCertificateService = async ({ id }) => {
     url: `${makeDigitalCertificatesBaseUrl()}/${id}?fields=${fields}`,
     method: 'GET'
   })
+
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
