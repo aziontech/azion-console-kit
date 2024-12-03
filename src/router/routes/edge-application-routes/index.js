@@ -5,6 +5,7 @@ import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
+import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
@@ -22,7 +23,7 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
+        deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
@@ -84,7 +85,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
-          createFunctionService: FunctionsService.createFunctionService,
+          createFunctionService: FunctionsServiceV4.createFunctionService,
           deleteFunctionService: FunctionsService.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
           listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
