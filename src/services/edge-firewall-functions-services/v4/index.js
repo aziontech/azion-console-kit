@@ -1,4 +1,6 @@
 import { listFunctionsService } from './list-functions-service'
+import { listEdgeFunctionsService } from './list-edge-functions-service'
+import { loadEdgeFunctionService } from './load-edge-function-service'
 import { createFunctionService } from './create-function-service'
 import { deleteFunctionService } from './delete-function-service'
 
@@ -12,4 +14,4 @@ import { deleteFunctionService } from './delete-function-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listFunctionsService, createFunctionService, deleteFunctionService }
+export { listFunctionsService, createFunctionService, listEdgeFunctionsService, loadEdgeFunctionService, deleteFunctionService }

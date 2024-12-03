@@ -14,8 +14,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :edgeFunctionsList="filteredEdgeFunctions"
-        :reloadEdgeFunctions="loadEdgeFunctions"
+        :listEdgeFunctionsService="listEdgeFunctionsServiceV4"
+        :loadEdgeFunctionService="loadEdgeFunctionServiceV4"
       />
     </template>
   </CreateDrawerBlock>
@@ -35,15 +35,15 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :edgeFunctionsList="filteredEdgeFunctions"
-        :reloadEdgeFunctions="loadEdgeFunctions"
+        :listEdgeFunctionsService="listEdgeFunctionsServiceV4"
+        :loadEdgeFunctionService="loadEdgeFunctionServiceV4"
       />
     </template>
   </EditDrawerBlock>
 </template>
 
 <script setup>
-  import { ref, onMounted, computed, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeFirewallFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
@@ -77,6 +77,14 @@
     loadFunctionService: {
       type: Function,
       required: true
+    },
+    listEdgeFunctionsServiceV4: {
+      required: true,
+      type: Function
+    },
+    loadEdgeFunctionServiceV4: {
+      required: true,
+      type: Function
     }
   })
 
@@ -87,10 +95,6 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const isOverlapped = ref(false)
-  const edgeFunctionsList = ref([])
-  const filteredEdgeFunctions = computed(() =>
-    edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_firewall')
-  )
 
   const initialValues = ref({
     id: props.edgeFirewallID,
@@ -112,14 +116,12 @@
     closeDrawerCreate()
     handleTrackSuccessCreate()
     emit('onSuccess')
-    loadEdgeFunctions()
   }
 
   const handleSuccessEdit = () => {
     showEditFunctionDrawer.value = false
     emit('onSuccess')
     handleTrackSuccessEdit()
-    loadEdgeFunctions()
   }
 
   const handleTrackSuccessCreate = () => {
@@ -207,16 +209,8 @@
     showEditFunctionDrawer.value = false
   }
 
-  const loadEdgeFunctions = async () => {
-    const response = await props.listEdgeFunctionsService({})
-    edgeFunctionsList.value = response
-  }
-
-  onMounted(loadEdgeFunctions)
-
   defineExpose({
     openDrawerCreate,
-    openDrawerEdit,
-    loadEdgeFunctions
+    openDrawerEdit
   })
 </script>

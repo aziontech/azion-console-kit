@@ -6,6 +6,8 @@
     :listEdgeFunctionsService="props.listEdgeFunctionsService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
+    :listEdgeFunctionsServiceV4="listEdgeFunctionsServiceV4"
+    :loadEdgeFunctionServiceV4="loadEdgeFunctionServiceV4"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
@@ -80,6 +82,14 @@
       type: Function
     },
     loadFunctionService: {
+      required: true,
+      type: Function
+    },
+    listEdgeFunctionsServiceV4: {
+      required: true,
+      type: Function
+    },
+    loadEdgeFunctionServiceV4: {
       required: true,
       type: Function
     },
