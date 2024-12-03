@@ -16,11 +16,11 @@ export const listEdgeDNSServiceV4 = async ({
     params.set('page_size', pageSize)
     params.set('fields', fields)
     params.set('search', search)
-  
+
     return params
   }
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
-  
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeDNSBaseUrl()}/zones?${searchParams.toString()}`,
     method: 'GET'

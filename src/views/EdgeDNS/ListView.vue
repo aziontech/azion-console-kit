@@ -88,12 +88,7 @@
     }
   })
 
-  const EDGE_DNS_API_FIELDS = [
-    'id',
-    'name',
-    'domain',
-    'active'
-  ]
+  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active']
   const toast = useToast()
   const hasContentToList = ref(true)
   const actions = [

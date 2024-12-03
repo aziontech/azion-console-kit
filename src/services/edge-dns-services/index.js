@@ -8,7 +8,6 @@ import { listEdgeDNSServiceV4 } from './v4/list-edge-dns-service'
 
 export {
   listEdgeDNSServiceV4,
-  
   listEdgeDNSService,
   deleteEdgeDNSService,
   createEdgeDNSService,

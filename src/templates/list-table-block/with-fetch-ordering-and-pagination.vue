@@ -671,7 +671,8 @@
     const { sortField, sortOrder } = event
     let ordering = sortOrder === -1 ? `-${sortField}` : sortField
     ordering = ordering === null ? props.defaultOrderingFieldName : ordering
-
+    const firstPage = 1
+    firstItemIndex.value = firstPage
     await reload({ ordering })
 
     savedOrdering.value = ordering
