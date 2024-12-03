@@ -57,16 +57,27 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*').as('getTrustedCACertificate')
+    cy.intercept('GET', `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`).as('getTrustedCACertificateByName')
+
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
     cy.get(selectors.domains.enableMtlsSwitch).click()
+
+    cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
+    cy.wait('@getTrustedCACertificate')
     cy.get(selectors.domains.dropdownTrustedCA).click()
     cy.get(selectors.domains.mtlsTrustedCADropdownFilter).clear()
     cy.get(selectors.domains.mtlsTrustedCADropdownFilter).type(digitalCertificateName)
+    cy.wait('@getTrustedCACertificateByName')
     cy.get(selectors.domains.trustedCAFirstDropdownOption).click()
 
     // Act
