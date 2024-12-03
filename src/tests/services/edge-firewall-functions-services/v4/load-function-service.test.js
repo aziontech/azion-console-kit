@@ -20,20 +20,20 @@ const makeSut = () => {
   return { sut }
 }
 
-describe('EdgeFirewallFunctionsServices', () => {
+describe('EdgeFirewallFunctionsServicesV4', () => {
   vi.restoreAllMocks()
 
   it('should call API with correct URL when loading a function instance', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: fixture.functionInstance }
+      body: { data: fixture.functionInstance }
     })
     const { sut } = makeSut()
 
     await sut({ edgeFirewallID: EDGE_FIREWALL_ID, functionID: FUNCTION_ID })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_firewall/${EDGE_FIREWALL_ID}/functions_instances/${FUNCTION_ID}`,
+      url: `v4/edge_firewall/firewalls/${EDGE_FIREWALL_ID}/functions/${FUNCTION_ID}`,
       method: 'GET'
     })
   })
@@ -41,7 +41,7 @@ describe('EdgeFirewallFunctionsServices', () => {
   it('should correctly parse the returned edge firewall function instance', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: fixture.functionInstance }
+      body: { data: fixture.functionInstance }
     })
     const { sut } = makeSut()
 

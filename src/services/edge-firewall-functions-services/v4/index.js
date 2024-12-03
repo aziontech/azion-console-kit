@@ -2,6 +2,7 @@ import { listFunctionsService } from './list-functions-service'
 import { createFunctionService } from './create-function-service'
 import { deleteFunctionService } from './delete-function-service'
 import { loadFunctionService } from './load-function-service'
+import { editFunctionService } from './edit-function-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -13,4 +14,4 @@ import { loadFunctionService } from './load-function-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listFunctionsService, createFunctionService, deleteFunctionService, loadFunctionService }
+export { listFunctionsService, createFunctionService, deleteFunctionService, loadFunctionService, editFunctionService }

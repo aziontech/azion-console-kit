@@ -71,7 +71,7 @@ export const edgeFirewallRoutes = {
           listEdgeFirewallFunctionService:
             EdgeFirewallFunctionsServices.listEdgeFirewallFunctionsService,
           createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,
-          editFunctionService: EdgeFirewallFunctionsServices.editFunctionService,
+          editFunctionService: EdgeFirewallFunctionsServicesV4.editFunctionService,
           deleteFunctionService: EdgeFirewallFunctionsServicesV4.deleteFunctionService,
           loadFunctionService: EdgeFirewallFunctionsServicesV4.loadFunctionService,
 
