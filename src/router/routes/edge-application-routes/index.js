@@ -85,7 +85,7 @@ export const edgeApplicationRoutes = {
         },
         functionsServices: {
           createFunctionService: FunctionsServiceV4.createFunctionService,
-          deleteFunctionService: FunctionsService.deleteFunctionService,
+          deleteFunctionService: FunctionsServiceV4.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
           listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
           loadFunctionService: FunctionsService.loadFunctionService,
