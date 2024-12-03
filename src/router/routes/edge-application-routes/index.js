@@ -88,8 +88,8 @@ export const edgeApplicationRoutes = {
           deleteFunctionService: FunctionsService.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
           listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
-          loadFunctionService: FunctionsService.loadFunctionService,
-          editFunctionService: FunctionsService.editFunctionService,
+          loadFunctionService: FunctionsServiceV4.loadFunctionService,
+          editFunctionService: FunctionsServiceV4.editFunctionService,
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
         },
         deviceGroupsServices: {
