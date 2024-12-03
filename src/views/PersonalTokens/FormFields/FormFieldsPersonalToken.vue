@@ -104,6 +104,12 @@
     )
     setExpiration(newExpirationInUserTimezone)
   }
+
+  const updateExpirationBlurEvent = ({ value }) => {
+    const expirationDate = new Date(value)
+
+    updateExpiration(expirationDate)
+  }
 </script>
 
 <template>
@@ -178,6 +184,7 @@
               data-testid="personal-token-form__expiration__calendar"
               class="w-full"
               @date-select="updateExpiration"
+              @blur="updateExpirationBlurEvent"
               v-model="customExpiration"
               placeholder="Select date from calendar"
               :minDate="minExpirationDate"
