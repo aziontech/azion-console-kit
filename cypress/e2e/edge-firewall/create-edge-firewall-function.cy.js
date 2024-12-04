@@ -14,7 +14,7 @@ const createFunctionCase = () => {
   cy.wait('@getFunctions')
 }
 
-describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
