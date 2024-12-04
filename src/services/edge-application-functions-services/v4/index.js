@@ -12,4 +12,5 @@ import { deleteFunctionService } from './delete-function-service'
 /**
  * @type {ExportedServicesType}
  */
+
 export { listFunctionsService, loadFunctionService, editFunctionService, createFunctionService, deleteFunctionService }
