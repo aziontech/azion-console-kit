@@ -14,8 +14,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsServiceV4"
-        :loadEdgeFunctionService="loadEdgeFunctionServiceV4"
+        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
       />
     </template>
   </CreateDrawerBlock>
@@ -35,8 +35,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsServiceV4"
-        :loadEdgeFunctionService="loadEdgeFunctionServiceV4"
+        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
       />
     </template>
   </EditDrawerBlock>
@@ -70,19 +70,15 @@
       required: true,
       type: Function
     },
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     loadFunctionService: {
       type: Function,
       required: true
     },
-    listEdgeFunctionsServiceV4: {
+    listEdgeFunctionsService: {
       required: true,
       type: Function
     },
-    loadEdgeFunctionServiceV4: {
+    loadEdgeFunctionService: {
       required: true,
       type: Function
     }

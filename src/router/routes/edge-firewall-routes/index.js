@@ -68,8 +68,6 @@ export const edgeFirewallRoutes = {
         edgeFirewallServices: {
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
           editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,
-
-          listEdgeFunctionsService: EdgeFirewallFunctionsServices.listEdgeFunctionsService,
           listEdgeFirewallFunctionService:
             EdgeFirewallFunctionsServices.listEdgeFirewallFunctionsService,
           createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,
@@ -77,8 +75,8 @@ export const edgeFirewallRoutes = {
           deleteFunctionService: EdgeFirewallFunctionsServicesV4.deleteFunctionService,
           loadFunctionService: EdgeFirewallFunctionsServices.loadFunctionService,
 
-          listEdgeFunctionsServiceV4: EdgeFunctionServiceV4.listEdgeFunctionsDropdownService,
-          loadEdgeFunctionServiceV4: EdgeFunctionServiceV4.loadEdgeFunctionService,
+          listEdgeFunctionsService: EdgeFunctionServiceV4.listEdgeFunctionsDropdownService,
+          loadEdgeFunctionService: EdgeFunctionServiceV4.loadEdgeFunctionService,
 
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'

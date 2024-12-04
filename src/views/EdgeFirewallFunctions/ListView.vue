@@ -3,11 +3,10 @@
     ref="drawerFunctionRef"
     :edgeFirewallID="props.edgeFirewallID"
     :createFunctionService="props.createFunctionService"
-    :listEdgeFunctionsService="props.listEdgeFunctionsService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
-    :listEdgeFunctionsServiceV4="listEdgeFunctionsServiceV4"
-    :loadEdgeFunctionServiceV4="loadEdgeFunctionServiceV4"
+    :listEdgeFunctionsService="listEdgeFunctionsService"
+    :loadEdgeFunctionService="loadEdgeFunctionService"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
@@ -73,10 +72,6 @@
       required: true,
       type: String
     },
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
     listEdgeFirewallFunctionService: {
       required: true,
       type: Function
@@ -85,11 +80,11 @@
       required: true,
       type: Function
     },
-    listEdgeFunctionsServiceV4: {
+    listEdgeFunctionsService: {
       required: true,
       type: Function
     },
-    loadEdgeFunctionServiceV4: {
+    loadEdgeFunctionService: {
       required: true,
       type: Function
     },
