@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
-export const listEdgeFunctionsService = async ({
+export const listEdgeFunctionsDropdownService = async ({
   fields = '',
   search = '',
   ordering = '',
@@ -28,7 +28,8 @@ const adapt = (httpResponse, initiatorType) => {
     ?.filter(edgeFirewall => !initiatorType || edgeFirewall.initiator_type === initiatorType)
     .map(edgeFirewall => ({
       id: edgeFirewall.id,
-      name: edgeFirewall.name
+      name: edgeFirewall.name,
+      args: JSON.stringify(edgeFirewall.json_args, null, '\t'),
     }))
 
   const count = httpResponse.body?.count ?? 0

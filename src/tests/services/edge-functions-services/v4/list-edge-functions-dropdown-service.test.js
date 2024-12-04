@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listEdgeFunctionsService } from '@/services/edge-firewall-functions-services/v4'
+import { listEdgeFunctionsDropdownService } from '@/services/edge-functions-services/v4'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const API_VERSION = 'v4'
@@ -18,7 +18,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listEdgeFunctionsService
+  const sut = listEdgeFunctionsDropdownService
   return { sut }
 }
 

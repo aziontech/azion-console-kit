@@ -6,6 +6,8 @@ import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
 import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-functions-services/v4'
 
+import * as EdgeFunctionServiceV4 from '@/services/edge-functions-services/v4'
+
 import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
@@ -75,8 +77,8 @@ export const edgeFirewallRoutes = {
           deleteFunctionService: EdgeFirewallFunctionsServicesV4.deleteFunctionService,
           loadFunctionService: EdgeFirewallFunctionsServices.loadFunctionService,
 
-          listEdgeFunctionsServiceV4: EdgeFirewallFunctionsServicesV4.listEdgeFunctionsService,
-          loadEdgeFunctionServiceV4: EdgeFirewallFunctionsServicesV4.loadEdgeFunctionService,
+          listEdgeFunctionsServiceV4: EdgeFunctionServiceV4.listEdgeFunctionsDropdownService,
+          loadEdgeFunctionServiceV4: EdgeFunctionServiceV4.loadEdgeFunctionService,
 
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'

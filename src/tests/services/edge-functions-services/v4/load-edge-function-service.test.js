@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { loadEdgeFunctionService } from '@/services/edge-firewall-functions-services/v4'
+import { loadEdgeFunctionService } from '@/services/edge-functions-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
 const FUNCTION_ID = '456'
