@@ -27,13 +27,13 @@ const adapt = async (httpResponse) => {
       name: domain.name,
       active: domain.active
         ? {
-          content: 'Active',
-          severity: 'success'
-        }
+            content: 'Active',
+            severity: 'success'
+          }
         : {
-          content: 'Inactive',
-          severity: 'danger'
-        },
+            content: 'Inactive',
+            severity: 'danger'
+          },
       activeSort: domain.active,
       domainName: {
         content: domain.domains[0].domain
