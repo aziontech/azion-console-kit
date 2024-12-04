@@ -1,4 +1,6 @@
 import { listFunctionsService } from './list-edge-functions-service'
+import { loadFunctionService } from './load-function-instance-service'
+import { editFunctionService } from './edit-function-instance-service'
 import { createFunctionService } from './create-function-service'
 
 /**
@@ -9,4 +11,4 @@ import { createFunctionService } from './create-function-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listFunctionsService, createFunctionService }
+export { listFunctionsService, loadFunctionService, editFunctionService, createFunctionService }
