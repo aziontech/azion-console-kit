@@ -84,7 +84,7 @@ export const edgeFirewallRoutes = {
           deleteEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServices.deleteEdgeFirewallRulesEngineService,
           createEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.createEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.createEdgeFirewallRulesEngineService,
           loadEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServices.loadEdgeFirewallRulesEngineService,
           editEdgeFirewallRulesEngineService:

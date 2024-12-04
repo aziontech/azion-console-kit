@@ -58,38 +58,38 @@
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
     switch (criteriaVariable) {
-      case 'header_accept':
-      case 'header_accept_encoding':
-      case 'header_accept_language':
-      case 'header_cookie':
-      case 'header_origin':
-      case 'header_referer':
-      case 'header_user_agent':
+      case '${header_accept}':
+      case '${header_accept_encoding}':
+      case '${header_accept_language}':
+      case '${header_cookie}':
+      case '${header_origin}':
+      case '${header_referer}':
+      case '${header_user_agent}':
         return [
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
-      case 'network':
+      case '${network}':
         return [
           { label: 'matches', value: 'is_in_list' },
           { label: 'does not match', value: 'is_not_in_list' }
         ]
-      case 'request_method':
-      case 'scheme':
-      case 'ssl_verification_status':
-      case 'client_certificate_validation':
+      case '${request_method}':
+      case '${scheme}':
+      case '${ssl_verification_status}':
+      case '${client_certificate_validation}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' }
         ]
-      case 'host':
+      case '${host}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
-      case 'request_args':
+      case '${request_args}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
@@ -98,7 +98,7 @@
           { label: 'exists', value: 'exists' },
           { label: 'does not exist', value: 'does_not_exist' }
         ]
-      case 'request_uri':
+      case '${request_uri}':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
@@ -179,7 +179,7 @@
         label: `${
           hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - requires WAF'
         }`,
-        value: 'header_accept',
+        value: '${header_accept}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -188,7 +188,7 @@
             ? 'Header Accept Encoding'
             : 'Header Accept Encoding - requires WAF'
         }`,
-        value: 'header_accept_encoding',
+        value: '${header_accept_encoding}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -197,21 +197,21 @@
             ? 'Header Accept Language'
             : 'Header Accept Language - requires WAF'
         }`,
-        value: 'header_accept_language',
+        value: '${header_accept_language}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - requires WAF'
         }`,
-        value: 'header_cookie',
+        value: '${header_cookie}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - requires WAF'
         }`,
-        value: 'header_origin',
+        value: '${header_origin}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -220,7 +220,7 @@
             ? 'Header Referer'
             : 'Header Referer - requires WAF'
         }`,
-        value: 'header_referer',
+        value: '${header_referer}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -229,24 +229,24 @@
             ? 'Header User Agent'
             : 'Header User Agent - requires WAF'
         }`,
-        value: 'header_user_agent',
+        value: '${header_user_agent}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
-      { label: 'Host', value: 'host', disabled: false },
+      { label: 'Host', value: '${host}', disabled: false },
       {
         label: `${
           hasNetworkProtectionLayerModuleEnabled
             ? 'Network'
             : 'Network - required Network Layer Protection'
         }`,
-        value: 'network',
+        value: '${network}',
         disabled: !hasNetworkProtectionLayerModuleEnabled
       },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled ? 'Request Args' : 'Request Args - required WAF'
         }`,
-        value: 'request_args',
+        value: '${request_args}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
       {
@@ -255,15 +255,15 @@
             ? 'Request Method'
             : 'Request Method - required WAF'
         }`,
-        value: 'request_method',
+        value: '${request_method}',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
-      { label: 'Request Uri', value: 'request_uri', disabled: false },
-      { label: 'Scheme', value: 'scheme', disabled: false },
-      { label: 'Ssl Verification Status', value: 'ssl_verification_status', disabled: false },
+      { label: 'Request Uri', value: '${request_uri}', disabled: false },
+      { label: 'Scheme', value: '${scheme}', disabled: false },
+      { label: 'Ssl Verification Status', value: '${ssl_verification_status}', disabled: false },
       {
         label: 'Client Certificate Validation',
-        value: 'client_certificate_validation',
+        value: '${client_certificate_validation}',
         disabled: false
       }
     ]
