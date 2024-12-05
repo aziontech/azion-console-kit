@@ -198,7 +198,6 @@
               class="text-md font-normal text-secondary"
               data-testid="list-table-block__empty-message__text"
             >
-              dd
               {{ emptyListMessage }}
             </p>
           </div>
