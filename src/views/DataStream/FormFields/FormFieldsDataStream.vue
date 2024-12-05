@@ -1152,12 +1152,7 @@
     const templates = await props.listDataStreamTemplateService()
     listTemplates.value = templates
 
-    const hasFirstTemplates = listTemplates?.value[0]?.value
-    if (hasFirstTemplates) {
-      const firstTemplateValue = listTemplates.value[0].value
-      return firstTemplateValue
-    }
-    return ''
+    return listTemplates.value[0].value ?? ''
   }
 
   const loaderDataStreamDomains = async () => {
@@ -1248,8 +1243,10 @@
   )
 
   const initializeFormValues = async () => {
-    const domains = await loaderDataStreamDomains()
-    const template = await loaderDataStreamTemplates()
+    const [domains, template] = await Promise.all([
+        loaderDataStreamDomains(),
+        loaderDataStreamTemplates()
+    ])
 
     if (props.resetForm) {
       const initialValues = {
