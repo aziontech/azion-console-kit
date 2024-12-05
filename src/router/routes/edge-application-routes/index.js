@@ -5,11 +5,12 @@ import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
-import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
+import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
+import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -22,7 +23,7 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
+        deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
@@ -84,21 +85,24 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
-          createFunctionService: FunctionsService.createFunctionService,
-          deleteFunctionService: FunctionsService.deleteFunctionService,
+          createFunctionService: FunctionsServiceV4.createFunctionService,
+          deleteFunctionService: FunctionsServiceV4.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
-          listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
-          loadFunctionService: FunctionsService.loadFunctionService,
-          editFunctionService: FunctionsService.editFunctionService,
+          loadFunctionService: FunctionsServiceV4.loadFunctionService,
+          editFunctionService: FunctionsServiceV4.editFunctionService,
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
+        },
+        edgeFunctionsServices: {
+          listEdgeFunctionsService: EdgeFunctionsServiceV4.listEdgeFunctionsDropdownService,
+          loadEdgeFunctionService: EdgeFunctionsServiceV4.loadEdgeFunctionService
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
-          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
+          deleteDeviceGroupService: DeviceGroupsServiceV4.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
-          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
-          editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
-          loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
+          editDeviceGroupService: DeviceGroupsServiceV4.editDeviceGroupService,
+          loadDeviceGroupService: DeviceGroupsServiceV4.loadDeviceGroupService,
+          createDeviceGroupService: DeviceGroupsServiceV4.createDeviceGroupService
         },
         errorResponsesServices: {
           loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
