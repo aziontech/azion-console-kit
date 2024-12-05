@@ -1,9 +1,10 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeFirewallRulesEngineBaseUrl } from './make-edge-firewall-rules-engine-base-url'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
+import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadEdgeFirewallRulesEngineService = async ({ id, edgeFirewallId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeFirewallRulesEngineBaseUrl(edgeFirewallId)}/${id}`,
+    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallId}/rules/${id}`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
@@ -47,7 +48,8 @@ const parseBehaviors = (behaviors) => {
           name: behavior.name,
           functionId: parseInt(behavior.argument)
         }
-      case 'set_waf_ruleset_and_waf_mode':
+
+      case 'set_waf_ruleset':
         return {
           name: behavior.name,
           mode: behavior.argument.waf_mode,
@@ -78,8 +80,12 @@ const parseBehaviors = (behaviors) => {
   return parsedBehaviors
 }
 
-const adapt = (httpResponse) => {
-  const ruleEngine = httpResponse.body.results
+const adapt = ({ body, statusCode }) => {
+  if (statusCode !== 200) {
+    throw new Error(extractApiError({ body })).message
+  }
+
+  const ruleEngine = body.data
   const parsedRuleEngine = {
     id: ruleEngine.id,
     name: ruleEngine.name,
@@ -90,6 +96,6 @@ const adapt = (httpResponse) => {
   }
   return {
     body: parsedRuleEngine,
-    statusCode: httpResponse.statusCode
+    statusCode
   }
 }

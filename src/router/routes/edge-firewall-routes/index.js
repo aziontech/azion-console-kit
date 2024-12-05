@@ -89,9 +89,9 @@ export const edgeFirewallRoutes = {
           createEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServices.createEdgeFirewallRulesEngineService,
           loadEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.loadEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.loadEdgeFirewallRulesEngineService,
           editEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.editEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.editEdgeFirewallRulesEngineService,
 
           listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
           listWafRulesService: WafRulesServices.listWafRulesService,
