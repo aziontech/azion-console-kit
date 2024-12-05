@@ -4,6 +4,7 @@
     :edgeApplicationId="edgeApplicationId"
     :createFunctionService="createFunctionService"
     :listEdgeFunctionsService="listEdgeFunctionsService"
+    :loadEdgeFunctionService="loadEdgeFunctionService"
     :loadFunctionService="loadFunctionService"
     :editFunctionService="editFunctionService"
     @onSuccess="reloadList"
@@ -86,6 +87,10 @@
       type: Function
     },
     listEdgeFunctionsService: {
+      required: true,
+      type: Function
+    },
+    loadEdgeFunctionService: {
       required: true,
       type: Function
     },
