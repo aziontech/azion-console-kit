@@ -6,10 +6,10 @@ const MAP_BEHAVIOR = {
 
 const adaptBehavior = (behaviors) => {
   return behaviors.map((behavior) => {
-    let behaviorTargetValue = { target: behavior[MAP_BEHAVIOR[behavior.name] || 'target'] }
+    let behaviorTargetValue = { argument: behavior[MAP_BEHAVIOR[behavior.name] || 'target'] }
     if (behavior.name === 'capture_match_groups') {
       behaviorTargetValue = {
-        target: {
+        argument: {
           captured_array: behavior.captured_array,
           subject: behavior.subject,
           regex: behavior.regex

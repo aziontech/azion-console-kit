@@ -48,7 +48,7 @@
     variable: '${uri}',
     operator: 'is_equal',
     conditional: 'if',
-    input_value: ''
+    argument: ''
   }
 
   const DEFAULT_BEHAVIOR = {
@@ -663,8 +663,8 @@
                   <FieldText
                     :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
                     v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
+                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
+                    :value="criteria[criteriaIndex].value[conditionalIndex].argument"
                     :disabled="isDefaultPhase"
                   />
                 </div>

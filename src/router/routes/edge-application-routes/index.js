@@ -108,7 +108,7 @@ export const edgeApplicationRoutes = {
           listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
           editRulesEngineService: RulesEngineService.editRulesEngineService,
-          createRulesEngineService: RulesEngineService.createRulesEngineService,
+          createRulesEngineService: RulesEngineServiceV4.createRulesEngineService,
           loadRulesEngineService: RulesEngineService.loadRulesEngineService,
           reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,

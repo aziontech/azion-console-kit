@@ -13,9 +13,9 @@ describe('adaptBehavior', () => {
     ]
 
     const expected = [
-      { name: 'run_function', target: 'func123' },
-      { name: 'set_origin', target: 'origin456' },
-      { name: 'set_cache_policy', target: 'cache789' }
+      { name: 'run_function', argument: 'func123' },
+      { name: 'set_origin', argument: 'origin456' },
+      { name: 'set_cache_policy', argument: 'cache789' }
     ]
 
     expect(adaptBehavior(behaviors)).toEqual(expected)
@@ -34,7 +34,7 @@ describe('adaptBehavior', () => {
     const expected = [
       {
         name: 'capture_match_groups',
-        target: {
+        argument: {
           captured_array: 'array_cap',
           subject: 'subject',
           regex: 'regex'
