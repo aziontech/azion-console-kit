@@ -10,6 +10,7 @@ import * as ErrorResponsesService from '@/services/edge-application-error-respon
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
+import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -85,12 +86,15 @@ export const edgeApplicationRoutes = {
         },
         functionsServices: {
           createFunctionService: FunctionsServiceV4.createFunctionService,
-          deleteFunctionService: FunctionsService.deleteFunctionService,
+          deleteFunctionService: FunctionsServiceV4.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
-          listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
           loadFunctionService: FunctionsServiceV4.loadFunctionService,
           editFunctionService: FunctionsServiceV4.editFunctionService,
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
+        },
+        edgeFunctionsServices: {
+          listEdgeFunctionsService: EdgeFunctionsServiceV4.listEdgeFunctionsDropdownService,
+          loadEdgeFunctionService: EdgeFunctionsServiceV4.loadEdgeFunctionService
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
