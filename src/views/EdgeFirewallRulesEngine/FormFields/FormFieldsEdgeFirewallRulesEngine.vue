@@ -353,7 +353,7 @@
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset_and_waf_mode')
+    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
 
     return [
@@ -361,7 +361,7 @@
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
-        value: 'set_waf_ruleset_and_waf_mode',
+        value: 'set_waf_ruleset',
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Set WAF Rule Set'
@@ -431,7 +431,7 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset_and_waf_mode'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
   }
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
@@ -457,7 +457,7 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset_and_waf_mode']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
