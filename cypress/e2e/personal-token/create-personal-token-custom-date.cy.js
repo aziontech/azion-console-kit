@@ -13,6 +13,9 @@ describe('Personal Token spec', { tags: ['@dev6'] }, () => {
     // Arrange
     cy.get(selectors.personalTokens.createTokenButton).click()
     cy.get(selectors.personalTokens.tokenName).type(personalTokenName)
+    cy.get(selectors.personalTokens.dropdownExpiration).click()
+    cy.get(selectors.personalTokens.dropdownOption).click()
+    cy.get(selectors.personalTokens.calendar).invoke('val', '10/10/2037').trigger('change')
 
     // Act
     // Verify if copy token dialog is displayed after save

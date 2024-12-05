@@ -126,6 +126,10 @@
       type: String,
       default: ''
     },
+    moreOptions: {
+      type: Array,
+      default: null
+    },
     optionDisabled: {
       type: [String, Function],
       default: ''
@@ -231,7 +235,14 @@
       let results = response.body?.map((item) => {
         return {
           [props.optionLabel]: item.name,
-          [props.optionValue]: item.id
+          [props.optionValue]: item.id,
+          ...props?.moreOptions?.reduce(
+            (additionalFields, option) => ({
+              ...additionalFields,
+              [option]: item[option]
+            }),
+            {}
+          )
         }
       })
 
@@ -261,9 +272,17 @@
 
       const newOption = {
         [props.optionLabel]: results.name,
-        [props.optionValue]: results.id
+        [props.optionValue]: results.id,
+        ...props?.moreOptions?.reduce(
+          (additionalFields, option) => ({
+            ...additionalFields,
+            [option]: results[option]
+          }),
+          {}
+        )
       }
       data.value = [newOption, ...data.value]
+      emitChange()
     } finally {
       loading.value = false
     }
