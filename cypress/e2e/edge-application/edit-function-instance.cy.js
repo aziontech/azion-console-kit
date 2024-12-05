@@ -63,6 +63,8 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.openProduct('Edge Application')
 
     createEdgeApplicationCase()
+    cy.intercept('GET', 'api/v4/edge_functions/functions?ordering=name&page=1&page_size=100&fields=&search=*').as('getEdgeFunctions')
+
 
     // Act - create a function instance
     cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
@@ -74,9 +76,13 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
       fixtures.functionInstanceName
     )
+
+    cy.wait('@getEdgeFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
     cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
+
+    cy.wait('@getEdgeFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
     cy.get(selectors.form.actionsSubmitButton).click()
 
