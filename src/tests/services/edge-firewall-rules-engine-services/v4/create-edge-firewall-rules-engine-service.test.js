@@ -60,7 +60,7 @@ describe('EdgeFirewallRulesEngineService', () => {
           { name: 'run_function', argument: 'abc123' },
           {
             name: 'set_waf_ruleset',
-            argument: { waf_mode: 'blocking', set_waf_ruleset: 'def456' }
+            argument: { mode: 'blocking', id: 'def456' }
           },
           {
             name: 'set_rate_limit',
