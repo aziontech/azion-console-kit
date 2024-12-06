@@ -55,7 +55,7 @@ const adapt = (results, statusCode) => {
       description: rules.description || '',
       lastModified: formatExhibitionDate(rules.last_modified, 'long', 'short'),
       lastEditor: rules.last_editor,
-      status: STATUS_AS_TAG[rules.is_active]
+      status: STATUS_AS_TAG[rules.active]
     }
   })
 
