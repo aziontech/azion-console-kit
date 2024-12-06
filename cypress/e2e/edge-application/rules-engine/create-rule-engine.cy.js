@@ -68,7 +68,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
+      cy.verifyToast('Rule successfully deleted')
     })
   })
 
@@ -78,7 +78,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       entityName: fixtures.edgeApplicationName,
       productName: 'Edge Application'
     }).then(() => {
-      cy.verifyToast('Rule successfully deleted')
+      cy.verifyToast('Resource successfully deleted')
     })
   })
 })
