@@ -10,4 +10,8 @@ import { loadDigitalCertificatesService } from './load-digital-certificates-serv
 /**
  * @type {ExportedServicesType}
  */
-export { listDigitalCertificatesService, loadDigitalCertificatesService, listDigitalCertificatesServiceDropdown }
+export {
+  listDigitalCertificatesService,
+  loadDigitalCertificatesService,
+  listDigitalCertificatesServiceDropdown
+}
