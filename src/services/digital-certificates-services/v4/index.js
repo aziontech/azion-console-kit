@@ -1,4 +1,6 @@
+import { listDigitalCertificatesServiceDropdown } from './list-digital-certificates-dropdown-service'
 import { listDigitalCertificatesService } from './list-digital-certificates-service'
+import { loadDigitalCertificatesService } from './load-digital-certificates-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +10,4 @@ import { listDigitalCertificatesService } from './list-digital-certificates-serv
 /**
  * @type {ExportedServicesType}
  */
-export { listDigitalCertificatesService }
+export { listDigitalCertificatesService, loadDigitalCertificatesService, listDigitalCertificatesServiceDropdown }
