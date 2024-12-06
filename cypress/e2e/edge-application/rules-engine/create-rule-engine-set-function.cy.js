@@ -41,7 +41,7 @@ const createFunctionCase = () => {
 }
 
 // TODO: remove xfail tag when the API v4 is fixed
-describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -91,7 +91,7 @@ describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
       .click()
     cy.intercept(
       'GET',
-      'api/v3/edge_applications/*/functions_instances?order_by=id&sort=asc&page=1&page_size=200'
+      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
     ).as('getFunctionInstance')
     cy.wait('@postFunction')
     cy.wait('@getFunctionInstance')

@@ -397,6 +397,7 @@
         :loadingOrigins="loadingOrigins"
         :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
+        @refreshFunctions="handleRefreshFunctions"
         :clipboardWrite="clipboardWrite"
         :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
