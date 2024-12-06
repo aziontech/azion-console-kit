@@ -97,7 +97,7 @@ export default {
       '[data-testid="edge-applications-functions-form__create-function-button"]',
     edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
     dropdownFilter:
-      '[data-testid="edge-application-function-instance-form__edge-function__dropdown-filter-input"]',
+      '[data-testid="edge-application-function-instance-form__edge-function__dropdown-search"]',
     firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
     createButton: '[data-testid="functions-instance__create-button"]',
     edgeFunctionsDropdown:

@@ -2,20 +2,20 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
 
   const emit = defineEmits(['toggleDrawer'])
 
   const props = defineProps({
-    edgeFunctionsList: {
-      required: true,
-      type: Array
+    listEdgeFunctionsService: {
+      type: Function,
+      required: true
     },
-    reloadEdgeFunctions: {
+    loadEdgeFunctionService: {
       type: Function,
       required: true
     }
@@ -27,17 +27,21 @@
   }
 
   const handleDrawerSuccess = (response) => {
-    props.reloadEdgeFunctions()
     edgeFunctionID.value = response.functionId
   }
 
   const store = useAccountStore()
 
-  const changeArgs = (target) => {
-    props.edgeFunctionsList.forEach((element) => {
-      if (element.value === target.value) {
-        args.value = element.args
-      }
+  const changeArgs = async (target) => {
+    if (target?.args) {
+      args.value = target?.args
+    }
+  }
+
+  const listEdgeFunctionsServiceDecorator = (queryParams) => {
+    return props.listEdgeFunctionsService({
+      initiatorType: 'edge_firewall',
+      ...queryParams
     })
   }
 
@@ -97,17 +101,17 @@
           ref="drawerRef"
           @onSuccess="handleDrawerSuccess"
         />
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Function"
-          required
           name="edgeFunctionID"
-          :options="edgeFunctionsList"
-          @onChange="changeArgs"
+          required
+          :service="listEdgeFunctionsServiceDecorator"
+          :loadService="props.loadEdgeFunctionService"
           :value="edgeFunctionID"
+          :moreOptions="['args']"
+          @onSelectOption="changeArgs"
           optionLabel="label"
           optionValue="value"
-          :optionDisabled="(option) => option.disabled"
-          filter
           appendTo="self"
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
         >
@@ -130,7 +134,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col gap-2 w-full">

@@ -2,7 +2,7 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import PrimeButton from 'primevue/button'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
 
@@ -12,11 +12,11 @@
   const emit = defineEmits(['toggleDrawer'])
 
   const props = defineProps({
-    edgeFunctionsList: {
-      required: true,
-      type: Array
+    listEdgeFunctionsService: {
+      type: Function,
+      required: true
     },
-    reloadEdgeFunctions: {
+    loadEdgeFunctionService: {
       type: Function,
       required: true
     }
@@ -28,17 +28,21 @@
   }
 
   const handleDrawerSuccess = (response) => {
-    props.reloadEdgeFunctions()
     edgeFunctionID.value = response.functionId
   }
 
   const store = useAccountStore()
 
   const changeArgs = (target) => {
-    props.edgeFunctionsList.forEach((element) => {
-      if (element.value === target.value) {
-        args.value = element.args
-      }
+    if (target?.args) {
+      args.value = target?.args
+    }
+  }
+
+  const listEdgeFunctionsServiceDecorator = (queryParams) => {
+    return props.listEdgeFunctionsService({
+      initiatorType: 'edge_application',
+      ...queryParams
     })
   }
 
@@ -97,19 +101,19 @@
           ref="drawerRef"
           @onSuccess="handleDrawerSuccess"
         />
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           data-testid="edge-application-function-instance-form__edge-function"
           label="Edge Function"
           required
           name="edgeFunctionID"
-          :options="edgeFunctionsList"
+          :service="listEdgeFunctionsServiceDecorator"
+          :loadService="loadEdgeFunctionService"
+          :moreOptions="['args']"
           optionLabel="label"
           optionValue="value"
           :value="edgeFunctionID"
           inputId="edgeFunctionID"
-          @change="changeArgs"
-          filter
-          :optionDisabled="(option) => option.disabled"
+          @onSelectOption="changeArgs"
         >
           <template #footer>
             <ul class="p-2">
@@ -130,7 +134,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col gap-2 w-full">

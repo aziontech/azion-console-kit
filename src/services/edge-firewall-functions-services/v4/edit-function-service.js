@@ -1,22 +1,24 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
-import { extractApiError } from '@/helpers/extract-api-error'
 import * as Errors from '@/services/axios/errors'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { extractApiError } from '@/helpers/extract-api-error'
+import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
 
-export const createPersonalToken = async (payload) => {
-  const { name, description, expiresAt } = payload
-
+export const editFunctionService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePersonalTokensBaseUrl()}`,
-    method: 'POST',
-    body: {
-      name,
-      description,
-      expires_at: expiresAt
-    }
+    url: `${makeEdgeFirewallBaseUrl()}/${payload.edgeFirewallID}/functions/${payload.id}`,
+    method: 'PATCH',
+    body: adapt(payload)
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+const adapt = (payload) => {
+  return {
+    name: payload.name,
+    edge_function: payload.edgeFunctionID,
+    json_args: JSON.parse(payload.args)
+  }
 }
 
 /**
@@ -28,12 +30,8 @@ export const createPersonalToken = async (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Personal token has been created',
-        token: httpResponse.body.key,
-        urlToEditView: '/personal-tokens'
-      }
+    case 202:
+      return 'Your Function has been updated'
     case 500:
       throw new Errors.InternalServerError().message
     default:
