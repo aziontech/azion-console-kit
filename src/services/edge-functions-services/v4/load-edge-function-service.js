@@ -17,7 +17,7 @@ const adapt = (httpResponse) => {
   const parsedEdgeFunctions = {
     id: data.id,
     name: data.name,
-    args: JSON.stringify(data.json_args, null, '\t'),
+    args: JSON.stringify(data.json_args, null, '\t')
   }
 
   return {
