@@ -3,10 +3,11 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
   import TableBlock from '@/templates/list-table-block/v2/index.vue'
-
+  import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -94,7 +95,9 @@
     'behaviors',
     'criteria',
     'active',
-    'order'
+    'order',
+    'last_modified',
+    'last_editor'
   ]
 
   const PARSE_PHASE = {
@@ -102,11 +105,11 @@
     'Response phase': 'response'
   }
 
-  const disabledOrdering = ref(true)
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
+  const dialog = useDialog()
   const toast = useToast()
 
   const getColumns = computed(() => {
@@ -114,12 +117,8 @@
       {
         field: 'phase.content',
         header: 'phase',
-        disableSort: true
-      },
-      {
-        field: 'order',
-        header: 'Order',
-        disableSort: true
+        disableSort: true,
+        hidden: true
       },
       {
         field: 'name',
@@ -165,10 +164,11 @@
   }
 
   const listRulesEngineWithDecorator = async (query) => {
-    return props.listRulesEngineService({
+    const data = await props.listRulesEngineService({
       id: props.edgeApplicationId,
       ...query
     })
+    return data
   }
 
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
@@ -209,40 +209,48 @@
     }
   ]
 
-  const checkOrderRules = async ({ event, data }) => {
-    
-    console.log('event', event)
-    console.log('data', data.value)
-    data.value = event.value
-    disabledOrdering.value = false
-  }
-
   const isLoadingButtonOrder = ref(false)
 
-  const updateRulesOrder = async (data, reload) => {
-    console.log('🚀 ~ updateRulesOrder ~ data:', data);
-    // disabledOrdering.value = true
-    // try {
-    //   isLoadingButtonOrder.value = true
-    //   await props.reorderRulesEngine(data, props.edgeApplicationId)
-    //   toast.add({
-    //     closable: true,
-    //     severity: 'success',
-    //     summary: 'success',
-    //     detail: 'Reorder saved'
-    //   })
-    // } catch (error) {
-    //   toast.add({
-    //     closable: true,
-    //     severity: 'error',
-    //     summary: 'error',
-    //     detail: error
-    //   })
-    // } finally {
-    //   await reload()
-    //   isLoadingButtonOrder.value = false
-    // }
+  const reorderDecoratorService = async (data, reload) => {
+    isLoadingButtonOrder.value = true
+    try {
+      await props.reorderRulesEngine(data, props.edgeApplicationId)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'success',
+        detail: 'Reorder saved'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    } finally {
+      isLoadingButtonOrder.value = false
+      reload()
+    }
   }
+
+  const updateRulesOrder = async (rows, alteredRows, reload) => {
+    dialog.open(orderDialog, {
+      data: {
+        rules: alteredRows
+      },
+      onClose: ({ data }) => {
+        if (data.updated || data.reset) {
+          return reload()
+        }
+        if (data.save) {
+          return reorderDecoratorService(rows, reload)
+        }
+      }
+    })
+  }
+
+
 </script>
 
 <template>
@@ -278,14 +286,14 @@
     }"
     emptyListMessage="No rules found."
     @on-before-go-to-edit="handleTrackEditEvent"
-    @onReorder="checkOrderRules"
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
+    groupColumn="phase.content"
   >
-    <template #addButton="{ reload, data }">
+    <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
         class="flex gap-4"
         data-testid="rules-engine-add-button"
@@ -293,18 +301,23 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
+          :disabled="columnOrderAltered"
           @click="openCreateRulesEngineDrawerByPhase"
           data-testid="rules-engine-create-button"
         />
-        <teleport to="#action-bar">
+        <teleport
+          to="#action-bar"
+          v-if="columnOrderAltered"
+        >
           <div
-            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
               class="bg-secondary"
               outlined
               label="Cancel"
               @click="reload"
+              :disabled="isLoadingButtonOrder"
               data-testid="rules-engine-cancel-order-button"
             />
 
@@ -312,12 +325,12 @@
               label="Review Changes"
               badgeClass="p-badge-lg text-color bg-transparent h-5 min-w-[20px] !text-xl"
               :loading="isLoadingButtonOrder"
+              :disabled="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
               size="small"
               type="button"
-              @click="updateRulesOrder(data, reload)"
-              :disabled="disabledOrdering"
-              badge="4"
+              @click="updateRulesOrder(data, alteredRows, reload)"
+              :badge="alteredRows.length"
             />
           </div>
         </teleport>
