@@ -96,7 +96,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
 
     const result = await sut({ id: '987654', payload: fixtures.ruleEngineMock })
 
-    expect(result).toBe('Rule successfully edited')
+    expect(result).toBe('Rule successfully updated')
   })
 
   it('should throw internal server error when request fails with 500', async () => {

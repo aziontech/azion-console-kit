@@ -28,7 +28,7 @@ const createEdgeApplicationCase = () => {
 }
 
 // TODO: remove xfail tag when the API v4 is fixed
-describe('Edge Application', { tags: ['@dev4'] }, () => {
+describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -79,9 +79,6 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       'not.have.class',
       'p-disabled'
     )
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaVariableSelect(0, 0)).type(
-      '${{}uri}{enter}'
-    )
     cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorDropdown(0, 0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaOperatorOption('is equal')).click()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
@@ -112,7 +109,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // edit behaviors
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Enable Gzip')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Bypass Cache')).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsAddButton).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(1)).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deny (403 Forbidden)')).click()
@@ -121,7 +118,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.phaseRadioGroup).should('have.class', 'p-disabled')
 
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Rule successfully edited')
+    cy.verifyToast('success', 'Rule successfully updated')
   })
 
   afterEach(() => {

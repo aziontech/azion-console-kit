@@ -45,7 +45,7 @@ const adapt = (payload, reorder) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Rule successfully edited'
+      return 'Rule successfully updated'
     case 500:
       throw new Errors.InternalServerError().message
     default:
