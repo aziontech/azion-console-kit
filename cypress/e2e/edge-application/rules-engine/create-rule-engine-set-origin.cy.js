@@ -101,7 +101,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       entityName: fixtures.edgeApplicationName,
       productName: 'Edge Application'
     }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Rule successfully deleted')
     })
   })
 })
