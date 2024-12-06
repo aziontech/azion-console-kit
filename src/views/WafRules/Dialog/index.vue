@@ -6,8 +6,8 @@
 
   defineOptions({ name: 'dialog-allow-rule' })
 
-  const emit = defineEmits(['update:visible', 'closeDialog'])
-  const reason = ref('')
+  const emit = defineEmits(['update:visible', 'closeDialog', 'handleDescriptionOfAttack'])
+  const name = ref('')
 
   const props = defineProps({
     visible: {
@@ -28,8 +28,8 @@
   }
 
   const handleAllowRule = () => {
-    if (!reason.value) return
-    emit('reason', reason.value)
+    if (!name.value) return
+    emit('handleDescriptionOfAttack', name.value)
     loading.value = true
   }
 
@@ -44,7 +44,7 @@
     () => props.isLoading,
     (value) => {
       if (value === false) {
-        reason.value = ''
+        name.value = ''
       }
       loading.value = value
     }
@@ -82,7 +82,7 @@
         </div>
         <TextArea
           required
-          v-model="reason"
+          v-model="name"
           type="text"
           rows="5"
           cols="60"
@@ -99,7 +99,7 @@
           severity="secondary"
           label="Allow Rules"
           :loading="loading"
-          :disabled="!reason"
+          :disabled="!name"
           @click="handleAllowRule"
           iconPos="right"
         />
