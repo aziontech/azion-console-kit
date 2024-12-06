@@ -4,6 +4,7 @@ import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
+import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
@@ -114,7 +115,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
           listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
-          listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
+          listEdgeApplicationFunctionsService: FunctionsServiceV4.listFunctionsServiceOptions
         },
         clipboardWrite: Helpers.clipboardWrite
       },

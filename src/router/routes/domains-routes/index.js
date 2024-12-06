@@ -40,8 +40,9 @@ export const domainsRoutes = {
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService: DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificatesService,
+        listDigitalCertificatesService:
+          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificatesService
       },
       meta: {
         breadCrumbs: [
@@ -69,8 +70,9 @@ export const domainsRoutes = {
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         updatedRedirect: 'list-domains',
         clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService: DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificatesService,
+        listDigitalCertificatesService:
+          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificatesService
       },
       meta: {
         breadCrumbs: [
