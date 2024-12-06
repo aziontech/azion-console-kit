@@ -249,6 +249,9 @@
 
   watch(sliceConfigurationEnabled, (value) => {
     isSliceEdgeCachingEnabled.value = value
+    if (!value) {
+      isSliceL2CachingEnabled.value = false
+    }
   })
 </script>
 
@@ -405,9 +408,8 @@
         title="Active"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
       />
-
       <FieldGroupCheckbox
-        v-if="showSliceConfigurationRange"
+        :class="{ hidden: !sliceConfigurationEnabled }"
         label="Layer"
         :options="layerFileOptimizationRadioOptions"
         :isCard="false"

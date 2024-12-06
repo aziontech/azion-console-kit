@@ -31,6 +31,9 @@ describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
     fixtures.deviceGroupName = generateUniqueName('DeviceGroup')
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAccelerator')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Device Groups')).click()
   })
 
@@ -41,7 +44,7 @@ describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     //assert
-    cy.verifyToast('success', 'Your Device Group has been created')
+    cy.verifyToast('success', 'Device Group successfully created')
     cy.get(selectors.list.searchInput).type(`${fixtures.deviceGroupName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.deviceGroupName)
   })

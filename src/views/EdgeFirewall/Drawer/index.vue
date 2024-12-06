@@ -4,7 +4,7 @@
   import * as yup from 'yup'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeFirewallService } from '@/services/edge-firewall-services'
+  import { createEdgeFirewallService } from '@/services/edge-firewall-services/v4'
   import FormCreateEdgeFirewall from '../FormFields/FormFieldsEdgeFirewall'
 
   defineOptions({

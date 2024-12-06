@@ -29,7 +29,7 @@ const makeSut = () => {
   }
 }
 
-describe('EdgeFirewallServices', () => {
+describe('EdgeFirewallServicesV4', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })

@@ -48,6 +48,22 @@ describe('ResetPasswordService', () => {
 
     expect(feedbackMessage).toBe('Password reset successfully')
   })
+  it('Should return an API error', async () => {
+    const apiErrorMock = 'Error reset password'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        non_field_errors: ['Error reset password']
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.userData)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
   it.each([
     {
       statusCode: 401,

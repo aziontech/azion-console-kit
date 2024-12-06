@@ -28,6 +28,7 @@
         <span class="p-input-icon-right w-full flex flex-col items-start gap-2">
           <PrimeInputText
             id="domain"
+            readonly
             data-testid="domains-dialog__domain-field__input"
             v-model="domainValue"
             type="text"

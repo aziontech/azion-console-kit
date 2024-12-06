@@ -25,7 +25,7 @@ describe('EdgeApplicationServices', () => {
     })
     const { sut } = makeSut()
     const version = 'v4'
-    await sut(fixtures.edgeApplicationsMock.id)
+    await sut({ id: fixtures.edgeApplicationsMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/edge_application/applications/${fixtures.edgeApplicationsMock.id}?fields=id,name`,

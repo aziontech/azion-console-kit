@@ -15,8 +15,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :edgeFunctionsList="filteredEdgeFunctions"
-        :reloadEdgeFunctions="loadEdgeFunctions"
+        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
       />
     </template>
   </CreateDrawerBlock>
@@ -36,14 +36,15 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :edgeFunctionsList="filteredEdgeFunctions"
+        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
       />
     </template>
   </EditDrawerBlock>
 </template>
 
 <script setup>
-  import { ref, onMounted, computed, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
@@ -74,6 +75,10 @@
       type: Function,
       required: true
     },
+    loadEdgeFunctionService: {
+      type: Function,
+      required: true
+    },
     loadFunctionService: {
       type: Function,
       required: true
@@ -87,10 +92,6 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const isOverlapped = ref(false)
-  const edgeFunctionsList = ref([])
-  const filteredEdgeFunctions = computed(() =>
-    edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application')
-  )
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -169,11 +170,6 @@
       .label('Edge Function')
   })
 
-  onMounted(async () => {
-    const response = await props.listEdgeFunctionsService({})
-    edgeFunctionsList.value = response
-  })
-
   const editService = async (payload) => {
     return await props.editFunctionService({
       ...payload,
@@ -208,17 +204,9 @@
     showCreateFunctionDrawer.value = false
   }
 
-  const loadEdgeFunctions = async () => {
-    const response = await props.listEdgeFunctionsService({})
-    edgeFunctionsList.value = response
-  }
-
-  onMounted(loadEdgeFunctions)
-
   defineExpose({
     showCreateFunctionDrawer,
     openDrawerCreate,
-    openDrawerEdit,
-    loadEdgeFunctions
+    openDrawerEdit
   })
 </script>
