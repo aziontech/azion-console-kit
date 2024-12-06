@@ -12,12 +12,13 @@
   import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import {
-    listEdgeFunctionsService,
-    createFunctionService
-  } from '@/services/edge-application-functions-services'
+  import { createFunctionService } from '@/services/edge-application-functions-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
+  import {
+    listEdgeFunctionsDropdownService,
+    loadEdgeFunctionService
+  } from '@/services/edge-functions-services/v4'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
 
   import Divider from 'primevue/divider'
@@ -525,8 +526,9 @@
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
         :createFunctionService="createFunctionService"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText

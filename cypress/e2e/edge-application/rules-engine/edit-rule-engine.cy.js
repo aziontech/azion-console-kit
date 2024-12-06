@@ -108,10 +108,6 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // new criteria
     cy.get(selectors.edgeApplication.rulesEngine.criteriaAddButton).click()
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaVariableSelect(1, 0)).clear()
-    cy.get(selectors.edgeApplication.rulesEngine.criteriaVariableSelect(1, 0)).type(
-      '${{}domain}{enter}'
-    )
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(1, 0)).type('azn.com')
 
     // edit behaviors

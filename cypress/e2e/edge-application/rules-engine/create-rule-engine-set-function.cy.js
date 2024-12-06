@@ -41,7 +41,7 @@ const createFunctionCase = () => {
 }
 
 // TODO: remove xfail tag when the API v4 is fixed
-describe('Edge Application', { tags: ['@dev3'] }, () => {
+describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -104,7 +104,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Rule successfully created')
+    cy.verifyToast('success', 'Your Rules Engine has been created.')
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
