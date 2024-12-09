@@ -1,10 +1,6 @@
 <script setup>
-  import {
-    EDGE_CERTIFICATE,
-    TRUSTED_CA_CERTIFICATE
-  } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -14,15 +10,19 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { ref, watch } from 'vue'
 
   const props = defineProps({
     digitalCertificates: {
       type: Array,
       required: true
     },
-    edgeApplicationsData: {
-      type: Array,
+    listEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeApplicationsService: {
+      type: Function,
       required: true
     },
     edgeFirewallsData: {
@@ -41,16 +41,28 @@
     isLoadingRequests: {
       type: Boolean
     },
-    updateDigitalCertificates: {
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    listDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
+    loadDigitalCertificatesService: {
       type: Function,
       required: true
     }
   })
 
+  const EDGE_CERTIFICATE = 'edge_certificate'
+  const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
+
   const digitalCertificateDrawerRef = ref('')
-  const openDigitalCertificateDrawer = () => {
-    digitalCertificateDrawerRef.value.openCreateDrawer()
-  }
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -62,9 +74,15 @@
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
+
+  const openDigitalCertificateDrawer = () => {
+    digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
+
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
+
   const openDrawerEdgeFirewall = () => {
     drawerEdgeFirewallRef.value.openCreateDrawer()
   }
@@ -76,44 +94,7 @@
 
   const handleEdgeFirewallCreated = (id) => {
     edgeFirewall.value = id
-    emit('edgeFirewallCreated')
   }
-
-  const edgeCertificates = computed(() => {
-    return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
-  })
-  const trustedCACertificates = computed(() => {
-    return props.digitalCertificates.filter(
-      (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
-    )
-  })
-  const edgeApplicationOptions = computed(() => {
-    return props.edgeApplicationsData.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
-  })
-
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
-  const edgeCertificatesOptions = computed(() => {
-    const defaultCertificate = [
-      { name: 'Azion (SAN)', value: 0 },
-      { name: "Let's Encrypt", value: 'lets_encrypt' }
-    ]
-    const parsedCertificates = edgeCertificates.value?.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-    return [...defaultCertificate, ...parsedCertificates]
-  })
-  const trustedCACertificatesOptions = computed(() => {
-    return trustedCACertificates.value.map((certificate) => ({
-      name: certificate.name,
-      value: certificate.id
-    }))
-  })
 
   const mtlsModeRadioOptions = ref([
     {
@@ -141,17 +122,28 @@
     }
   ])
 
-  const isLoadingRequestsData = computed(() => {
-    return props.isLoadingRequests
-  })
-
   watch(edgeCertificate, async (newEdgeCertificate) => {
     setEdgeCertificate(newEdgeCertificate)
   })
 
   const onDigitalCertificateSuccess = (domainId) => {
     edgeCertificate.value = domainId
-    props.updateDigitalCertificates()
+  }
+
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return await props.listDigitalCertificatesService({
+      type: EDGE_CERTIFICATE,
+      fields: ['id,name'],
+      ...queryParams
+    })
+  }
+
+  const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
+    return await props.listDigitalCertificatesService({
+      type: TRUSTED_CA_CERTIFICATE,
+      fields: ['id,name'],
+      ...queryParams
+    })
   }
 
   const emit = defineEmits(['edgeApplicationCreated'])
@@ -210,18 +202,16 @@
         @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :options="edgeApplicationOptions"
-          :loading="isLoadingRequestsData"
-          :disabled="isLoadingRequestsData"
+          :service="listEdgeApplicationsService"
+          :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          filter
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -244,20 +234,18 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
           placeholder="Select an edge firewall"
         >
@@ -280,7 +268,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         data-testid="domains-form__cname-access-only-field"
@@ -303,17 +291,15 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           data-testid="domains-form__edge-certificate-field"
           label="Digital Certificate"
           name="edgeCertificate"
-          :options="edgeCertificatesOptions"
-          :loading="isLoadingRequestsData"
-          :disabled="isLoadingRequestsData"
+          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
-          filter
           appendTo="self"
           placeholder="Select a certificate"
         >
@@ -336,7 +322,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>
@@ -369,18 +355,18 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <FieldDropdown
+        <!-- domains-form__mtls-trusted-certificate-field__dropdown -->
+        <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"
           required
           name="mtlsTrustedCertificate"
-          :options="trustedCACertificatesOptions"
-          :loading="isLoadingRequestsData"
+          :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"
           :value="mtlsTrustedCertificate"
-          filter
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
         />
