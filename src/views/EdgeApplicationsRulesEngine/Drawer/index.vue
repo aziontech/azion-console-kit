@@ -99,7 +99,7 @@
           variable: '${uri}',
           operator: 'is_equal',
           conditional: 'if',
-          input_value: ''
+          argument: ''
         }
       ]
     ],
@@ -128,7 +128,7 @@
             variable: yup.string().required().label('variable'),
             operator: yup.string().required().label('operator'),
             conditional: yup.string().required().label('conditional'),
-            input_value: yup.string().when('operator', {
+            argument: yup.string().when('operator', {
               is: (operator) => operator !== 'exists' && operator !== 'does_not_exist',
               then: (schema) => schema.required().label('criteria argument'),
               otherwise: (schema) => schema.notRequired()
