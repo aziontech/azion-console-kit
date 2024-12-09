@@ -16,7 +16,7 @@
       :class="{ 'mr-[32rem]': showSidebar }"
       :style="{ transition: 'margin-right 0.2s' }"
     >
-      <router-view class="flex flex-1" />
+      <router-view class="flex flex-1 flex-col" />
       <AppFooter v-if="!showLoading" />
     </main>
   </div>

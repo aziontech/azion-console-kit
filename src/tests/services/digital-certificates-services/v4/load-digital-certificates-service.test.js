@@ -32,7 +32,9 @@ describe('LoadDigitalCertificatesService', () => {
   })
 
   it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(fixtures.apiResponse)
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce(fixtures.apiResponse)
     const { sut } = makeSut()
     const globalId = '123'
 
