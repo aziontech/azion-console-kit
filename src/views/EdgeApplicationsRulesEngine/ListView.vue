@@ -292,6 +292,7 @@
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
     groupColumn="phase.content"
+    :expandedRowGroups="['Request', 'Response']"
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div

@@ -7,7 +7,7 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
-      v-model:expandedRowGroups="expandedRowGroups"
+      v-model:expandedRowGroups="expandedGroups"
       @rowReorder="onRowReorder"
       scrollable
       removableSort
@@ -369,6 +369,10 @@
     groupColumn: {
       type: String
     },
+    expandedRowGroups: {
+      type: Array,
+      default: () => []
+    },
     isGraphql: {
       type: Boolean
     },
@@ -437,8 +441,8 @@
   const isRenderActions = !!props.actions?.length
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
-  const expandedRowGroups = ref(['Request', 'Response'])
   const dataTableRef = ref(null)
+  const expandedGroups = ref(props.expandedRowGroups)
 
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
