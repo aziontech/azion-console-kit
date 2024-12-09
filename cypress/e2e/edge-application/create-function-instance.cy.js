@@ -10,7 +10,7 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v3/edge_functions*').as('getFunctions')
+  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions')
   cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
     .find(selectors.functions.saveButton)
     .click()

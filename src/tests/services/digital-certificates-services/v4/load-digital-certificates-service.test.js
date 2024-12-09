@@ -1,59 +1,58 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@services/axios/errors'
-import { loadDigitalCertificatesService } from '@/services/digital-certificates-services/v4'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { loadDigitalCertificateService } from '@/services/digital-certificates-services/v4/'
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  apiResponse: {
-    statusCode: 200,
-    body: {
-      data: {
-        id: 1,
-        name: 'Certificate 1'
-      }
-    }
+  certificateMock: {
+    id: 72395,
+    name: 'Cert_A.pem',
+    type: 'trusted_ca_certificate',
+    managed: false,
+    csr: null
   }
 }
 
 const makeSut = () => {
-  const sut = loadDigitalCertificatesService
+  const sut = loadDigitalCertificateService
 
   return {
     sut
   }
 }
 
-describe('LoadDigitalCertificatesService', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
+describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(fixtures.apiResponse)
-    const { sut } = makeSut()
-    const globalId = '123'
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { data: fixtures.certificateMock }
+    })
 
-    await sut(globalId)
+    const { sut } = makeSut()
+    const version = 'v4'
+    await sut({ id: fixtures.certificateMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/digital_certificates/certificates/123?fields=id,name',
+      url: `${version}/digital_certificates/certificates/${fixtures.certificateMock.id}?fields=id,name,type,csr,managed`,
       method: 'GET'
     })
   })
 
-  it('should return correct data on success', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(fixtures.apiResponse)
+  it('should parse correctly the api response', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { data: fixtures.certificateMock }
+    })
     const { sut } = makeSut()
-    const globalId = '123'
 
-    const result = await sut(globalId)
+    const result = await sut({ id: fixtures.certificateMock.id })
 
     expect(result).toEqual({
-      id: 1,
-      name: 'Certificate 1'
+      id: fixtures.certificateMock.id,
+      name: fixtures.certificateMock.name,
+      type: fixtures.certificateMock.type,
+      managed: fixtures.certificateMock.managed,
+      csr: undefined
     })
   })
 
@@ -87,11 +86,11 @@ describe('LoadDigitalCertificatesService', () => {
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
-        body: {}
+        body: { data: fixtures.certificateMock }
       })
       const { sut } = makeSut()
 
-      const response = sut('123')
+      const response = sut({ id: fixtures.certificateMock.id })
 
       expect(response).rejects.toBe(expectedError)
     }

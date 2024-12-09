@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-url'
 
-export const loadEdgeApplicationsService = async (globalId) => {
+export const loadEdgeApplicationsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${globalId}?fields=id,name`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${id}?fields=id,name`,
     method: 'GET'
   })
 

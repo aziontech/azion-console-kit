@@ -31,8 +31,8 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=&type=*').as('searchDigitalCertificatesApi')
-    cy.intercept('GET', `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=id%2Cname&search=${domainName}&type=*`).as('searchDigitalCertificatesApiByDomain')
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*').as('searchDigitalCertificatesApi')
+    cy.intercept('GET', `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${domainName}&type=*`).as('searchDigitalCertificatesApiByDomain')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)

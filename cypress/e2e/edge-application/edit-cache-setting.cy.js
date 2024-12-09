@@ -27,7 +27,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -45,7 +45,9 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
 
   it('should edit a cache setting', () => {
     // Arrange
-    cy.intercept('GET', '/api/v3/edge_applications/*/cache_settings/*').as('loadCacheSetting')
+    cy.intercept('GET', '/api/v4/edge_application/applications/*/cache_settings/*').as(
+      'loadCacheSetting'
+    )
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
 

@@ -439,7 +439,7 @@ const formatBigNumbers = ({ report, data }) => {
   const fieldName = report.fields[0]
   const aggregation = report.aggregationType
 
-  const total = data[dataset].reduce((acc, current) => acc + current[aggregation || fieldName], 0)
+  const total = data[dataset].reduce((acc, current) => acc + (current[aggregation] || current[fieldName]), 0)
   let { unit, value } = formatDataUnit(total, report)
 
   const IMPACTED_URLS_CHART = '847143804009563421'

@@ -17,7 +17,7 @@ const makeSut = () => {
   }
 }
 
-describe('EdgeFirewallService', () => {
+describe('EdgeFirewallServicesV4', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,

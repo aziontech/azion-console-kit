@@ -8,13 +8,13 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v3/edge_functions*').as('getFunctions')
+  cy.intercept('GET', '/api/v4/edge_functions/functions/*').as('getFunctions')
   cy.get(selectors.edgeFirewall.edgeFunctionActionbar).find(selectors.functions.saveButton).click()
   cy.verifyToast('success', 'Your edge function has been created')
   cy.wait('@getFunctions')
 }
 
-describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')

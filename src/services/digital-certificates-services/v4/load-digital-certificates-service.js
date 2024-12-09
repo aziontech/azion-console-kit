@@ -1,9 +1,11 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 
-export const loadDigitalCertificatesService = async (globalId) => {
+export const loadDigitalCertificateService = async ({ id }) => {
+  const fields = ['id', 'name', 'type', 'csr', 'managed']
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDigitalCertificatesBaseUrl()}/${globalId}?fields=id,name`,
+    url: `${makeDigitalCertificatesBaseUrl()}/${id}?fields=${fields}`,
     method: 'GET'
   })
 
@@ -13,14 +15,18 @@ export const loadDigitalCertificatesService = async (globalId) => {
 }
 
 const adapt = (httpResponse) => {
-  const data = httpResponse.body?.data
-  const parsedDigitalCertificates = {
-    id: data?.id,
-    name: data?.name
+  const certificate = httpResponse.body.data
+
+  const parsedCertificate = {
+    id: certificate.id,
+    name: certificate.name,
+    type: certificate.type,
+    managed: certificate.managed,
+    csr: certificate.csr ?? undefined
   }
 
   return {
-    body: parsedDigitalCertificates,
+    body: parsedCertificate,
     statusCode: httpResponse.statusCode
   }
 }

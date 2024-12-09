@@ -61,7 +61,7 @@
       :invokeClearChat="activeComponent.props?.clearChat"
     >
       <template #chatControls="{ clearChat }">
-        <div class="flex gap-3">
+        <div class="flex gap-2">
           <PrimeButton
             icon="pi pi-eraser"
             outlined
@@ -71,11 +71,11 @@
             @click="clearChat"
           />
           <PrimeButton
-            icon="pi pi-external-link"
+            icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
             outlined
             class="surface-border h-8 w-8"
-            aria-label="Open a chat in new tab"
-            v-tooltip.bottom="'Open a chat in new tab'"
+            aria-label="Open chat to full page"
+            v-tooltip.bottom="'Open chat to full page'"
             @click="openChatInNewTab"
           />
           <PrimeButton
@@ -96,6 +96,7 @@
           label="Open a support ticket"
           @click="openContactSupport"
           iconPos="right"
+          size="small"
           link
           icon="pi pi-external-link"
         />

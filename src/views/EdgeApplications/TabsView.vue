@@ -27,7 +27,8 @@
     deviceGroupsServices: { type: Object, required: true },
     errorResponsesServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true }
+    functionsServices: { type: Object, required: true },
+    edgeFunctionsServices: { type: Object, required: true }
   })
 
   const defaultTabs = {
@@ -236,6 +237,7 @@
       show: showTabs.functions,
       props: () => ({
         ...props.functionsServices,
+        ...props.edgeFunctionsServices,
         edgeApplicationId: edgeApplicationId.value
       })
     },
