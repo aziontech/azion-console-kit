@@ -37,9 +37,6 @@
     }
   })
 
-  const { isSidebarActive, isVisibleMobileSidebar } = useLayout()
-  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
-
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
@@ -47,8 +44,9 @@
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
-  const { OpenSidebarComponent } = useLayout()
+  const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
 
+  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
   })
@@ -167,8 +165,8 @@
         </div>
 
         <div
-          :class="showSidebar ? 'flex-col' : 'flex-col xl:flex-row'"
-          class="flex gap-6"
+          class="flex gap-6 flex-col"
+          :class="{ 'xl:flex-row': !showSidebar }"
         >
           <!-- Manage Applications -->
           <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
