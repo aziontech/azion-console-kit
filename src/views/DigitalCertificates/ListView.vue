@@ -106,6 +106,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
+        sortField: 'name',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
