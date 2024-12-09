@@ -75,7 +75,7 @@
     'description',
     'last_modified',
     'last_editor',
-    'is_active'
+    'active'
   ]
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
