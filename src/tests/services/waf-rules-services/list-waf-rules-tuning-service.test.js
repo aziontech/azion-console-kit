@@ -66,7 +66,7 @@ describe('WafRulesService', () => {
         hitCount: fixtures.wafRulesMock.hit_count,
         topIps: fixtures?.wafRulesMock?.top_10_ips?.[0]?.[1] || '',
         ruleId: fixtures.wafRulesMock.rule_id,
-        id: fixtures.wafRulesMock.rule_id,
+        id: `${fixtures.wafRulesMock.rule_id}0`,
         ruleIdDescription: `${fixtures.wafRulesMock.rule_id} - ${fixtures.wafRulesMock.rule_description}`,
         ipCount: fixtures.wafRulesMock.ip_count,
         matchZone: fixtures.wafRulesMock.match_zone,
