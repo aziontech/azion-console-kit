@@ -104,12 +104,19 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        sortField: 'name',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'subjectName',
         header: 'Subject Names',
-        sortField: 'subject_name'
+        sortField: 'subject_name',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'issuer',

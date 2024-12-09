@@ -1124,7 +1124,7 @@ describe('RealTimeMetricsModule', () => {
           aggregations: [],
           filters: {},
           groupBy: [],
-          fields: ["uniqRequestUrl"],
+          fields: ['uniqRequestUrl'],
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'inverse',
