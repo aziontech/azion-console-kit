@@ -30,7 +30,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Your Device Group has been edited'
     case 500:
       throw new Errors.InternalServerError().message

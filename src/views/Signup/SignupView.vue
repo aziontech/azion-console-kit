@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="justify-center align-items-center">
     <section
       class="flex flex-col md:flex-row p-3 md:p-6 2xl:p-10 gap-10 md:gap-20 2xl:gap-40 justify-center"
     >
