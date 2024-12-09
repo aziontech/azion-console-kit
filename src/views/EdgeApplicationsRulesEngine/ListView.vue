@@ -2,7 +2,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import TableBlock from '@/templates/list-table-block/v2/index.vue'
+  import TableBlockGroup from '@/templates/list-table-block/v2/index.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
@@ -116,26 +116,58 @@
     return [
       {
         field: 'phase.content',
-        header: 'phase',
+        header: 'Phase',
         disableSort: true,
         hidden: true
       },
       {
-        field: 'name',
-        header: 'Name',
+        field: 'type',
+        header: 'Type',
+        type: 'component',
+        filterPath: 'type.content',
+        sortField: 'type.content',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        },
         disableSort: true
       },
       {
-        field: 'description',
-        header: 'Description',
+        field: 'criteria',
+        header: 'criteria',
+        type: 'component',
+        sortField: 'criteria',
+        filterPath: 'criteria',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'criteria-column'
+          })
+        },
+        disableSort: true
+      },
+      {
+        field: 'behaviors',
+        header: 'behaviors',
+        type: 'component',
+        sortField: 'behaviors',
+        filterPath: 'behaviors',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'behaviors-column'
+          })
+        },
         disableSort: true
       },
       {
         field: 'status',
         header: 'Status',
         type: 'component',
-        filterPath: 'active',
-        sortField: 'active',
+        sortField: 'status.content',
+        filterPath: 'status.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -249,8 +281,6 @@
       }
     })
   }
-
-
 </script>
 
 <template>
@@ -274,7 +304,7 @@
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
-  <TableBlock
+  <TableBlockGroup
     ref="listRulesEngineRef"
     :orderableRows="true"
     :columns="getColumns"
@@ -360,5 +390,5 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </TableBlock>
+  </TableBlockGroup>
 </template>

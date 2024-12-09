@@ -13,6 +13,8 @@ import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
 import TextWithTagColumn from './text-with-tag-column.vue'
 import CreditCardColumn from './credit-card-column.vue'
 import CountryFlagColumn from './country-flag-column.vue'
+import CriteriaColumn from './criteria-column.vue'
+import BehaviorsColumn from './behaviors-column.vue'
 /**
  * Build and return a specific column based on the given appearance.
  *
@@ -75,6 +77,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
         copyContentService: dependencies.copyContentService
       })
     case 'tag':
+      if (!data.content) return
       return h(Tag, {
         value: data.content,
         icon: data.icon,
@@ -100,6 +103,14 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(CountryFlagColumn, {
         country: data?.country,
         code: data?.code
+      })
+    case 'criteria-column':
+      return h(CriteriaColumn, {
+        criteria: data
+      })
+    case 'behaviors-column':
+      return h(BehaviorsColumn, {
+        behaviors: data
       })
     default:
       throw new Error('Invalid column appearance')

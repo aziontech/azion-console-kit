@@ -47,11 +47,17 @@ const STATUS_AS_TAG = {
   }
 }
 
-const phaseAsTag = (phase) => {
+const phaseAsTag = (phase, typeDefault) => {
+  let content = capitalizeFirstLetter(phase)
+
+  if (typeDefault) {
+    content = phase === 'request' ? 'GET' : phase === 'response' ? 'POST' : ''
+  }
+
   return {
-    content: capitalizeFirstLetter(phase),
+    content,
     outlined: true,
-    severity: 'info'
+    severity: phase === 'request' ? 'Primary' : 'warning'
   }
 }
 
@@ -83,6 +89,7 @@ const adapt = (results, statusCode) => {
       id: rule.id,
       name: rule.name,
       phase: phaseAsTag(rule.phase),
+      type: phaseAsTag(rule.phase, true),
       behaviors: rule.behaviors,
       criteria: rule.criteria,
       status: STATUS_AS_TAG[rule.active],
