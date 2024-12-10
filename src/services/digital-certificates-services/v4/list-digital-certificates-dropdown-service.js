@@ -38,9 +38,9 @@ const adapt = (httpResponse, certificateType, search) => {
     ]
 
     const filteredDefaultCertificates = search
-      ? DEFAULT_CERTIFICATES.filter(cert =>
-        cert.name.toLowerCase().includes(search.toLowerCase())
-      )
+      ? DEFAULT_CERTIFICATES.filter((cert) =>
+          cert.name.toLowerCase().includes(search.toLowerCase())
+        )
       : DEFAULT_CERTIFICATES
 
     parsedDigitalCertificates = [...filteredDefaultCertificates, ...parsedDigitalCertificates]

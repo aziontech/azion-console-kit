@@ -1,10 +1,12 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
-import * as EdgeFirewallServices from '@/services/edge-firewall-services'
+
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
-import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
+import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-functions-services/v4'
+
+import * as EdgeFunctionServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
 import * as WafRulesServices from '@/services/waf-rules-services'
@@ -21,7 +23,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        deleteEdgeFirewallService: EdgeFirewallServices.deleteEdgeFirewallService,
+        deleteEdgeFirewallService: EdgeFirewallServicesV4.deleteEdgeFirewallService,
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
       meta: {
@@ -39,7 +41,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/CreateView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
-        createEdgeFirewallService: EdgeFirewallServices.createEdgeFirewallService
+        createEdgeFirewallService: EdgeFirewallServicesV4.createEdgeFirewallService
       },
       meta: {
         breadCrumbs: [
@@ -62,17 +64,18 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService,
         listNetworkListService: NetworkListsService.listNetworkListService,
         edgeFirewallServices: {
-          createEdgeFirewallService: EdgeFirewallServices.createEdgeFirewallService,
-          loadEdgeFirewallService: EdgeFirewallServices.loadEdgeFirewallService,
-          editEdgeFirewallService: EdgeFirewallServices.editEdgeFirewallService,
-
-          listEdgeFunctionsService: EdgeFirewallFunctionsServices.listEdgeFunctionsService,
+          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
+          editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,
           listEdgeFirewallFunctionService:
             EdgeFirewallFunctionsServices.listEdgeFirewallFunctionsService,
-          createFunctionService: EdgeFirewallFunctionsServices.createFunctionService,
-          editFunctionService: EdgeFirewallFunctionsServices.editFunctionService,
-          deleteFunctionService: EdgeFirewallFunctionsServices.deleteFunctionService,
-          loadFunctionService: EdgeFirewallFunctionsServices.loadFunctionService,
+          createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,
+          editFunctionService: EdgeFirewallFunctionsServicesV4.editFunctionService,
+          deleteFunctionService: EdgeFirewallFunctionsServicesV4.deleteFunctionService,
+          loadFunctionService: EdgeFirewallFunctionsServicesV4.loadFunctionService,
+
+          listEdgeFunctionsService: EdgeFunctionServiceV4.listEdgeFunctionsDropdownService,
+          loadEdgeFunctionService: EdgeFunctionServiceV4.loadEdgeFunctionService,
+
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'
         },
@@ -80,13 +83,13 @@ export const edgeFirewallRoutes = {
           listEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServicesV4.listEdgeFirewallRulesEngineService,
           deleteEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.deleteEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.deleteEdgeFirewallRulesEngineService,
           createEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.createEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.createEdgeFirewallRulesEngineService,
           loadEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.loadEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.loadEdgeFirewallRulesEngineService,
           editEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.editEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.editEdgeFirewallRulesEngineService,
 
           listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
           listWafRulesService: WafRulesServices.listWafRulesService,
