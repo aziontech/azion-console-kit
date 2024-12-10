@@ -2,10 +2,6 @@
   <PrimeButton
     v-if="showButton"
     @click="toggleSidebarComponent('copilot')"
-    :pt="{
-      root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
-      label: { class: 'max-md:hidden' }
-    }"
     :class="buttonClasses"
     size="small"
     class="special-button"
