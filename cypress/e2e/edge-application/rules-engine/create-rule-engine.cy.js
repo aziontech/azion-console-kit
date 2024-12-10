@@ -60,7 +60,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your Rules Engine has been created.')
+    cy.verifyToast('success', 'Rule successfully created')
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
