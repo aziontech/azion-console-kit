@@ -2,7 +2,8 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -48,14 +49,27 @@
     }
   ]
 
+  const USERS_API_FIELDS = [
+    'id',
+    'first_name',
+    'last_name',
+    'email',
+    'teams',
+    'two_factor_enabled',
+    'is_active',
+    'is_account_owner'
+  ]
+
   const getColumns = computed(() => [
     {
       field: 'firstName',
-      header: 'First Name'
+      header: 'First Name',
+      sortField: 'first_name'
     },
     {
       field: 'lastName',
-      header: 'Last Name'
+      header: 'Last Name',
+      sortField: 'last_name'
     },
     {
       field: 'email',
@@ -63,12 +77,14 @@
     },
     {
       field: 'teams',
-      header: 'Teams'
+      header: 'Teams',
+      disableSort: true
     },
     {
       field: 'mfa',
       header: 'MFA',
       type: 'component',
+      disableSort: true,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -79,7 +95,7 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'status.content',
+      sortField: 'is_active',
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
@@ -94,6 +110,7 @@
       header: 'Account Owner',
       filterPath: 'owner.content',
       type: 'component',
+      disableSort: true,
       component: (columnData) => {
         return columnBuilder({
           data: columnData,
@@ -117,7 +134,7 @@
       />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listUsersService"
         :columns="getColumns"
@@ -129,6 +146,8 @@
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No users found."
         :actions="actions"
+        :defaultOrderingFieldName="'name'"
+        :apiFields="USERS_API_FIELDS"
       />
       <EmptyResultsBlock
         v-else

@@ -8,9 +8,7 @@ const fixtures = {
     statusCode: 200,
     body: {
       count: 1,
-      results: [
-        { id: 1, name: 'Certificate 1' }
-      ]
+      results: [{ id: 1, name: 'Certificate 1' }]
     }
   },
   defaultCertificates: [
