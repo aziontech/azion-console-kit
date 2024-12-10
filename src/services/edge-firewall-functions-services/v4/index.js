@@ -14,4 +14,10 @@ import { editFunctionService } from './edit-function-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listFunctionsService, createFunctionService, deleteFunctionService, loadFunctionService, editFunctionService }
+export {
+  listFunctionsService,
+  createFunctionService,
+  deleteFunctionService,
+  loadFunctionService,
+  editFunctionService
+}
