@@ -1,5 +1,7 @@
 import { listEdgeFirewallRulesEngineService } from './list-edge-firewall-rules-engine-service'
 import { reorderRulesEngine } from './reorder-rules-engine-service'
+import { loadEdgeFirewallRulesEngineService } from './load-edge-firewall-rules-engine-service'
+import { editEdgeFirewallRulesEngineService } from './edit-edge-firewall-rules-engine-service'
 import { createEdgeFirewallRulesEngineService } from './create-edge-firewall-rules-engine-service'
 import { deleteEdgeFirewallRulesEngineService } from './delete-edge-firewall-rules-engine-service'
 /**
@@ -13,6 +15,8 @@ import { deleteEdgeFirewallRulesEngineService } from './delete-edge-firewall-rul
 export {
   listEdgeFirewallRulesEngineService,
   reorderRulesEngine,
+  loadEdgeFirewallRulesEngineService,
+  editEdgeFirewallRulesEngineService,
   createEdgeFirewallRulesEngineService,
   deleteEdgeFirewallRulesEngineService
 }
