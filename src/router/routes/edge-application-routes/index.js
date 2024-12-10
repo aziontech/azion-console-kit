@@ -7,7 +7,6 @@ import * as FunctionsService from '@/services/edge-application-functions-service
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
-import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
@@ -110,7 +109,7 @@ export const edgeApplicationRoutes = {
         },
         rulesEngineServices: {
           listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
-          deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
+          deleteRulesEngineService: RulesEngineServiceV4.deleteRuleService,
           editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
           createRulesEngineService: RulesEngineServiceV4.createRulesEngineService,
           loadRulesEngineService: RulesEngineServiceV4.loadRulesEngineService,

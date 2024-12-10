@@ -68,7 +68,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
+      cy.verifyToast('Rule successfully deleted')
     })
   })
 
