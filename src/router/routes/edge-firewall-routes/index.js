@@ -7,8 +7,6 @@ import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functio
 import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-functions-services/v4'
 
 import * as EdgeFunctionServiceV4 from '@/services/edge-functions-services/v4'
-
-import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
 import * as WafRulesServices from '@/services/waf-rules-services'
@@ -85,13 +83,13 @@ export const edgeFirewallRoutes = {
           listEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServicesV4.listEdgeFirewallRulesEngineService,
           deleteEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.deleteEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.deleteEdgeFirewallRulesEngineService,
           createEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.createEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.createEdgeFirewallRulesEngineService,
           loadEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.loadEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.loadEdgeFirewallRulesEngineService,
           editEdgeFirewallRulesEngineService:
-            EdgeFirewallRulesEngineServices.editEdgeFirewallRulesEngineService,
+            EdgeFirewallRulesEngineServicesV4.editEdgeFirewallRulesEngineService,
 
           listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
           listWafRulesService: WafRulesServices.listWafRulesService,
