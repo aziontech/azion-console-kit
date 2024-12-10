@@ -25,11 +25,11 @@ const adapt = (httpResponse, initiatorType) => {
   const bodyResults = httpResponse.body.results
 
   const parsedEdgeFunctions = bodyResults
-    ?.filter(edgeFirewall => !initiatorType || edgeFirewall.initiator_type === initiatorType)
-    .map(edgeFirewall => ({
+    ?.filter((edgeFirewall) => !initiatorType || edgeFirewall.initiator_type === initiatorType)
+    .map((edgeFirewall) => ({
       id: edgeFirewall.id,
       name: edgeFirewall.name,
-      args: JSON.stringify(edgeFirewall.json_args, null, '\t'),
+      args: JSON.stringify(edgeFirewall.json_args, null, '\t')
     }))
 
   const count = httpResponse.body?.count ?? 0
