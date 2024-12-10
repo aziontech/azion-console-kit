@@ -95,7 +95,7 @@
     {
       field: 'status',
       header: 'Status',
-      sortField: 'is_active',
+      disableSort: true,
       filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
