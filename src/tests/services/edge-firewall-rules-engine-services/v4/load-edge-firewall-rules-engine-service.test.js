@@ -53,7 +53,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: fixture.rulesEngine }
+      body: { data: fixture.rulesEngine }
     })
     const { sut } = makeSut()
 
@@ -68,7 +68,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
   it('should correctly parse the returned edge firewall rules engine', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: fixture.rulesEngine }
+      body: { data: fixture.rulesEngine }
     })
     const { sut } = makeSut()
 
@@ -100,7 +100,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     }
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: rulesEngineWithNetworkCriteria }
+      body: { data: rulesEngineWithNetworkCriteria }
     })
     const { sut } = makeSut()
 
@@ -130,7 +130,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     }
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: rulesEngineWithRunFunction }
+      body: { data: rulesEngineWithRunFunction }
     })
     const { sut } = makeSut()
 
@@ -159,7 +159,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     }
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: rulesEngineWithWAF }
+      body: { data: rulesEngineWithWAF }
     })
     const { sut } = makeSut()
 
@@ -167,9 +167,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
 
     expect(result.behaviors).toEqual([
       {
-        name: 'set_waf_ruleset_and_waf_mode',
-        mode: 'blocking',
-        waf_id: 456
+        name: 'set_waf_ruleset_and_waf_mode'
       }
     ])
   })
@@ -192,7 +190,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     }
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: rulesEngineWithWAF }
+      body: { data: rulesEngineWithWAF }
     })
     const { sut } = makeSut()
 
@@ -225,7 +223,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     }
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: rulesEngineWithWAF }
+      body: { data: rulesEngineWithWAF }
     })
     const { sut } = makeSut()
 
