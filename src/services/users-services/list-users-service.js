@@ -1,14 +1,17 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 import { useAccountStore } from '@/stores/account'
+import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listUsersService = async ({
-  orderBy = 'id',
-  sort = 'asc',
+  fields = '',
+  search = '',
+  ordering = '',
   page = 1,
-  pageSize = 200
+  pageSize = 10
 } = {}) => {
-  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeUsersBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
@@ -75,18 +78,11 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.results.map(parseUser).filter(removeUserIfItsMe)
     : []
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: parsedUsers,
     statusCode: httpResponse.statusCode
   }
-}
-
-const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
-  const searchParams = new URLSearchParams()
-  searchParams.set('order_by', orderBy)
-  searchParams.set('sort', sort)
-  searchParams.set('page', page)
-  searchParams.set('page_size', pageSize)
-
-  return searchParams
 }
