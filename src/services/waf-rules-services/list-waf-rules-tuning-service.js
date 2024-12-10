@@ -66,7 +66,6 @@ const adapt = (httpResponse) => {
 
   if (httpResponse.statusCode !== 200) return httpResponse
 
-
   const isArray = Array.isArray(httpResponse.body.results)
   const parsedWafRulesTuning = isArray
     ? httpResponse.body.results.map((event, index) => {
