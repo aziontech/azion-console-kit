@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeWafBaseUrl } from './make-waf-rules-base-url'
+import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listWafRulesService = async ({
@@ -11,7 +11,7 @@ export const listWafRulesService = async ({
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafBaseUrl()}?${searchParams.toString()}`,
+    url: `${makeWafRulesBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
