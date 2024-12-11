@@ -1,8 +1,8 @@
-import { makeWafBaseUrl } from '@/services/waf-rules-services/v4/make-waf-rules-base-url'
+import { makeWafRulesBaseUrl } from '@/services/waf-rules-services/v4/make-waf-rules-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = makeWafBaseUrl
+  const sut = makeWafRulesBaseUrl
 
   return {
     sut

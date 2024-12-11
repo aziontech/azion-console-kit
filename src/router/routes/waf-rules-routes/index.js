@@ -32,7 +32,7 @@ export const wafRulesRoutes = {
       name: 'create-waf-rules',
       component: () => import('@views/WafRules/CreateView.vue'),
       props: {
-        createWafRulesService: WafRulesService.createWafRulesService
+        createWafRulesService: WafRulesServiceV4.createWafRulesService
       },
       meta: {
         breadCrumbs: [
