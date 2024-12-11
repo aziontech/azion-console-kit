@@ -10,7 +10,7 @@ const fixtures = {
     description: 'My description',
     last_modified: new Date(2023, 10, 10),
     last_editor: 'az editor',
-    active: true
+    is_active: true
   },
   edgeFirewallRulesEngineInactiveMock: {
     id: 1239876,
@@ -18,7 +18,7 @@ const fixtures = {
     description: 'My description 2',
     last_modified: new Date(2023, 10, 11),
     last_editor: 'az editor 2',
-    active: false
+    is_active: false
   }
 }
 
