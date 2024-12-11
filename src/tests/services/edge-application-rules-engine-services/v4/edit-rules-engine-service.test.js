@@ -60,7 +60,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
           }
         ],
         criteria: fixtures.ruleEngineMock.criteria,
-        is_active: fixtures.ruleEngineMock.isActive,
+        active: fixtures.ruleEngineMock.isActive,
         description: fixtures.ruleEngineMock.description
       }
     })

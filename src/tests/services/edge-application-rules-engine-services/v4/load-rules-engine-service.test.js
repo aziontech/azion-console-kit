@@ -26,7 +26,7 @@ const fixtures = {
           argument: 'mockTarget'
         }
       ],
-      is_active: true,
+      active: true,
       order: 1,
       description: 'mockDescription'
     }
@@ -80,7 +80,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
           target: 'mockTarget'
         }
       ],
-      isActive: fixtures.rulesEngineMock.data.is_active,
+      isActive: fixtures.rulesEngineMock.data.active,
       order: fixtures.rulesEngineMock.data.order,
       description: fixtures.rulesEngineMock.data.description
     })

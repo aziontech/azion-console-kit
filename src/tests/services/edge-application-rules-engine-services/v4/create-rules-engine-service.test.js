@@ -8,7 +8,7 @@ const fixtures = {
     edgeApplicationId: 1234567890,
     name: 'Mock Rule',
     phase: 'default',
-    active: true,
+    isActive: true,
     behaviors: [
       {
         name: 'redirect',
@@ -50,7 +50,7 @@ describe('EdgeApplicationRulesEngineService', () => {
       body: {
         name: fixtures.rulesEngineMock.name,
         phase: fixtures.rulesEngineMock.phase,
-        active: fixtures.rulesEngineMock.active,
+        active: fixtures.rulesEngineMock.isActive,
         behaviors: [
           {
             name: 'redirect',

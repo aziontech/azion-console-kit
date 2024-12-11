@@ -19,7 +19,7 @@ const adapt = (httpResponse) => {
     phase: ruleEngine.phase,
     criteria: ruleEngine.criteria,
     behaviors: parsedBehavior(ruleEngine.behaviors),
-    isActive: ruleEngine.is_active,
+    isActive: ruleEngine.active,
     order: ruleEngine.order,
     description: ruleEngine.description
   }
