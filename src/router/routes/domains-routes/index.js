@@ -72,7 +72,7 @@ export const domainsRoutes = {
         clipboardWrite: Helpers.clipboardWrite,
         listDigitalCertificatesService:
           DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificatesService
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
         breadCrumbs: [
