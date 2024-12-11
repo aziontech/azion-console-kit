@@ -101,7 +101,7 @@ export default async function LoadReportWithMeta(filters, report, userUTC) {
 
   let variable = null
   let aggregation = null
-  if (report.aggregations) {
+  if (report.aggregations?.length) {
     variable = report.aggregations[0].variable
     aggregation = report.aggregations[0].aggregation
   }

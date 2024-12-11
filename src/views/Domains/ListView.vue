@@ -141,11 +141,6 @@
             data: columnData,
             columnAppearance: 'tag'
           })
-      },
-      {
-        field: 'edgeApplicationName',
-        header: 'Edge Application',
-        disableSort: true
       }
     ]
   })

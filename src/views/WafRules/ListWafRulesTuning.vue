@@ -59,7 +59,7 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No requests found."
     hiddenHeader
-    :pt="{ root: { class: 'rounded-t-none' } }"
+    :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
   />
 
   <EmptyResultsBlock
@@ -119,7 +119,7 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
 
-  import ListTableBlock from '@templates/list-table-block'
+  import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 

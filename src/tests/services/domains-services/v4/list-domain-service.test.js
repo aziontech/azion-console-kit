@@ -7,7 +7,6 @@ const fixtures = {
     id: 1718802691,
     name: 'variable-deploy-azion-20240619134303',
     alternate_domains: ['CName 1', 'CName 2'],
-    edge_application: 1718801860,
     active: true,
     domains: [
       {
@@ -21,18 +20,13 @@ const fixtures = {
     name: 'Edge App Y',
     alternate_domains: ['CName 3', 'CName 4'],
     active: false,
-    edge_application: 1718801861,
     domains: [
       {
         domain: 'nvk8w1x3sa.map.azionedge.net',
         allow_access: true
       }
     ]
-  },
-  edgeApplicationsMock: [
-    { id: 1718801860, name: 'Edge App X', last_modified: new Date() },
-    { id: 1718801861, name: 'Edge App Y', last_modified: new Date() }
-  ]
+  }
 }
 
 const makeSut = () => {
@@ -45,16 +39,10 @@ const makeSut = () => {
 
 describe('DomainsServices', () => {
   it('should call api with correct params', async () => {
-    const requestSpy = vi
-      .spyOn(AxiosHttpClientAdapter, 'request')
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: [] }
-      })
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: fixtures.edgeApplicationsMock, count: 1 }
-      })
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [] }
+    })
 
     const { sut } = makeSut()
     const version = 'v4'
@@ -67,15 +55,10 @@ describe('DomainsServices', () => {
   })
 
   it('should parsed correctly all returned domains', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request')
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
-      })
-      .mockResolvedValueOnce({
-        statusCode: 200,
-        body: { results: fixtures.edgeApplicationsMock }
-      })
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
+    })
 
     const { sut } = makeSut()
 
@@ -93,8 +76,7 @@ describe('DomainsServices', () => {
           content: 'Active',
           severity: 'success'
         },
-        activeSort: true,
-        edgeApplicationName: fixtures.edgeApplicationsMock[0].name
+        activeSort: true
       },
       {
         id: fixtures.disabledDomainMock.id,
@@ -107,8 +89,7 @@ describe('DomainsServices', () => {
           content: 'Inactive',
           severity: 'danger'
         },
-        activeSort: false,
-        edgeApplicationName: fixtures.edgeApplicationsMock[1].name
+        activeSort: false
       }
     ])
   })
