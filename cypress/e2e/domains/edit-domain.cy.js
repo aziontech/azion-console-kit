@@ -23,7 +23,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-const createDigitalCertificateCase = () => {
+const createDigitalCertificate = () => {
   digitalCertificateName = generateUniqueName('digitalCertificate')
 
   cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
@@ -106,7 +106,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.cnamesField).clear()
     cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
 
-    createDigitalCertificateCase()
+    createDigitalCertificate()
 
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
