@@ -19,7 +19,7 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     phase: payload.phase || 'default',
-    active: payload.active !== undefined ? payload.active : true,
+    active: payload.isActive,
     behaviors: adaptBehavior(payload.behaviors),
     criteria: payload.criteria,
     description: payload.description || ''

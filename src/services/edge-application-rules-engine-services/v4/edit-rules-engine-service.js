@@ -29,7 +29,7 @@ const adapt = (payload, reorder) => {
       phase: phase.content || phase,
       behaviors: adaptBehavior(behaviors),
       criteria,
-      is_active: isActive,
+      active: isActive,
       description
     }
   }
