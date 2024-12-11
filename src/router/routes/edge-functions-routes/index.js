@@ -31,7 +31,7 @@ export const edgeFunctionsRoutes = {
       name: 'create-edge-functions',
       component: () => import('@views/EdgeFunctions/CreateView.vue'),
       props: {
-        createEdgeFunctionsService: EdgeFunctionsService.createEdgeFunctionsService
+        createEdgeFunctionsService: EdgeFunctionsServiceV4.createEdgeFunctionsService
       },
       meta: {
         breadCrumbs: [
