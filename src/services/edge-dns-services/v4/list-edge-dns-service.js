@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttp
 // import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 
-export const listEdgeDNSServiceV4 = async ({
+export const listEdgeDNSService = async ({
   fields = '',
   search = '',
   ordering = '',
