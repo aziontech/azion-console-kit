@@ -9,7 +9,7 @@ const makeSut = () => {
   }
 }
 
-describe('EdgeFirewallServices', () => {
+describe('EdgeFirewallServicesV4', () => {
   it('should return the API base url to edge firewall service', () => {
     const { sut } = makeSut()
     const correctApiUrl = 'v4/edge_firewall/firewalls'

@@ -4,7 +4,7 @@
       :blockScroll="true"
       visible
       modal
-      class="w-[40vw]"
+      class="max-w-xl"
     >
       <template #header>
         <h5 class="text-lg not-italic font-bold leading-5">Clone {{ wafRules.name }}</h5>
@@ -12,7 +12,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="To confirm, type a unique and easy-to-remember name for the new Waf:"
+          label="To confirm, type a unique and easy-to-remember name for the new WAF:"
           name="wafRulesName"
           :value="wafRulesName"
           placeholder="Name"
@@ -28,7 +28,7 @@
       </template>
 
       <template #footer>
-        <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
+        <div class="flex gap-2 flex-col-reverse md:flex-row sm:justify-end w-full md:w-auto">
           <PrimeButton
             severity="primary"
             outlined

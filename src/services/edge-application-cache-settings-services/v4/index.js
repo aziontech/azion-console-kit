@@ -1,4 +1,8 @@
 import { listCacheSettingsService } from './list-cache-settings-service'
+import { createCacheSettingsService } from './create-cache-settings-service'
+import { deleteCacheSettingsService } from './delete-cache-settings-service'
+import { loadCacheSettingsService } from './load-cache-settings-service'
+import { editCacheSettingsService } from './edit-cache-settings-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +12,11 @@ import { listCacheSettingsService } from './list-cache-settings-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listCacheSettingsService }
+
+export {
+  listCacheSettingsService,
+  createCacheSettingsService,
+  loadCacheSettingsService,
+  editCacheSettingsService,
+  deleteCacheSettingsService
+}
