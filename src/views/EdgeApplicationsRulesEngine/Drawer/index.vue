@@ -170,9 +170,10 @@
 
     try {
       loadingFunctionsInstance.value = true
-      const responseFunctions = await props.listEdgeApplicationFunctionsService(
-        props.edgeApplicationId
-      )
+      const responseFunctions = await props.listEdgeApplicationFunctionsService({
+        id: props.edgeApplicationId,
+        fields: ['id', 'name']
+      })
       functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
       toast.add({
@@ -396,6 +397,7 @@
         :loadingOrigins="loadingOrigins"
         :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
+        @refreshFunctions="handleRefreshFunctions"
         :clipboardWrite="clipboardWrite"
         :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"

@@ -784,7 +784,7 @@
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
                 :options="functionsInstanceOptions"
-                optionLabel="functionInstanced"
+                optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.functionId"
