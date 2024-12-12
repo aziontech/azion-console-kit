@@ -281,7 +281,14 @@
           {}
         )
       }
-      data.value = [newOption, ...data.value]
+
+      const optionExists = data.value.some(
+        (item) => item[props.optionValue] === newOption[props.optionValue]
+      )
+
+      if (!optionExists) {
+        data.value = [newOption, ...data.value]
+      }
       emitChange()
     } finally {
       loading.value = false
