@@ -11,7 +11,7 @@ const fixture = {
     last_editor: 'test@azion.com',
     last_modified: '2024-07-30T16:38:23.405703Z',
     name: 'RT',
-    is_active: true,
+    active: true,
     description: '',
     behaviors: [
       {
@@ -78,7 +78,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
       id: fixture.rulesEngine.id,
       name: fixture.rulesEngine.name,
       description: fixture.rulesEngine.description,
-      active: fixture.rulesEngine.is_active,
+      active: fixture.rulesEngine.active,
       criteria: fixture.criteriaParsed,
       behaviors: fixture.rulesEngine.behaviors
     })

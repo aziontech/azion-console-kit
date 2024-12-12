@@ -90,7 +90,7 @@ const adapt = ({ body, statusCode }) => {
     id: ruleEngine.id,
     name: ruleEngine.name,
     description: ruleEngine.description,
-    active: ruleEngine.is_active,
+    active: ruleEngine.active,
     criteria: parseCriteria(ruleEngine.criteria),
     behaviors: parseBehaviors(ruleEngine.behaviors)
   }
