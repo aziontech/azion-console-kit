@@ -39,10 +39,10 @@ describe('WafRulesService', () => {
       body: { results: [fixtures.wafRulesMock] }
     })
     const { sut } = makeSut()
-    await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704', tuningId: 100 })
+    await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704', tuningId: 10011 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/4044/waf_events/100?hour_range=48&domains_ids=1705587704',
+      url: 'v3/waf/4044/waf_events/1001?hour_range=48&domains_ids=1705587704',
       method: 'GET'
     })
   })
@@ -57,7 +57,7 @@ describe('WafRulesService', () => {
     const result = await sut({
       wafId: 4044,
       query: '?hour_range=48&domains_ids=1705587704',
-      tuningId: 100
+      tuningId: 10011
     })
 
     expect(result).toEqual([

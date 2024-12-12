@@ -2,8 +2,10 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
 export const listWafRulesTuningAttacksService = async ({ wafId, tuningId, query }) => {
+  const trimmedTuningId = tuningId.toString().slice(0, -1)
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/${wafId}/waf_events/${tuningId}${query}`,
+    url: `${makeWafRulesBaseUrl()}/${wafId}/waf_events/${trimmedTuningId}${query}`,
     method: 'GET'
   })
 
