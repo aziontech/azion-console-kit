@@ -126,6 +126,10 @@
       type: String,
       default: ''
     },
+    moreOptions: {
+      type: Array,
+      default: null
+    },
     optionDisabled: {
       type: [String, Function],
       default: ''
@@ -231,7 +235,14 @@
       let results = response.body?.map((item) => {
         return {
           [props.optionLabel]: item.name,
-          [props.optionValue]: item.id
+          [props.optionValue]: item.id,
+          ...props?.moreOptions?.reduce(
+            (additionalFields, option) => ({
+              ...additionalFields,
+              [option]: item[option]
+            }),
+            {}
+          )
         }
       })
 
@@ -252,18 +263,33 @@
     }
   }
 
-  const loadSelectedValue = async (globalId) => {
-    if (!globalId) return
+  const loadSelectedValue = async (id) => {
+    if (!id) return
     try {
       loading.value = true
-      const results = await props.loadService(globalId)
+      const results = await props.loadService({ id })
       if (!results) return
 
       const newOption = {
         [props.optionLabel]: results.name,
-        [props.optionValue]: results.id
+        [props.optionValue]: results.id,
+        ...props?.moreOptions?.reduce(
+          (additionalFields, option) => ({
+            ...additionalFields,
+            [option]: results[option]
+          }),
+          {}
+        )
       }
-      data.value = [newOption, ...data.value]
+
+      const optionExists = data.value.some(
+        (item) => item[props.optionValue] === newOption[props.optionValue]
+      )
+
+      if (!optionExists) {
+        data.value = [newOption, ...data.value]
+      }
+      emitChange()
     } finally {
       loading.value = false
     }
