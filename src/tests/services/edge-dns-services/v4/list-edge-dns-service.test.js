@@ -37,7 +37,7 @@ describe('EdgeDnsServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_dns/zones?ordering=%22%22&page=1&page_size=10&fields=&search=`,
+      url: `${version}/edge_dns/zones?ordering=&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })
