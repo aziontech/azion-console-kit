@@ -240,17 +240,15 @@
         rules: alteredRows
       },
       onClose: ({ data }) => {
-        if (data.updated || data.reset) {
+        if (data?.updated || data?.reset) {
           return reload()
         }
-        if (data.save) {
+        if (data?.save) {
           return reorderDecoratorService(rows, reload)
         }
       }
     })
   }
-
-
 </script>
 
 <template>
