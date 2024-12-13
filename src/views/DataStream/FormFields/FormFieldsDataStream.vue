@@ -425,7 +425,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -465,7 +465,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -505,7 +505,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -748,7 +748,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -789,7 +789,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -899,7 +899,7 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewDataStream"
+              v-if="hasNoPermissionToViewKeyFields"
             >
               <i class="pi pi-eye-slash"></i>
             </template>
@@ -1249,6 +1249,9 @@
 
   const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
   const hasNoPermissionToViewDataStream = computed(() => !store.hasPermissionToViewDataStream)
+  const hasNoPermissionToViewKeyFields = computed(
+    () => hasNoPermissionToEditDataStream.value && hasNoPermissionToViewDataStream.value
+  )
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {
