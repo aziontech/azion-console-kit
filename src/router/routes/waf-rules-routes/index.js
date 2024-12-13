@@ -15,7 +15,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
         listWafRulesService: WafRulesServiceV4.listWafRulesService,
-        deleteWafRulesService: WafRulesService.deleteWafRulesService,
+        deleteWafRulesService: WafRulesServiceV4.deleteWafRulesService,
         documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
