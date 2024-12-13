@@ -23,8 +23,11 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
     cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates*').as('getDigitalCertificates')
     cy.get(selectors.list.searchInput).type(`${digitalCertificateName}{enter}`)
-    cy.get(selectors.list.filteredRow.column('name')).should('have.text', digitalCertificateName)
+    cy.wait('@getDigitalCertificates')
+    cy.get(selectors.list.filteredRow.column('name')).find(selectors.list.showMore).click()
+    cy.get(selectors.list.filteredRow.column('name')).contains(digitalCertificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 

@@ -41,18 +41,21 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
+    cy.intercept('GET', '/api/v4/digital_certificates/certificates*').as('getDigitalCertificates')
     cy.get(selectors.list.searchInput).type(`${certificateName}{enter}`)
-    cy.get(selectors.list.filteredRow.column('name')).should('have.text', certificateName)
+    cy.wait('@getDigitalCertificates')
+    cy.get(selectors.list.filteredRow.column('name')).find(selectors.list.showMore).click()
+    cy.get(selectors.list.filteredRow.column('name')).contains(certificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 
   afterEach(() => {
     // Cleanup
     cy.deleteEntityFromList({
-        entityName: certificateName,
-        productName: 'Digital Certificates'
-      }).then(() => {
-        cy.verifyToast('Digital certificate successfully deleted!')
-      })
+      entityName: certificateName,
+      productName: 'Digital Certificates'
+    }).then(() => {
+      cy.verifyToast('Digital certificate successfully deleted!')
+    })
   })
 })

@@ -28,7 +28,7 @@ const createEdgeApplicationCase = () => {
 }
 
 // TODO: remove xfail tag when the API v4 is fixed
-describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
