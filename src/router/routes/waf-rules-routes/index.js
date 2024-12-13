@@ -63,8 +63,8 @@ export const wafRulesRoutes = {
         },
         wafServices: {
           updatedRedirect: 'list-waf-rules',
-          editWafRulesService: WafRulesService.editWafRulesService,
-          loadWafRulesService: WafRulesService.loadWafRulesService
+          editWafRulesService: WafRulesServiceV4.editWafRulesService,
+          loadWafRulesService: WafRulesServiceV4.loadWafRulesService
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,
