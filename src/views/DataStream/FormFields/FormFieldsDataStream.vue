@@ -425,9 +425,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -465,9 +465,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -505,9 +505,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -748,9 +748,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
 
@@ -789,9 +789,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -899,9 +899,9 @@
           >
             <template
               #showicon
-              v-if="hasNoPermissionToViewKeyFields"
+              v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -1248,10 +1248,6 @@
   })
 
   const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
-  const hasNoPermissionToViewDataStream = computed(() => !store.hasPermissionToViewDataStream)
-  const hasNoPermissionToViewKeyFields = computed(
-    () => hasNoPermissionToEditDataStream.value && hasNoPermissionToViewDataStream.value
-  )
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {
