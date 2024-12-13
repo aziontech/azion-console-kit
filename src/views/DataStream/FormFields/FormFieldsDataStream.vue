@@ -85,7 +85,8 @@
           class="text-xs text-color-secondary font-normal leading-5"
           data-testid="data-stream-form__data-settings__data-set-description"
         >
-          Exhibits or allows writing the variables that'll be sent to the in a JSON format.
+          Exhibits or allows writing the variables that'll be sent to the connector in a JSON
+          format.
         </small>
       </div>
     </template>
