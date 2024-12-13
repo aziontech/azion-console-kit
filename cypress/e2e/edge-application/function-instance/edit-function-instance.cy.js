@@ -1,6 +1,6 @@
 // cypress/integration/edge-application/edit-function-instance.spec.js
-import generateUniqueName from '../../support/utils'
-import selectors from '../../support/selectors'
+import generateUniqueName from '../../../support/utils'
+import selectors from '../../../support/selectors'
 
 let fixtures = {}
 
@@ -42,7 +42,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -63,8 +63,10 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.openProduct('Edge Application')
 
     createEdgeApplicationCase()
-    cy.intercept('GET', 'api/v4/edge_functions/functions?ordering=name&page=1&page_size=100&fields=&search=*').as('getEdgeFunctions')
-
+    cy.intercept(
+      'GET',
+      'api/v4/edge_functions/functions?ordering=name&page=1&page_size=100&fields=&search=*'
+    ).as('getEdgeFunctions')
 
     // Act - create a function instance
     cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()

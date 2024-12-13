@@ -2,6 +2,7 @@ export default {
   createDigitalCertificateButton: '[data-testid="create_Digital Certificate_button"]',
   searchInput: '[data-testid="data-table-search-input"]',
   searchField: '[data-testid="data-table-search-input"]',
+  showMore: '[data-testid="table-column-expand-text-column__show-more__toggle"]',
   filteredRow: {
     column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
     statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',

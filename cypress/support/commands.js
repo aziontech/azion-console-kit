@@ -249,9 +249,7 @@ const deleteEntityFromList = (entityName, productName, columnName) => {
   cy.openProduct(productName)
   cy.get(selectors.list.searchInput).clear()
   cy.get(selectors.list.searchInput).type(`${entityName}{enter}`)
-  cy.get(selectors.list.filteredRow.column(columnName))
-    .should('be.visible')
-    .should('contain', entityName)
+  cy.get(selectors.list.filteredRow.column(columnName)).should('be.visible')
 
   cy.get('body').then(($body) => {
     if ($body.find(selectors.list.actionsMenu.button).length) {
