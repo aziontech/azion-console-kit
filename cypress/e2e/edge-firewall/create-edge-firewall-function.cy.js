@@ -13,8 +13,8 @@ const createFunctionCase = () => {
   cy.verifyToast('success', 'Your edge function has been created')
   cy.wait('@getFunctionsSaved')
 }
-
-describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
+//Flag xfail until the api contract is updated on prod
+describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')

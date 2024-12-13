@@ -13,7 +13,7 @@ describe('Teams Permissions Spec', { tags: ['@dev2'] }, () => {
 
   it('should block users without access of entering in the edit page', function () {
     //act
-    cy.get(selectors.list.searchField).type('Default Team')
+    cy.get(selectors.list.searchField).type('Default Team {enter}')
     cy.intercept('GET', '/api/v4/iam/teams/*', { statusCode: 403, body: fixtures.errorMessage }).as(
       'teamsPermissions'
     )
