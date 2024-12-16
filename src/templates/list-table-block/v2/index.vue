@@ -82,10 +82,7 @@
         data-testid="data-table-reorder-column"
       >
         <template #body="{ data: rowData }">
-          <div
-            v-if="rowData.position.value"
-            class="gap-4 align-items-center flex flex-row"
-          >
+          <div class="gap-4 align-items-center flex flex-row">
             <i
               class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
               data-pc-section="rowreordericon"
@@ -95,11 +92,12 @@
               showButtons
               :allowEmpty="false"
               @update:modelValue="(value) => onPositionChange(rowData, value)"
+              @input="(value) => (valueInputedUser = value.value)"
               buttonLayout="horizontal"
               class="disabled-click-row"
               :min="rowData.position.min"
               :max="rowData.position.max"
-              :pt="{ input: { class: 'w-11' } }"
+              :pt="{ input: { class: 'w-11 text-center' } }"
             >
               <template #incrementbuttonicon>
                 <span class="pi pi-chevron-down" />
@@ -202,46 +200,48 @@
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
-          <div
-            class="flex justify-end"
-            v-if="isRenderOneOption"
-            data-testid="data-table-actions-column-body-action"
-          >
-            <PrimeButton
-              size="small"
-              outlined
-              v-bind="optionsOneAction(rowData)"
-              @click="executeCommand(rowData)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-action-button"
-            />
-          </div>
-          <div
-            class="flex justify-end"
-            v-else
-            data-testid="data-table-actions-column-body-actions"
-          >
-            <PrimeMenu
-              :ref="setMenuRefForRow(rowData.id)"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-              data-testid="data-table-actions-column-body-actions-menu"
-              :pt="{
-                menuitem: ({ context }) => ({
-                  'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
-                })
-              }"
-            />
-            <PrimeButton
-              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-              size="small"
-              icon="pi pi-ellipsis-h"
-              outlined
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer table-button"
-              data-testid="data-table-actions-column-body-actions-menu-button"
-            />
+          <div v-if="rowData.phase.content !== 'Default'">
+            <div
+              class="flex justify-end"
+              v-if="isRenderOneOption"
+              data-testid="data-table-actions-column-body-action"
+            >
+              <PrimeButton
+                size="small"
+                outlined
+                v-bind="optionsOneAction(rowData)"
+                @click="executeCommand(rowData)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-action-button"
+              />
+            </div>
+            <div
+              class="flex justify-end"
+              v-else
+              data-testid="data-table-actions-column-body-actions"
+            >
+              <PrimeMenu
+                :ref="setMenuRefForRow(rowData.id)"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+                data-testid="data-table-actions-column-body-actions-menu"
+                :pt="{
+                  menuitem: ({ context }) => ({
+                    'data-testid': `data-table__actions-menu-item__${context.item?.label}-button`
+                  })
+                }"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                outlined
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+                data-testid="data-table-actions-column-body-actions-menu-button"
+              />
+            </div>
           </div>
         </template>
       </Column>
@@ -453,6 +453,7 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
+  const valueInputedUser = ref(null)
 
   const dialog = useDialog()
   const router = useRouter()
@@ -489,8 +490,8 @@
   }
 
   const onPositionChange = (updatedRow, newValue) => {
+    if (valueInputedUser.value > updatedRow.position.max) console.log('dispara o toast')
     const oldIndex = data.value.findIndex((item) => item.id === updatedRow.id)
-
     if (oldIndex === -1) return
 
     const [movedItem] = data.value.splice(oldIndex, 1)

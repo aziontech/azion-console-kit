@@ -290,7 +290,7 @@
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
     groupColumn="phase.content"
-    :expandedRowGroups="['Request', 'Response']"
+    :expandedRowGroups="['Default', 'Request', 'Response']"
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
@@ -322,7 +322,7 @@
 
             <PrimeButton
               label="Review Changes"
-              badgeClass="p-badge-lg text-color bg-transparent h-5 min-w-[20px] !text-xl"
+              badgeClass="p-badge-lg !text-black !bg-white !border-surface h-5 min-w-[20px] !text-xl"
               :loading="isLoadingButtonOrder"
               :disabled="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
