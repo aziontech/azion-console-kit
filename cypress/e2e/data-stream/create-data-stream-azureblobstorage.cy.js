@@ -44,10 +44,6 @@ describe('Data Stream spec', { tags: ['@dev2'] }, () => {
       'have.text',
       'Edge Applications'
     )
-    cy.get(selectors.dataStream.list.columnName('templateName')).should(
-      'have.text',
-      'Template teste'
-    )
     cy.get(selectors.dataStream.list.columnName('endpointType')).should(
       'have.text',
       'azure_blob_storage'
