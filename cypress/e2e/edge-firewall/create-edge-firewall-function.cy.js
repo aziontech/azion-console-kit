@@ -14,7 +14,7 @@ const createFunctionCase = () => {
   cy.wait('@getFunctionsSaved')
 }
 //Flag xfail until the api contract is updated on prod
-describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
