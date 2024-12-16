@@ -3,6 +3,7 @@ import * as DomainServices from '@/services/domains-services'
 import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
 import * as EdgeApplicationServices from '@/services/edge-application-services'
+import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -36,6 +37,8 @@ export const domainsRoutes = {
         createDomainService: DomainServices.createDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
+        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
@@ -60,6 +63,8 @@ export const domainsRoutes = {
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
+        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
+        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         updatedRedirect: 'list-domains',
         clipboardWrite: Helpers.clipboardWrite
       },
