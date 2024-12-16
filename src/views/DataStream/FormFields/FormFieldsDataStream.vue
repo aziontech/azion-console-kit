@@ -485,8 +485,7 @@
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__object-key-prefix-field__description"
           >
-          The prefix name of your uploaded object. Default value: user/logs/. The file name is composed of the Prefix (user/logs/), the Timestamp in the YYYY/MM/DD/hh/mm/ format, and the UUID. Example: user/logs/2024/10/12/06/24/37d66e78-c308-4006-9d4d-1c013ed89276
-          </small>
+          The prefix for the name of your uploaded object. The name consists of the Prefix, the date and time the packets are sent in the YYYY/MM/DD/hh/mm/ format, and the UUID. <br/> Example: user/logs/2024/10/12/06/24/37d66e78-c308-4006-9d4d-1c013ed89276.          </small>
           <small
             id="object-key-help"
             class="p-error"
