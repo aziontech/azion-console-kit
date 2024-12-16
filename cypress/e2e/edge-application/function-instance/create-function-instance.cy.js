@@ -79,7 +79,9 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
-    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.functionInstanceActionbar)
+      .find(selectors.functions.saveButton)
+      .click()
 
     // Assert
     cy.verifyToast('success', 'Your Function has been created')
