@@ -6,6 +6,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
@@ -39,12 +40,16 @@
       type: Function,
       required: true
     },
-    edgeFirewallsData: {
-      type: Array,
-      required: true
-    },
     isLoadingEdgeFirewalls: {
       type: Boolean,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
       required: true
     }
   })
@@ -71,13 +76,6 @@
     edgeFirewall.value = id
     emit('edgeFirewallCreated')
   }
-
-  const edgeFirewallOptions = computed(() => {
-    return props.edgeFirewallsData.map((edgeFirewall) => ({
-      name: edgeFirewall.name,
-      value: edgeFirewall.id
-    }))
-  })
 
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
@@ -328,17 +326,15 @@
           ref="drawerEdgeFirewallRef"
           @onSuccess="handleEdgeFirewallCreated"
         />
-        <FieldDropdown
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :options="edgeFirewallOptions"
-          :loading="isLoadingEdgeFirewalls"
-          :disabled="isLoadingEdgeFirewalls"
+          :service="listEdgeFirewallService"
+          :loadService="loadEdgeFirewallService"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
-          filter
           appendTo="self"
           placeholder="Select an edge firewall"
         >
@@ -361,7 +357,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdown>
+        </FieldDropdownLazyLoader>
       </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"

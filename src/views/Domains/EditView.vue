@@ -17,13 +17,13 @@
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
-            :edgeFirewallsData="edgeFirewallsData"
             :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
             hasDomainName
             @copyDomainName="copyDomainName"
             :loadingEdgeApplications="loadingEdgeApplications"
             :updateDigitalCertificates="updateDigitalCertificates"
+            :listEdgeFirewallService="listEdgeFirewallService"
+            :loadEdgeFirewallService="loadEdgeFirewallService"
             @edgeApplicationCreated="handleEdgeApplicationCreated"
           />
         </template>
@@ -50,7 +50,6 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -83,6 +82,14 @@
     updateDigitalCertificates: {
       type: Function,
       required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -109,7 +116,6 @@
   const toast = useToast()
   const loadingEdgeApplications = ref(true)
   const domainName = ref()
-  const edgeFirewallsData = ref([])
   const isLoadingEdgeFirewalls = ref(true)
 
   const requestEdgeApplications = async () => {
@@ -155,29 +161,10 @@
     domainName.value = domain.name
   }
 
-  const requestEdgeFirewalls = async () => {
-    isLoadingEdgeFirewalls.value = true
-    try {
-      edgeFirewallsData.value = await listEdgeFirewallService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingEdgeFirewalls.value = false
-    }
-  }
-
-  const handleEdgeFirewallCreated = async () => {
-    await requestEdgeFirewalls()
-  }
-
   onMounted(async () => {
     try {
       scrollToTop()
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
+      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
     } finally {

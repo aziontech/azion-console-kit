@@ -17,12 +17,12 @@
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
             :edgeApplicationsData="edgeApplicationsData"
-            :edgeFirewallsData="edgeFirewallsData"
             :isLoadingRequests="isLoadingRequests"
             :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
             :updateDigitalCertificates="updateDigitalCertificates"
+            :listEdgeFirewallService="listEdgeFirewallService"
+            :loadEdgeFirewallService="loadEdgeFirewallService"
             @edgeApplicationCreated="handleEdgeApplicationCreated"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -48,7 +48,6 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { listEdgeFirewallService } from '@/services/edge-firewall-services'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -73,6 +72,14 @@
     listEdgeApplicationsService: {
       type: Function,
       required: true
+    },
+    loadEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -82,7 +89,6 @@
   const router = useRouter()
 
   const edgeApplicationsData = ref([])
-  const edgeFirewallsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
   const isLoadingRequests = ref(true)
@@ -159,23 +165,8 @@
     }
   }
 
-  const requestEdgeFirewalls = async () => {
-    isLoadingEdgeFirewalls.value = true
-    try {
-      edgeFirewallsData.value = await listEdgeFirewallService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingEdgeFirewalls.value = false
-    }
-  }
-
   const handleEdgeApplicationCreated = async () => {
     await requestEdgeApplications()
-  }
-
-  const handleEdgeFirewallCreated = async () => {
-    await requestEdgeFirewalls()
   }
 
   const requestDigitalCertificates = async () => {
@@ -198,11 +189,7 @@
 
   onMounted(async () => {
     try {
-      await Promise.all([
-        requestEdgeApplications(),
-        requestDigitalCertificates(),
-        requestEdgeFirewalls()
-      ])
+      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
     } catch (error) {
       toastError(error)
     } finally {
