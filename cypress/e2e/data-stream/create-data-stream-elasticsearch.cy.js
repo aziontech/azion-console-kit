@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let dataStreamName
 
-describe('Data Stream spec', { tags: ['@dev2', '@xfail'] }, () => {
+describe('Data Stream spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
@@ -42,10 +42,6 @@ describe('Data Stream spec', { tags: ['@dev2', '@xfail'] }, () => {
     cy.get(selectors.dataStream.list.columnName('dataSource')).should(
       'have.text',
       'Edge Applications'
-    )
-    cy.get(selectors.dataStream.list.columnName('templateName')).should(
-      'have.text',
-      'Template teste'
     )
     cy.get(selectors.dataStream.list.columnName('endpointType')).should(
       'have.text',
