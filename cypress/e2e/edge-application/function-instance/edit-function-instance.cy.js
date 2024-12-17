@@ -114,7 +114,6 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // Assert - Verify the instance was edited
     cy.verifyToast('success', 'Your Function has been updated')
-    cy.get(selectors.form.goBackButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
       'have.text',
       editedFunctionInstanceName
