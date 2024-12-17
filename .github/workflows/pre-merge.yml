@@ -6,6 +6,7 @@ on:
     branches:
       - dev
       - freezing
+      - main
   push:
     branches:
       - dev
