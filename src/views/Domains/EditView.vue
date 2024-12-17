@@ -24,7 +24,6 @@
             :loadDigitalCertificatesService="loadDigitalCertificatesService"
             hasDomainName
             @copyDomainName="copyDomainName"
-            @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">

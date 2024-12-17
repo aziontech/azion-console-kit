@@ -6,6 +6,7 @@ on:
     branches:
       - dev
       - freezing
+      - main
   push:
     branches:
       - dev
@@ -65,7 +66,7 @@ jobs:
         env:
           PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
           PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
-          VITE_ENVIRONMENT: "production"
+          VITE_ENVIRONMENT: 'production'
         with:
           build: yarn build
           start: yarn dev --logLevel=warn
@@ -164,25 +165,25 @@ jobs:
     needs: [run-tests, download_and_merge]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        
-    - uses: actions/download-artifact@v4
-      with:
-        name: coverage_unit_report
-        
-    - uses: actions/download-artifact@v4
-      with:
-        name: coverage_e2e_report
-        
-    - name: Extract E2E Coverage Report
-      run: |
-        unzip coverage.zip -d coverage_e2e
-        pwd
-        find ./
-        
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@v2.3.0
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage_unit_report
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage_e2e_report
+
+      - name: Extract E2E Coverage Report
+        run: |
+          unzip coverage.zip -d coverage_e2e
+          pwd
+          find ./
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
