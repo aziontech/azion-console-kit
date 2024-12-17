@@ -453,7 +453,7 @@
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
   const menuRef = ref({})
-  const valueInputedUser = ref(null)
+  const valueInputedUser = ref(0)
 
   const dialog = useDialog()
   const router = useRouter()
@@ -489,8 +489,25 @@
     })
   }
 
+  const displayPositionExceededToast = () => {
+    toast.add({
+      closable: true,
+      severity: 'info',
+      summary: 'Invalid Position',
+      detail:
+        'The entered position exceeds the list limit. The rule has been moved to the last position in the list.'
+    })
+  }
+
+  const checkPositionExceededMaxResults = (maxPosition) => {
+    if (valueInputedUser.value > maxPosition) {
+      displayPositionExceededToast()
+      valueInputedUser.value = 0
+    }
+  }
+
   const onPositionChange = (updatedRow, newValue) => {
-    if (valueInputedUser.value > updatedRow.position.max) console.log('dispara o toast')
+    checkPositionExceededMaxResults(updatedRow.position.max)
     const oldIndex = data.value.findIndex((item) => item.id === updatedRow.id)
     if (oldIndex === -1) return
 
