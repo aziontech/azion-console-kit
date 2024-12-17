@@ -44,8 +44,9 @@
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
-  const { OpenSidebarComponent } = useLayout()
+  const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
 
+  const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
   const disclaimer = computed(() => {
     return removeHtmlTagFromText(user.disclaimer, 'a')
   })
@@ -163,7 +164,10 @@
           </div>
         </div>
 
-        <div class="flex flex-col xl:flex-row gap-6">
+        <div
+          class="flex gap-6 flex-col"
+          :class="{ 'xl:flex-row': !showSidebar }"
+        >
           <!-- Manage Applications -->
           <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
             <div class="flex flex-row justify-start gap-3">

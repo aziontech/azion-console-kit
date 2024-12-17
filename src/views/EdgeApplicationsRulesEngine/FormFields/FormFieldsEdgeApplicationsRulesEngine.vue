@@ -12,12 +12,13 @@
   import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import {
-    listEdgeFunctionsService,
-    createFunctionService
-  } from '@/services/edge-application-functions-services'
+  import { createFunctionService } from '@/services/edge-application-functions-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
+  import {
+    listEdgeFunctionsDropdownService,
+    loadEdgeFunctionService
+  } from '@/services/edge-functions-services/v4'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
 
   import Divider from 'primevue/divider'
@@ -48,7 +49,7 @@
     variable: '${uri}',
     operator: 'is_equal',
     conditional: 'if',
-    input_value: ''
+    argument: ''
   }
 
   const DEFAULT_BEHAVIOR = {
@@ -525,8 +526,9 @@
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
+        :loadEdgeFunctionService="loadEdgeFunctionService"
         :createFunctionService="createFunctionService"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
+        :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -663,8 +665,8 @@
                   <FieldText
                     :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
                     v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
+                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
+                    :value="criteria[criteriaIndex].value[conditionalIndex].argument"
                     :disabled="isDefaultPhase"
                   />
                 </div>
@@ -782,7 +784,7 @@
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
                 :options="functionsInstanceOptions"
-                optionLabel="functionInstanced"
+                optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.functionId"

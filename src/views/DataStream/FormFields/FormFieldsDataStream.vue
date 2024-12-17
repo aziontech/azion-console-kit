@@ -1,4 +1,13 @@
 <template>
+  <InlineMessage
+    v-if="hasNoPermissionToEditDataStream"
+    class="w-fit"
+    severity="info"
+    data-testid="permission-rule-message-data-stream"
+  >
+    This account has <strong>View Data Stream</strong> permission only. It allows viewing the
+    account’s streams but doesn't permit creating, editing, or deleting streams.
+  </InlineMessage>
   <FormHorizontal
     title="General"
     description="Create a stream to feed your data platforms with logs from your applications."
@@ -13,6 +22,7 @@
           name="name"
           placeholder="My stream"
           data-testid="data-stream-form__general__name-field"
+          :disabled="hasNoPermissionToEditDataStream"
         />
       </div>
     </template>
@@ -37,6 +47,7 @@
             appendTo="self"
             description="Represents the data source the data will be collected from."
             data-testid="data-stream-form__data-settings__data-source-field"
+            :disabled="hasNoPermissionToEditDataStream"
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -51,6 +62,7 @@
             appendTo="self"
             description="Represents a preset of variables for specific sources or an open template to choose variables."
             data-testid="data-stream-form__data-settings__template-field"
+            :disabled="hasNoPermissionToEditDataStream"
           />
         </div>
       </div>
@@ -67,6 +79,7 @@
           :options="dataSetMonacoOptions"
           class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
+          :readOnly="hasNoPermissionToEditDataStream"
         />
         <small
           class="text-xs text-color-secondary font-normal leading-5"
@@ -91,6 +104,7 @@
           :isCard="false"
           :options="domainsRadioOptions"
           data-testid="data-stream-form__domains__options-field"
+          :disabled="hasNoPermissionToEditDataStream"
         />
       </div>
       <div
@@ -105,6 +119,7 @@
         />
         <PickList
           v-model="domains"
+          :disabled="hasNoPermissionToEditDataStream"
           :pt="{
             sourceList: { class: ['h-80'] },
             targetList: { class: ['h-80'] },
@@ -207,6 +222,7 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
+          :disabled="hasNoPermissionToEditDataStream"
           label="Connector"
           required
           name="endpoint"
@@ -228,6 +244,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             description="Specific URL that'll receive the collected data."
@@ -251,6 +268,7 @@
             :key="index"
           >
             <InputText
+              :disabled="hasNoPermissionToEditDataStream"
               v-model="header.value"
               type="text"
               id="header-value"
@@ -258,6 +276,7 @@
               data-testid="data-stream-form__destination__headers-field__input"
             />
             <ButtonPrimer
+              :disabled="hasNoPermissionToEditDataStream"
               icon="pi pi-trash"
               size="small"
               outlined
@@ -268,6 +287,7 @@
           </div>
 
           <ButtonPrimer
+            :disabled="hasNoPermissionToEditDataStream"
             outlined
             icon="pi pi-plus-circle"
             v-if="hasLessThanFive"
@@ -288,6 +308,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            :disabled="hasNoPermissionToEditDataStream"
             label="Bootstrap Servers"
             required
             name="bootstrapServers"
@@ -301,6 +322,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Kafka Topic"
             required
             name="kafkaTopic"
@@ -313,6 +335,7 @@
 
         <div class="flex sm:max-w-lg w-full gap-2 items-top">
           <InputSwitch
+            :disabled="hasNoPermissionToEditDataStream"
             v-model="useTls"
             id="useTls"
             class="flex-shrink-0 flex-grow"
@@ -344,6 +367,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             name="host"
@@ -356,6 +380,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Bucket Name"
             required
             name="bucket"
@@ -368,6 +393,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Region"
             required
             name="region"
@@ -392,6 +418,7 @@
             class="flex flex-col w-full"
             :class="{ 'p-invalid': accessKeyError }"
             :feedback="false"
+            :disabled="hasNoPermissionToEditDataStream"
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
             data-testid="data-stream-form__destination__access-key-field__input"
@@ -400,7 +427,7 @@
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -432,6 +459,7 @@
             class="flex flex-col w-full"
             :class="{ 'p-invalid': secretKeyError }"
             :feedback="false"
+            :disabled="hasNoPermissionToEditDataStream"
             toggleMask
             data-testid="data-stream-form__destination__secret-key-field__input"
           >
@@ -439,7 +467,7 @@
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -471,6 +499,7 @@
             class="flex flex-col w-full"
             :class="{ 'p-invalid': objectKeyError }"
             :feedback="false"
+            :disabled="hasNoPermissionToEditDataStream"
             toggleMask
             data-testid="data-stream-form__destination__object-key-prefix-field__input"
           >
@@ -478,7 +507,7 @@
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -509,6 +538,7 @@
               :key="contentTypeItem.value"
             >
               <RadioButton
+                :disabled="hasNoPermissionToEditDataStream"
                 :class="{ 'p-invalid': contentTypeError }"
                 v-model="contentType"
                 inputId="contentType"
@@ -533,6 +563,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Project ID"
             required
             name="projectID"
@@ -545,6 +576,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Dataset ID"
             required
             name="datasetID"
@@ -557,6 +589,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Table ID"
             required
             name="tableID"
@@ -581,6 +614,7 @@
             :options="serviceAccountMonacoOptions"
             class="min-h-[300px] surface-border border rounded-md overflow-hidden"
             data-testid="data-stream-form__destination__service-account-key-field__input"
+            :readOnly="hasNoPermissionToEditDataStream"
           />
           <small
             class="text-xs text-color-secondary font-normal leading-5"
@@ -604,6 +638,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             name="elasticsearchUrl"
@@ -616,6 +651,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
             required
             name="apiKey"
@@ -635,6 +671,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             name="splunkUrl"
@@ -647,6 +684,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
             required
             name="splunkApiKey"
@@ -665,6 +703,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Stream Name"
             required
             name="streamName"
@@ -677,6 +716,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Region"
             required
             name="awsRegion"
@@ -703,13 +743,14 @@
             :class="{ 'p-invalid': awsAccessKeyError }"
             :feedback="false"
             toggleMask
+            :disabled="hasNoPermissionToEditDataStream"
             data-testid="data-stream-form__destination__kinesis-access-key-field__input"
           >
             <template
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
 
@@ -743,13 +784,14 @@
             :class="{ 'p-invalid': awsSecretKeyError }"
             :feedback="false"
             toggleMask
+            :disabled="hasNoPermissionToEditDataStream"
             data-testid="data-stream-form__destination__kinesis-secret-key-field__input"
           >
             <template
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -774,6 +816,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             name="datadogUrl"
@@ -786,6 +829,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
+            :disabled="hasNoPermissionToEditDataStream"
             label="API Key"
             required
             name="datadogApiKey"
@@ -804,6 +848,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="URL"
             required
             name="QRadarUrl"
@@ -822,6 +867,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Log Type"
             required
             name="logType"
@@ -848,13 +894,14 @@
             :class="{ 'p-invalid': sharedKeyError }"
             :feedback="false"
             toggleMask
+            :disabled="hasNoPermissionToEditDataStream"
             data-testid="data-stream-form__destination__azure-monitor-shared-key-field__input"
           >
             <template
               #showicon
               v-if="hasNoPermissionToEditDataStream"
             >
-              <i class="pi pi-eye-slash"></i>
+              <i class="pi pi-lock"></i>
             </template>
           </PrimePassword>
           <small
@@ -873,6 +920,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Time Generated Field"
             name="generatedField"
             :value="generatedField"
@@ -885,6 +933,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Workspace ID"
             required
             name="workspaceID"
@@ -903,6 +952,7 @@
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Storage Account"
             required
             name="storageAccount"
@@ -915,6 +965,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Container Name"
             required
             name="containerName"
@@ -927,6 +978,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
             label="Blob SAS Token"
             required
             name="blobToken"
@@ -947,6 +999,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          :disabled="hasNoPermissionToEditDataStream"
           label="Payload Format"
           required
           name="payloadFormat"
@@ -959,6 +1012,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
+          :disabled="hasNoPermissionToEditDataStream"
           label="Payload Log Line Separator"
           required
           name="lineSeparator"
@@ -970,6 +1024,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldNumber
+          :disabled="hasNoPermissionToEditDataStream"
           label="Payload Max Size"
           name="maxSize"
           :min="MIN_PAYLOAD_SIZE_IN_BYTES"
@@ -990,6 +1045,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
+          :disabled="hasNoPermissionToEditDataStream"
           nameField="status"
           name="status"
           auto
@@ -1152,12 +1208,7 @@
     const templates = await props.listDataStreamTemplateService()
     listTemplates.value = templates
 
-    const hasFirstTemplates = listTemplates?.value[0]?.value
-    if (hasFirstTemplates) {
-      const firstTemplateValue = listTemplates.value[0].value
-      return firstTemplateValue
-    }
-    return ''
+    return listTemplates.value[0].value ?? ''
   }
 
   const loaderDataStreamDomains = async () => {
@@ -1248,8 +1299,10 @@
   )
 
   const initializeFormValues = async () => {
-    const domains = await loaderDataStreamDomains()
-    const template = await loaderDataStreamTemplates()
+    const [domains, template] = await Promise.all([
+      loaderDataStreamDomains(),
+      loaderDataStreamTemplates()
+    ])
 
     if (props.resetForm) {
       const initialValues = {

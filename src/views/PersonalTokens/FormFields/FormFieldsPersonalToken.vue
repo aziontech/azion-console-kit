@@ -57,6 +57,8 @@
     return selectedExpiration.value === 'custom' ? tomorrow : null
   })
 
+  const maximumAllowedDate = new Date('02/09/2038')
+
   const disabledFields = computed(() => {
     return !!props.personalTokenKey
   })
@@ -101,6 +103,12 @@
       props.userUtcOffset
     )
     setExpiration(newExpirationInUserTimezone)
+  }
+
+  const updateExpirationBlurEvent = ({ value }) => {
+    const expirationDate = new Date(value)
+
+    updateExpiration(expirationDate)
   }
 </script>
 
@@ -176,9 +184,11 @@
               data-testid="personal-token-form__expiration__calendar"
               class="w-full"
               @date-select="updateExpiration"
+              @blur="updateExpirationBlurEvent"
               v-model="customExpiration"
               placeholder="Select date from calendar"
               :minDate="minExpirationDate"
+              :maxDate="maximumAllowedDate"
               :class="{ 'p-invalid': errorCustom }"
               showIcon
               :disabled="disabledFields"

@@ -1118,21 +1118,13 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts',
           isTopX: false,
           rotated: false,
-          dataset: 'securityMetrics',
+          dataset: 'botManagerBreakdownMetrics',
           dataUnit: 'count',
           limit: 10000,
-          aggregations: [
-            {
-              aggregation: 'sum',
-              variable: 'value'
-            }
-          ],
-          filters: {
-            metricEq: 'uniq_request_url',
-            datasetEq: 'bot_manager'
-          },
+          aggregations: [],
+          filters: {},
           groupBy: [],
-          fields: [],
+          fields: ['uniqRequestUrl'],
           orderDirection: 'DESC',
           dashboardId: '659868342290523846',
           variationType: 'inverse',
