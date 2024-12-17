@@ -303,6 +303,7 @@
         />
         <FieldDropdownLazyLoader
           label="Edge Firewall"
+          :showClear="true"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"
