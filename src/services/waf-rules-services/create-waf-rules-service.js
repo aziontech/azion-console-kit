@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const createWafRulesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -51,38 +52,9 @@ const parseHttpResponse = (httpResponse) => {
         feedback: 'Your waf rule has been created',
         urlToEditView: `/waf/edit/${httpResponse.body.id}`
       }
-    case 400:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
-}
-
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const errorMessage = extractErrorKey(httpResponse.body, 'detail')
-
-  return errorMessage
 }

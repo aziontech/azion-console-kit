@@ -4,7 +4,8 @@ import selectors from '../../support/selectors'
 
 let firewallName, ruleName
 
-describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
+//Flag xfail until the api contract is updated on prod
+describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
@@ -38,7 +39,7 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleBehaviorFirstOption).click()
 
-    cy.intercept('POST', '/api/v3/edge_firewall/*/rules_engine*').as('addEdgeFirewallRule')
+    cy.intercept('POST', '/api/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
 
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
 

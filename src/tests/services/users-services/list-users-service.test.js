@@ -78,7 +78,7 @@ describe('UsersServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `${version}/iam/users?ordering=&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
   })

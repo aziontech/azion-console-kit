@@ -1,9 +1,9 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as DomainServicesV4 from '@/services/domains-services/v4'
-import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
-import * as EdgeApplicationServices from '@/services/edge-application-services'
+import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
+import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -35,11 +35,14 @@ export const domainsRoutes = {
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
         createDomainService: DomainServices.createDomainService,
-        listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
-        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
+        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        listDigitalCertificatesService:
+          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
         breadCrumbs: [
@@ -60,13 +63,16 @@ export const domainsRoutes = {
       component: () => import('@views/Domains/EditView.vue'),
       props: {
         editDomainService: DomainServices.editDomainService,
-        listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
-        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
+        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         updatedRedirect: 'list-domains',
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        listDigitalCertificatesService:
+          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
         breadCrumbs: [

@@ -16,15 +16,15 @@
         <template #form>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
-            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
-            hasDomainName
-            @copyDomainName="copyDomainName"
-            :loadingEdgeApplications="loadingEdgeApplications"
-            :updateDigitalCertificates="updateDigitalCertificates"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="listEdgeFirewallService"
             :loadEdgeFirewallService="loadEdgeFirewallService"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
+            :listDigitalCertificatesService="listDigitalCertificatesService"
+            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            hasDomainName
+            @copyDomainName="copyDomainName"
+            @edgeFirewallCreated="handleEdgeFirewallCreated"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -63,11 +63,27 @@
       type: Function,
       required: true
     },
+    loadDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
     listEdgeApplicationsService: {
       type: Function,
       required: true
     },
+    loadEdgeApplicationsService: {
+      type: Function,
+      required: true
+    },
     loadDomainService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
       type: Function,
       required: true
     },
@@ -80,14 +96,6 @@
       required: true
     },
     updateDigitalCertificates: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
       type: Function,
       required: true
     }
@@ -111,31 +119,9 @@
       .track()
   }
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
-  const loadingEdgeApplications = ref(true)
   const domainName = ref()
-  const isLoadingEdgeFirewalls = ref(true)
-
-  const requestEdgeApplications = async () => {
-    loadingEdgeApplications.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
-
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
-  }
 
   const showToast = (severity, summary) => {
     toast.add({
@@ -145,32 +131,14 @@
     })
   }
 
-  const toastError = (error) => {
-    showToast('error', error)
-  }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
     showToast('success', 'Successfully copied!')
   }
 
-  const scrollToTop = () => {
-    window.scrollTo(0, 0)
-  }
-
   const setDomainName = async (domain) => {
     domainName.value = domain.name
   }
-
-  onMounted(async () => {
-    try {
-      scrollToTop()
-      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  })
 
   const validationSchema = yup.object({
     id: yup.string().required(),
@@ -213,15 +181,4 @@
     active: yup.boolean(),
     environment: yup.string()
   })
-
-  const updateDigitalCertificates = async () => {
-    try {
-      loadingEdgeApplications.value = true
-      digitalCertificates.value = await props.listDigitalCertificatesService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      loadingEdgeApplications.value = false
-    }
-  }
 </script>

@@ -1,6 +1,9 @@
 import { listEdgeFirewallRulesEngineService } from './list-edge-firewall-rules-engine-service'
 import { reorderRulesEngine } from './reorder-rules-engine-service'
-
+import { loadEdgeFirewallRulesEngineService } from './load-edge-firewall-rules-engine-service'
+import { editEdgeFirewallRulesEngineService } from './edit-edge-firewall-rules-engine-service'
+import { createEdgeFirewallRulesEngineService } from './create-edge-firewall-rules-engine-service'
+import { deleteEdgeFirewallRulesEngineService } from './delete-edge-firewall-rules-engine-service'
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
  * @property {typeof listEdgeFirewallRulesEngineService} listEdgeFirewallRulesEngineService - The listEdgeFirewallRulesEngineService reference
@@ -9,4 +12,11 @@ import { reorderRulesEngine } from './reorder-rules-engine-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listEdgeFirewallRulesEngineService, reorderRulesEngine }
+export {
+  listEdgeFirewallRulesEngineService,
+  reorderRulesEngine,
+  loadEdgeFirewallRulesEngineService,
+  editEdgeFirewallRulesEngineService,
+  createEdgeFirewallRulesEngineService,
+  deleteEdgeFirewallRulesEngineService
+}
