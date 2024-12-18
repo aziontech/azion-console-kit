@@ -16,6 +16,7 @@
     :optionDisabled="props.optionDisabled"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
+    :showClear="props.showClear"
     @change="emitChange"
     @blur="emitBlur"
     :class="errorMessage ? 'p-invalid' : ''"
@@ -143,6 +144,10 @@
       required: true
     },
     enableWorkaroundLabelToDisabledOptions: {
+      type: Boolean,
+      default: false
+    },
+    showClear: {
       type: Boolean,
       default: false
     }
