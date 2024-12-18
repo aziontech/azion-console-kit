@@ -239,7 +239,7 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
           label="Edge Firewall"
-          :showClear="true"
+          showClear
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"
