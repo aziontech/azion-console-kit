@@ -1,4 +1,6 @@
 import * as EdgeDNSService from '@/services/edge-dns-services'
+import * as EdgeDNSServiceV4 from '@/services/edge-dns-services/v4'
+
 import * as EdgeDNSRecordsService from '@/services/edge-dns-records-services'
 import * as Helpers from '@/helpers'
 
@@ -12,8 +14,7 @@ export const edgeDnsRoutes = {
       name: 'list-edge-dns',
       component: () => import('@views/EdgeDNS/ListView.vue'),
       props: {
-        listEdgeDNSService: EdgeDNSService.listEdgeDNSService,
-        listEdgeDNSServiceV4: EdgeDNSService.listEdgeDNSServiceV4,
+        listEdgeDNSService: EdgeDNSServiceV4.listEdgeDNSService,
         deleteEdgeDNSService: EdgeDNSService.deleteEdgeDNSService,
         documentationService: Helpers.documentationCatalog.edgeDNS,
         clipboardWrite: Helpers.clipboardWrite
