@@ -89,18 +89,21 @@ describe('HttpRequestServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        configurationId: fixtures.httpRequest.configurationId,
-        requestMethod: fixtures.httpRequest.requestMethod,
-        requestUri: fixtures.httpRequest.requestUri,
-        status: fixtures.httpRequest.status,
-        host: fixtures.httpRequest.host,
-        requestId: fixtures.httpRequest.requestId,
-        ts: fixtures.httpRequest.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          configurationId: fixtures.httpRequest.configurationId,
+          requestMethod: fixtures.httpRequest.requestMethod,
+          requestUri: fixtures.httpRequest.requestUri,
+          status: fixtures.httpRequest.status,
+          host: fixtures.httpRequest.host,
+          requestId: fixtures.httpRequest.requestId,
+          ts: fixtures.httpRequest.ts,
+          tsFormat: 'February 23, 2024 at 06:07 PM'
+        }
+      ],
+      recordsFound: "1",
+    })
   })
 })
