@@ -104,7 +104,7 @@ describe('ActivityHistoryServices', () => {
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
       ],
-      recordsFound: "1",
+      recordsFound: '1'
     })
   })
 })

@@ -110,7 +110,7 @@ describe('edgeDns', () => {
           zoneId: fixtures.edgeDns.zoneId
         }
       ],
-      recordsFound: "1",
+      recordsFound: '1'
     })
   })
 })
