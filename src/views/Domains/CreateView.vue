@@ -16,13 +16,13 @@
         <template #form>
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
-            :edgeApplicationsData="edgeApplicationsData"
-            :isLoadingRequests="isLoadingRequests"
-            :isLoadingEdgeFirewalls="isLoadingEdgeFirewalls"
-            :updateDigitalCertificates="updateDigitalCertificates"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="listEdgeFirewallService"
             :loadEdgeFirewallService="loadEdgeFirewallService"
-            @edgeApplicationCreated="handleEdgeApplicationCreated"
+            :listDigitalCertificatesService="listDigitalCertificatesService"
+            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            :isLoadingRequests="isLoadingRequests"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   import CreateFormBlock from '@/templates/create-form-block'
@@ -65,6 +65,10 @@
       type: Function,
       required: true
     },
+    loadDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -73,11 +77,15 @@
       type: Function,
       required: true
     },
-    loadEdgeFirewallService: {
+    loadEdgeApplicationsService: {
       type: Function,
       required: true
     },
     listEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallService: {
       type: Function,
       required: true
     }
@@ -88,11 +96,9 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const edgeApplicationsData = ref([])
   const digitalCertificates = ref([])
   const domainName = ref('')
   const isLoadingRequests = ref(true)
-  const isLoadingEdgeFirewalls = ref(true)
 
   const handleResponse = (value) => {
     domainName.value = value?.domainName
@@ -154,49 +160,6 @@
       .track()
   }
 
-  const requestEdgeApplications = async () => {
-    isLoadingRequests.value = true
-    try {
-      edgeApplicationsData.value = await props.listEdgeApplicationsService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  }
-
-  const handleEdgeApplicationCreated = async () => {
-    await requestEdgeApplications()
-  }
-
-  const requestDigitalCertificates = async () => {
-    digitalCertificates.value = await props.listDigitalCertificatesService({})
-  }
-
-  const showToast = (severity, summary) => {
-    const options = {
-      closable: true,
-      severity,
-      summary
-    }
-
-    toast.add(options)
-  }
-
-  const toastError = (error) => {
-    showToast('error', error)
-  }
-
-  onMounted(async () => {
-    try {
-      await Promise.all([requestEdgeApplications(), requestDigitalCertificates()])
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  })
-
   const initialValues = {
     name: '',
     environment: 'production',
@@ -249,15 +212,4 @@
     active: yup.boolean(),
     environment: yup.string()
   })
-
-  const updateDigitalCertificates = async () => {
-    try {
-      isLoadingRequests.value = true
-      digitalCertificates.value = await props.listDigitalCertificatesService({})
-    } catch (error) {
-      toastError(error)
-    } finally {
-      isLoadingRequests.value = false
-    }
-  }
 </script>

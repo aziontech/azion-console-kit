@@ -8,12 +8,12 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v3/edge_functions*').as('getFunctions')
+  cy.intercept('GET', '/api/v4/edge_functions/functions/*').as('getFunctionsSaved')
   cy.get(selectors.edgeFirewall.edgeFunctionActionbar).find(selectors.functions.saveButton).click()
   cy.verifyToast('success', 'Your edge function has been created')
-  cy.wait('@getFunctions')
+  cy.wait('@getFunctionsSaved')
 }
-
+//Flag xfail until the api contract is updated on prod
 describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
@@ -37,9 +37,11 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
     // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
+    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
     cy.get(selectors.edgeFirewall.functionInstanceName).type(functionInstanceName)
+    cy.wait('@getFunctions')
     cy.get(selectors.edgeFirewall.functionInstanceDropdown).click()
     cy.get(selectors.edgeFirewall.createFunctionButton).click()
     createFunctionCase()
@@ -48,7 +50,9 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
     // Assert - Find created function
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(`${functionInstanceName}{enter}`)
+    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(
+      `${functionInstanceName}{enter}`
+    )
     cy.get(selectors.edgeFirewall.functionInstanceTableColumnName).should(
       'have.text',
       functionInstanceName
@@ -92,7 +96,9 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     // Cleanup - Remove the created function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
     cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).clear()
-    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(`${functionInstanceName}{enter}`)
+    cy.get(selectors.edgeFirewall.functionInstanceTableSearchInput).type(
+      `${functionInstanceName}{enter}`
+    )
     cy.deleteEntityFromLoadedList().then(() => {
       cy.verifyToast('Function successfully deleted')
     })

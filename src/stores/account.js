@@ -36,6 +36,11 @@ export const useAccountStore = defineStore({
         (permission) => permission.name === permissionToEditDataStream
       )
     },
+    hasPermissionToViewDataStream(state) {
+      return !!state.account.permissions.find(
+        (permission) => permission.name === 'View Data Stream'
+      )
+    },
     hasSamplingFlag(state) {
       return state.account?.client_flags?.includes(state.flags.DATA_STREAM_SAMPLING)
     },

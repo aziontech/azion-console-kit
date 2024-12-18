@@ -83,7 +83,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your Rules Engine has been created.')
+    cy.verifyToast('success', 'Rule successfully created')
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
@@ -91,7 +91,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
 
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
+      cy.verifyToast('Rule successfully deleted')
     })
   })
 

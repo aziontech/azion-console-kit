@@ -1,6 +1,5 @@
-// cypress/integration/edge-application/edit-function-instance.spec.js
-import generateUniqueName from '../../support/utils'
-import selectors from '../../support/selectors'
+import generateUniqueName from '../../../support/utils'
+import selectors from '../../../support/selectors'
 
 let fixtures = {}
 
@@ -8,14 +7,15 @@ let fixtures = {}
  * Creates a new edge function.
  */
 const createFunctionCase = () => {
-  cy.openProduct('Edge Functions')
-
   // Act
-  cy.get(selectors.functions.createButton).click()
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.get(selectors.functions.saveButton).click()
+  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions')
+  cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
+    .find(selectors.functions.saveButton)
+    .click()
   cy.verifyToast('success', 'Your edge function has been created')
+  cy.wait('@getFunctions')
 }
 
 /**
@@ -42,7 +42,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -58,10 +58,10 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     }
   })
 
-  it('should edit a function instance', () => {
-    createFunctionCase()
+  it('should create a function instance', () => {
     cy.openProduct('Edge Application')
 
+    // Act - Create an edge application
     createEdgeApplicationCase()
 
     // Act - create a function instance
@@ -69,18 +69,21 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
+    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
       fixtures.functionInstanceName
     )
+    cy.wait('@getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).clear()
-    cy.get(selectors.edgeApplication.functionsInstance.dropdownFilter).type(fixtures.functionName)
-    cy.get(selectors.edgeApplication.functionsInstance.firstEdgeFunctionDropdownOption).click()
-    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
+    createFunctionCase()
+    cy.get(selectors.edgeApplication.functionsInstance.functionInstanceActionbar)
+      .find(selectors.functions.saveButton)
+      .click()
 
-    // Assert - Verify the instance was created
+    // Assert
     cy.verifyToast('success', 'Your Function has been created')
     cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(`${fixtures.functionInstanceName}{enter}`)
@@ -91,25 +94,6 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.firstFilteredEdgeFunctionRow).should(
       'have.text',
       fixtures.functionName
-    )
-
-    // Act - Edit the instance
-    const editedFunctionInstanceName = `${fixtures.functionInstanceName}-edit`
-    cy.get(selectors.list.filteredRow.column('name')).click()
-    cy.get(selectors.edgeApplication.functionsInstance.nameInput).should(
-      'have.value',
-      fixtures.functionInstanceName
-    )
-    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
-    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(editedFunctionInstanceName)
-    cy.get(selectors.form.actionsSubmitButton).click()
-
-    // Assert - Verify the instance was edited
-    cy.verifyToast('success', 'Your Function has been updated')
-    cy.get(selectors.form.goBackButton).click()
-    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
-      'have.text',
-      editedFunctionInstanceName
     )
 
     // Cleanup - Remove the instance

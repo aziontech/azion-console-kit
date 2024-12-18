@@ -32,16 +32,15 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v3/edge_functions*').as('getEdgeFunctions')
+  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions2')
   cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
     .find(selectors.functions.saveButton)
     .click()
   cy.verifyToast('success', 'Your edge function has been created')
-  cy.wait('@getEdgeFunctions')
+  cy.wait('@getFunctions2')
 }
 
-// TODO: remove xfail tag when the API v4 is fixed
-describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -77,11 +76,13 @@ describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Run Function')).click()
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
+    cy.intercept('GET', 'api/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.rulesEngine.createFunctionInstanceButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
       fixtures.functionInstanceName
     )
+    cy.wait('@getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
@@ -91,7 +92,7 @@ describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
       .click()
     cy.intercept(
       'GET',
-      'api/v3/edge_applications/*/functions_instances?order_by=id&sort=asc&page=1&page_size=200'
+      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
     ).as('getFunctionInstance')
     cy.wait('@postFunction')
     cy.wait('@getFunctionInstance')
@@ -104,7 +105,7 @@ describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your Rules Engine has been created.')
+    cy.verifyToast('success', 'Rule successfully created')
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
@@ -112,7 +113,7 @@ describe('Edge Application', { tags: ['@dev3', '@xfail'] }, () => {
 
     // Cleanup - Remove the rule engine
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule Engine successfully deleted')
+      cy.verifyToast('Rule successfully deleted')
     })
   })
 

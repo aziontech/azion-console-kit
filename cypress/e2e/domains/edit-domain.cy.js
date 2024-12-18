@@ -5,6 +5,7 @@ let domainName
 let edgeAppName
 
 let domainEditedName
+let digitalCertificateName
 
 const createEdgeApplicationCase = () => {
   // Arrange
@@ -22,6 +23,41 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
+const createDigitalCertificate = () => {
+  digitalCertificateName = generateUniqueName('digitalCertificate')
+
+  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
+  cy.get(selectors.domains.createDigitalCertificateButton).click()
+  cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
+  cy.get(selectors.digitalCertificates.generateCSRRadioOption).click()
+  cy.get(selectors.digitalCertificates.subjectNameInput).type(
+    `${digitalCertificateName}.example.com`
+  )
+  cy.get(selectors.digitalCertificates.countryInput).type('BR')
+  cy.get(selectors.digitalCertificates.stateInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.cityInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.organizationInput).type(`${digitalCertificateName} S.A.`)
+  cy.get(selectors.digitalCertificates.organizationUnitInput).type('IT Department')
+  cy.get(selectors.digitalCertificates.emailInput).clear()
+  cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
+  cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
+
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as('getDigitalCertificatesApi')
+
+  // Act
+  cy.get(selectors.domains.digitalCertificateActionBar)
+    .find(selectors.form.actionsSubmitButton)
+    .click()
+
+  // Assert
+  cy.verifyToast('success', 'Your digital certificate has been created!')
+  cy.wait('@getDigitalCertificatesApi')
+
+  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).should('have.text', digitalCertificateName)
+  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
+  cy.get(selectors.domains.letsEncryptDropdownOption).click()
+}
+
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
@@ -33,12 +69,19 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
+    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+    cy.intercept('GET', `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownFilter).type(edgeAppName)
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
+
+    cy.wait('@getEdgeApplicationListFilter')
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -61,7 +104,10 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.fieldTextInput).clear()
     cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
     cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.edge.app`)
+    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
+
+    createDigitalCertificate()
+
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
     cy.get(selectors.domains.activeSwitchEditForm).click()

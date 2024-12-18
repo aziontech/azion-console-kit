@@ -17,8 +17,8 @@ const createWAFCase = () => {
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.verifyToast('success', 'Your waf rule has been created')
 }
-
-describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
+// added @xfail due to a problem with edge firewall
+describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')

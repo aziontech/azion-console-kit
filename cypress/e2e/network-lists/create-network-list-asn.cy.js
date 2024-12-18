@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let networkListName
 
-describe('Network Lists spec', { tags: ['@dev6', '@xfail'] }, () => {
+describe('Network Lists spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Network Lists')
