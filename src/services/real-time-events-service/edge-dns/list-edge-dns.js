@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeDNS = async (filter) => {
   const payload = adapt(filter)
@@ -69,8 +70,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const totalRecords = body.data.idnsQueriesEvents?.length
 
-  return body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
+  const data = body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
     level: getLevelDNS(edgeDnsQueriesEvents.level),
     zoneId: edgeDnsQueriesEvents.zoneId,
@@ -82,4 +84,9 @@ const adaptResponse = (response) => {
     tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
     uuid: edgeDnsQueriesEvents.uuid
   }))
+
+  return {
+    data,
+    recordsFound: getRecordsFound(totalRecords)
+  }
 }
