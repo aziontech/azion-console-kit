@@ -69,7 +69,7 @@ const adapt = (payload) => {
   const parsedPayload = {
     name: payload.name,
     description: payload.description,
-    is_active: payload.active,
+    active: payload.active,
     criteria: payload.criteria,
     behaviors: parseBehaviors(payload.behaviors)
   }

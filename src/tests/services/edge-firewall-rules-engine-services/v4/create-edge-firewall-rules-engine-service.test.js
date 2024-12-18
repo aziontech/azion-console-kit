@@ -54,7 +54,7 @@ describe('EdgeFirewallRulesEngineService', () => {
       body: {
         name: fixtures.payload.name,
         description: fixtures.payload.description,
-        is_active: fixtures.payload.active,
+        active: fixtures.payload.active,
         criteria: fixtures.payload.criteria,
         behaviors: [
           { name: 'run_function', argument: 'abc123' },
