@@ -299,6 +299,7 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin
+        isEditMode
         :disabledFields="disabledFields"
         :listOrigins="ORIGIN_TYPES_OPTIONS"
         :copyToClipboard="copyToKey"
