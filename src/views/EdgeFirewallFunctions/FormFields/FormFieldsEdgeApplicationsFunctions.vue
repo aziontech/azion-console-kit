@@ -34,7 +34,7 @@
 
   const changeArgs = async (target) => {
     if (target?.args) {
-      args.value = target?.args
+      args.value = target.args
     }
   }
 
@@ -109,6 +109,7 @@
           :loadService="props.loadEdgeFunctionService"
           :value="edgeFunctionID"
           :moreOptions="['args']"
+          disableEmitFirstRender
           @onSelectOption="changeArgs"
           optionLabel="label"
           optionValue="value"

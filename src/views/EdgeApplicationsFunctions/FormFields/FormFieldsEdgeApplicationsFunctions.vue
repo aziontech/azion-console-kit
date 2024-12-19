@@ -109,6 +109,7 @@
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionService"
           :moreOptions="['args']"
+          disableEmitFirstRender
           optionLabel="label"
           optionValue="value"
           :value="edgeFunctionID"
