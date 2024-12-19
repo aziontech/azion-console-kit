@@ -67,8 +67,8 @@ describe('EdgeFirewallRulesEngineService', () => {
             argument: {
               type: 'second',
               limit_by: 'ip',
-              average_rate_limit: '10',
-              maximum_burst_size: '20'
+              average_rate_limit: 10,
+              maximum_burst_size: 20
             }
           },
           {
