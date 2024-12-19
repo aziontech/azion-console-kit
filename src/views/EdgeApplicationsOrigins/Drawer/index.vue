@@ -256,7 +256,7 @@
 
     dialog.open(CopyKeyDialog, {
       data: {
-        name: 'Origin Key',
+        title: 'Origin Key',
         key: feedback.originKey,
         copy: copyToKey
       }
