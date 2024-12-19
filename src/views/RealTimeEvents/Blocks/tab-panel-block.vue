@@ -28,7 +28,7 @@
   const listTableBlockRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
-  const totalRecordsFound = ref(0)
+  const recordsFound = ref(0)
 
   const defaultFilter = {
     tsRange: {},
@@ -78,7 +78,7 @@
 
   const listProvider = async () => {
     const response = await props.listService({ ...filterData.value })
-    totalRecordsFound.value = response.recordsFound
+    recordsFound.value = response.recordsFound
     return response.data
   }
 
@@ -98,22 +98,20 @@
       ref="drawerRef"
       :loadService="loadService"
     />
-    <div class="flex justify-between gap-8 my-4">
+    <div class="flex flex-col gap-8 my-4">
       <div class="flex gap-1">
         <p class="text-xs text-color font-medium leading-4">Specification</p>
         <p class="text-xs text-color-secondary font-normal leading-4">
           {{ props.tabSelected.description }}
         </p>
       </div>
-      <p class="text-xs text-color-secondary font-normal leading-4">
-        {{ totalRecordsFound }} records found
-      </p>
     </div>
     <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
       <ContentFilterBlock
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
         :downloadCSV="exportTableCSV"
+        :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>
