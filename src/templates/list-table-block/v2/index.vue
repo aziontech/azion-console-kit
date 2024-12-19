@@ -86,6 +86,7 @@
             <i
               class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
               data-pc-section="rowreordericon"
+              v-if="rowData.phase.content !== 'Default'"
             />
             <InputNumber
               v-model="rowData.position.value"
@@ -98,6 +99,7 @@
               :min="rowData.position.min"
               :max="rowData.position.max"
               :pt="{ input: { class: 'w-11 text-center' } }"
+              :disabled="rowData.phase.content === 'Default'"
             >
               <template #incrementbuttonicon>
                 <span class="pi pi-chevron-down" />

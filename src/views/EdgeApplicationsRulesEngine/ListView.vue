@@ -7,10 +7,14 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const { currentTheme } = storeToRefs(useAccountStore())
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -249,6 +253,14 @@
       }
     })
   }
+
+  const badgeClass = computed(() => {
+    if (currentTheme.value !== 'dark') {
+      return 'p-badge-lg !text-black bg-white !border-surface h-5 min-w-[20px] !text-xl'
+    } else {
+      return 'p-badge-lg !text-white bg-black !border-surface h-5 min-w-[20px] !text-xl'
+    }
+  })
 </script>
 
 <template>
@@ -322,7 +334,8 @@
 
             <PrimeButton
               label="Review Changes"
-              badgeClass="p-badge-lg !text-black !bg-white !border-surface h-5 min-w-[20px] !text-xl"
+              class="bg-surface"
+              :badgeClass="badgeClass"
               :loading="isLoadingButtonOrder"
               :disabled="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
