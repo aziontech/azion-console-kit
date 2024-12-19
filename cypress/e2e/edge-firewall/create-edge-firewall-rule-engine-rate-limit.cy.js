@@ -4,8 +4,7 @@ import selectors from '../../support/selectors'
 
 let firewallName, ruleName
 
-//Flag xfail until the api contract is updated on prod
-describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
