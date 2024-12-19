@@ -86,7 +86,7 @@
             <i
               class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
               data-pc-section="rowreordericon"
-              v-if="rowData.phase.content !== 'Default'"
+              :class="hasContentDefault(rowData.phase.content) ? 'no-before mr-8' : ''"
             />
             <InputNumber
               v-model="rowData.position.value"
@@ -99,7 +99,7 @@
               :min="rowData.position.min"
               :max="rowData.position.max"
               :pt="{ input: { class: 'w-11 text-center' } }"
-              :disabled="rowData.phase.content === 'Default'"
+              :disabled="hasContentDefault(rowData.phase.content)"
             >
               <template #incrementbuttonicon>
                 <span class="pi pi-chevron-down" />
@@ -692,6 +692,10 @@
     }
   }
 
+  const hasContentDefault = (content) => {
+    return content === 'Default'
+  }
+
   const filterBy = computed(() => {
     const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
     const filters = props.columns.map((item) => item.field)
@@ -700,6 +704,7 @@
   })
 
   const optionsColumns = ref([])
+
   onMounted(() => {
     loadData({
       fields: props.apiFields,
@@ -733,5 +738,9 @@
         }
       }
     }
+  }
+
+  .no-before::before {
+    content: none !important;
   }
 </style>
