@@ -91,23 +91,26 @@ describe('edgeDns', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        level: {
-          content: 'Error',
-          icon: 'pi pi-times-circle',
-          severity: 'danger'
-        },
-        qtype: fixtures.edgeDns.qtype,
-        resolutionType: fixtures.edgeDns.resolutionType,
-        source: fixtures.edgeDns.source,
-        solutionId: fixtures.edgeDns.solutionId,
-        ts: fixtures.edgeDns.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM',
-        uuid: fixtures.edgeDns.uuid,
-        zoneId: fixtures.edgeDns.zoneId
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          level: {
+            content: 'Error',
+            icon: 'pi pi-times-circle',
+            severity: 'danger'
+          },
+          qtype: fixtures.edgeDns.qtype,
+          resolutionType: fixtures.edgeDns.resolutionType,
+          source: fixtures.edgeDns.source,
+          solutionId: fixtures.edgeDns.solutionId,
+          ts: fixtures.edgeDns.ts,
+          tsFormat: 'February 23, 2024 at 06:07 PM',
+          uuid: fixtures.edgeDns.uuid,
+          zoneId: fixtures.edgeDns.zoneId
+        }
+      ],
+      recordsFound: '1'
+    })
   })
 })

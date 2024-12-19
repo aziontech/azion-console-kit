@@ -91,22 +91,25 @@ describe('tieredCacheServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        configurationId: fixtures.tieredCache.configurationId,
-        host: fixtures.tieredCache.host,
-        requestUri: fixtures.tieredCache.requestUri,
-        requestMethod: fixtures.tieredCache.requestMethod,
-        upstreamCacheStatus: {
-          content: fixtures.tieredCache.upstreamCacheStatus,
-          severity: 'info'
-        },
-        proxyHost: fixtures.tieredCache.proxyHost,
-        source: fixtures.tieredCache.source,
-        ts: fixtures.tieredCache.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          configurationId: fixtures.tieredCache.configurationId,
+          host: fixtures.tieredCache.host,
+          requestUri: fixtures.tieredCache.requestUri,
+          requestMethod: fixtures.tieredCache.requestMethod,
+          upstreamCacheStatus: {
+            content: fixtures.tieredCache.upstreamCacheStatus,
+            severity: 'info'
+          },
+          proxyHost: fixtures.tieredCache.proxyHost,
+          source: fixtures.tieredCache.source,
+          ts: fixtures.tieredCache.ts,
+          tsFormat: 'February 23, 2024 at 06:07 PM'
+        }
+      ],
+      recordsFound: '1'
+    })
   })
 })

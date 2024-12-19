@@ -28,6 +28,7 @@
   const listTableBlockRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
+  const recordsFound = ref(0)
 
   const defaultFilter = {
     tsRange: {},
@@ -76,7 +77,9 @@
   }
 
   const listProvider = async () => {
-    return await props.listService({ ...filterData.value })
+    const response = await props.listService({ ...filterData.value })
+    recordsFound.value = response.recordsFound
+    return response.data
   }
 
   onBeforeMount(() => {
@@ -108,6 +111,7 @@
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
         :downloadCSV="exportTableCSV"
+        :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>

@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -41,8 +42,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const totalRecords = body.data.edgeFunctionsEvents?.length
 
-  return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+  const data = body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: edgeFunctionsEvents.configurationId,
     functionLanguage: edgeFunctionsEvents.functionLanguage,
@@ -52,4 +54,9 @@ const adaptResponse = (response) => {
     ts: edgeFunctionsEvents.ts,
     tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
   }))
+
+  return {
+    data,
+    recordsFound: getRecordsFound(totalRecords)
+  }
 }
