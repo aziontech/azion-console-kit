@@ -2,8 +2,10 @@
   import FormFieldsDrawerOrigin from '@/views/EdgeApplicationsOrigins/FormFields/FormFieldsEdgeApplicationsOrigins'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
+  import CopyKeyDialog from '@templates/dialog-copy-key'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref } from 'vue'
   import * as yup from 'yup'
@@ -14,6 +16,7 @@
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
+  const dialog = useDialog()
 
   const props = defineProps({
     showBarGoBack: {
@@ -250,7 +253,15 @@
 
   const handleCreateOrigin = (feedback) => {
     handleTrackCreation()
-    createFormDrawer.value.scrollOriginKey()
+
+    dialog.open(CopyKeyDialog, {
+      data: {
+        name: 'Origin Key',
+        key: feedback.originKey,
+        copy: copyToKey
+      }
+    })
+
     originKey.value = feedback.originKey
     emit('onSuccess')
   }
@@ -272,7 +283,6 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
     @onError="handleFailedCreateOrigin"
-    :showBarGoBack="showBarGoBack"
     title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
@@ -281,7 +291,6 @@
         :disabledFields="disabledFields"
         :listOrigins="ORIGIN_TYPES_OPTIONS"
         :copyToClipboard="copyToKey"
-        :generatedOriginKey="originKey"
       />
     </template>
   </CreateDrawerBlock>
