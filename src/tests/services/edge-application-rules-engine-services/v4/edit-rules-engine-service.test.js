@@ -135,7 +135,12 @@ describe('EdgeApplicationRulesEngineServices', () => {
           variable: 'remote_addr',
           operator: 'is_equal',
           argument: '192.168.1.1'
-        }
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'does_not_exist',
+          argument: '192.168.1.2'
+        },
       ]
     ]
 
@@ -149,7 +154,11 @@ describe('EdgeApplicationRulesEngineServices', () => {
           variable: 'remote_addr',
           operator: 'is_equal',
           argument: '192.168.1.1'
-        }
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'does_not_exist'
+        },
       ]
     ]
 
