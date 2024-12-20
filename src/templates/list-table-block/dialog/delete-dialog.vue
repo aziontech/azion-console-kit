@@ -150,7 +150,7 @@
 
   const cancelDialog = () => {
     resetForm()
-    dialogRef.value.close({ data: { updated: false } })
+    dialogRef.value.close({ updated: false })
   }
 
   const getLoadingIcon = computed(() => {
