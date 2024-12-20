@@ -1,95 +1,99 @@
 <template>
-  <PrimeDialog
-    blockScroll
-    modal
-    visible
-    :header="`Delete ${data.title}`"
-    :draggable="false"
-    class="max-w-2xl"
-    @keyup.enter="removeItem()"
-    data-testid="delete-dialog"
-  >
-    <div
-      class="flex flex-col gap-6"
-      data-testid="delete-dialog-content"
+  <div @keydown.esc="cancelDialog">
+    <PrimeDialog
+      blockScroll
+      modal
+      visible
+      :closeOnEscape="false"
+      :header="`Delete ${data.title}`"
+      :draggable="false"
+      class="max-w-2xl"
+      @keyup.enter="removeItem()"
+      @hide="cancelDialog"
+      data-testid="delete-dialog"
     >
-      <div data-testid="delete-dialog-warning">
-        <Message
-          severity="warn"
-          :closable="false"
-          data-testid="delete-dialog-warning-message"
-        >
-          Once confirmed, this action can't be reversed.
-        </Message>
-
-        <p
-          class="pt-4 text-color-secondary"
-          data-testid="delete-dialog-warning-message-details"
-        >
-          This {{ data.title }} will be deleted along with any associated settings or instances.
-          Check Help Center for more details.
-        </p>
-      </div>
-
-      <div data-testid="delete-dialog-confirmation">
-        <div
-          class="flex flex-col w-full gap-2"
-          data-testid="delete-dialog-confirmation-input"
-        >
-          <label
-            for="confirm-input"
-            class="font-semibold text-sm"
-            data-testid="delete-dialog-confirmation-input-label"
-            >Type “delete” to confirm:</label
+      <div
+        class="flex flex-col gap-6"
+        data-testid="delete-dialog-content"
+      >
+        <div data-testid="delete-dialog-warning">
+          <Message
+            severity="warn"
+            :closable="false"
+            data-testid="delete-dialog-warning-message"
           >
-          <InputText
-            id="confirm-input"
-            type="text"
-            autofocus
-            v-model="confirmation"
-            :class="{ 'p-invalid': errors.confirmation }"
-            data-testid="delete-dialog-confirmation-input-field"
-          />
-          <small
-            v-if="errors.confirmation"
-            class="p-error text-xs font-normal leading-tight"
-            data-testid="delete-dialog-confirmation-input-error"
-            >{{ errors.confirmation }}</small
+            Once confirmed, this action can't be reversed.
+          </Message>
+
+          <p
+            class="pt-4 text-color-secondary"
+            data-testid="delete-dialog-warning-message-details"
           >
+            This {{ data.title }} will be deleted along with any associated settings or instances.
+            Check Help Center for more details.
+          </p>
+        </div>
+
+        <div data-testid="delete-dialog-confirmation">
+          <div
+            class="flex flex-col w-full gap-2"
+            data-testid="delete-dialog-confirmation-input"
+          >
+            <label
+              for="confirm-input"
+              class="font-semibold text-sm"
+              data-testid="delete-dialog-confirmation-input-label"
+              >Type “delete” to confirm:</label
+            >
+            <InputText
+              id="confirm-input"
+              type="text"
+              autofocus
+              v-model="confirmation"
+              :class="{ 'p-invalid': errors.confirmation }"
+              data-testid="delete-dialog-confirmation-input-field"
+            />
+            <small
+              v-if="errors.confirmation"
+              class="p-error text-xs font-normal leading-tight"
+              data-testid="delete-dialog-confirmation-input-error"
+              >{{ errors.confirmation }}</small
+            >
+          </div>
         </div>
       </div>
-    </div>
 
-    <template #closeicon>
-      <PrimeButton
-        outlined
-        @click="cancelDialog()"
-        icon="pi pi-times"
-      />
-    </template>
+      <template #closeicon>
+        <PrimeButton
+          outlined
+          @click="cancelDialog()"
+          icon="pi pi-times"
+        />
+      </template>
 
-    <template #footer>
-      <PrimeButton
-        outlined
-        label="Cancel"
-        @click="cancelDialog()"
-        data-testid="delete-dialog-footer-cancel-button"
-      ></PrimeButton>
-      <PrimeButton
-        severity="danger"
-        label="Delete"
-        icon-pos="right"
-        @click="removeItem()"
-        :icon="getLoadingIcon"
-        :disabled="isDisabled"
-        data-testid="delete-dialog-footer-delete-button"
-      ></PrimeButton>
-    </template>
-  </PrimeDialog>
+      <template #footer>
+        <PrimeButton
+          outlined
+          label="Cancel"
+          @click="cancelDialog()"
+          data-testid="delete-dialog-footer-cancel-button"
+        ></PrimeButton>
+        <PrimeButton
+          severity="danger"
+          label="Delete"
+          icon-pos="right"
+          @click="removeItem()"
+          :icon="getLoadingIcon"
+          :disabled="isDisabled"
+          data-testid="delete-dialog-footer-delete-button"
+        ></PrimeButton>
+      </template>
+    </PrimeDialog>
+  </div>
 </template>
 
 <script setup>
-  import { computed, ref, watch, inject } from 'vue'
+  import { computed, ref, watch, inject, onMounted, onBeforeUnmount } from 'vue'
   import { useField, useForm } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
@@ -148,7 +152,7 @@
 
   const cancelDialog = () => {
     resetForm()
-    dialogRef.value.close({ updated: false })
+    dialogRef.value.close({ data: { updated: false } })
   }
 
   const getLoadingIcon = computed(() => {
@@ -179,4 +183,18 @@
     },
     { deep: true }
   )
+
+  const handleEscKey = (event) => {
+    if (event.key === 'Escape') {
+      cancelDialog()
+    }
+  }
+
+  onMounted(() => {
+    document.addEventListener('keydown', handleEscKey)
+  })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('keydown', handleEscKey)
+  })
 </script>
