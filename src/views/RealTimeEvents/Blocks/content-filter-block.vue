@@ -50,16 +50,19 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex flex-col gap-2 md:flex-row justify-between">
-      <IntervalFilterBlock
-        v-model:filterDate="filter.tsRange"
-        @applyTSRange="filterSearch"
-        class="w-[100%] md:w-[50%]"
-      />
-      <PrimeTag
-        :value="totalRecordsFound"
-        severity="info"
-      />
+    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+      <div class="w-full">
+        <IntervalFilterBlock
+          v-model:filterDate="filter.tsRange"
+          @applyTSRange="filterSearch"
+        />
+      </div>
+      <div class="flex justify-end w-full">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+      </div>
     </div>
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
       <AdvancedFilter
