@@ -50,16 +50,15 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex flex-col gap-2 md:flex-row md:justify-between">
+    <div class="flex flex-col gap-2 md:flex-row justify-between">
       <IntervalFilterBlock
         v-model:filterDate="filter.tsRange"
         @applyTSRange="filterSearch"
-        class="w-full"
+        class="w-[100%] md:w-[50%]"
       />
       <PrimeTag
         :value="totalRecordsFound"
         severity="info"
-        class="md:w-44"
       />
     </div>
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
