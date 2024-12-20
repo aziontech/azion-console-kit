@@ -3,10 +3,12 @@
     blockScroll
     modal
     visible
+    :closeOnEscape="false"
     :header="`Delete ${data.title}`"
     :draggable="false"
     class="max-w-2xl"
     @keyup.enter="removeItem()"
+    @keydown.esc="cancelDialog"
     data-testid="delete-dialog"
   >
     <div
