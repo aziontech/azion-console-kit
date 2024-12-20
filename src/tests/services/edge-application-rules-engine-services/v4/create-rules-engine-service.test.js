@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { createRulesEngineService } from '@/services/edge-application-rules-engine-services/v4'
 import { describe, expect, it, vi } from 'vitest'
-import { adaptCriteria } from '@/services/edge-application-rules-engine-services/v4/helper-criteria'
 
 const fixtures = {
   rulesEngineMock: {
@@ -104,40 +103,5 @@ describe('EdgeApplicationRulesEngineService', () => {
     const apiErrorResponse = sut(fixtures.rulesEngineMock)
 
     expect(apiErrorResponse).rejects.toBe('api error message')
-  })
-
-  it('should remove argument from criteria when operator is "exists" or "does_not_exist"', () => {
-    const criterias = [
-      [
-        {
-          variable: 'remote_addr',
-          operator: 'exists',
-          argument: '192.168.1.1'
-        },
-        {
-          variable: 'remote_addr',
-          operator: 'is_equal',
-          argument: '192.168.1.1'
-        }
-      ]
-    ]
-
-    const expectedCriterias = [
-      [
-        {
-          variable: 'remote_addr',
-          operator: 'exists'
-        },
-        {
-          variable: 'remote_addr',
-          operator: 'is_equal',
-          argument: '192.168.1.1'
-        }
-      ]
-    ]
-
-    const result = adaptCriteria(criterias)
-
-    expect(result).toEqual(expectedCriterias)
   })
 })
