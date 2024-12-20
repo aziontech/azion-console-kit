@@ -11,7 +11,7 @@ const processCriteria = (criteria) => {
 }
 
 export const adaptCriteria = (criterias) => {
-  return criterias.map(criteriaArray => {
+  return criterias.map((criteriaArray) => {
     return criteriaArray.map(processCriteria)
   })
 }
