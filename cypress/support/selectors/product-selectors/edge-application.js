@@ -64,8 +64,8 @@ export default {
     addressInput: '[data-testid="origin-form__address__input"]',
     originType: '[data-testid="origin-form__origin-type__dropdown"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
-    dialogCopyButton: '[copy-key-dialog__dialog-footer__confirm-button"]',
-    dialogCloseButton: '[copy-key-dialog__token-field__copy-key-button"]',
+    dialogCopyButton: '[data-testid="copy-key-dialog__token-field__copy-key-button"]',
+    dialogCloseButton: '[data-testid="copy-key-dialog__dialog-footer__confirm-button"]',
   },
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',

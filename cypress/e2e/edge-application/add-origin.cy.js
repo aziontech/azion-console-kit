@@ -62,16 +62,11 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     cy.get(selectors.edgeApplication.origins.addressInput).type('teste.com')
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should('have.text', 'Origin Key has been created')
+    cy.get(selectors.edgeApplication.origins.dialogCopyButton).click()
     cy.verifyToast('success', 'Your origin has been created')
-
-
-    cy.get(selectors.personalTokens.copyTokenDialogHeader).should(
-        'have.text',
-        'Origin key has been created'
-      )
-      cy.get(selectors.edgeApplication.origins.dialogCopyButton).click()
-      cy.verifyToast('Successfully copied!')
-      cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
+    cy.verifyToast('Successfully copied!')
+    cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
 
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
