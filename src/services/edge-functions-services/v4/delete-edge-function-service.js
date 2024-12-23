@@ -9,7 +9,7 @@ import { extractApiError } from '@/helpers/extract-api-error'
  * @param {string} payload.id - The id of cache settings.
  * @returns {Promise<string>} The result message based on the status code.
  */
-export const deleteEdgeFunctionService = async ({ id }) => {
+export const deleteEdgeFunctionService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFunctionsBaseUrl()}/${id}`,
     method: 'DELETE'
@@ -26,7 +26,7 @@ export const deleteEdgeFunctionService = async ({ id }) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Edge Function successfully deleted'
     case 500:
       throw new Errors.InternalServerError().message

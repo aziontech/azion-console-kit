@@ -16,11 +16,11 @@ const makeSut = () => {
 describe('EdgeFunctionsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 202
     })
 
     const { sut } = makeSut()
-    await sut({ id: fixtures.id })
+    await sut(fixtures.id)
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `v4/edge_functions/functions/${fixtures.id}`,
@@ -30,7 +30,7 @@ describe('EdgeFunctionsServices', () => {
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 202
     })
 
     const { sut } = makeSut()
@@ -51,7 +51,7 @@ describe('EdgeFunctionsServices', () => {
 
     const { sut } = makeSut()
 
-    const apiErrorResponse = sut({ id: fixtures.id })
+    const apiErrorResponse = sut(fixtures.id)
 
     expect(apiErrorResponse).rejects.toBe('api error message')
   })
@@ -63,7 +63,7 @@ describe('EdgeFunctionsServices', () => {
 
     const { sut } = makeSut()
 
-    const apiErrorResponse = sut({ id: fixtures.id })
+    const apiErrorResponse = sut(fixtures.id)
     const expectedError = new Errors.InternalServerError().message
 
     expect(apiErrorResponse).rejects.toBe(expectedError)
