@@ -8,7 +8,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { useRouter } from 'vue-router'
-  import { createEdgeFunctionsService } from '@/services/edge-functions-services'
+  import { createEdgeFunctionsService } from '@/services/edge-functions-services/v4'
   defineOptions({
     name: 'edge-functions-drawer'
   })
@@ -32,7 +32,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -56,7 +56,7 @@
     active: true,
     language: 'javascript',
     code: HelloWorldSample,
-    jsonArgs: ARGS_INITIAL_STATE,
+    args: ARGS_INITIAL_STATE,
     initiatorType: initiatorType
   }
   const handleTrackCreation = () => {
