@@ -78,6 +78,7 @@
                 size="small"
                 class="p-0"
                 v-if="solution.isLaunched"
+                @click="openNewWindow('https://www.azion.com/en/documentation/products/marketplace/integrations/')"
               />
             </p>
             <InlineMessage
@@ -119,9 +120,10 @@
                 class="p-0 text-right"
                 label="Azion Sales Team"
                 size="small"
-                link
+                link=""
                 icon="pi pi-external-link"
                 iconPos="right"
+                @click="openNewWindow('https://www.azion.com/en/contact-sales/')"
               />
             </div>
           </div>
@@ -238,6 +240,10 @@
 
   const openVendorSite = () => {
     props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openNewWindow = (url) => {
+    props.windowOpen(url, '_blank')
   }
 
   const startLaunchSolution = () => {
