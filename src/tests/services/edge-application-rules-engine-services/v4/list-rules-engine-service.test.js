@@ -84,7 +84,13 @@ describe('EdgeApplicationRulesEngineServicesV4', () => {
             content: 'Active',
             severity: 'success'
           },
-          order: 0,
+          position: {
+            altered: false,
+            immutableValue: 0,
+            max: 0,
+            min: 0,
+            value: 0
+          },
           description: 'string'
         }
       ],

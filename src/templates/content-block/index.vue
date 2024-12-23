@@ -15,7 +15,7 @@
       </div>
     </section>
     <div
-      class="sticky bottom-0"
+      class="sticky bottom-0 z-50"
       id="action-bar"
     ></div>
   </section>
