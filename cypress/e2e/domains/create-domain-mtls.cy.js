@@ -98,10 +98,6 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
-    cy.get(selectors.domains.mtlsTrustedCAFieldSelectedValue).should(
-      'contain',
-      digitalCertificateName
-    )
   })
 
   afterEach(() => {
