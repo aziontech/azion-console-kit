@@ -78,7 +78,11 @@
                 size="small"
                 class="p-0"
                 v-if="solution.isLaunched"
-                @click="openNewWindow('https://www.azion.com/en/documentation/products/marketplace/integrations/')"
+                @click="
+                  openNewWindow(
+                    'https://www.azion.com/en/documentation/products/marketplace/integrations/'
+                  )
+                "
               />
             </p>
             <InlineMessage
