@@ -20,7 +20,7 @@
       v-model:selection="selectedItems"
       :loading="isLoading"
       data-testid="data-table"
-      expandableRowGroups
+      :expandableRowGroups="expandableRowGroups"
       rowGroupMode="subheader"
       :groupRowsBy="props.groupColumn"
       :sortField="props.groupColumn"
@@ -86,7 +86,7 @@
             <i
               class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
               data-pc-section="rowreordericon"
-              :class="hasContentDefault(rowData.phase.content) ? 'no-before mr-8' : ''"
+              :class="hasContentDefault(rowData.phase?.content) ? 'no-before mr-8' : ''"
             />
             <InputNumber
               v-model="rowData.position.value"
@@ -99,7 +99,7 @@
               :min="rowData.position.min"
               :max="rowData.position.max"
               :pt="{ input: { class: 'w-11 text-center' } }"
-              :disabled="hasContentDefault(rowData.phase.content)"
+              :disabled="hasContentDefault(rowData.phase?.content)"
             >
               <template #incrementbuttonicon>
                 <span class="pi pi-chevron-down" />
@@ -202,7 +202,7 @@
           #body="{ data: rowData }"
           v-if="isRenderActions"
         >
-          <div v-if="rowData.phase.content !== 'Default'">
+          <div v-if="rowData.phase?.content !== 'Default'">
             <div
               class="flex justify-end"
               v-if="isRenderOneOption"
@@ -437,6 +437,10 @@
     defaultOrderingFieldName: {
       type: String,
       default: () => ''
+    },
+    expandableRowGroups: {
+      type: Boolean,
+      default: false
     }
   })
 

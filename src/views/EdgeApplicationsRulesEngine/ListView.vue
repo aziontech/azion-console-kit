@@ -286,7 +286,7 @@
   />
   <TableBlock
     ref="listRulesEngineRef"
-    :orderableRows="true"
+    orderableRows
     :columns="getColumns"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
@@ -303,6 +303,7 @@
     :defaultOrderingFieldName="''"
     groupColumn="phase.content"
     :expandedRowGroups="['Default', 'Request', 'Response']"
+    expandableRowGroups
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
