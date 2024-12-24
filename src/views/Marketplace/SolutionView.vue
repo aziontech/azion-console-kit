@@ -78,6 +78,7 @@
                 size="small"
                 class="p-0"
                 v-if="solution.isLaunched"
+                @click="openMarketplaceIntegrationsDocumentation()"
               />
             </p>
             <InlineMessage
@@ -122,6 +123,7 @@
                 link
                 icon="pi pi-external-link"
                 iconPos="right"
+                @click="contactSalesEdgeApplicationService()"
               />
             </div>
           </div>
@@ -161,6 +163,7 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import IntegrationInstall from './drawer/IntegrationInstall'
   import CreateEdgeApplication from './drawer/CreateEdgeApplication'
+  import { contactSalesEdgeApplicationService } from '@/services/edge-application-services/contact-sales-service.js'
 
   const ERROR_PROPS = {
     closable: true,
@@ -238,6 +241,13 @@
 
   const openVendorSite = () => {
     props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openMarketplaceIntegrationsDocumentation = () => {
+    props.windowOpen(
+      'https://www.azion.com/en/documentation/products/marketplace/integrations/',
+      '_blank'
+    )
   }
 
   const startLaunchSolution = () => {
