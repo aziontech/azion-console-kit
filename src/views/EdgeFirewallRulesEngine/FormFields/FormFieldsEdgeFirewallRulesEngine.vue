@@ -146,20 +146,20 @@
   const showArgumentBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaRow = criteria.value[criteriaIndex].value[criteriaInnerRowIndex]
     return (
-      criteriaRow.operator !== 'exists' &&
-      criteriaRow.operator !== 'does_not_exist' &&
-      criteriaRow.variable !== 'ssl_verification_status' &&
-      criteriaRow.variable !== 'network'
+      criteriaRow.operator !== '${exists}' &&
+      criteriaRow.operator !== '${does_not_exist}' &&
+      criteriaRow.variable !== '${ssl_verification_status}' &&
+      criteriaRow.variable !== '${network}'
     )
   }
   const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
-    return criteriaVariable === 'ssl_verification_status'
+    return criteriaVariable === '${ssl_verification_status}'
   }
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
-    const isCriteriaNetworkSelected = criteriaVariable === 'network'
+    const isCriteriaNetworkSelected = criteriaVariable === '${network}'
     const hasNetworkOptionsToSelect = networkListOptions.value.length
 
     if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
