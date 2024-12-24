@@ -103,7 +103,7 @@
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
           { label: 'starts with', value: 'starts_with' },
-          { label: 'does not start with', value: 'does_not_starts_with' },
+          { label: 'does not start with', value: 'does_not_start_with' },
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
