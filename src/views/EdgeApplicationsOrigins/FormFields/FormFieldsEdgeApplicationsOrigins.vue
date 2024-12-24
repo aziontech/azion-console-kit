@@ -26,6 +26,10 @@
     generatedOriginKey: {
       type: String,
       required: false
+    },
+    isEditMode: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -152,6 +156,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    v-if="isEditMode"
     :isDrawer="true"
     title="Origin Key"
     description="Save the origin to visualize the key attributed by Azion to this configuration."
