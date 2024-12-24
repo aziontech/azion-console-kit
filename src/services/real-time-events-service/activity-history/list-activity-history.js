@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -34,8 +35,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const totalRecords = body.data.activityHistoryEvents?.length
 
-  return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+  const data = body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
     userIp: activityHistoryEvents.userIp,
     authorName: activityHistoryEvents.authorName,
@@ -46,4 +48,9 @@ const adaptResponse = (response) => {
     ts: activityHistoryEvents.ts,
     tsFormat: convertValueToDate(activityHistoryEvents.ts)
   }))
+
+  return {
+    data,
+    recordsFound: getRecordsFound(totalRecords)
+  }
 }
