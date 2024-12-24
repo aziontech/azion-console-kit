@@ -78,11 +78,7 @@
                 size="small"
                 class="p-0"
                 v-if="solution.isLaunched"
-                @click="
-                  openNewWindow(
-                    'https://www.azion.com/en/documentation/products/marketplace/integrations/'
-                  )
-                "
+                @click="openMarketplaceIntegrationsDocumentation()"
               />
             </p>
             <InlineMessage
@@ -124,10 +120,10 @@
                 class="p-0 text-right"
                 label="Azion Sales Team"
                 size="small"
-                link=""
+                link
                 icon="pi pi-external-link"
                 iconPos="right"
-                @click="openNewWindow('https://www.azion.com/en/contact-sales/')"
+                @click="contactSalesEdgeApplicationService()"
               />
             </div>
           </div>
@@ -167,6 +163,7 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import IntegrationInstall from './drawer/IntegrationInstall'
   import CreateEdgeApplication from './drawer/CreateEdgeApplication'
+  import { contactSalesEdgeApplicationService } from '@/services/edge-application-services/contact-sales-service.js'
 
   const ERROR_PROPS = {
     closable: true,
@@ -246,8 +243,11 @@
     props.windowOpen(solution.value.vendor.url, '_blank')
   }
 
-  const openNewWindow = (url) => {
-    props.windowOpen(url, '_blank')
+  const openMarketplaceIntegrationsDocumentation = () => {
+    props.windowOpen(
+      'https://www.azion.com/en/documentation/products/marketplace/integrations/',
+      '_blank'
+    )
   }
 
   const startLaunchSolution = () => {
