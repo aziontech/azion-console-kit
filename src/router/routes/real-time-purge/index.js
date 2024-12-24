@@ -8,7 +8,7 @@ export const realTimePurgeRoutes = {
   children: [
     {
       path: '',
-      name: 'real-time-purge',
+      name: 'list-real-time-purge',
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
         listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
