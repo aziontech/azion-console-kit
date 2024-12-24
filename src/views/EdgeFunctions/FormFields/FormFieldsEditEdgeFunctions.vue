@@ -14,7 +14,7 @@
   import { computed, ref, watch } from 'vue'
 
   defineProps(['previewData', 'lang'])
-  const emit = defineEmits(['update:previewData', 'update:lang'])
+  const emit = defineEmits(['update:previewData', 'update:lang', 'update:name'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -40,6 +40,7 @@
   const unwatch = watch(name, () => {
     initialCodeValue = code.value
     initialJsonArgsValue = jsonArgs.value
+    emit('update:name', name.value)
 
     if (initialCodeValue) {
       unwatch()
