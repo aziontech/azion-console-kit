@@ -100,6 +100,7 @@
               :max="rowData.position.max"
               :pt="{ input: { class: 'w-11 text-center' } }"
               :disabled="hasContentDefault(rowData.phase?.content)"
+              data-testid="data-table-input-position"
             >
               <template #incrementbuttonicon>
                 <span class="pi pi-chevron-down" />

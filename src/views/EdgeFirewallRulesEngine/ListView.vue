@@ -73,7 +73,6 @@
   const hasContentToList = ref(true)
   const drawerRef = ref('')
   const listTableBlockRef = ref('')
-  const selectedPhase = ref('Request phase')
   const toast = useToast()
   const dialog = useDialog()
 
@@ -85,11 +84,6 @@
     'last_editor',
     'active'
   ]
-
-  const PARSE_PHASE = {
-    'Request phase': 'request',
-    'Response phase': 'response'
-  }
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
     return await props.listEdgeFirewallRulesEngineService({
@@ -231,7 +225,7 @@
 
   const openCreateRulesEngineDrawerByPhase = () => {
     handleCreateTrackEvent()
-    drawerRef.value.openDrawerCreate(PARSE_PHASE[selectedPhase.value])
+    drawerRef.value.openCreateDrawer()
   }
 
   const badgeClass = computed(() => {
