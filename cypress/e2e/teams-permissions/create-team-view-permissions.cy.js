@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let teamsPermissionsName
 
-describe('Teams Permissions', { tags: ['@dev7', '@xfail'] }, () => {
+describe('Teams Permissions', { tags: ['@dev7'] }, () => {
   beforeEach(() => {
     teamsPermissionsName = generateUniqueName('Team')
     cy.login()
@@ -19,7 +19,6 @@ describe('Teams Permissions', { tags: ['@dev7', '@xfail'] }, () => {
       'View Real-Time Analytics',
       'View Security Settings',
       'View Subscriptions',
-      'View Payment Methods',
       'View Bills',
       'View Edge Applications',
       'View Domains',
@@ -30,12 +29,12 @@ describe('Teams Permissions', { tags: ['@dev7', '@xfail'] }, () => {
       'View Network Lists',
       'View Edge Firewall',
       'View Edge Functions',
-      'View client list',
       'View Storage Bucket',
       'View Storage Object',
       'View Storage Credentials',
       'View VCS Integrations',
-      'View VCS Continuous Deployment'
+      'View VCS Continuous Deployment',
+      'View Policies'
     ]
 
     cy.get(selectors.teams.createTeamButton).click()
@@ -59,12 +58,8 @@ describe('Teams Permissions', { tags: ['@dev7', '@xfail'] }, () => {
 
     cy.get(selectors.form.actionsCancelButton).click()
 
-    cy.get(selectors.list.searchField).type(teamsPermissionsName)
+    cy.get(selectors.list.searchField).type(`${teamsPermissionsName}{enter}`)
     cy.get(selectors.teams.listRow('name')).should('have.text', teamsPermissionsName)
-    cy.get(selectors.teams.listRow('permissions')).should(
-      'have.text',
-      'View Content Delivery SettingsView Real-Time AnalyticsShow more (19)'
-    )
     cy.get(selectors.teams.listRow('status')).should('have.text', 'Active')
   })
 

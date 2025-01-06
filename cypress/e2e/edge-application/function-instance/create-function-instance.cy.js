@@ -1,5 +1,5 @@
-import generateUniqueName from '../../support/utils'
-import selectors from '../../support/selectors'
+import generateUniqueName from '../../../support/utils'
+import selectors from '../../../support/selectors'
 
 let fixtures = {}
 
@@ -42,7 +42,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
+describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     // Login
@@ -69,15 +69,19 @@ describe('Edge Application', { tags: ['@dev4', '@xfail'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
+    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
       fixtures.functionInstanceName
     )
+    cy.wait('@getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
-    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.get(selectors.edgeApplication.functionsInstance.functionInstanceActionbar)
+      .find(selectors.functions.saveButton)
+      .click()
 
     // Assert
     cy.verifyToast('success', 'Your Function has been created')

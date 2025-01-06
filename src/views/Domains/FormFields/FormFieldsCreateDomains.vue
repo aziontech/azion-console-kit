@@ -25,10 +25,6 @@
       type: Function,
       required: true
     },
-    edgeFirewallsData: {
-      type: Array,
-      required: true
-    },
     isLoadingEdgeFirewalls: {
       type: Boolean,
       required: true
@@ -355,7 +351,6 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <!-- domains-form__mtls-trusted-certificate-field__dropdown -->
         <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"

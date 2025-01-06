@@ -4,15 +4,14 @@ import selectors from '../../support/selectors'
 
 let firewallName, ruleName
 
-//Flag xfail until the api contract is updated on prod
-describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
+describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
     cy.login()
     firewallName = generateUniqueName('EdgeFirewall')
     ruleName = generateUniqueName('EdgeFirewallRule')
   })
 
-  it('should create an Edge Firewall and run a function', () => {
+  it('should create an Edge Firewall and set a rate limit', () => {
     cy.openProduct('Edge Firewall')
 
     // Act - create Edge Firewall
@@ -36,8 +35,14 @@ describe('Edge Firewall spec', { tags: ['@dev5, @xfail'] }, () => {
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorMatches).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaInput).clear()
     cy.get(selectors.edgeFirewall.ruleCriteriaInput).type('test')
+
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
-    cy.get(selectors.edgeFirewall.ruleBehaviorFirstOption).click()
+    cy.get(selectors.edgeFirewall.ruleBehaviorSetRateLimit).click()
+    cy.get(selectors.edgeFirewall.behaviorRateLimitType).click()
+    cy.get(selectors.edgeFirewall.behaviorRateLimitTypeFirstOption).click()
+    cy.get(selectors.edgeFirewall.behaviorAverageRateLimitInput).type('1')
+    cy.get(selectors.edgeFirewall.behaviorLimitBy).click()
+    cy.get(selectors.edgeFirewall.behaviorLimitByFirstOption).click()
 
     cy.intercept('POST', '/api/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
 

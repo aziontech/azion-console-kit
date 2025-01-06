@@ -9,7 +9,6 @@
     :isOverlapped="isOverlapped"
     @onSuccess="handleSuccessCreate"
     @onError="handleFailedToCreate"
-    :showBarGoBack="true"
     title="Create Instance"
   >
     <template #formFields>
@@ -28,7 +27,6 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
-    :showBarGoBack="true"
     @onSuccess="handleSuccessEdit"
     @onError="handleFailedToEdit"
     title="Edit Instance"

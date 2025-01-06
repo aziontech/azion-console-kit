@@ -104,6 +104,7 @@ export default {
     createFunctionButton:
       '[data-testid="edge-applications-functions-form__create-function-button"]',
     edgeFunctionActionbar: '[data-testid="create-edge-functions-drawer__action-bar"]',
+    functionInstanceActionbar: '[data-testid="create-function-instance-drawer__action-bar"]',
     dropdownFilter:
       '[data-testid="edge-application-function-instance-form__edge-function__dropdown-search"]',
     firstEdgeFunctionDropdownOption: '#edgeFunctionID_0',
