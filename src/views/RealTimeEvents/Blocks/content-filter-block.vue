@@ -1,11 +1,19 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import { computed } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
+  import { storeToRefs } from 'pinia'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import CodeEditor from './components/code-editor.vue'
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
+  import { useGraphQLStore } from '@/stores/graphql-query'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
+
+  const graphqlStore = useGraphQLStore()
+  const { getLastQuery } = storeToRefs(graphqlStore)
 
   const props = defineProps({
     filterData: {
@@ -19,6 +27,12 @@
       type: Array,
       required: true
     }
+  })
+
+  const code = ref('')
+
+  onMounted(() => {
+    filter.value.isUserUsingGraphqlQuery = false
   })
 
   const filter = computed({
@@ -35,7 +49,35 @@
   })
 
   const filterSearch = () => {
+    filter.value.isUserUsingGraphqlQuery = false
+    filter.value.graphqlQuery = ''
     emit('updatedFilter')
+  }
+
+  const filterSearchUserQuery = () => {
+    filter.value.isUserUsingGraphqlQuery = true
+    filter.value.graphqlQuery = code.value
+    emit('updatedFilter')
+  }
+
+  const replaceVariablesInQuery = (query, variables) => {
+    if (!query && !variables) return
+    let updatedQuery = query
+
+    Object.entries(variables).forEach(([key, value]) => {
+      const placeholder = new RegExp(`\\$${key}`, 'g')
+      const formattedValue = Array.isArray(value)
+        ? // eslint-disable-next-line id-length
+          `[${value.map((v) => (typeof v === 'string' ? `"${v}"` : v)).join(', ')}]`
+        : typeof value === 'string'
+        ? `"${value}"`
+        : value
+      updatedQuery = updatedQuery.replace(placeholder, formattedValue)
+    })
+
+    updatedQuery = updatedQuery.replace(/query\s*\([^)]*\)\s*{/, 'query {')
+
+    return updatedQuery.trim()
   }
 </script>
 
@@ -70,6 +112,24 @@
           @click="downloadCSV"
         />
       </div>
+    </div>
+
+    <div class="flex flex-col items-end gap-2">
+      <Accordion class="w-full">
+        <AccordionTab header="Query Graphql">
+          <CodeEditor
+            v-model="code"
+            :initialValue="replaceVariablesInQuery(getLastQuery.query, getLastQuery.variables)"
+          />
+        </AccordionTab>
+      </Accordion>
+      <PrimeButton
+        label="Search By Query"
+        size="small"
+        class="h-auto w-full md:max-w-fit"
+        data-testid="search-filter-search-button"
+        @click="filterSearchUserQuery()"
+      />
     </div>
   </div>
 </template>

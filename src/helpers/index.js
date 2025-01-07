@@ -36,6 +36,7 @@ import FILTERS_RULES from './real-time-filters-rules'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
 import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
+import { userUsingGraphqlQuery } from './user-using-graphql-query'
 
 export {
   InviteSession,
@@ -79,5 +80,6 @@ export {
   openGraphQlPlayground,
   eventsPlaygroundOpener,
   setRedirectRoute,
-  getRedirectRoute
+  getRedirectRoute,
+  userUsingGraphqlQuery
 }
