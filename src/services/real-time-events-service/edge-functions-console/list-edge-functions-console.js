@@ -5,6 +5,7 @@ import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import * as Errors from '@/services/axios/errors'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -20,7 +21,7 @@ export const listEdgeFunctionsConsole = async (filter) => {
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -66,12 +67,11 @@ const levelMap = {
   }
 }
 
-const adaptResponse = (response) => {
-  const { body, statusCode } = response
-
-  switch (statusCode) {
-    case 200:
-      return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
+const adaptResponse = (body) => {
+  const cellsConsoleEventsList = body.data?.cellsConsoleEvents
+  const totalRecords = cellsConsoleEventsList?.length
+  const parser = cellsConsoleEventsList?.length
+    ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
         configurationId: cellsConsoleEvents.configurationId,
         functionId: cellsConsoleEvents.functionId,
         id: generateCurrentTimestamp(),
@@ -86,6 +86,20 @@ const adaptResponse = (response) => {
         tsFormat: convertValueToDate(cellsConsoleEvents.ts),
         ts: cellsConsoleEvents.ts
       }))
+    : []
+
+  return {
+    data: parser,
+    recordsFound: getRecordsFound(totalRecords)
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
     case 400:
       const apiError = body.detail
       throw new Error(apiError).message
