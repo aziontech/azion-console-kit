@@ -199,6 +199,10 @@
       type: Function,
       required: true
     },
+    windowManager: {
+      type: Object,
+      required: true
+    },
     launchSolutionService: {
       type: Function,
       required: true
@@ -244,10 +248,7 @@
   }
 
   const openMarketplaceIntegrationsDocumentation = () => {
-    props.windowOpen(
-      'https://www.azion.com/en/documentation/products/marketplace/integrations/',
-      '_blank'
-    )
+    props.windowManager.openMarketplaceIntegrationsDocumentation()
   }
 
   const startLaunchSolution = () => {
