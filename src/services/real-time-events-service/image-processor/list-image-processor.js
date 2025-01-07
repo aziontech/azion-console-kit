@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -43,8 +44,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const totalRecords = body.data.imagesProcessedEvents?.length
 
-  return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+  const data = body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,
@@ -56,4 +58,9 @@ const adaptResponse = (response) => {
     ts: imagesProcessedEvents.ts,
     tsFormat: convertValueToDate(imagesProcessedEvents.ts)
   }))
+
+  return {
+    data,
+    recordsFound: getRecordsFound(totalRecords)
+  }
 }

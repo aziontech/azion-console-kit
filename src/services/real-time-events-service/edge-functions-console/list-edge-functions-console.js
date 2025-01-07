@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -67,8 +68,9 @@ const levelMap = {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const totalRecords = body.data.cellsConsoleEvents?.length
 
-  return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
+  const data = body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
     configurationId: cellsConsoleEvents.configurationId,
     functionId: cellsConsoleEvents.functionId,
     id: generateCurrentTimestamp(),
@@ -83,4 +85,9 @@ const adaptResponse = (response) => {
     tsFormat: convertValueToDate(cellsConsoleEvents.ts),
     ts: cellsConsoleEvents.ts
   }))
+
+  return {
+    data,
+    recordsFound: getRecordsFound(totalRecords)
+  }
 }

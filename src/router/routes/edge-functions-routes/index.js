@@ -13,7 +13,7 @@ export const edgeFunctionsRoutes = {
       name: 'list-edge-functions',
       component: () => import('@views/EdgeFunctions/ListView.vue'),
       props: {
-        deleteEdgeFunctionsService: EdgeFunctionsService.deleteEdgeFunctionsService,
+        deleteEdgeFunctionsService: EdgeFunctionsServiceV4.deleteEdgeFunctionService,
         listEdgeFunctionsService: EdgeFunctionsServiceV4.listEdgeFunctionsService,
         documentationService: Helpers.documentationCatalog.edgeFunctions
       },
