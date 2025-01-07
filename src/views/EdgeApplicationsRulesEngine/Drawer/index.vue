@@ -273,8 +273,6 @@
         product: 'edgeApplication'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   const closeDrawerEdit = () => {
