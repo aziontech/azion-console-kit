@@ -9,7 +9,7 @@
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, nextTick, ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
@@ -485,8 +485,10 @@
     criteriaIndex,
     criteriaInnerRowIndex
   }) => {
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    nextTick(() => {
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    })
   }
 </script>
 <template>
