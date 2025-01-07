@@ -21,7 +21,7 @@ const fixture = {
     criteria: [
       [
         {
-          variable: 'network',
+          variable: '${network}',
           operator: 'is_in_list',
           conditional: 'if',
           argument: 66
@@ -33,7 +33,7 @@ const fixture = {
   criteriaParsed: [
     [
       {
-        variable: 'network',
+        variable: '${network}',
         operator: 'is_in_list',
         conditional: 'if',
         argument: '66'
@@ -90,7 +90,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
       criteria: [
         [
           {
-            variable: 'network',
+            variable: '${network}',
             operator: 'is_in_list',
             conditional: 'if',
             argument: 66
@@ -109,7 +109,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
     expect(result.criteria).toEqual([
       [
         {
-          variable: 'network',
+          variable: '${network}',
           operator: 'is_in_list',
           conditional: 'if',
           argument: '66'

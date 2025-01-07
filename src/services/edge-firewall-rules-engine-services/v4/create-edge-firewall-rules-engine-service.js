@@ -68,12 +68,30 @@ const parseBehaviors = (behaviors) => {
 
   return parsedBehaviors
 }
+
+const parseCriteria = (criteria) => {
+  const argumentTransformers = {
+    '${network}': (arg) => Number(arg)
+  }
+
+  return criteria.map((criterionGroup) =>
+    criterionGroup.map((criterion) => {
+      return {
+        ...criterion,
+        argument: argumentTransformers[criterion.variable]
+          ? argumentTransformers[criterion.variable](criterion.argument)
+          : criterion.argument
+      }
+    })
+  )
+}
+
 const adapt = (payload) => {
   const parsedPayload = {
     name: payload.name,
     description: payload.description,
     active: payload.active,
-    criteria: payload.criteria,
+    criteria: parseCriteria(payload.criteria),
     behaviors: parseBehaviors(payload.behaviors)
   }
   return parsedPayload
