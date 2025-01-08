@@ -21,7 +21,7 @@ const parseCriteria = (criteria) => {
   const parsedCriteria = criteria.map((criterionGroup) => {
     return criterionGroup.map((criterion) => {
       switch (criterion.variable) {
-        case 'network':
+        case '${network}':
           return {
             ...criterion,
             argument: criterion.argument.toString()
