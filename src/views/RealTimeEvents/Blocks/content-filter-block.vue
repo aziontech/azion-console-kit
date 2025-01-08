@@ -4,6 +4,7 @@
   import { computed } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import PrimeTag from 'primevue/tag'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -17,6 +18,10 @@
     },
     fieldsInFilter: {
       type: Array,
+      required: true
+    },
+    recordsFound: {
+      type: String,
       required: true
     }
   })
@@ -37,14 +42,28 @@
   const filterSearch = () => {
     emit('updatedFilter')
   }
+
+  const totalRecordsFound = computed(() => {
+    return `${props.recordsFound} records found`
+  })
 </script>
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <IntervalFilterBlock
-      v-model:filterDate="filter.tsRange"
-      @applyTSRange="filterSearch"
-    />
+    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+      <div class="w-full">
+        <IntervalFilterBlock
+          v-model:filterDate="filter.tsRange"
+          @applyTSRange="filterSearch"
+        />
+      </div>
+      <div class="flex justify-end w-full">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+      </div>
+    </div>
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"

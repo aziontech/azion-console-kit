@@ -150,6 +150,10 @@
     showClear: {
       type: Boolean,
       default: false
+    },
+    disableEmitFirstRender: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -171,6 +175,7 @@
   const page = ref(INITIAL_PAGE)
   const search = ref('')
   const focusSearch = ref(null)
+  const disableEmitInit = ref(props.disableEmitFirstRender)
 
   onMounted(async () => {
     await fetchData()
@@ -293,6 +298,11 @@
 
       if (!optionExists) {
         data.value = [newOption, ...data.value]
+      }
+
+      if (disableEmitInit.value) {
+        disableEmitInit.value = false
+        return
       }
       emitChange()
     } finally {

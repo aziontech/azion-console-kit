@@ -36,16 +36,19 @@ const parseBehaviors = (behaviors) => {
         }
       case 'set_rate_limit':
         const typeToEnableBurstSize = 'second'
-        const burstSizeByType =
-          behavior.type === typeToEnableBurstSize ? behavior.maximum_burst_size : ''
+        const argument = {
+          type: behavior.type,
+          limit_by: behavior.limit_by,
+          average_rate_limit: Number(behavior.average_rate_limit)
+        }
+
+        if (behavior.type === typeToEnableBurstSize) {
+          argument.maximum_burst_size = Number(behavior.maximum_burst_size)
+        }
+
         return {
           name: behavior.name,
-          argument: {
-            type: behavior.type,
-            limit_by: behavior.limit_by,
-            average_rate_limit: `${behavior.average_rate_limit}`,
-            maximum_burst_size: `${burstSizeByType}`
-          }
+          argument
         }
       case 'set_custom_response':
         return {
@@ -70,7 +73,7 @@ const adapt = (payload) => {
   const parsedPayload = {
     name: payload.name,
     description: payload.description,
-    is_active: payload.active,
+    active: payload.active,
     criteria: payload.criteria,
     behaviors: parseBehaviors(payload.behaviors)
   }

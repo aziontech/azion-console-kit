@@ -54,7 +54,7 @@ describe('EdgeFirewallRulesEngineService', () => {
       body: {
         name: fixtures.payload.name,
         description: fixtures.payload.description,
-        is_active: fixtures.payload.active,
+        active: fixtures.payload.active,
         criteria: fixtures.payload.criteria,
         behaviors: [
           { name: 'run_function', argument: 'abc123' },
@@ -67,8 +67,8 @@ describe('EdgeFirewallRulesEngineService', () => {
             argument: {
               type: 'second',
               limit_by: 'ip',
-              average_rate_limit: '10',
-              maximum_burst_size: '20'
+              average_rate_limit: 10,
+              maximum_burst_size: 20
             }
           },
           {

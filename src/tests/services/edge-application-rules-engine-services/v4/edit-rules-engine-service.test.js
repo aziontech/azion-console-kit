@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { editRulesEngineService } from '@/services/edge-application-rules-engine-services/v4'
 import { describe, expect, it, vi } from 'vitest'
+import { adaptCriteria } from '@/services/edge-application-rules-engine-services/v4/helper-criteria'
 
 const fixtures = {
   ruleEngineMock: {
@@ -17,15 +18,13 @@ const fixtures = {
       }
     ],
     criteria: [
-      {
-        entries: [
-          {
-            variable: 'remote_addr',
-            operator: 'is_equal',
-            value: '127.0.0.1'
-          }
-        ]
-      }
+      [
+        {
+          variable: 'remote_addr',
+          operator: 'is_equal',
+          value: '127.0.0.1'
+        }
+      ]
     ],
     isActive: true,
     description: 'Test rule description'
@@ -122,5 +121,49 @@ describe('EdgeApplicationRulesEngineServices', () => {
     const promise = sut({ id: '987654', payload: fixtures.ruleEngineMock })
 
     expect(promise).rejects.toBe('Bad Request Error')
+  })
+
+  it('should remove argument from criteria when operator is "exists" or "does_not_exist"', () => {
+    const criterias = [
+      [
+        {
+          variable: 'remote_addr',
+          operator: 'exists',
+          argument: '192.168.1.1'
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'is_equal',
+          argument: '192.168.1.1'
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'does_not_exist',
+          argument: '192.168.1.2'
+        }
+      ]
+    ]
+
+    const expectedCriterias = [
+      [
+        {
+          variable: 'remote_addr',
+          operator: 'exists'
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'is_equal',
+          argument: '192.168.1.1'
+        },
+        {
+          variable: 'remote_addr',
+          operator: 'does_not_exist'
+        }
+      ]
+    ]
+
+    const result = adaptCriteria(criterias)
+
+    expect(result).toEqual(expectedCriterias)
   })
 })

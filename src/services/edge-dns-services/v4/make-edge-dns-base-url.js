@@ -1,3 +1,3 @@
 export const makeEdgeDNSBaseUrl = () => {
-  return `v4/dns`
+  return `v4/edge_dns`
 }

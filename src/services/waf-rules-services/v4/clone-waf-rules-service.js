@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeWafBaseUrl } from './make-waf-rules-base-url'
+import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
 export const cloneWafRulesService = async ({ wafRulesName, payload }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafBaseUrl()}/${payload.id}/clone`,
+    url: `${makeWafRulesBaseUrl()}/${payload.id}/clone`,
     method: 'POST',
     body: adapt(payload, wafRulesName)
   })

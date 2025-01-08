@@ -29,7 +29,7 @@ describe('Edge Functions spec', { tags: ['@dev5'] }, () => {
 
   afterEach(() => {
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge function successfully deleted')
+      cy.verifyToast('Edge Function successfully deleted')
     })
   })
 })
