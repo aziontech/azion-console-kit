@@ -48,14 +48,21 @@ const STATUS_AS_TAG = {
 }
 
 const adapt = (results, statusCode) => {
-  const parsedRulesEngine = results.map((rules) => {
+  const parsedRulesEngine = results.map((rules, index) => {
     return {
       id: rules.id,
       name: rules.name,
       description: rules.description || '',
       lastModified: formatExhibitionDate(rules.last_modified, 'long', 'short'),
       lastEditor: rules.last_editor,
-      status: STATUS_AS_TAG[rules.active]
+      status: STATUS_AS_TAG[rules.active],
+      position: {
+        value: index,
+        immutableValue: index,
+        altered: false,
+        min: 0,
+        max: results.length - 1
+      }
     }
   })
 

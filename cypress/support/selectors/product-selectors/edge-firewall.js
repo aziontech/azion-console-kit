@@ -76,4 +76,10 @@ export default {
   behaviorAverageRateLimitInput: '[data-testid="field-number__input"] > .p-inputtext',
   behaviorLimitBy: '#behaviors\\[0\\]\\.limit_by > .p-dropdown-label',
   behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
+
+  createRulesEngine: '[data-testid="rules-engine-create-button"] > .p-button-label',
+  inputNumberFirstPosition: '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+  reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
+  reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
+  saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
 }
