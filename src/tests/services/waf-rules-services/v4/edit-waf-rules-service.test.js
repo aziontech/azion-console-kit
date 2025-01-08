@@ -64,7 +64,7 @@ describe('WafRulesServices', () => {
           cross_site_scripting: fixtures.wafRulesMock.crossSiteScripting,
           directory_traversal: fixtures.wafRulesMock.directoryTraversal,
           remote_file_inclusion: fixtures.wafRulesMock.remoteFileInclusion,
-          sql_injection: fixtures.wafRulesMock.sqlInjection,
+          sql_injection: fixtures.wafRulesMock.sqlInjection
         },
         id: fixtures.wafRulesMock.id,
         name: fixtures.wafRulesMock.name,

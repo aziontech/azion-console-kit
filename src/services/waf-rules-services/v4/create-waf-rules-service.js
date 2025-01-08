@@ -34,7 +34,7 @@ const adapt = (payload) => {
       cross_site_scripting: payload.crossSiteScripting,
       directory_traversal: payload.directoryTraversal,
       remote_file_inclusion: payload.remoteFileInclusion,
-      sql_injection: payload.sqlInjection,
+      sql_injection: payload.sqlInjection
     }
   }
 }
