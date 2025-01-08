@@ -16,7 +16,7 @@
     :optionDisabled="props.optionDisabled"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
-    :showClear="props.showClear"
+    :showClear="props.enableClearOption"
     @change="emitChange"
     @blur="emitBlur"
     :class="errorMessage ? 'p-invalid' : ''"
@@ -147,7 +147,7 @@
       type: Boolean,
       default: false
     },
-    showClear: {
+    enableClearOption: {
       type: Boolean,
       default: false
     },
