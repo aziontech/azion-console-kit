@@ -2,7 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate, userUsingGraphqlQuery } from '@/helpers'
+import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 
 export const listEdgeFunctionsConsole = async (filter) => {
@@ -16,7 +16,7 @@ export const listEdgeFunctionsConsole = async (filter) => {
   const response = await decorator.request({
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
-    body: userUsingGraphqlQuery(filter) ?? payload
+    body: payload
   })
 
   return adaptResponse(response)

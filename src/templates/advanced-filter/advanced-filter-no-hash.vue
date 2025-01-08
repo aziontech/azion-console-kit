@@ -7,6 +7,7 @@
   import chipsDefaultDisplay from './component/display/chips-default-display.vue'
   import chipsRangeDisplay from './component/display/chips-range-display.vue'
   import chipsInDisplay from './component/display/chips-in-display.vue'
+  // import InputText from 'primevue/inputtext'
 
   const emit = defineEmits(['applyFilter', 'update:filterAdvanced'])
 
