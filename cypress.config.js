@@ -21,12 +21,6 @@ export default defineConfig({
           fs.unlinkSync(results.video)
         }
       })
-      on('task', {
-        allowClipboardAccess() {
-          process.env.CYPRESS_CLIPBOARD_ACCESS = true
-          return null
-        }
-      })
       return config
     },
     testIsolation: false
