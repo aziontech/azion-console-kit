@@ -46,6 +46,7 @@ export default {
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-filter-input"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
+  ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_2',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
   rulesWafDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
@@ -69,5 +70,10 @@ export default {
   cancelButton: '[data-testid="form-actions-cancel-button"]',
   searchInput: '[data-testid="data-table-search-input"]',
   nameRow: '[data-testid="list-table-block__column__name__row"]',
-  activeRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value'
+  activeRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+  behaviorRateLimitType: '#behaviors\\[0\\]\\.type > .p-dropdown-label',
+  behaviorRateLimitTypeFirstOption: '#behaviors\\[0\\]\\.type_1',
+  behaviorAverageRateLimitInput: '[data-testid="field-number__input"] > .p-inputtext',
+  behaviorLimitBy: '#behaviors\\[0\\]\\.limit_by > .p-dropdown-label',
+  behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
 }

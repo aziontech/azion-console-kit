@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-services/v4/make-edge-application-v4-base-url'
 import * as Errors from '@/services/axios/errors'
 import { adaptBehavior } from './helper-behavior'
+import { adaptCriteria } from './helper-criteria'
 import { extractApiError } from '@/helpers/extract-api-error'
 
 export const editRulesEngineService = async ({ id, payload, reorder = false }) => {
@@ -28,7 +29,7 @@ const adapt = (payload, reorder) => {
       name,
       phase: phase.content || phase,
       behaviors: adaptBehavior(behaviors),
-      criteria,
+      criteria: adaptCriteria(criteria),
       active: isActive,
       description
     }
