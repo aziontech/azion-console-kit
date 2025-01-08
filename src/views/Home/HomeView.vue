@@ -60,7 +60,7 @@
   }
 
   const navigateToPayment = () => {
-    router.push({ name: 'billing' })
+    router.push({ name: 'billing-tabs' })
   }
 
   const navigateToRealTimeMetrics = () => {
