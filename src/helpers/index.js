@@ -10,7 +10,8 @@ import {
   openAzionDiscord,
   openAzionGithub,
   openAzionX,
-  openShowMorePlan
+  openShowMorePlan,
+  openMarketplaceIntegrationsDocumentation
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
@@ -54,6 +55,7 @@ export {
   openContactSupport,
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
+  openMarketplaceIntegrationsDocumentation,
   openSearchResult,
   openAzionSite,
   openAzionBlog,
