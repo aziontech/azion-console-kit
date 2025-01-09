@@ -165,7 +165,16 @@
       .number()
       .transform((value) => (Number.isNaN(value) ? null : value))
       .required()
-      .label('Edge Function')
+      .label('Edge Function'),
+    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
+      let isValidJson = true
+      try {
+        JSON.parse(value)
+      } catch {
+        isValidJson = false
+      }
+      return isValidJson
+    })
   })
 
   const editService = async (payload) => {
