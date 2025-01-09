@@ -305,7 +305,7 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref, onUpdated } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
@@ -431,7 +431,6 @@
   const isRenderOneOption = props.actions?.length === 1
   const selectedId = ref(null)
   const dataTableRef = ref(null)
-  const paginationFirstElement = ref(0)
 
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -542,7 +541,7 @@
                     deleteService: action.service,
                     rerender: Math.random()
                   },
-                  onClose: (opt) => opt.data.updated && reload()
+                  onClose: (opt) => opt.data.updated && reload() && updateDataTablePagination()
                 }
                 openDialog(DeleteDialog, bodyDelete)
               }
@@ -586,7 +585,6 @@
           emit('on-load-data', !!hasData)
         }
         firstLoadData.value = false
-        paginationFirstElement.value = page
       }
     }
   }
@@ -691,8 +689,8 @@
   }
 
   const updateDataTablePagination = () => {
-    if (!dataTableRef.value) return
-    dataTableRef.value.d_first = (paginationFirstElement.value - 1) * dataTableRef.value.rows
+    const FIRST_NUMBER_PAGE = 1
+    firstItemIndex.value = FIRST_NUMBER_PAGE
   }
 
   const handleSearchValue = () => {
@@ -710,10 +708,6 @@
       })
     }
     selectedColumns.value = props.columns
-  })
-
-  onUpdated(() => {
-    updateDataTablePagination()
   })
 
   defineExpose({ reload, handleExportTableDataToCSV })
