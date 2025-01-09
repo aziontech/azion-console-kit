@@ -9,7 +9,7 @@
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, nextTick, ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
@@ -146,20 +146,20 @@
   const showArgumentBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaRow = criteria.value[criteriaIndex].value[criteriaInnerRowIndex]
     return (
-      criteriaRow.operator !== 'exists' &&
-      criteriaRow.operator !== 'does_not_exist' &&
-      criteriaRow.variable !== 'ssl_verification_status' &&
-      criteriaRow.variable !== 'network'
+      criteriaRow.operator !== '${exists}' &&
+      criteriaRow.operator !== '${does_not_exist}' &&
+      criteriaRow.variable !== '${ssl_verification_status}' &&
+      criteriaRow.variable !== '${network}'
     )
   }
   const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
-    return criteriaVariable === 'ssl_verification_status'
+    return criteriaVariable === '${ssl_verification_status}'
   }
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
-    const isCriteriaNetworkSelected = criteriaVariable === 'network'
+    const isCriteriaNetworkSelected = criteriaVariable === '${network}'
     const hasNetworkOptionsToSelect = networkListOptions.value.length
 
     if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
@@ -485,8 +485,10 @@
     criteriaIndex,
     criteriaInnerRowIndex
   }) => {
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    nextTick(() => {
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    })
   }
 </script>
 <template>

@@ -1,20 +1,22 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createEdgeFirewallRulesEngineService } from '@/services/edge-firewall-rules-engine-services/v4'
+import { editEdgeFirewallRulesEngineService } from '@/services/edge-firewall-rules-engine-services/v4'
+
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeFirewallId: '123',
   payload: {
-    name: 'Rules Engine teste',
-    description: 'My description',
+    id: '456',
+    name: 'Test Rule',
+    description: 'Test Description',
     active: true,
     criteria: [
-      [{ conditional: 'if', input: '${uri}', comparison: 'starts_with', subject: '/api' }]
+      [{ conditional: 'if', input: 'hostname', comparison: 'is_equal', subject: 'example.com' }]
     ],
     behaviors: [
-      { name: 'run_function', functionId: 'abc123' },
-      { name: 'set_waf_ruleset', mode: 'blocking', waf_id: 'def456' },
+      { name: 'run_function', functionId: '789' },
+      { name: 'set_waf_ruleset', mode: 'blocking', waf_id: '101112' },
       {
         name: 'set_rate_limit',
         type: 'second',
@@ -26,43 +28,42 @@ const fixtures = {
         name: 'set_custom_response',
         status_code: 403,
         content_type: 'text/plain',
-        content_body: 'Not Access'
-      }
+        content_body: 'Forbidden'
+      },
+      { name: 'deny' }
     ]
   }
 }
 
 const makeSut = () => {
-  const sut = createEdgeFirewallRulesEngineService
+  const sut = editEdgeFirewallRulesEngineService
 
   return {
     sut
   }
 }
 
-describe('EdgeFirewallRulesEngineService', () => {
-  it('should call the API with the correct parameters.', async () => {
+describe('EdgeFirewallRulesEngineServices', () => {
+  it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202
     })
-
     const { sut } = makeSut()
-
     await sut(fixtures)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      url: `v4/edge_firewall/firewalls/${fixtures.edgeFirewallId}/rules`,
+      url: `v4/edge_firewall/firewalls/${fixtures.edgeFirewallId}/rules/${fixtures.payload.id}`,
+      method: 'PATCH',
       body: {
         name: fixtures.payload.name,
         description: fixtures.payload.description,
         active: fixtures.payload.active,
         criteria: fixtures.payload.criteria,
         behaviors: [
-          { name: 'run_function', argument: 'abc123' },
+          { name: 'run_function', argument: '789' },
           {
             name: 'set_waf_ruleset',
-            argument: { mode: 'blocking', id: 'def456' }
+            argument: { mode: 'blocking', id: '101112' }
           },
           {
             name: 'set_rate_limit',
@@ -75,55 +76,59 @@ describe('EdgeFirewallRulesEngineService', () => {
           },
           {
             name: 'set_custom_response',
-            argument: { status_code: 403, content_type: 'text/plain', content_body: 'Not Access' }
-          }
+            argument: { status_code: 403, content_type: 'text/plain', content_body: 'Forbidden' }
+          },
+          { name: 'deny' }
         ]
       }
     })
   })
 
-  it('should return a feedback message when successfully created.', async () => {
+  it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202
     })
-
     const { sut } = makeSut()
 
-    const { feedback } = await sut(fixtures)
+    const feedbackMessage = await sut(fixtures)
 
-    expect(feedback).toBe('Rule Engine successfully created')
+    expect(feedbackMessage).toBe('Rule Engine successfully updated')
   })
 
-  it('should throw parsing api error when request fails', async () => {
-    const apiErrorMock = {
-      detail: 'error message'
-    }
-
+  it('should throw an error if the API returns a validation error', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      body: apiErrorMock
+      body: { name: { invalid_value: 'Test' } }
     })
 
     const { sut } = makeSut()
+    const promise = sut(fixtures)
 
-    const apiErrorResponse = sut(fixtures)
-
-    await expect(apiErrorResponse).rejects.toThrow('error message')
+    await expect(promise).rejects.toBe('Unknown error occurred')
   })
 
-  it('should throw internal server error when request fails with 500 status code', async () => {
+  it('should throw when request fails with status code 500', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 500,
-      body: { data: { id: '123' } }
+      statusCode: 500
     })
-
     const { sut } = makeSut()
 
-    const apiErrorResponse = sut(fixtures)
+    const response = sut(fixtures)
     const expectedError = new Errors.InternalServerError().message
-
-    await expect(apiErrorResponse).rejects.toThrow(expectedError)
+    await expect(response).rejects.toBe(expectedError)
   })
+
+  it('should throw when request fails with status code 401', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 401,
+      body: { detail: 'Invalid API token' }
+    })
+    const { sut } = makeSut()
+
+    const response = sut(fixtures)
+    await expect(response).rejects.toBe('Invalid API token')
+  })
+
   it('should correctly convert the criteria variable to number and not modify other criteria', async () => {
     const originalCriteria = [
       {
