@@ -1,9 +1,11 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import { computed, onMounted } from 'vue'
+  import AdvancedFilterGraphql from './advanced-filter-graphql.vue'
+  import { computed, onMounted, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import SelectButton from 'primevue/selectbutton'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -25,6 +27,9 @@
     filter.value.isUserUsingGraphqlQuery = false
   })
 
+  const filterMode = ref('Wizard')
+  const options = ref(['Wizard', 'Advanced'])
+
   const filter = computed({
     get: () => {
       return props.filterData
@@ -41,6 +46,11 @@
   const filterSearch = () => {
     emit('updatedFilter')
   }
+
+  const searchAdvancedFilter = (filters) => {
+    filter.value.fields = filters
+    emit('updatedFilter')
+  }
 </script>
 
 <template>
@@ -49,7 +59,16 @@
       v-model:filterDate="filter.tsRange"
       @applyTSRange="filterSearch"
     />
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
+    <SelectButton
+      v-model="filterMode"
+      :options="options"
+      aria-labelledby="basic"
+      class="w-fit"
+    />
+    <div
+      class="flex w-full flex-column gap-6 md:gap-2 md:flex-row"
+      v-if="filterMode === 'Wizard'"
+    >
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
@@ -75,5 +94,10 @@
         />
       </div>
     </div>
+    <AdvancedFilterGraphql
+      :fieldsInFilter="props.fieldsInFilter"
+      :searchAdvancedFilter="searchAdvancedFilter"
+      v-else
+    />
   </div>
 </template>
