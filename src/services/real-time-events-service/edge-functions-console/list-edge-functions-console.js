@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import * as Errors from '@/services/axios/errors'
 import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeFunctionsConsole = async (filter) => {
@@ -20,7 +21,7 @@ export const listEdgeFunctionsConsole = async (filter) => {
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -66,28 +67,50 @@ const levelMap = {
   }
 }
 
-const adaptResponse = (response) => {
-  const { body } = response
-  const totalRecords = body.data.cellsConsoleEvents?.length
-
-  const data = body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
-    configurationId: cellsConsoleEvents.configurationId,
-    functionId: cellsConsoleEvents.functionId,
-    id: generateCurrentTimestamp(),
-    originalId: cellsConsoleEvents.id,
-    level: levelMap[cellsConsoleEvents.level],
-    line: cellsConsoleEvents.line,
-    lineSource: {
-      content: cellsConsoleEvents.lineSource,
-      severity: 'info'
-    },
-    source: cellsConsoleEvents.source,
-    tsFormat: convertValueToDate(cellsConsoleEvents.ts),
-    ts: cellsConsoleEvents.ts
-  }))
+const adaptResponse = (body) => {
+  const cellsConsoleEventsList = body.data?.cellsConsoleEvents
+  const totalRecords = cellsConsoleEventsList?.length
+  const parser = cellsConsoleEventsList?.length
+    ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
+        configurationId: cellsConsoleEvents.configurationId,
+        functionId: cellsConsoleEvents.functionId,
+        id: generateCurrentTimestamp(),
+        originalId: cellsConsoleEvents.id,
+        level: levelMap[cellsConsoleEvents.level],
+        line: cellsConsoleEvents.line,
+        lineSource: {
+          content: cellsConsoleEvents.lineSource,
+          severity: 'info'
+        },
+        source: cellsConsoleEvents.source,
+        tsFormat: convertValueToDate(cellsConsoleEvents.ts),
+        ts: cellsConsoleEvents.ts
+      }))
+    : []
 
   return {
-    data,
+    data: parser,
     recordsFound: getRecordsFound(totalRecords)
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
   }
 }
