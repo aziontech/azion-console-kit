@@ -13,10 +13,11 @@ const fixtures = {
 describe('Account Settings spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
+    cy.intercept('GET', '/api/v4/iam/account').as('getAccountSettingsApi')
     cy.openProduct('Account Settings')
 
     fixtures.companyName = generateUniqueName('companyName')
-    cy.wait(3000)
+    cy.wait('@getAccountSettingsApi')
   })
 
   it('should update the billing email list successfully', () => {
