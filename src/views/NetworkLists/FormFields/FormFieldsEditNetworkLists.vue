@@ -136,7 +136,7 @@
           filter
           autoFilterFocus
           optionLabel="name"
-          optionValue="value"
+          optionValue="name"
           placeholder="Select Countries"
           :class="{ 'p-invalid': itemsValuesCountryError }"
           data-testid="network-list-form__countries__multiselect"
