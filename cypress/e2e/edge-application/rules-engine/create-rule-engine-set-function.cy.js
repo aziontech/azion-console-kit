@@ -96,7 +96,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     ).as('getFunctionInstance')
     cy.wait('@postFunction')
     cy.wait('@getFunctionInstance')
-    cy.wait(3000)
+    cy.wait(1000)
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0))
       .find(
