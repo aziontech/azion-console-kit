@@ -11,7 +11,9 @@
               @input="handleInput"
               @focus="handleInput"
               @keydown="handleKeyDown"
+              @click="handleInput"
               placeholder="Digite sua consulta GraphQL..."
+              ref="searchInputRef"
             />
           </div>
           <div class="h-auto w-full md:max-w-fit">
@@ -78,7 +80,7 @@
 </template>
 
 <script setup>
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import Card from 'primevue/card'
   import InputText from 'primevue/inputtext'
   import OverlayPanel from 'primevue/overlaypanel'
@@ -98,36 +100,38 @@
   })
 
   const options = computed(() => {
-    return props.fieldsInFilter
-      .filter((item) => !item.label.includes('Domain'))
-      .map(({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
-        return {
-          label,
-          mostRelevant,
-          value: {
-            disabled,
-            description,
-            value,
+    return (
+      props.fieldsInFilter
+        // .filter((item) => !item.label.includes('Domain'))
+        .map(({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
+          return {
             label,
-            operator: operator.map(
-              ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
-                const { value: valueLabel, label: labelOp, format } = OPERATOR_MAPPING[valueOp]
-                return {
-                  label: labelOp,
-                  value: {
-                    disabled: disabledOp,
-                    placeholder,
-                    value: valueLabel,
-                    props,
-                    format,
-                    type
+            mostRelevant,
+            value: {
+              disabled,
+              description,
+              value,
+              label,
+              operator: operator.map(
+                ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
+                  const { value: valueLabel, label: labelOp, format } = OPERATOR_MAPPING[valueOp]
+                  return {
+                    label: labelOp,
+                    value: {
+                      disabled: disabledOp,
+                      placeholder,
+                      value: valueLabel,
+                      props,
+                      format,
+                      type
+                    }
                   }
                 }
-              }
-            )
+              )
+            }
           }
-        }
-      })
+        })
+    )
   })
 
   // Estados
@@ -144,6 +148,7 @@
     step: 'field' // 'field' | 'operator' | 'value'
   })
   const savedFilters = ref([])
+  const searchInputRef = ref(null)
 
   // Métodos
   const handleInput = (event) => {
@@ -155,7 +160,7 @@
     showSuggestionsPanel(event)
   }
 
-  const updateSuggestions = () => {
+  const updateSuggestions = async () => {
     let suggestions = []
     switch (currentFilter.step) {
       case 'field':
@@ -181,7 +186,10 @@
               value: op.value.format,
               type: op.value.type,
               iconMap: op.value.value,
-              disabled: savedFilters.value.some((filter) => filter.format === op.value.format)
+              disabled: savedFilters.value.some(
+                (filter) => filter.format === op.value.format && filter.field === field.value.label
+              ),
+              props: op.value.props
             }))
         }
         break
@@ -204,10 +212,14 @@
       case 'field':
         currentFilter.field = suggestion.value
         currentFilter.step = 'operator'
+        last.value = 2
         break
       case 'operator':
         currentFilter.operator = suggestion.value
         currentFilter.step = 'value'
+        last.value = 3
+        break
+      case 'value':
         break
     }
 
@@ -261,7 +273,8 @@
   const saveCurrentFilter = () => {
     if (currentFilter.field && currentFilter.operator && editorContent.value.trim()) {
       if (currentFilter.step === 'value') {
-        currentFilter.value = editorContent.value.split(' ')[2]
+        const wordCount = editorContent.value.split(' ').length
+        currentFilter.value = editorContent.value.split(' ')[wordCount - 1]
       } else {
         currentFilter.value = editorContent.value.trim()
       }
@@ -292,9 +305,13 @@
     }
   }
 
-  const showSuggestionsPanel = (event) => {
+  const showSuggestionsPanel = () => {
     if (suggestionPanel.value && filteredSuggestions.value.length > 0) {
-      suggestionPanel.value.show(event)
+      suggestionPanel.value.show({
+        target: searchInputRef.value.$el,
+        currentTarget: searchInputRef.value.$el,
+        preventDefault: () => {}
+      })
     }
   }
 
@@ -333,6 +350,52 @@
 
     props.searchAdvancedFilter(searchParams)
   }
+
+  const resetStepFilter = (step = 'field') => {
+    Object.assign(currentFilter, {
+      field: step === 'field' ? '' : currentFilter.field,
+      operator: step === 'operator' ? '' : currentFilter.operator,
+      value: '',
+      step: step
+    })
+    updateSuggestions()
+    showSuggestionsPanel()
+  }
+
+  const resetAllFilter = () => {
+    Object.assign(currentFilter, {
+      field: '',
+      operator: '',
+      value: '',
+      step: 'field'
+    })
+    last.value = 1
+    updateSuggestions()
+    showSuggestionsPanel()
+  }
+
+  const last = ref(1)
+
+  watch(editorContent, (str) => {
+    const values = str.split(' ')
+    const hasSpace = str.endsWith(' ')
+    const hasSpaceField = currentFilter.field.split(' ').length
+
+    const wordCount = values.filter((value) => value !== '').length + (hasSpace ? 1 : 0)
+
+    if (wordCount < last.value) {
+      if (wordCount === 1 || wordCount === hasSpaceField || hasSpaceField === 1) {
+        resetStepFilter('field')
+      } else if (wordCount === hasSpaceField + 1) {
+        resetStepFilter('operator')
+      } else if (wordCount === 0) {
+        resetAllFilter()
+        return
+      }
+    }
+
+    last.value = wordCount
+  })
 </script>
 
 <style scoped>
