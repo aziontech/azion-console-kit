@@ -467,8 +467,8 @@
   const setNetworkListOptions = async () => {
     try {
       loadingNetworkList.value = true
-      const result = await props.listNetworkListService()
-      networkListOptions.value = result
+      const { body } = await props.listNetworkListService({ pageSize: 100 })
+      networkListOptions.value = body
     } catch (error) {
       toast.add({
         closable: true,
