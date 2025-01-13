@@ -60,7 +60,7 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
     // edit service
 
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(2000) // waiting for api response is not working because of page update
+    cy.wait(2000)
     cy.get(selectors.edgeServices.statusSwitch).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
