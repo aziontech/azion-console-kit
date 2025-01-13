@@ -83,7 +83,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.verifyToast('success', 'Your origin has been created')
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
-
+    cy.wait('@getOrigin')
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0))
       .find(selectors.edgeApplication.rulesEngine.originOption(fixtures.originName))
