@@ -6,11 +6,13 @@ on:
     branches:
       - dev
       - freezing
+      - redesigning-the-flow-of-the-user-journey-in-domain-and-edge-app
       - main
   push:
     branches:
       - dev
       - freezing
+      - redesigning-the-flow-of-the-user-journey-in-domain-and-edge-app
   workflow_dispatch:
 
 env:
