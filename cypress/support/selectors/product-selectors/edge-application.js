@@ -57,13 +57,23 @@ export default {
     firstBehaviorValueOption: '#behaviors\\[0\\]\\.functionId_0',
     dropdownLoadingIcon:
       '[data-testid="edge-application-rule-form__function-instance-item[0]__loading-icon"]',
-    phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]'
+    phaseRadioGroup: '[data-testid="edge-application-rule-form__phase__radio-group"]',
+
+    clickOnTabRulesEngine: '#tab_5 > .p-tabview-title',
+    checkDefaultRulesEngine: '[data-testid="list-table-block__column__name__row"]',
+    saveButton: '[data-testid="form-actions-submit-button"]',
+    inputNumberFirstPosition: '#row-1 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+    reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
+    reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
+    saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',
     addressInput: '[data-testid="origin-form__address__input"]',
     originType: '[data-testid="origin-form__origin-type__dropdown"]',
-    nameInput: '[data-testid="form-horizontal-general-name__input"]'
+    nameInput: '[data-testid="form-horizontal-general-name__input"]',
+    dialogCopyButton: '[data-testid="copy-key-dialog__token-field__copy-key-button"]',
+    dialogCloseButton: '[data-testid="copy-key-dialog__dialog-footer__confirm-button"]',
   },
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',

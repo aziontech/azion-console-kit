@@ -77,6 +77,13 @@ describe('EdgeFirewallRulesEngineServices', () => {
           status: {
             content: 'Active',
             severity: 'success'
+          },
+          position: {
+            altered: false,
+            immutableValue: 0,
+            max: 0,
+            min: 0,
+            value: 0
           }
         }
       ],
@@ -106,6 +113,13 @@ describe('EdgeFirewallRulesEngineServices', () => {
           status: {
             content: 'Inactive',
             severity: 'danger'
+          },
+          position: {
+            altered: false,
+            immutableValue: 0,
+            max: 0,
+            min: 0,
+            value: 0
           }
         }
       ],

@@ -541,7 +541,7 @@
                     deleteService: action.service,
                     rerender: Math.random()
                   },
-                  onClose: (opt) => opt.data.updated && reload()
+                  onClose: (opt) => opt.data.updated && reload() && updateDataTablePagination()
                 }
                 openDialog(DeleteDialog, bodyDelete)
               }
@@ -686,6 +686,11 @@
     const firstPage = 1
     firstItemIndex.value = firstPage
     reload()
+  }
+
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 1
+    firstItemIndex.value = FIRST_NUMBER_PAGE
   }
 
   const handleSearchValue = () => {
