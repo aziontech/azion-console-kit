@@ -27,7 +27,7 @@ describe('RealTimeMetricsServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+    const version = 'v4'
 
     await sut({ query: fixtures.query, signal: fixtures.signal })
 
