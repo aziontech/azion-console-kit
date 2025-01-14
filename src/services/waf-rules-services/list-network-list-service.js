@@ -21,7 +21,6 @@ const adapt = (httpResponse) => {
         return {
           value: {
             id: networkList.id,
-            value: networkList.value,
             disabledIP,
             disabledCountries
           },
