@@ -237,7 +237,7 @@ const backRules = [
     behavior: {
       forwardCookies: true,
       setOrigin: {
-        name: 'origin-manager',
+        name: 'origin-api',
         type: 'single_origin'
       },
       rewrite: '/billing/graphql'
@@ -250,7 +250,7 @@ const backRules = [
     behavior: {
       forwardCookies: true,
       setOrigin: {
-        name: 'origin-manager',
+        name: 'origin-api',
         type: 'single_origin'
       },
       rewrite: '/accounting/graphql'

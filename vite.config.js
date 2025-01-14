@@ -50,7 +50,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
         '/graphql/billing': {
-          target: `${URLStartPrefix}manager.azion.com`,
+          target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
@@ -85,7 +85,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/ai/, '')
         },
         '/graphql/accounting': {
-          target: `${URLStartPrefix}manager.azion.com`,
+          target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
         },
