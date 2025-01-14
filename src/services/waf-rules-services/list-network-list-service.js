@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeNetworkListBaseUrl } from '../network-lists-services/make-network-list-base-url'
+import { makeNetworkListBaseUrl } from '../network-lists-services/v4/make-network-list-service'
 
 export const listNetworkListService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeNetworkListBaseUrl()}?pagination=false&exclude_azion_lists=true`,
+    url: `${makeNetworkListBaseUrl()}?page_size=100`,
     method: 'GET'
   })
 
@@ -16,8 +16,8 @@ const adapt = (httpResponse) => {
 
   const networkList = isArray
     ? httpResponse.body.results.map((networkList) => {
-        const disabledIP = networkList.list_type === 'ip_cidr'
-        const disabledCountries = networkList.list_type === 'countries'
+        const disabledIP = networkList.type === 'ip_cidr'
+        const disabledCountries = networkList.type === 'countries'
         return {
           value: {
             id: networkList.id,

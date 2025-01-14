@@ -37,7 +37,7 @@ describe('WafRulesServices', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/network_lists?pagination=false&exclude_azion_lists=true`,
+      url: `v4/workspace/network_lists?page_size=100`,
       method: 'GET'
     })
   })
