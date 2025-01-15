@@ -34,9 +34,18 @@
   const generateHomeBreadCrumb = computed(() => {
     return {
       label: 'Home',
+      command: () => router.push('/'),
       to: '/'
     }
   })
+
+  const convertBreadcrumbs = computed(() => {
+    return breadcrumbs.items.map((item) => ({
+      ...item,
+      command: () => router.push(item.to)
+    }))
+  })
+
   const hasDefaultSlot = computed(() => {
     return !!slots.default
   })
@@ -48,7 +57,7 @@
   <div class="w-full flex-col justify-center items-start inline-flex">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
-      :model="breadcrumbs.items"
+      :model="convertBreadcrumbs"
       class="-ml-1.5 overflow-auto w-full"
       :pt="{
         label: { class: 'whitespace-nowrap' },
