@@ -139,6 +139,7 @@
           severity="info"
           data-testid="message-deprecation"
         >
+          Azion Console is now the primary way to access Azion's platform.
           <PrimeButton
             label="Real-Time Manager (RTM)"
             @click="openRTM"
@@ -147,9 +148,8 @@
             size="small"
             link
           />
-
-          will be deprecated and accessible only until January 27, 2025. Azion Console is now the
-          primary way to access Azion's platform.
+          will be deprecated soon, and access will only be available for a limited time through this
+          link.
         </InlineMessage>
 
         <div
