@@ -13,6 +13,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import { useLayout } from '@/composables/use-layout'
   import InlineMessage from 'primevue/inlinemessage'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -114,6 +115,12 @@
     }
   }
 
+  const openRTM = async () => {
+    const urlEOL = getStaticUrlsByEnvironment('managerEOL')
+    await tracker.product.clickedTo({ target: 'RTM' }).track()
+    window.location.href = urlEOL
+  }
+
   onMounted(async () => {
     teams.value = await props.listTeamsService()
     showOnboardingSchedulingDialog()
@@ -134,11 +141,11 @@
         >
           <PrimeButton
             label="Real-Time Manager (RTM)"
-            @click="openContactSupport"
+            @click="openRTM"
             iconPos="right"
+            class="p-0"
             size="small"
             link
-            icon="pi pi-external-link"
           />
 
           will be deprecated and accessible only until January 27, 2025. Azion Console is now the

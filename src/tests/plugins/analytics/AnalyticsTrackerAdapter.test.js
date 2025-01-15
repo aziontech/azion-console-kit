@@ -557,7 +557,7 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to RTM', {
       application: fixtures.application
     })
-  }
+  })
 
   // Waf Rules Tracker - Scenarios
   it('should be able to track click to allow rules with correct params', () => {
