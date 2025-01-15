@@ -5,6 +5,10 @@ const urls = {
     stage: 'https://stage-manager.azion.com',
     production: 'https://manager.azion.com'
   },
+  managerEOL: {
+    stage: 'https://stage-manager.azion.com/home',
+    production: 'https://manager.azion.com/home'
+  },
   billing: {
     stage: 'https://stage-manager.azion.com/billing-subscriptions',
     production: 'https://manager.azion.com/billing-subscriptions'
