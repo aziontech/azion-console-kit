@@ -12,6 +12,7 @@
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import { useLayout } from '@/composables/use-layout'
+  import InlineMessage from 'primevue/inlinemessage'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -126,7 +127,24 @@
   <ContentBlock>
     <template #content>
       <section class="w-full flex flex-col gap-6 lg:gap-8">
-        <!-- Getting Started -->
+        <InlineMessage
+          class="p-3 gap-1"
+          severity="info"
+          data-testid="message-deprecation"
+        >
+          <PrimeButton
+            label="Real-Time Manager (RTM)"
+            @click="openContactSupport"
+            iconPos="right"
+            size="small"
+            link
+            icon="pi pi-external-link"
+          />
+
+          will be deprecated and accessible only until January 27, 2025. Azion Console is now the
+          primary way to access Azion's platform.
+        </InlineMessage>
+
         <div
           v-if="showExperimental"
           class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"

@@ -544,6 +544,21 @@ describe('AnalyticsTrackerAdapter', () => {
     })
   })
 
+  it('should be able to track clicked to with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const targetName = 'RTM'
+
+    sut.product.clickedTo({
+      target: targetName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to RTM', {
+      application: fixtures.application
+    })
+  }
+
   // Waf Rules Tracker - Scenarios
   it('should be able to track click to allow rules with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
