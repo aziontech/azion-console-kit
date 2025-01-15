@@ -3,7 +3,9 @@ import selectors from '../../support/selectors'
 describe('Your Settings spec', { tags: ['@dev7'] }, () => {
   beforeEach(() => {
     cy.login()
+    cy.intercept('GET', '/api/v4/iam/user').as('getUser')
     cy.openProduct('Your Settings')
+    cy.wait('@getUser')
   })
 
   it('should edit user phone number', () => {
