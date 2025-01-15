@@ -18,7 +18,9 @@ export const switchAccountRoutes = {
     const refresh = AuthServices.refreshAuthenticationService
 
     try {
-      const redirect = await accountHandler.switchAccountFromSocialIdp(verify, refresh)
+      const EnableSocialLogin = true
+      const redirect = await accountHandler.switchAccountFromSocialIdp(verify, refresh, EnableSocialLogin)
+      console.log('🚀 ~ beforeEnter: ~ redirect:', redirect);
       next(redirect)
     } catch {
       next({ name: 'login' })
