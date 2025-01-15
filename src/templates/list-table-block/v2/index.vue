@@ -23,7 +23,6 @@
       :expandableRowGroups="expandableRowGroups"
       rowGroupMode="subheader"
       :groupRowsBy="props.groupColumn"
-      :sortField="props.groupColumn"
       sortMode="single"
       :rowClass="stateClassRules"
       :pt="{
