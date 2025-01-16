@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-service'
+import { makeDomainsBaseUrl } from './make-domains-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listDomainsService = async ({
