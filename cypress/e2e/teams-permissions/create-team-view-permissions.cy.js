@@ -44,8 +44,12 @@ describe('Teams Permissions', { tags: ['@dev7'] }, () => {
     cy.get(selectors.teams.nameInput).type(teamsPermissionsName)
 
     viewPermissionsFixtures.forEach((permission) => {
-      cy.get(selectors.teams.permission(permission)).dblclick()
+      cy.get(selectors.teams.permission(permission)).click()
     })
+
+    cy.get(
+      '[data-testid="teams-permissions-form__permissions-field-picklist__move-to-target-btn"]'
+    ).click()
 
     cy.get(selectors.teams.sourceList).should('not.contain', 'View', {
       matchCase: false
