@@ -49,7 +49,11 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeServices.listRow('contentType')).should('have.text', 'Shell Script')
     cy.get(selectors.edgeServices.listRow('trigger')).should('have.text', 'Install')
 
-    cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
+    cy.window().then((win) => {
+      const app = win.document.querySelector('#app').__vue_app__
+      const router = app.config.globalProperties.$router
+      router.push('/edge-services')
+    })
     //service
     cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('name')).should('have.text', fixtures.edgeServiceName)
@@ -84,7 +88,11 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeServices.listRow('trigger')).should('be.empty')
 
     // Prepare for cleanup
-    cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
+    cy.window().then((win) => {
+      const app = win.document.querySelector('#app').__vue_app__
+      const router = app.config.globalProperties.$router
+      router.push('/edge-services')
+    })
     cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
   })

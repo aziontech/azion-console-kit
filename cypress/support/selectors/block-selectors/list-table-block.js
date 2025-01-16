@@ -27,7 +27,7 @@ export default {
     option: (size) => `li.p-dropdown-item[aria-label="${size}"]`
   },
   pageNumber: {
-    option: (page) => `button.p-paginator-page[aria-label="${page}"]`
+    option: (page) => `button.p-paginator-page[aria-label="Page ${page}"]`
   },
   orderingHeader: {
     firstColumn: ':nth-child(1) > .p-column-header-content > [data-pc-section="sort"] > .p-icon'

@@ -13,7 +13,7 @@ export default {
   createEdgeApplicationButton: '[data-testid="domains-form__create-edge-application-button"]',
   createEdgeFirewallButton: '[data-testid="domains-form__create-edge-firewall-button"]',
   edgeApplicationDrawer: '.p-sidebar-content',
-  dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
+  dialogTitle: '.p-dialog-title',
   domainField: '[data-testid="domains-dialog__domain-field__input"]',
   digitalCertificateDropdownFilter:
     '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
@@ -26,13 +26,17 @@ export default {
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
   digitalCertificateFieldSelectedValue:
     ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
-  digitalCertificateDropdownSearch: '[data-testid="domains-form__digital-certificates-field__dropdown-search"]',
+  digitalCertificateDropdownSearch:
+    '[data-testid="domains-form__digital-certificates-field__dropdown-search"]',
   digitalCertificateDropdown:
     '[data-testid="domains-form__edge-certificate-field__dropdown"] > .p-dropdown-label',
-  digitalCertificateDropdownFilterSearch: '[data-testid="domains-form__edge-certificate-field__dropdown-search"]',
-  digitalCertificatesDropdownLetsEncrypt: '[data-testid="domains-form__digital-certificates-field__dropdown"] > .p-dropdown-label',
+  digitalCertificateDropdownFilterSearch:
+    '[data-testid="domains-form__edge-certificate-field__dropdown-search"]',
+  digitalCertificatesDropdownLetsEncrypt:
+    '[data-testid="domains-form__digital-certificates-field__dropdown"] > .p-dropdown-label',
   letsEncryptDropdownOption: '#edgeCertificate_1',
-  editPageTitle: '[data-testid="page-heading-block__breadcrumb__Edit Domain"] > .p-menuitem-link > .p-menuitem-text',
+  editPageTitle:
+    '[data-testid="page-heading-block__breadcrumb__Edit Domain"] > .p-menuitem-link > .p-menuitem-text',
   enableMtlsSwitch:
     '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
   dropdownTrustedCA:
@@ -49,7 +53,10 @@ export default {
   listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',
   listTableBlockColumnActiveRow:
     '[data-testid="list-table-block__column__active__row"] > .p-tag-value',
-  edgeApplicationSaveButton: '[data-testid="create-drawer-block__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
-  edgeFirewallSaveButton: '[data-testid="edge-firewall-drawer__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
-  edgeApplicationDropdownSearch: '[data-testid="domains-form__edge-application-field__dropdown-search"]'
+  edgeApplicationSaveButton:
+    '[data-testid="create-drawer-block__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
+  edgeFirewallSaveButton:
+    '[data-testid="edge-firewall-drawer__action-bar"] > [data-testid="form-actions-content"] > [data-testid="form-actions-buttons"] > [data-testid="form-actions-submit-button"] > .p-button-label',
+  edgeApplicationDropdownSearch:
+    '[data-testid="domains-form__edge-application-field__dropdown-search"]'
 }
