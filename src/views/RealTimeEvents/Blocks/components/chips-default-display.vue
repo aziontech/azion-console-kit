@@ -22,7 +22,13 @@
       newFilter = { ...filter, value: filter?.value?.label.toLowerCase() }
 
     const isEmptyString = !newFilter?.value && newFilter?.type === 'String'
-
+    if (newFilter.operator === 'Range' && newFilter.type === 'IntRange') {
+      return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value.begin} and ${
+        newFilter.value.end
+      }`
+    } else if (newFilter.type === 'ArrayObjectDomain') {
+      return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value.label}`
+    }
     return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value}`
   }
 </script>

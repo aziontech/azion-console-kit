@@ -34,7 +34,7 @@
           class="w-fit h-fit max-h-96 overflow-y-auto"
         >
           <div
-            v-if="showSuggestions"
+            v-if="showSuggestions && !loading"
             class="suggestions"
           >
             <div
@@ -50,7 +50,9 @@
                   class="mr-2"
                   v-if="!suggestion?.iconMap"
                 ></i>
-                <p v-else>{{ OPERATOR_MAPPING[suggestion?.iconMap].format }}</p>
+                <p v-if="suggestion?.iconMap && suggestion.iconMap !== 'In'">
+                  {{ OPERATOR_MAPPING[suggestion?.iconMap].format }}
+                </p>
                 <p>
                   {{ suggestion.display }}
                   <span v-if="suggestion.disabled"> - disable</span>
@@ -58,13 +60,20 @@
               </div>
             </div>
           </div>
+          <div
+            v-if="loading"
+            class="flex flex-col items-center gap-2"
+          >
+            <i class="pi pi-spinner spinner text-xl"></i>
+            <span>...loading</span>
+          </div>
         </OverlayPanel>
 
         <!-- Exibir filtros salvos -->
         <div class="mt-3">
           <div
             v-for="(filter, index) in savedFilters"
-            :key="index"
+            :key="filter"
             class="mb-2"
           >
             <ChipsDefaultDisplay
@@ -133,6 +142,7 @@
         })
     )
   })
+  const loading = ref(false)
 
   // Estados
   const editorContent = ref('')
@@ -145,19 +155,33 @@
     field: '',
     operator: '',
     value: '',
-    step: 'field' // 'field' | 'operator' | 'value'
+    step: 'field',
+    domain: false,
+    isBetween: false,
+    secondValue: '',
+    operatorMapping: ''
   })
   const savedFilters = ref([])
   const searchInputRef = ref(null)
 
-  // Métodos
   const handleInput = (event) => {
     const text = event.target.value
     const words = text.split(' ')
     currentWord.value = words[words.length - 1].toLowerCase()
 
+    if (currentFilter.isBetween && editorContent.value.endsWith(' ')) {
+      const hasAnd = editorContent.value.indexOf('and')
+      if (hasAnd !== -1) {
+        hideSuggestions()
+        return
+      }
+      currentFilter.step = 'between'
+      currentFilter.value = getValueIputedOnFilter()
+      last.value = 4
+      updateSuggestions()
+      return
+    }
     updateSuggestions()
-    showSuggestionsPanel(event)
   }
 
   const updateSuggestions = async () => {
@@ -186,8 +210,12 @@
               value: op.value.format,
               type: op.value.type,
               iconMap: op.value.value,
+              operatorMapping: op.value.value,
               disabled: savedFilters.value.some(
-                (filter) => filter.format === op.value.format && filter.field === field.value.label
+                (filter) =>
+                  filter.format === op.value.format &&
+                  filter.field === field.value.label &&
+                  op.value.format !== 'in'
               ),
               props: op.value.props
             }))
@@ -195,18 +223,52 @@
         break
 
       case 'value':
-        // Para o valor, não mostraremos sugestões
+        const currentField = options.value.find((item) => item.value.label === currentFilter.field)
+        if (currentField.label === 'Domain') {
+          suggestions = await getDomains(currentField.value.operator[0].value.props.services)
+        } else {
+          hideSuggestions()
+        }
+        break
+      case 'between':
+        const hasAnd = editorContent.value.indexOf('and')
+        if (hasAnd !== -1) return
+        suggestions = [
+          {
+            display: 'And',
+            value: 'and',
+            type: 'and',
+            disabled: false
+          }
+        ]
         break
     }
 
     filteredSuggestions.value = suggestions
     showSuggestions.value = suggestions.length > 0
+    showSuggestionsPanel()
+  }
+
+  const getDomains = async (service) => {
+    try {
+      loading.value = true
+      const resp = await service()
+      return resp.map((item) => ({
+        display: item.label,
+        value: item.value,
+        domain: true
+      }))
+    } catch (error) {
+      return []
+    } finally {
+      loading.value = false
+    }
   }
 
   const selectSuggestion = (index) => {
     const suggestion = filteredSuggestions.value[index]
-    if (!suggestion) return
-    if (suggestion.disabled) return
+    if (!suggestion && currentFilter.step !== 'value') return
+    if (suggestion?.disabled && currentFilter.step !== 'value') return
 
     switch (currentFilter.step) {
       case 'field':
@@ -217,9 +279,29 @@
       case 'operator':
         currentFilter.operator = suggestion.value
         currentFilter.step = 'value'
+        currentFilter.operatorMapping = suggestion.operatorMapping
         last.value = 3
+        currentFilter.isBetween = suggestion.display === 'Between'
         break
       case 'value':
+        if (suggestion?.domain) {
+          currentFilter.value = {
+            label: suggestion.display,
+            value: suggestion.value
+          }
+          currentFilter.domain = true
+          hideSuggestions()
+          saveCurrentFilter()
+          return
+        } else if (currentFilter.isBetween) {
+          currentFilter.value = getValueIputedOnFilter()
+          currentFilter.step = 'between'
+          last.value = 4
+        }
+        break
+      case 'between':
+        editorContent.value += ' And'
+        hideSuggestions()
         break
     }
 
@@ -227,7 +309,12 @@
     updateEditorContent()
     updateSuggestions()
 
-    if (currentFilter.step === 'value') hideSuggestions()
+    // if (currentFilter.step === 'value') hideSuggestions()
+  }
+
+  const getValueIputedOnFilter = () => {
+    const wordCount = editorContent.value.split(' ').filter((item) => item !== '').length
+    return editorContent.value.split(' ')[wordCount - 1]
   }
 
   const updateEditorContent = () => {
@@ -255,7 +342,13 @@
         case 'Enter':
           event.preventDefault()
           if (currentFilter.step === 'value') {
-            saveCurrentFilter()
+            if (currentFilter.field === 'Domain') {
+              selectSuggestion(selectedIndex.value)
+              hideSuggestions()
+            }
+          } else if (currentFilter.step === 'between') {
+            editorContent.value += ' and'
+            hideSuggestions()
           } else if (selectedIndex.value >= 0) {
             selectSuggestion(selectedIndex.value)
           }
@@ -264,30 +357,54 @@
           hideSuggestions()
           break
       }
-    } else if (event.key === 'Enter' && currentFilter.step === 'value') {
+    } else if (
+      event.key === 'Enter' &&
+      currentFilter.step === 'value' &&
+      !currentFilter.isBetween
+    ) {
       event.preventDefault()
       saveCurrentFilter()
+    } else if (event.key === 'Enter' && currentFilter.isBetween) {
+      const hasAnd = editorContent.value.indexOf('and')
+      if (hasAnd === -1) {
+        selectSuggestion(selectedIndex.value)
+        updateSuggestions()
+      } else {
+        const secondValue = editorContent.value.split('and')[1]?.trim()
+        currentFilter.secondValue = secondValue
+
+        if (currentFilter.secondValue) saveCurrentFilter()
+      }
+    }
+  }
+
+  const handleFilter = (operator) => {
+    if (operator.label === 'Between') {
+      return Object.assign({
+        begin: parseInt(currentFilter.value),
+        end: parseInt(currentFilter.secondValue)
+      })
+    } else {
+      return operator.value.type === 'Int' ? parseInt(currentFilter.value) : currentFilter.value
     }
   }
 
   const saveCurrentFilter = () => {
     if (currentFilter.field && currentFilter.operator && editorContent.value.trim()) {
-      if (currentFilter.step === 'value') {
+      if (currentFilter.step === 'value' && !currentFilter?.domain) {
         const wordCount = editorContent.value.split(' ').length
         currentFilter.value = editorContent.value.split(' ')[wordCount - 1]
-      } else {
-        currentFilter.value = editorContent.value.trim()
       }
 
       const field = options.value.find((item) => item.value.label === currentFilter.field)
       const operator = field.value.operator.find(
-        (item) => item.value.format === currentFilter.operator
+        (item) => item.value.value === currentFilter.operatorMapping
       )
 
       savedFilters.value.push({
         field: currentFilter.field,
         format: currentFilter.operator,
-        value: operator.value.type === 'Int' ? parseInt(currentFilter.value) : currentFilter.value,
+        value: handleFilter(operator),
 
         operator: operator.value.value,
         valueField: field.value.value,
@@ -299,7 +416,8 @@
         field: '',
         operator: '',
         value: '',
-        step: 'field'
+        step: 'field',
+        domain: false
       })
       editorContent.value = ''
     }
@@ -336,17 +454,39 @@
     return type === 'field' ? 'pi pi-table' : 'pi pi-code'
   }
 
-  const removeFilterList = (index) => {
-    savedFilters.value.splice(index, 1)
+  const removeFilterList = (idx) => {
+    savedFilters.value = savedFilters.value.filter((item, index) => index !== idx)
   }
 
   const searchFilter = () => {
-    const searchParams = savedFilters.value.map((filter) => ({
-      operator: filter.operator,
-      type: filter.type,
-      value: filter.value,
-      valueField: filter.valueField
-    }))
+    const searchParams = savedFilters.value.reduce((acc, filter) => {
+      if (filter.type !== 'ArrayObjectDomain') {
+        // eslint-disable-next-line no-unused-vars
+        const { field, format, ...filterRest } = filter
+        acc.push(filterRest)
+        return acc
+      }
+
+      const existingFilter = acc.find(
+        (item) => item.type === 'ArrayObjectDomain' && item.valueField === filter.valueField
+      )
+
+      if (existingFilter) {
+        existingFilter.value = Array.isArray(existingFilter.value)
+          ? [...existingFilter.value, filter.value]
+          : [existingFilter.value.toString(), filter.value]
+      } else {
+        // console.log(filter)
+        acc.push({
+          operator: filter.operator,
+          type: filter.type,
+          value: [filter.value],
+          valueField: filter.valueField
+        })
+      }
+
+      return acc
+    }, [])
 
     props.searchAdvancedFilter(searchParams)
   }
@@ -356,10 +496,8 @@
       field: step === 'field' ? '' : currentFilter.field,
       operator: step === 'operator' ? '' : currentFilter.operator,
       value: '',
-      step: step
+      step
     })
-    updateSuggestions()
-    showSuggestionsPanel()
   }
 
   const resetAllFilter = () => {
@@ -382,9 +520,8 @@
     const hasSpaceField = currentFilter.field.split(' ').length
 
     const wordCount = values.filter((value) => value !== '').length + (hasSpace ? 1 : 0)
-
     if (wordCount < last.value) {
-      if (wordCount === 1 || wordCount === hasSpaceField || hasSpaceField === 1) {
+      if (wordCount === 1 || wordCount === hasSpaceField) {
         resetStepFilter('field')
       } else if (wordCount === hasSpaceField + 1) {
         resetStepFilter('operator')
@@ -405,5 +542,18 @@
 
   :deep(.p-overlaypanel-content) {
     padding: 0;
+  }
+
+  .spinner {
+    animation: rotate 1s linear infinite;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
