@@ -13,6 +13,7 @@ export const loadContractServicePlan = async ({ clientId }) => {
 const PLAN_MAP = {
   business: 'Business',
   enterprise: 'Enterprise',
+  missioncritical: 'Mission Critical',
   mission_critical: 'Mission Critical'
 }
 
