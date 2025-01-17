@@ -33,7 +33,6 @@
   >
     <Chip
       class="text-sm px-2 cursor-pointer w-max"
-      @click="props.clickFilter(props.itemFilter, $event)"
       @remove="props.removeValueItemFilter(props.position, idx, $event)"
       removable
     >

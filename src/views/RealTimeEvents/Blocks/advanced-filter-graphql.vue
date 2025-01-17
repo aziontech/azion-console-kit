@@ -80,7 +80,7 @@
               v-if="filter.operator === 'In'"
               :itemFilter="filter"
               :position="index"
-              :removeValueItemFilter="removeFilterList"
+              :removeValueItemFilter="removeFilterInList"
             />
 
             <ChipsDefaultDisplay
@@ -491,6 +491,12 @@
 
   const removeFilterList = (idx) => {
     savedFilters.value = savedFilters.value.filter((item, index) => index !== idx)
+  }
+
+  const removeFilterInList = (position, idx) => {
+    savedFilters.value[position].value = savedFilters.value[position].value.filter(
+      (item, index) => idx !== index
+    )
   }
 
   const searchFilter = () => {
