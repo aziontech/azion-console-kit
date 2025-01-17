@@ -52,7 +52,7 @@ const adapt = (payload) => {
     domains: [{ allow_access: payload.cnameAccessOnly }],
     network_map: payload.environment
   }
-
+  2
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
   }

@@ -258,10 +258,6 @@
             isRequired
           />
           <span class="p-input-icon-right">
-            <i
-              class="pi pi-lock text-[var(--text-color-secondary)]"
-              data-testid="form-horizontal-delivery-settings-http-ports-lock-icon"
-            />
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
@@ -273,11 +269,6 @@
               placeholder="Select an HTTP port"
               class="w-full"
               display="chip"
-              :pt="{
-                trigger: {
-                  class: `${checkIsProtocol.http3 ? 'hidden' : ''}`
-                }
-              }"
               data-testid="form-horizontal-delivery-settings-http-ports-multi-select"
             />
 
@@ -293,7 +284,7 @@
       </div>
       <div class="flex gap-6 max-sm:flex-col">
         <FieldSwitchBlock
-          data-testid=""
+          data-testid="domains-form__use-https-field"
           nameField="useHttps"
           name="useHttps"
           auto
@@ -387,7 +378,7 @@
       </div>
       <div class="flex gap-6 max-sm:flex-col">
         <FieldSwitchBlock
-          data-testid=""
+          data-testid="domains-form__use-http3-field"
           nameField="useHttp3"
           name="useHttp3"
           auto
@@ -404,7 +395,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
             for="port-https"
-            data-testid="form-horizontal-delivery-settings-https-ports-label"
+            data-testid="form-horizontal-delivery-settings-https-port3-label"
             label="HTTP3 Port"
             isRequired
           />
@@ -425,7 +416,12 @@
               placeholder="Select an HTTPS port"
               class="w-full"
               disabled
-              data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
+              :pt="{
+                trigger: {
+                  class: 'hidden'
+                }
+              }"
+              data-testid="form-horizontal-delivery-settings-http3-ports-multi-select"
             />
             <small
               v-if="quicPortError"
