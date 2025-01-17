@@ -76,7 +76,15 @@
             :key="filter"
             class="mb-2"
           >
+            <ChipsInDisplay
+              v-if="filter.operator === 'In'"
+              :itemFilter="filter"
+              :position="index"
+              :removeValueItemFilter="removeFilterList"
+            />
+
             <ChipsDefaultDisplay
+              v-else
               :itemFilter="filter"
               :position="index"
               :removeItemFilter="removeFilterList"
@@ -96,6 +104,7 @@
   import PrimeButton from 'primevue/button'
   import { OPERATOR_MAPPING } from '@/templates/advanced-filter/component/index'
   import ChipsDefaultDisplay from './components/chips-default-display.vue'
+  import ChipsInDisplay from './components/chips-in-display.vue'
 
   const props = defineProps({
     fieldsInFilter: {
@@ -104,6 +113,10 @@
     },
     searchAdvancedFilter: {
       type: Function,
+      required: true
+    },
+    filterAdvanced: {
+      type: Array,
       required: true
     }
   })
@@ -401,15 +414,37 @@
         (item) => item.value.value === currentFilter.operatorMapping
       )
 
-      savedFilters.value.push({
-        field: currentFilter.field,
-        format: currentFilter.operator,
-        value: handleFilter(operator),
+      if (currentFilter.domain) {
+        const existingDomain = savedFilters.value.find((el) => el.field === currentFilter.field)
 
-        operator: operator.value.value,
-        valueField: field.value.value,
-        type: operator.value.type
-      })
+        if (!existingDomain) {
+          savedFilters.value.push({
+            field: currentFilter.field,
+            format: currentFilter.operator,
+            value: [
+              {
+                ...handleFilter(operator)
+              }
+            ],
+
+            operator: operator.value.value,
+            valueField: field.value.value,
+            type: operator.value.type
+          })
+        } else {
+          existingDomain.value.push(handleFilter(operator))
+        }
+      } else {
+        savedFilters.value.push({
+          field: currentFilter.field,
+          format: currentFilter.operator,
+          value: handleFilter(operator),
+
+          operator: operator.value.value,
+          valueField: field.value.value,
+          type: operator.value.type
+        })
+      }
 
       // Resetar o estado atual
       Object.assign(currentFilter, {
@@ -460,31 +495,9 @@
 
   const searchFilter = () => {
     const searchParams = savedFilters.value.reduce((acc, filter) => {
-      if (filter.type !== 'ArrayObjectDomain') {
-        // eslint-disable-next-line no-unused-vars
-        const { field, format, ...filterRest } = filter
-        acc.push(filterRest)
-        return acc
-      }
-
-      const existingFilter = acc.find(
-        (item) => item.type === 'ArrayObjectDomain' && item.valueField === filter.valueField
-      )
-
-      if (existingFilter) {
-        existingFilter.value = Array.isArray(existingFilter.value)
-          ? [...existingFilter.value, filter.value]
-          : [existingFilter.value.toString(), filter.value]
-      } else {
-        // console.log(filter)
-        acc.push({
-          operator: filter.operator,
-          type: filter.type,
-          value: [filter.value],
-          valueField: filter.valueField
-        })
-      }
-
+      // eslint-disable-next-line no-unused-vars
+      const { field, format, ...filterRest } = filter
+      acc.push(filterRest)
       return acc
     }, [])
 
@@ -533,6 +546,37 @@
 
     last.value = wordCount
   })
+
+  const updateDisplayFilter = (filterDisplay) => {
+    if (!filterDisplay?.length) return
+
+    const newDisplay = filterDisplay.map((item) => {
+      const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
+
+      const { label, disabled, operator } = selectedFields.find(({ operator }) => {
+        return operator.find(({ value }) => value === item.operator)
+      })
+
+      const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
+
+      if (disabled || disabledOp) return
+
+      return {
+        ...item,
+        field: label,
+        format: OPERATOR_MAPPING[item.operator].format
+      }
+    })
+
+    savedFilters.value = newDisplay.filter((item) => item)
+  }
+
+  watch(
+    () => props.fieldsInFilter,
+    () => {
+      updateDisplayFilter(props.filterAdvanced)
+    }
+  )
 </script>
 
 <style scoped>

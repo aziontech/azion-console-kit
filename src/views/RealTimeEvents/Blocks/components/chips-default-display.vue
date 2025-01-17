@@ -26,8 +26,6 @@
       return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value.begin} and ${
         newFilter.value.end
       }`
-    } else if (newFilter.type === 'ArrayObjectDomain') {
-      return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value.label}`
     }
     return `${newFilter.format} ${isEmptyString ? '""' : newFilter.value}`
   }
