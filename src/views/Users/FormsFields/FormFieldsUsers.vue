@@ -145,12 +145,12 @@
 
   const switchOptions = computed(() => [
     {
-      title: 'Social login',
+      title: 'Account owner',
       nameField: 'isAccountOwner',
       readonly: accountIsOwner.value,
       disabled: accountIsOwner.value,
       subtitle:
-        'The Account Owner can enable or disable the Social Login functionality. When enabled, users linked to the account can authenticate on Azion using their social networks. When disabled, users must authenticate on Azion with their email and password.'
+        'Account owner: Full access to all features, including account and solution management. Non-owner: Restricted access to solution management, based on Teams permissions.'
     },
     {
       title: 'Enforce Multi-Factor Authentication',
@@ -359,7 +359,7 @@
           filter
           autoFilterFocus
           id="teams"
-          :disabled="isAccountOwner"
+          :disabled="isAccountOwner || !optionsTeams.length"
           :loading="!optionsTeams.length"
           :options="optionsTeams"
           optionLabel="label"
