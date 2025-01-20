@@ -38,17 +38,17 @@ const scenarios = [
   {
     section: 'playgroundMetrics',
     env: 'development',
-    expected: 'https://stage-manager.azion.com/metrics/graphql'
+    expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'playgroundMetrics',
     env: 'stage',
-    expected: 'https://stage-manager.azion.com/metrics/graphql'
+    expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'playgroundMetrics',
     env: 'production',
-    expected: 'https://manager.azion.com/metrics/graphql'
+    expected: 'https://api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'helpCenter',

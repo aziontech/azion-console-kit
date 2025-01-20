@@ -10,12 +10,12 @@ const urls = {
     production: 'https://manager.azion.com/billing-subscriptions'
   },
   playgroundMetrics: {
-    stage: 'https://stage-manager.azion.com/metrics/graphql',
-    production: 'https://manager.azion.com/metrics/graphql'
+    stage: 'https://stage-api.azion.com/v4/metrics/graphql',
+    production: 'https://api.azion.com/v4/metrics/graphql'
   },
   playgroundEvents: {
-    stage: 'https://stage-manager.azion.com/events/graphql',
-    production: 'https://manager.azion.com/events/graphql'
+    stage: 'https://stage-api.azion.com/v4/events/graphql',
+    production: 'https://api.azion.com/v4/events/graphql'
   },
   helpCenter: {
     stage: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/',

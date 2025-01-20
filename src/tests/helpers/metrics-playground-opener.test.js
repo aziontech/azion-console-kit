@@ -13,12 +13,12 @@ const scenarios = [
   {
     label: 'should open a new window to metrics playground in prod env',
     href: 'https://azion.com',
-    expected: 'https://manager.azion.com/metrics/graphql'
+    expected: 'https://api.azion.com/metrics/graphql'
   },
   {
     label: 'should open a new window to metrics playground in stage env',
     href: 'http://localhost',
-    expected: 'https://stage-manager.azion.com/metrics/graphql'
+    expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   }
 ]
 
