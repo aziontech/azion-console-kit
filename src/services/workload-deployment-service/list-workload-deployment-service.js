@@ -1,17 +1,18 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { makeWorkloadsDeploymentBaseUrl } from './make-workload-deployment-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
-export const listDomainsService = async ({
+export const listWorkloadDeploymentsService = async ({
   search = '',
   fields = '',
   ordering = 'name',
   page = 1,
-  pageSize = 10
+  pageSize = 10,
+  id
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
+    url: `${makeWorkloadsDeploymentBaseUrl()}/${id}/deployments?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -21,24 +22,13 @@ export const listDomainsService = async ({
 }
 
 const adapt = async (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((domain) => {
+  const parsedWorkloadDeployments = httpResponse.body.results?.map((domain) => {
     return {
       id: domain.id,
-      name: domain.name,
-      active: domain.active
-        ? {
-            content: 'Active',
-            severity: 'success'
-          }
-        : {
-            content: 'Inactive',
-            severity: 'danger'
-          },
-      activeSort: domain.active,
-      domainName: {
-        content: domain.domains[0].domain
-      },
-      cnames: domain.alternate_domains
+      tag: domain.tag,
+      current: domain.current,
+      edgeApplication: domain.edge_application,
+      edgeFirewall: domain.edge_firewall
     }
   })
 
@@ -46,7 +36,7 @@ const adapt = async (httpResponse) => {
 
   return {
     count,
-    body: parsedDomains,
+    body: parsedWorkloadDeployments,
     statusCode: httpResponse.statusCode
   }
 }
