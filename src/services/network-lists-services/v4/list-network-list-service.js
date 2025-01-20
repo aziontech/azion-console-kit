@@ -8,15 +8,25 @@ export const listNetworkListService = async ({
   search = '',
   ordering = '',
   page = 1,
-  pageSize = 10
+  pageSize = 10,
+  allResults = false
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET'
-  })
+  let httpResponse = await fetchAndAdaptNetworkList(searchParams)
 
-  httpResponse = adapt(httpResponse)
+  if (allResults) {
+    const count = httpResponse.count
+    let currentPage = page
+
+    while (count > currentPage * 100) {
+      currentPage += 1
+
+      const newSearchParams = makeListServiceQueryParams({ fields, ordering, page: currentPage, pageSize, search, allResults })
+      let response = await fetchAndAdaptNetworkList(newSearchParams)
+      httpResponse.body = [...httpResponse.body, ...response.body]
+    }
+  }
+
   return parseHttpResponse(httpResponse)
 }
 
@@ -30,14 +40,14 @@ const adapt = (httpResponse) => {
 
   const networkList = isArray
     ? httpResponse.body.results.map((element) => ({
-        id: element.id,
-        stringId: element.id.toString(),
-        name: element.name,
-        lastEditor: element.last_editor,
-        listType: listTypeMap[element.type],
-        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
-        lastModifiedDate: element.last_modified
-      }))
+      id: element.id,
+      stringId: element.id.toString(),
+      name: element.name,
+      lastEditor: element.last_editor,
+      listType: listTypeMap[element.type],
+      lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
+      lastModifiedDate: element.last_modified
+    }))
     : []
 
   const count = httpResponse.body?.count ?? 0
@@ -47,4 +57,12 @@ const adapt = (httpResponse) => {
     body: networkList,
     statusCode: httpResponse.statusCode
   }
+}
+
+const fetchAndAdaptNetworkList = async (searchParams) => {
+  const httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
+    method: 'GET'
+  })
+  return adapt(httpResponse)
 }
