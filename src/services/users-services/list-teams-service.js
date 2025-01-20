@@ -1,10 +1,19 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeTeamsBaseUrl } from './make-teams-base-url'
 import { InvalidDataStructureError } from '../axios/errors'
+import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
-export const listTeamsService = async () => {
+export const listTeamsService = async ({
+  fields = '',
+  ordering = 'name',
+  page = 1,
+  pageSize = 100,
+  search = ''
+} = {}) => {
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeTeamsBaseUrl()}`,
+    url: `${makeTeamsBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 

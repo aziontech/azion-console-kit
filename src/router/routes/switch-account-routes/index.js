@@ -19,7 +19,11 @@ export const switchAccountRoutes = {
 
     try {
       const EnableSocialLogin = true
-      const redirect = await accountHandler.switchAccountFromSocialIdp(verify, refresh, EnableSocialLogin)
+      const redirect = await accountHandler.switchAccountFromSocialIdp(
+        verify,
+        refresh,
+        EnableSocialLogin
+      )
       next(redirect)
     } catch {
       next({ name: 'login' })
