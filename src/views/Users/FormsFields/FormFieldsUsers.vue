@@ -62,7 +62,7 @@
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
 
-  const disabledUserTeams = computed(() => isAccountOwner || !optionsTeams.value.length)
+  const disabledUserTeams = computed(() => isAccountOwner.value || !optionsTeams.value.length)
 
   const setCountriesOptions = (countries) => {
     optionsCountriesMobile.value = countries
