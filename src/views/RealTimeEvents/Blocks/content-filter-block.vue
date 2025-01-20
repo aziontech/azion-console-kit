@@ -27,7 +27,7 @@
     filter.value.isUserUsingGraphqlQuery = false
   })
 
-  const filterMode = ref('Wizard')
+  const filterMode = ref('Advanced')
   const options = ref(['Wizard', 'Advanced'])
 
   const filter = computed({
@@ -97,6 +97,7 @@
     <AdvancedFilterGraphql
       :fieldsInFilter="props.fieldsInFilter"
       :searchAdvancedFilter="searchAdvancedFilter"
+      :filterAdvanced="filter.fields"
       v-else
     />
   </div>

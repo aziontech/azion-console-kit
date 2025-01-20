@@ -176,6 +176,7 @@
   })
   const savedFilters = ref([])
   const searchInputRef = ref(null)
+  const domains = ref([])
 
   const handleInput = (event) => {
     const text = event.target.value
@@ -197,51 +198,79 @@
     updateSuggestions()
   }
 
+  const getFieldSuggestions = () => {
+    return options.value
+      .filter((item) => item.value.label.toLowerCase().includes(currentWord.value))
+      .map((item) => ({
+        display: item.value.label,
+        value: item.value.label,
+        type: 'field',
+        disabled: false
+      }))
+  }
+
+  const isOperatorSuggestionDisabled = (op, field) => {
+    return savedFilters.value.some(
+      (filter) =>
+        filter.format === op.value.format &&
+        filter.field === field.value.label &&
+        op.value.format !== 'in'
+    )
+  }
+
+  const getOperatorSuggestions = (field) => {
+    return field.value.operator
+      .filter((op) => op.label.includes(currentWord.value))
+      .map((op) => ({
+        display: op.label,
+        value: op.value.format,
+        type: op.value.type,
+        iconMap: op.value.value,
+        operatorMapping: op.value.value,
+        disabled: isOperatorSuggestionDisabled(op, field),
+        props: op.value.props
+      }))
+  }
+
+  const listDomains = async (service) => {
+    try {
+      if (!domains.value.length) {
+        loading.value = true
+        domains.value = await service()
+      }
+      return domains.value.map((item) => ({
+        display: item.label,
+        value: item.value,
+        domain: true
+      }))
+    } catch (error) {
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getValueSuggestions = async () => {
+    const currentField = options.value.find((item) => item.value.label === currentFilter.field)
+    if (currentField.label === 'Domain') {
+      return await listDomains(currentField.value.operator[0].value.props.services)
+    }
+    hideSuggestions()
+    return []
+  }
+
   const updateSuggestions = async () => {
     let suggestions = []
     switch (currentFilter.step) {
       case 'field':
-        if (!currentFilter.field) {
-          suggestions = options.value
-            .filter((item) => item.value.label.toLowerCase().includes(currentWord.value))
-            .map((item) => ({
-              display: item.value.label,
-              value: item.value.label,
-              type: 'field',
-              disabled: false
-            }))
-        }
+        if (!currentFilter.field) suggestions = getFieldSuggestions()
         break
-
       case 'operator':
-        const field = options.value.find((item) => item.value.label === currentFilter.field)
-        if (field) {
-          suggestions = field.value.operator
-            .filter((op) => op.label.includes(currentWord.value))
-            .map((op) => ({
-              display: op.label,
-              value: op.value.format,
-              type: op.value.type,
-              iconMap: op.value.value,
-              operatorMapping: op.value.value,
-              disabled: savedFilters.value.some(
-                (filter) =>
-                  filter.format === op.value.format &&
-                  filter.field === field.value.label &&
-                  op.value.format !== 'in'
-              ),
-              props: op.value.props
-            }))
-        }
+        const hasField = options.value.find((item) => item.value.label === currentFilter.field)
+        if (hasField) suggestions = getOperatorSuggestions(hasField)
         break
-
       case 'value':
-        const currentField = options.value.find((item) => item.value.label === currentFilter.field)
-        if (currentField.label === 'Domain') {
-          suggestions = await getDomains(currentField.value.operator[0].value.props.services)
-        } else {
-          hideSuggestions()
-        }
+        suggestions = await getValueSuggestions()
         break
       case 'between':
         const hasAnd = editorContent.value.indexOf('and')
@@ -260,22 +289,6 @@
     filteredSuggestions.value = suggestions
     showSuggestions.value = suggestions.length > 0
     showSuggestionsPanel()
-  }
-
-  const getDomains = async (service) => {
-    try {
-      loading.value = true
-      const resp = await service()
-      return resp.map((item) => ({
-        display: item.label,
-        value: item.value,
-        domain: true
-      }))
-    } catch (error) {
-      return []
-    } finally {
-      loading.value = false
-    }
   }
 
   const selectSuggestion = (index) => {
@@ -497,6 +510,9 @@
     savedFilters.value[position].value = savedFilters.value[position].value.filter(
       (item, index) => idx !== index
     )
+    if (!savedFilters.value[position].value.length) {
+      removeFilterList(position)
+    }
   }
 
   const searchFilter = () => {
