@@ -62,6 +62,8 @@
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
 
+  const disabledUserTeams = computed(() => isAccountOwner || !optionsTeams.value.length)
+
   const setCountriesOptions = (countries) => {
     optionsCountriesMobile.value = countries
     filteredCountriesMobile.value = [...countries]
@@ -359,7 +361,7 @@
           filter
           autoFilterFocus
           id="teams"
-          :disabled="isAccountOwner || !optionsTeams.length"
+          :disabled="disabledUserTeams"
           :loading="!optionsTeams.length"
           :options="optionsTeams"
           optionLabel="label"
