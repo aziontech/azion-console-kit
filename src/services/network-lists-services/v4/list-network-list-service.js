@@ -11,17 +11,18 @@ export const listNetworkListService = async ({
   pageSize = 10,
   allResults = false
 }) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+  const newPageSize = allResults ? 100 : pageSize
+  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize: newPageSize, search })
   let httpResponse = await fetchAndAdaptNetworkList(searchParams)
 
   if (allResults) {
     const count = httpResponse.count
     let currentPage = page
 
-    while (count > currentPage * 100) {
+    while (count > currentPage * newPageSize) {
       currentPage += 1
 
-      const newSearchParams = makeListServiceQueryParams({ fields, ordering, page: currentPage, pageSize, search, allResults })
+      const newSearchParams = makeListServiceQueryParams({ fields, ordering, page: currentPage, pageSize: newPageSize, search, allResults })
       let response = await fetchAndAdaptNetworkList(newSearchParams)
       httpResponse.body = [...httpResponse.body, ...response.body]
     }
