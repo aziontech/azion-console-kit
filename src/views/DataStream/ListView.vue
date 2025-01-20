@@ -6,6 +6,16 @@
     <template #content>
       <div class="flex flex-col gap-3 items-start">
         <InlineMessage
+          v-if="hasNoPermissionToCreateDataStream"
+          class="w-fit"
+          severity="info"
+          data-testid="permission-rule-message-data-stream"
+        >
+          This account has <strong>View Data Stream</strong> permission only. It allows viewing the
+          account’s streams but doesn't permit creating, editing, or deleting streams.
+        </InlineMessage>
+
+        <InlineMessage
           v-if="isMaxDomainsReached"
           severity="info"
         >

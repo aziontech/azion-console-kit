@@ -179,6 +179,7 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
         <FieldSwitchBlock
+          :disabled="hasNoPermissionToEditDataStream"
           nameField="hasSampling"
           name="hasSampling"
           auto
@@ -193,6 +194,7 @@
           v-if="hasSampling"
         >
           <FieldNumber
+            :disabled="hasNoPermissionToEditDataStream"
             label="Sampling Percentage (%)"
             name="samplingPercentage"
             :value="samplingPercentage"
