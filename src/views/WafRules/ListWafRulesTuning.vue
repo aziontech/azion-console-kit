@@ -9,7 +9,7 @@
       @change="filterTuning"
       class="w-full sm:max-w-xs"
     />
-    <MultiSelect
+    <!-- <MultiSelect
       placeholder="Select domain"
       resetFilterOnHide
       autoFilterFocus
@@ -35,6 +35,33 @@
       :loading="netWorkListOptions.done"
       @change="filterTuning"
       class="w-full sm:max-w-xs"
+    /> -->
+
+    <FieldDropdownLazyLoader
+      data-testid="waf-tuning-list__network-list-field"
+      name="valueNetworkId"
+      :service="props.listNetworkListService"
+      :loadService="props.loadNetworkListService"
+      optionLabel="name"
+      optionValue="id"
+      :value="valueNetworkId"
+      :moreOptions="['value']"
+      appendTo="self"
+      placeholder="Select an network list"
+      @onSelectOption="setNetworkListOption"
+    />
+
+    <fieldMultiselectLazyLoader
+      data-testid="waf-tuning-list__domains-field"
+      name="valueDomainId"
+      :service="props.listDomainsService"
+      :loadService="props.loadDomainService"
+      optionLabel="name"
+      optionValue="id"
+      :value="valueDomainId"
+      appendTo="self"
+      placeholder="Select domain"
+      @onChange="filterTuning"
     />
   </div>
   <div
@@ -118,13 +145,14 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import fieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 
   import advancedFilter from '@/templates/advanced-filter'
-  import MultiSelect from 'primevue/multiselect'
   import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -165,6 +193,18 @@
     listWafRulesTuningAttacksService: {
       type: Function,
       required: true
+    },
+    listDomainsService: {
+      type: Function,
+      required: true
+    },
+    loadDomainService: {
+      type: Function,
+      required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -189,6 +229,10 @@
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
+
+  const valueNetworkId = ref(null)
+  const valueDomainId = ref(null)
+
   const valueDomains = computed({
     get: () => {
       if (domainsOptions.value.done) return []
@@ -317,6 +361,11 @@
   const showListTable = computed(() => {
     return selectedFilter.value.domains?.length
   })
+
+  const setNetworkListOption = (value) => {
+
+console.log('network value:', value);
+  }
 
   const showToast = (summary, severity) => {
     return toast.add({
@@ -458,7 +507,7 @@
 
   const setNetWorkListOptions = async () => {
     try {
-      const response = await props.listNetworkListService()
+      const response = await props.listNetworkListService({ fields: '' })
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
@@ -469,8 +518,8 @@
 
   const setDomainsOptions = async () => {
     try {
-      const response = await props.listWafRulesDomainsService({ wafId: wafRuleId.value })
-      domainsOptions.value.options = response
+      const response = await props.listDomainsService({ fields: 'id,name,active' })
+      domainsOptions.value.options = response.body
     } catch (error) {
       showToast(error, 'error')
     } finally {
