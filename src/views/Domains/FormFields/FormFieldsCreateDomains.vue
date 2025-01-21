@@ -68,6 +68,7 @@
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
 

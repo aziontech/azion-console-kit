@@ -2,43 +2,28 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import MultiSelect from 'primevue/multiselect'
+  import LabelBlock from '@/templates/label-block'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import Drawer from '@/views/EdgeApplications/Drawer'
   import { useField } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
-  import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
 
   const props = defineProps({
     digitalCertificates: {
       type: Array,
       required: true
     },
-    listEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
     hasDomainName: {
       type: Boolean,
       required: false,
       default: false
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
-      type: Function,
-      required: true
     },
     listDigitalCertificatesService: {
       type: Function,
@@ -56,25 +41,58 @@
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
   const { value: cnameAccessOnly } = useField('cnameAccessOnly')
-  const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: environment } = useField('environment')
   const { value: domainName } = useField('domainName')
+  const { value: deliveryProtocol } = useField('deliveryProtocol')
+  const { value: useHttps } = useField('useHttps')
+  const { value: useHttp3 } = useField('useHttp3')
+  const { value: httpPort, errorMessage: httpPortError } = useField('httpPort')
+  const { value: httpsPort, errorMessage: httpsPortError } = useField('httpsPort')
+  const { value: quicPort, errorMessage: quicPortError } = useField('quicPort')
+  const { value: minimumTlsVersion } = useField('minimumTlsVersion')
+  const { value: supportedCiphers } = useField('supportedCiphers')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
-  const { value: edgeFirewall } = useField('edgeFirewall')
-  const drawerEdgeFirewallRef = ref('')
-
-  const openDrawerEdgeFirewall = () => {
-    drawerEdgeFirewallRef.value.openCreateDrawer()
-  }
-
-  const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
-    emit('edgeFirewallCreated')
-  }
+  const HTTP_PORT_LIST_OPTIONS = [
+    { name: '80 (Default)', value: 80 },
+    { name: '8008', value: 8008 },
+    { name: '8080', value: 8080 },
+    // Custom Ports
+    { name: '8880', value: 8880 }
+  ]
+  const HTTP3_PORT_LIST_OPTIONS = [{ name: '443 (Default)', value: 443 }]
+  const HTTPS_PORT_LIST_OPTIONS = [
+    { name: '443 (Default)', value: 443 },
+    { name: '8443', value: 8443 },
+    { name: '9440', value: 9440 },
+    { name: '9441', value: 9441 },
+    { name: '9442', value: 9442 },
+    { name: '9443', value: 9443 },
+    // Custom Ports
+    { name: '7777', value: 7777 },
+    { name: '8888', value: 8888 },
+    { name: '9553', value: 9553 },
+    { name: '9653', value: 9653 },
+    { name: '8035', value: 8035 },
+    { name: '8090', value: 8090 }
+  ]
+  const TLS_VERSIONS_OPTIONS = [
+    { label: 'None', value: 'none' },
+    { label: 'TLS 1.0', value: 'tls_1_0' },
+    { label: 'TLS 1.1', value: 'tls_1_1' },
+    { label: 'TLS 1.2', value: 'tls_1_2' },
+    { label: 'TLS 1.3', value: 'tls_1_3' }
+  ]
+  const SUPPORTED_CIPHERS_LIST_OPTIONS = [
+    { label: 'All', value: 'all' },
+    { label: 'TLSv1.2_2018', value: 'TLSv1.2_2018' },
+    { label: 'TLSv1.2_2019', value: 'TLSv1.2_2019' },
+    { label: 'TLSv1.2_2021', value: 'TLSv1.2_2021' },
+    { label: 'TLSv1.3_2022', value: 'TLSv1.3_2022' }
+  ]
 
   const mtlsModeRadioOptions = ref([
     {
@@ -99,17 +117,17 @@
     const environmentOptionsRadios = [
       {
         title: 'Global Edge Network',
-        inputValue: 'production',
+        inputValue: '1',
         disabled: true
       },
       {
         title: 'Staging Network',
-        inputValue: 'preview',
+        inputValue: '2',
         disabled: true
       }
     ]
 
-    if (environment.value === 'production') {
+    if (environment.value === '1') {
       environmentOptionsRadios[0].tag = tag
     } else if (environment.value === 'preview') {
       environmentOptionsRadios[1].tag = tag
@@ -118,17 +136,22 @@
     return environmentOptionsRadios
   })
 
-  const drawerRef = ref('')
-
-  const openDrawer = () => {
-    drawerRef.value.openCreateDrawer()
+  const handleHttps = (value) => {
+    if (value) {
+      useHttps.value = value
+    }
   }
 
-  const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
-  }
+  const checkIsProtocol = computed(() => ({
+    https: deliveryProtocol.value === 'https',
+    http3: deliveryProtocol.value === 'http3'
+  }))
 
-  const emit = defineEmits(['copyDomainName', 'edgeFirewallCreated'])
+  watch(useHttp3, (newValue) => {
+    if (newValue) {
+      quicPort.value = HTTP3_PORT_LIST_OPTIONS
+    }
+  })
 
   const digitalCertificateDrawerRef = ref('')
   const openDigitalCertificateDrawer = () => {
@@ -200,6 +223,199 @@
     </template>
   </form-horizontal>
 
+  <FormHorizontal
+    title="Delivery Settings"
+    description="Choose the protocols used between the edge application and users."
+    data-testid="form-horizontal-delivery-settings"
+  >
+    <template #inputs>
+      <div class="flex gap-6 max-sm:flex-col">
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <LabelBlock
+            for="port-http"
+            data-testid="form-horizontal-delivery-settings-http-ports-label"
+            label="HTTP Ports"
+            isRequired
+          />
+          <span class="p-input-icon-right">
+            <MultiSelect
+              :options="HTTP_PORT_LIST_OPTIONS"
+              v-model="httpPort"
+              name="httpPort"
+              filter
+              autoFilterFocus
+              optionLabel="name"
+              :class="{ 'p-invalid': httpPortError }"
+              placeholder="Select an HTTP port"
+              class="w-full"
+              display="chip"
+              data-testid="form-horizontal-delivery-settings-http-ports-multi-select"
+            />
+
+            <small
+              v-if="httpPortError"
+              class="p-error text-xs font-normal leading-tight"
+              data-testid="form-horizontal-delivery-settings-http-ports-error"
+            >
+              {{ httpPortError }}
+            </small>
+          </span>
+        </div>
+      </div>
+      <div class="flex gap-6 max-sm:flex-col">
+        <FieldSwitchBlock
+          data-testid="domains-form__use-https-field"
+          nameField="useHttps"
+          name="useHttps"
+          auto
+          :isCard="false"
+          :disabled="useHttp3"
+          title="HTTPS support"
+          subtitle="Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports."
+        />
+      </div>
+      <div
+        class="flex gap-6 max-sm:flex-col"
+        v-if="useHttps"
+      >
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <LabelBlock
+            for="port-https"
+            data-testid="form-horizontal-delivery-settings-https-ports-label"
+            label="HTTPS Ports"
+            :isRequired="useHttps"
+          />
+          <span class="p-input-icon-right">
+            <i
+              class="pi pi-lock text-[var(--text-color-secondary)]"
+              v-if="!useHttps"
+              data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
+            />
+            <MultiSelect
+              :options="HTTPS_PORT_LIST_OPTIONS"
+              v-model="httpsPort"
+              name="httpsPort"
+              filter
+              autoFilterFocus
+              optionLabel="name"
+              display="chip"
+              :class="{ 'p-invalid': httpsPortError }"
+              placeholder="Select an HTTPS port"
+              class="w-full"
+              :disabled="!useHttps"
+              :pt="{
+                trigger: {
+                  class: `${!useHttps ? 'hidden' : ''}`
+                }
+              }"
+              data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
+            />
+            <small
+              v-if="httpsPortError"
+              class="p-error text-xs font-normal leading-tight"
+              data-testid="form-horizontal-delivery-settings-https-ports-error"
+            >
+              {{ httpsPortError }}
+            </small>
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex gap-6 max-sm:flex-col"
+        v-if="useHttps || useHttp3"
+      >
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <FieldDropdown
+            data-testid="form-horizontal-delivery-settings-tls-version-field-dropdown"
+            label="Minimum TLS version"
+            name="minimumTlsVersion"
+            :options="TLS_VERSIONS_OPTIONS"
+            optionLabel="label"
+            optionValue="value"
+            :value="minimumTlsVersion"
+            inputId="minimumTlsVersion"
+            placeholder="Select a minimum TLS Version"
+            :disabled="checkIsProtocol.http"
+            description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
+          />
+        </div>
+
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <FieldDropdown
+            data-testid="form-horizontal-delivery-settings-cipher-suite-field-dropdown"
+            label="Cipher suite"
+            name="supportedCiphers"
+            :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
+            optionLabel="label"
+            optionValue="value"
+            :value="supportedCiphers"
+            inputId="supportedCiphers"
+            placeholder="Select the supported cipher suite"
+            :disabled="checkIsProtocol.http"
+            description="Select which cipher suite the application supports. See the list of supported ciphers in the documentation."
+          />
+        </div>
+      </div>
+      <div class="flex gap-6 max-sm:flex-col">
+        <FieldSwitchBlock
+          data-testid="domains-form__use-http3-field"
+          nameField="useHttp3"
+          name="useHttp3"
+          auto
+          @onSwitchChange="handleHttps"
+          :isCard="false"
+          title="HTTP/3 support"
+          subtitle="Enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443."
+        />
+      </div>
+      <div
+        class="flex gap-6 max-sm:flex-col"
+        v-if="useHttp3"
+      >
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <LabelBlock
+            for="port-https"
+            data-testid="form-horizontal-delivery-settings-https-port3-label"
+            label="HTTP3 Port"
+            isRequired
+          />
+          <span class="p-input-icon-right">
+            <i
+              class="pi pi-lock text-[var(--text-color-secondary)]"
+              data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
+            />
+            <MultiSelect
+              :options="HTTP3_PORT_LIST_OPTIONS"
+              v-model="quicPort"
+              name="quicPort"
+              filter
+              autoFilterFocus
+              optionLabel="name"
+              display="chip"
+              :class="{ 'p-invalid': quicPortError }"
+              placeholder="Select an HTTPS port"
+              class="w-full"
+              disabled
+              :pt="{
+                trigger: {
+                  class: 'hidden'
+                }
+              }"
+              data-testid="form-horizontal-delivery-settings-http3-ports-multi-select"
+            />
+            <small
+              v-if="quicPortError"
+              class="p-error text-xs font-normal leading-tight"
+              data-testid="form-horizontal-delivery-settings-https-ports-error"
+            >
+              {{ quicPortError }}
+            </small>
+          </span>
+        </div>
+      </div>
+    </template>
+  </FormHorizontal>
+
   <form-horizontal
     title="Domain"
     description="The domain URL attributed by Azion."
@@ -247,94 +463,11 @@
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #inputs>
-      <Drawer
-        ref="drawerRef"
-        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
-      />
       <DigitalCertificatesDrawer
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
       />
-      <DrawerEdgeFirewall
-        ref="drawerEdgeFirewallRef"
-        @onSuccess="handleEdgeFirewallCreated"
-      />
 
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
-          label="Edge Application"
-          required
-          data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
-          :service="listEdgeApplicationsService"
-          :loadService="loadEdgeApplicationsService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeApplication"
-          appendTo="self"
-          placeholder="Select an edge application"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-application-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Application"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
-
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <DrawerEdgeFirewall
-          ref="drawerEdgeFirewallRef"
-          @onSuccess="handleEdgeFirewallCreated"
-        />
-        <FieldDropdownLazyLoader
-          label="Edge Firewall"
-          enableClearOption
-          data-testid="domains-form__edge-firewall-field"
-          name="edgeFirewall"
-          :service="listEdgeFirewallService"
-          :loadService="loadEdgeFirewallService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeFirewall"
-          appendTo="self"
-          placeholder="Select an edge firewall"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawerEdgeFirewall"
-                  class="w-full whitespace-nowrap flex"
-                  data-testid="domains-form__create-edge-firewall-button"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Firewall"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"
@@ -406,7 +539,7 @@
         title="Mutual Authentication"
       />
 
-      <div v-if="mtlsIsEnabled">
+      <div v-show="mtlsIsEnabled">
         <div class="flex flex-col gap-3">
           <FieldGroupRadio
             nameField="mtlsVerification"

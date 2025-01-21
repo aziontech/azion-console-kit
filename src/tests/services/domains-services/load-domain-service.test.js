@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { loadDomainService } from '@/services/domains-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 
@@ -38,6 +38,9 @@ const makeSut = () => {
 }
 
 describe('DomainServices', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

@@ -2,10 +2,10 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeWorkloadsDeploymentBaseUrl } from '@/services/workload-deployment-service/make-workload-deployment-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
-export const editWorkloadDeploymentService = async ({ domainId, workloadId, payload }) => {
+export const editWorkloadDeploymentService = async ({ domainId, payload }) => {
   const httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWorkloadsDeploymentBaseUrl()}/${domainId}/deployment/${workloadId}`,
-    method: 'PUT',
+    url: `${makeWorkloadsDeploymentBaseUrl()}/${domainId}/deployments/${payload.id}`,
+    method: 'PATCH',
     body: adapt(payload)
   })
 
@@ -14,12 +14,10 @@ export const editWorkloadDeploymentService = async ({ domainId, workloadId, payl
 
 const adapt = (payload) => {
   return {
-    tag: payload.tag,
     binds: {
       edge_application: payload.edgeApplication,
-      edge_firewall: payload.edgeApplication
-    },
-    current: payload.current
+      edge_firewall: payload.edgeFirewall
+    }
   }
 }
 
