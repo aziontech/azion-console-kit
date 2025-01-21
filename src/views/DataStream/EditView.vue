@@ -33,6 +33,10 @@
     }
   })
 
+  const store = useAccountStore()
+  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
+  const hasAccessToSampling = computed(() => store.hasSamplingFlag)
+
   // Schema de Validação
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -44,7 +48,7 @@
     status: yup.boolean(),
     hasSampling: yup.boolean(),
     samplingPercentage: yup.number().when('hasSampling', {
-      is: true,
+      is: true && hasAccessToSampling.value,
       then: (schema) =>
         schema
           .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
@@ -216,9 +220,6 @@
       then: (schema) => schema.required('Blob SAS Token is a required field')
     })
   })
-
-  const store = useAccountStore()
-  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const displaySamplingDialog = ref(false)
   const formSubmit = (onSubmit, values) => {

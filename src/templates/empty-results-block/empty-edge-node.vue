@@ -17,15 +17,13 @@
         <div class="flex flex-wrap gap-2">
           <PrimeButton
             severity="secondary"
-            outlined
             icon="pi pi-download"
             label="Edge Orchestrator"
             @click="downloadOrchestrator"
           />
         </div>
         <PrimeButton
-          outlined
-          text
+          link
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"

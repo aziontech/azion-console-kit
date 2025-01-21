@@ -1,24 +1,14 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttpClientAdapter'
-// import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 
-export const listEdgeDNSServiceV4 = async ({
+export const listEdgeDNSService = async ({
   fields = '',
   search = '',
   ordering = '',
   page = 1,
   pageSize = 10
 }) => {
-  const makeListServiceQueryParams = ({ fields, ordering, page, pageSize, search }) => {
-    const params = new URLSearchParams()
-    params.set('ordering', `"${ordering.replace(/([A-Z])/g, '_$1').toLowerCase()}"`)
-    params.set('page', page)
-    params.set('page_size', pageSize)
-    params.set('fields', fields)
-    params.set('search', search)
-
-    return params
-  }
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({

@@ -3,6 +3,7 @@ import { listEdgeFunctionsDropdownService } from './list-edge-functions-dropdown
 import { loadEdgeFunctionService } from './load-edge-function-service'
 import { createEdgeFunctionsService } from './create-edge-functions-service'
 import { editEdgeFunctionsService } from './edit-edge-functions-service'
+import { deleteEdgeFunctionService } from './delete-edge-function-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -17,5 +18,6 @@ export {
   listEdgeFunctionsDropdownService,
   loadEdgeFunctionService,
   createEdgeFunctionsService,
-  editEdgeFunctionsService
+  editEdgeFunctionsService,
+  deleteEdgeFunctionService
 }

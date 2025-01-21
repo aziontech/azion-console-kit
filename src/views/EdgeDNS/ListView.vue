@@ -22,7 +22,7 @@
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
-        :listService="listEdgeDNSServiceV4"
+        :listService="listEdgeDNSService"
         :columns="getColumns"
         :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -67,10 +67,6 @@
 
   const props = defineProps({
     listEdgeDNSService: {
-      required: true,
-      type: Function
-    },
-    listEdgeDNSServiceV4: {
       required: true,
       type: Function
     },

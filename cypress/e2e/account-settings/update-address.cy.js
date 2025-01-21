@@ -13,10 +13,11 @@ const fixtures = {
 describe('Account Settings spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
+    cy.intercept('GET', '/api/v4/iam/account').as('getAccountSettingsApi')
     cy.openProduct('Account Settings')
 
     fixtures.companyName = generateUniqueName('companyName')
-    cy.wait(3000)
+    cy.wait('@getAccountSettingsApi')
   })
 
   it('should update address info successfully', () => {
@@ -31,6 +32,7 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     // Act
     cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, { delay: 0 })
 
+    cy.get(selectors.accountSettings.countryLoading).should('not.exist')
     cy.get(selectors.accountSettings.countryDropdown).click()
     cy.get(selectors.accountSettings.countryOption(randomCountryOption)).click()
 
@@ -38,7 +40,7 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.accountSettings.country).invoke('text').as('countryValue')
 
     // wait for cities api to provide region options
-    cy.wait(1000)
+    cy.get(selectors.accountSettings.regionLoading).should('not.exist')
     cy.get(selectors.accountSettings.regionDropdown).click()
     cy.get(selectors.accountSettings.regionOption(firstOption)).click()
 
@@ -46,7 +48,7 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.accountSettings.region).invoke('text').as('regionValue')
 
     // wait for cities api to provide city options
-    cy.wait(1000)
+    cy.get(selectors.accountSettings.cityLoading).should('not.exist')
     cy.get(selectors.accountSettings.cityDropdown).click()
     cy.get(selectors.accountSettings.cityOption(firstOption)).click()
 
