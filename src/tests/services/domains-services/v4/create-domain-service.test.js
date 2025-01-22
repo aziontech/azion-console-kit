@@ -81,8 +81,7 @@ describe('DomainsServicesV4', () => {
         alternate_domains: [fixtures.domainMock.cnames],
         edge_application: fixtures.domainMock.edgeApplication,
         edge_firewall: fixtures.domainMock.edgeFirewall,
-        is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
-        is_active: fixtures.domainMock.active,
+        active: fixtures.domainMock.active,
         tls: {
           ciphers: fixtures.domainMock.supportedCiphers,
           minimum_version: fixtures.domainMock.minimumTlsVersion
@@ -99,7 +98,7 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: fixtures.domainMock.cnameAccessOnly }],
+        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment
       }
     })
@@ -128,8 +127,7 @@ describe('DomainsServicesV4', () => {
         alternate_domains: [fixtures.domainMock.cnames],
         edge_application: fixtures.domainMock.edgeApplication,
         edge_firewall: fixtures.domainMock.edgeFirewall,
-        is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
-        is_active: fixtures.domainMock.active,
+        active: fixtures.domainMock.active,
         tls: {
           ciphers: fixtures.domainMock.supportedCiphers,
           minimum_version: fixtures.domainMock.minimumTlsVersion
@@ -146,7 +144,7 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: fixtures.domainMock.cnameAccessOnly }],
+        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment
       }
     })
@@ -177,8 +175,7 @@ describe('DomainsServicesV4', () => {
         alternate_domains: [fixtures.domainMock.cnames],
         edge_application: fixtures.domainMock.edgeApplication,
         edge_firewall: fixtures.domainMock.edgeFirewall,
-        is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
-        is_active: fixtures.domainMock.active,
+        active: fixtures.domainMock.active,
         tls: {
           certificate: fixtures.domainMock.edgeCertificate,
           ciphers: fixtures.domainMock.supportedCiphers,
@@ -196,7 +193,7 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: fixtures.domainMock.cnameAccessOnly }],
+        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
         network_map: fixtures.domainMock.environment
       }
     })

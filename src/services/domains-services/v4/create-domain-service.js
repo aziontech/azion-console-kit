@@ -31,8 +31,7 @@ const adapt = (payload) => {
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
     edge_application: payload.edgeApplication,
     edge_firewall: payload.edgeFirewall,
-    is_mtls_enabled: payload.mtlsIsEnabled,
-    is_active: payload.active,
+    active: payload.active,
     tls: {
       ciphers: payload.supportedCiphers,
       minimum_version: payload.minimumTlsVersion
@@ -49,7 +48,7 @@ const adapt = (payload) => {
       verification: payload.mtlsVerification,
       certificate: payload.mtlsTrustedCertificate
     },
-    domains: [{ allow_access: payload.cnameAccessOnly }],
+    domains: [{ allow_access: !payload.cnameAccessOnly }],
     network_map: payload.environment
   }
   if (payload.edgeCertificate !== 0) {
