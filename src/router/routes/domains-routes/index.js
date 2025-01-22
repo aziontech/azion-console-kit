@@ -58,7 +58,7 @@ export const domainsRoutes = {
       }
     },
     {
-      path: 'edit/:id/:tab',
+      path: 'edit/:id/:tab?',
       name: 'edit-domain',
       component: () => import('@views/Domains/TabsView.vue'),
       props: {

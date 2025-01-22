@@ -71,8 +71,8 @@
 
   const title = ref('')
 
-  const updateDomainValue = async (waf) => {
-    title.value = waf.name
+  const updateDomainValue = async (value) => {
+    title.value = value.name
     domain.value = await getDomain()
     formHasUpdated.value = false
   }
