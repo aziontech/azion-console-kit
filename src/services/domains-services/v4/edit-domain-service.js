@@ -13,13 +13,13 @@ export const editDomainService = async (payload) => {
   return parseHttpResponse(httpResponse)
 }
 
-const handleVersions = (useHttp3) => {
-  if (useHttp3) {
-    return ['http1', 'http2', 'http3']
-  }
-
-  return ['http1', 'http2']
+const SUPPORTED_VERSIONS = {
+  default: ['http1', 'http2'],
+  withHttp3: ['http1', 'http2', 'http3']
 }
+
+const handleVersions = (useHttp3) =>
+  useHttp3 ? SUPPORTED_VERSIONS.withHttp3 : SUPPORTED_VERSIONS.default
 
 const convertPortToInt = (ports) => {
   return ports.map((port) => parseInt(port.value))
