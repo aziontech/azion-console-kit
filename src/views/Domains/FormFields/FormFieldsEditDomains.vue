@@ -147,6 +147,8 @@
     http3: deliveryProtocol.value === 'http3'
   }))
 
+  const showTlsAndCipherDropdown = computed(() => useHttps.value || useHttp3.value)
+
   watch(useHttp3, (newValue) => {
     if (newValue) {
       quicPort.value = HTTP3_PORT_LIST_OPTIONS
@@ -303,11 +305,6 @@
               placeholder="Select an HTTPS port"
               class="w-full"
               :disabled="!useHttps"
-              :pt="{
-                trigger: {
-                  class: `${!useHttps ? 'hidden' : ''}`
-                }
-              }"
               data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
             />
             <small
@@ -322,7 +319,7 @@
       </div>
       <div
         class="flex gap-6 max-sm:flex-col"
-        v-if="useHttps || useHttp3"
+        v-if="showTlsAndCipherDropdown"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <FieldDropdown
