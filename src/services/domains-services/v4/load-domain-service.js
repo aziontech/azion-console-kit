@@ -12,50 +12,7 @@ export const loadDomainService = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
-const handlerHttp = (ports, LIST_OPTIONS) => {
-  const parserPorts = []
-  if (ports !== null) {
-    ports.forEach((port) => {
-      parserPorts.push(LIST_OPTIONS.find((el) => el.value == port))
-    })
-
-    return parserPorts
-  }
-
-  return null
-}
-
-const adapt = (httpResponse) => {
-  const body = httpResponse.body?.data
-
-  const parsedVariable = {
-    id: body?.id,
-    name: body?.name,
-    domainName: body?.domains[0].domain,
-    cnames: body?.alternate_domains.join('\n'),
-    cnameAccessOnly: !body?.domains[0].allow_access,
-    domains: body?.domains,
-    edgeCertificate: body?.tls.certificate ?? 0,
-    active: body.active,
-    mtlsVerification: body?.mtls.verification,
-    mtlsTrustedCertificate: body?.mtls.certificate || undefined,
-    mtlsIsEnabled: body?.mtls.certificate !== null ? true : false,
-    environment: body.network_map,
-    useHttp3: body.protocols.http.quic_ports !== null ? true : false,
-    useHttps: body.protocols.http.https_ports !== null ? true : false,
-    httpsPort: handlerHttp(body.protocols.http.https_ports, HTTPS_PORT_LIST_OPTIONS),
-    quicPort: handlerHttp(body.protocols.http.quic_ports, HTTP3_PORT_LIST_OPTIONS),
-    httpPort: handlerHttp(body.protocols.http.http_ports, HTTP_PORT_LIST_OPTIONS),
-    supportedCiphers: body.tls.ciphers,
-    minimumTlsVersion: body.tls.minimum_version
-  }
-
-  return {
-    body: parsedVariable,
-    statusCode: httpResponse.statusCode
-  }
-}
-
+// Constants for port list options
 const HTTP3_PORT_LIST_OPTIONS = [{ name: '443 (Default)', value: 443 }]
 
 const HTTP_PORT_LIST_OPTIONS = [
@@ -78,3 +35,46 @@ const HTTPS_PORT_LIST_OPTIONS = [
   { name: '8035', value: 8035 },
   { name: '8090', value: 8090 }
 ]
+
+/**
+ *
+ * @param {Array<number>} ports - The ports
+ * @param {Array<Object>} listOptions - The list options
+ * @returns {Array<Object>|null} The parsed ports or null
+ */
+const handlerHttp = (ports, listOptions) => {
+  if (!ports) return null
+
+  return ports.map((port) => listOptions.find((option) => option.value === port))
+}
+
+const adapt = (httpResponse) => {
+  const body = httpResponse.body?.data
+
+  const parsedVariable = {
+    id: body?.id,
+    name: body?.name,
+    domainName: body?.domains[0].domain,
+    cnames: body?.alternate_domains.join('\n'),
+    cnameAccessOnly: !body?.domains[0].allow_access,
+    domains: body?.domains,
+    edgeCertificate: body?.tls.certificate ?? 0,
+    active: body.active,
+    mtlsVerification: body?.mtls.verification,
+    mtlsTrustedCertificate: body?.mtls.certificate || undefined,
+    mtlsIsEnabled: body?.mtls.certificate !== null,
+    environment: body.network_map,
+    useHttp3: body.protocols.http.quic_ports !== null,
+    useHttps: body.protocols.http.https_ports !== null,
+    httpsPort: handlerHttp(body.protocols.http.https_ports, HTTPS_PORT_LIST_OPTIONS),
+    quicPort: handlerHttp(body.protocols.http.quic_ports, HTTP3_PORT_LIST_OPTIONS),
+    httpPort: handlerHttp(body.protocols.http.http_ports, HTTP_PORT_LIST_OPTIONS),
+    supportedCiphers: body.tls.ciphers,
+    minimumTlsVersion: body.tls.minimum_version
+  }
+
+  return {
+    body: parsedVariable,
+    statusCode: httpResponse.statusCode
+  }
+}
