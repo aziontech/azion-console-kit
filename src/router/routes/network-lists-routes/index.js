@@ -52,8 +52,8 @@ export const networkListsRoutes = {
       name: 'edit-network-list',
       component: () => import('@views/NetworkLists/EditView.vue'),
       props: {
-        editNetworkListsService: NetworkListsService.editNetworkListService,
-        loadNetworkListsService: NetworkListsService.loadNetworkListService,
+        editNetworkListsService: NetworkListsServiceV4.editNetworkListService,
+        loadNetworkListsService: NetworkListsServiceV4.loadNetworkListService,
         listCountriesService: NetworkListsService.listCountriesService,
         updatedRedirect: 'list-network-list'
       },
