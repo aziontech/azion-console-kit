@@ -32,6 +32,22 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
+    // protocol section
+    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.domains.portHttp).click()
+
+    cy.get(selectors.domains.useHttpsField).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.tlsVersion).click()
+    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.domains.cipherSuite).click()
+    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
 

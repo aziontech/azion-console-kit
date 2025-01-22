@@ -109,7 +109,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     createDigitalCertificateCase()
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
+    cy.verifyToast('error', 'certificate: Invalid certificate status, CANNOT use pending certificate.')
 
     cy.get(selectors.domains.digitalCertificateDropdown).click()
 
