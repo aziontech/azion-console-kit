@@ -32,10 +32,7 @@ const adapt = (httpResponse, certificateType, search) => {
   let count = httpResponse.body?.count ?? 0
 
   if (certificateType === 'edge_certificate') {
-    const DEFAULT_CERTIFICATES = [
-      { id: 0, name: 'Azion (SAN)' },
-      { id: 'lets_encrypt', name: "Let's Encrypt" }
-    ]
+    const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
 
     const filteredDefaultCertificates = search
       ? DEFAULT_CERTIFICATES.filter((cert) =>

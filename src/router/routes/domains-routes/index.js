@@ -34,7 +34,7 @@ export const domainsRoutes = {
       name: 'create-domain',
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
-        createDomainService: DomainServices.createDomainService,
+        createDomainService: DomainServicesV4.createDomainService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
