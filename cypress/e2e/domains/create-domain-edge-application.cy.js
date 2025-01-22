@@ -74,6 +74,25 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
+    // protocol section
+    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.domains.portHttp).click()
+
+    cy.get(selectors.domains.useHttpsField).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.tlsVersion).click()
+    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.domains.cipherSuite).click()
+    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+
+
+    cy.get(selectors.domains.useHttp3Field).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.createEdgeApplicationButton).click()
@@ -90,7 +109,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     createDigitalCertificateCase()
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
+    cy.verifyToast('error', 'certificate: Invalid certificate status, CANNOT use pending certificate.')
 
     cy.get(selectors.domains.digitalCertificateDropdown).click()
 
