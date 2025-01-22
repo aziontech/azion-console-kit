@@ -50,13 +50,15 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
         generatedDomainUrl = $el.val()
       })
       .then(() => {
+        cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getDomain')
         cy.get(selectors.domains.copyDomainButton).click()
         cy.verifyToast('Successfully copied!')
         cy.get(selectors.domains.confirmButton).click()
         cy.verifyToast(
           'Succesfully created!',
           'The domain is now available in the Domain management section.'
-        )
+        )        
+        cy.wait('@getDomain')
 
         // Act
         cy.openProduct('Real-Time Purge')
