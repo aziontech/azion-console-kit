@@ -37,7 +37,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     //Edit Flow
     //Arrange
-    cy.intercept('GET', '/api/v3/network_lists/*').as('networkListsApi')
+    cy.intercept('GET', '/api/v4/workspace/network_lists/*').as('networkListsApi')
     cy.get(selectors.networkLists.nameRow).click()
     cy.wait('@networkListsApi')
 
