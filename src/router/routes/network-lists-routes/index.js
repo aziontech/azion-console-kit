@@ -31,7 +31,7 @@ export const networkListsRoutes = {
       name: 'create-network-list',
       component: () => import('@views/NetworkLists/CreateView.vue'),
       props: {
-        createNetworkListService: NetworkListsService.createNetworkListService,
+        createNetworkListService: NetworkListsServiceV4.createNetworkListService,
         listCountriesService: NetworkListsService.listCountriesService
       },
       meta: {
