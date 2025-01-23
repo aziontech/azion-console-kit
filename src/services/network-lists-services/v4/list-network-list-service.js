@@ -37,14 +37,14 @@ const adapt = (httpResponse) => {
 
   const networkList = isArray
     ? httpResponse.body.results.map((element) => ({
-      id: element.id,
-      stringId: element.id.toString(),
-      name: element.name,
-      lastEditor: element.last_editor,
-      listType: listTypeMap[element.type],
-      lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
-      lastModifiedDate: element.last_modified
-    }))
+        id: element.id,
+        stringId: element.id.toString(),
+        name: element.name,
+        lastEditor: element.last_editor,
+        listType: listTypeMap[element.type],
+        lastModified: formatExhibitionDate(element.last_modified, 'full', 'short'),
+        lastModifiedDate: element.last_modified
+      }))
     : []
 
   const count = httpResponse.body?.count ?? 0
