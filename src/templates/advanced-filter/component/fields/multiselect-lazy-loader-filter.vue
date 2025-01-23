@@ -91,7 +91,7 @@
 
   const { value: selectedValue, errorMessage } = useField(
     'selectedValue',
-    yup.array().min(1).required(),
+    yup.array().min(1),
     {
       initialValue: props.value
     }

@@ -1,56 +1,61 @@
 <template>
-  <LabelBlock
-    :for="props.name"
-    :label="props.label"
-    :isRequired="$attrs.required"
-    :data-testid="customTestId.label"
-  />
-  <MultiSelect
-    :id="props.name"
-    v-model="selectedValue"
-    :options="items"
-    :optionLabel="optionLabel"
-    :optionValue="optionValue"
-    :virtualScrollerOptions="virtualScrollerConfig"
-    :loading="loading"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    class="w-full md:w-14rem"
-    display="chip"
-    :pt="{
-      filterInput: {
-        class: 'w-full',
-        'data-testid': customTestId.filterInput
-      },
-      trigger: {
-        'data-testid': customTestId.trigger
-      },
-      loadingIcon: {
-        'data-testid': customTestId.loadingIcon
-      }
-    }"
-    :data-testid="customTestId.dropdown"
-  >
-    <template #header>
-      <div class="flex">
-        <InputText
-          placeholder="Search"
-          v-model="search"
-          :pt="{ root: { class: 'rounded-none w-full' } }"
-        />
-        <PrimeButton
-          icon="pi pi-search"
-          @click="fetchListData()"
-          :pt="{ root: { class: 'rounded-none cursor-pointer' } }"
-        />
-      </div>
-    </template>
-  </MultiSelect>
-  <small
-    v-if="errorMessage"
-    class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
-  >
+  <div class="flex flex-col w-full sm:w-full gap-2">
+    <LabelBlock
+      v-if="props.label"
+      :for="props.name"
+      :label="props.label"
+      :isRequired="$attrs.required"
+      :data-testid="customTestId.label"
+    />
+    <MultiSelect
+      :id="props.name"
+      v-model="selectedValue"
+      :options="items"
+      :optionLabel="optionLabel"
+      :optionValue="optionValue"
+      :virtualScrollerOptions="virtualScrollerConfig"
+      :loading="loading"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      class="w-full sm:max-w-xs overflow-hidden"
+      @change="emitChange"
+      @blur="emitBlur"
+      display="chip"
+      :pt="{
+        filterInput: {
+          class: 'max-w-full',
+          'data-testid': customTestId.filterInput
+        },
+        trigger: {
+          'data-testid': customTestId.trigger
+        },
+        loadingIcon: {
+          'data-testid': customTestId.loadingIcon
+        }
+      }"
+      :data-testid="customTestId.dropdown"
+    >
+      <template #header>
+        <div class="flex">
+          <InputText
+            placeholder="Search"
+            v-model="search"
+            :pt="{ root: { class: 'rounded-none w-full' } }"
+          />
+          <PrimeButton
+            icon="pi pi-search"
+            @click="fetchListData()"
+            :pt="{ root: { class: 'rounded-none cursor-pointer' } }"
+          />
+        </div>
+      </template>
+    </MultiSelect>
+    <small
+      v-if="errorMessage"
+      class="p-error text-xs font-normal leading-tight"
+      >{{ errorMessage }}</small
+    >
+  </div>
 </template>
 
 <script setup>
@@ -62,6 +67,8 @@
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
+
+  const emit = defineEmits(['onBlur', 'onChange'])
 
   defineOptions({ name: 'multiSelectLazyLoaderFilter' })
 
@@ -122,7 +129,8 @@
       type: String
     },
     name: {
-      type: String
+      type: String,
+      required: true
     }
   })
 
@@ -139,13 +147,9 @@
   const totalCount = ref(0)
   const search = ref('')
 
-  const { value: selectedValue, errorMessage } = useField(
-    name,
-    yup.array().min(1).required(),
-    {
-      initialValue: props.value
-    }
-  )
+  const { value: selectedValue, errorMessage } = useField(name, yup.array(), {
+    initialValue: props.value
+  })
 
   const attrs = useAttrs()
 
@@ -168,6 +172,14 @@
   onMounted(async () => {
     await fetchListData()
   })
+
+  const emitBlur = () => {
+    emit('onBlur')
+  }
+
+  const emitChange = () => {
+    emit('onChange', selectedValue.value)
+  }
 
   const handleLazyLoad = (event) => {
     const { last } = event

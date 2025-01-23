@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-6 mt-4 flex-col sm:flex-row">
+  <div class="flex flex-shrink gap-6 mt-4 flex-col sm:flex-row sm:w-xs">
     <Dropdown
       appendTo="self"
       optionValue="value"
@@ -9,33 +9,6 @@
       @change="filterTuning"
       class="w-full sm:max-w-xs"
     />
-    <!-- <MultiSelect
-      placeholder="Select domain"
-      resetFilterOnHide
-      autoFilterFocus
-      optionValue="id"
-      optionLabel="name"
-      filter
-      :options="domainsOptions.options"
-      v-model="valueDomains"
-      :loading="domainsOptions.done"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-    <Dropdown
-      filter
-      autoFilterFocus
-      appendTo="self"
-      optionValue="value"
-      optionLabel="name"
-      placeholder="Select network list"
-      showClear
-      :options="netWorkListOptions.options"
-      v-model="valueNetwork"
-      :loading="netWorkListOptions.done"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    /> -->
 
     <FieldDropdownLazyLoader
       data-testid="waf-tuning-list__network-list-field"
@@ -48,10 +21,13 @@
       :moreOptions="['value']"
       appendTo="self"
       placeholder="Select an network list"
-      @onSelectOption="setNetworkListOption"
+      @onClear="setNetworkListSelectedOption(null)"
+      @onSelectOption="setNetworkListSelectedOption"
+      class="w-full sm:max-w-xs"
+      enableClearOption
     />
 
-    <fieldMultiselectLazyLoader
+    <FieldMultiselectLazyLoader
       data-testid="waf-tuning-list__domains-field"
       name="valueDomainId"
       :service="props.listDomainsService"
@@ -60,10 +36,12 @@
       optionValue="id"
       :value="valueDomainId"
       appendTo="self"
+      class="w-full sm:max-w-xs overflow-hidden"
       placeholder="Select domain"
-      @onChange="filterTuning"
+      @onChange="setDomainsSelectedOptions"
     />
   </div>
+
   <div
     class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none"
   >
@@ -146,7 +124,7 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import fieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
+  import FieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
@@ -232,28 +210,6 @@
 
   const valueNetworkId = ref(null)
   const valueDomainId = ref(null)
-
-  const valueDomains = computed({
-    get: () => {
-      if (domainsOptions.value.done) return []
-      return selectedFilter.value.domains
-    },
-    set: (value) => {
-      selectedFilter.value.domains = value
-    }
-  })
-
-  const valueNetwork = computed({
-    get: () => {
-      if (netWorkListOptions.value.done || !selectedFilter.value.network?.id) return null
-      return netWorkListOptions.value.options.find(
-        (item) => item.value.id === selectedFilter.value.network?.id
-      ).value
-    },
-    set: (value) => {
-      selectedFilter.value.network = value
-    }
-  })
 
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
@@ -362,9 +318,14 @@
     return selectedFilter.value.domains?.length
   })
 
-  const setNetworkListOption = (value) => {
+  const setNetworkListSelectedOption = (value) => {
+    selectedFilter.value.network = value
+    filterTuning()
+  }
 
-console.log('network value:', value);
+  const setDomainsSelectedOptions = (value) => {
+    selectedFilter.value.domains = value
+    filterTuning()
   }
 
   const showToast = (summary, severity) => {
