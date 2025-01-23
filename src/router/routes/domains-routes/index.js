@@ -4,7 +4,7 @@ import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
-
+import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
   path: '/domains',
@@ -58,21 +58,28 @@ export const domainsRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-domain',
-      component: () => import('@views/Domains/EditView.vue'),
+      component: () => import('@views/Domains/TabsView.vue'),
       props: {
-        editDomainService: DomainServices.editDomainService,
-        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
-        loadDomainService: DomainServices.loadDomainService,
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-        updatedRedirect: 'list-domains',
-        clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService:
-          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        domainServices: {
+          editDomainService: DomainServicesV4.editDomainService,
+          loadDomainService: DomainServicesV4.loadDomainService,
+          updatedRedirect: 'list-domains',
+          clipboardWrite: Helpers.clipboardWrite,
+          listDigitalCertificatesService:
+            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+          loadDigitalCertificatesService:
+            DigitalCertificatesServicesV4.loadDigitalCertificateService
+        },
+        workloadDeploymentServices: {
+          listWorkloadDeploymentService: WorkloadDeploymentServices.listWorkloadDeploymentsService,
+          editWorkloadDeploymentService: WorkloadDeploymentServices.editWorkloadDeploymentService,
+          listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
+          loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
+          listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
+          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService
+        }
       },
       meta: {
         breadCrumbs: [

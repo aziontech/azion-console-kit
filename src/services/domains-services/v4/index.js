@@ -1,4 +1,6 @@
 import { listDomainsService } from './list-domain-service'
+import { loadDomainService } from './load-domain-service'
+import { editDomainService } from './edit-domain-service'
 import { createDomainService } from './create-domain-service'
 
 /**
@@ -10,4 +12,4 @@ import { createDomainService } from './create-domain-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listDomainsService, createDomainService }
+export { listDomainsService, loadDomainService, editDomainService, createDomainService }

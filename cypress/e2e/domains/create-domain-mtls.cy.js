@@ -70,6 +70,9 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`
     ).as('getTrustedCACertificateByName')
 
+    cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getDomain')
+
+
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
@@ -97,6 +100,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
     cy.get(selectors.domains.enableMtlsSwitch).click()
 
+
     cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
     cy.wait('@getTrustedCACertificate')
     cy.get(selectors.domains.dropdownTrustedCA).click()
@@ -113,6 +117,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
+    cy.wait('@getDomain')
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
   })
 

@@ -70,6 +70,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
     cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*').as('searchDigitalCertificatesApi')
+    cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getDomain')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -130,6 +131,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'Succesfully created!',
       'The domain is now available in the Domain management section.'
     )
+    cy.wait('@getDomain')
   })
 
   afterEach(() => {

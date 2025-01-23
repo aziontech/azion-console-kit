@@ -3,10 +3,10 @@ import { makeDomainsBaseUrl } from './make-domains-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const createDomainService = async (payload) => {
+export const editDomainService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}`,
-    method: 'POST',
+    url: `${makeDomainsBaseUrl()}/${payload.id}`,
+    method: 'PATCH',
     body: adapt(payload)
   })
 
@@ -26,12 +26,14 @@ const convertPortToInt = (ports) => {
 }
 
 const adapt = (payload) => {
+  payload.domains[0].allow_access = !payload.cnameAccessOnly
+  const domains = payload.domains
+
   const dataRequest = {
     name: payload.name,
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
-    edge_application: payload.edgeApplication,
-    edge_firewall: payload.edgeFirewall,
     active: payload.active,
+    tls: {},
     protocols: {
       http: {
         versions: handleVersions(payload.useHttp3),
@@ -44,11 +46,9 @@ const adapt = (payload) => {
       verification: payload.mtlsVerification,
       certificate: payload.mtlsTrustedCertificate
     },
-    domains: [{ allow_access: !payload.cnameAccessOnly }],
-    network_map: payload.environment,
-    tls: {}
+    domains,
+    network_map: payload.environment
   }
-
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
   }
@@ -72,11 +72,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return {
-        feedback: 'Your domain has been created',
-        urlToEditView: `/domains/edit/${httpResponse.body.data.id}`,
-        domainName: httpResponse.body.data.domains[0].domain
-      }
+      return 'Your domain has been edited'
     case 500:
       throw new Errors.InternalServerError().message
     default:
