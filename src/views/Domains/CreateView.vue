@@ -169,6 +169,7 @@
     httpPort: [{ name: '80 (Default)', value: 80 }],
     httpsPort: [{ name: '443 (Default)', value: 443 }],
     quicPort: [{ name: '443 (Default)', value: 443 }],
+    minimumTlsVersion: 'tls_1_2',
     useHttps: false,
     useHttp3: false,
     cnames: '',
@@ -207,6 +208,11 @@
     httpsPort: yup.array().when('useHttps', {
       is: true,
       then: (schema) => schema.min(1, 'At least one port is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    minimumTlsVersion: yup.string().when('useHttps', {
+      is: true,
+      then: (schema) => schema.required().label('TLS Version'),
       otherwise: (schema) => schema.notRequired()
     }),
     httpPort: yup.array().min(1).required(),

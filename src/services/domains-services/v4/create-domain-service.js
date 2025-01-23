@@ -52,10 +52,10 @@ const adapt = (payload) => {
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
   }
-  if (payload.supportedCiphers) {
+  if (payload.supportedCiphers && payload.useHttps) {
     dataRequest.tls.ciphers = payload.supportedCiphers
   }
-  if (payload.minimumTlsVersion) {
+  if (payload.minimumTlsVersion && payload.useHttps) {
     dataRequest.tls.minimum_version = payload.minimumTlsVersion
   }
 
