@@ -51,16 +51,19 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
 
     // Act - Set Criteria
-    cy.intercept('GET', '/api/v3/network_lists?page=1&page_size=200').as('networkList')
+    cy.intercept('GET', '/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search=').as('networkList')
+    cy.intercept('GET', `/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search=${networkListName}`).as('networkListSearch')
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownNetworkLists).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorFirstOption).click()
     cy.wait('@networkList')
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
+    cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).clear()
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListFilter).type(networkListName)
     cy.get(selectors.edgeFirewall.ruleCriteriaNetworkListDropdown).click()
+    cy.wait('@networkListSearch')
     cy.get(selectors.edgeFirewall.ruleCriteriaValueFirstOption).click()
 
     // Act - Set Behavior

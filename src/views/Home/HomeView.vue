@@ -118,7 +118,7 @@
   const openRTM = async () => {
     const urlEOL = getStaticUrlsByEnvironment('managerEOL')
     await tracker.product.clickedTo({ target: 'RTM' }).track()
-    window.location.href = urlEOL
+    window.location.href = `${urlEOL}?disableRedirect=true`
   }
 
   onMounted(async () => {

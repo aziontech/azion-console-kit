@@ -4,6 +4,7 @@ import { editNetworkListService } from './edit-network-list-service'
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
  * @property {typeof listNetworkListService} listNetworkListService - The listNetworkListService reference
+ * @property {typeof deleteNetworkListService} deleteNetworkListService - The deleteNetworkListService reference
  */
 
 /**

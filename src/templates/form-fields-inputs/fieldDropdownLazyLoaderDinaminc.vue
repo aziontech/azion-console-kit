@@ -154,6 +154,11 @@
     disableEmitFirstRender: {
       type: Boolean,
       default: false
+    },
+    initalData: {
+      type: Array,
+      default: () => [],
+      require: true
     }
   })
 
@@ -178,7 +183,6 @@
   const disableEmitInit = ref(props.disableEmitFirstRender)
 
   onMounted(async () => {
-    await fetchData()
     loadSelectedValue(props.value)
   })
 
@@ -348,6 +352,28 @@
       if (!existitemInList) {
         loadSelectedValue(newValue)
       }
+    }
+  )
+
+  watch(
+    () => props.initalData,
+    (newValue) => {
+      let results = newValue.body?.map((item) => {
+        return {
+          [props.optionLabel]: item.name,
+          [props.optionValue]: item.id,
+          ...props?.moreOptions?.reduce(
+            (additionalFields, option) => ({
+              ...additionalFields,
+              [option]: item[option]
+            }),
+            {}
+          )
+        }
+      })
+
+      data.value = results
+      totalCount.value = newValue.count
     }
   )
 

@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-service'
 
 export const loadNetworkListService = async ({ id }) => {
@@ -15,6 +15,7 @@ const adapt = (httpResponse, id) => {
   const networkList = {
     name: httpResponse.body.data.name,
     id: id,
+    stringId: httpResponse.body.data.id.toString(),
     lastEditor: httpResponse.body.data.last_editor,
     networkListType: httpResponse.body.data.type,
     itemsValuesCountry:
