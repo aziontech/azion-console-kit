@@ -89,13 +89,9 @@
   const totalCount = ref(0)
   const search = ref('')
 
-  const { value: selectedValue, errorMessage } = useField(
-    'selectedValue',
-    yup.array().min(1),
-    {
-      initialValue: props.value
-    }
-  )
+  const { value: selectedValue, errorMessage } = useField('selectedValue', yup.array().min(1), {
+    initialValue: props.value
+  })
 
   onMounted(async () => {
     await loadDomains()

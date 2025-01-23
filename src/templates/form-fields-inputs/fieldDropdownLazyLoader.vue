@@ -209,7 +209,7 @@
 
     emit('onChange', inputValue.value)
 
-    if (inputValue.value === null){
+    if (inputValue.value === null) {
       emit('onClear')
     }
 
