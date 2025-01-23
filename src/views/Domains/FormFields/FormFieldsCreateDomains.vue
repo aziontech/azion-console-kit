@@ -345,6 +345,7 @@
           <FieldDropdown
             data-testid="form-horizontal-delivery-settings-tls-version-field-dropdown"
             label="Minimum TLS version"
+            required
             name="minimumTlsVersion"
             :options="TLS_VERSIONS_OPTIONS"
             optionLabel="label"
