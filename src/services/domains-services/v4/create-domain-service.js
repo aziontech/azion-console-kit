@@ -32,10 +32,6 @@ const adapt = (payload) => {
     edge_application: payload.edgeApplication,
     edge_firewall: payload.edgeFirewall,
     active: payload.active,
-    tls: {
-      ciphers: payload.supportedCiphers,
-      minimum_version: payload.minimumTlsVersion
-    },
     protocols: {
       http: {
         versions: handleVersions(payload.useHttp3),
@@ -49,10 +45,18 @@ const adapt = (payload) => {
       certificate: payload.mtlsTrustedCertificate
     },
     domains: [{ allow_access: !payload.cnameAccessOnly }],
-    network_map: payload.environment
+    network_map: payload.environment,
+    tls: {}
   }
+
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
+  }
+  if (payload.supportedCiphers) {
+    dataRequest.tls.ciphers = payload.supportedCiphers
+  }
+  if (payload.minimumTlsVersion) {
+    dataRequest.tls.minimum_version = payload.minimumTlsVersion
   }
 
   return dataRequest

@@ -13,4 +13,3 @@ import { createDomainService } from './create-domain-service'
  * @type {ExportedServicesType}
  */
 export { listDomainsService, loadDomainService, editDomainService, createDomainService }
-
