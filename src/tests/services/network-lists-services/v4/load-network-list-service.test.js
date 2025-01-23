@@ -73,7 +73,8 @@ describe('NetworkListsServices V4', () => {
       networkListType: fixtures.networkMock.type,
       itemsValuesCountry: [],
       itemsValues: '123.123.123.123\n192.168.0.0',
-      lastModified: 'Friday, November 10, 2023 at 12:00 AM'
+      lastModified: 'Friday, November 10, 2023 at 12:00 AM',
+      stringId: fixtures.networkMock.id.toString()
     })
   })
 
@@ -97,7 +98,8 @@ describe('NetworkListsServices V4', () => {
       networkListType: fixtures.networkMockWithCountries.type,
       itemsValues: '',
       itemsValuesCountry: fixtures.networkMockWithCountries.items,
-      lastModified: 'Sunday, June 11, 2023 at 12:00 AM'
+      lastModified: 'Sunday, June 11, 2023 at 12:00 AM',
+      stringId: fixtures.networkMockWithCountries.id.toString()
     })
   })
 })
