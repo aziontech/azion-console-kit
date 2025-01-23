@@ -20,10 +20,16 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.nameInput).type(`${networkListName}`)
 
     cy.get(selectors.networkLists.typeDropdown).click()
-    cy.get(selectors.networkLists.typeDropdown).find('li').eq(2).should('have.text', 'IP/CIDR').click()
+    cy.get(selectors.networkLists.typeDropdown)
+      .find('li')
+      .eq(2)
+      .should('have.text', 'IP/CIDR')
+      .click()
 
     cy.get(selectors.networkLists.ipcidrTextarea).click()
-    cy.get(selectors.networkLists.ipcidrTextarea).type('192.168.172.4 #comment{enter}192.168.1.4 #comment{enter}')
+    cy.get(selectors.networkLists.ipcidrTextarea).type(
+      '192.168.172.4 #comment{enter}192.168.1.4 #comment{enter}'
+    )
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
@@ -44,7 +50,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.ipcidrTextarea).click()
     cy.get(selectors.networkLists.ipcidrTextarea).type('{enter}192.148.3.4')
 
-
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been edited')
 
@@ -57,7 +62,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
   afterEach(() => {
     // Delete the network list
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Network list successfully deleted')
     })
   })
 })

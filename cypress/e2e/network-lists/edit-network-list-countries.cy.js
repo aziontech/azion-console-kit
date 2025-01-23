@@ -20,7 +20,11 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.nameInput).type(`${networkListName}`)
 
     cy.get(selectors.networkLists.typeDropdown).click()
-    cy.get(selectors.networkLists.typeDropdown).find('li').eq(1).should('have.text', 'Countries').click()
+    cy.get(selectors.networkLists.typeDropdown)
+      .find('li')
+      .eq(1)
+      .should('have.text', 'Countries')
+      .click()
 
     cy.get(selectors.networkLists.countriesMultiselect).click()
     cy.get(selectors.networkLists.countriesListOption(0)).click()
@@ -58,7 +62,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
   afterEach(() => {
     // Delete the network list
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Network list successfully deleted')
     })
   })
 })
