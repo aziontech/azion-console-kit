@@ -12,4 +12,9 @@ import { loadNetworkListService } from './load-network-list-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listNetworkListService, deleteNetworkListService, loadNetworkListService, createNetworkListService }
+export {
+  listNetworkListService,
+  deleteNetworkListService,
+  loadNetworkListService,
+  createNetworkListService
+}
