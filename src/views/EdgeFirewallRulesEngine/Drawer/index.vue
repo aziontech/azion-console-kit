@@ -49,6 +49,10 @@
     listNetworkListService: {
       type: Function,
       required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -272,6 +276,7 @@
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
         :listNetworkListService="listNetworkListService"
+        :loadNetworkListService="loadNetworkListService"
       />
     </template>
   </CreateDrawerBlock>
@@ -293,6 +298,7 @@
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
         :listNetworkListService="listNetworkListService"
+        :loadNetworkListService="loadNetworkListService"
       />
     </template>
   </EditDrawerBlock>
