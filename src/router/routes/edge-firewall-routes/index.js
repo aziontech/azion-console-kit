@@ -63,6 +63,7 @@ export const edgeFirewallRoutes = {
       props: {
         listDomainsService: DomainServices.listDomainsService,
         listNetworkListService: NetworkListsServiceV4.listNetworkListService,
+        loadNetworkListService: NetworkListsServiceV4.loadNetworkListService,
         edgeFirewallServices: {
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
           editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,

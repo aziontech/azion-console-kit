@@ -8,26 +8,22 @@ export const listNetworkListService = async ({
   search = '',
   ordering = '',
   page = 1,
-  pageSize = 10,
-  allResults = false
+  pageSize = 10
 }) => {
-  const newPageSize = allResults ? 100 : pageSize
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize: newPageSize, search })
-  let httpResponse = await fetchAndAdaptNetworkList(searchParams)
+  const searchParams = makeListServiceQueryParams({
+    fields,
+    ordering,
+    page,
+    pageSize,
+    search
+  })
 
-  if (allResults) {
-    const count = httpResponse.count
-    let currentPage = page
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
+    method: 'GET'
+  })
 
-    while (count > currentPage * newPageSize) {
-      currentPage += 1
-
-      const newSearchParams = makeListServiceQueryParams({ fields, ordering, page: currentPage, pageSize: newPageSize, search, allResults })
-      let response = await fetchAndAdaptNetworkList(newSearchParams)
-      httpResponse.body = [...httpResponse.body, ...response.body]
-    }
-  }
-
+  httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
@@ -58,12 +54,4 @@ const adapt = (httpResponse) => {
     body: networkList,
     statusCode: httpResponse.statusCode
   }
-}
-
-const fetchAndAdaptNetworkList = async (searchParams) => {
-  const httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET'
-  })
-  return adapt(httpResponse)
 }
