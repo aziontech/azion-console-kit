@@ -33,7 +33,10 @@ const adapt = (payload) => {
     name: payload.name,
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
     active: payload.active,
-    tls: {},
+    tls: {
+      ciphers: null,
+      minimum_version: null
+    },
     protocols: {
       http: {
         versions: handleVersions(payload.useHttp3),
@@ -52,10 +55,10 @@ const adapt = (payload) => {
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
   }
-  if (payload.supportedCiphers) {
+  if (payload.supportedCiphers && payload.useHttps) {
     dataRequest.tls.ciphers = payload.supportedCiphers
   }
-  if (payload.minimumTlsVersion) {
+  if (payload.minimumTlsVersion && payload.useHttps) {
     dataRequest.tls.minimum_version = payload.minimumTlsVersion
   }
 
