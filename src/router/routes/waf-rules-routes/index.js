@@ -3,8 +3,7 @@ import * as WafRulesService from '@/services/waf-rules-services'
 import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
 import * as DomainsServiceV4 from '@/services/domains-services/v4'
 
-import { listCountriesService, loadNetworkListService } from '@/services/network-lists-services'
-import { load } from 'ol/Image'
+import { listCountriesService } from '@/services/network-lists-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const wafRulesRoutes = {

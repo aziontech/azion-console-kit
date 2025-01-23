@@ -24,7 +24,6 @@ const adapt = (httpResponse) => {
     },
     name: element.name
   }
-  console.log('networkList :', networkList)
 
   return {
     body: networkList,
