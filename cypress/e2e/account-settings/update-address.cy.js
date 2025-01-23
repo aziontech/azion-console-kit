@@ -32,24 +32,23 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     // Act
     cy.get(selectors.accountSettings.postalCode).type(fixtures.postalCode, { delay: 0 })
 
+    cy.get(selectors.accountSettings.countryLoading).should('not.exist')
     cy.get(selectors.accountSettings.countryDropdown).click()
-    cy.intercept('POST', '/graphql/cities').as('getRegion')
     cy.get(selectors.accountSettings.countryOption(randomCountryOption)).click()
 
     // store country alias value to be used for validation
     cy.get(selectors.accountSettings.country).invoke('text').as('countryValue')
 
     // wait for cities api to provide region options
-    cy.wait('@getRegion')
+    cy.get(selectors.accountSettings.regionLoading).should('not.exist')
     cy.get(selectors.accountSettings.regionDropdown).click()
-    cy.intercept('POST', '/graphql/cities').as('getCity')
     cy.get(selectors.accountSettings.regionOption(firstOption)).click()
 
     // store region alias value to be used for validation
     cy.get(selectors.accountSettings.region).invoke('text').as('regionValue')
 
     // wait for cities api to provide city options
-    cy.wait('@getCity')
+    cy.get(selectors.accountSettings.cityLoading).should('not.exist')
     cy.get(selectors.accountSettings.cityDropdown).click()
     cy.get(selectors.accountSettings.cityOption(firstOption)).click()
 

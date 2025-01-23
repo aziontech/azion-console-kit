@@ -83,7 +83,7 @@ export class AccountHandler {
    * @param {function} refreshService - The function that refreshes the service.
    * @return {string | object} The URL string or object to redirect to.
    */
-  async switchAccountFromSocialIdp(verifyService, refreshService) {
+  async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 
@@ -91,7 +91,7 @@ export class AccountHandler {
         return '/login'
       }
 
-      if (twoFactor) {
+      if (twoFactor && !EnableSocialLogin) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         return `/mfa/${mfaRoute}`
       }

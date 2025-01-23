@@ -14,7 +14,7 @@ export const networkListsRoutes = {
       component: () => import('@views/NetworkLists/ListView.vue'),
       props: {
         listNetworkListService: NetworkListsServiceV4.listNetworkListService,
-        deleteNetworkListService: NetworkListsService.deleteNetworkListService,
+        deleteNetworkListService: NetworkListsServiceV4.deleteNetworkListService,
         documentationService: Helpers.documentationCatalog.networkLists
       },
       meta: {
