@@ -65,6 +65,10 @@
       type: Function,
       required: true
     },
+    loadNetworkListService: {
+      type: Function,
+      required: true
+    },
     reorderRulesEngine: {
       type: Function,
       required: true
@@ -247,6 +251,7 @@
     :loadService="loadEdgeFirewallRulesEngineService"
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="listNetworkListService"
+    :loadNetworkListService="loadNetworkListService"
     @onSuccess="reloadList"
   />
 

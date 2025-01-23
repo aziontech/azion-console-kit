@@ -88,15 +88,19 @@
   const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
   const isIpHashMethod = computed(() => method.value === 'ip_hash')
 
-  const defaultAddress = {
+  const defaultAddressSingleOrigin = {
     address: '',
-    weight: 1,
     serverRole: 'primary',
     isActive: true
   }
+  const defaultAddress = { ...defaultAddressSingleOrigin, weight: 1 }
 
   const resetAddressesFields = (option) => {
-    resetAddresses([{ ...defaultAddress }])
+    resetAddresses(
+      option.value === 'load_balancer'
+        ? [{ ...defaultAddress }]
+        : [{ ...defaultAddressSingleOrigin }]
+    )
     if (option.value === 'load_balancer') {
       method.value = 'ip_hash'
       pushAddress({ ...defaultAddress })
@@ -349,6 +353,7 @@
             label="Address"
             required
             placeholder="example.com"
+            :data-testid="`origin-form__address-${index}`"
             :name="`addresses[${index}].address`"
             :value="addresses[index].value.address"
             description="Define an origin for the content, in FQDN format or an IPv4/IPv6 address."
