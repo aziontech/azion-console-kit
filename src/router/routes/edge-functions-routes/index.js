@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 
-import * as EdgeFunctionsService from '@/services/edge-functions-services'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -31,7 +30,7 @@ export const edgeFunctionsRoutes = {
       name: 'create-edge-functions',
       component: () => import('@views/EdgeFunctions/CreateView.vue'),
       props: {
-        createEdgeFunctionsService: EdgeFunctionsService.createEdgeFunctionsService
+        createEdgeFunctionsService: EdgeFunctionsServiceV4.createEdgeFunctionsService
       },
       meta: {
         breadCrumbs: [
@@ -51,8 +50,8 @@ export const edgeFunctionsRoutes = {
       name: 'edit-edge-functions',
       component: () => import('@views/EdgeFunctions/EditView.vue'),
       props: {
-        loadEdgeFunctionsService: EdgeFunctionsService.loadEdgeFunctionsService,
-        editEdgeFunctionsService: EdgeFunctionsService.editEdgeFunctionsService,
+        loadEdgeFunctionsService: EdgeFunctionsServiceV4.loadEdgeFunctionService,
+        editEdgeFunctionsService: EdgeFunctionsServiceV4.editEdgeFunctionsService,
         updatedRedirect: 'list-edge-functions'
       },
       meta: {
