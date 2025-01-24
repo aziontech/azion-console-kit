@@ -120,7 +120,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     //Edit Flow
     //Arrange
-    cy.intercept('GET', '/api/v3/network_lists/*').as('networkListsApi')
+    cy.intercept('GET', '/api/v4/workspace/network_lists/*').as('networkListsApi')
     cy.get(selectors.networkLists.nameRow).click()
     cy.wait('@networkListsApi')
 
@@ -129,7 +129,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.asnTextarea).type('{enter}123{enter}')
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your network list has been edited')
+    cy.verifyToast('success', 'Your Network List has been updated')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -178,7 +178,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.countriesListOption(3)).click()
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your network list has been edited')
+    cy.verifyToast('success', 'Your Network List has been updated')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
