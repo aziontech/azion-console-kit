@@ -69,7 +69,7 @@ describe('NetworkListsServices V4', () => {
 
     const feedbackMessage = await sut(fixtures.networkMock)
 
-    expect(feedbackMessage).toBe('Your network list has been updated')
+    expect(feedbackMessage).toBe('Your Network List has been updated')
   })
 
   it('should throw when request fails with API error', async () => {

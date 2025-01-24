@@ -38,7 +38,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Your network list has been updated'
+      return 'Your Network List has been updated'
     case 500:
       throw new Errors.InternalServerError().message
     default:

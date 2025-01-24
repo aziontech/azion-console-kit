@@ -51,7 +51,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.countriesListOption(3)).click()
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your network list has been edited')
+    cy.verifyToast('success', 'Your Network List has been updated')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
