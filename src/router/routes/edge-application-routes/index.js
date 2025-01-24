@@ -10,6 +10,7 @@ import * as ErrorResponsesService from '@/services/edge-application-error-respon
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
+import * as DomainServices from '@/services/domains-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -39,7 +40,7 @@ export const edgeApplicationRoutes = {
       name: 'create-edge-application',
       component: () => import('@views/EdgeApplications/CreateView.vue'),
       props: {
-        createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService
+        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -50,6 +51,30 @@ export const edgeApplicationRoutes = {
           {
             label: 'Create Edge Application',
             to: '/edge-applications/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'config/:id',
+      name: 'config-edge-application',
+      component: () => import('@views/EdgeApplications/Config/ConfigView.vue'),
+      props: {
+        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
+        domainsService: {
+          listDomainsService: DomainServices.listDomainsService,
+          loadDomainService: DomainServices.loadDomainService
+        }
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Applications',
+            to: '/edge-applications'
+          },
+          {
+            label: 'Config Edge Application',
+            to: '/edge-applications/config'
           }
         ]
       }
