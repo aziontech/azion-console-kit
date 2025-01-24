@@ -46,13 +46,13 @@ const adaptTemplate = (httpResponse) => {
 const parseStatusData = (status) => {
   const parsedStatus = status
     ? {
-      content: 'Active',
-      severity: 'success'
-    }
+        content: 'Active',
+        severity: 'success'
+      }
     : {
-      content: 'Inactive',
-      severity: 'danger'
-    }
+        content: 'Inactive',
+        severity: 'danger'
+      }
 
   return parsedStatus
 }
@@ -65,12 +65,13 @@ const adapt = async (httpResponse) => {
     waf: 'WAF Events'
   }
 
-  const templates_ids = httpResponse.body?.results?.reduce((accumulator, current) => {
-    if (current.template_id && !accumulator.includes(current.template_id)) {
-      accumulator.push(current.template_id)
-    }
-    return accumulator
-  }, []) ?? []
+  const templates_ids =
+    httpResponse.body?.results?.reduce((accumulator, current) => {
+      if (current.template_id && !accumulator.includes(current.template_id)) {
+        accumulator.push(current.template_id)
+      }
+      return accumulator
+    }, []) ?? []
 
   const mapTemplateId = await getTemplateById(templates_ids)
 
