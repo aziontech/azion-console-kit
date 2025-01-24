@@ -1,6 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-service'
-import { formatExhibitionDate } from '@/helpers/convert-date'
 
 export const loadNetworkListService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -8,26 +7,26 @@ export const loadNetworkListService = async ({ id }) => {
     method: 'GET'
   })
 
-  httpResponse = adapt(httpResponse)
+  httpResponse = adapt(httpResponse, id)
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (httpResponse) => {
-  const { data } = httpResponse.body
-  const listTypeMap = {
-    ip_cidr: 'IP/CIDR',
-    asn: 'ASN',
-    countries: 'Countries'
-  }
-
+const adapt = (httpResponse, id) => {
   const networkList = {
-    id: data.id,
-    stringId: data.id.toString(),
-    name: data.name,
-    lastEditor: data.last_editor,
-    listType: listTypeMap[data.type],
-    lastModified: formatExhibitionDate(data.last_modified, 'full', 'short'),
-    lastModifiedDate: data.last_modified
+    name: httpResponse.body.data.name,
+    id: id,
+    stringId: httpResponse.body.data.id.toString(),
+    lastEditor: httpResponse.body.data.last_editor,
+    networkListType: httpResponse.body.data.type,
+    itemsValuesCountry:
+      httpResponse.body.data.type === 'countries' ? httpResponse.body.data.items : [],
+    itemsValues:
+      httpResponse.body.data.type !== 'countries'
+        ? httpResponse.body.data.items.toString().replaceAll(',', '\n')
+        : '',
+    lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
+      new Date(httpResponse.body.data.last_modified)
+    )
   }
 
   return {
