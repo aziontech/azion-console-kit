@@ -71,7 +71,7 @@ const adapt = async (httpResponse) => {
         accumulator.push(current.template_id)
       }
       return accumulator
-    }, []) ?? []
+    }, []) || []
 
   const mapTemplateId = await getTemplateById(templatesIDs)
 
