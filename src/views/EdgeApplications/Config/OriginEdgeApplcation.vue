@@ -4,7 +4,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     :createService="createOriginServices"
-    >
+  >
     <template #form>
       <FormFieldsOrigin></FormFieldsOrigin>
     </template>

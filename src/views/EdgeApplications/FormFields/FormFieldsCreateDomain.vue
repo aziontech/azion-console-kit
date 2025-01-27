@@ -58,7 +58,5 @@
     }
   })
 
-
   const { value: domain } = useField('domain')
-
 </script>

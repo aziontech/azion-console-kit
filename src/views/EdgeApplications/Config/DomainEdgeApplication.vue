@@ -3,7 +3,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     :createService="createDomainsServices"
-    >
+  >
     <template #form>
       <FormFieldsCreateDomain
         :listDomainsService="listDomainsService"
