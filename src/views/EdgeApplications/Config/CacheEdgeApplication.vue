@@ -1,128 +1,50 @@
 <template>
-  <div>
-    <form action="">
-      <FormHorizontal
-        :isDrawer="true"
-        data-testid="form-horizontal-cache-expiration-policies"
-        :hiddenTitle="false"
-        :noBorder="false"
-      >
-        <template #inputs>
-          <FieldGroupRadio
-            label="Browser Cache Settings"
-            nameField="browserCacheSettings"
-            :isCard="false"
-            :options="cacheSettingsRadioOptions('browser')"
-            data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings"
-          />
-
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="!isBrowserCacheTypeHonor"
-            data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl"
-          >
-            <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="maximun-ttl-seconds"
-                class="text-color text-base font-medium"
-                data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl-label"
-              >
-                Maximum TTL (seconds)
-              </label>
-
-              <InputNumber
-                v-model="browserCacheSettingsMaximumTtl"
-                showButtons
-                data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl-input"
-              />
-            </div>
-          </div>
-
-          <FieldGroupRadio
-            label="Edge Cache Settings"
-            nameField="cdnCacheSettings"
-            :isCard="false"
-            :options="cacheSettingsRadioOptions('cdn')"
-            data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings"
-          />
-
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl"
-          >
-            <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="cdn-maximun-ttl-seconds"
-                class="text-color text-base font-medium"
-                data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-label"
-              >
-                {{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}
-              </label>
-
-              <InputNumber
-                v-model="cdnCacheSettingsMaximumTtl"
-                showButtons
-                data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-input"
-              />
-
-              <div
-                class="text-color-secondary text-sm font-normal"
-                data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-description"
-              >
-                Enable Application Accelerator in the Main Settings tab to use values lower than 60
-                seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
-              </div>
-            </div>
-          </div>
-        </template>
-      </FormHorizontal>
-
-      <ActionBar :cancelDisabled="false"></ActionBar>
-    </form>
-  </div>
+  <FormAccordion
+    :schema="validationSchema"
+    :initialValues="initialValues"
+    :createService="createCacheSettingServices"
+  >
+    <template #form>
+      <FormFieldsCache></FormFieldsCache>
+    </template>
+    <template #action-bar-accordion="{ onSubmit, loading }">
+      <ActionBarAccordion
+        @onSubmit="onSubmit"
+        :loading="loading"
+        data-testid="create-edge-application-action-bar"
+      />
+    </template>
+  </FormAccordion>
 </template>
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import InputNumber from 'primevue/inputnumber'
-
-  import ActionBar from '@/templates/action-bar-block/action-bar-accordion.vue'
-
-  import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import ActionBarAccordion from '@/templates/action-bar-block/action-bar-accordion.vue'
+  import FormAccordion from '@/templates/create-form-block/form-accordion.vue'
+  import FormFieldsCache from '../FormFields/FormFieldsCreateCacheSettings.vue'
+  import * as yup from 'yup'
+  import { ref } from 'vue'
 
   defineProps({
-    listDomainsService: {
-      type: Function,
-      required: true
-    },
-    loadDomainsService: {
+    createCacheServices: {
       type: Function,
       required: true
     }
   })
 
-  const { value: browserCacheSettings } = useField('browserCacheSettings')
-  const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
-  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-  const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
-  const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
+  const validationSchema = yup.object({
+    cdnCacheSettingsMaximumTtl: yup.number().required().label('Maximum TTL '),
+    browserCacheSettingsMaximumTtl: yup.number().label('Maximum TTL'),
+    browserCacheSettings: yup.string().required(),
+    cdnCacheSettings: yup.string().required()
+  })
 
-  const cacheSettingsRadioOptions = (type) => {
-    const isBrowser = type === 'browser'
+  const initialValues = ref({
+    browserCacheSettings: 'override',
+    browserCacheSettingsMaximumTtl: 0,
+    cdnCacheSettings: 'override',
+    cdnCacheSettingsMaximumTtl: 60
+  })
 
-    const browserSubtitle =
-      'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
-    const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
-
-    return [
-      { title: 'Override cache settings', inputValue: 'override' },
-      {
-        title: 'Honor cache policies',
-        subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
-        inputValue: 'honor'
-      }
-    ]
+  const createCacheSettingServices = async (values) => {
+    return values
   }
-  const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
 </script>

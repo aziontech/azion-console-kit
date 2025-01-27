@@ -9,7 +9,8 @@
     loading: Boolean,
     inDrawer: Boolean,
     submitDisabled: Boolean,
-    primaryActionLabel: { type: String, default: 'Skip Configuration' }
+    primaryActionLabel: { type: String, default: 'Skip Configuration' },
+    finishedConfiguration: Boolean
   })
 
   const handleSubmit = () => {
@@ -52,7 +53,7 @@
             @click="handleSubmit"
             icon-pos="right"
             class="max-md:w-full"
-            outlined
+            :outlined="!finishedConfiguration"
             :icon="calculateLoadIconByLoadingState"
             :disabled="isDisabledSubmit"
             data-testid="form-actions-submit-button"

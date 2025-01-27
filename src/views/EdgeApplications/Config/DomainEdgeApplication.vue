@@ -1,58 +1,28 @@
 <template>
-  <div>
-    <form action="">
-      <FormHorizontal
-        data-testid="form-horizontal-domain-dropdown"
-        isDrawer
-        :hiddenTitle="false"
-        :noBorder="false"
-      >
-        <template #inputs>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <FieldDropdownLazyLoader
-              data-testid="edge-app-form__domain-field"
-              label="Domain"
-              name="domain"
-              :service="listDomainsService"
-              :loadService="loadDomainsService"
-              optionLabel="name"
-              optionValue="value"
-              :value="domain"
-              appendTo="self"
-              placeholder="Select a Domain"
-            >
-              <template #footer>
-                <ul class="p-2">
-                  <li>
-                    <PrimeButton
-                      class="w-full whitespace-nowrap flex"
-                      text
-                      size="small"
-                      icon="pi pi-plus-circle"
-                      data-testid="edge-app-form__create-domain-button"
-                      :pt="{
-                        label: { class: 'w-full text-left' },
-                        root: { class: 'p-2' }
-                      }"
-                      label="Create Domain"
-                    />
-                  </li>
-                </ul>
-              </template>
-            </FieldDropdownLazyLoader>
-          </div>
-        </template>
-      </FormHorizontal>
-      <ActionBar :cancelDisabled="false"></ActionBar>
-    </form>
-  </div>
+  <FormAccordion
+    :schema="validationSchema"
+    :initialValues="initialValues"
+    :createService="createDomainsServices"
+    >
+    <template #form>
+      <FormFieldsCreateDomain
+        :listDomainsService="listDomainsService"
+        :loadDomainsService="loadDomainsService"
+      ></FormFieldsCreateDomain>
+    </template>
+    <template #action-bar-accordion="{ onSubmit, loading }">
+      <ActionBarAccordion
+        @onSubmit="onSubmit"
+        :loading="loading"
+        data-testid="create-edge-application-action-bar"
+      />
+    </template>
+  </FormAccordion>
 </template>
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import ActionBar from '@/templates/action-bar-block/action-bar-accordion.vue'
-
-  import { useField } from 'vee-validate'
+  import ActionBarAccordion from '@/templates/action-bar-block/action-bar-accordion.vue'
+  import FormAccordion from '@/templates/create-form-block/form-accordion.vue'
+  import FormFieldsCreateDomain from '../FormFields/FormFieldsCreateDomain.vue'
 
   defineProps({
     listDomainsService: {
@@ -65,5 +35,7 @@
     }
   })
 
-  const { value: domain } = useField('domain')
+  const createDomainsServices = (values) => {
+    return values
+  }
 </script>

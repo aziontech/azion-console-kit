@@ -12,7 +12,7 @@
         <Accordion
           :multiple="true"
           class="mt-4"
-          :activeIndex="0"
+          v-model:activeIndex="activeAccordionTab"
           :pt="{
             root: {
               class: 'flex flex-col gap-8'
@@ -21,33 +21,47 @@
         >
           <AccordionTab
             :pt="{
-              content: { class: 'p-0' },
-              headerAction: { class: 'flex flex-row-reverse' }
+              content: { class: 'p-0 pt-2' },
+              headerAction: { class: hideOriginBorder },
+              headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="w-full flex flex-col gap-2 ml-4">
-                <span> Define a default origin</span>
-                <span class="text-sm text-color-secondary"
-                  >Customize settings related to origin servers and hosts.
-                </span>
+              <div class="flex w-full items-center">
+                <div class="w-full flex flex-col gap-2">
+                  <span>{{ textInfoOrigin.title }}</span>
+                  <span class="text-sm text-color-secondary"
+                    >{{ textInfoOrigin.description }}
+                  </span>
+                </div>
+                <PrimeButton
+                  v-if="hasCreateOrigin"
+                  icon="pi pi-check"
+                ></PrimeButton>
               </div>
             </template>
             <OriginEdgeApplcation></OriginEdgeApplcation>
           </AccordionTab>
           <AccordionTab
             :pt="{
-              content: { class: 'p-0' },
+              content: { class: 'p-0 pt-2' },
               header: { class: 'border-t surface-border rounded-md' },
-              headerAction: { class: 'flex flex-row-reverse' }
+              headerAction: { class: hideDomainBorder },
+              headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="w-full flex flex-col gap-2 ml-4">
-                <span>Associate a domain</span>
-                <span class="text-sm text-color-secondary"
-                  >Select the domain to associate with the edge application.</span
-                >
+              <div class="flex w-full items-center">
+                <div class="w-full flex flex-col gap-2">
+                  <span>{{ textInfoDomain.title }}</span>
+                  <span class="text-sm text-color-secondary"
+                    >{{ textInfoDomain.description }}
+                  </span>
+                </div>
+                <PrimeButton
+                  v-if="hasBindDomain"
+                  icon="pi pi-check"
+                ></PrimeButton>
               </div>
             </template>
             <DomainEdgeApplication
@@ -57,18 +71,22 @@
           </AccordionTab>
           <AccordionTab
             :pt="{
-              content: { class: 'p-0' },
-              header: { class: 'border surface-border rounded-md' },
-              headerAction: { class: 'flex flex-row-reverse border-none' }
+              content: { class: 'p-0 pt-2' },
+              header: { class: 'border-t surface-border rounded-md' },
+              headerAction: { class: hideCacheBorder },
+              headerIcon: { class: `${hasCreateCache ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="w-full flex flex-col gap-2 ml-4">
-                <span>Set cache expiration policies</span>
-                <span class="text-sm text-color-secondary"
-                  >Define how the edge should handle TTL values sent by the origin as well as how
-                  long your content should remain cached at the edge.</span
-                >
+              <div class="flex w-full items-center">
+                <div class="w-full flex flex-col gap-2">
+                  <span>{{ textInfoCache.title }}</span>
+                  <span class="text-sm text-color-secondary">{{ textInfoCache.description }} </span>
+                </div>
+                <PrimeButton
+                  v-if="hasCreateCache"
+                  icon="pi pi-check"
+                ></PrimeButton>
               </div>
             </template>
             <CacheEdgeApplication />
@@ -76,7 +94,10 @@
         </Accordion>
       </div>
     </section>
-    <actionBarSkitConfig />
+    <actionBarSkitConfig
+      :finishedConfiguration="finishedConfiguration"
+      :primaryActionLabel="primaryActionLabel"
+    />
   </div>
 </template>
 <script setup>
@@ -86,7 +107,80 @@
   import DomainEdgeApplication from './DomainEdgeApplication.vue'
   import CacheEdgeApplication from './CacheEdgeApplication.vue'
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
+  import PrimeButton from 'primevue/button'
+
+  import { ref, computed } from 'vue'
   const props = defineProps({
     domainsService: { type: Object, required: true }
   })
+
+  const activeAccordionTab = ref([])
+  const hasBindDomain = ref(true)
+  const hasCreateOrigin = ref(true)
+  const hasCreateCache = ref(true)
+
+  const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
+  const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
+
+  const hideOriginBorder = computed(() =>
+    activeAccordionTab.value.includes(0) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const hideDomainBorder = computed(() =>
+    activeAccordionTab.value.includes(1) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const hideCacheBorder = computed(() =>
+    activeAccordionTab.value.includes(2) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const textInfoOrigin = computed(() => {
+    if (hasCreateOrigin.value) {
+      return {
+        description:
+          'The application will use the origin servers and hosts as configured. To edit these settings, go to the Edge Application page and select the application > Origins.',
+        title: 'Default origin defined!'
+      }
+    }
+    return {
+      description: 'Customize settings related to origin servers and hosts.',
+      title: 'Define a default origin'
+    }
+  })
+
+  const textInfoDomain = computed(() => {
+    if (hasCreateOrigin.value) {
+      return {
+        description:
+          'The selected domain is now associated with this application. To edit these settings, go to the Domains page and select the domain > Deployment.',
+        title: 'Domain associed!'
+      }
+    }
+    return {
+      description: 'Select the domain to associate with the edge application.',
+      title: 'Associate a domain'
+    }
+  })
+
+  const textInfoCache = computed(() => {
+    if (hasCreateOrigin.value) {
+      return {
+        description:
+          'The edge will handle TTL values sent by the origin and content cache as set. To edit these settings, go to the Edge Application page and select the application > Cache Settings.',
+        title: 'Cache expiration policies set!'
+      }
+    }
+    return {
+      description:
+        'Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge.',
+      title: 'Set cache expiration policies'
+    }
+  })
+
+  const finishedConfiguration = computed(
+    () => hasBindDomain.value && hasCreateCache.value && hasCreateOrigin.value
+  )
+  const primaryActionLabel = computed(() =>
+    finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
+  )
 </script>
