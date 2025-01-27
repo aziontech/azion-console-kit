@@ -231,29 +231,14 @@ const backRules = [
     }
   },
   {
-    name: 'Route GraphQL Billing Queries to Manager Origin',
-    description: 'Routes GraphQL Billing queries to the Manager, updating the URI accordingly',
-    match: '^/graphql/billing',
+    name: 'API Version 4 Routing',
+    description: 'Directs API version 4 requests to the designated API origin for handling.',
+    match: '^/v4',
     behavior: {
-      forwardCookies: true,
       setOrigin: {
         name: 'origin-api',
         type: 'single_origin'
-      },
-      rewrite: '/billing/graphql'
-    }
-  },
-  {
-    name: 'Route GraphQL Accounting Queries to Manager Origin',
-    description: 'Routes GraphQL Accounting queries to the Manager, updating the URI accordingly',
-    match: '^/graphql/accounting',
-    behavior: {
-      forwardCookies: true,
-      setOrigin: {
-        name: 'origin-api',
-        type: 'single_origin'
-      },
-      rewrite: '/accounting/graphql'
+      }
     }
   },
   {

@@ -8,6 +8,7 @@ export const loadEdgeDNS = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload

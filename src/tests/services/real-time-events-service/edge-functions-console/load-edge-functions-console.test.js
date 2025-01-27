@@ -45,6 +45,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {

@@ -34,6 +34,7 @@ describe('RealTimeMetricsServices', () => {
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/metrics/graphql`,
       method: 'POST',
+      baseURL: '/',
       body: fixtures.formattedQuery,
       signal: fixtures.signal
     })

@@ -2,8 +2,7 @@ import axios from 'axios'
 
 const api = (personalToken) => {
   delete axios.defaults.headers.common['Authorization']
-  const version = 'v4'
-  const baseURL = `api/${version}/events`
+  const baseURL = `v4/events`
 
   axios.defaults.headers.common['Accept'] = 'application/json'
 

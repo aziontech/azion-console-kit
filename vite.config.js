@@ -49,11 +49,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
-        '/graphql/billing': {
-          target: `${URLStartPrefix}api.azion.com`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
-        },
         '/api/webhook/console_feedback': {
           target: `https://automate.azion.net/`,
           changeOrigin: true,
@@ -69,6 +64,10 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
+        '/v4': {
+          target: `${URLStartPrefix}api.azion.com`,
+          changeOrigin: true
+        },
         '/webpagetest': {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
@@ -83,12 +82,7 @@ const getConfig = () => {
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '')
-        },
-        '/graphql/accounting': {
-          target: `${URLStartPrefix}api.azion.com`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
-        },
+        }
       }
     }
   }
