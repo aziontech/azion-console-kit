@@ -54,8 +54,8 @@ export const edgeDnsRoutes = {
       name: 'edit-edge-dns',
       component: () => import('@views/EdgeDNS/EditView.vue'),
       props: {
-        editEdgeDNSService: EdgeDNSService.editEdgeDNSService,
-        loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
+        editEdgeDNSService: EdgeDNSServiceV4.editEdgeDNSService,
+        loadEdgeDNSService: EdgeDNSServiceV4.loadEdgeDNSService,
         listRecordsService: EdgeDNSRecordsService.listRecordsService,
         deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
