@@ -20,6 +20,7 @@
           }"
         >
           <AccordionTab
+            :disabled="hasCreateOrigin"
             :pt="{
               content: { class: 'p-0 pt-2' },
               headerAction: { class: hideOriginBorder },
@@ -43,6 +44,7 @@
             <OriginEdgeApplcation></OriginEdgeApplcation>
           </AccordionTab>
           <AccordionTab
+            :disabled="hasBindDomain"
             :pt="{
               content: { class: 'p-0 pt-2' },
               header: { class: 'border-t surface-border rounded-md' },
@@ -70,6 +72,7 @@
             />
           </AccordionTab>
           <AccordionTab
+            :disabled="hasCreateCache"
             :pt="{
               content: { class: 'p-0 pt-2' },
               header: { class: 'border-t surface-border rounded-md' },
@@ -97,6 +100,7 @@
     <actionBarSkitConfig
       :finishedConfiguration="finishedConfiguration"
       :primaryActionLabel="primaryActionLabel"
+      @onSubmit="onSubmit"
     />
   </div>
 </template>
@@ -108,6 +112,7 @@
   import CacheEdgeApplication from './CacheEdgeApplication.vue'
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
   import PrimeButton from 'primevue/button'
+  import { useRoute, useRouter } from 'vue-router'
 
   import { ref, computed } from 'vue'
   const props = defineProps({
@@ -118,6 +123,10 @@
   const hasBindDomain = ref(true)
   const hasCreateOrigin = ref(true)
   const hasCreateCache = ref(true)
+  const route = useRoute()
+  const router = useRouter()
+
+  const edgeApplicationId = ref(route.params.id)
 
   const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
   const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
@@ -183,4 +192,8 @@
   const primaryActionLabel = computed(() =>
     finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
   )
+
+  const onSubmit = () => {
+    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId } })
+  }
 </script>
