@@ -10,6 +10,20 @@
       class="w-full sm:max-w-xs"
     />
 
+    <FieldMultiselectLazyLoader
+      data-testid="waf-tuning-list__domains-field"
+      name="valueDomainId"
+      :service="props.listDomainsService"
+      :loadService="props.loadDomainService"
+      optionLabel="name"
+      optionValue="id"
+      :value="valueDomainId"
+      appendTo="self"
+      class="w-full sm:max-w-xs overflow-hidden"
+      placeholder="Select domain"
+      @onChange="setDomainsSelectedOptions"
+    />
+
     <FieldDropdownLazyLoader
       data-testid="waf-tuning-list__network-list-field"
       name="valueNetworkId"
@@ -25,20 +39,6 @@
       @onSelectOption="setNetworkListSelectedOption"
       class="w-full sm:max-w-xs"
       enableClearOption
-    />
-
-    <FieldMultiselectLazyLoader
-      data-testid="waf-tuning-list__domains-field"
-      name="valueDomainId"
-      :service="props.listDomainsService"
-      :loadService="props.loadDomainService"
-      optionLabel="name"
-      optionValue="id"
-      :value="valueDomainId"
-      appendTo="self"
-      class="w-full sm:max-w-xs overflow-hidden"
-      placeholder="Select domain"
-      @onChange="setDomainsSelectedOptions"
     />
   </div>
 
