@@ -30,8 +30,8 @@ const parseHttpResponse = (httpResponse) => {
     case 202:
       return {
         feedback: 'Your edge application has been created',
-        urlToEditView: `/edge-applications/config/${httpResponse.body.results.id}`,
-        applicationId: httpResponse.body.results.id
+        urlToEditView: `/edge-applications/config/${httpResponse.body.data.id}`,
+        applicationId: httpResponse.body.data.id
       }
     case 500:
       throw new Errors.InternalServerError().message

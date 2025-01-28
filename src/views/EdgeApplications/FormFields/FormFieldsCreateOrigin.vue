@@ -2,8 +2,8 @@
   <FormHorizontal
     data-testid="form-horizontal-default-origin"
     isDrawer
-    :hiddenTitle="false"
-    :noBorder="false"
+    :hiddenTitle="true"
+    :noBorder="true"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -86,7 +86,6 @@
 
   import { useField } from 'vee-validate'
 
-  // import { computed } from 'vue'
   const { value: originType } = useField('originType')
   const { value: address } = useField('address')
   const { value: hostHeader } = useField('hostHeader')

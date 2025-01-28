@@ -2,8 +2,8 @@
   <FormHorizontal
     data-testid="form-horizontal-domain-dropdown"
     isDrawer
-    :hiddenTitle="false"
-    :noBorder="false"
+    :hiddenTitle="true"
+    :noBorder="true"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

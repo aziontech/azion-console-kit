@@ -2,8 +2,8 @@
   <FormHorizontal
     :isDrawer="true"
     data-testid="form-horizontal-cache-expiration-policies"
-    :hiddenTitle="false"
-    :noBorder="false"
+    :hiddenTitle="true"
+    :noBorder="true"
   >
     <template #inputs>
       <FieldGroupRadio
