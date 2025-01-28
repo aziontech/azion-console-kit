@@ -36,7 +36,7 @@ const adapt = async (httpResponse) => {
           },
       activeSort: domain.active,
       domainName: {
-        content: domain.domains ? domain.domains[0] : null
+        content: domain.domains ? domain.domains[0].domain : null
       },
       cnames: domain.alternate_domains
     }
