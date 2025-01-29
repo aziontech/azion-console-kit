@@ -20,7 +20,8 @@ export const useAccountStore = defineStore({
       FULL_CONSOLE_ACCESS: 'allow_console',
       SSO_MANAGEMENT: 'federated_auth',
       DATA_STREAM_SAMPLING: 'data_streaming_sampling',
-      MARKETPLACE_PRODUCTS: 'marketplace_products'
+      MARKETPLACE_PRODUCTS: 'marketplace_products',
+      HIDE_CREATE_OPTIONS: 'hide_create_options'
     }
   }),
   getters: {
@@ -101,6 +102,10 @@ export const useAccountStore = defineStore({
     },
     accountIsNotRegular(state) {
       return state.account?.status !== state.accountStatuses.REGULAR
+    },
+
+    hasHideCreateOptionsFlag(state) {
+      return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
     }
   },
   actions: {
