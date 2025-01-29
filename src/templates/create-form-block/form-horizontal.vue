@@ -1,10 +1,17 @@
 <template>
   <fieldset
-    class="flex max-w-screen-2xl-test mx-auto gap-8 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
-    :class="{ 'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer }"
+    class="flex max-w-screen-2xl-test mx-auto gap-8 w-full surface-section px-8 rounded-md flex-wrap min-w-[2rem]"
+    :class="{
+      'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer,
+      'border surface-border ': !noBorder,
+      'py-8': !noBorder
+    }"
   >
     <!-- title and description -->
-    <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]">
+    <div
+      class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]"
+      v-if="!hiddenTitle"
+    >
       <div class="text-color text-xl font-medium flex gap-2 items-center">
         <slot name="title">
           {{ props.title }}
@@ -28,8 +35,10 @@
 </template>
 <script setup>
   const props = defineProps({
-    title: { type: String, required: true },
+    title: { type: String, required: false },
     description: { type: String },
-    isDrawer: { type: Boolean, default: false }
+    isDrawer: { type: Boolean, default: false },
+    hiddenTitle: { type: Boolean, default: false },
+    noBorder: { type: Boolean, default: false }
   })
 </script>

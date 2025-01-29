@@ -9,18 +9,13 @@
   const props = defineProps({
     loading: Boolean,
     inDrawer: Boolean,
-    cancelDisabled: Boolean,
     submitDisabled: Boolean,
-    primaryActionLabel: { type: String, default: 'Save' },
-    secondaryActionLabel: { type: String, default: 'Cancel' }
+    primaryActionLabel: { type: String, default: 'Skip Configuration' },
+    finishedConfiguration: Boolean
   })
 
   const handleSubmit = () => {
     emit('onSubmit')
-  }
-
-  const handleCancel = () => {
-    emit('onCancel')
   }
 
   const calculateLoadIconByLoadingState = computed(() => {
@@ -29,10 +24,6 @@
 
   const isDisabledSubmit = computed(() => {
     return props.submitDisabled || props.loading
-  })
-
-  const isDisabledCancel = computed(() => {
-    return props.cancelDisabled || props.loading
   })
 
   const inDrawerStyles = computed(() => {
@@ -59,19 +50,11 @@
         <slot>
           <PrimeButton
             severity="primary"
-            :label="props.secondaryActionLabel"
-            outlined
-            class="max-md:min-w-max"
-            @click="handleCancel"
-            :disabled="isDisabledCancel"
-            data-testid="form-actions-cancel-button"
-          />
-          <PrimeButton
-            severity="primary"
             :label="props.primaryActionLabel"
             @click="handleSubmit"
             icon-pos="right"
             class="max-md:w-full"
+            :outlined="!finishedConfiguration"
             :icon="calculateLoadIconByLoadingState"
             :disabled="isDisabledSubmit"
             data-testid="form-actions-submit-button"
