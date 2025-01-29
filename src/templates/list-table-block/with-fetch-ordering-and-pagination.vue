@@ -409,7 +409,7 @@
     },
     rowsPerPageOptions: {
       type: Array,
-      default: () => [10, 20, 50, 100]
+      default: () => [1000]
     },
     lazy: {
       type: Boolean,
@@ -674,7 +674,6 @@
     const firstPage = 1
     firstItemIndex.value = firstPage
     await reload({ ordering })
-
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
