@@ -409,7 +409,7 @@
     },
     rowsPerPageOptions: {
       type: Array,
-      default: () => [1000]
+      default: () => [10, 20, 50, 100]
     },
     lazy: {
       type: Boolean,
