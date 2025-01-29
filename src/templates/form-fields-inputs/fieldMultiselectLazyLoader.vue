@@ -135,7 +135,7 @@
   })
 
   const PAGE_INCREMENT = 1
-  const PAGE_SIZE = 10
+  const PAGE_SIZE = 100
   const INITIAL_PAGE = 1
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
@@ -194,9 +194,6 @@
   const fetchListData = async () => {
     try {
       loading.value = true
-      if (page.value === INITIAL_PAGE) {
-        items.value = []
-      }
 
       const response = await props.service({
         pageSize: PAGE_SIZE,
@@ -222,8 +219,6 @@
         }
       })
 
-      checkItemsDuplicatedList()
-
       if (page.value === INITIAL_PAGE) {
         items.value = results
       } else {
@@ -244,14 +239,6 @@
 
         items.value.push(selectedElement)
       })
-    }
-  }
-
-  const checkItemsDuplicatedList = () => {
-    if (Array.isArray(selectedValue.value)) {
-      items.value = items.value.filter(
-        (result) => !selectedValue.value.some((selected) => selected.value === result.value)
-      )
     }
   }
 
