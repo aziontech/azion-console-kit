@@ -26,7 +26,7 @@ const fixtures = {
   certificateWithMissingData: {
     id: 2,
     name: 'Certificate 2',
-    subject_name: [],
+    subject_name: null,
     type: null,
     validity: null,
     status: 'pending'

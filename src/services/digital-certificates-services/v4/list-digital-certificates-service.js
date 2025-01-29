@@ -55,7 +55,7 @@ const parseValidityDate = (validity) => {
 
 const adapt = (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((item) => {
-    const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
+    const subjectNames = item.subject_name?.map((subject) => subject)?.join(',') ?? ''
     const typeMap = {
       edge_certificate: EDGE_CERTIFICATE,
       trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
