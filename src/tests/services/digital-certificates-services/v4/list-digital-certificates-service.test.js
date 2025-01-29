@@ -102,7 +102,7 @@ describe('DigitalCertificatesServices', () => {
         content: 'Pending',
         severity: 'danger'
       },
-      subjectName: '-',
+      subjectName: '',
       type: '-',
       validity: '-'
     })
@@ -144,7 +144,7 @@ describe('DigitalCertificatesServices', () => {
           content: 'Inactive',
           severity: 'danger'
         },
-        subjectName: '-',
+        subjectName: '',
         type: '-',
         validity: '-'
       })
