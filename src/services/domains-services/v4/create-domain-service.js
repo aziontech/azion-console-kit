@@ -32,6 +32,10 @@ const adapt = (payload) => {
     edge_application: payload.edgeApplication,
     edge_firewall: payload.edgeFirewall,
     active: payload.active,
+    mtls: {
+      verification: payload.mtlsVerification,
+      certificate: payload.mtlsTrustedCertificate
+    },
     protocols: {
       http: {
         versions: handleVersions(payload.useHttp3),
@@ -39,10 +43,6 @@ const adapt = (payload) => {
         https_ports: payload.useHttps ? convertPortToInt(payload.httpsPort) : null,
         quic_ports: payload.useHttp3 ? convertPortToInt(payload.quicPort) : null
       }
-    },
-    mtls: {
-      verification: payload.mtlsVerification,
-      certificate: payload.mtlsTrustedCertificate
     },
     domains: [{ allow_access: !payload.cnameAccessOnly }],
     network_map: payload.environment,
@@ -53,10 +53,14 @@ const adapt = (payload) => {
     dataRequest.tls.certificate = payload.edgeCertificate
   }
   if (payload.supportedCiphers && payload.useHttps) {
-    dataRequest.tls.ciphers = payload.supportedCiphers
+    dataRequest.tls.ciphers = payload.supportedCiphers === 'all' ? null : payload.supportedCiphers
   }
   if (payload.minimumTlsVersion && payload.useHttps) {
     dataRequest.tls.minimum_version = payload.minimumTlsVersion
+  }
+
+  if (!Object.keys(dataRequest.tls).length) {
+    delete dataRequest.tls
   }
 
   return dataRequest
