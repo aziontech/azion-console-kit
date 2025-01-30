@@ -30,8 +30,15 @@ jobs:
       - name: Install packages
         run: yarn ci
 
-      - name: Run Build
-        run: yarn build
-
       - name: Run eslint
         run: yarn lint
+
+      - name: Run format
+        run: yarn format
+
+      - name: Check for uncommitted changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "❌ O código não está formatado corretamente. Rode 'yarn format' localmente e faça commit das mudanças antes de enviar a PR."
+            exit 1
+          fi
