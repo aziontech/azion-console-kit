@@ -1,4 +1,5 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
+import * as EdgeNodeServiceV4 from '@/services/edge-node-services/v4'
 import * as ServiceEdgeNode from '@/services/edge-node-service-services'
 import * as Helpers from '@/helpers'
 
@@ -13,7 +14,7 @@ export const edgeNodeRoutes = {
       component: () => import('@views/EdgeNode/ListView.vue'),
       props: {
         listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
-        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
+        deleteEdgeNodeService: EdgeNodeServiceV4.deleteEdgeNodeService,
         documentationService: Helpers.documentationCatalog.edgeNodes
       },
       meta: {
