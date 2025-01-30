@@ -62,7 +62,7 @@ const adapt = (httpResponse) => {
     active: body.active,
     mtlsVerification: body?.mtls.verification,
     mtlsTrustedCertificate: body?.mtls.certificate || undefined,
-    mtlsIsEnabled: body?.mtls.certificate !== null,
+    mtlsIsEnabled: !!body?.mtls?.certificate,
     environment: body.network_map,
     useHttp3: body.protocols.http.quic_ports !== null,
     useHttps: body.protocols.http.https_ports !== null,
