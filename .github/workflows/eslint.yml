@@ -30,8 +30,5 @@ jobs:
       - name: Install packages
         run: yarn ci
 
-      - name: Build application
-        run: yarn prod
-
       - name: Run eslint
         run: yarn lint
