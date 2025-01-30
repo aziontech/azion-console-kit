@@ -2,23 +2,17 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeWorkloadsDeploymentBaseUrl } from '@/services/workload-deployment-service/make-workload-deployment-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
-export const editWorkloadDeploymentService = async ({ domainId, payload, all = false }) => {
+export const editWorkloadDeploymentService = async ({ domainId, payload }) => {
   const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeWorkloadsDeploymentBaseUrl()}/${domainId}/deployments/${payload.id}`,
     method: 'PATCH',
-    body: adapt(payload, all)
+    body: adapt(payload)
   })
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (payload, all) => {
-  if (all) {
-    return payload.map((workload) => ({
-      edge_application: workload.edgeApplication,
-      edge_firewall: workload?.edgeFirewall || null
-    }))
-  }
+const adapt = (payload) => {
   return {
     binds: {
       edge_application: payload.edgeApplication,

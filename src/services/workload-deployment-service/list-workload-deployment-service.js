@@ -8,8 +8,7 @@ export const listWorkloadDeploymentsService = async ({
   ordering = 'name',
   page = 1,
   pageSize = 10,
-  id,
-  all = false
+  id
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -17,12 +16,12 @@ export const listWorkloadDeploymentsService = async ({
     method: 'GET'
   })
 
-  httpResponse = await adapt(httpResponse, all)
+  httpResponse = await adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = async (httpResponse, all) => {
+const adapt = async (httpResponse) => {
   const workloadDeployments = httpResponse.body.results
   const hasItem = workloadDeployments.length
   const parsedWorkloadDeployments = hasItem
@@ -36,7 +35,7 @@ const adapt = async (httpResponse, all) => {
     : []
 
   return {
-    body: all ? parsedWorkloadDeployments : parsedWorkloadDeployments[0],
+    body: parsedWorkloadDeployments[0],
     statusCode: httpResponse.statusCode
   }
 }
