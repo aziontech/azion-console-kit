@@ -94,6 +94,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       .eq(0)
       .should('have.text', 'Single Origin')
       .click()
+    cy.get(selectors.edgeApplication.origins.originType).should('have.text', 'Single Origin')
     cy.get(selectors.edgeApplication.origins.addressInput).clear()
     cy.get(selectors.edgeApplication.origins.addressInput).type('test2.com')
     cy.get(selectors.form.actionsSubmitButton).click()
