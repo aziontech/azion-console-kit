@@ -34,7 +34,6 @@ const adapt = (payload) => {
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
     active: payload.active,
     tls: {
-      ciphers: null,
       minimum_version: null
     },
     protocols: {
@@ -52,6 +51,11 @@ const adapt = (payload) => {
     domains,
     network_map: payload.environment
   }
+
+  if (!payload.mtlsIsEnabled) {
+    delete dataRequest.mtls
+  }
+
   if (payload.edgeCertificate !== 0) {
     dataRequest.tls.certificate = payload.edgeCertificate
   }

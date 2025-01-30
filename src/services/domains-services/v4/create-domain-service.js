@@ -46,7 +46,13 @@ const adapt = (payload) => {
     },
     domains: [{ allow_access: !payload.cnameAccessOnly }],
     network_map: payload.environment,
-    tls: {}
+    tls: {
+      minimum_version: null
+    }
+  }
+
+  if (!payload.mtlsIsEnabled) {
+    delete dataRequest.mtls
   }
 
   if (payload.edgeCertificate !== 0) {
@@ -57,10 +63,6 @@ const adapt = (payload) => {
   }
   if (payload.minimumTlsVersion && payload.useHttps) {
     dataRequest.tls.minimum_version = payload.minimumTlsVersion
-  }
-
-  if (!Object.keys(dataRequest.tls).length) {
-    delete dataRequest.tls
   }
 
   return dataRequest

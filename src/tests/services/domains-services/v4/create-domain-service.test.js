@@ -177,7 +177,8 @@ describe('DomainsServicesV4', () => {
         edge_firewall: fixtures.domainMock.edgeFirewall,
         active: fixtures.domainMock.active,
         tls: {
-          certificate: fixtures.domainMock.edgeCertificate
+          certificate: fixtures.domainMock.edgeCertificate,
+          minimum_version: null
         },
         protocols: {
           http: {
