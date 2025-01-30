@@ -1,0 +1,37 @@
+name: Run Linters
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - dev
+env:
+  HUSKY: 0
+
+jobs:
+  eslint:
+    runs-on: self-hosted
+    container:
+      image: node:18-alpine3.18
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SO deps
+        run: apk add curl bash
+
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install packages
+        run: yarn ci
+
+      - name: Build application
+        run: yarn prod
+
+      - name: Run eslint
+        run: yarn lint
