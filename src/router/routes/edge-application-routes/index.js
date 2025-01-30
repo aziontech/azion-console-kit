@@ -10,8 +10,9 @@ import * as ErrorResponsesService from '@/services/edge-application-error-respon
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
-import * as DomainServices from '@/services/domains-services/v4'
-import * as WorkloadDeployments from '@/services/workload-deployment-service'
+import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
+import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
+import * as DomainServicesV4 from '@/services/domains-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -63,10 +64,16 @@ export const edgeApplicationRoutes = {
       props: {
         createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
         domainsService: {
-          listDomainsService: DomainServices.listDomainsService,
-          loadDomainService: DomainServices.loadDomainService,
-          listWorkloadDeploymentService: WorkloadDeployments.listWorkloadDeploymentsService,
-          editWorkloadDeploymentService: WorkloadDeployments.editWorkloadDeploymentService
+          listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
+          createDomainService: DomainServicesV4.createDomainService,
+
+          loadEdgeApplicationsService: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
+          listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
+          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
+          listDigitalCertificatesService:
+            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+          loadDigitalCertificatesService:
+            DigitalCertificatesServicesV4.loadDigitalCertificateService
         },
         cacheSettingsServices: {
           createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService

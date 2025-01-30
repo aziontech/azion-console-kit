@@ -70,10 +70,14 @@
               </div>
             </template>
             <DomainEdgeApplication
-              :listDomainsService="props.domainsService.listDomainsService"
-              :loadDOmainsService="props.domainsService.loadDOmainsService"
-              :listWorkloadDeploymentService="props.domainsService.listWorkloadDeploymentService"
-              :editWorkloadDeploymentService="props.domainsService.editWorkloadDeploymentService"
+              :listEdgeFirewallService="props.domainsService.listEdgeFirewallService"
+              :loadEdgeFirewallService="props.domainsService.loadEdgeFirewallService"
+              :listDigitalCertificatesService="props.domainsService.listDigitalCertificatesService"
+              :loadDigitalCertificatesService="props.domainsService.loadDigitalCertificateService"
+              :loadEdgeApplicationsService="props.domainsService.loadEdgeApplicationsService"
+              :listEdgeApplicationsService="props.domainsService.listEdgeApplicationsService"
+              :createDomainService="props.domainsService.createDomainService"
+              @createdDomain="handleResponse('domain')"
             />
           </AccordionTab>
           <AccordionTab
@@ -204,7 +208,7 @@
   )
 
   const onSubmit = () => {
-    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId } })
+    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
   }
 
   const closeAccordionTab = (index) => {
@@ -218,7 +222,7 @@
     }
     if (tab === 'cache') {
       hasCreateCache.value = true
-      closeAccordionTab(1)
+      closeAccordionTab(2)
     }
     if (tab === 'domain') {
       hasBindDomain.value = true
