@@ -12,5 +12,7 @@ export default {
     '[data-testid="teams-permissions-form__permissions-field-picklist__move-to-target-btn"]',
   permission: (permissionName) =>
     `[data-testid="teams-permissions-form__permissions-field__picklist__item-${permissionName}"]`,
-  listRow: (rowName) => `[data-testid="list-table-block__column__${rowName}__row"]`
+  listRow: (rowName) => `[data-testid="list-table-block__column__${rowName}__row"]`,
+  addOption:
+    '[data-testid="teams-permissions-form__permissions-field-picklist__move-to-target-btn"]'
 }

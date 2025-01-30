@@ -6,17 +6,6 @@
   import { GetRelevantField } from '@/modules/real-time-metrics/filters'
   import { FILTERS_RULES } from '@/helpers'
 
-  const {
-    getDatasetAvailableFilters,
-    infoAvailableFiltersCurrent,
-    getIsLoadingFilters,
-    dashboardCurrent,
-    currentFilters
-  } = props.moduleGetters
-
-  const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
-    props.moduleActions
-
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -51,6 +40,17 @@
       required: true
     }
   })
+
+  const {
+    getDatasetAvailableFilters,
+    infoAvailableFiltersCurrent,
+    getIsLoadingFilters,
+    dashboardCurrent,
+    currentFilters
+  } = props.moduleGetters
+  const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
+    props.moduleActions
+
   const refAdvancedFilter = ref('')
 
   const disabledFilter = computed(() => {

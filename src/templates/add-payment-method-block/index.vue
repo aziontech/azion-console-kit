@@ -211,13 +211,15 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full' },
-      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
+      header: { class: 'flex w-full' },
       content: { class: 'p-8' }
     }"
   >
     <template #header>
-      <h2>Add Payment Method</h2>
-      <ConsoleFeedback />
+      <div class="flex justify-between items-center w-full pr-2">
+        <h2>Add Payment Method</h2>
+        <ConsoleFeedback />
+      </div>
     </template>
 
     <div class="flex w-full">

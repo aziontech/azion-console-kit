@@ -150,13 +150,15 @@
             props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
           }`
         },
-        headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
+        header: { class: 'flex w-full' },
         content: { class: 'p-8' }
       }"
     >
       <template #header>
-        <h2>{{ title }}</h2>
-        <ConsoleFeedback />
+        <div class="flex justify-between items-center w-full pr-2">
+          <h2>{{ title }}</h2>
+          <ConsoleFeedback />
+        </div>
       </template>
 
       <div class="flex w-full">

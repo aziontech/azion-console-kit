@@ -301,6 +301,7 @@
   import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
   import { useLoadingStore } from '@/stores/loading'
+  import { useRouter } from 'vue-router'
 
   defineOptions({ name: 'profile-block' })
   const { startLoading } = useLoadingStore()
@@ -308,25 +309,26 @@
   const { currentTheme } = storeToRefs(useAccountStore())
   const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
+  const router = useRouter()
 
   onBeforeMount(() => {
     switch (user.kind) {
       case 'brand':
         profileMenuDefault.push({
           label: 'Resellers Management',
-          to: '/reseller/management'
+          command: () => navigateTo('/reseller/management')
         })
         break
       case 'company':
         profileMenuDefault.push({
           label: 'Groups Management',
-          to: '/group/management'
+          command: () => navigateTo('/group/management')
         })
         break
       case 'reseller':
         profileMenuDefault.push({
           label: 'Clients Management',
-          to: '/client/management'
+          command: () => navigateTo('/client/management')
         })
         break
     }
@@ -337,36 +339,36 @@
   const profileMenuDefault = [
     {
       label: 'Account Settings',
-      to: '/account/settings'
+      command: () => navigateTo('/account/settings')
     },
     {
       label: 'Users Management',
-      to: '/users'
+      command: () => navigateTo('/users')
     },
     {
       label: 'Billing & Subscriptions',
-      to: '/billing'
+      command: () => navigateTo('/billing')
     },
     {
       label: 'Activity History',
-      to: '/activity-history'
+      command: () => navigateTo('/activity-history')
     },
     {
       label: 'Teams Permissions',
-      to: '/teams-permission'
+      command: () => navigateTo('/teams-permission')
     },
     ...(hasAccessToSSOManagement.value
-      ? [{ label: 'SSO Management', to: '/identity-providers' }]
+      ? [{ label: 'SSO Management', command: () => navigateTo('/identity-providers') }]
       : [])
   ]
   const profileMenuSettings = [
     {
       label: 'Your Settings',
-      to: '/settings'
+      command: () => navigateTo('/settings')
     },
     {
       label: 'Personal Token',
-      to: '/personal-tokens'
+      command: () => navigateTo('/personal-tokens')
     }
   ]
   const themeOptions = [
@@ -432,6 +434,12 @@
 
     return [...switchAccount, ...profileMenuDefault, separator]
   })
+
+  const navigateTo = (path) => {
+    router.push(path)
+    closeMobileMenu()
+    closeDesktopMenu()
+  }
 
   watch(currentWidth, async (width) => {
     if (width <= SCREEN_BREAKPOINT_MD) {

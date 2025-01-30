@@ -21,7 +21,11 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your digital certificate has been created!')
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
-    cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
+    cy.window().then((win) => {
+      const app = win.document.querySelector('#app').__vue_app__
+      const router = app.config.globalProperties.$router
+      router.push('/digital-certificates')
+    })
     cy.get(selectors.list.searchInput).clear()
     cy.intercept('GET', '/api/v4/digital_certificates/certificates*').as('getDigitalCertificates')
     cy.get(selectors.list.searchInput).type(`${digitalCertificateName}{enter}`)
