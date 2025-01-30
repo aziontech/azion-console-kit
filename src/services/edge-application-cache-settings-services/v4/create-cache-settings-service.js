@@ -31,7 +31,7 @@ const parseDeviceGroup = (deviceGroup) => {
 }
 
 const parseTextContentToArrayByBreaklines = (textContent) => {
-  if (textContent === '') {
+  if (!textContent) {
     return []
   }
   return textContent.split('\n')?.map((queryString) => queryString)

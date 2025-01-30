@@ -55,6 +55,11 @@
     loadDigitalCertificatesService: {
       type: Function,
       required: true
+    },
+    disabledEdgeApplicationDropdown: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   })
 
@@ -462,6 +467,7 @@
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
+          :disabled="disabledEdgeApplicationDropdown"
           appendTo="self"
           placeholder="Select an edge application"
         >

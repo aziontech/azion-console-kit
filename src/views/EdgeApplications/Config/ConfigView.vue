@@ -41,7 +41,10 @@
                 ></PrimeButton>
               </div>
             </template>
-            <OriginEdgeApplcation></OriginEdgeApplcation>
+            <OriginEdgeApplcation
+              @createdOrigin="handleResponse('origin')"
+              :createOriginService="props.originsServices.createOriginService"
+            />
           </AccordionTab>
           <AccordionTab
             :disabled="hasBindDomain"
@@ -69,6 +72,8 @@
             <DomainEdgeApplication
               :listDomainsService="props.domainsService.listDomainsService"
               :loadDOmainsService="props.domainsService.loadDOmainsService"
+              :listWorkloadDeploymentService="props.domainsService.listWorkloadDeploymentService"
+              :editWorkloadDeploymentService="props.domainsService.editWorkloadDeploymentService"
             />
           </AccordionTab>
           <AccordionTab
@@ -92,7 +97,10 @@
                 ></PrimeButton>
               </div>
             </template>
-            <CacheEdgeApplication />
+            <CacheEdgeApplication
+              @createdCache="handleResponse('cache')"
+              :createCacheSettingsService="props.cacheSettingsServices.createCacheSettingsService"
+            />
           </AccordionTab>
         </Accordion>
       </div>
@@ -116,13 +124,15 @@
 
   import { ref, computed } from 'vue'
   const props = defineProps({
-    domainsService: { type: Object, required: true }
+    domainsService: { type: Object, required: true },
+    cacheSettingsServices: { type: Object, required: true },
+    originsServices: { type: Object, required: true }
   })
 
   const activeAccordionTab = ref([])
-  const hasBindDomain = ref(true)
-  const hasCreateOrigin = ref(true)
-  const hasCreateCache = ref(true)
+  const hasBindDomain = ref(false)
+  const hasCreateOrigin = ref(false)
+  const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
 
@@ -158,7 +168,7 @@
   })
 
   const textInfoDomain = computed(() => {
-    if (hasCreateOrigin.value) {
+    if (hasBindDomain.value) {
       return {
         description:
           'The selected domain is now associated with this application. To edit these settings, go to the Domains page and select the domain > Deployment.',
@@ -172,7 +182,7 @@
   })
 
   const textInfoCache = computed(() => {
-    if (hasCreateOrigin.value) {
+    if (hasCreateCache.value) {
       return {
         description:
           'The edge will handle TTL values sent by the origin and content cache as set. To edit these settings, go to the Edge Application page and select the application > Cache Settings.',
@@ -195,5 +205,24 @@
 
   const onSubmit = () => {
     router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId } })
+  }
+
+  const closeAccordionTab = (index) => {
+    activeAccordionTab.value = activeAccordionTab.value.filter((item) => item !== index)
+  }
+
+  const handleResponse = (tab) => {
+    if (tab === 'origin') {
+      hasCreateOrigin.value = true
+      closeAccordionTab(0)
+    }
+    if (tab === 'cache') {
+      hasCreateCache.value = true
+      closeAccordionTab(1)
+    }
+    if (tab === 'domain') {
+      hasBindDomain.value = true
+      closeAccordionTab(1)
+    }
   }
 </script>

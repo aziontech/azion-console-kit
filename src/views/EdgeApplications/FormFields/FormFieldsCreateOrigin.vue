@@ -54,10 +54,10 @@
           data-testid="form-horizontal-default-origin-address-field-text"
           label="Address"
           required
-          name="address"
+          name="addresses[0].address"
+          :value="addresses[0].value.address"
           aria-describedby="address-help"
           placeholder="example.com"
-          :value="address"
           description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
       </div>
@@ -84,11 +84,11 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import LabelBlock from '@/templates/label-block'
 
-  import { useField } from 'vee-validate'
+  import { useField, useFieldArray } from 'vee-validate'
 
   const { value: originType } = useField('originType')
-  const { value: address } = useField('address')
   const { value: hostHeader } = useField('hostHeader')
+  const { fields: addresses } = useFieldArray('addresses')
 
   const ORIGIN_TYPE_LIST_OPTIONS = [{ label: 'Single Origin', value: 'single_origin' }]
   const policyProtocolRadioOptions = [

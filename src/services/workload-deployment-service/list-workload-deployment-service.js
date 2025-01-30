@@ -8,7 +8,8 @@ export const listWorkloadDeploymentsService = async ({
   ordering = 'name',
   page = 1,
   pageSize = 10,
-  id
+  id,
+  all = false
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -16,24 +17,26 @@ export const listWorkloadDeploymentsService = async ({
     method: 'GET'
   })
 
-  httpResponse = await adapt(httpResponse)
+  httpResponse = await adapt(httpResponse, all)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = async (httpResponse) => {
-  const workload = httpResponse.body.results[0]
-
-  const parsedWorkloadDeployments = {
-    id: workload.id,
-    tag: workload.tag,
-    current: workload.current,
-    edgeApplication: workload.binds.edge_application,
-    edgeFirewall: workload.binds.edge_firewall
-  }
+const adapt = async (httpResponse, all) => {
+  const workloadDeployments = httpResponse.body.results
+  const hasItem = workloadDeployments.length
+  const parsedWorkloadDeployments = hasItem
+    ? workloadDeployments.map((workload) => ({
+        id: workload.id,
+        tag: workload.tag,
+        current: workload.current,
+        edgeApplication: workload.binds.edge_application,
+        edgeFirewall: workload.binds.edge_firewall
+      }))
+    : []
 
   return {
-    body: parsedWorkloadDeployments,
+    body: all ? parsedWorkloadDeployments : parsedWorkloadDeployments[0],
     statusCode: httpResponse.statusCode
   }
 }

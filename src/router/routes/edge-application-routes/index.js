@@ -11,6 +11,7 @@ import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as DomainServices from '@/services/domains-services/v4'
+import * as WorkloadDeployments from '@/services/workload-deployment-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -63,7 +64,15 @@ export const edgeApplicationRoutes = {
         createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
         domainsService: {
           listDomainsService: DomainServices.listDomainsService,
-          loadDomainService: DomainServices.loadDomainService
+          loadDomainService: DomainServices.loadDomainService,
+          listWorkloadDeploymentService: WorkloadDeployments.listWorkloadDeploymentsService,
+          editWorkloadDeploymentService: WorkloadDeployments.editWorkloadDeploymentService
+        },
+        cacheSettingsServices: {
+          createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService
+        },
+        originsServices: {
+          createOriginService: OriginsService.createOriginService
         }
       },
       meta: {
