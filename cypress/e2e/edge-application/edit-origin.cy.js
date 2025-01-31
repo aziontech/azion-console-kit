@@ -85,7 +85,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     //edit origin
     //arrange
-    cy.intercept('GET', '/api/v3/edge_applications/*/origins*').as('loadOrigins')
+    cy.intercept('GET', '/api/v3/edge_applications/*/origins/*').as('loadOrigins')
     cy.get(selectors.list.filteredRow.column('name')).click()
 
     //act
