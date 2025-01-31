@@ -16,11 +16,11 @@ jobs:
       image: node:18-alpine3.18
 
     steps:
+      - name: Install SO deps
+        run: apk add --no-cache curl bash git
+
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install SO deps
-        run: apk add curl git bash jq
 
       - uses: actions/cache@v2
         with:
