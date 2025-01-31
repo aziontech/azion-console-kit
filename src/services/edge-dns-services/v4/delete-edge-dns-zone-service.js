@@ -3,28 +3,23 @@ import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const editEdgeDNSService = async (payload) => {
-  const parsedPayload = adapt(payload)
+/**
+ * @param {Object} payload - The error schema.
+ * @param {string} payload.edgeApplicationId - The cache settings Edge Application id.
+ * @param {string} payload.id - The id of cache settings.
+ * @returns {Promise<string>} The result message based on the status code.
+ */
+export const deleteEdgeDnsZoneService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSBaseUrl()}/zones/${payload.id}`,
-    method: 'PATCH',
-    body: parsedPayload
+    url: `${makeEdgeDNSBaseUrl()}/zones/${id}`,
+    method: 'DELETE'
   })
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (payload) => {
-  return {
-    name: payload.name,
-    domain: payload.domain,
-    active: payload.isActive
-  }
-}
-
 /**
  * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
  * @returns {string} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
@@ -32,7 +27,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Edge DNS has been updated'
+      return 'Your Edge DNS has been deleted'
     case 500:
       throw new Errors.InternalServerError().message
     default:

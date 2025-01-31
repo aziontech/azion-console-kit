@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 
 export const loadEdgeDNSService = async ({ id }) => {
@@ -12,7 +12,7 @@ export const loadEdgeDNSService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
-  const edgeDNS = httpResponse.body.data
+  const edgeDNS = httpResponse.body?.data
 
   const parsedEdgeDNS = {
     id: edgeDNS.id,

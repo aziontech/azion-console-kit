@@ -85,15 +85,18 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     //edit origin
     //arrange
+    cy.intercept('GET', '/api/v3/edge_applications/*/origins/*').as('loadOrigins')
     cy.get(selectors.list.filteredRow.column('name')).click()
 
     //act
+    cy.wait('@loadOrigins')
     cy.get(selectors.edgeApplication.origins.originType).click()
     cy.get(selectors.edgeApplication.origins.originType)
       .find('li')
       .eq(0)
       .should('have.text', 'Single Origin')
       .click()
+    cy.get(selectors.edgeApplication.origins.originType).should('have.text', 'Single Origin')
     cy.get(selectors.edgeApplication.origins.addressInput).clear()
     cy.get(selectors.edgeApplication.origins.addressInput).type('test2.com')
     cy.get(selectors.form.actionsSubmitButton).click()

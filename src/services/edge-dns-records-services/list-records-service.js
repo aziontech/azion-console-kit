@@ -3,7 +3,7 @@ import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
 
 export const listRecordsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSRecordsBaseUrl()}/${id}/records?page_size=200`,
+    url: `${makeEdgeDNSRecordsBaseUrl()}/${id}/records?page_size=1000`,
     method: 'GET'
   })
 
