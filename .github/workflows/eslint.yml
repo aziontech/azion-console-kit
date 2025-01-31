@@ -22,6 +22,11 @@ jobs:
       - name: Install SO deps
         run: apk add --no-cache curl bash git
 
+      - name: Clone repository
+        run: |
+          git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY .
+          git config --global --add safe.directory $(pwd)
+
       - uses: actions/cache@v2
         with:
           path: '**/node_modules'
