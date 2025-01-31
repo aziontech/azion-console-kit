@@ -36,17 +36,24 @@ jobs:
       - name: Run Prettier Formatting
         run: yarn format
 
-      - name: Notify Developer
-        if: steps.format.outputs.has_issues == 'true'
+      - name: Check for Uncommitted Changes
         run: |
-          echo "⚠️ Attention @${{ github.actor }}!"
-          echo "::error::Formatting issues were found in your code. Please follow these steps:"
-          echo "::error::1. Run 'yarn format' locally in your branch"
-          echo "::error::2. Commit the formatting changes"
-          echo "::error::3. Push the changes to update the PR"
-          exit 1
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "❌ The code is not properly formatted. Run 'yarn format' locally and commit the changes before submitting the PR."
+            exit 1
+          fi
 
-      - name: Success Message
-        if: steps.format.outputs.has_issues == 'false'
-        run: |
-          echo "✅ All files are properly formatted!"
+      # - name: Notify Developer
+      #   if: steps.format.outputs.has_issues == 'true'
+      #   run: |
+      #     echo "⚠️ Attention @${{ github.actor }}!"
+      #     echo "::error::Formatting issues were found in your code. Please follow these steps:"
+      #     echo "::error::1. Run 'yarn format' locally in your branch"
+      #     echo "::error::2. Commit the formatting changes"
+      #     echo "::error::3. Push the changes to update the PR"
+      #     exit 1
+
+      # - name: Success Message
+      #   if: steps.format.outputs.has_issues == 'false'
+      #   run: |
+      #     echo "✅ All files are properly formatted!"
