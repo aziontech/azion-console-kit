@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   comment-on-pr:
-    runs-on: [self-hosted, stage]
+    runs-on: ubuntu-latest
     container:
       image: node:20-alpine
 
@@ -42,7 +42,7 @@ jobs:
 
   review:
     if: github.base_ref != 'main'
-    runs-on: [self-hosted, stage]
+    runs-on: ubuntu-latest
     steps:
       - name: Fix permissions
         run: docker run --rm --volume "`pwd`:/app" --workdir "/app" alpine:3.13 chmod -R a+rw .
