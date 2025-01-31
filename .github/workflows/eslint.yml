@@ -1,4 +1,4 @@
-name: Run Linters
+name: Run Linters And Checking Build Integrity
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
       - name: Install Dependencies
         run: yarn ci
 
-      - name: Checking build integrity
+      - name: Checking Build Integrity
         run: |
           echo "checking build integrity"
           yarn build
