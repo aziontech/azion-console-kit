@@ -177,18 +177,20 @@ describe('DigitalCertificatesServices', () => {
       url: `v4/digital_certificates/certificates?ordering=name&page=1&page_size=10&fields=&search=Certificate1`,
       method: 'GET'
     })
-    expect(result).toEqual([{
-      id: fixtures.certificateMock.id,
-      name: fixtures.certificateMock.name,
-      issuer: fixtures.certificateMock.issuer,
-      type: 'TLS Certificate',
-      subjectName: "Subject 1,Subject 2",
-      validity: "Nov 10, 2023, 12:00 AM",
-      status: {
-        content: "Active",
-        severity: "success",
-      },
-    }])
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      }
+    ])
   })
 
   it('should return correct certificates when ordering parameters are provided', async () => {
@@ -205,18 +207,20 @@ describe('DigitalCertificatesServices', () => {
       url: `v4/digital_certificates/certificates?ordering=issuer&page=1&page_size=10&fields=&search=`,
       method: 'GET'
     })
-    expect(result).toEqual([{
-      id: fixtures.certificateMock.id,
-      name: fixtures.certificateMock.name,
-      issuer: fixtures.certificateMock.issuer,
-      type: 'TLS Certificate',
-      subjectName: "Subject 1,Subject 2",
-      validity: "Nov 10, 2023, 12:00 AM",
-      status: {
-        content: "Active",
-        severity: "success",
-      },
-    }])
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      }
+    ])
   })
 
   it.each([
