@@ -20,7 +20,6 @@ jobs:
   comment-on-pr:
     runs-on: ubuntu-latest
 
-    if: github.base_ref != 'main'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -39,7 +38,6 @@ jobs:
             })
 
   review:
-    if: github.base_ref != 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
