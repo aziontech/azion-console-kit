@@ -30,6 +30,13 @@ jobs:
       - name: Install packages
         run: yarn ci
 
+      - name: Checking build integrity
+        run: |
+          echo "checking build integrity"
+          yarn build
+          rm -rf dist
+          rm -rf coverage
+
       - name: Run eslint
         run: yarn lint
 
