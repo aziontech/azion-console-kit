@@ -36,14 +36,14 @@ jobs:
       - name: Run Prettier Formatting
         run: yarn prettier --check src/
 
-      - name: Check for Uncommitted Changes
-        run: |
-          git config --global --add safe.directory $(pwd)
-          git init
-          if [[ -n $(git status --porcelain) ]]; then
-            echo "❌ The code is not properly formatted. Run 'yarn format' locally and commit the changes before submitting the PR."
-            exit 1
-          fi
+      # - name: Check for Uncommitted Changes
+      #   run: |
+      #     git config --global --add safe.directory $(pwd)
+      #     git init
+      #     if [[ -n $(git status --porcelain) ]]; then
+      #       echo "❌ The code is not properly formatted. Run 'yarn format' locally and commit the changes before submitting the PR."
+      #       exit 1
+      #     fi
 
       # - name: Notify Developer
       #   if: steps.format.outputs.has_issues == 'true'
