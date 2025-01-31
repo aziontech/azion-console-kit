@@ -34,7 +34,7 @@ jobs:
         run: yarn lint
 
       - name: Run Prettier Formatting
-        run: yarn format
+        run: yarn format --check
 
       - name: Check for Uncommitted Changes
         run: |

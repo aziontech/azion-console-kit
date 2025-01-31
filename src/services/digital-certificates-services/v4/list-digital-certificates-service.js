@@ -29,7 +29,8 @@ const parseStatusData = (status) => {
     const parsedStatus = isActive
         ? {
             content: capitalizeFirstLetter(status),
-            severity: 'success'
+            severity:
+                'success'
         }
         : {
             content: capitalizeFirstLetter(status),
