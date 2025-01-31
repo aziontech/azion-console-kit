@@ -1,0 +1,61 @@
+name: AI Code Reviewer
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - converted_to_draft
+      - ready_for_review
+
+concurrency:
+  # only one job per reference (branch or tag)
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  comment-on-pr:
+    runs-on: [self-hosted, stage]
+    container:
+      image: node:20-alpine
+
+    if: github.event_name == 'pull_request' && github.base_ref != 'main'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🔍 AI Code Reviewer is analyzing this PR… Please wait for the results!"
+            })
+
+  review:
+    if: github.base_ref != 'main'
+    runs-on: [self-hosted, stage]
+    steps:
+      - name: Fix permissions
+        run: docker run --rm --volume "`pwd`:/app" --workdir "/app" alpine:3.13 chmod -R a+rw .
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: AI PR Reviwer
+        uses: coderabbitai/ai-pr-reviewer@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.AZION_OPEN_AI_SECRET }}
+        with:
+          debug: false
+          review_simple_changes: false
+          review_comment_lgtm: false
