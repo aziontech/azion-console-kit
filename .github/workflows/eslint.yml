@@ -20,12 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install SO deps
-        run: apk add --no-cache curl bash git
-
-      - name: Clone repository
-        run: |
-          git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY .
-          git config --global --add safe.directory $(pwd)
+        run: apk add curl git bash jq
 
       - uses: actions/cache@v2
         with:
