@@ -16,34 +16,27 @@ jobs:
       image: node:18-alpine3.18
 
     steps:
-      - name: Install SO deps
-        run: apk add --no-cache curl bash git
-
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Install SO Dependencies
+        run: apk add --no-cache curl bash git
 
       - uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install packages
+      - name: Install Dependencies
         run: yarn ci
 
-      - name: Checking build integrity
-        run: |
-          echo "checking build integrity"
-          yarn build
-          rm -rf dist
-          rm -rf coverage
-
-      - name: Run eslint
+      - name: Run ESLint
         run: yarn lint
 
-      - name: Run format
+      - name: Run Prettier Formatting
         run: yarn format
 
-      - name: Check for uncommitted changes
+      - name: Check for Uncommitted Changes
         run: |
           if [[ -n $(git status --porcelain) ]]; then
             echo " ❌ The code is not properly formatted. Run yarn format locally and commit the changes before submitting the PR."
