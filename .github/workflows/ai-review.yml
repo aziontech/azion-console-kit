@@ -8,7 +8,7 @@ on:
       - ready_for_review
 
 concurrency:
-  # only one job per reference (branch or tag)
+  # Only one job per reference (branch or tag)
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
@@ -19,10 +19,8 @@ permissions:
 jobs:
   comment-on-pr:
     runs-on: ubuntu-latest
-    container:
-      image: node:20-alpine
 
-    if: github.event_name == 'pull_request' && github.base_ref != 'main'
+    if: github.base_ref != 'main'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -44,13 +42,10 @@ jobs:
     if: github.base_ref != 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Fix permissions
-        run: docker run --rm --volume "`pwd`:/app" --workdir "/app" alpine:3.13 chmod -R a+rw .
-
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: AI PR Reviwer
+      - name: AI PR Reviewer
         uses: coderabbitai/ai-pr-reviewer@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,3 +54,16 @@ jobs:
           debug: false
           review_simple_changes: false
           review_comment_lgtm: false
+
+      - name: Comment AI Review Completion
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "✅ AI Code Review completed! Check the comments for more details."
+            })
