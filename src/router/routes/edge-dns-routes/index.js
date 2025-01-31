@@ -15,7 +15,7 @@ export const edgeDnsRoutes = {
       component: () => import('@views/EdgeDNS/ListView.vue'),
       props: {
         listEdgeDNSService: EdgeDNSServiceV4.listEdgeDNSService,
-        deleteEdgeDNSService: EdgeDNSService.deleteEdgeDNSService,
+        deleteEdgeDNSService: EdgeDNSServiceV4.deleteEdgeDnsZoneService,
         documentationService: Helpers.documentationCatalog.edgeDNS,
         clipboardWrite: Helpers.clipboardWrite
       },
