@@ -46,6 +46,6 @@ jobs:
       - name: Check for uncommitted changes
         run: |
           if [[ -n $(git status --porcelain) ]]; then
-            echo " ❌ The code is not properly formatted. Run ‘yarn format’ locally and commit the changes before submitting the PR."
+            echo " ❌ The code is not properly formatted. Run yarn format locally and commit the changes before submitting the PR."
             exit 1
           fi
