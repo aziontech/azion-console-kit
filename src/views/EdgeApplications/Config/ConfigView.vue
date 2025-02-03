@@ -3,8 +3,8 @@
     <section class="flex my-10 m-auto h-full">
       <div class="flex flex-col p-8 self-center border surface-border max-w-3xl gap-4">
         <div class="flex flex-col">
-          <span class="text-color text-4xl">Edge Application Created!</span>
-          <p class="font-normal text-lg text-color-secondary mt-4">
+          <span class="text-color text-3xl font-medium">Edge Application Created!</span>
+          <p class="font-normal text-base text-color-secondary mt-4">
             Start customizing the application with a quick setup. Once completed, advanced settings
             will become available and can be edited anytime on the Edge Application or Domain page.
           </p>
@@ -12,6 +12,8 @@
         <Accordion
           :multiple="true"
           class="mt-4"
+          expandIcon="pi pi-chevron-down"
+          collapseIcon="pi pi-chevron-up"
           v-model:activeIndex="activeAccordionTab"
           :pt="{
             root: {
@@ -22,7 +24,7 @@
           <AccordionTab
             :disabled="hasCreateOrigin"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               headerAction: { class: hideOriginBorder },
               headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
             }"
@@ -52,7 +54,7 @@
           <AccordionTab
             :disabled="hasBindDomain"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               header: { class: 'border-t surface-border rounded-md' },
               headerAction: { class: hideDomainBorder },
               headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
@@ -89,7 +91,7 @@
           <AccordionTab
             :disabled="hasCreateCache"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               header: { class: 'border-t surface-border rounded-md' },
               headerAction: { class: hideCacheBorder },
               headerIcon: { class: `${hasCreateCache ? 'hidden' : ''}` }

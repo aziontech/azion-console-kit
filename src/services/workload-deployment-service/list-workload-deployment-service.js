@@ -35,7 +35,7 @@ const adapt = async (httpResponse) => {
     : []
 
   return {
-    body: parsedWorkloadDeployments[0],
+    body: parsedWorkloadDeployments[0] || [],
     statusCode: httpResponse.statusCode
   }
 }

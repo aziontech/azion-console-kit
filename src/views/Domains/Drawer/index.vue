@@ -23,6 +23,7 @@
   defineOptions({
     name: 'domain-drawer'
   })
+
   const emit = defineEmits(['onSuccess'])
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
