@@ -19,6 +19,10 @@
     }
   })
 
+  const accountStore = useAccountStore()
+
+  const hideCreateOptions = computed(() => accountStore.hasHideCreateOptionsFlag)
+
   const RESOURCES = [
     {
       label: 'Domains',
@@ -81,21 +85,29 @@
   const TABS = [
     {
       label: 'Recommended',
-      value: 'recommended'
+      value: 'recommended',
+      show: !hideCreateOptions.value
     },
     {
       label: 'Templates',
-      value: 'templates'
+      value: 'templates',
+      show: !hideCreateOptions.value
     },
     {
       label: 'Resources',
-      value: 'newResource'
+      value: 'newResource',
+      show: true
     },
     {
       label: 'Import from GitHub',
-      value: 'githubImport'
+      value: 'githubImport',
+      show: !hideCreateOptions.value
     }
   ]
+
+  const filteredTabs = computed(() => {
+    return TABS.filter((menuitem) => menuitem.show)
+  })
 
   const emit = defineEmits('closeModal')
 
@@ -111,6 +123,10 @@
   const search = ref('')
   const isSearching = computed(() => !!search.value.trim().length)
 
+  if (hideCreateOptions.value) {
+    selectedTab.value = 'newResource'
+  }
+
   const templatesData = ref({
     recommended: [],
     templates: [],
@@ -120,10 +136,19 @@
 
   const tabInfo = computed(() => {
     return {
-      recommended: { show: selectedTab.value === 'recommended', title: 'Select a Template' },
+      recommended: {
+        show: selectedTab.value === 'recommended',
+        title: 'Select a Template'
+      },
       templates: { show: selectedTab.value === 'templates', title: 'Select a Template' },
-      newResource: { show: selectedTab.value === 'newResource', title: 'Select a Resource' },
-      githubImport: { show: selectedTab.value === 'githubImport', title: 'Import from GitHub' }
+      newResource: {
+        show: selectedTab.value === 'newResource',
+        title: 'Select a Resource'
+      },
+      githubImport: {
+        show: selectedTab.value === 'githubImport',
+        title: 'Import from GitHub'
+      }
     }
   })
 
@@ -151,8 +176,7 @@
   }
 
   const loadRecommendedSolutions = async () => {
-    const accountStore = useAccountStore().accountData
-    await loadSolutions({ group: 'recommended', type: accountStore.jobRole })
+    await loadSolutions({ group: 'recommended', type: accountStore.accountData.jobRole })
   }
 
   const loadTemplates = async () => {
@@ -274,11 +298,14 @@
         data-testid="integrations-list-menu-items"
       >
         <li
-          v-for="(menuitem, index) in TABS"
+          v-for="(menuitem, index) in filteredTabs"
           :key="index"
         >
           <PrimeButton
-            :class="{ 'surface-200': menuitem.value === selectedTab, 'p-disabled': isLoading }"
+            :class="{
+              'surface-200': menuitem.value === selectedTab,
+              'p-disabled': isLoading
+            }"
             class="w-full whitespace-nowrap h-[38px] flex"
             text
             size="small"
@@ -346,7 +373,6 @@
           </template>
         </template>
       </div>
-
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         v-if="tabInfo.recommended.show"

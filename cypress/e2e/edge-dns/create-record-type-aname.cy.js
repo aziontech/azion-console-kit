@@ -12,7 +12,7 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
 
   it('Create a record of type ANAME', () => {
     // Arrange
-    cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
+    cy.intercept('/api/v4/edge_dns/zones/*').as('loadZone')
 
     const recordTypeFixtures = {
       name: generateUniqueName('record'),

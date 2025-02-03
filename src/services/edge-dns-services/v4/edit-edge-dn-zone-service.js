@@ -1,15 +1,14 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
+import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const createEdgeDNSZonesService = async (payload) => {
-  const adaptPayload = adapt(payload)
-
+export const editEdgeDNSService = async (payload) => {
+  const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSBaseUrl()}/zones`,
-    method: 'POST',
-    body: adaptPayload
+    url: `${makeEdgeDNSBaseUrl()}/zones/${payload.id}`,
+    method: 'PATCH',
+    body: parsedPayload
   })
 
   return parseHttpResponse(httpResponse)
@@ -26,15 +25,14 @@ const adapt = (payload) => {
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
- * @returns {string} The formatted error message.
+ * @param {String} httpResponse.statusCode - The HTTP status code.
+ * @returns {string} The result message based on the status code.
+ * @throws {Error} If there is an error with the response.
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 202:
-      return {
-        feedback: 'Your Edge DNS Zone has been created',
-        urlToEditView: `/edge-dns/edit/${httpResponse.body.data.id}`
-      }
+    case 200:
+      return 'Edge DNS has been updated'
     case 500:
       throw new Errors.InternalServerError().message
     default:

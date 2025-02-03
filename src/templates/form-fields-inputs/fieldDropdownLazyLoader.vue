@@ -180,7 +180,6 @@
 
   onMounted(async () => {
     await fetchData()
-    loadSelectedValue(props.value)
   })
 
   const hasDescriptionSlot = !!slots.description
