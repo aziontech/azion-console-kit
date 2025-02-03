@@ -1292,7 +1292,7 @@ const REPORTS = [
     dashboardId: '357548675837198934',
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.threatsBreakdown.threatsRequestsByIps
-  },
+  }
 ]
 
 export default REPORTS

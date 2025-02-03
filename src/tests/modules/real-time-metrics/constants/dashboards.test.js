@@ -156,7 +156,7 @@ describe('RealTimeMetricsModule', () => {
                   dataset: 'httpBreakdownMetrics'
                 }
               ]
-            },
+            }
           ]
         },
         {

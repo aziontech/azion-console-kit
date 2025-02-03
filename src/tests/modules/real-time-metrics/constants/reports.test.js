@@ -1268,7 +1268,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198934',
           variationType: 'regular',
           helpCenterPath: '/real-time-metrics/threats/breakdown'
-        },
+        }
       ]
 
       expect(REPORTS).toEqual(reports)

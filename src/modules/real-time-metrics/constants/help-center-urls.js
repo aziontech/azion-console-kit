@@ -74,7 +74,7 @@ const HELP_CENTER_URLS = {
       remoteFileInclusionRfiThreats:
         '/real-time-metrics/waf/threats/remote-file-inclusion-rfi-threats',
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
-      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests',
+      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests'
     }
   },
   botManager: {

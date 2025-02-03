@@ -161,7 +161,7 @@ const PAGES_DASHBOARDS = {
           dataset: 'httpBreakdownMetrics'
         }
       ]
-    },
+    }
   ],
   observe: [
     {
