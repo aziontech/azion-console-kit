@@ -18,7 +18,7 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.domainInput).clear()
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS has been created')
+    cy.verifyToast('success', 'Your Edge DNS Zone has been created')
     cy.get(selectors.edgeDns.cancelButton).click()
 
     // Assert

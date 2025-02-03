@@ -33,7 +33,7 @@ export const edgeDnsRoutes = {
       name: 'create-edge-dns',
       component: () => import('@views/EdgeDNS/CreateView.vue'),
       props: {
-        createEdgeDNSService: EdgeDNSService.createEdgeDNSService,
+        createEdgeDNSService: EdgeDNSServiceV4.createEdgeDNSZonesService,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
