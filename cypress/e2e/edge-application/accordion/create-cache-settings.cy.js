@@ -14,7 +14,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
   })
 
-  it('should add an chace settings', () => {
+  it('should add an cache settings', () => {
     //edge application creation
     cy.openProduct('Edge Application')
     

@@ -73,7 +73,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
   })
 
-  it('should add an chace settings', () => {
+  it('should add all step settings', () => {
     //edge application creation
     cy.openProduct('Edge Application')
     

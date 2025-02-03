@@ -16,7 +16,7 @@ const adapt = (payload) => {
   return {
     binds: {
       edge_application: payload.edgeApplication,
-      edge_firewall: payload?.edgeFirewall || null
+      edge_firewall: payload?.edgeFirewall
     }
   }
 }
