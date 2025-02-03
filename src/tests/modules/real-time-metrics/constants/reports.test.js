@@ -1240,6 +1240,34 @@ describe('RealTimeMetricsModule', () => {
           type: 'line',
           variationType: 'regular',
           xAxis: 'ts'
+        },
+        {
+          id: '424388331488145487',
+          chartOwner: 'azion',
+          label: 'Top WAF Threat Requests by IP',
+          description: 'Top 10 IPs that generated the most threats identified by the WAF',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'ordered-bar',
+          xAxis: 'cat',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'count',
+          dataset: 'httpBreakdownMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'wafThreatRequests'
+            }
+          ],
+          filters: {},
+          limit: 10,
+          groupBy: ['remoteAddress'],
+          fields: ['remoteAddress'],
+          orderDirection: 'DESC',
+          dashboardId: '357548675837198934',
+          variationType: 'regular',
+          helpCenterPath: '/real-time-metrics/threats/breakdown'
         }
       ]
 
