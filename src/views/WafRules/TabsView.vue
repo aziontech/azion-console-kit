@@ -152,9 +152,12 @@
             :listCountriesService="props.wafTuning.listCountriesService"
             :listNetworkListService="props.wafTuning.listNetworkListService"
             :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
+            :listDomainsService="props.wafTuning.listDomainsService"
             :showActionBar="activeTab === mapTabs.tuning"
             :createWafRulesAllowedTuningService="props.wafTuning.createWafRulesAllowedTuningService"
             :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
+            :loadDomainService="props.wafTuning.loadDomainService"
+            :loadNetworkListService="props.wafTuning.loadNetworkListService"
           />
         </TabPanel>
         <TabPanel
