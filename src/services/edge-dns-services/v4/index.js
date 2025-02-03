@@ -1,4 +1,6 @@
 import { listEdgeDNSService } from './list-edge-dns-service'
+import { loadEdgeDNSService } from './load-edge-dns-zone-service'
+import { editEdgeDNSService } from './edit-edge-dn-zone-service'
 import { deleteEdgeDnsZoneService } from './delete-edge-dns-zone-service'
 
-export { listEdgeDNSService, deleteEdgeDnsZoneService }
+export { listEdgeDNSService, loadEdgeDNSService, editEdgeDNSService, deleteEdgeDnsZoneService }
