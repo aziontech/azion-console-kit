@@ -1,7 +1,9 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
 
-let fixtures = {}
+let fixtures = {
+  originName: 'Default Origin'
+}
 
 /**
  * Creates a new edge application with basic settings.
@@ -10,10 +12,12 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
+  cy.get(selectors.form.actionsSkipButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created

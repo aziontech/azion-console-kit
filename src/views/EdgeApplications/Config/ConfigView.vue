@@ -28,7 +28,10 @@
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-origion-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoOrigin.title }}</span>
                   <span class="text-sm text-color-secondary"
@@ -56,7 +59,10 @@
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-domain-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoDomain.title }}</span>
                   <span class="text-sm text-color-secondary"
@@ -90,7 +96,10 @@
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-cache-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoCache.title }}</span>
                   <span class="text-sm text-color-secondary">{{ textInfoCache.description }} </span>
