@@ -42,7 +42,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
   afterEach(() => {
     // Delete the network list
     cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Network list successfully deleted')
     })
   })
 })

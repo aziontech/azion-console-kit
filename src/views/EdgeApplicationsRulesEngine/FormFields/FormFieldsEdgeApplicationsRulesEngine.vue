@@ -215,7 +215,7 @@
   const placeholderBehaviors = (behavior) => {
     const placeholders = {
       add_request_cookie: 'cookie-name=value',
-      add_request_header: 'header-name=value',
+      add_request_header: 'header-name: value',
       filter_request_cookie: 'cookie-name or cookie-name=cookie-value',
       filter_request_header: 'header-name',
       redirect_to_301: 'location',
@@ -853,7 +853,7 @@
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.cacheId"
+                :value="`${behaviors[behaviorIndex].value.cacheId}`"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               >
                 <template #footer>

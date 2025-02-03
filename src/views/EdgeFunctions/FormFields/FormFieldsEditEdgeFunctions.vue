@@ -31,7 +31,7 @@
   const { value: name } = useField('name')
 
   const { value: isProprietaryCode } = useField('isProprietaryCode')
-  const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
+  const { value: args, errorMessage: argsError } = useField('args')
   const { value: code, errorMessage: codeError } = useField('code')
   const { value: language } = useField('language')
 
@@ -39,7 +39,8 @@
   let initialJsonArgsValue = ARGS_INITIAL_STATE
   const unwatch = watch(name, () => {
     initialCodeValue = code.value
-    initialJsonArgsValue = jsonArgs.value
+    initialJsonArgsValue = args.value
+
     emit('update:name', name.value)
 
     if (initialCodeValue) {
@@ -62,13 +63,13 @@
   })
 
   const hasArgsError = computed(() => {
-    return !!jsonArgsError.value
+    return !!argsError.value
   })
 
   const updateObject = computed(() => {
     const previewValues = {
       code: code.value,
-      args: jsonArgs.value
+      args: args.value
     }
     emit('update:previewData', previewValues)
     return previewValues
@@ -235,7 +236,7 @@
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
-            v-model="jsonArgs"
+            v-model="args"
             :initialValue="initialJsonArgsValue"
             language="json"
             :errors="hasArgsError"
@@ -251,7 +252,7 @@
       </Splitter>
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
-          v-model="jsonArgs"
+          v-model="args"
           :initialValue="initialJsonArgsValue"
           language="json"
           :errors="hasArgsError"
