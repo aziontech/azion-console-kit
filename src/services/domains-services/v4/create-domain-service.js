@@ -81,7 +81,8 @@ const parseHttpResponse = (httpResponse) => {
       return {
         feedback: 'Your domain has been created',
         urlToEditView: `/domains/edit/${httpResponse.body.data.id}`,
-        domainName: httpResponse.body.data.domains[0].domain
+        domainName: httpResponse.body.data.domains[0].domain,
+        id: parseInt(httpResponse.body.data.id)
       }
     case 500:
       throw new Errors.InternalServerError().message

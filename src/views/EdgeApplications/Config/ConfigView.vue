@@ -3,8 +3,8 @@
     <section class="flex my-10 m-auto h-full">
       <div class="flex flex-col p-8 self-center border surface-border max-w-3xl gap-4">
         <div class="flex flex-col">
-          <span class="text-color text-4xl">Edge Application Created!</span>
-          <p class="font-normal text-lg text-color-secondary mt-4">
+          <span class="text-color text-3xl font-medium">Edge Application Created!</span>
+          <p class="font-normal text-base text-color-secondary mt-4">
             Start customizing the application with a quick setup. Once completed, advanced settings
             will become available and can be edited anytime on the Edge Application or Domain page.
           </p>
@@ -12,6 +12,8 @@
         <Accordion
           :multiple="true"
           class="mt-4"
+          expandIcon="pi pi-chevron-down"
+          collapseIcon="pi pi-chevron-up"
           v-model:activeIndex="activeAccordionTab"
           :pt="{
             root: {
@@ -22,13 +24,16 @@
           <AccordionTab
             :disabled="hasCreateOrigin"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               headerAction: { class: hideOriginBorder },
               headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-origion-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoOrigin.title }}</span>
                   <span class="text-sm text-color-secondary"
@@ -41,19 +46,25 @@
                 ></PrimeButton>
               </div>
             </template>
-            <OriginEdgeApplcation></OriginEdgeApplcation>
+            <OriginEdgeApplcation
+              @createdOrigin="handleResponse('origin')"
+              :createOriginService="props.originsServices.createOriginService"
+            />
           </AccordionTab>
           <AccordionTab
             :disabled="hasBindDomain"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               header: { class: 'border-t surface-border rounded-md' },
               headerAction: { class: hideDomainBorder },
               headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-domain-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoDomain.title }}</span>
                   <span class="text-sm text-color-secondary"
@@ -67,21 +78,30 @@
               </div>
             </template>
             <DomainEdgeApplication
-              :listDomainsService="props.domainsService.listDomainsService"
-              :loadDOmainsService="props.domainsService.loadDOmainsService"
+              :listEdgeFirewallService="props.domainsService.listEdgeFirewallService"
+              :loadEdgeFirewallService="props.domainsService.loadEdgeFirewallService"
+              :listDigitalCertificatesService="props.domainsService.listDigitalCertificatesService"
+              :loadDigitalCertificatesService="props.domainsService.loadDigitalCertificateService"
+              :loadEdgeApplicationsService="props.domainsService.loadEdgeApplicationsService"
+              :listEdgeApplicationsService="props.domainsService.listEdgeApplicationsService"
+              :createDomainService="props.domainsService.createDomainService"
+              @createdDomain="handleResponse('domain')"
             />
           </AccordionTab>
           <AccordionTab
             :disabled="hasCreateCache"
             :pt="{
-              content: { class: 'p-0 pt-2' },
+              content: { class: 'p-0 pt-6' },
               header: { class: 'border-t surface-border rounded-md' },
               headerAction: { class: hideCacheBorder },
               headerIcon: { class: `${hasCreateCache ? 'hidden' : ''}` }
             }"
           >
             <template #header>
-              <div class="flex w-full items-center">
+              <div
+                class="flex w-full items-center"
+                data-testid="create-cache-accordion"
+              >
                 <div class="w-full flex flex-col gap-2">
                   <span>{{ textInfoCache.title }}</span>
                   <span class="text-sm text-color-secondary">{{ textInfoCache.description }} </span>
@@ -92,7 +112,10 @@
                 ></PrimeButton>
               </div>
             </template>
-            <CacheEdgeApplication />
+            <CacheEdgeApplication
+              @createdCache="handleResponse('cache')"
+              :createCacheSettingsService="props.cacheSettingsServices.createCacheSettingsService"
+            />
           </AccordionTab>
         </Accordion>
       </div>
@@ -116,13 +139,15 @@
 
   import { ref, computed } from 'vue'
   const props = defineProps({
-    domainsService: { type: Object, required: true }
+    domainsService: { type: Object, required: true },
+    cacheSettingsServices: { type: Object, required: true },
+    originsServices: { type: Object, required: true }
   })
 
   const activeAccordionTab = ref([])
-  const hasBindDomain = ref(true)
-  const hasCreateOrigin = ref(true)
-  const hasCreateCache = ref(true)
+  const hasBindDomain = ref(false)
+  const hasCreateOrigin = ref(false)
+  const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
 
@@ -158,7 +183,7 @@
   })
 
   const textInfoDomain = computed(() => {
-    if (hasCreateOrigin.value) {
+    if (hasBindDomain.value) {
       return {
         description:
           'The selected domain is now associated with this application. To edit these settings, go to the Domains page and select the domain > Deployment.',
@@ -172,7 +197,7 @@
   })
 
   const textInfoCache = computed(() => {
-    if (hasCreateOrigin.value) {
+    if (hasCreateCache.value) {
       return {
         description:
           'The edge will handle TTL values sent by the origin and content cache as set. To edit these settings, go to the Edge Application page and select the application > Cache Settings.',
@@ -194,6 +219,25 @@
   )
 
   const onSubmit = () => {
-    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId } })
+    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
+  }
+
+  const closeAccordionTab = (index) => {
+    activeAccordionTab.value = activeAccordionTab.value.filter((item) => item !== index)
+  }
+
+  const handleResponse = (tab) => {
+    if (tab === 'origin') {
+      hasCreateOrigin.value = true
+      closeAccordionTab(0)
+    }
+    if (tab === 'cache') {
+      hasCreateCache.value = true
+      closeAccordionTab(2)
+    }
+    if (tab === 'domain') {
+      hasBindDomain.value = true
+      closeAccordionTab(1)
+    }
   }
 </script>

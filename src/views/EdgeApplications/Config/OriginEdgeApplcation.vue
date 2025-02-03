@@ -4,6 +4,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     :createService="createOriginServices"
+    disabledCallback
   >
     <template #form>
       <FormFieldsOrigin></FormFieldsOrigin>
@@ -23,22 +24,61 @@
   import FormFieldsOrigin from '../FormFields/FormFieldsCreateOrigin.vue'
   import * as yup from 'yup'
   import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
+
+  const props = defineProps({
+    createOriginService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const emit = defineEmits(['createdOrigin'])
+
+  const route = useRoute()
+  const edgeApplicationId = ref(route.params.id)
 
   const validationSchema = yup.object({
-    address: yup.string().required().label('Address'),
+    addresses: yup.array().of(
+      yup.object({
+        address: yup.string().required().label('Address')
+      })
+    ),
     hostHeader: yup.string().required().label('Host Header')
   })
 
   const initialValues = ref({
+    name: 'Default Origin',
     originType: 'single_origin',
     address: '',
+    addresses: [
+      {
+        address: '',
+        serverRole: 'primary',
+        isActive: true,
+        weight: null
+      }
+    ],
     originProtocolPolicy: 'preserve',
-    hostHeader: '${host}'
+    hostHeader: '${host}',
+    originPath: '',
+    hmacAuthentication: false,
+    hmacRegionName: '',
+    hmacAccessKey: '',
+    hmacSecretKey: '',
+    connectionTimeout: 60,
+    timeoutBetweenBytes: 120
   })
 
-  const createOriginServices = async (values) => {
-    return values
+  const createOriginServices = async (payload) => {
+    const bodyRequest = {
+      id: edgeApplicationId.value,
+      ...payload
+    }
+    return props.createOriginService(bodyRequest)
   }
 
-  const handleResponse = () => {}
+  const handleResponse = () => {
+    emit('createdOrigin')
+  }
 </script>

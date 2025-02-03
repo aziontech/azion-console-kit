@@ -22,18 +22,20 @@ export const listWorkloadDeploymentsService = async ({
 }
 
 const adapt = async (httpResponse) => {
-  const workload = httpResponse.body.results[0]
-
-  const parsedWorkloadDeployments = {
-    id: workload.id,
-    tag: workload.tag,
-    current: workload.current,
-    edgeApplication: workload.binds.edge_application,
-    edgeFirewall: workload.binds.edge_firewall
-  }
+  const workloadDeployments = httpResponse.body.results
+  const hasItem = workloadDeployments.length
+  const parsedWorkloadDeployments = hasItem
+    ? workloadDeployments.map((workload) => ({
+        id: workload.id,
+        tag: workload.tag,
+        current: workload.current,
+        edgeApplication: workload.binds.edge_application,
+        edgeFirewall: workload.binds.edge_firewall
+      }))
+    : []
 
   return {
-    body: parsedWorkloadDeployments,
+    body: parsedWorkloadDeployments[0] || [],
     statusCode: httpResponse.statusCode
   }
 }

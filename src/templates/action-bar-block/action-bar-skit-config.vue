@@ -57,7 +57,7 @@
             :outlined="!finishedConfiguration"
             :icon="calculateLoadIconByLoadingState"
             :disabled="isDisabledSubmit"
-            data-testid="form-actions-submit-button"
+            data-testid="form-actions-skipt-and-finish-button"
           />
         </slot>
       </div>

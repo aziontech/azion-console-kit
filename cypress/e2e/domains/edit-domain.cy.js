@@ -140,7 +140,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
   afterEach(() => {
     // Cleanup
     cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Domain successfully deleted')
     })
     cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })

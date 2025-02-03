@@ -55,7 +55,7 @@
             class="max-md:w-full"
             :icon="calculateLoadIconByLoadingState"
             :disabled="isDisabledSubmit"
-            data-testid="form-actions-submit-button"
+            data-testid="form-actions-submit-button-accordion-1"
           />
         </slot>
       </div>

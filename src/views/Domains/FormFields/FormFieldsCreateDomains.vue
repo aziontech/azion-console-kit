@@ -55,6 +55,17 @@
     loadDigitalCertificatesService: {
       type: Function,
       required: true
+    },
+    disabledEdgeApplicationDropdown: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    isDrawer: {
+      type: Boolean
+    },
+    noBorder: {
+      type: Boolean
     }
   })
 
@@ -213,6 +224,8 @@
 <template>
   <form-horizontal
     description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
   >
     <template #title> General </template>
     <template #inputs>
@@ -230,6 +243,8 @@
     </template>
   </form-horizontal>
   <form-horizontal
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
     title="Environment Type"
     description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
   >
@@ -246,7 +261,9 @@
   </form-horizontal>
 
   <FormHorizontal
+    :isDrawer="isDrawer"
     title="Delivery Settings"
+    :noBorder="noBorder"
     description="Choose the protocols used between the edge application and users."
     data-testid="form-horizontal-delivery-settings"
   >
@@ -435,6 +452,8 @@
   </FormHorizontal>
 
   <form-horizontal
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
     description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
   >
     <template #title> Settings </template>
@@ -462,6 +481,7 @@
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
+          :disabled="disabledEdgeApplicationDropdown"
           appendTo="self"
           placeholder="Select an edge application"
         >
@@ -579,6 +599,8 @@
   </form-horizontal>
 
   <form-horizontal
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
     title="Mutual Authentication Settings"
     description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
   >
@@ -624,7 +646,11 @@
     </template>
   </form-horizontal>
 
-  <form-horizontal title="Status">
+  <form-horizontal
+    title="Status"
+    :noBorder="noBorder"
+    :isDrawer="isDrawer"
+  >
     <template #inputs>
       <FieldSwitchBlock
         data-testid="domains-form__active-field"

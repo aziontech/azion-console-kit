@@ -4,8 +4,22 @@ export default {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    unsaved: '[data-testid="dialog-unsaved__leave-page"]',
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
+  },
+  accordionStepOrigin: {
+    createOrigin: '[data-testid="create-origion-accordion"]',
+    addressOriginInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    hostOriginInput: '[data-testid="form-horizontal-default-origin-host-header-field-text__input"]'
+  },
+  accordionStepCache: {
+    createCache: '[data-testid="create-cache-accordion"]',
+    browserCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
+    cdnCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
+  },
+  accordionStepDomain: {
+    createDomain: '[data-testid="create-domain-accordion"]',
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',

@@ -2,7 +2,9 @@
   <FormAccordion
     :schema="validationSchema"
     :initialValues="initialValues"
-    :createService="createCacheSettingServices"
+    :createService="createCacheSetting"
+    @on-response="handleResponse"
+    disabledCallback
   >
     <template #form>
       <FormFieldsCache></FormFieldsCache>
@@ -22,13 +24,19 @@
   import FormFieldsCache from '../FormFields/FormFieldsCreateCacheSettings.vue'
   import * as yup from 'yup'
   import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
 
-  defineProps({
-    createCacheServices: {
+  const props = defineProps({
+    createCacheSettingsService: {
       type: Function,
       required: true
     }
   })
+
+  const emit = defineEmits(['createdCache'])
+
+  const route = useRoute()
+  const edgeApplicationId = ref(route.params.id)
 
   const validationSchema = yup.object({
     cdnCacheSettingsMaximumTtl: yup.number().required().label('Maximum TTL '),
@@ -38,13 +46,37 @@
   })
 
   const initialValues = ref({
+    name: 'Default Cache Settings',
     browserCacheSettings: 'override',
     browserCacheSettingsMaximumTtl: 0,
     cdnCacheSettings: 'override',
-    cdnCacheSettingsMaximumTtl: 60
+    cdnCacheSettingsMaximumTtl: 60,
+    enableCachingForPost: false,
+    enableCachingForOptions: false,
+    enableStaleCache: true,
+    l2CachingEnabled: false,
+    l2Region: null,
+    cacheByQueryString: 'ignore',
+    queryStringFields: null,
+    enableQueryStringSort: false,
+    cacheByCookies: 'ignore',
+    cookieNames: null,
+    adaptiveDeliveryAction: 'ignore',
+    deviceGroup: [],
+    sliceConfigurationEnabled: false,
+    isSliceEdgeCachingEnabled: false,
+    isSliceL2CachingEnabled: false,
+    sliceConfigurationRange: 1024
   })
 
-  const createCacheSettingServices = async (values) => {
-    return values
+  const createCacheSetting = async (payload) => {
+    return props.createCacheSettingsService({
+      edgeApplicationId: edgeApplicationId.value,
+      ...payload
+    })
+  }
+
+  const handleResponse = () => {
+    emit('createdCache')
   }
 </script>

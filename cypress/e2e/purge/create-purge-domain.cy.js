@@ -17,13 +17,14 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.openProduct('Edge Application')
     cy.get(selectors.edgeApplication.mainSettings.createButton).click()
     cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-    cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
-
-    // Act
+    cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@createEdgeApp')
+    cy.verifyToast('success', 'Your edge application has been created')
+    cy.get(selectors.form.actionsSkipButton).click()
+    cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
 
     // Assert - create a edge application
-    cy.verifyToast('success', 'Your edge application has been created')
     cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 
     // Arrange
@@ -91,7 +92,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   afterEach(() => {
     // Cleanup
     cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
+      cy.verifyToast('Domain successfully deleted')
     })
     cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
