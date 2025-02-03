@@ -147,7 +147,21 @@ const PAGES_DASHBOARDS = {
           dataset: 'botManagerBreakdownMetrics'
         }
       ]
-    }
+    },
+    {
+      id: 10,
+      label: 'Threats Breakdown',
+      path: 'threats',
+      groupId: 2,
+      dashboards: [
+        {
+          id: '357548675837198934',
+          label: 'Threats Breakdown',
+          path: 'breakdown',
+          dataset: 'httpBreakdownMetrics'
+        }
+      ]
+    },
   ],
   observe: [
     {

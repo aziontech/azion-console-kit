@@ -74,7 +74,7 @@ const HELP_CENTER_URLS = {
       remoteFileInclusionRfiThreats:
         '/real-time-metrics/waf/threats/remote-file-inclusion-rfi-threats',
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
-      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests'
+      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests',
     }
   },
   botManager: {
@@ -97,6 +97,9 @@ const HELP_CENTER_URLS = {
       topBadBotIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips',
       topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
+  },
+  threatsBreakdown: {
+    threatsRequestsByIps: '/real-time-metrics/threats/breakdown'
   }
 }
 
