@@ -67,7 +67,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
         entityName: fixtures.domainName,
         productName: 'Domains'
       }).then(() => {
-        cy.verifyToast('Resource successfully deleted')
+        cy.verifyToast('Domain successfully deleted')
       })
     cy.deleteEntityFromList({
       entityName: fixtures.edgeApplicationName,
