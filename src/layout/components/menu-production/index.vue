@@ -44,6 +44,7 @@
           @click="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
+          v-if="item?.clientFlag ? checkFlag(item?.clientFlag) : true"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
@@ -95,6 +96,8 @@
       router.push(route)
     }
   }
+
+  const checkFlag = (flag) => accountStore.account.client_flags.includes(flag)
 
   const showMarketplaceProductsInMenu = computed(() => accountStore.hasAccessToMarketplaceProducts)
 
