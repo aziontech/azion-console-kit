@@ -500,6 +500,39 @@ const REPORTS = [
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes5xx
   },
+  {
+    id: '357824919768138330',
+    chartOwner: 'azion',
+    isDoubleChart: true,
+    label: 'HTTP Status Codes 2XX And 3XX',
+    description: 'Present each of the existing statuses without the “2XX” and “3XX” aggregations.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      statusRange: {
+        begin: 200,
+        end: 399
+      }
+    },
+    fields: [],
+    groupBy: ['ts', 'status'],
+    orderDirection: 'ASC',
+    dashboardId: '357548642810200653',
+    helpCenterPath: '/'
+  },
   /**
    * BUILD
    * Edge Applications - Bandwidth Saving

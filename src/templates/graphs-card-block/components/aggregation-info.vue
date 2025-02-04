@@ -37,7 +37,7 @@
   })
 
   const displayTag = computed(() => {
-    if (props.report.type === 'big-numbers') {
+    if (props.report.type === 'big-numbers' || props.report.isDoubleChart) {
       return false
     }
     return props.report.hasFeedbackTag && typeof Number(props.report.aggregationValue)

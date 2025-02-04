@@ -547,6 +547,35 @@ const formatStackedAreaChart = ({ report, data }) => {
   return objectStackedChart({ columns, seriesNames, report, type })
 }
 
+const formatDoubleChart = ({
+  report,
+  data,
+  variable,
+  aggregation,
+  groupBy,
+  additionalSeries,
+  userUTC
+}) => {
+  const chartFormated = formatTsChartData({
+    report,
+    data,
+    variable,
+    aggregation,
+    groupBy,
+    additionalSeries,
+    userUTC
+  })
+  const ts = chartFormated[0]
+  const resultNotTs = chartFormated.slice(1)
+  const status200 = resultNotTs.filter((item) => item[0] > 200 && item[0] < 299)
+  const status300 = resultNotTs.filter((item) => item[0] > 300 && item[0] < 399)
+
+  return [
+    [ts, ...status200],
+    [ts, ...status300]
+  ]
+}
+
 /**
  * Function that transforms a list of tuples into a list of lists (columns).
  *
@@ -571,6 +600,17 @@ function ConvertBeholderToChart({
   switch (report.type) {
     case 'line':
     case 'spline':
+      if (report.isDoubleChart) {
+        return formatDoubleChart({
+          report,
+          data,
+          variable,
+          aggregation,
+          groupBy,
+          additionalSeries,
+          userUTC
+        })
+      }
       return formatTsChartData({
         report,
         data,

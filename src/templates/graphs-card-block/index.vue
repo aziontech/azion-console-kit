@@ -2,7 +2,8 @@
   <div
     :class="[
       cardColumns,
-      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6'
+      'flex flex-col rounded-md border surface-border col-span-12 p-6',
+      maxHeightCard
     ]"
   >
     <header class="flex w-full items-center justify-between gap-2">
@@ -35,7 +36,7 @@
       <section class="flex-auto relative">
         <component
           v-if="chartStatus.showChart"
-          :is="chartType[report.type]"
+          :is="!report.isDoubleChart ? chartType[report.type] : chartType['line-double']"
           :chartData="report"
           :variationValue="report.variationValue"
           :resultChart="report.resultQuery"
@@ -90,9 +91,15 @@
     return columns[props.report.columns] || defaultColumns
   })
 
+  const maxHeightCard = computed(() => {
+    if (props.report.isDoubleChart) return 'min-h-[576px] h-fit'
+    return 'h-graph-card'
+  })
+
   const chartType = {
     bar: defineAsyncComponent(() => import('./components/chart/bar-chart')),
     line: defineAsyncComponent(() => import('./components/chart/line-chart')),
+    'line-double': defineAsyncComponent(() => import('./components/chart/line-chart-double')),
     spline: defineAsyncComponent(() => import('./components/chart/spline-chart')),
     pie: defineAsyncComponent(() => import('./components/chart/pie-chart')),
     donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
