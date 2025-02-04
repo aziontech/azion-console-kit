@@ -32,7 +32,7 @@ export const edgeNodeRoutes = {
       component: () => import('@/views/EdgeNode/TabsView.vue'),
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
-        editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
+        editEdgeNodeService: EdgeNodeServiceV4.editEdgeNodeService,
         listGroupsEdgeNodeService: EdgeNodeService.listGroupsEdgeNodeService,
         listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
         deleteServiceEdgeNodeService: ServiceEdgeNode.deleteServiceEdgeNodeService,
