@@ -37,10 +37,13 @@ const adapt = (httpResponse) => {
       originId: convertOriginIdToString(origin.origin_id),
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],
-      addresses: formattedListOfAddresses,
+      addresses:
+        origin.origin_type === 'live_ingest'
+          ? [origin.streaming_endpoint]
+          : formattedListOfAddresses,
       originProtocolPolicy: origin.origin_protocol_policy,
       isOriginRedirectionEnabled: origin.is_origin_redirection_enabled,
-      hostHeader: origin.host_header,
+      hostHeader: origin.origin_type === 'live_ingest' ? 'N/A' : origin.host_header,
       method: origin.method,
       originPath: origin.origin_path,
       connectionTimeout: origin.connection_timeout,

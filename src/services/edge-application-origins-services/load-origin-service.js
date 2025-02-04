@@ -24,6 +24,7 @@ const adapt = (httpResponse) => {
       serverRole: address.server_role,
       isActive: address.is_active
     })),
+    streamingEndpoint: origin.streaming_endpoint,
     originProtocolPolicy: origin.origin_protocol_policy,
     isOriginRedirectionEnabled: origin.is_origin_redirection_enabled,
     hostHeader: origin.host_header,

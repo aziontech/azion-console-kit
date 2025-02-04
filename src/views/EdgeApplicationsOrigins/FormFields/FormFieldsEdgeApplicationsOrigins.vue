@@ -58,6 +58,14 @@
     { title: 'Backup', inputValue: 'backup' }
   ]
 
+  const STREAMING_ENDPOINT_OPTIONS = [
+    'br-east-1.azioningest.net',
+    'br-east-2.azioningest.net',
+    'br-east-3.azioningest.net',
+    'us-east-1.azioningest.net',
+    'us-east-2.azioningest.net'
+  ]
+
   const originKeyInput = ref(null)
 
   const { value: originKey, setValue: setOriginKey } = useField('originKey')
@@ -72,6 +80,7 @@
   const { value: originType } = useField('originType')
   useField('originProtocolPolicy')
   const { value: method } = useField('method')
+  const { value: streamingEndpoint } = useField('streamingEndpoint')
   const { value: originPath } = useField('originPath')
   const { value: connectionTimeout } = useField('connectionTimeout')
   const { value: timeoutBetweenBytes } = useField('timeoutBetweenBytes')
@@ -83,6 +92,7 @@
   const { value: prefix } = useField('prefix')
 
   const isSingleOriginType = computed(() => originType.value === 'single_origin')
+  const isLiveIngestOriginType = computed(() => originType.value === 'live_ingest')
   const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
   const isObjectStorageOriginType = computed(() => originType.value === 'object_storage')
   const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
@@ -216,7 +226,22 @@
           :description="descriptionOriginType"
         />
       </div>
-      <div v-if="!isObjectStorageOriginType">
+      <div
+        v-if="isLiveIngestOriginType"
+        class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full"
+      >
+        <FieldDropdown
+          label="Streaming Endpoint"
+          required
+          name="streamingEndpoint"
+          :options="STREAMING_ENDPOINT_OPTIONS"
+          :value="streamingEndpoint"
+          inputId="streamingEndpoint"
+          data-testid="origin-form__streaming-endpoint"
+          description="Select an HLS streaming endpoint used by your live stream."
+        />
+      </div>
+      <div v-if="!isObjectStorageOriginType && !isLiveIngestOriginType">
         <FieldGroupRadio
           label="Protocol Policy"
           nameField="originProtocolPolicy"
@@ -256,7 +281,7 @@
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="!isObjectStorageOriginType"
+        v-if="!isObjectStorageOriginType && !isLiveIngestOriginType"
       >
         <FieldText
           label="Host Header"
@@ -269,7 +294,7 @@
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="!isObjectStorageOriginType"
+        v-if="!isObjectStorageOriginType && !isLiveIngestOriginType"
       >
         <FieldText
           label="Path"
@@ -466,7 +491,7 @@
     :isDrawer="true"
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
-    v-if="!isObjectStorageOriginType"
+    v-if="!isObjectStorageOriginType && !isLiveIngestOriginType"
   >
     <template #inputs>
       <div class="w-full flex max-sm:flex-col gap-8 max-md:gap-6">
