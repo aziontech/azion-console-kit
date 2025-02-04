@@ -227,10 +227,6 @@
     emit('onSuccess')
   }
 
-  const closeDrawerEdit = () => {
-    showEditOriginDrawer.value = false
-  }
-
   const handleTrackCreation = () => {
     tracker.product
       .productCreated({
@@ -259,8 +255,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   const handleFailedCreateOrigin = (error) => {
@@ -309,8 +303,7 @@
     @onError="handleFailedCreateOrigin"
     title="Create Origin"
   >
-    <template #formFields="{ disabledFields, errors }">
-      {{ errors }}
+    <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin
         ref="createFormDrawer"
         :disabledFields="disabledFields"

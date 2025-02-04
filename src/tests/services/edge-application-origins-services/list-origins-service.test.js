@@ -159,7 +159,7 @@ describe('EdgeApplicationOriginsServices', () => {
       hmacAuthentication: undefined,
       hmacRegionName: undefined,
       hmacSecretKey: undefined,
-      hostHeader: 'N/A',
+      hostHeader: '-',
       originId: fixtures.originLiveIngestType.origin_id,
       name: fixtures.originLiveIngestType.name,
       originType: 'Live Ingest',

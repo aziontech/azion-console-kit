@@ -43,7 +43,7 @@ const adapt = (httpResponse) => {
           : formattedListOfAddresses,
       originProtocolPolicy: origin.origin_protocol_policy,
       isOriginRedirectionEnabled: origin.is_origin_redirection_enabled,
-      hostHeader: origin.origin_type === 'live_ingest' ? 'N/A' : origin.host_header,
+      hostHeader: origin.origin_type === 'live_ingest' ? '-' : origin.host_header,
       method: origin.method,
       originPath: origin.origin_path,
       connectionTimeout: origin.connection_timeout,

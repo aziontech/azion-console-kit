@@ -115,6 +115,10 @@
       method.value = 'ip_hash'
       pushAddress({ ...defaultAddress })
     }
+    if (!connectionTimeout.value || !timeoutBetweenBytes.value) {
+      connectionTimeout.value = 60
+      timeoutBetweenBytes.value = 120
+    }
   }
 
   const removeCurrentAddress = (index) => {
