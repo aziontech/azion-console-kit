@@ -96,6 +96,13 @@ function createObserveItems() {
       icon: 'ai ai-real-time-events',
       tag: 'Preview',
       id: 'real-time-events'
+    },
+    {
+      label: 'SIEM',
+      to: '/siem',
+      icon: 'pi pi-chart-bar',
+      clientFlag: 'siem_bb',
+      id: 'siem'
     }
   ]
 }

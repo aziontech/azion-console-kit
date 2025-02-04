@@ -26,6 +26,21 @@ const scenarios = [
     expected: 'https://manager.azion.com'
   },
   {
+    section: 'managerEOL',
+    env: 'development',
+    expected: 'https://stage-manager.azion.com/home'
+  },
+  {
+    section: 'managerEOL',
+    env: 'stage',
+    expected: 'https://stage-manager.azion.com/home'
+  },
+  {
+    section: 'managerEOL',
+    env: 'production',
+    expected: 'https://manager.azion.com/home'
+  },
+  {
     section: 'billing',
     env: 'stage',
     expected: 'https://stage-manager.azion.com/billing-subscriptions'

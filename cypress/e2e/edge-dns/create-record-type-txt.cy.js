@@ -12,7 +12,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
 
   it('Create a record of type TXT', () => {
     // Arrange
-    cy.intercept('/api/v3/intelligent_dns/*').as('loadZone')
+    cy.intercept('/api/v4/edge_dns/zones/*').as('loadZone')
 
     const recordTypeFixtures = {
       name: generateUniqueName('record'),
@@ -29,7 +29,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.nameInput).type(zoneName)
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS has been created')
+    cy.verifyToast('success', 'Your Edge DNS Zone has been created')
     cy.get(selectors.edgeDns.cancelButton).click()
     cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)

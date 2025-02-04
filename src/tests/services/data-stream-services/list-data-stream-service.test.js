@@ -163,6 +163,23 @@ describe('DataStreamServices', () => {
     expect(result).toEqual([])
   })
 
+  it('should call api with 403 not permission', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 403,
+      body: {
+        details: 'You do not have permission to do this action.'
+      }
+    })
+
+    const { sut } = makeSut()
+
+    try {
+      await sut()
+    } catch (error) {
+      expect(error).toBe('You do not have permission to do this action.')
+    }
+  })
+
   it.each([
     {
       statusCode: 400,
