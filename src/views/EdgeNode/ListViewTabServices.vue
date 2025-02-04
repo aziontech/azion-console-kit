@@ -12,12 +12,13 @@
 
   const props = defineProps({
     edgeNodeId: { type: String, required: true },
-    createServiceEdgeNodeService: { type: Function, required: true },
+    bindServiceEdgeNodeService: { type: Function, required: true },
     editServiceEdgeNodeService: { type: Function, required: true },
     loadServiceEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
     deleteServiceEdgeNodeService: { type: Function, required: true },
-    documentationServiceServices: { type: Function, required: true }
+    documentationServiceServices: { type: Function, required: true },
+    listEdgeServiceServices: { type: Function, required: true }
   })
 
   const hasContentToList = ref(true)
@@ -112,8 +113,8 @@
     <DrawerService
       ref="drawerServiceRef"
       :edgeNodeId="edgeNodeId"
-      :listServiceEdgeNodeService="listServiceEdgeNodeService"
-      :createServiceEdgeNodeService="createServiceEdgeNodeService"
+      :listEdgeServiceServices="listEdgeServiceServices"
+      :bindServiceEdgeNodeService="bindServiceEdgeNodeService"
       :editServiceEdgeNodeService="editServiceEdgeNodeService"
       :loadServiceEdgeNodeService="loadServiceEdgeNodeService"
       @onSuccess="reloadServicesList"

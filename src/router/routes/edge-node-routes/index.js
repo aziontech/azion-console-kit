@@ -1,7 +1,9 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
 import * as EdgeNodeServiceV4 from '@/services/edge-node-services/v4'
 import * as ServiceEdgeNode from '@/services/edge-node-service-services'
+import * as ServiceEdgeNodeV4 from '@/services/edge-node-service-services/v4'
 import * as Helpers from '@/helpers'
+import * as EdgeServiceServices from '@/services/edge-service-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeNodeRoutes = {
@@ -33,12 +35,17 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
+
         listGroupsEdgeNodeService: EdgeNodeService.listGroupsEdgeNodeService,
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+
+        listServiceEdgeNodeService: ServiceEdgeNodeV4.listServiceEdgeNodeService,
         deleteServiceEdgeNodeService: ServiceEdgeNode.deleteServiceEdgeNodeService,
-        createServiceEdgeNodeService: ServiceEdgeNode.createServiceEdgeNodeService,
         loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
         editServiceEdgeNodeService: ServiceEdgeNode.editServiceEdgeNodeService,
+
+        listEdgeServiceServices: EdgeServiceServices.listEdgeServiceServices,
+        bindServiceEdgeNodeService: ServiceEdgeNodeV4.bindServiceEdgeNodeService,
+
         documentationServiceServices: Helpers.documentationCatalog.edgeServices,
         updatedRedirect: 'list-edge-node'
       },
