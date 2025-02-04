@@ -12,34 +12,29 @@ const makeSut = () => {
 const scenarios = [
   {
     label: 'should open a new window to metrics playground in prod env',
-    href: 'https://azion.com',
-    expected: 'https://api.azion.com/metrics/graphql'
+    environment: 'production',
+    expected: 'https://api.azion.com/v4/metrics/graphql'
   },
   {
     label: 'should open a new window to metrics playground in stage env',
-    href: 'http://localhost',
+    environment: 'stage',
     expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   }
 ]
 
 describe('metricsPlaygroundOpener', () => {
   afterAll(() => {
-    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
-
-  it.each(scenarios)('$label', ({ href, expected }) => () => {
-    vi.stubGlobal('window', {
-      open: (url) => url,
-      location: {
-        href
-      }
-    })
-
-    const openWindowSpy = vi.spyOn(window, 'open')
+  it.each(scenarios)('$label', async ({ environment, expected }) => {
+    vi.stubEnv('VITE_ENVIRONMENT', environment)
+    const mockWindowOpen = vi.fn()
+    vi.stubGlobal('window', { open: mockWindowOpen })
     const { sut } = makeSut()
 
-    sut()
+    await sut()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(expected, '_blank')
+    expect(mockWindowOpen).toHaveBeenCalledTimes(1)
+    expect(mockWindowOpen).toHaveBeenCalledWith(expected, '_blank')
   })
 })
