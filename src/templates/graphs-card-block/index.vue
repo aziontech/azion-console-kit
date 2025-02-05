@@ -35,7 +35,7 @@
       <section class="flex-auto relative">
         <component
           v-if="chartStatus.showChart"
-          :is="!report.isDoubleChart ? chartType[report.type] : chartType['line-double']"
+          :is="chartType[report.type]"
           :chartData="report"
           :variationValue="report.variationValue"
           :resultChart="report.resultQuery"
@@ -93,7 +93,6 @@
   const chartType = {
     bar: defineAsyncComponent(() => import('./components/chart/bar-chart')),
     line: defineAsyncComponent(() => import('./components/chart/line-chart')),
-    'line-double': defineAsyncComponent(() => import('./components/chart/line-chart-double')),
     spline: defineAsyncComponent(() => import('./components/chart/spline-chart')),
     pie: defineAsyncComponent(() => import('./components/chart/pie-chart')),
     donut: defineAsyncComponent(() => import('./components/chart/donut-chart')),
