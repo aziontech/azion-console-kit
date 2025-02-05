@@ -396,6 +396,33 @@ const REPORTS = [
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsByMethod
   },
+  {
+    id: '357825388709151310',
+    chartOwner: 'azion',
+    label: 'Average Request Time',
+    description: REPORTS_TEXTS.edgeApplications.httpMethods.averageRequestTime.description,
+    aggregationType: 'avg',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'perSecond',
+    limit: 10000,
+    fields: [],
+    groupBy: [],
+    aggregations: [
+      {
+        aggregation: 'avg',
+        variable: 'requestTime'
+      }
+    ],
+    orderDirection: 'ASC',
+    variationType: 'inverse',
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+  },
   /**
    * BUILD
    * Edge Applications - Status Codes
