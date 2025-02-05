@@ -1,6 +1,5 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
@@ -11,15 +10,12 @@
   import LabelBlock from '@/templates/label-block'
   import { useScrollToError } from '@/composables/useScrollToError'
   import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
 
   defineOptions({ name: 'add-payment-method-block' })
 
-  const router = useRouter()
   const accountStore = useAccountStore()
-
   const stripe = ref(null)
   const isSubmitting = ref(false)
   const stripeComponents = ref(null)
@@ -143,10 +139,6 @@
     cardCvc.value?.on('blur', handleBlur)
   }
 
-  const redirectUserToAccountSettings = () => {
-    router.push({ name: 'account-settings', query: { payment: true } })
-  }
-
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
@@ -210,11 +202,6 @@
       isSubmitting.value = false
     }
   }
-
-  const userContainAdress = computed(() => {
-    const accountData = accountStore.account
-    return !accountData.postal_code && !accountData.address
-  })
 </script>
 
 <template>
@@ -239,19 +226,6 @@
         title="Payment Method"
       >
         <template #inputs>
-          <div v-if="userContainAdress">
-            <InlineMessage severity="warn">
-              Users must have a registered address before adding a payment method.
-              <PrimeButton
-                label="Register address now."
-                @click="redirectUserToAccountSettings"
-                iconPos="right"
-                class="p-0"
-                size="small"
-                link
-              />
-            </InlineMessage>
-          </div>
           <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
             <form
               ref="form"
