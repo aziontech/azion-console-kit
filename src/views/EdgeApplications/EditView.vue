@@ -6,7 +6,6 @@
     :schema="validationSchema"
     @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
-    disableRedirect
     isTabs
     data-testid="edit-edge-application-form-block"
   >

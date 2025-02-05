@@ -14,7 +14,7 @@
           class="mt-4"
           expandIcon="pi pi-chevron-down"
           collapseIcon="pi pi-chevron-up"
-          v-model:activeIndex="activeAccordionTab"
+          v-model:activeIndex="tabOrigin"
           :pt="{
             root: {
               class: 'flex flex-col gap-8'
@@ -52,11 +52,19 @@
               :createOriginService="props.originsServices.createOriginService"
             />
           </AccordionTab>
+        </Accordion>
+        <Accordion
+          :multiple="true"
+          class="mt-4"
+          expandIcon="pi pi-chevron-down"
+          collapseIcon="pi pi-chevron-up"
+          v-model:activeIndex="tabDomain"
+        >
           <AccordionTab
             :disabled="hasBindDomain"
             :pt="{
               content: { class: 'p-0 pt-6' },
-              header: { class: 'border-t surface-border rounded-md' },
+              header: { class: ' rounded-md' },
               headerAction: { class: hideDomainBorder },
               headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
             }"
@@ -89,11 +97,19 @@
               @createdDomain="handleResponse('domain')"
             />
           </AccordionTab>
+        </Accordion>
+        <Accordion
+          :multiple="true"
+          class="mt-4"
+          expandIcon="pi pi-chevron-down"
+          collapseIcon="pi pi-chevron-up"
+          v-model:activeIndex="tabCache"
+        >
           <AccordionTab
             :disabled="hasCreateCache"
             :pt="{
               content: { class: 'p-0 pt-6' },
-              header: { class: 'border-t surface-border rounded-md' },
+              header: { class: ' rounded-md' },
               headerAction: { class: hideCacheBorder },
               headerIcon: { class: `${hasCreateCache ? 'hidden' : ''}` }
             }"
@@ -151,6 +167,9 @@
   const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
+  const tabOrigin = ref([])
+  const tabDomain = ref([])
+  const tabCache = ref([])
 
   const edgeApplicationId = ref(route.params.id)
 
@@ -223,22 +242,22 @@
     router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
   }
 
-  const closeAccordionTab = (index) => {
-    activeAccordionTab.value = activeAccordionTab.value.filter((item) => item !== index)
+  const closeAccordionTab = (tab) => {
+    tab.value = tab.value.filter((item) => item !== 0)
   }
 
   const handleResponse = (tab) => {
     if (tab === 'origin') {
       hasCreateOrigin.value = true
-      closeAccordionTab(0)
+      closeAccordionTab(tabOrigin)
     }
     if (tab === 'cache') {
       hasCreateCache.value = true
-      closeAccordionTab(2)
+      closeAccordionTab(tabCache)
     }
     if (tab === 'domain') {
       hasBindDomain.value = true
-      closeAccordionTab(1)
+      closeAccordionTab(tabDomain)
     }
   }
 </script>

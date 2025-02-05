@@ -67,9 +67,7 @@ describe('EdgeApplicationServicesV4', () => {
 
     const result = await sut(fixtures.edgeApplication)
 
-    expect(result).toEqual({
-      feedback: 'Your edge application has been updated'
-    })
+    expect(result).toEqual('Your edge application has been updated')
   })
 
   it('should throw parsing api error when request fails', async () => {
