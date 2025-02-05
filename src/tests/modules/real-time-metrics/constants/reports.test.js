@@ -394,6 +394,33 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          aggregationType: 'avg',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548623571976783',
+          dataUnit: 'perSecond',
+          dataset: 'httpMetrics',
+          description:
+            'average request time in a line chart.',
+          fields: [],
+          groupBy: [],
+          aggregations: [
+            {
+              aggregation: 'avg',
+              variable: 'requestTime'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151310',
+          isTopX: false,
+          label: 'Average Request Time',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
           aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,

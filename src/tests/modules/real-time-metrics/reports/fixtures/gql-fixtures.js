@@ -468,6 +468,36 @@ ts
     }
   },
   {
+    id: '357825388709151310',
+    label: 'Average Request Time',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {avg: requestTime 
+}
+        groupBy: [ts]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          avg
+ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357825388709151309',
     label: 'Requests by Method',
     gqlQuery: {
