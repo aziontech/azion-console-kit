@@ -419,6 +419,7 @@ const REPORTS = [
       }
     ],
     orderDirection: 'ASC',
+    variationType: 'inverse',
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
   },

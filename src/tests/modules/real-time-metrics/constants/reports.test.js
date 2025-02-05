@@ -400,8 +400,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548623571976783',
           dataUnit: 'perSecond',
           dataset: 'httpMetrics',
-          description:
-            'average request time in a line chart.',
+          description: 'average request time in a line chart.',
           fields: [],
           groupBy: [],
           aggregations: [
@@ -412,6 +411,7 @@ describe('RealTimeMetricsModule', () => {
           ],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
           id: '357825388709151310',
+          variationType: 'inverse',
           isTopX: false,
           label: 'Average Request Time',
           limit: 10000,
