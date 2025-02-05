@@ -174,15 +174,15 @@ jobs:
         with:
           name: coverage_unit_report
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage_e2e_report
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #     name: coverage_e2e_report
 
-      - name: Extract E2E Coverage Report
-        run: |
-          unzip coverage.zip -d coverage_e2e
-          pwd
-          find ./
+      # - name: Extract E2E Coverage Report
+      #   run: |
+      #     unzip coverage.zip -d coverage_e2e
+      #     pwd
+      #     find ./
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.3.0
