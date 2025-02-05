@@ -45,6 +45,7 @@ const adapt = (httpResponse) => {
 
   return {
     body: parsedEdgeNodes,
+    count: httpResponse.body.count,
     statusCode: httpResponse.statusCode
   }
 }
