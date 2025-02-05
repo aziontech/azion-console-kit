@@ -505,9 +505,10 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
-        groupBy: [ts]
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, status]
         orderBy: [ts_ASC]
         filter: {
           tsRange: {
@@ -515,14 +516,17 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+statusRange: {
+begin: 200
+end: 299
+
+}
 
         }
         ) {
-          requestsStatusCode200
-requestsStatusCode204
-requestsStatusCode206
-requestsStatusCode2xx
+          sum
 ts
+status
         }
       }`,
       variables: {
@@ -537,9 +541,10 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
-        groupBy: [ts]
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, status]
         orderBy: [ts_ASC]
         filter: {
           tsRange: {
@@ -547,14 +552,17 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+statusRange: {
+begin: 300
+end: 399
+
+}
 
         }
         ) {
-          requestsStatusCode301
-requestsStatusCode302
-requestsStatusCode304
-requestsStatusCode3xx
+          sum
 ts
+status
         }
       }`,
       variables: {

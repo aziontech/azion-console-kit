@@ -402,18 +402,25 @@ describe('RealTimeMetricsModule', () => {
           dataset: 'httpMetrics',
           description:
             'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.',
-          fields: [
-            'requestsStatusCode200',
-            'requestsStatusCode204',
-            'requestsStatusCode206',
-            'requestsStatusCode2xx'
-          ],
-          groupBy: [],
+          fields: [],
+          groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
           id: '357824919768138325',
           isTopX: false,
           label: 'HTTP Status Codes 2XX',
-          limit: 5000,
+          limit: 10000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            statusRange: {
+              begin: 200,
+              end: 299
+            }
+          },
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',
@@ -428,18 +435,25 @@ describe('RealTimeMetricsModule', () => {
           dataset: 'httpMetrics',
           description:
             'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.',
-          fields: [
-            'requestsStatusCode301',
-            'requestsStatusCode302',
-            'requestsStatusCode304',
-            'requestsStatusCode3xx'
-          ],
-          groupBy: [],
+          fields: [],
+          groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
           id: '357825000731837013',
           isTopX: false,
           label: 'HTTP Status Codes 3XX',
-          limit: 5000,
+          limit: 10000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            statusRange: {
+              begin: 300,
+              end: 399
+            }
+          },
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',

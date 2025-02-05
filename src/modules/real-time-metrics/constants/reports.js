@@ -413,14 +413,21 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsStatusCode200',
-      'requestsStatusCode204',
-      'requestsStatusCode206',
-      'requestsStatusCode2xx'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    filters: {
+      statusRange: {
+        begin: 200,
+        end: 299
+      }
+    },
+    fields: [],
+    groupBy: ['ts', 'status'],
     orderDirection: 'ASC',
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes2xx
@@ -438,14 +445,21 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsStatusCode301',
-      'requestsStatusCode302',
-      'requestsStatusCode304',
-      'requestsStatusCode3xx'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    filters: {
+      statusRange: {
+        begin: 300,
+        end: 399
+      }
+    },
+    fields: [],
+    groupBy: ['ts', 'status'],
     orderDirection: 'ASC',
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes3xx
