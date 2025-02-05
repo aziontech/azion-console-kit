@@ -30,7 +30,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 202:
+    case 201:
       return {
         feedback: 'Your Edge DNS Zone has been created',
         urlToEditView: `/edge-dns/edit/${httpResponse.body.data.id}`
