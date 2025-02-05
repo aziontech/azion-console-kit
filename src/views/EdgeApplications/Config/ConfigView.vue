@@ -24,7 +24,8 @@
           <AccordionTab
             :disabled="hasCreateOrigin"
             :pt="{
-              content: { class: 'p-0 pt-6' },
+              root: { class: 'rounded-md overflow-hidden border-none' },
+              content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               headerAction: { class: hideOriginBorder },
               headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
             }"

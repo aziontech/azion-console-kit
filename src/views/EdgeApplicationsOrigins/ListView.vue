@@ -41,10 +41,6 @@
     clipboardWrite: {
       type: Function,
       required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
     }
   })
 
@@ -149,7 +145,6 @@
     :loadOriginService="props.loadOriginService"
     :documentationService="props.documentationService"
     :clipboardWrite="props.clipboardWrite"
-    :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">

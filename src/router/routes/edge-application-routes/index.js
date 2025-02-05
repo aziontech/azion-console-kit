@@ -67,7 +67,8 @@ export const edgeApplicationRoutes = {
           listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
           createDomainService: DomainServicesV4.createDomainService,
 
-          loadEdgeApplicationsService: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
+          loadEdgeApplicationsService:
+            EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService,
           listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
           listDigitalCertificatesService:
@@ -101,8 +102,8 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/TabsView.vue'),
       props: {
         edgeApplicationServices: {
-          editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
-          loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
+          editEdgeApplication: EdgeApplicationsServiceV4.editEdgeApplicationsService,
+          loadEdgeApplication: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
           updatedRedirect: 'list-edge-applications',
           contactSalesEdgeApplicationService:
             EdgeApplicationsService.contactSalesEdgeApplicationService
