@@ -51,11 +51,9 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
 
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAccelerator')).click()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('deviceDetection')).click()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('imageOptimization')).click()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('loadBalancer')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAcceleratorEnabled')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('imageProcessorEnabled')).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')

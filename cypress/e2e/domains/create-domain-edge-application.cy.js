@@ -10,7 +10,6 @@ const createEdgeApplicationCase = () => {
   firewallName = generateUniqueName('EdgeFirewall')
   // Arrange
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
   // Act
   cy.get(selectors.domains.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
