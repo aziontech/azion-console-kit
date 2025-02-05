@@ -39,7 +39,7 @@
 
   const { value: name } = useField('name')
 
-  const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs', null, {
+  const { value: args, errorMessage: argsError } = useField('args', null, {
     initialValue: ARGS_INITIAL_STATE
   })
   const { value: code, errorMessage: codeError } = useField('code', null, {
@@ -51,13 +51,13 @@
   })
 
   const hasArgsError = computed(() => {
-    return !!jsonArgsError.value
+    return !!argsError.value
   })
 
   const updateObject = computed(() => {
     const previewValues = {
       code: code.value,
-      args: jsonArgs.value
+      args: args.value
     }
     emit('update:previewData', previewValues)
     return previewValues
@@ -216,7 +216,7 @@
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
-            v-model="jsonArgs"
+            v-model="args"
             :initialValue="ARGS_INITIAL_STATE"
             language="json"
             :errors="hasArgsError"
@@ -232,7 +232,7 @@
       </Splitter>
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
-          v-model="jsonArgs"
+          v-model="args"
           :initialValue="ARGS_INITIAL_STATE"
           language="json"
           :errors="hasArgsError"

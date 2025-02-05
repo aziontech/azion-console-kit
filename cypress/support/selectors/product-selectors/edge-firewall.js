@@ -41,9 +41,9 @@ export default {
   ruleCriteriaValueFirstOption: '#criteria\\[0\\]\\[0\\]\\.argument_0',
   ruleCriteriaInput: '[data-testid="edge-firewall-rules-form__argument[0][0]__input"]',
   ruleCriteriaNetworkListDropdown:
-    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-trigger"]',
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"]',
   ruleCriteriaNetworkListFilter:
-    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-filter-input"]',
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-search"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
   ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_2',

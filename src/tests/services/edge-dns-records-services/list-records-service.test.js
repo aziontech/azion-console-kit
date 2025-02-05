@@ -46,7 +46,7 @@ describe('EdgeDnsRecordsServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/intelligent_dns/${dnsRecordIdMock}/records?page_size=200`,
+      url: `${version}/intelligent_dns/${dnsRecordIdMock}/records?page_size=1000`,
       method: 'GET'
     })
   })

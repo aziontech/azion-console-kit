@@ -1,5 +1,6 @@
 <template>
   <LabelBlock
+    v-if="props.label"
     :for="props.name"
     :label="props.label"
     :isRequired="$attrs.required"
@@ -207,6 +208,10 @@
     )
 
     emit('onChange', inputValue.value)
+
+    if (inputValue.value === null) {
+      emit('onClear')
+    }
 
     if (selectedOption) {
       emit('onSelectOption', selectedOption)

@@ -65,14 +65,15 @@ const adapt = async (httpResponse) => {
     waf: 'WAF Events'
   }
 
-  const templates_ids = httpResponse.body?.results.reduce((accumulator, current) => {
-    if (current.template_id && !accumulator.includes(current.template_id)) {
-      accumulator.push(current.template_id)
-    }
-    return accumulator
-  }, [])
+  const templatesIDs =
+    httpResponse.body?.results?.reduce((accumulator, current) => {
+      if (current.template_id && !accumulator.includes(current.template_id)) {
+        accumulator.push(current.template_id)
+      }
+      return accumulator
+    }, []) || []
 
-  const mapTemplateId = await getTemplateById(templates_ids)
+  const mapTemplateId = await getTemplateById(templatesIDs)
 
   const parsedDataStreams =
     httpResponse.body?.results?.map((dataStream) => {

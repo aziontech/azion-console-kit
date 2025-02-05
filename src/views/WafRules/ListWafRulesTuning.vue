@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-6 mt-4 flex-col sm:flex-row">
+  <div class="flex flex-shrink gap-6 mt-4 flex-col sm:flex-row sm:w-xs">
     <Dropdown
       appendTo="self"
       optionValue="value"
@@ -9,34 +9,39 @@
       @change="filterTuning"
       class="w-full sm:max-w-xs"
     />
-    <MultiSelect
-      placeholder="Select domain"
-      resetFilterOnHide
-      autoFilterFocus
+
+    <FieldMultiselectLazyLoader
+      data-testid="waf-tuning-list__domains-field"
+      name="valueDomainId"
+      :service="props.listDomainsService"
+      :loadService="props.loadDomainService"
+      optionLabel="name"
       optionValue="id"
-      optionLabel="name"
-      filter
-      :options="domainsOptions.options"
-      v-model="valueDomains"
-      :loading="domainsOptions.done"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-    <Dropdown
-      filter
-      autoFilterFocus
+      :value="valueDomainId"
       appendTo="self"
-      optionValue="value"
+      class="w-full sm:max-w-xs overflow-hidden"
+      placeholder="Select domain"
+      @onChange="setDomainsSelectedOptions"
+    />
+
+    <FieldDropdownLazyLoader
+      data-testid="waf-tuning-list__network-list-field"
+      name="valueNetworkId"
+      :service="props.listNetworkListService"
+      :loadService="props.loadNetworkListService"
       optionLabel="name"
-      placeholder="Select network list"
-      showClear
-      :options="netWorkListOptions.options"
-      v-model="valueNetwork"
-      :loading="netWorkListOptions.done"
-      @change="filterTuning"
+      optionValue="id"
+      :value="valueNetworkId"
+      :moreOptions="['value']"
+      appendTo="self"
+      placeholder="Select an network list"
+      @onClear="setNetworkListSelectedOption(null)"
+      @onSelectOption="setNetworkListSelectedOption"
       class="w-full sm:max-w-xs"
+      enableClearOption
     />
   </div>
+
   <div
     class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none"
   >
@@ -118,13 +123,14 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 
   import advancedFilter from '@/templates/advanced-filter'
-  import MultiSelect from 'primevue/multiselect'
   import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -165,6 +171,18 @@
     listWafRulesTuningAttacksService: {
       type: Function,
       required: true
+    },
+    listDomainsService: {
+      type: Function,
+      required: true
+    },
+    loadDomainService: {
+      type: Function,
+      required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -189,27 +207,9 @@
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
-  const valueDomains = computed({
-    get: () => {
-      if (domainsOptions.value.done) return []
-      return selectedFilter.value.domains
-    },
-    set: (value) => {
-      selectedFilter.value.domains = value
-    }
-  })
 
-  const valueNetwork = computed({
-    get: () => {
-      if (netWorkListOptions.value.done || !selectedFilter.value.network?.id) return null
-      return netWorkListOptions.value.options.find(
-        (item) => item.value.id === selectedFilter.value.network?.id
-      ).value
-    },
-    set: (value) => {
-      selectedFilter.value.network = value
-    }
-  })
+  const valueNetworkId = ref(null)
+  const valueDomainId = ref(null)
 
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
@@ -317,6 +317,16 @@
   const showListTable = computed(() => {
     return selectedFilter.value.domains?.length
   })
+
+  const setNetworkListSelectedOption = (value) => {
+    selectedFilter.value.network = value
+    filterTuning()
+  }
+
+  const setDomainsSelectedOptions = (value) => {
+    selectedFilter.value.domains = value
+    filterTuning()
+  }
 
   const showToast = (summary, severity) => {
     return toast.add({
@@ -458,7 +468,7 @@
 
   const setNetWorkListOptions = async () => {
     try {
-      const response = await props.listNetworkListService()
+      const response = await props.listNetworkListService({ fields: '' })
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
@@ -469,8 +479,8 @@
 
   const setDomainsOptions = async () => {
     try {
-      const response = await props.listWafRulesDomainsService({ wafId: wafRuleId.value })
-      domainsOptions.value.options = response
+      const response = await props.listDomainsService({ fields: 'id,name,active' })
+      domainsOptions.value.options = response.body
     } catch (error) {
       showToast(error, 'error')
     } finally {

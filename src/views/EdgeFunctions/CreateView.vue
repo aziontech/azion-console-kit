@@ -55,7 +55,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -75,7 +75,7 @@
     active: true,
     language: 'javascript',
     code: HelloWorldSample,
-    jsonArgs: ARGS_INITIAL_STATE,
+    args: ARGS_INITIAL_STATE,
     initiatorType: 'edge_application'
   }
 </script>

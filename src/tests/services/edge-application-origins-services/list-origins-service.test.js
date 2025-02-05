@@ -28,6 +28,13 @@ const fixtures = {
     hmac_access_key: '',
     hmac_secret_key: ''
   },
+  originLiveIngestType: {
+    origin_id: '111111',
+    origin_key: '11111-0000-11111-111111-11111',
+    name: 'Origin 2',
+    origin_type: 'live_ingest',
+    streaming_endpoint: 'br-east-1.azioningest.net'
+  },
   originLoadBalancerType: {
     origin_id: '111111',
     origin_key: '11111-0000-11111-111111-11111',
@@ -84,7 +91,11 @@ describe('EdgeApplicationOriginsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: [fixtures.originSingleType, fixtures.originLoadBalancerType]
+        results: [
+          fixtures.originSingleType,
+          fixtures.originLoadBalancerType,
+          fixtures.originLiveIngestType
+        ]
       }
     })
 
@@ -92,7 +103,7 @@ describe('EdgeApplicationOriginsServices', () => {
 
     const { sut } = makeSut()
     const result = await sut({ id: edgeApplicationId })
-    const [singleType, loadBalancerType] = result
+    const [singleType, loadBalancerType, liveIngestType] = result
 
     expect(singleType).toEqual({
       id: fixtures.originSingleType.origin_key,
@@ -136,6 +147,23 @@ describe('EdgeApplicationOriginsServices', () => {
       hmacRegionName: fixtures.originLoadBalancerType.hmac_region_name,
       hmacAccessKey: fixtures.originLoadBalancerType.hmac_access_key,
       hmacSecretKey: fixtures.originLoadBalancerType.hmac_secret_key
+    })
+
+    expect(liveIngestType).toEqual({
+      id: fixtures.originLiveIngestType.origin_key,
+      originKey: {
+        content: fixtures.originLiveIngestType.origin_key
+      },
+      connectionTimeout: undefined,
+      hmacAccessKey: undefined,
+      hmacAuthentication: undefined,
+      hmacRegionName: undefined,
+      hmacSecretKey: undefined,
+      hostHeader: '-',
+      originId: fixtures.originLiveIngestType.origin_id,
+      name: fixtures.originLiveIngestType.name,
+      originType: 'Live Ingest',
+      addresses: ['br-east-1.azioningest.net']
     })
   })
 })
