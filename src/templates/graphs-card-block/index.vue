@@ -2,8 +2,7 @@
   <div
     :class="[
       cardColumns,
-      'flex flex-col rounded-md border surface-border col-span-12 p-6',
-      maxHeightCard
+      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6'
     ]"
   >
     <header class="flex w-full items-center justify-between gap-2">
@@ -89,11 +88,6 @@
     }
 
     return columns[props.report.columns] || defaultColumns
-  })
-
-  const maxHeightCard = computed(() => {
-    if (props.report.isDoubleChart) return 'min-h-[576px] h-fit'
-    return 'h-graph-card'
   })
 
   const chartType = {
