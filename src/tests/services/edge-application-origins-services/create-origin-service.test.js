@@ -26,6 +26,11 @@ const fixtures = {
     connectionTimeout: 60,
     timeoutBetweenBytes: 35
   },
+  requestPayloadMockLiveIngest: {
+    name: 'New Origin',
+    originType: 'live_ingest',
+    streamingEndpoint: 'br-east-1.azioningest.net'
+  },
   adaptedPayloadMock: {
     name: 'New Origin',
     origin_type: 'single_origin',
@@ -106,6 +111,15 @@ const scenarios = [
       origin_type: 'object_storage',
       bucket: 'my-bucket',
       prefix: '/'
+    }
+  },
+  {
+    label: 'should call API with correct params when origin type is live ingest',
+    payload: fixtures.requestPayloadMockLiveIngest,
+    adaptedPayload: {
+      name: 'New Origin',
+      origin_type: 'live_ingest',
+      streaming_endpoint: 'br-east-1.azioningest.net'
     }
   }
 ]

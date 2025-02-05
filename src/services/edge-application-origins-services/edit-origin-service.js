@@ -23,6 +23,14 @@ const adapt = (payload) => {
     }
   }
 
+  if (payload.originType === 'live_ingest') {
+    return {
+      name: payload.name,
+      origin_type: payload.originType,
+      streaming_endpoint: payload.streamingEndpoint
+    }
+  }
+
   let payloadAdapted = {
     name: payload.name,
     host_header: payload.hostHeader,
