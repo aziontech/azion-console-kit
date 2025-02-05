@@ -136,6 +136,8 @@ jobs:
 
       # - name: Merge Coverage Reports
       #   run: npx nyc merge ./coverage_report .nyc_output/out.json
+      - name: Merge Coverage Reports
+        run: npx nyc merge ./coverage_report
 
       - name: Generate Text Coverage Report
         run: npx nyc report --reporter=text-summary
