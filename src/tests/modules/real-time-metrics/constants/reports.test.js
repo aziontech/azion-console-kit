@@ -424,6 +424,33 @@ describe('RealTimeMetricsModule', () => {
           aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,
+          dashboardId: '357548623571976783',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          groupBy: ['ts', 'scheme'],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/request-by-scheme',
+          id: '357825388709151312',
+          variationType: 'inverse',
+          isTopX: false,
+          label: 'Requests by Scheme',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
           dashboardId: '357548642810200653',
           dataUnit: 'count',
           dataset: 'httpMetrics',
