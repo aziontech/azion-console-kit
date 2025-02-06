@@ -27,7 +27,8 @@ const HELP_CENTER_URLS = {
       missedRequests: '/real-time-metrics/edge-applications/requests/missed-requests',
       requestsByMethod: '/real-time-metrics/edge-applications/requests/requests-by-method',
       averageRequestTime: '/real-time-metrics/edge-applications/requests/average-request-time',
-      averageRequestTimeByHost: '/real-time-metrics/edge-applications/requests/average-request-time-by-host',
+      averageRequestTimeByHost:
+        '/real-time-metrics/edge-applications/requests/average-request-time-by-host',
       requestsOffloaded: '/real-time-metrics/edge-applications/requests/requests-offloaded',
       requestsPerSecondOffloaded:
         '/real-time-metrics/edge-applications/requests/requests-per-second-offloaded',

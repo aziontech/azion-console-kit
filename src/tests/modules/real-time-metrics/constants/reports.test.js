@@ -436,7 +436,8 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requestTime'
             }
           ],
-          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time-by-host',
+          helpCenterPath:
+            '/real-time-metrics/edge-applications/requests/average-request-time-by-host',
           id: '357825388709151311',
           variationType: 'inverse',
           isTopX: false,

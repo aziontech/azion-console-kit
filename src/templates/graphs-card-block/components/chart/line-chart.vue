@@ -38,7 +38,6 @@
 
 <style>
   .c3-tooltip-container {
-    overflow: scroll !important;
     max-height: 400px !important;
   }
 </style>
