@@ -62,7 +62,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()

@@ -71,7 +71,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     ).as('getEdgeFunctions')
 
     // Act - create a function instance
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()

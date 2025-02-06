@@ -35,7 +35,7 @@ export const domainsRoutes = {
       props: {
         createDomainService: DomainServicesV4.createDomainService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
+        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite,
@@ -75,7 +75,8 @@ export const domainsRoutes = {
           listWorkloadDeploymentService: WorkloadDeploymentServices.listWorkloadDeploymentsService,
           editWorkloadDeploymentService: WorkloadDeploymentServices.editWorkloadDeploymentService,
           listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-          loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
+          loadEdgeApplicationsService:
+            EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
           listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService
         }
