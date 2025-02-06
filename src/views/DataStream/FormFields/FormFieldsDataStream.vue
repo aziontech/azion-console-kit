@@ -660,7 +660,7 @@
             :value="apiKey"
             rows="5"
             placeholder="VnVhQ2ZHY0JDZGJrUW0tZTVhT3g6dWkybHAyYXhUTm1zeWFrdzl0dk5udw=="
-            description="Base64 key corresponding to the encoded value generated during the creation of the API Key in ElasticSearch."
+            description="Base64 key corresponding to the encoded value generated while creating the API Key in ElasticSearch."
             data-testid="data-stream-form__destination__api-key-field"
           />
         </div>
