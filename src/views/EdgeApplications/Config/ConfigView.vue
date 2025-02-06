@@ -36,8 +36,8 @@
                 data-testid="create-origion-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span>{{ textInfoOrigin.title }}</span>
-                  <span class="text-sm text-color-secondary"
+                  <span class="text-lg">{{ textInfoOrigin.title }}</span>
+                  <span class="text-sm text-color-secondary font-normal"
                     >{{ textInfoOrigin.description }}
                   </span>
                 </div>
@@ -63,7 +63,7 @@
           <AccordionTab
             :disabled="hasBindDomain"
             :pt="{
-              content: { class: 'p-0 pt-6' },
+              content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               header: { class: ' rounded-md' },
               headerAction: { class: hideDomainBorder },
               headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
@@ -75,8 +75,8 @@
                 data-testid="create-domain-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span>{{ textInfoDomain.title }}</span>
-                  <span class="text-sm text-color-secondary"
+                  <span class="text-lg">{{ textInfoDomain.title }}</span>
+                  <span class="text-sm text-color-secondary font-normal"
                     >{{ textInfoDomain.description }}
                   </span>
                 </div>
@@ -108,7 +108,7 @@
           <AccordionTab
             :disabled="hasCreateCache"
             :pt="{
-              content: { class: 'p-0 pt-6' },
+              content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               header: { class: ' rounded-md' },
               headerAction: { class: hideCacheBorder },
               headerIcon: { class: `${hasCreateCache ? 'hidden' : ''}` }
@@ -120,8 +120,10 @@
                 data-testid="create-cache-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span>{{ textInfoCache.title }}</span>
-                  <span class="text-sm text-color-secondary">{{ textInfoCache.description }} </span>
+                  <span class="text-lg">{{ textInfoCache.title }}</span>
+                  <span class="text-sm text-color-secondary font-normal"
+                    >{{ textInfoCache.description }}
+                  </span>
                 </div>
                 <PrimeButton
                   v-if="hasCreateCache"
@@ -211,7 +213,7 @@
       }
     }
     return {
-      description: 'Select the domain to associate with the edge application.',
+      description: 'Create the domain to associate with the edge application.',
       title: 'Associate a domain'
     }
   })
