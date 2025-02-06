@@ -421,6 +421,33 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          aggregationType: 'avg',
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357548623571976783',
+          dataUnit: 'perSecond',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          groupBy: ['ts', 'host'],
+          aggregations: [
+            {
+              aggregation: 'avg',
+              variable: 'requestTime'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time-by-host',
+          id: '357825388709151311',
+          variationType: 'inverse',
+          isTopX: false,
+          label: 'Average Request Time by Host',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
           aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,

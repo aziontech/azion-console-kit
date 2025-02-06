@@ -423,6 +423,33 @@ const REPORTS = [
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
   },
+  {
+    id: '357825388709151311',
+    chartOwner: 'azion',
+    label: 'Average Request Time by Host',
+    description: '',
+    aggregationType: 'avg',
+    columns: 12,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'perSecond',
+    limit: 10000,
+    fields: [],
+    groupBy: ['ts', 'host'],
+    aggregations: [
+      {
+        aggregation: 'avg',
+        variable: 'requestTime'
+      }
+    ],
+    orderDirection: 'ASC',
+    variationType: 'inverse',
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTimeByHost
+  },
   /**
    * BUILD
    * Edge Applications - Status Codes
