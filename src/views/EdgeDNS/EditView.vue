@@ -149,7 +149,7 @@
   })
 
   const EDGE_DNS_RECORDS_FIELDS = [
-    'record_id',
+    'id',
     'entry',
     'record_type',
     'answers_list',
@@ -430,6 +430,7 @@
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
               addButtonLabel="Record"
+              :defaultOrderingFieldName="'entry'"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"

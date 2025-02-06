@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
@@ -17,7 +17,6 @@ export const listRecordsService = async ({
   })
 
   httpResponse = adapt(httpResponse)
-
   return parseHttpResponse(httpResponse)
 }
 
@@ -26,7 +25,7 @@ const adapt = (httpResponse) => {
 
   const parsedRecords = isArray
     ? httpResponse.body.results.map((record) => ({
-        id: record.record_id,
+        id: record.id,
         name: record.entry,
         type: record.record_type,
         value: record.answers_list,
