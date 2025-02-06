@@ -481,7 +481,7 @@
               :createService="createRecordsService"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
-              @onSuccess="[reloadResourcesList, handleTrackSuccessCreated()]"
+              @onSuccess="[reloadResourcesList(), handleTrackSuccessCreated()]"
               @onError="handleTrackFailCreated"
               title="Create Record"
             >
@@ -497,7 +497,7 @@
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"
               :schema="validationSchemaEDNSRecords"
-              @onSuccess="[reloadResourcesList, handleTrackSuccessEdit()]"
+              @onSuccess="[reloadResourcesList(), handleTrackSuccessEdit()]"
               @onError="handleTrackFailEdit"
               title="Edit Record"
             >
