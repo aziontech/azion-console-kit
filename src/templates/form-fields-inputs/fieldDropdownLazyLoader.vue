@@ -1,10 +1,10 @@
 <template>
   <LabelBlock
+    v-if="props.label"
     :for="props.name"
     :label="props.label"
     :isRequired="$attrs.required"
     :data-testid="customTestId.label"
-    v-if="props.label"
   />
   <Dropdown
     appendTo="self"
@@ -180,7 +180,6 @@
 
   onMounted(async () => {
     await fetchData()
-    loadSelectedValue(props.value)
   })
 
   const hasDescriptionSlot = !!slots.description
@@ -209,6 +208,10 @@
     )
 
     emit('onChange', inputValue.value)
+
+    if (inputValue.value === null) {
+      emit('onClear')
+    }
 
     if (selectedOption) {
       emit('onSelectOption', selectedOption)

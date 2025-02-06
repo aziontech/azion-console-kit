@@ -1,4 +1,3 @@
-'
 <script setup>
   import ButtonPrime from 'primevue/button'
   import Divider from 'primevue/divider'

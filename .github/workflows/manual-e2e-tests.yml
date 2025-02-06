@@ -42,7 +42,7 @@ jobs:
           env: environment=${{ github.event.inputs.environmentName }}
 
       - name: Upload Manual Cypress Screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: cypress_screenshots
@@ -50,7 +50,7 @@ jobs:
           retention-days: 4
 
       - name: Upload Manual Cypress Videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: cypress_videos

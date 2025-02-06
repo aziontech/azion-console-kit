@@ -26,7 +26,7 @@ const fixtures = {
   certificateWithMissingData: {
     id: 2,
     name: 'Certificate 2',
-    subject_name: [],
+    subject_name: null,
     type: null,
     validity: null,
     status: 'pending'
@@ -161,6 +161,66 @@ describe('DigitalCertificatesServices', () => {
         }
       })
     })
+  })
+
+  it('should return correct certificates when search parameters are provided', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.certificateMock]
+      }
+    })
+    const { sut } = makeSut()
+    const result = await sut({ search: 'Certificate1' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v4/digital_certificates/certificates?ordering=name&page=1&page_size=10&fields=&search=Certificate1`,
+      method: 'GET'
+    })
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      }
+    ])
+  })
+
+  it('should return correct certificates when ordering parameters are provided', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.certificateMock]
+      }
+    })
+    const { sut } = makeSut()
+    const result = await sut({ ordering: 'issuer' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v4/digital_certificates/certificates?ordering=issuer&page=1&page_size=10&fields=&search=`,
+      method: 'GET'
+    })
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      }
+    ])
   })
 
   it.each([
