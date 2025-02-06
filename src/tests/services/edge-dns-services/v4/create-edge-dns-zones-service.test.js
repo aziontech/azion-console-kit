@@ -20,7 +20,7 @@ const makeSut = () => {
 describe('EdgeDNSZonesService', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202,
+      statusCode: 201,
       body: {
         data: {
           id: '123456'
@@ -45,7 +45,7 @@ describe('EdgeDNSZonesService', () => {
   it('should return feedback and urlToEditView when successfully create an Edge DNS Zone', async () => {
     const zoneId = '123456'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202,
+      statusCode: 201,
       body: {
         data: {
           id: zoneId

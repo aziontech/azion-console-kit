@@ -6,9 +6,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import FormFieldsAccountSettings from './FormFields/FormFieldsAccountSettings'
-  import { inject, onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { inject } from 'vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -36,14 +34,6 @@
     }
   })
 
-  const router = useRouter()
-
-  const userWasInPayments = ref(false)
-
-  onMounted(() => {
-    userWasInPayments.value = Boolean(router.currentRoute.value.query?.payment) || false
-  })
-
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
@@ -51,7 +41,6 @@
       })
       .track()
   }
-
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -79,20 +68,6 @@
     isSocialLoginEnabled: yup.boolean(),
     isEnabledMfaToAllUsers: yup.boolean()
   })
-
-  const redirectUserOnSuccessEdit = async () => {
-    if (userWasInPayments.value) {
-      router.push({ path: '/billing/payment', query: { payment: true } })
-      await loadUserAndAccountInfo()
-    } else {
-      router.push({ path: '/' })
-    }
-  }
-
-  const handleActionsSuccessEdit = async () => {
-    handleTrackSuccessEdit()
-    await redirectUserOnSuccessEdit()
-  }
 </script>
 
 <template>
@@ -104,9 +79,9 @@
       <EditFormBlock
         :editService="updateAccountSettingsService"
         :loadService="getAccountSettingsService"
-        @on-edit-success="handleActionsSuccessEdit"
+        @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
-        disableRedirect
+        updatedRedirect="home"
         :schema="validationSchema"
       >
         <template #form>

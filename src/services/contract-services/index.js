@@ -1,3 +1,5 @@
 import { loadContractServicePlan } from './load-contract-service-plan'
 import { makeContractBaseUrl } from './make-contract-base-url'
-export { loadContractServicePlan, makeContractBaseUrl }
+import { loadProductsListService } from './load-products-list-service'
+
+export { loadContractServicePlan, makeContractBaseUrl, loadProductsListService }
