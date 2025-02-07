@@ -16,7 +16,7 @@
     editServiceEdgeNodeService: { type: Function, required: true },
     loadServiceEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
+    unbindServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     listEdgeServiceServices: { type: Function, required: true }
   })
@@ -73,7 +73,7 @@
   }
 
   const unbindServicesWithDecorator = async (id) => {
-    return await props.deleteServiceEdgeNodeService({
+    return await props.unbindServiceEdgeNodeService({
       edgeNodeId: props.edgeNodeId,
       id
     })

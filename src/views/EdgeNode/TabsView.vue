@@ -17,7 +17,7 @@
     editEdgeNodeService: { type: Function, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
+    unbindServiceEdgeNodeService: { type: Function, required: true },
     bindServiceEdgeNodeService: { type: Function, required: true },
     loadServiceEdgeNodeService: { type: Function, required: true },
     editServiceEdgeNodeService: { type: Function, required: true },
@@ -141,7 +141,7 @@
             :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
             :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
             :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-            :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
+            :unbindServiceEdgeNodeService="props.unbindServiceEdgeNodeService"
             :documentationServiceServices="props.documentationServiceServices"
           />
         </TabPanel>
