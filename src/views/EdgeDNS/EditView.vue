@@ -170,6 +170,16 @@
     edgeDNSID: route.params.id
   }
 
+  const handleCreatedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessCreated()
+  }
+
+  const handleEditedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessEdit()
+  }
+
   const reloadResourcesList = () => {
     if (hasContentToList.value) {
       listEDNSResourcesRef.value.reload()
@@ -430,7 +440,7 @@
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
               addButtonLabel="Record"
-              :defaultOrderingFieldName="'entry'"
+              defaultOrderingFieldName="entry"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
@@ -481,7 +491,7 @@
               :createService="createRecordsService"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
-              @onSuccess="[reloadResourcesList(), handleTrackSuccessCreated()]"
+              @onSuccess="handleCreatedSuccessfully"
               @onError="handleTrackFailCreated"
               title="Create Record"
             >
@@ -497,7 +507,7 @@
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"
               :schema="validationSchemaEDNSRecords"
-              @onSuccess="[reloadResourcesList(), handleTrackSuccessEdit()]"
+              @onSuccess="handleEditedSuccessfully"
               @onError="handleTrackFailEdit"
               title="Edit Record"
             >
