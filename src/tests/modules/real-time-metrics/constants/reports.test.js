@@ -854,6 +854,37 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          id: '357842851576414806',
+          isTopX: true,
+          label: 'Top WAF Threat Requests by Country',
+          limit: 20,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
