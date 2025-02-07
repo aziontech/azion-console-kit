@@ -11,6 +11,7 @@
       :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
+      :scrollHeight="props.scrollHeight"
       removableSort
       :value="data"
       dataKey="id"
@@ -353,6 +354,10 @@
     listService: {
       required: true,
       type: Function
+    },
+    scrollHeight: {
+      type: String,
+      default: () => ''
     },
     enableEditClick: {
       type: Boolean,
