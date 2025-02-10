@@ -428,7 +428,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Requests by Status and Upstream Status ',
     description: REPORTS_TEXTS.edgeApplications.httpMethods.averageRequestTime.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'list',
     xAxis: 'cat',

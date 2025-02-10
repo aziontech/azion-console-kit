@@ -421,7 +421,7 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
-          aggregationType: 'avg',
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
