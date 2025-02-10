@@ -2,6 +2,7 @@ import * as EdgeDNSService from '@/services/edge-dns-services'
 import * as EdgeDNSServiceV4 from '@/services/edge-dns-services/v4'
 
 import * as EdgeDNSRecordsService from '@/services/edge-dns-records-services'
+import * as EdgeDNSRecordsServiceV4 from '@/services/edge-dns-records-services/v4'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -82,7 +83,7 @@ export const edgeDnsRoutes = {
         loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
         listRecordsService: EdgeDNSRecordsService.listRecordsService,
         deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
-        createRecordsService: EdgeDNSRecordsService.createRecordsService,
+        createRecordsService: EdgeDNSRecordsServiceV4.createRecordsService,
         editRecordsService: EdgeDNSRecordsService.editRecordsService,
         loadRecordsService: EdgeDNSRecordsService.loadRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
