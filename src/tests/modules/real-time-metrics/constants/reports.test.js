@@ -433,7 +433,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548623571976783',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'average request time in a line chart.',
+          description: 'Top 10 Status e Upstream Status que mais tiveram requisições.',
           fields: ['status', 'upstreamStatus'],
           groupBy: ['status', 'upstreamStatus'],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',

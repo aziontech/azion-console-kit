@@ -6,7 +6,7 @@
 </script>
 
 <template>
-  <div class="w-full h-full overflow-scroll overscroll-contain">
+  <div class="w-full h-full">
     <ListTableBlock
       scrollHeight="385px"
       :data="props.resultChart[0].data"

@@ -80,6 +80,9 @@ const REPORTS_TEXTS = {
       missedRequestsPerSecond: {
         description:
           'Average of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
+      },
+      statusUpstream: {
+        description: 'Top 10 Status e Upstream Status que mais tiveram requisições.'
       }
     },
     statusCodes: {
