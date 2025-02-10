@@ -930,6 +930,37 @@ const REPORTS = [
     variationType: 'regular',
     helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
   },
+  {
+    id: '357842851576414808',
+    chartOwner: 'azion',
+    label: 'WAF Threat Requests by Family Attack',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['wafAttackFamily'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack'
+  },
   /**
    * SECURE
    * Edge DNS - Standard Queries

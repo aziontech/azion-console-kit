@@ -1133,6 +1133,38 @@ geolocCountryName
     }
   },
   {
+    id: '357842851576414808',
+    label: 'WAF Threat Requests by Family Attack',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [wafAttackFamily]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+wafAttackFamily
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357843490139298789',
     label: 'Total Queries',
     gqlQuery: {
