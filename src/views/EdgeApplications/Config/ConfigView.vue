@@ -48,7 +48,7 @@
               </div>
             </template>
             <OriginEdgeApplcation
-              @createdOrigin="handleResponse('origin')"
+              @createdOrigin="handleResponseOrigin"
               :createOriginService="props.originsServices.createOriginService"
             />
           </AccordionTab>
@@ -132,7 +132,7 @@
               </div>
             </template>
             <CacheEdgeApplication
-              @createdCache="handleResponse('cache')"
+              @createdCache="handleResponseCache"
               :createCacheSettingsService="props.cacheSettingsServices.createCacheSettingsService"
             />
           </AccordionTab>
@@ -156,11 +156,12 @@
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
 
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   const props = defineProps({
     domainsService: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
-    originsServices: { type: Object, required: true }
+    originsServices: { type: Object, required: true },
+    rulesEngineServices: { type: Object, required: true }
   })
 
   const activeAccordionTab = ref([])
@@ -172,8 +173,10 @@
   const tabOrigin = ref([])
   const tabDomain = ref([])
   const tabCache = ref([])
-
+  const originId = ref(0)
+  const cacheSettingId = ref(0)
   const edgeApplicationId = ref(route.params.id)
+  const rulesEngine = ref(null)
 
   const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
   const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
@@ -240,12 +243,42 @@
     finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
   )
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    if (hasCreateCache.value && hasCreateOrigin.value) {
+      const payload = {
+        ...rulesEngine.value.body[0],
+        phase: 'default',
+        behaviors: [
+          {
+            name: 'set_origin',
+            originId: originId.value
+          },
+          {
+            name: 'set_cache_policy',
+            cacheId: cacheSettingId.value
+          }
+        ]
+      }
+      await props.rulesEngineServices.editRulesEngineService({
+        id: edgeApplicationId.value,
+        payload
+      })
+    }
     router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
   }
 
   const closeAccordionTab = (tab) => {
     tab.value = tab.value.filter((item) => item !== 0)
+  }
+
+  const handleResponseOrigin = (value) => {
+    originId.value = value.originId
+    handleResponse('origin')
+  }
+
+  const handleResponseCache = (value) => {
+    cacheSettingId.value = value.cacheId
+    handleResponse('cache')
   }
 
   const handleResponse = (tab) => {
@@ -262,4 +295,10 @@
       closeAccordionTab(tabDomain)
     }
   }
+
+  onMounted(async () => {
+    rulesEngine.value = await props.rulesEngineServices.listRulesEngineService({
+      id: edgeApplicationId.value
+    })
+  })
 </script>

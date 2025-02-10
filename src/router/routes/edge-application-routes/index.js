@@ -81,6 +81,10 @@ export const edgeApplicationRoutes = {
         },
         originsServices: {
           createOriginService: OriginsService.createOriginService
+        },
+        rulesEngineServices: {
+          editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
+          listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll
         }
       },
       meta: {
