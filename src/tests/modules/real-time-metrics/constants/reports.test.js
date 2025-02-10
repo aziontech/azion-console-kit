@@ -974,7 +974,9 @@ describe('RealTimeMetricsModule', () => {
           rotated: false,
           type: 'line',
           variationType: 'inverse',
-          xAxis: 'ts'
+          xAxis: 'ts',
+          doNotConvertToCamelCase: true,
+          largeTooltip: true
         },
         {
           aggregationType: 'sum',

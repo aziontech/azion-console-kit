@@ -28,8 +28,8 @@
     })
   }
 
-  const getClassToLargeTooltip = computed(() => {
-    if (props.chartData?.id === '357842851576414809') {
+  const largeTooltipClass = computed(() => {
+    if (props.chartData?.largeTooltip) {
       return 'large-tooltip'
     }
     return ''
@@ -39,7 +39,7 @@
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
-    :class="getClassToLargeTooltip"
+    :class="largeTooltipClass"
     :id="`line-chart-${props.chartData?.id}`"
   />
 </template>

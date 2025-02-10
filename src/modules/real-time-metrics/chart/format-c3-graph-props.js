@@ -333,7 +333,7 @@ export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMea
       seriesTotal /= series.length - 1
     }
     const formattedSeriesTotal = formatYAxisLabels(seriesTotal, chartData)
-    const seriesName = camelToTitle(series[0])
+    const seriesName = !chartData?.doNotConvertToCamelCase ? camelToTitle(series[0]) : series[0]
     const renamedSeries = `${seriesName} - ${formattedSeriesTotal}`
 
     seriesNames = { ...seriesNames, [series[0]]: renamedSeries }

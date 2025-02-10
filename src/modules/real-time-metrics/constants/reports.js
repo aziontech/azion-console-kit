@@ -990,7 +990,9 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357548675837198933',
     variationType: 'inverse',
-    helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host'
+    helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+    doNotConvertToCamelCase: true,
+    largeTooltip: true
   },
   /**
    * SECURE
