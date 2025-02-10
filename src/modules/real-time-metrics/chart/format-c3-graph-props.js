@@ -275,6 +275,7 @@ function generateMeanLineValues(resultChart, mean) {
  * @returns {string} - The title case string
  */
 export function camelToTitle(text) {
+  if (!text) return
   return text
     .replace(/([a-z])([A-Z0-9])/g, '$1 $2')
     .replace(/\s+/g, ' ')

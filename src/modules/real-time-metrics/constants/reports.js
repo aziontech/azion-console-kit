@@ -868,6 +868,37 @@ const REPORTS = [
     variationType: 'inverse',
     helpCenterPath: HELP_CENTER_URLS.waf.threats.otherThreats
   },
+  {
+    id: '357842851576414806',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by Country',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 20,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['geolocCountryName'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
+  },
   /**
    * SECURE
    * Edge DNS - Standard Queries
