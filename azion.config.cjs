@@ -159,7 +159,7 @@ const backRules = [
         subject: 'request_uri'
       },
       rewrite: `/marketplace/api/%{captured[1]}`,
-      setCache: 'Marketplace - Cache'
+      // setCache: 'Marketplace - Cache'
     }
   },
   {
