@@ -1150,6 +1150,33 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description:
+            'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+          groupBy: ['classified'],
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
+          id: '329891149133127509',
+          isTopX: true,
+          label: 'Top Bot Traffic',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
           id: '577704475532819772',
           chartOwner: 'azion',
           label: 'Top Bot Action',

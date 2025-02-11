@@ -1172,6 +1172,33 @@ const REPORTS = [
     helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botTraffic
   },
   {
+    id: '329891149133127509',
+    chartOwner: 'azion',
+    label: 'Top Bot Traffic',
+    description:
+      'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    limit: 10000,
+    groupBy: ['classified'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotTraffic
+  },
+  {
     id: '577704475532819772',
     chartOwner: 'azion',
     label: 'Top Bot Action',

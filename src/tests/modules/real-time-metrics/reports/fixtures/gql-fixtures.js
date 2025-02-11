@@ -1382,6 +1382,36 @@ classified
     }
   },
   {
+    id: '329891149133127509',
+    label: 'Top Bot Traffic',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [classified]
+        orderBy: [sum_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
+classified
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '577704475532819772',
     label: 'Bot Action',
     gqlQuery: {
