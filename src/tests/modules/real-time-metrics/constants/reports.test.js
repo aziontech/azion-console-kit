@@ -947,6 +947,39 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['ts', 'host'],
+          helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+          id: '357842851576414809',
+          isTopX: false,
+          label: 'WAF Threat Requests by Host',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          variationType: 'inverse',
+          xAxis: 'ts',
+          doNotConvertToCamelCase: true,
+          largeTooltip: true
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',

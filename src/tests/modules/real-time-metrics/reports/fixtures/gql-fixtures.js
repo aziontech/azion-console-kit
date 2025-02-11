@@ -1165,6 +1165,39 @@ wafAttackFamily
     }
   },
   {
+    id: '357842851576414809',
+    label: 'WAF Threat Requests by Host',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, host]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+ts
+host
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357843490139298789',
     label: 'Total Queries',
     gqlQuery: {

@@ -333,7 +333,7 @@ export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMea
       seriesTotal /= series.length - 1
     }
     const formattedSeriesTotal = formatYAxisLabels(seriesTotal, chartData)
-    const seriesName = camelToTitle(series[0])
+    const seriesName = !chartData?.doNotConvertToCamelCase ? camelToTitle(series[0]) : series[0]
     const renamedSeries = `${seriesName} - ${formattedSeriesTotal}`
 
     seriesNames = { ...seriesNames, [series[0]]: renamedSeries }
@@ -367,10 +367,10 @@ export function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMea
  * @param {Array} tooltipData - The tooltip data to reset
  * @returns {Array} - The tooltip data with the label reset
  */
-function resetTooltipLabel(tooltipData) {
+function resetTooltipLabel(tooltipData, chartData) {
   return tooltipData.map((item) => ({
     ...item,
-    name: camelToTitle(item.id)
+    name: !chartData?.doNotConvertToCamelCase ? camelToTitle(item.id) : item.id
   }))
 }
 
@@ -536,7 +536,7 @@ export function FormatC3GraphProps({
         if (chartData.type === 'ordered-bar') {
           const { index } = d[0]
           return this.getTooltipContent(
-            resetTooltipLabel(d),
+            resetTooltipLabel(d, chartData),
             defaultTitleFormat,
             defaultValueFormat,
             () => CHART_RULES.BASE_COLOR_PATTERNS[index]
@@ -544,7 +544,7 @@ export function FormatC3GraphProps({
         }
 
         return this.getTooltipContent(
-          resetTooltipLabel(d),
+          resetTooltipLabel(d, chartData),
           defaultTitleFormat,
           defaultValueFormat,
           color
