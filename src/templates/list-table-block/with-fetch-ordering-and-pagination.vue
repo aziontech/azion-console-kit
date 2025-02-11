@@ -674,7 +674,6 @@
     const firstPage = 1
     firstItemIndex.value = firstPage
     await reload({ ordering })
-
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder

@@ -1,7 +1,6 @@
 import * as EdgeDNSService from '@/services/edge-dns-services'
 import * as EdgeDNSServiceV4 from '@/services/edge-dns-services/v4'
-
-import * as EdgeDNSRecordsService from '@/services/edge-dns-records-services'
+import * as EdgeDNSRecordsServiceV4 from '@/services/edge-dns-records-services/v4'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -56,8 +55,8 @@ export const edgeDnsRoutes = {
       props: {
         editEdgeDNSService: EdgeDNSServiceV4.editEdgeDNSService,
         loadEdgeDNSService: EdgeDNSServiceV4.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
-        deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
+        listRecordsService: EdgeDNSRecordsServiceV4.listRecordsService,
+        deleteRecordsService: EdgeDNSRecordsServiceV4.deleteRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
         updatedRedirect: 'list-edge-dns'
       },
@@ -80,11 +79,11 @@ export const edgeDnsRoutes = {
       props: {
         editEdgeDNSService: EdgeDNSService.editEdgeDNSService,
         loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
-        deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
-        createRecordsService: EdgeDNSRecordsService.createRecordsService,
-        editRecordsService: EdgeDNSRecordsService.editRecordsService,
-        loadRecordsService: EdgeDNSRecordsService.loadRecordsService,
+        listRecordsService: EdgeDNSRecordsServiceV4.listRecordsService,
+        deleteRecordsService: EdgeDNSRecordsServiceV4.deleteRecordsService,
+        createRecordsService: EdgeDNSRecordsServiceV4.createRecordsService,
+        editRecordsService: EdgeDNSRecordsServiceV4.editRecordsService,
+        loadRecordsService: EdgeDNSRecordsServiceV4.loadRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationCatalog.records
       },
