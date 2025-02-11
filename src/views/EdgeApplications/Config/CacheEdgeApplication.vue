@@ -76,7 +76,7 @@
     })
   }
 
-  const handleResponse = () => {
-    emit('createdCache')
+  const handleResponse = (value) => {
+    emit('createdCache', value)
   }
 </script>

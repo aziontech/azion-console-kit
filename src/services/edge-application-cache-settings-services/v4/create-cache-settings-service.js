@@ -80,7 +80,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return { feedback: 'Cache Settings successfully created' }
+      return {
+        feedback: 'Cache Settings successfully created',
+        cacheId: httpResponse.body.data.id
+      }
     case 500:
       throw new Errors.InternalServerError().message
     default:

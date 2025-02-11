@@ -78,7 +78,7 @@
     return props.createOriginService(bodyRequest)
   }
 
-  const handleResponse = () => {
-    emit('createdOrigin')
+  const handleResponse = (value) => {
+    emit('createdOrigin', value)
   }
 </script>
