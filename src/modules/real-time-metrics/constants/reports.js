@@ -1175,7 +1175,8 @@ const REPORTS = [
     id: '329891149133127509',
     chartOwner: 'azion',
     label: 'Top Bot Traffic',
-    description: 'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+    description:
+      'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
