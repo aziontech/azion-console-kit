@@ -100,7 +100,7 @@ const REPORTS_TEXTS = {
           'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code 500, Requests Status Code 502, Requests Status Code 503, and Requests Status Code 5xx.'
       },
       statusUpstream: {
-        description: 'Top 10 Status e Upstream Status que mais tiveram requisições.'
+        description: 'Top 10 Status and Upstream Status that had the most requests.'
       }
     },
     waf: {

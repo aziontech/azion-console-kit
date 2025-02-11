@@ -42,7 +42,8 @@ const HELP_CENTER_URLS = {
       httpStatusCodes2xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
       httpStatusCodes3xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
       httpStatusCodes4xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-4xx',
-      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx'
+      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx',
+      statusUpstream: '/real-time-metrics/edge-applications/status-codes/status-upstream'
     }
   },
   edgeFunctions: {

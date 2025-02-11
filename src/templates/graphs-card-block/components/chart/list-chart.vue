@@ -5,7 +5,7 @@
     resultChart: Array
   })
 
-  const HEIGHT_ROW = '385px'
+  const HEIGHT_ROW = '375px'
   const chartData = computed(() => props.resultChart[0].data)
   const columns = computed(() => props.resultChart[0].columns)
 </script>

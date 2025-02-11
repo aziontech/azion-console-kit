@@ -578,7 +578,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548642810200653',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Top 10 Status e Upstream Status que mais tiveram requisições.',
+          description: 'Top 10 Status and Upstream Status that had the most requests.',
           fields: ['status', 'upstreamStatus'],
           groupBy: ['status', 'upstreamStatus'],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
