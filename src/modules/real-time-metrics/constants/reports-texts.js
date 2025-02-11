@@ -80,9 +80,6 @@ const REPORTS_TEXTS = {
       missedRequestsPerSecond: {
         description:
           'Average of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
-      },
-      statusUpstream: {
-        description: 'Top 10 Status e Upstream Status que mais tiveram requisições.'
       }
     },
     statusCodes: {
@@ -101,6 +98,9 @@ const REPORTS_TEXTS = {
       httpStatusCodes5xx: {
         description:
           'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code 500, Requests Status Code 502, Requests Status Code 503, and Requests Status Code 5xx.'
+      },
+      statusUpstream: {
+        description: 'Top 10 Status e Upstream Status que mais tiveram requisições.'
       }
     },
     waf: {

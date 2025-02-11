@@ -9,12 +9,14 @@
       class="overflow-clip rounded-md"
       :pt="props.pt"
       scrollable
+      showGridlines
       :scrollHeight="props.scrollHeight"
       :value="props.data"
       dataKey="id"
       :rowHover="!disabledList"
       :paginator="false"
       :rows="10"
+      tableStyle="min-width: 50rem"
       data-testid="data-table"
     >
       <Column
