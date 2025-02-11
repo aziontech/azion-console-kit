@@ -86,6 +86,7 @@ const HELP_CENTER_URLS = {
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
       transactions: '/real-time-metrics/bot-manager-advanced/overview/transactions',
       botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
+      topBotTraffic: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
       topBotAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
       botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
       topBotCaptchaPie:
