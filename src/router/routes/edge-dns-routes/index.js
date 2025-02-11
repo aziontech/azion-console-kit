@@ -56,7 +56,7 @@ export const edgeDnsRoutes = {
       props: {
         editEdgeDNSService: EdgeDNSServiceV4.editEdgeDNSService,
         loadEdgeDNSService: EdgeDNSServiceV4.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
+        listRecordsService: EdgeDNSRecordsServiceV4.listRecordsService,
         deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
         updatedRedirect: 'list-edge-dns'
@@ -80,9 +80,9 @@ export const edgeDnsRoutes = {
       props: {
         editEdgeDNSService: EdgeDNSService.editEdgeDNSService,
         loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
-        listRecordsService: EdgeDNSRecordsService.listRecordsService,
+        listRecordsService: EdgeDNSRecordsServiceV4.listRecordsService,
         deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
-        createRecordsService: EdgeDNSRecordsService.createRecordsService,
+        createRecordsService: EdgeDNSRecordsServiceV4.createRecordsService,
         editRecordsService: EdgeDNSRecordsServiceV4.editRecordsService,
         loadRecordsService: EdgeDNSRecordsServiceV4.loadRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
