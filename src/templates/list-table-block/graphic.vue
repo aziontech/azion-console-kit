@@ -118,7 +118,7 @@
 
   const computedClass = computed(() => ({
     'hover:cursor-pointer': !props.disabledList,
-    'px-[0.875rem] py-[0.395rem]': props.smallRow
+    'px-[0.875rem] py-[0.295rem]': props.smallRow
   }))
 
   const sizeColumn = computed(() => {
