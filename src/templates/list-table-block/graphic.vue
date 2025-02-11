@@ -7,16 +7,14 @@
     <DataTable
       ref="dataTableRef"
       class="overflow-clip rounded-md"
-      :pt="props.pt"
+      :pt="pt"
       scrollable
-      showGridlines
-      :scrollHeight="props.scrollHeight"
-      :value="props.data"
+      :scrollHeight="scrollHeight"
+      :value="data"
       dataKey="id"
       :rowHover="!disabledList"
       :paginator="false"
       :rows="10"
-      tableStyle="min-width: 50rem"
       data-testid="data-table"
     >
       <Column
@@ -26,11 +24,12 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        :class="{ 'hover:cursor-pointer': !disabledList, 'px-[0.875rem] py-[0.395rem]': smallRow }"
+        :class="computedClass"
+        :style="sizeColumn"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
-          <template v-if="col.type !== 'component'">
+          <template v-if="isNotComponent(col.type)">
             <div
               v-html="rowData[col.field]"
               :data-testid="`list-table-block__column__${col.field}__row`"
@@ -66,7 +65,7 @@
 <script setup>
   import Column from 'primevue/column'
   import DataTable from 'primevue/datatable'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   defineOptions({ name: 'list-table-block-graphic' })
 
   const props = defineProps({
@@ -115,6 +114,19 @@
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
   }
+  const isNotComponent = (type) => type !== 'component'
+
+  const computedClass = computed(() => ({
+    'hover:cursor-pointer': !props.disabledList,
+    'px-[0.875rem] py-[0.395rem]': props.smallRow
+  }))
+
+  const sizeColumn = computed(() => {
+    const amountColumn = props.columns.length
+    const columnSize = 100 / amountColumn
+    return `width: ${columnSize}%`
+  })
+
   onMounted(() => {
     selectedColumns.value = props.columns
   })
