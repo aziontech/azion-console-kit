@@ -423,7 +423,33 @@ const REPORTS = [
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
   },
-
+  {
+    id: '357825388709151312',
+    chartOwner: 'azion',
+    label: 'Requests by Scheme',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    fields: [],
+    groupBy: ['ts', 'scheme'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'ASC',
+    variationType: 'inverse',
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestByScheme
+  },
   /**
    * BUILD
    * Edge Applications - Status Codes
@@ -869,6 +895,132 @@ const REPORTS = [
     variationType: 'inverse',
     helpCenterPath: HELP_CENTER_URLS.waf.threats.otherThreats
   },
+  {
+    id: '357842851576414806',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by Country',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 20,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['geolocCountryName'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
+  },
+  {
+    id: '357842851576414807',
+    chartOwner: 'azion',
+    label: 'Top WAF Threat Requests by Country',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 20,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['geolocCountryName'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
+  },
+  {
+    id: '357842851576414808',
+    chartOwner: 'azion',
+    label: 'WAF Threat Requests by Family Attack',
+    description: '',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'ordered-bar',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: true,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['wafAttackFamily'],
+    orderDirection: 'DESC',
+    dashboardId: '357548675837198933',
+    variationType: 'regular',
+    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack'
+  },
+  {
+    id: '357842851576414809',
+    chartOwner: 'azion',
+    label: 'WAF Threat Requests by Host',
+    description: '',
+    aggregationType: 'sum',
+    columns: 12,
+    type: 'line',
+    xAxis: 'ts',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    filters: {
+      wafBlock: '1',
+      wafLearning: '0'
+    },
+    fields: [],
+    groupBy: ['ts', 'host'],
+    orderDirection: 'ASC',
+    dashboardId: '357548675837198933',
+    variationType: 'inverse',
+    helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+    doNotConvertToCamelCase: true,
+    largeTooltip: true
+  },
   /**
    * SECURE
    * Edge DNS - Standard Queries
@@ -1045,6 +1197,33 @@ const REPORTS = [
     dashboardId: '371360344901061482',
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.botTraffic
+  },
+  {
+    id: '329891149133127509',
+    chartOwner: 'azion',
+    label: 'Top Bot Traffic',
+    description:
+      'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'pie',
+    xAxis: 'cat',
+    isTopX: true,
+    rotated: false,
+    dataUnit: 'count',
+    dataset: 'botManagerMetrics',
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    limit: 10000,
+    groupBy: ['classified'],
+    orderDirection: 'ASC',
+    dashboardId: '371360344901061482',
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.botManager.botManagerOverview.topBotTraffic
   },
   {
     id: '577704475532819772',

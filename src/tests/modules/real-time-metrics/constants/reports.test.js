@@ -424,6 +424,33 @@ describe('RealTimeMetricsModule', () => {
           aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,
+          dashboardId: '357548623571976783',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          groupBy: ['ts', 'scheme'],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/request-by-scheme',
+          id: '357825388709151312',
+          variationType: 'inverse',
+          isTopX: false,
+          label: 'Requests by Scheme',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
           dashboardId: '357548642810200653',
           dataUnit: 'count',
           dataset: 'httpMetrics',
@@ -854,6 +881,132 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          id: '357842851576414806',
+          isTopX: true,
+          label: 'Top WAF Threat Requests by Country',
+          limit: 20,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          id: '357842851576414807',
+          isTopX: true,
+          label: 'Top WAF Threat Requests by Country',
+          limit: 20,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['wafAttackFamily'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack',
+          id: '357842851576414808',
+          isTopX: true,
+          label: 'WAF Threat Requests by Family Attack',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: '',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['ts', 'host'],
+          helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+          id: '357842851576414809',
+          isTopX: false,
+          label: 'WAF Threat Requests by Host',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          variationType: 'inverse',
+          xAxis: 'ts',
+          doNotConvertToCamelCase: true,
+          largeTooltip: true
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
@@ -1022,6 +1175,33 @@ describe('RealTimeMetricsModule', () => {
           type: 'line',
           variationType: 'regular',
           xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description:
+            'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+          groupBy: ['classified'],
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
+          id: '329891149133127509',
+          isTopX: true,
+          label: 'Top Bot Traffic',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
         },
         {
           id: '577704475532819772',

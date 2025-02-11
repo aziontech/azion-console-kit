@@ -498,6 +498,37 @@ ts
     }
   },
   {
+    id: '357825388709151312',
+    label: 'Requests by Scheme',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, scheme]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
+ts
+scheme
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357825388709151309',
     label: 'Requests by Method',
     gqlQuery: {
@@ -1038,6 +1069,135 @@ ts
     }
   },
   {
+    id: '357842851576414806',
+    label: 'Top WAF Threat Requests by Country',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 20
+        aggregate: {sum: requests 
+}
+        groupBy: [geolocCountryName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+geolocCountryName
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414807',
+    label: 'Top WAF Threat Requests by Country',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 20
+        aggregate: {sum: requests 
+}
+        groupBy: [geolocCountryName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+geolocCountryName
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414808',
+    label: 'WAF Threat Requests by Family Attack',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [wafAttackFamily]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+wafAttackFamily
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414809',
+    label: 'WAF Threat Requests by Host',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, host]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+ts
+host
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357843490139298789',
     label: 'Total Queries',
     gqlQuery: {
@@ -1212,6 +1372,36 @@ end: $tsRange_end
         ) {
           sum
 ts
+classified
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '329891149133127509',
+    label: 'Top Bot Traffic',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [classified]
+        orderBy: [sum_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
 classified
         }
       }`,
