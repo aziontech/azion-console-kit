@@ -569,6 +569,33 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548642810200653',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: 'Top 10 Status and Upstream Status that had the most requests.',
+          fields: ['status', 'upstreamStatus'],
+          groupBy: ['status', 'upstreamStatus'],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151322',
+          isTopX: false,
+          label: 'Requests by Status and Upstream Status ',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'list',
+          variationType: 'inverse',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,
           dashboardId: '357549179454620239',

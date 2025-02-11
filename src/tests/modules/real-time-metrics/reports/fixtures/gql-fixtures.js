@@ -1779,6 +1779,38 @@ sum
         tsRange_end: '2024-12-01T12:00:00'
       }
     }
+  },
+  {
+    id: '357825388709151322',
+    label: 'Top WAF Threat Requests by IP',
+    description: 'Top 10 IPs that generated the most threats identified by the WAF',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [status, upstreamStatus]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          status
+upstreamStatus
+sum
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
   }
 ]
 

@@ -569,6 +569,33 @@ const REPORTS = [
     dashboardId: '357548642810200653',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes5xx
   },
+  {
+    id: '357825388709151322',
+    chartOwner: 'azion',
+    label: 'Requests by Status and Upstream Status ',
+    description: REPORTS_TEXTS.edgeApplications.statusCodes.statusUpstream.description,
+    aggregationType: 'sum',
+    columns: 6,
+    type: 'list',
+    xAxis: 'cat',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    fields: ['status', 'upstreamStatus'],
+    groupBy: ['status', 'upstreamStatus'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'DESC',
+    variationType: 'inverse',
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+  },
   /**
    * BUILD
    * Edge Applications - Bandwidth Saving

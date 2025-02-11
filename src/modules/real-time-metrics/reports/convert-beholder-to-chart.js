@@ -2,7 +2,6 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatDataUnit } from '../chart/format-graph'
-import countries from '../helpers/countries-code.json'
 
 import {
   formatYAxisLabels,
@@ -466,37 +465,31 @@ const formatBigNumbers = ({ report, data }) => {
  * @param {Array} data - The data to be formatted.
  */
 const formatListChart = ({ report, data }) => {
-  const dataset = Object.keys(data)
-  const fieldsRequest = Object.keys(data[dataset][0])
-  const fieldNames = report.fields
-  const fieldCountryName = report.groupBy[0]
+  const datasetKey = report.dataset
+  const dataset = data[datasetKey] || []
 
-  const dataValue = data[dataset].map((obj) => {
-    const extractedObj = {}
-    fieldNames.forEach((key) => {
-      extractedObj[key] = formatYAxisLabels(obj[key], report)
-      extractedObj[fieldCountryName] = {
-        code: countries[obj[fieldCountryName]] || '-',
-        country: obj[fieldCountryName]
-      }
-    })
+  if (!dataset.length) return { data: [], columns: [] }
 
-    return { ...obj, ...extractedObj }
-  })
+  const { fields, aggregations } = report
+  const aggregationKey = aggregations[0]?.aggregation
 
-  const header = fieldsRequest.map((field) => camelToTitle(field))
+  if (!aggregationKey) return { data: [], columns: [] }
 
-  const columns = fieldsRequest.map((field, index) => ({
-    field: field,
-    header: header[index]
+  // Formata os valores da agregação para exibição
+  const formattedData = dataset.map((item) => ({
+    ...item,
+    [aggregationKey]: formatDataUnit(item[aggregationKey], report)?.value
   }))
 
-  return [
-    {
-      data: dataValue,
-      columns
-    }
-  ]
+  fields.push(aggregationKey)
+
+  // Define as colunas com os nomes corretos
+  const columns = fields.map((field) => ({
+    field,
+    header: field === aggregationKey ? 'Total' : camelToTitle(field)
+  }))
+
+  return [{ data: formattedData, columns }]
 }
 
 const formatMapChartData = ({ report, data }) => {
