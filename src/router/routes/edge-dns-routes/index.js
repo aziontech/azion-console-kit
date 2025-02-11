@@ -82,7 +82,7 @@ export const edgeDnsRoutes = {
         loadEdgeDNSService: EdgeDNSService.loadEdgeDNSService,
         listRecordsService: EdgeDNSRecordsServiceV4.listRecordsService,
         deleteRecordsService: EdgeDNSRecordsService.deleteRecordsService,
-        createRecordsService: EdgeDNSRecordsService.createRecordsService,
+        createRecordsService: EdgeDNSRecordsServiceV4.createRecordsService,
         editRecordsService: EdgeDNSRecordsService.editRecordsService,
         loadRecordsService: EdgeDNSRecordsService.loadRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
