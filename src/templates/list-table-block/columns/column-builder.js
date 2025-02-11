@@ -13,6 +13,8 @@ import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
 import TextWithTagColumn from './text-with-tag-column.vue'
 import CreditCardColumn from './credit-card-column.vue'
 import CountryFlagColumn from './country-flag-column.vue'
+import TagWithTooltip from './tag-with-tooltip'
+
 /**
  * Build and return a specific column based on the given appearance.
  *
@@ -100,6 +102,15 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(CountryFlagColumn, {
         country: data?.country,
         code: data?.code
+      })
+    case 'tag-with-tooltip':
+      return h(TagWithTooltip, {
+        tagProps: {
+          value: data.content,
+          icon: data.icon,
+          severity: data.severity,
+        },
+        tooltipText: data.tooltipText
       })
     default:
       throw new Error('Invalid column appearance')
