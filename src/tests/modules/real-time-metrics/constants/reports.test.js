@@ -401,7 +401,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548623571976783',
           dataUnit: 'perSecond',
           dataset: 'httpMetrics',
-          description: 'average request time in a line chart.',
+          description:
+            'Average request duration over time. Displays how long requests take on average, in milliseconds.',
           fields: [],
           groupBy: [],
           aggregations: [
@@ -428,7 +429,7 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548623571976783',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: '',
+          description: 'Sum of requests, categorized by scheme, over the selected period.',
           fields: [],
           groupBy: ['ts', 'scheme'],
           aggregations: [
@@ -456,7 +457,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.',
+            'Sum of requests, broken down by individual HTTP response 2XX, without data aggregation.',
           fields: [],
           groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
@@ -489,7 +490,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.',
+            'Sum of requests, broken down by individual HTTP response 3XX, without data aggregation.',
           fields: [],
           groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
@@ -860,7 +861,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: '',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -891,7 +893,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: '',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -922,7 +925,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: '',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -953,7 +957,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: '',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -1467,7 +1472,8 @@ describe('RealTimeMetricsModule', () => {
           id: '424388331488145487',
           chartOwner: 'azion',
           label: 'Top WAF Threat Requests by IP',
-          description: 'Top 10 IPs that generated the most threats identified by the WAF',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',

@@ -85,11 +85,11 @@ const REPORTS_TEXTS = {
     statusCodes: {
       httpStatusCodes2xx: {
         description:
-          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.'
+          'Sum of requests, broken down by individual HTTP response 2XX, without data aggregation.'
       },
       httpStatusCodes3xx: {
         description:
-          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.'
+          'Sum of requests, broken down by individual HTTP response 3XX, without data aggregation.'
       },
       httpStatusCodes4xx: {
         description:
@@ -128,7 +128,8 @@ const REPORTS_TEXTS = {
           'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.'
       },
       averageRequestTime: {
-        description: 'average request time in a line chart.'
+        description:
+          'Average request duration over time. Displays how long requests take on average, in milliseconds.'
       }
     },
     bandwidthSaving: {
