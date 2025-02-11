@@ -128,7 +128,8 @@ const REPORTS_TEXTS = {
           'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.'
       },
       averageRequestTime: {
-        description: 'Average request duration over time. Displays how long requests take on average, in milliseconds.'
+        description:
+          'Average request duration over time. Displays how long requests take on average, in milliseconds.'
       }
     },
     bandwidthSaving: {

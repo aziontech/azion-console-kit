@@ -401,7 +401,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548623571976783',
           dataUnit: 'perSecond',
           dataset: 'httpMetrics',
-          description: 'Average request duration over time. Displays how long requests take on average, in milliseconds.',
+          description:
+            'Average request duration over time. Displays how long requests take on average, in milliseconds.',
           fields: [],
           groupBy: [],
           aggregations: [
@@ -860,7 +861,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -891,7 +893,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -922,7 +925,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -953,7 +957,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548675837198933',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
           fields: [],
           aggregations: [
             {
@@ -1467,7 +1472,8 @@ describe('RealTimeMetricsModule', () => {
           id: '424388331488145487',
           chartOwner: 'azion',
           label: 'Top WAF Threat Requests by IP',
-          description: 'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
