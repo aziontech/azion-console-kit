@@ -375,19 +375,20 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Total requests made to your domain divided by the HTTP method used. Displays methods Requests Http Method Get, Requests Http Method Post, Requests Http Method Head, and Requests Http Method Others.',
-          fields: [
-            'requestsHttpMethodGet',
-            'requestsHttpMethodPost',
-            'requestsHttpMethodHead',
-            'requestsHttpMethodOthers'
+            'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.',
+          fields: [],
+          groupBy: ['ts', 'requestMethod'],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
           ],
-          groupBy: [],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/requests-by-method',
           id: '357825388709151309',
           isTopX: false,
           label: 'Requests by Method',
-          limit: 5000,
+          limit: 10000,
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',

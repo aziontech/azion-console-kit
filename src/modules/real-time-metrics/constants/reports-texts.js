@@ -125,7 +125,7 @@ const REPORTS_TEXTS = {
     httpMethods: {
       requestsByMethod: {
         description:
-          'Total requests made to your domain divided by the HTTP method used. Displays methods Requests Http Method Get, Requests Http Method Post, Requests Http Method Head, and Requests Http Method Others.'
+          'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.'
       },
       averageRequestTime: {
         description: 'average request time in a line chart.'

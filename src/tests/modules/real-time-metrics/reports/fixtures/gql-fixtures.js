@@ -534,9 +534,10 @@ scheme
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
-        groupBy: [ts]
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, requestMethod]
         orderBy: [ts_ASC]
         filter: {
           tsRange: {
@@ -547,11 +548,9 @@ end: $tsRange_end
 
         }
         ) {
-          requestsHttpMethodGet
-requestsHttpMethodPost
-requestsHttpMethodHead
-requestsHttpMethodOthers
+          sum
 ts
+requestMethod
         }
       }`,
       variables: {
