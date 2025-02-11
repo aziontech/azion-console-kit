@@ -384,14 +384,15 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsHttpMethodGet',
-      'requestsHttpMethodPost',
-      'requestsHttpMethodHead',
-      'requestsHttpMethodOthers'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    fields: [],
+    groupBy: ['ts', 'requestMethod'],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsByMethod
