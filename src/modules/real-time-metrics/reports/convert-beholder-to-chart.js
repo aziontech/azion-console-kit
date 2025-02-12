@@ -415,6 +415,7 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const values = [dataUnit]
 
   const TOP_IMPACTED_URLS_CHART = '1030427483148242'
+  const WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART = '357842851576414808'
 
   data[dataset].forEach((item) => {
     report.id !== TOP_IMPACTED_URLS_CHART
@@ -422,6 +423,13 @@ const formatRotatedBarChartData = ({ report, data }) => {
       : series.push(item[seriesName])
     values.push(item[aggregation] || item[fieldName])
   })
+
+  if (report.id === WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART) {
+    const newSeries = series.map((value) =>
+      typeof value === 'string' ? value.replaceAll('$', '') : value
+    )
+    return [newSeries, values]
+  }
 
   return [series, values]
 }

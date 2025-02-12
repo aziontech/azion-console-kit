@@ -375,7 +375,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.',
+            'Sum of requests for each HTTP method during the selected period. Displays the overall request count for each method.',
           fields: [],
           groupBy: ['ts', 'requestMethod'],
           aggregations: [
@@ -402,7 +402,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'perSecond',
           dataset: 'httpMetrics',
           description:
-            'Average request duration over time. Displays how long requests take on average, in milliseconds.',
+            'Average request duration over time. Displays how long requests take on average, in seconds.',
           fields: [],
           groupBy: [],
           aggregations: [
@@ -457,7 +457,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Sum of requests, broken down by individual HTTP response 2XX, without data aggregation.',
+            'Indicates successful responses to user requests. Displays Request Status Code 200 and other 2xx status codes.',
           fields: [],
           groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
@@ -490,7 +490,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Sum of requests, broken down by individual HTTP response 3XX, without data aggregation.',
+            'Indicates redirections that have occurred with user requests. Displays Request Status Code 300 and other 3xx status codes.',
           fields: [],
           groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
@@ -889,7 +889,7 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the data in percentages.',
           fields: [],
           aggregations: [
             {
@@ -1337,7 +1337,7 @@ describe('RealTimeMetricsModule', () => {
           label: 'Bot Activity Map',
           description: 'Sum of requests identified as bots, presented by the country of origin.',
           aggregationType: 'sum',
-          columns: 6,
+          columns: 12,
           type: 'map',
           xAxis: 'cat',
           isTopX: true,
@@ -1500,7 +1500,7 @@ describe('RealTimeMetricsModule', () => {
           chartOwner: 'azion',
           label: 'Top WAF Threat Requests by IP',
           description:
-            'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
+            'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests.',
           aggregationType: 'sum',
           columns: 6,
           type: 'ordered-bar',
