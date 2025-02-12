@@ -426,7 +426,9 @@ const formatRotatedBarChartData = ({ report, data }) => {
   })
 
   if (report.id === WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART) {
-    const newSeries = series.map((value) => typeof value === 'string' ? value.replaceAll('$', '') : value)
+    const newSeries = series.map((value) =>
+      typeof value === 'string' ? value.replaceAll('$', '') : value
+    )
     return [newSeries, values]
   }
 
