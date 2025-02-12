@@ -874,7 +874,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Top WAF Threat Requests by Country',
     description:
-      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the data in percentages.',
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -1496,7 +1496,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Top WAF Threat Requests by IP',
     description:
-      'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
+      'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests.',
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',

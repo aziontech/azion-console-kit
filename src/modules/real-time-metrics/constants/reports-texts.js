@@ -85,11 +85,11 @@ const REPORTS_TEXTS = {
     statusCodes: {
       httpStatusCodes2xx: {
         description:
-          'Sum of requests, broken down by individual HTTP response 2XX, without data aggregation.'
+          'Indicates successful responses to user requests. Displays Request Status Code 200 and other 2xx status codes.'
       },
       httpStatusCodes3xx: {
         description:
-          'Sum of requests, broken down by individual HTTP response 3XX, without data aggregation.'
+          'Indicates redirections that have occurred with user requests. Displays Request Status Code 300 and other 3xx status codes.'
       },
       httpStatusCodes4xx: {
         description:
@@ -125,11 +125,11 @@ const REPORTS_TEXTS = {
     httpMethods: {
       requestsByMethod: {
         description:
-          'Sum of of requests for each HTTP method during the selected time period. Displays the overall request count for each method.'
+          'Sum of requests for each HTTP method during the selected period. Displays the overall request count for each method.'
       },
       averageRequestTime: {
         description:
-          'Average request duration over time. Displays how long requests take on average, in milliseconds.'
+          'Average request duration over time. Displays how long requests take on average, in seconds.'
       }
     },
     bandwidthSaving: {
