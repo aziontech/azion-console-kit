@@ -384,14 +384,15 @@ const REPORTS = [
     rotated: false,
     dataset: 'httpMetrics',
     dataUnit: 'count',
-    limit: 5000,
-    fields: [
-      'requestsHttpMethodGet',
-      'requestsHttpMethodPost',
-      'requestsHttpMethodHead',
-      'requestsHttpMethodOthers'
+    limit: 10000,
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
     ],
-    groupBy: [],
+    fields: [],
+    groupBy: ['ts', 'requestMethod'],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsByMethod
@@ -427,7 +428,7 @@ const REPORTS = [
     id: '357825388709151312',
     chartOwner: 'azion',
     label: 'Requests by Scheme',
-    description: '',
+    description: 'Sum of requests, categorized by scheme, over the selected period.',
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -899,7 +900,8 @@ const REPORTS = [
     id: '357842851576414806',
     chartOwner: 'azion',
     label: 'Top WAF Threat Requests by Country',
-    description: '',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
     aggregationType: 'sum',
     columns: 6,
     type: 'pie',
@@ -930,7 +932,8 @@ const REPORTS = [
     id: '357842851576414807',
     chartOwner: 'azion',
     label: 'Top WAF Threat Requests by Country',
-    description: '',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -961,7 +964,8 @@ const REPORTS = [
     id: '357842851576414808',
     chartOwner: 'azion',
     label: 'WAF Threat Requests by Family Attack',
-    description: '',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
@@ -992,7 +996,8 @@ const REPORTS = [
     id: '357842851576414809',
     chartOwner: 'azion',
     label: 'WAF Threat Requests by Host',
-    description: '',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
     aggregationType: 'sum',
     columns: 12,
     type: 'line',
@@ -1517,7 +1522,8 @@ const REPORTS = [
     id: '424388331488145487',
     chartOwner: 'azion',
     label: 'Top WAF Threat Requests by IP',
-    description: 'Top 10 IPs that generated the most threats identified by the WAF',
+    description:
+      'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests',
     aggregationType: 'sum',
     columns: 6,
     type: 'ordered-bar',
