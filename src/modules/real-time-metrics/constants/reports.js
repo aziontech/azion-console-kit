@@ -1328,7 +1328,7 @@ const REPORTS = [
     label: 'Bot Activity Map',
     description: REPORTS_TEXTS.botManager.botManagerOverview.botActivityMap.description,
     aggregationType: 'sum',
-    columns: 6,
+    columns: 12,
     type: 'map',
     xAxis: 'cat',
     isTopX: true,

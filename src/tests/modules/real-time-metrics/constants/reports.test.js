@@ -1310,7 +1310,7 @@ describe('RealTimeMetricsModule', () => {
           label: 'Bot Activity Map',
           description: 'Sum of requests identified as bots, presented by the country of origin.',
           aggregationType: 'sum',
-          columns: 6,
+          columns: 12,
           type: 'map',
           xAxis: 'cat',
           isTopX: true,
