@@ -172,6 +172,8 @@
       const operatorType = filterSelected.operator[0].value.type
       if (['Boolean', 'StringObject'].includes(operatorType)) {
         data.value = selectedValue
+      } else if (['Like', 'Ilike'].includes(operatorSelected.value)) {
+        data.value = `%${selectedValue}%`
       } else {
         data.value = selectedValue ?? { begin, end }
       }
