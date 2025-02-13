@@ -71,16 +71,5 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
       'have.text',
       recordTypeFixtures.description
     )
-
-    // Cleanup
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge DNS Record successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromList({ entityName: zoneName, productName: 'Edge DNS' }).then(() => {
-      cy.verifyToast('Your Edge DNS has been deleted')
-    })
   })
 })
