@@ -43,6 +43,12 @@ describe('RealTimeMetricsModule', () => {
                   label: 'Bandwidth Saving',
                   path: 'bandwidth-saving',
                   dataset: 'httpMetrics'
+                },
+                {
+                  dataset: 'httpBreakdownMetrics',
+                  id: '357549179454620240',
+                  label: 'Request Breakdown',
+                  path: 'request-breakdown'
                 }
               ]
             },

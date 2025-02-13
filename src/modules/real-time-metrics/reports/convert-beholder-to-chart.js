@@ -471,6 +471,8 @@ const formatListChart = ({ report, data }) => {
   if (!dataset.length) return { data: [], columns: [] }
 
   const { fields, aggregations } = report
+  const fieldsHandle = [...new Set(fields)]
+
   const aggregationKey = aggregations[0]?.aggregation
 
   if (!aggregationKey) return { data: [], columns: [] }
@@ -481,12 +483,12 @@ const formatListChart = ({ report, data }) => {
     [aggregationKey]: formatDataUnit(item[aggregationKey], report)?.value
   }))
 
-  fields.push(aggregationKey)
+  fieldsHandle.push(aggregationKey)
 
   // Define as colunas com os nomes corretos
-  const columns = fields.map((field) => ({
+  const columns = fieldsHandle.map((field) => ({
     field,
-    header: field === aggregationKey ? 'Total' : camelToTitle(field)
+    header: CHART_RULES.COLUMN_NAMES_FIELD[field] || camelToTitle(field)
   }))
 
   return [{ data: formattedData, columns }]

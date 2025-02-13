@@ -103,6 +103,12 @@ const REPORTS_TEXTS = {
         description: 'Top 10 Status and Upstream Status that had the most requests.'
       }
     },
+    requestBreakdown: {
+      iPAddressInformation: {
+        description:
+          'Displays the distribution of requests by region, country, ASN, and individual IP address.'
+      }
+    },
     waf: {
       threatsVsRequests: {
         description:

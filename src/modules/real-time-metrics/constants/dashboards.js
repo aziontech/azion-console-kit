@@ -53,6 +53,12 @@ const PAGES_DASHBOARDS = {
           label: 'Bandwidth Saving',
           path: 'bandwidth-saving',
           dataset: 'httpMetrics'
+        },
+        {
+          id: '357549179454620240',
+          label: 'Request Breakdown',
+          path: 'request-breakdown',
+          dataset: 'httpBreakdownMetrics'
         }
       ]
     },

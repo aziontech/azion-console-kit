@@ -618,6 +618,34 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357549179454620240',
+          dataUnit: 'count',
+          dataset: 'httpBreakdownMetrics',
+          description:
+            'Displays the distribution of requests by region, country, ASN, and individual IP address.',
+          fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+          groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151326',
+          isTopX: false,
+          label: 'IP Address Information',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'list',
+          variationType: 'inverse',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,
           dashboardId: '357549371218199219',
