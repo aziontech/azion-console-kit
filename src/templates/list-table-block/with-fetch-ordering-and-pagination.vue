@@ -625,6 +625,10 @@
   }
 
   const reload = async (query = {}) => {
+    if (!savedOrdering.value) {
+      savedOrdering.value = props.defaultOrderingFieldName
+    }
+
     const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
