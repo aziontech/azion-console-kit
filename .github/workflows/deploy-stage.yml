@@ -27,8 +27,8 @@ jobs:
 
       - name: Download Azion CLI
         run: |
-          wget https://github.com/aziontech/azion/releases/download/1.36.1/azion_1.36.1_linux_amd64.apk
-          apk add --allow-untrusted azion_1.36.1_linux_amd64.apk
+          wget https://github.com/aziontech/azion/releases/download/2.5.3/azion_2.5.3_linux_amd64.apk
+          apk add --allow-untrusted azion_2.5.3_linux_amd64.apk
 
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
