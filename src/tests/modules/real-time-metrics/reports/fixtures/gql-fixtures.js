@@ -1811,6 +1811,40 @@ sum
         tsRange_end: '2024-12-01T12:00:00'
       }
     }
+  },
+  {
+    id: '357825388709151326',
+    label: 'IP Address Information',
+    description:
+      'Displays the distribution of requests by region, country, ASN, and individual IP address.',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpBreakdownMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [remoteAddress, geolocAsn, geolocCountryName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          remoteAddress
+geolocAsn
+geolocCountryName
+sum
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
   }
 ]
 

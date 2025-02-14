@@ -621,6 +621,39 @@ const REPORTS = [
     variationType: 'regular',
     helpCenterPath: HELP_CENTER_URLS.edgeApplications.bandwidthSaving.bandwidthSaving
   },
+
+  /**
+   * BUILD
+   * Resquest Breakdown
+   */
+  {
+    id: '357825388709151326',
+    chartOwner: 'azion',
+    label: 'IP Address Information',
+    description: REPORTS_TEXTS.edgeApplications.requestBreakdown.iPAddressInformation.description,
+    aggregationType: 'sum',
+    columns: 12,
+    type: 'list',
+    xAxis: 'cat',
+    isTopX: false,
+    rotated: false,
+    dataset: 'httpBreakdownMetrics',
+    dataUnit: 'count',
+    limit: 10,
+    fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+    groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+    aggregations: [
+      {
+        aggregation: 'sum',
+        variable: 'requests'
+      }
+    ],
+    orderDirection: 'DESC',
+    variationType: 'inverse',
+    dashboardId: '357549179454620240',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+  },
+
   /**
    * BUILD
    * Tiered Cache - Caching Offload
