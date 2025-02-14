@@ -108,7 +108,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
         tagProps: {
           value: data.content,
           icon: data.icon,
-          severity: data.severity,
+          severity: data.severity
         },
         tooltipText: data.tooltipText
       })
