@@ -1823,7 +1823,7 @@ sum
         limit: 10
         aggregate: {sum: requests 
 }
-        groupBy: [remoteAddress, geolocAsn, geolocCountryName]
+        groupBy: [remoteAddress, geolocAsn, geolocCountryName, geolocRegionName]
         orderBy: [sum_DESC]
         filter: {
           tsRange: {
@@ -1837,6 +1837,7 @@ end: $tsRange_end
           remoteAddress
 geolocAsn
 geolocCountryName
+geolocRegionName
 sum
         }
       }`,

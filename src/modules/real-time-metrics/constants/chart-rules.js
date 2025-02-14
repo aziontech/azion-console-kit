@@ -19,7 +19,8 @@ const MEAN_LINE_LABEL = 'Mean Line'
 const COLUMN_NAMES_FIELD = {
   sum: 'Total',
   geolocCountryName: 'Country',
-  geolocAsn: 'ASN'
+  geolocAsn: 'ASN',
+  geolocRegionName: 'Region'
 }
 
 const DATA_VOLUME = {

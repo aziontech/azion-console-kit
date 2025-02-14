@@ -631,8 +631,8 @@ describe('RealTimeMetricsModule', () => {
           dataset: 'httpBreakdownMetrics',
           description:
             'Displays the distribution of requests by region, country, ASN, and individual IP address.',
-          fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
-          groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+          fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+          groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
           id: '357825388709151326',
           isTopX: false,

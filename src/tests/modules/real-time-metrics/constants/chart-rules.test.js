@@ -31,6 +31,7 @@ describe('RealTimeMetricsModule', () => {
         COLUMN_NAMES_FIELD: {
           geolocAsn: 'ASN',
           geolocCountryName: 'Country',
+          geolocRegionName: 'Region',
           sum: 'Total'
         },
         LABEL: {

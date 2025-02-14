@@ -640,8 +640,8 @@ const REPORTS = [
     dataset: 'httpBreakdownMetrics',
     dataUnit: 'count',
     limit: 10,
-    fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
-    groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName'],
+    fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+    groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
     aggregations: [
       {
         aggregation: 'sum',
