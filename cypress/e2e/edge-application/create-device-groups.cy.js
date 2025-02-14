@@ -48,14 +48,4 @@ describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.list.searchInput).type(`${fixtures.deviceGroupName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.deviceGroupName)
   })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-  })
 })

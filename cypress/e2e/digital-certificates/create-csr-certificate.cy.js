@@ -41,14 +41,4 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.digitalCertificates.copyCsrButton).click()
     cy.get(selectors.digitalCertificates.copyCsrMessage).should('have.text', 'Successfully copied!')
   })
-
-  afterEach(() => {
-    // Delete the digital certificate
-    cy.deleteEntityFromList({
-      entityName: digitalCertificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
-  })
 })

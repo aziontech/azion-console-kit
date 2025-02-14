@@ -46,11 +46,4 @@ describe('Data Stream spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.dataStream.list.columnName('endpointType')).should('have.text', 'splunk')
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
   })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
-      cy.verifyToast('Data Stream successfully deleted')
-    })
-  })
 })
