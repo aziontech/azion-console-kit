@@ -580,7 +580,8 @@ describe('RealTimeMetricsModule', () => {
           dashboardId: '357548642810200653',
           dataUnit: 'count',
           dataset: 'httpMetrics',
-          description: 'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
+          description:
+            'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
           fields: ['status', 'upstreamStatus'],
           groupBy: ['status', 'upstreamStatus'],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',

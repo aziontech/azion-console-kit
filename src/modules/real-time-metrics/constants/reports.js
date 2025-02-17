@@ -573,7 +573,8 @@ const REPORTS = [
     id: '357825388709151322',
     chartOwner: 'azion',
     label: 'Requests by Status and Upstream Status ',
-    description: 'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
+    description:
+      'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
     aggregationType: 'sum',
     columns: 6,
     type: 'list',
