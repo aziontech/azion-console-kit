@@ -110,20 +110,5 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
-
-    // Cleanup - Remove the rule engine
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

@@ -1,6 +1,7 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const editRecordsService = async (payload) => {
   const adaptPayload = adapt(payload)
@@ -18,35 +19,12 @@ const adapt = (payload) => {
   return {
     record_type: payload.selectedRecordType,
     entry: payload.name,
-    answers_list: [payload.value],
+    answers_list: payload.value.split('\n'),
     ttl: payload.ttl,
     policy: payload.selectedPolicy,
     weight: payload.weight,
     description: payload.description
   }
-}
-
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const apiValidationErros = extractErrorKey(httpResponse.body, 'errors')
-
-  const errorMessages = [apiValidationErros]
-  const errorMessage = errorMessages.find((error) => !!error)
-
-  return errorMessage
 }
 
 /**
@@ -60,18 +38,9 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return 'Edge DNS Record has been updated'
-    case 400:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
 }

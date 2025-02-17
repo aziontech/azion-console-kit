@@ -13,6 +13,19 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
 
 const adapt = (httpResponse) => {
   const origin = httpResponse.body?.results
+  if (origin.origin_type === 'live_ingest') {
+    return {
+      body: {
+        originId: origin.origin_id,
+        originKey: origin.origin_key,
+        name: origin.name,
+        originType: origin.origin_type,
+        streamingEndpoint: origin.streaming_endpoint
+      },
+      statusCode: httpResponse.statusCode
+    }
+  }
+
   const parsedBody = {
     originId: origin.origin_id,
     originKey: origin.origin_key,

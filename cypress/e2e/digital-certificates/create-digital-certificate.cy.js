@@ -30,14 +30,4 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.list.filteredRow.column('name')).contains(digitalCertificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
-
-  afterEach(() => {
-    // Delete the digital certificate
-    cy.deleteEntityFromList({
-      entityName: digitalCertificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
-  })
 })

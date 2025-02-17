@@ -188,6 +188,11 @@
       }
 
       const accountData = accountStore.account
+
+      if (!accountData.postal_code || !accountData.country) {
+        throw new Error('Account address are required to add a payment method.')
+      }
+
       const payload = {
         card_address_zip: accountData.postal_code,
         card_country: accountData.country,
@@ -204,8 +209,8 @@
       showToast('success', response.feedback)
       toggleDrawerVisibility(false)
     } catch (error) {
-      emit('onError', error)
-      showToast('error', error)
+      emit('onError', error.message)
+      showToast('error', error.message)
     } finally {
       isSubmitting.value = false
     }

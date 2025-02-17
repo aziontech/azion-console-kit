@@ -1,19 +1,19 @@
-import { makeEdgeDNSBaseUrl } from '@/services/edge-dns-services/make-edge-dns-base-url'
+import { makeEdgeDNSRecordsBaseUrl } from '@/services/edge-dns-records-services/v4/make-edge-dns-records-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = makeEdgeDNSBaseUrl
+  const sut = makeEdgeDNSRecordsBaseUrl
 
   return {
     sut
   }
 }
 
-describe('EdgeDnsServices', () => {
+describe('EdgeDnsServicesV4', () => {
   it('should return the API base url to edge dns service', () => {
     const { sut } = makeSut()
-    const version = 'v3'
-    const correctApiUrl = `${version}/intelligent_dns`
+    const version = 'v4'
+    const correctApiUrl = `${version}/edge_dns/zones`
 
     const baseUrl = sut()
 

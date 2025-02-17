@@ -1,25 +1,22 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
 
 export const loadRecordsService = async ({ id, edgeDNSId }) => {
-  const recordId = id
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSRecordsBaseUrl()}/${edgeDNSId}/records?page_size=200`,
+    url: `${makeEdgeDNSRecordsBaseUrl()}/${edgeDNSId}/records/${id}`,
     method: 'GET'
   })
 
-  httpResponse = adapt(httpResponse, recordId)
+  httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (httpResponse, recordId) => {
-  const record = httpResponse.body.results.records.find(
-    (record) => record.record_id === Number(recordId)
-  )
+const adapt = (httpResponse) => {
+  const record = httpResponse.body.data
 
   const parsedRecord = {
-    id: record.record_id,
+    id: record.id,
     name: record.entry,
     selectedRecordType: record.record_type,
     value: record.answers_list.join('\n'),

@@ -40,21 +40,6 @@ const cacheConfig = [
     }
   },
   {
-    name: 'Marketplace - Cache',
-    stale: false,
-    queryStringSort: false,
-    cacheByQueryString: {
-      option: 'varies'
-    },
-    methods: {
-      post: false,
-      options: false
-    },
-    edge: {
-      maxAgeSeconds: 60 * 60 * 24 * 2 // 2 days
-    }
-  },
-  {
     name: 'Cities - Cache',
     stale: false,
     queryStringSort: false,
@@ -159,7 +144,7 @@ const backRules = [
         subject: 'request_uri'
       },
       rewrite: `/marketplace/api/%{captured[1]}`,
-      setCache: 'Marketplace - Cache'
+      // setCache: 'Marketplace - Cache'
     }
   },
   {

@@ -5,6 +5,9 @@
   import CopyKeyDialog from '@templates/dialog-copy-key'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
+  import { onMounted } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { loadProductsListService } from '@/services/contract-services'
   import { useDialog } from 'primevue/usedialog'
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref } from 'vue'
@@ -47,14 +50,28 @@
     }
   })
 
+  onMounted(async () => {
+    const products = await loadProductsListService({ clientId: accountStore.account.client_id })
+    if (products.slugs.includes('live_ingest')) {
+      hasLiveIngest.value = true
+    }
+    originTypesOptions.value.push({
+      label: 'Live Ingest',
+      value: 'live_ingest',
+      disabled: !hasLiveIngest.value
+    })
+  })
+
+  const accountStore = useAccountStore()
   const toast = useToast()
   const showCreateOriginDrawer = ref(false)
+  const hasLiveIngest = ref(false)
   const showEditOriginDrawer = ref(false)
   const debouncedDrawerAnimate = 300
   const loadCreateOriginDrawer = refDebounced(showCreateOriginDrawer, debouncedDrawerAnimate)
   const loadEditOriginDrawer = refDebounced(showEditOriginDrawer, debouncedDrawerAnimate)
   const selectedOriginToEdit = ref('')
-  const ORIGIN_TYPES_OPTIONS = [
+  const originTypesOptions = ref([
     {
       label: 'Single Origin',
       value: 'single_origin',
@@ -70,7 +87,7 @@
       value: 'object_storage',
       disabled: false
     }
-  ]
+  ])
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -109,11 +126,11 @@
       .string()
       .label('Host Header')
       .when('originType', {
-        is: (originType) => originType !== 'object_storage',
+        is: (originType) => originType !== 'object_storage' && originType !== 'live_ingest',
         then: (schema) => schema.required()
       }),
     addresses: yup.array().when('originType', {
-      is: (originType) => originType === 'object_storage',
+      is: (originType) => originType === 'object_storage' || originType === 'live_ingest',
       then: (schema) => schema.optional(),
       otherwise: (schema) =>
         schema.of(
@@ -130,6 +147,13 @@
         return /^(\/\.?[\w][\w.-]*)+$/.test(value) || !value
       })
       .label('Origin Path'),
+    streamingEndpoint: yup
+      .string()
+      .label('Streaming Endpoint')
+      .when('originType', {
+        is: (originType) => originType === 'live_ingest',
+        then: (schema) => schema.required()
+      }),
     hmacAuthentication: yup.boolean(),
     hmacRegionName: yup
       .string()
@@ -203,10 +227,6 @@
     emit('onSuccess')
   }
 
-  const closeDrawerEdit = () => {
-    showEditOriginDrawer.value = false
-  }
-
   const handleTrackCreation = () => {
     tracker.product
       .productCreated({
@@ -235,8 +255,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   const handleFailedCreateOrigin = (error) => {
@@ -289,7 +307,7 @@
       <FormFieldsDrawerOrigin
         ref="createFormDrawer"
         :disabledFields="disabledFields"
-        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :listOrigins="originTypesOptions"
         :copyToClipboard="copyToKey"
       />
     </template>
@@ -310,7 +328,7 @@
       <FormFieldsDrawerOrigin
         isEditMode
         :disabledFields="disabledFields"
-        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :listOrigins="originTypesOptions"
         :copyToClipboard="copyToKey"
       />
     </template>
