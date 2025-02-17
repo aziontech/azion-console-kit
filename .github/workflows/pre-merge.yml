@@ -3,9 +3,6 @@ name: Pre-merge
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - dev
-      - main
   push:
     branches:
       - dev
@@ -161,7 +158,6 @@ jobs:
 
   sonarcloud:
     needs: [run-tests, download_and_merge]
-    needs: [run-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
