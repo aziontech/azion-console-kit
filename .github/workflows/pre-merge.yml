@@ -5,12 +5,10 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
-      - freezing
       - main
   push:
     branches:
       - dev
-      - freezing
   workflow_dispatch:
 
 env:
