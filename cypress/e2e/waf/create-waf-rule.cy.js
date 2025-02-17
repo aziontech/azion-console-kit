@@ -37,11 +37,4 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
       'File uploadEvading TricksShow more (6)'
     )
   })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
-  })
 })

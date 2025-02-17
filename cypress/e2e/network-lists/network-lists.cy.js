@@ -234,11 +234,4 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.searchInput).type(`${networkListName}{enter}`)
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
   })
-
-  afterEach(() => {
-    // Delete the network list
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Network list successfully deleted')
-    })
-  })
 })

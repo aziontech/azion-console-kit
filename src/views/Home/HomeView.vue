@@ -42,7 +42,8 @@
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
-  const user = useAccountStore().accountData
+  const { accountData, isBannerVisible } = useAccountStore()
+  const user = accountData
 
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
@@ -135,6 +136,7 @@
     <template #content>
       <section class="w-full flex flex-col gap-6 lg:gap-8">
         <InlineMessage
+          v-if="isBannerVisible"
           class="p-3 gap-1"
           severity="info"
           data-testid="message-deprecation"
