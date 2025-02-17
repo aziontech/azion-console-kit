@@ -222,15 +222,16 @@ const formatFilterParameter = (variables, fields) => {
     let type
     if (key.startsWith('and_')) {
       const fieldKey = key.replace('and_', '')
-      const field = fields.find(({ valueField, operator }) => `${valueField}${operator}` === fieldKey)
+      const field = fields.find(
+        ({ valueField, operator }) => `${valueField}${operator}` === fieldKey
+      )
       type = field && field?.type ? field.type : getGraphQLType(variables[key])
     } else {
       type = getGraphQLType(variables[key])
     }
 
     return `\t$${key}: ${type}!`
-  }
-  )
+  })
 }
 
 export default convertGQL

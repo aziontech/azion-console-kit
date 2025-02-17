@@ -29,9 +29,7 @@ describe('convertGQL', () => {
           { value: 'value4', label: 'test2' }
         ]
       },
-      fields: [
-        { valueField: 'value2', operator: 'Eq', value: 'value2' }
-      ]
+      fields: [{ valueField: 'value2', operator: 'Eq', value: 'value2' }]
     }
 
     const { sut } = makeSut()
@@ -51,7 +49,7 @@ describe('convertGQL', () => {
 
   it('should convert filter and table to gql body when only filter is provided', () => {
     const filter = {
-      tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' },
+      tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' }
     }
 
     const { sut } = makeSut()
