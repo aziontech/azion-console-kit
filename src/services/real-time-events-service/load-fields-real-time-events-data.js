@@ -10,6 +10,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
  */
 export async function loadFieldsEventsData({ query, signal }) {
   const response = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: {

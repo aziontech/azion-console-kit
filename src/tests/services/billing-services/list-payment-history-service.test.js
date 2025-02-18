@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 import { getStaticUrlsByEnvironment } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
-import graphQLApi from '@/services/axios/makeGraphQl'
 import { getLastDayMonth } from '@/helpers/payment-history'
 
 const fixtures = {
@@ -128,12 +127,12 @@ describe('BillingServices', () => {
     const { sut } = makeSut()
     await sut()
 
-    expect(requestSpy).toHaveBeenCalledWith(
-      {
-        url: 'accounting',
-        method: 'POST',
-        body: {
-          query: `
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: 'v4/accounting/graphql',
+      method: 'POST',
+      baseURL: '/',
+      body: {
+        query: `
         query {
           accountingDetail (
             filter: {
@@ -152,10 +151,8 @@ describe('BillingServices', () => {
             metricSlug
           }
         }`
-        }
-      },
-      graphQLApi
-    )
+      }
+    })
   })
 
   it('should parse correctly payment history for regular accounts', async () => {

@@ -1,4 +1,3 @@
 export const makeBeholderBaseUrl = () => {
-  const version = 'v3'
-  return `${version}/metrics/graphql`
+  return `v4/metrics/graphql`
 }

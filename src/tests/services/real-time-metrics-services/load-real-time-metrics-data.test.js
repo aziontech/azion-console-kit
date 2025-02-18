@@ -27,13 +27,14 @@ describe('RealTimeMetricsServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+    const version = 'v4'
 
     await sut({ query: fixtures.query, signal: fixtures.signal })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/metrics/graphql`,
       method: 'POST',
+      baseURL: '/',
       body: fixtures.formattedQuery,
       signal: fixtures.signal
     })

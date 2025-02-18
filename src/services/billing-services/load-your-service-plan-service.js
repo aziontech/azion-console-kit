@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
-
+import { makeBillingBaseUrl } from './make-billing-base-url'
 export const loadYourServicePlanService = async (disclaimer = '') => {
   const { lastDayOfMonth, firstDayOfMonth } = getFirstDayCurrentDate()
 
@@ -25,14 +24,12 @@ export const loadYourServicePlanService = async (disclaimer = '') => {
       }`
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `/billing`,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: makeBillingBaseUrl(),
+    method: 'POST',
+    body: payload
+  })
 
   httpResponse = adapt(httpResponse, disclaimer)
 

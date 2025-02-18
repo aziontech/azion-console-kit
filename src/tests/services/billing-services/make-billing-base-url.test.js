@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('BillingServices', () => {
   it('should return the API base url to billing service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'billing'
+    const correctApiUrl = 'v4/billing/graphql'
 
     const baseUrl = sut()
 

@@ -1,5 +1,4 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
 
@@ -17,14 +16,12 @@ export const loadInvoiceLastUpdatedService = async () => {
     }`
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeBillingBaseUrl()}`,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeBillingBaseUrl()}`,
+    method: 'POST',
+    body: payload
+  })
 
   httpResponse = adapt(httpResponse)
 
