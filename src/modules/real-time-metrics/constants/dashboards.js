@@ -53,6 +53,12 @@ const PAGES_DASHBOARDS = {
           label: 'Bandwidth Saving',
           path: 'bandwidth-saving',
           dataset: 'httpMetrics'
+        },
+        {
+          id: '357549179454620240',
+          label: 'Request Breakdown',
+          path: 'request-breakdown',
+          dataset: 'httpBreakdownMetrics'
         }
       ]
     },
@@ -145,6 +151,20 @@ const PAGES_DASHBOARDS = {
           label: 'Breakdown',
           path: 'breakdown',
           dataset: 'botManagerBreakdownMetrics'
+        }
+      ]
+    },
+    {
+      id: 10,
+      label: 'Threats Breakdown',
+      path: 'threats',
+      groupId: 2,
+      dashboards: [
+        {
+          id: '357548675837198934',
+          label: 'Threats Breakdown',
+          path: 'breakdown',
+          dataset: 'httpBreakdownMetrics'
         }
       ]
     }

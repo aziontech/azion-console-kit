@@ -26,6 +26,8 @@ const HELP_CENTER_URLS = {
         '/real-time-metrics/edge-applications/requests/missed-requests-per-second',
       missedRequests: '/real-time-metrics/edge-applications/requests/missed-requests',
       requestsByMethod: '/real-time-metrics/edge-applications/requests/requests-by-method',
+      averageRequestTime: '/real-time-metrics/edge-applications/requests/average-request-time',
+      requestByScheme: '/real-time-metrics/edge-applications/requests/request-by-scheme',
       requestsOffloaded: '/real-time-metrics/edge-applications/requests/requests-offloaded',
       requestsPerSecondOffloaded:
         '/real-time-metrics/edge-applications/requests/requests-per-second-offloaded',
@@ -40,7 +42,8 @@ const HELP_CENTER_URLS = {
       httpStatusCodes2xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
       httpStatusCodes3xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
       httpStatusCodes4xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-4xx',
-      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx'
+      httpStatusCodes5xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-5xx',
+      statusUpstream: '/real-time-metrics/edge-applications/status-codes/status-upstream'
     }
   },
   edgeFunctions: {
@@ -84,6 +87,7 @@ const HELP_CENTER_URLS = {
       botHits: '/real-time-metrics/bot-manager-advanced/overview/bot-hits',
       transactions: '/real-time-metrics/bot-manager-advanced/overview/transactions',
       botTraffic: '/real-time-metrics/bot-manager-advanced/overview/bot-traffic',
+      topBotTraffic: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
       topBotAction: '/real-time-metrics/bot-manager-advanced/overview/top-bot-action',
       botCaptchaLine: '/real-time-metrics/bot-manager-advanced/overview/bot-captcha-line-graph',
       topBotCaptchaPie:
@@ -97,6 +101,9 @@ const HELP_CENTER_URLS = {
       topBadBotIps: '/real-time-metrics/bot-manager-advanced/breakdown/top-bad-bot-ips',
       topImpactedUrls: '/real-time-metrics/bot-manager-advanced/breakdown/top-impacted-urls'
     }
+  },
+  threatsBreakdown: {
+    threatsRequestsByIps: '/real-time-metrics/threats/breakdown'
   }
 }
 
