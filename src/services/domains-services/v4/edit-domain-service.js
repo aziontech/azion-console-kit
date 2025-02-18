@@ -34,7 +34,8 @@ const adapt = (payload) => {
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
     active: payload.active,
     tls: {
-      minimum_version: null
+      minimum_version: null,
+      ciphers: null
     },
     protocols: {
       http: {
