@@ -1,6 +1,6 @@
 <script setup>
   import c3 from 'c3'
-  import { onMounted } from 'vue'
+  import { onMounted, computed } from 'vue'
   import { FormatC3GraphProps } from '@modules/real-time-metrics/chart'
 
   const props = defineProps({
@@ -27,11 +27,34 @@
       ...c3Props
     })
   }
+
+  const largeTooltipClass = computed(() => {
+    if (props.chartData?.largeTooltip) {
+      return 'large-tooltip'
+    }
+    return ''
+  })
 </script>
 
 <template>
   <div
     class="[&>svg]:w-auto [&>svg]:flex"
+    :class="largeTooltipClass"
     :id="`line-chart-${props.chartData?.id}`"
   />
 </template>
+
+<style>
+  .large-tooltip .c3-tooltip-container {
+    max-height: 400px !important;
+    max-width: 100% !important;
+  }
+
+  .large-tooltip .c3-tooltip tbody {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-height: 400px;
+    gap: 5px;
+  }
+</style>

@@ -16,6 +16,13 @@ const SCREEN_XSMALL_BREAKPOINT = 540
 
 const MEAN_LINE_LABEL = 'Mean Line'
 
+const COLUMN_NAMES_FIELD = {
+  sum: 'Total',
+  geolocCountryName: 'Country',
+  geolocAsn: 'ASN',
+  geolocRegionName: 'Region'
+}
+
 const DATA_VOLUME = {
   tera: 1e12,
   giga: 1073741824,
@@ -82,7 +89,8 @@ const CHART_RULES = {
   BOTTOM_LEGEND_PADDING,
   BASE_COLOR_PATTERNS,
   MEAN_LINE_PATTERN,
-  GAUGE_COLOR_SCHEMA
+  GAUGE_COLOR_SCHEMA,
+  COLUMN_NAMES_FIELD
 }
 
 export default CHART_RULES
