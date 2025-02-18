@@ -58,6 +58,10 @@
     loadEdgeFirewallService: {
       type: Function,
       required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
     }
   })
 
