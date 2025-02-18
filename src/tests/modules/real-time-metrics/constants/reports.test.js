@@ -375,19 +375,75 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Total requests made to your domain divided by the HTTP method used. Displays methods Requests Http Method Get, Requests Http Method Post, Requests Http Method Head, and Requests Http Method Others.',
-          fields: [
-            'requestsHttpMethodGet',
-            'requestsHttpMethodPost',
-            'requestsHttpMethodHead',
-            'requestsHttpMethodOthers'
+            'Sum of requests for each HTTP method during the selected period. Displays the overall request count for each method.',
+          fields: [],
+          groupBy: ['ts', 'requestMethod'],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
           ],
-          groupBy: [],
           helpCenterPath: '/real-time-metrics/edge-applications/requests/requests-by-method',
           id: '357825388709151309',
           isTopX: false,
           label: 'Requests by Method',
-          limit: 5000,
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'avg',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548623571976783',
+          dataUnit: 'perSecond',
+          dataset: 'httpMetrics',
+          description:
+            'Average request duration over time. Displays how long requests take on average, in seconds.',
+          fields: [],
+          groupBy: [],
+          aggregations: [
+            {
+              aggregation: 'avg',
+              variable: 'requestTime'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151310',
+          variationType: 'inverse',
+          isTopX: false,
+          label: 'Average Request Time',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548623571976783',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description: 'Sum of requests, categorized by scheme, over the selected period.',
+          fields: [],
+          groupBy: ['ts', 'scheme'],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/request-by-scheme',
+          id: '357825388709151312',
+          variationType: 'inverse',
+          isTopX: false,
+          label: 'Requests by Scheme',
+          limit: 10000,
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',
@@ -401,19 +457,26 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.',
-          fields: [
-            'requestsStatusCode200',
-            'requestsStatusCode204',
-            'requestsStatusCode206',
-            'requestsStatusCode2xx'
-          ],
-          groupBy: [],
+            'Indicates successful responses to user requests. Displays Request Status Code 200 and other 2xx status codes.',
+          fields: [],
+          groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
           id: '357824919768138325',
           isTopX: false,
           label: 'HTTP Status Codes 2XX',
-          limit: 5000,
+          limit: 10000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            statusRange: {
+              begin: 200,
+              end: 299
+            }
+          },
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',
@@ -427,19 +490,26 @@ describe('RealTimeMetricsModule', () => {
           dataUnit: 'count',
           dataset: 'httpMetrics',
           description:
-            'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.',
-          fields: [
-            'requestsStatusCode301',
-            'requestsStatusCode302',
-            'requestsStatusCode304',
-            'requestsStatusCode3xx'
-          ],
-          groupBy: [],
+            'Indicates redirections that have occurred with user requests. Displays Request Status Code 300 and other 3xx status codes.',
+          fields: [],
+          groupBy: ['ts', 'status'],
           helpCenterPath: '/real-time-metrics/edge-applications/status-codes/http-status-codes-3xx',
           id: '357825000731837013',
           isTopX: false,
           label: 'HTTP Status Codes 3XX',
-          limit: 5000,
+          limit: 10000,
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            statusRange: {
+              begin: 300,
+              end: 399
+            }
+          },
           orderDirection: 'ASC',
           rotated: false,
           type: 'line',
@@ -499,6 +569,34 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548642810200653',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description:
+            'Sum of processed requests, broken down by the top status and upstream status categories responsible for the most flagged requests.',
+          fields: ['status', 'upstreamStatus'],
+          groupBy: ['status', 'upstreamStatus'],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151322',
+          isTopX: false,
+          label: 'Requests by Status and Upstream Status ',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'list',
+          variationType: 'inverse',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
           chartOwner: 'azion',
           columns: 6,
           dashboardId: '357549179454620239',
@@ -518,6 +616,34 @@ describe('RealTimeMetricsModule', () => {
           type: 'line',
           variationType: 'regular',
           xAxis: 'ts'
+        },
+        {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357549179454620240',
+          dataUnit: 'count',
+          dataset: 'httpBreakdownMetrics',
+          description:
+            'Displays the distribution of requests by region, country, ASN, and individual IP address.',
+          fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+          groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          id: '357825388709151326',
+          isTopX: false,
+          label: 'IP Address Information',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'list',
+          variationType: 'inverse',
+          xAxis: 'cat'
         },
         {
           aggregationType: 'sum',
@@ -786,6 +912,136 @@ describe('RealTimeMetricsModule', () => {
         },
         {
           aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the data in percentages.',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          id: '357842851576414806',
+          isTopX: true,
+          label: 'Top WAF Threat Requests by Country',
+          limit: 20,
+          orderDirection: 'DESC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top countries responsible for the most flagged requests. Displays the total amount of detected threats.',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['geolocCountryName'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          id: '357842851576414807',
+          isTopX: true,
+          label: 'Top WAF Threat Requests by Country',
+          limit: 20,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top attack families responsible for the most flagged requests. Displays the total amount of detected threats.',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['wafAttackFamily'],
+          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack',
+          id: '357842851576414808',
+          isTopX: true,
+          label: 'WAF Threat Requests by Family Attack',
+          limit: 10,
+          orderDirection: 'DESC',
+          rotated: true,
+          type: 'ordered-bar',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
+          aggregationType: 'sum',
+          chartOwner: 'azion',
+          columns: 12,
+          dashboardId: '357548675837198933',
+          dataUnit: 'count',
+          dataset: 'httpMetrics',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top hosts responsible for the most flagged requests. Displays the total amount of detected threats.',
+          fields: [],
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          filters: {
+            wafBlock: '1',
+            wafLearning: '0'
+          },
+          groupBy: ['ts', 'host'],
+          helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-host',
+          id: '357842851576414809',
+          isTopX: false,
+          label: 'WAF Threat Requests by Host',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'line',
+          variationType: 'inverse',
+          xAxis: 'ts',
+          doNotConvertToCamelCase: true,
+          largeTooltip: true
+        },
+        {
+          aggregationType: 'sum',
           aggregations: [
             {
               aggregation: 'sum',
@@ -956,6 +1212,33 @@ describe('RealTimeMetricsModule', () => {
           xAxis: 'ts'
         },
         {
+          aggregationType: 'sum',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'requests'
+            }
+          ],
+          chartOwner: 'azion',
+          columns: 6,
+          dashboardId: '371360344901061482',
+          dataUnit: 'count',
+          dataset: 'botManagerMetrics',
+          description:
+            'Sum of requests grouped by identifying traffic as Legitimate, Bad Bot, Good Bot, and Under Evaluation.',
+          groupBy: ['classified'],
+          helpCenterPath: '/real-time-metrics/bot-manager-advanced/overview/top-bot-traffic',
+          id: '329891149133127509',
+          isTopX: true,
+          label: 'Top Bot Traffic',
+          limit: 10000,
+          orderDirection: 'ASC',
+          rotated: false,
+          type: 'pie',
+          variationType: 'regular',
+          xAxis: 'cat'
+        },
+        {
           id: '577704475532819772',
           chartOwner: 'azion',
           label: 'Top Bot Action',
@@ -1083,7 +1366,7 @@ describe('RealTimeMetricsModule', () => {
           label: 'Bot Activity Map',
           description: 'Sum of requests identified as bots, presented by the country of origin.',
           aggregationType: 'sum',
-          columns: 6,
+          columns: 12,
           type: 'map',
           xAxis: 'cat',
           isTopX: true,
@@ -1240,6 +1523,35 @@ describe('RealTimeMetricsModule', () => {
           type: 'line',
           variationType: 'regular',
           xAxis: 'ts'
+        },
+        {
+          id: '424388331488145487',
+          chartOwner: 'azion',
+          label: 'Top WAF Threat Requests by IP',
+          description:
+            'Sum of requests identified as threats by WAF, broken down by the top IP addresses responsible for the most flagged requests.',
+          aggregationType: 'sum',
+          columns: 6,
+          type: 'ordered-bar',
+          xAxis: 'cat',
+          isTopX: true,
+          rotated: true,
+          dataUnit: 'count',
+          dataset: 'httpBreakdownMetrics',
+          aggregations: [
+            {
+              aggregation: 'sum',
+              variable: 'wafThreatRequests'
+            }
+          ],
+          filters: {},
+          limit: 10,
+          groupBy: ['remoteAddress'],
+          fields: ['remoteAddress'],
+          orderDirection: 'DESC',
+          dashboardId: '357548675837198934',
+          variationType: 'regular',
+          helpCenterPath: '/real-time-metrics/threats/breakdown'
         }
       ]
 
