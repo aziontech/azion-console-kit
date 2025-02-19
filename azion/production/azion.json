@@ -2,7 +2,6 @@
   "name": "console_kit_31-07-2024",
   "bucket": "consolekit31-07-2024",
   "preset": "vue",
-  "mode": "deliver",
   "env": "production",
   "prefix": "20240731102422",
   "not-first-run": true,
@@ -162,6 +161,41 @@
         "id": 318350,
         "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
+      },
+      {
+        "id": 364147,
+        "name": "Route SIEM Azion (BB)",
+        "phase": "request"
+      },
+      {
+        "id": 368275,
+        "name": "Rewrite azrt Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368276,
+        "name": "Rewrite azrt Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368277,
+        "name": "Rewrite azsid Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368278,
+        "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368279,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368280,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
       }
     ]
   },
