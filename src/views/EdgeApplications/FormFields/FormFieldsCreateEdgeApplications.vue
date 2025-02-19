@@ -5,11 +5,6 @@
   import { useField } from 'vee-validate'
 
   defineProps({
-    handleBlock: {
-      type: Array,
-      required: false,
-      default: () => ['full']
-    },
     isDrawer: {
       type: Boolean
     }
