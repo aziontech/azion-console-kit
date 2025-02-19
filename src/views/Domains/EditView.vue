@@ -1,41 +1,31 @@
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
+  <EditFormBlock
+    :editService="editDomainService"
+    :loadService="loadDomainService"
+    :schema="validationSchema"
+    :updatedRedirect="updatedRedirect"
+    @loaded-service-object="setDomainName"
+    @on-edit-success="handleTrackEditEvent"
+    @on-edit-fail="handleTrackFailEditEvent"
+    isTabs
+  >
+    <template #form>
+      <FormFieldsEditDomains
+        :digitalCertificates="digitalCertificates"
+        :listDigitalCertificatesService="listDigitalCertificatesService"
+        :loadDigitalCertificatesService="loadDigitalCertificatesService"
+        hasDomainName
+        @copyDomainName="copyDomainName"
+      />
     </template>
-    <template #content>
-      <EditFormBlock
-        :editService="editDomainService"
-        :loadService="loadDomainService"
-        :schema="validationSchema"
-        :updatedRedirect="updatedRedirect"
-        @loaded-service-object="setDomainName"
-        @on-edit-success="handleTrackEditEvent"
-        @on-edit-fail="handleTrackFailEditEvent"
-      >
-        <template #form>
-          <FormFieldsEditDomains
-            :digitalCertificates="digitalCertificates"
-            :listEdgeApplicationsService="listEdgeApplicationsService"
-            :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
-            hasDomainName
-            @copyDomainName="copyDomainName"
-          />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </EditFormBlock>
+    <template #action-bar="{ onSubmit, onCancel, loading }">
+      <ActionBarTemplate
+        @onSubmit="onSubmit"
+        @onCancel="onCancel"
+        :loading="loading"
+      />
     </template>
-  </ContentBlock>
+  </EditFormBlock>
 </template>
 
 <script setup>
@@ -43,8 +33,6 @@
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
@@ -66,26 +54,6 @@
       type: Function,
       required: true
     },
-    listEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    loadDomainService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
@@ -96,6 +64,10 @@
     },
     updateDigitalCertificates: {
       type: Function,
+      required: true
+    },
+    domain: {
+      type: Object,
       required: true
     }
   })
@@ -139,6 +111,10 @@
     domainName.value = domain.name
   }
 
+  const loadDomainService = () => {
+    return props.domain
+  }
+
   const validationSchema = yup.object({
     id: yup.string().required(),
     name: yup
@@ -153,7 +129,17 @@
         }
       ),
     domainName: yup.string().required(),
-    edgeApplication: yup.number().label('Edge Application'),
+    httpsPort: yup.array().when('useHttps', {
+      is: true,
+      then: (schema) => schema.min(1, 'At least one port is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    httpPort: yup.array().min(1).required(),
+    quicPort: yup.array().when('useHtpp3', {
+      is: true,
+      then: (schema) => schema.min(1, 'At least one port is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
     cnames: yup
       .string()
       .label('CNAME')

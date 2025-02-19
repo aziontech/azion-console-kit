@@ -37,7 +37,12 @@ const makeSut = () => {
 describe('EdgeApplicationCacheSettingsServices', () => {
   it('should be able to call Api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -84,21 +89,32 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
   it('should return a feedback when successfully create an cache settings', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
     const result = await sut(fixtures.cacheSettingsMock)
 
     expect(result).toEqual({
-      feedback: 'Cache Settings successfully created'
+      feedback: 'Cache Settings successfully created',
+      cacheId: 1
     })
   })
 
   it('should parse each query string use to control content at a cache settings', async () => {
     const cacheSettingsMock = { ...fixtures.cacheSettingsMock, queryStringFields: '' }
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -110,7 +126,12 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
   it('should parse each cookie name used to control content at a cache settings', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -122,7 +143,12 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
   it('should parse correctly empty device group list', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 

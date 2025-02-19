@@ -43,10 +43,6 @@
     clipboardWrite: {
       type: Function,
       required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
     }
   })
 
@@ -80,7 +76,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: !props.isLoadBalancerEnabled
+      disabled: false
     },
     {
       label: 'Edge Storage',

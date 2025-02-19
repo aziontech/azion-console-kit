@@ -82,6 +82,7 @@
     :readonly="readonly"
     :disabled="disabled"
     type="text"
+    @keypress.enter.prevent
     :placeholder="props.placeholder"
     @input="handleChange"
     :class="{ 'p-invalid': errorMessage }"

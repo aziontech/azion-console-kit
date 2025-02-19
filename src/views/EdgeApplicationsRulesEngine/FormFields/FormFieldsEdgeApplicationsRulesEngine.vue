@@ -148,9 +148,6 @@
     isApplicationAcceleratorEnabled: {
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      type: Boolean
-    },
     isImageOptimizationEnabled: {
       type: Boolean
     },
@@ -178,10 +175,6 @@
       type: Function,
       required: true
     },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
-    },
     loadingOrigins: {
       type: Boolean,
       default: false
@@ -206,7 +199,7 @@
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
         ? ' - Requires Application Accelerator'
         : empty,
-      https: !props.isDeliveryProtocolHttps ? ' - Requires Delivery Protocol with HTTPS' : empty,
+      https: empty,
       imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
       edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
     }
@@ -272,7 +265,7 @@
     {
       label: 'Redirect HTTP to HTTPS' + behaviorsLabelsTags.value.https,
       value: 'redirect_http_to_https',
-      requires: !props.isDeliveryProtocolHttps
+      requires: false
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
@@ -520,7 +513,6 @@
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
       />
       <DrawerFunction
         ref="drawerFunctionRef"

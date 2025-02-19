@@ -82,8 +82,8 @@
       return acc
     }, {})
   }
-  const verifyTab = ({ edgeFunctions }) => {
-    if (!edgeFunctions) {
+  const verifyTab = ({ edgeFunctionsEnabled }) => {
+    if (!edgeFunctionsEnabled) {
       delete mapTabs.value.functions
       reindexMapTabs()
       return
@@ -106,8 +106,6 @@
 
   const tabTitle = computed(() => edgeApplication.value?.name || '')
 
-  const isHttpsEnabled = () =>
-    computed(() => edgeApplication.value?.deliveryProtocol.includes('https'))
   const isModuleEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
 
   const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
@@ -191,7 +189,6 @@
       show: showTabs.origins,
       props: () => ({
         ...props.originsServices,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite
       })
@@ -225,15 +222,15 @@
       show: showTabs.cacheSettings,
       props: () => ({
         ...props.cacheSettingsServices,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isTieredCacheEnabled: isModuleEnabled('l2Caching').value,
+        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAcceleratorEnabled').value,
+        isTieredCacheEnabled: isModuleEnabled('tieredCacheEnabled').value,
         edgeApplicationId: edgeApplicationId.value
       })
     },
     {
       header: 'Functions Instances',
       component: EdgeApplicationsFunctionsListView,
-      condition: isModuleEnabled('edgeFunctions'),
+      condition: isModuleEnabled('edgeFunctionsEnabled'),
       show: showTabs.functions,
       props: () => ({
         ...props.functionsServices,
@@ -248,14 +245,12 @@
       show: showTabs.rulesEngine,
       props: () => ({
         ...props.rulesEngineServices,
-        isImageOptimizationEnabled: isModuleEnabled('imageOptimization').value,
-        isDeliveryProtocolHttps: isHttpsEnabled().value,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctions').value,
+        isImageOptimizationEnabled: isModuleEnabled('imageProcessorEnabled').value,
+        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAcceleratorEnabled').value,
+        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctionsEnabled').value,
         edgeApplicationId: edgeApplicationId.value,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         clipboardWrite: props.clipboardWrite,
-        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
+        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAcceleratorEnabled
       })
     }
   ])
