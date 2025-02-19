@@ -40,6 +40,33 @@ function isValidDate(dateString) {
  * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
  * @return {string} The constructed GraphQL query string.
  */
+function buildGraphQLQueryTotalRecords({ filterParameter, dataset, limit, filterQuery, fields }) {
+  const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
+  return [
+    `query (`,
+    filterParameter.join('\n'),
+    `) {`,
+    `\t${dataset} (`,
+    `\t\tlimit: ${limit}`,
+    `\t\taggregate: {`,
+    `count: rows`,
+    `\t\t}`,
+    `\t\tfilter: {`,
+    filter,
+    `\t\t}`,
+    `\t) {`,
+    fields,
+    `\t}`,
+    `}`
+  ].join('\n')
+}
+
+/**
+ * Builds a GraphQL query based on the provided parameters.
+ *
+ * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
+ * @return {string} The constructed GraphQL query string.
+ */
 function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
   const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
   return [
@@ -66,6 +93,38 @@ const formatValueContainOperator = (variable) => {
     }
   }
   return variable
+}
+
+/**
+ * Convert filter and table to gql body
+ *
+ * @param {Object} filter - Object with the filter to apply
+ * @param {Object} table - Object with the table to query
+ * @returns {Object} Returns the body of the gql query with variables
+ */
+const convertGQLTotalRecords = (filter, table) => {
+  if (!table) throw new Error('Table parameter is required')
+
+  let variables = {}
+  const filterQuery = buildFilterQuery(filter, variables)
+  const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
+  const filterParameter = formatFilterParameter(variables)
+  variables = formatValueContainOperator(variables)
+
+  const queryConfig = {
+    filterParameter,
+    dataset: table.dataset,
+    limit: table.limit,
+    filterQuery,
+    fields: fieldsFormat
+  }
+
+  const query = buildGraphQLQueryTotalRecords(queryConfig)
+
+  return {
+    query,
+    variables
+  }
 }
 
 /**
@@ -220,4 +279,4 @@ const formatFilterParameter = (variables) => {
   return Object.keys(variables).map((key) => `\t$${key}: ${getGraphQLType(variables[key])}!`)
 }
 
-export default convertGQL
+export { convertGQL, convertGQLTotalRecords }

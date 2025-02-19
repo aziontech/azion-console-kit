@@ -3,10 +3,8 @@ import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDe
 import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
 import { useGraphQLStore } from '@/stores/graphql-query'
 
-export const getTotalRecords = async (filter, dataset) => {
-  console.log('filter', filter)
+export const getTotalRecords = async ({ filter, dataset }) => {
   const payload = adapt(filter, dataset)
-  console.log('payload', payload)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
@@ -25,17 +23,15 @@ const adapt = (filter, dataset) => {
   const table = {
     dataset: dataset,
     limit: 10000,
-    fields: ['count'],
+    fields: ['count']
   }
   return convertGQLTotalRecords(filter, table)
 }
 
 const adaptResponse = (httpResponse, dataset) => {
   const { body } = httpResponse
-  const totalRecords = body.data[dataset]?.length
-  console.log(body.data[dataset])
+  const totalRecords = body.data[dataset][0].count
+  const formattedBR = new Intl.NumberFormat('pt-BR').format(totalRecords)
 
-  return {
-    total: totalRecords
-  }
+  return formattedBR
 }

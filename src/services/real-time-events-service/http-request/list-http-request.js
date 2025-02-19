@@ -1,4 +1,4 @@
-import convertGQL from '@/helpers/convert-gql'
+import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -8,7 +8,6 @@ import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listHttpRequest = async (filter) => {
   const payload = adapt(filter)
-
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
