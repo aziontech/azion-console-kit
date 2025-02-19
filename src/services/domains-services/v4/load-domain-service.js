@@ -69,8 +69,8 @@ const adapt = (httpResponse) => {
     httpsPort: handlerHttp(body.protocols.http.https_ports, HTTPS_PORT_LIST_OPTIONS),
     quicPort: handlerHttp(body.protocols.http.quic_ports, HTTP3_PORT_LIST_OPTIONS),
     httpPort: handlerHttp(body.protocols.http.http_ports, HTTP_PORT_LIST_OPTIONS),
-    supportedCiphers: body.tls.ciphers,
-    minimumTlsVersion: body.tls.minimum_version
+    supportedCiphers: String(body.tls.ciphers),
+    minimumTlsVersion: String(body.tls.minimum_version)
   }
 
   return {

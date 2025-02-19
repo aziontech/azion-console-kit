@@ -97,14 +97,14 @@
     { name: '8090', value: 8090 }
   ]
   const TLS_VERSIONS_OPTIONS = [
-    { label: 'None', value: 'none' },
+    { label: 'None', value: 'null' },
     { label: 'TLS 1.0', value: 'tls_1_0' },
     { label: 'TLS 1.1', value: 'tls_1_1' },
     { label: 'TLS 1.2', value: 'tls_1_2' },
     { label: 'TLS 1.3', value: 'tls_1_3' }
   ]
   const SUPPORTED_CIPHERS_LIST_OPTIONS = [
-    { label: 'All', value: 'all' },
+    { label: 'All', value: 'null' },
     { label: 'TLSv1.2_2018', value: 'TLSv1.2_2018' },
     { label: 'TLSv1.2_2019', value: 'TLSv1.2_2019' },
     { label: 'TLSv1.2_2021', value: 'TLSv1.2_2021' },
