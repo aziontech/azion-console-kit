@@ -66,7 +66,10 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     cy.get(selectors.edgeApplication.origins.addressInput).type('teste.com')
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should('have.text', 'Origin Key has been created')
+    cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should(
+      'have.text',
+      'Origin Key has been created'
+    )
     cy.get(selectors.edgeApplication.origins.dialogCopyButton).click()
     cy.verifyToast('success', 'Your origin has been created')
     cy.verifyToast('Successfully copied!')
@@ -75,15 +78,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

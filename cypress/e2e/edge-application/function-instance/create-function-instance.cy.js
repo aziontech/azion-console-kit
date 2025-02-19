@@ -96,20 +96,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       'have.text',
       fixtures.functionName
     )
-
-    // Cleanup - Remove the instance
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Function successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

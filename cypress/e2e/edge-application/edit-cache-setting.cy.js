@@ -97,14 +97,4 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       'Honor Origin Cache Headers'
     )
   })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-  })
 })

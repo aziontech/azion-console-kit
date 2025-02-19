@@ -39,7 +39,10 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     createEdgeApplicationCase()
 
     cy.get(selectors.edgeApplication.rulesEngine.clickOnTabRulesEngine).click()
-    cy.get(selectors.edgeApplication.rulesEngine.checkDefaultRulesEngine).should('have.text', 'Default Rule')
+    cy.get(selectors.edgeApplication.rulesEngine.checkDefaultRulesEngine).should(
+      'have.text',
+      'Default Rule'
+    )
 
     cy.get(selectors.edgeApplication.rulesEngine.createButton).click()
 
@@ -62,18 +65,11 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.reviewChanges).should('be.visible')
     cy.get(selectors.edgeApplication.rulesEngine.reviewChanges).click()
 
-    cy.get(selectors.edgeApplication.rulesEngine.reviewChangesModal).should('have.text', ' Rule ”regra01” reordered from 1 to 2. ')
+    cy.get(selectors.edgeApplication.rulesEngine.reviewChangesModal).should(
+      'have.text',
+      ' Rule ”regra01” reordered from 1 to 2. '
+    )
     cy.get(selectors.edgeApplication.rulesEngine.saveReorder).click()
     cy.verifyToast('success', 'Reorder saved')
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

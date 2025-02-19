@@ -43,7 +43,9 @@ const createDigitalCertificate = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as('getDigitalCertificatesApi')
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+    'getDigitalCertificatesApi'
+  )
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -54,7 +56,10 @@ const createDigitalCertificate = () => {
   cy.verifyToast('success', 'Your digital certificate has been created!')
   cy.wait('@getDigitalCertificatesApi')
 
-  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).should('have.text', digitalCertificateName)
+  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).should(
+    'have.text',
+    digitalCertificateName
+  )
   cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
   cy.get(selectors.domains.letsEncryptDropdownOption).click()
 }
@@ -70,8 +75,14 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`).as('getEdgeApplicationListFilter')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+    ).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
@@ -136,13 +147,5 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
     cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
     cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Domain successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

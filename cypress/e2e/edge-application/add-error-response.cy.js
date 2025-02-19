@@ -77,14 +77,4 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.verifyToast('success', 'Your Error Responses has been edited')
     cy.get(selectors.form.actionsCancelButton).click()
   })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-  })
 })

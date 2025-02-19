@@ -93,12 +93,4 @@ describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.edgeCertificateOption).click()
     cy.get(selectors.domains.edgeCertificateOption).should('be.visible')
   })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Domain successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
-  })
 })

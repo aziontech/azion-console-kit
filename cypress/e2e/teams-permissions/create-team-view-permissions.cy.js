@@ -62,9 +62,4 @@ describe('Teams Permissions', { tags: ['@dev7'] }, () => {
     cy.get(selectors.teams.listRow('name')).should('have.text', teamsPermissionsName)
     cy.get(selectors.teams.listRow('status')).should('have.text', 'Active')
   })
-
-  afterEach(() => {
-    // Delete the team permissions
-    cy.deleteEntityFromLoadedList()
-  })
 })

@@ -6,7 +6,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
-  import ListTableNoHeaderBlock from '@templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import PageHeadingBlock from '@templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
@@ -56,15 +56,18 @@
   const recordListColumns = ref([
     {
       field: 'name',
-      header: 'Name'
+      header: 'Name',
+      sortField: 'entry'
     },
     {
       field: 'type',
-      header: 'Type'
+      header: 'Type',
+      sortField: 'record_type'
     },
     {
       field: 'value',
       header: 'Value',
+      sortField: 'answers_list',
       filterPath: 'value.content',
       type: 'component',
       component: (columnData) =>
@@ -72,19 +75,23 @@
     },
     {
       field: 'ttl',
-      header: 'TTL (seconds)'
+      header: 'TTL (seconds)',
+      sortField: 'ttl'
     },
     {
       field: 'policy',
-      header: 'Policy'
+      header: 'Policy',
+      sortField: 'policy'
     },
     {
       field: 'weight',
-      header: 'Weight'
+      header: 'Weight',
+      sortField: 'weight'
     },
     {
       field: 'description',
-      header: 'Description'
+      header: 'Description',
+      sortField: 'description'
     }
   ])
   const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
@@ -141,6 +148,17 @@
     edgeDNSID: yup.number()
   })
 
+  const EDGE_DNS_RECORDS_FIELDS = [
+    'id',
+    'entry',
+    'record_type',
+    'answers_list',
+    'ttl',
+    'policy',
+    'weight',
+    'description'
+  ]
+
   const initialValuesCreateRecords = {
     name: '',
     selectedRecordType: 'A',
@@ -150,6 +168,16 @@
     weight: '100',
     description: '',
     edgeDNSID: route.params.id
+  }
+
+  const handleCreatedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessCreated()
+  }
+
+  const handleEditedSuccessfully = () => {
+    reloadResourcesList()
+    handleTrackSuccessEdit()
   }
 
   const reloadResourcesList = () => {
@@ -178,8 +206,8 @@
       .track()
   }
 
-  const listRecordsServiceEdgeDNSDecorator = async () => {
-    return await props.listRecordsService({ id: edgeDNSID.value })
+  const listRecordsServiceEdgeDNSDecorator = async (query) => {
+    return await props.listRecordsService({ id: edgeDNSID.value, ...query })
   }
 
   const deleteRecordsServiceEdgeDNSDecorator = async (recordID) => {
@@ -408,10 +436,11 @@
           }"
         >
           <div v-if="showRecords">
-            <ListTableNoHeaderBlock
+            <FetchListTableBlock
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
               addButtonLabel="Record"
+              defaultOrderingFieldName="entry"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
@@ -419,6 +448,7 @@
               emptyListMessage="No records found."
               :actions="actions"
               isTabs
+              :apiFields="EDGE_DNS_RECORDS_FIELDS"
               @on-before-go-to-edit="handleTrackEventGoToEdit"
             >
               <template #addButton>
@@ -429,7 +459,7 @@
                   data-testid="create_Record_button"
                 />
               </template>
-            </ListTableNoHeaderBlock>
+            </FetchListTableBlock>
 
             <EmptyResultsBlock
               v-else
@@ -461,7 +491,7 @@
               :createService="createRecordsService"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
-              @onSuccess="[reloadResourcesList, handleTrackSuccessCreated()]"
+              @onSuccess="handleCreatedSuccessfully"
               @onError="handleTrackFailCreated"
               title="Create Record"
             >
@@ -477,7 +507,7 @@
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"
               :schema="validationSchemaEDNSRecords"
-              @onSuccess="[reloadResourcesList, handleTrackSuccessEdit()]"
+              @onSuccess="handleEditedSuccessfully"
               @onError="handleTrackFailEdit"
               title="Edit Record"
             >
