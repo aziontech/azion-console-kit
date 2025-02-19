@@ -145,6 +145,7 @@
         >
           <DeploymentView
             v-if="activeTab === mapTabs.deployment"
+            :updatedRedirect="props.domainServices.updatedRedirect"
             :listEdgeApplicationsService="
               props.workloadDeploymentServices.listEdgeApplicationsService
             "
