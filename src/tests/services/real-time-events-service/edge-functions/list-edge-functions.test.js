@@ -99,8 +99,7 @@ describe('EdgeFunctionsServices', () => {
           ts: fixtures.edgeFunction.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

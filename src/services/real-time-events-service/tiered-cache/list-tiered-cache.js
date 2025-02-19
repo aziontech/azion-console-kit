@@ -4,7 +4,6 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
-import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -44,7 +43,6 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const totalRecords = body.data.l2CacheEvents?.length
 
   const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     id: generateCurrentTimestamp(),
@@ -63,7 +61,6 @@ const adaptResponse = (response) => {
   }))
 
   return {
-    data,
-    recordsFound: getRecordsFound(totalRecords)
+    data
   }
 }

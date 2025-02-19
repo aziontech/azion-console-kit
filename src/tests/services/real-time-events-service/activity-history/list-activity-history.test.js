@@ -103,8 +103,7 @@ describe('ActivityHistoryServices', () => {
           ts: fixtures.activityHistory.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })
