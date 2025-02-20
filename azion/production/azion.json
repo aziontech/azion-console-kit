@@ -163,11 +163,6 @@
         "phase": "request"
       },
       {
-        "id": 364147,
-        "name": "Route SIEM Azion (BB)",
-        "phase": "request"
-      },
-      {
         "id": 368275,
         "name": "Rewrite azrt Cookie in azion.com",
         "phase": "response"
