@@ -101,7 +101,7 @@ describe('ActivityHistoryServices', () => {
           resourceId: fixtures.activityHistory.resourceId,
           userId: fixtures.activityHistory.userId,
           ts: fixtures.activityHistory.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ],
       recordsFound: '1'
