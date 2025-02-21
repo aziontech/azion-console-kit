@@ -25,18 +25,14 @@
       client_id: clientId,
       email,
       name,
-      company_name: companyName,
       kind: accountType,
-      full_name: fullName,
       status
     } = accountStore.account
 
     const defaultTraits = { 
       client_id: clientId,
       email,
-      client_name: fullName,
       account_id: accountId,
-      account_company_name: companyName,
       account_name: name,
       account_type: accountType,
       client_status: status
