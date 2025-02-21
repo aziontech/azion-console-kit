@@ -5,6 +5,7 @@ import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
 
 export const listHttpRequest = async (filter) => {
   const payload = adapt(filter)
@@ -27,11 +28,12 @@ const adapt = (filter) => {
   const table = {
     dataset: 'httpEvents',
     limit: 10000,
-    fields: ['configurationId', 'host', 'requestId', 'requestUri', 'requestMethod', 'status', 'ts'],
+    fields: ['configurationId', 'host', 'requestId','httpUserAgent', 'requestMethod', 'status', 'ts', 'upstreamBytesSent', 'sslProtocol', 'wafLearning', 'requestTime'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
 }
+
 
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
@@ -39,13 +41,7 @@ const adaptResponse = (httpResponse) => {
 
   const data = body.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
-    configurationId: httpEventItem.configurationId,
-    host: httpEventItem.host,
-    requestId: httpEventItem.requestId,
-    requestUri: httpEventItem.requestUri,
-    requestMethod: httpEventItem.requestMethod,
-    status: httpEventItem.status,
-    ts: httpEventItem.ts,
+    summary: buildSummary(httpEventItem),
     tsFormat: convertValueToDate(httpEventItem.ts)
   }))
 

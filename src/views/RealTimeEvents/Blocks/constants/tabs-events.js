@@ -10,31 +10,18 @@ const TABS_EVENTS = {
     tabRouter: 'http-requests',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'host',
-        header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri'
-      },
-
-      {
-        field: 'requestMethod',
-        header: 'Request Method'
-      },
-      {
-        field: 'status',
-        header: 'Status'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
-      }
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'log-body' })
+      },
     ],
     customColumnMapper: (rowData) => ({
       tsFormat: rowData.data

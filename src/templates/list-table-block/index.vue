@@ -124,7 +124,7 @@
       <Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 13rem"
+        headerStyle="width: 3rem"
         data-testid="data-table-actions-column"
       >
         <template #header>
