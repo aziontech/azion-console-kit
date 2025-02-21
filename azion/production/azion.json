@@ -73,6 +73,11 @@
     "created": false,
     "rules": [
       {
+        "id": 269747,
+        "name": "enable gzip",
+        "phase": "response"
+      },
+      {
         "id": 269748,
         "name": "Apply Common Configuration for All Requests",
         "phase": "request"
