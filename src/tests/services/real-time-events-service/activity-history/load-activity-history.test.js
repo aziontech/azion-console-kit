@@ -74,7 +74,7 @@ describe('ActivityHistoryServices', () => {
       userId: fixtures.activityHistory.userId,
       title: fixtures.activityHistory.title,
       comment: fixtures.activityHistory.comment,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

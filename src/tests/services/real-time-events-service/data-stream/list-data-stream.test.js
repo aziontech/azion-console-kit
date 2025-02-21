@@ -111,7 +111,7 @@ describe('DataStreamingServices', () => {
           dataStreamed: fixtures.dataStreaming.dataStreamed,
           source: fixtures.dataStreaming.source,
           streamedLines: fixtures.dataStreaming.streamedLines,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ],
       recordsFound: '1'

@@ -120,7 +120,7 @@ describe('HttpRequestServices', () => {
       serverProtocol: undefined,
       upstreamCacheStatus: undefined,
       tcpinfoRtt: fixtures.httpRequest.tcpinfoRtt,
-      ts: 'February 23, 2024 at 06:07 PM',
+      ts: 'February 23, 2024 at 06:07:25 PM',
       upstreamAddr: fixtures.httpRequest.upstreamAddr,
       upstreamBytesReceived: fixtures.httpRequest.upstreamBytesReceived,
       upstreamBytesSent: fixtures.httpRequest.upstreamBytesSent,

@@ -97,7 +97,7 @@ describe('EdgeFunctionsServices', () => {
           edgeFunctionsList: ['function-1', ' function-2', ' function-3'],
           edgeFunctionsTime: `${fixtures.edgeFunction.edgeFunctionsTime}ms`,
           ts: fixtures.edgeFunction.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ],
       recordsFound: '1'

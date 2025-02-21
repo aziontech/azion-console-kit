@@ -111,7 +111,7 @@ describe('tieredCacheServices', () => {
       solution: fixtures.tieredCache.solution,
       status: fixtures.tieredCache.status,
       tcpinfoRtt: fixtures.tieredCache.tcpinfoRtt,
-      ts: 'February 23, 2024 at 06:07 PM',
+      ts: 'February 23, 2024 at 06:07:25 PM',
       upstreamBytesReceived: fixtures.tieredCache.upstreamBytesReceived,
       upstreamBytesReceivedStr: fixtures.tieredCache.upstreamBytesReceivedStr,
       upstreamCacheStatus: fixtures.tieredCache.upstreamCacheStatus,

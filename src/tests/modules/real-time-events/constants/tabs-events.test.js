@@ -61,48 +61,48 @@ describe('RealTimeEventsModule', () => {
     it('should have the correct columns for each tab', () => {
       const expectedColumns = {
         httpRequests: [
+          'tsFormat',
           'configurationId',
           'host',
-          'requestUri',
           'requestMethod',
           'status',
-          'tsFormat'
+          'requestUri'
         ],
         edgeFunctions: [
+          'tsFormat',
           'configurationId',
           'functionLanguage',
           'edgeFunctionsInitiatorTypeList',
           'edgeFunctionsList',
-          'edgeFunctionsTime',
-          'tsFormat'
+          'edgeFunctionsTime'
         ],
         edgeFunctionsConsole: [
+          'tsFormat',
           'configurationId',
           'functionId',
           'lineSource',
           'level',
-          'line',
-          'tsFormat'
+          'line'
         ],
         imageProcessor: [
+          'tsFormat',
           'configurationId',
           'host',
-          'requestUri',
           'status',
           'bytesSent',
-          'tsFormat'
+          'requestUri'
         ],
         tieredCache: [
+          'tsFormat',
           'configurationId',
           'host',
-          'requestUri',
           'requestMethod',
           'upstreamCacheStatus',
-          'tsFormat'
+          'requestUri'
         ],
-        edgeDNS: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'tsFormat'],
-        dataStream: ['configurationId', 'jobName', 'endpointType', 'url', 'statusCode', 'tsFormat'],
-        activityHistory: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'tsFormat']
+        edgeDNS: ['tsFormat', 'level', 'zoneId', 'qtype', 'resolutionType', 'solutionId'],
+        dataStream: ['tsFormat', 'configurationId', 'jobName', 'endpointType', 'url', 'statusCode'],
+        activityHistory: ['tsFormat', 'userIp', 'authorName', 'title', 'resourceType', 'resourceId']
       }
 
       Object.entries(TABS_EVENTS).forEach(([tabName, tabData]) => {
