@@ -9,6 +9,7 @@ import istanbul from 'vite-plugin-istanbul'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
 
   return {
     plugins: [
@@ -45,7 +46,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
         },
         '/graphql/cities': {
-          target: `${URLStartPrefix}cities.azion.com`,
+          target: `${URLStartPrefix}cities.azion.${DomainSuffix}`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
