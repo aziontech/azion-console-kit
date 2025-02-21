@@ -5,9 +5,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
+      - UXE-6333-real-time-event-improvement-fork
   push:
     branches:
       - dev
+      - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 
 env:

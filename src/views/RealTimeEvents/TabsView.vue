@@ -17,6 +17,7 @@
           <TabPanelBlock
             v-if="isTabActive(tab)"
             :listService="selectedTabProps.listService"
+            :getTotalRecords="getTotalRecords"
             :loadService="selectedTabProps.loadService"
             :filterFields="generatedFilterFields"
             :tabSelected="tab"
@@ -81,6 +82,10 @@
       required: true
     },
     loadFieldsData: {
+      type: Function,
+      required: true
+    },
+    getTotalRecords: {
       type: Function,
       required: true
     }

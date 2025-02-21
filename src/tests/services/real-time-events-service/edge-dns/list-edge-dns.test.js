@@ -109,8 +109,7 @@ describe('edgeDns', () => {
           uuid: fixtures.edgeDns.uuid,
           zoneId: fixtures.edgeDns.zoneId
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })
