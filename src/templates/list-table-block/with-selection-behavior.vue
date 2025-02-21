@@ -498,7 +498,7 @@
     }
   }
 
-  defineExpose({ reload, data })
+  defineExpose({ reload, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
