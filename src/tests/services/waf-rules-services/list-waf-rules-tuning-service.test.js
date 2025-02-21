@@ -61,22 +61,25 @@ describe('WafRulesService', () => {
 
     const result = await sut(fixtures.payload)
 
-    expect(result).toEqual([
-      {
-        hitCount: fixtures.wafRulesMock.hit_count,
-        topIps: fixtures?.wafRulesMock?.top_10_ips?.[0]?.[1] || '',
-        ruleId: fixtures.wafRulesMock.rule_id,
-        id: `${fixtures.wafRulesMock.rule_id}0`,
-        ruleIdDescription: `${fixtures.wafRulesMock.rule_id} - ${fixtures.wafRulesMock.rule_description}`,
-        ipCount: fixtures.wafRulesMock.ip_count,
-        matchZone: fixtures.wafRulesMock.match_zone,
-        pathCount: fixtures.wafRulesMock.path_count,
-        topCountries: fixtures?.wafRulesMock?.top_10_countries?.[0]?.[1] || '',
-        matchesOn: fixtures.wafRulesMock.matches_on,
-        ruleDescription: fixtures.wafRulesMock.rule_description,
-        countryCount: fixtures.wafRulesMock.country_count
-      }
-    ])
+    expect(result).toEqual({
+      data: [
+        {
+          hitCount: fixtures.wafRulesMock.hit_count,
+          topIps: fixtures?.wafRulesMock?.top_10_ips?.[0]?.[1] || '',
+          ruleId: fixtures.wafRulesMock.rule_id,
+          id: `${fixtures.wafRulesMock.rule_id}0`,
+          ruleIdDescription: `${fixtures.wafRulesMock.rule_id} - ${fixtures.wafRulesMock.rule_description}`,
+          ipCount: fixtures.wafRulesMock.ip_count,
+          matchZone: fixtures.wafRulesMock.match_zone,
+          pathCount: fixtures.wafRulesMock.path_count,
+          topCountries: fixtures?.wafRulesMock?.top_10_countries?.[0]?.[1] || '',
+          matchesOn: fixtures.wafRulesMock.matches_on,
+          ruleDescription: fixtures.wafRulesMock.rule_description,
+          countryCount: fixtures.wafRulesMock.country_count
+        }
+      ],
+      recordsFound: 1
+    })
   })
   it('should return empty data when the values in the parameter are not passed in ', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -87,7 +90,10 @@ describe('WafRulesService', () => {
 
     const result = await sut({})
 
-    expect(result).toEqual([])
+    expect(result).toEqual({
+      data: [],
+      recordsFound: 0
+    })
   })
 
   it('Should return an API error for an 400 response status', async () => {
