@@ -29,7 +29,7 @@
       status
     } = accountStore.account
 
-    const defaultTraits = { 
+    const defaultTraits = {
       client_id: clientId,
       email,
       account_id: accountId,
