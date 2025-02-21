@@ -13,19 +13,19 @@ export const loadDeviceGroupService = async ({ edgeApplicationId, id }) => {
 }
 
 const adapt = (httpResponse) => {
-  if (httpResponse.statusCode === 200) {
-    const deviceGroup = httpResponse.body.data
-    const parsedBody = {
-      id: deviceGroup.id,
-      name: deviceGroup.name,
-      userAgent: deviceGroup.user_agent
-    }
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
 
-    return {
-      body: parsedBody,
-      statusCode: httpResponse.statusCode
-    }
-  } else {
-    throw new Error(extractApiError(httpResponse)).message
+  const deviceGroup = httpResponse.body.data
+  const parsedBody = {
+    id: deviceGroup.id,
+    name: deviceGroup.name,
+    userAgent: deviceGroup.user_agent
+  }
+
+  return {
+    body: parsedBody,
+    statusCode: httpResponse.statusCode
   }
 }

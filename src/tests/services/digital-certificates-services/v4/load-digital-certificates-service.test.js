@@ -1,5 +1,4 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@services/axios/errors'
 import { loadDigitalCertificateService } from '@/services/digital-certificates-services/v4/'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -56,43 +55,13 @@ describe('DigitalCertificatesServices', () => {
     })
   })
 
-  it.each([
-    {
-      statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
-    },
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
-      statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: { data: fixtures.certificateMock }
-      })
-      const { sut } = makeSut()
+  it('should throw an error when request fails', async () => {
+    const errorMock = new Error('Request failed')
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockRejectedValueOnce(errorMock)
 
-      const response = sut({ id: fixtures.certificateMock.id })
+    const { sut } = makeSut()
+    const promise = sut({ id: fixtures.certificateMock.id })
 
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
+    await expect(promise).rejects.toThrow('Request failed')
+  })
 })

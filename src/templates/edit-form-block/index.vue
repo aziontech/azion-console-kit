@@ -109,6 +109,7 @@
     } catch (error) {
       emit('on-load-fail', error)
       showToast('error', error)
+      goBackToList()
     }
   }
 
