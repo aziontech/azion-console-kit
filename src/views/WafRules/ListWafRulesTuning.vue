@@ -53,12 +53,30 @@
         />
       </div>
     </div>
-    <advancedFilter
-      v-model:externalFilter="selectedFilter"
-      v-model:filterAdvanced="selectedFilterAdvanced"
-      :fieldsInFilter="listFields"
-      @applyFilter="filterSearch"
-    />
+    <div class="flex flex-col md:flex-row md:items-center gap-2">
+      <advancedFilter
+        v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
+        :fieldsInFilter="listFields"
+        @applyFilter="filterSearch"
+      />
+      <PrimeButton
+        class="md:hidden"
+        outlined
+        size="small"
+        label="Export to CSV"
+        icon="pi pi-download"
+        @click="downloadCSV"
+      />
+      <PrimeButton
+        class="hidden md:flex"
+        outlined
+        size="small"
+        icon="pi pi-download"
+        v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+        @click="downloadCSV"
+      />
+    </div>
   </div>
   <ListTableBlock
     v-show="showListTable"
@@ -345,6 +363,10 @@
   const setDomainsSelectedOptions = (value) => {
     selectedFilter.value.domains = value
     filterTuning()
+  }
+
+  const downloadCSV = () => {
+    listServiceWafTunningRef.value?.handleExportTableDataToCSV()
   }
 
   const showToast = (summary, severity) => {
