@@ -129,21 +129,6 @@
         "phase": "request"
       },
       {
-        "id": 277560,
-        "name": "Rewrite _azrt Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 277561,
-        "name": "Rewrite azsid Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 277562,
-        "name": "Rewrite _azat Cookie",
-        "phase": "response"
-      },
-      {
         "id": 277563,
         "name": "Secure Headers",
         "phase": "response"
@@ -162,6 +147,36 @@
         "id": 317377,
         "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
+      },
+      {
+        "id": 368013,
+        "name": "Rewrite azrt Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368014,
+        "name": "Rewrite azrt Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368015,
+        "name": "Rewrite azsid Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368016,
+        "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368017,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368018,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
       }
     ]
   },

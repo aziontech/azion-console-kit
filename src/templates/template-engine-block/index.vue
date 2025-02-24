@@ -360,8 +360,18 @@
 
   const saveIntegration = async (integration) => {
     isIntegrationsLoading.value = true
-    await props.postCallbackUrlService(callbackUrl.value, integration.data)
-    await listIntegrations()
+    try {
+      await props.postCallbackUrlService(callbackUrl.value, integration.data)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    } finally {
+      await listIntegrations()
+    }
   }
 
   const createSchemaObject = async () => {
