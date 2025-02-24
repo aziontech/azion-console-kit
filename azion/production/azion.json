@@ -128,21 +128,6 @@
         "phase": "request"
       },
       {
-        "id": 269760,
-        "name": "Rewrite _azrt Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269761,
-        "name": "Rewrite azsid Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269762,
-        "name": "Rewrite _azat Cookie",
-        "phase": "response"
-      },
-      {
         "id": 269763,
         "name": "Secure Headers",
         "phase": "response"

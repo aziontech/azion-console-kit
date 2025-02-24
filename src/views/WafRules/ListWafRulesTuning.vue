@@ -1,50 +1,59 @@
 <template>
-  <div class="flex flex-shrink gap-6 mt-4 flex-col sm:flex-row sm:w-xs">
-    <Dropdown
-      appendTo="self"
-      optionValue="value"
-      optionLabel="name"
-      :options="timeOptions"
-      v-model="selectedFilter.hourRange"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-
-    <FieldMultiselectLazyLoader
-      data-testid="waf-tuning-list__domains-field"
-      name="valueDomainId"
-      :service="props.listDomainsService"
-      :loadService="props.loadDomainService"
-      optionLabel="name"
-      optionValue="id"
-      :value="valueDomainId"
-      appendTo="self"
-      class="w-full sm:max-w-xs overflow-hidden"
-      placeholder="Select domain"
-      @onChange="setDomainsSelectedOptions"
-    />
-
-    <FieldDropdownLazyLoader
-      data-testid="waf-tuning-list__network-list-field"
-      name="valueNetworkId"
-      :service="props.listNetworkListService"
-      :loadService="props.loadNetworkListService"
-      optionLabel="name"
-      optionValue="id"
-      :value="valueNetworkId"
-      :moreOptions="['value']"
-      appendTo="self"
-      placeholder="Select an network list"
-      @onClear="setNetworkListSelectedOption(null)"
-      @onSelectOption="setNetworkListSelectedOption"
-      class="w-full sm:max-w-xs"
-      enableClearOption
-    />
-  </div>
-
   <div
     class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex md:flex-row flex-col md:items-center gap-2"
+    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex flex-col gap-6 md:gap-4"
   >
+    <div class="w-full flex md:flex-row flex-col gap-4 md:items-center">
+      <div class="flex gap-6 flex-col sm:flex-row w-full">
+        <Dropdown
+          appendTo="self"
+          optionValue="value"
+          optionLabel="name"
+          :options="timeOptions"
+          v-model="selectedFilter.hourRange"
+          @change="filterTuning"
+          class="w-full sm:max-w-xs"
+        />
+
+        <FieldMultiselectLazyLoader
+          data-testid="waf-tuning-list__domains-field"
+          name="valueDomainId"
+          :service="props.listDomainsService"
+          :loadService="props.loadDomainService"
+          optionLabel="name"
+          optionValue="id"
+          :value="valueDomainId"
+          appendTo="self"
+          class="w-full sm:max-w-xs overflow-hidden"
+          placeholder="Select domain"
+          @onChange="setDomainsSelectedOptions"
+        />
+
+        <FieldDropdownLazyLoader
+          data-testid="waf-tuning-list__network-list-field"
+          name="valueNetworkId"
+          :service="props.listNetworkListService"
+          :loadService="props.loadNetworkListService"
+          optionLabel="name"
+          optionValue="id"
+          :value="valueNetworkId"
+          :moreOptions="['value']"
+          appendTo="self"
+          placeholder="Select an network list"
+          @onClear="setNetworkListSelectedOption(null)"
+          @onSelectOption="setNetworkListSelectedOption"
+          class="w-full sm:max-w-xs"
+          enableClearOption
+        />
+      </div>
+      <div class="flex items-center justify-end">
+        <PrimeTag
+          class="no-wrap whitespace-nowrap ml-auto"
+          :value="recordsFoundLabel"
+          severity="info"
+        />
+      </div>
+    </div>
     <advancedFilter
       v-model:externalFilter="selectedFilter"
       v-model:filterAdvanced="selectedFilterAdvanced"
@@ -71,7 +80,7 @@
   <ListTableBlock
     v-show="showListTable"
     pageTitleDelete="WAF rules tuning"
-    :listService="props.listWafRulesTuningService"
+    :listService="listService"
     ref="listServiceWafTunningRef"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
@@ -88,7 +97,6 @@
     title="Select a domain to query data"
     description="To use this feature, a domain must be associated with the edge firewall that has a behavior running this WAF rule set."
     :documentationService="props.documentationServiceTuning"
-    inTabs
     noShowBorderTop
     class="!mt-0"
   >
@@ -151,6 +159,7 @@
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import PrimeTag from 'primevue/tag'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -211,6 +220,7 @@
     hourRange: '1'
   })
   const selectedEvents = ref([])
+  const totalRecordsFound = ref(0)
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
@@ -226,6 +236,10 @@
 
   const valueNetworkId = ref(null)
   const valueDomainId = ref(null)
+
+  const recordsFoundLabel = computed(() => {
+    return `${totalRecordsFound.value} records found`
+  })
 
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
@@ -333,6 +347,12 @@
   const showListTable = computed(() => {
     return selectedFilter.value.domains?.length
   })
+
+  const listService = async (params) => {
+    const response = await props.listWafRulesTuningService(params)
+    totalRecordsFound.value = response.recordsFound
+    return response.data
+  }
 
   const setNetworkListSelectedOption = (value) => {
     selectedFilter.value.network = value
