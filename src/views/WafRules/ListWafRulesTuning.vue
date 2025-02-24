@@ -1,6 +1,5 @@
 <template>
   <div
-    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex md:flex-row flex-col md:items-center gap-2"
     class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex flex-col gap-6 md:gap-4"
   >
     <div class="w-full flex md:flex-row flex-col gap-4 md:items-center">
@@ -54,28 +53,30 @@
         />
       </div>
     </div>
-    <advancedFilter
-      v-model:externalFilter="selectedFilter"
-      v-model:filterAdvanced="selectedFilterAdvanced"
-      :fieldsInFilter="listFields"
-      @applyFilter="filterSearch"
-    />
-    <PrimeButton
-      class="md:hidden"
-      outlined
-      size="small"
-      label="Export to CSV"
-      icon="pi pi-download"
-      @click="downloadCSV"
-    />
-    <PrimeButton
-      class="hidden md:flex"
-      outlined
-      size="small"
-      icon="pi pi-download"
-      v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-      @click="downloadCSV"
-    />
+    <div class="flex flex-col md:flex-row md:items-center gap-2">
+      <advancedFilter
+        v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
+        :fieldsInFilter="listFields"
+        @applyFilter="filterSearch"
+      />
+      <PrimeButton
+        class="md:hidden"
+        outlined
+        size="small"
+        label="Export to CSV"
+        icon="pi pi-download"
+        @click="downloadCSV"
+      />
+      <PrimeButton
+        class="hidden md:flex"
+        outlined
+        size="small"
+        icon="pi pi-download"
+        v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+        @click="downloadCSV"
+      />
+    </div>
   </div>
   <ListTableBlock
     v-show="showListTable"
