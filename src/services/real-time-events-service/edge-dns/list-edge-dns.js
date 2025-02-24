@@ -22,42 +22,7 @@ export const listEdgeDNS = async (filter) => {
   })
 
   return adaptResponse(response)
-}
-
-// const levelMap = {
-//   ERROR: {
-//     content: 'Error',
-//     severity: 'danger',
-//     icon: 'pi pi-times-circle'
-//   },
-//   WARN: {
-//     content: 'Warning',
-//     severity: 'warning',
-//     icon: 'pi pi-exclamation-triangle'
-//   },
-//   INFO: {
-//     content: 'Info',
-//     severity: 'info',
-//     icon: 'pi pi-info-circle'
-//   },
-//   DEBUG: {
-//     content: 'Debug',
-//     severity: 'success',
-//     icon: 'pi pi-check-circle'
-//   },
-//   TRACE: {
-//     content: 'Trace',
-//     severity: 'info',
-//     icon: 'pi pi-code'
-//   }
-// }
-
-// const getLevelDNS = (level) => {
-//   let words = level.trim().split(/\s+/)
-//   let firstWord = words[0]
-
-//   return levelMap[firstWord.toUpperCase()]
-// }
+} 
 
 const adapt = (filter) => {
   const table = {
