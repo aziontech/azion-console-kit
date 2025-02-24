@@ -5,6 +5,7 @@ import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -48,13 +49,7 @@ const adaptResponse = (response) => {
 
   const data = body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
-    configurationId: imagesProcessedEvents.configurationId,
-    host: imagesProcessedEvents.host,
-    requestUri: imagesProcessedEvents.requestUri,
-    status: imagesProcessedEvents.status,
-    bytesSent: imagesProcessedEvents.bytesSent,
-    httpReferer: imagesProcessedEvents.httpReferer,
-    httpUserAgent: imagesProcessedEvents.httpUserAgent,
+    summary: buildSummary(imagesProcessedEvents),
     ts: imagesProcessedEvents.ts,
     tsFormat: convertValueToDate(imagesProcessedEvents.ts)
   }))

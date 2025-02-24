@@ -93,17 +93,15 @@ describe('EdgeFunctionsConsoleServices', () => {
     expect(response).toEqual({
       data: [
         {
-          configurationId: fixtures.edgeFunctionConsole.configurationId,
-          functionId: fixtures.edgeFunctionConsole.functionId,
           id: 'mocked-timestamp',
-          level: {
-            content: 'Info',
-            severity: 'info',
-            icon: 'pi pi-info-circle'
-          },
-          line: fixtures.edgeFunctionConsole.line,
-          lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
-          source: fixtures.edgeFunctionConsole.source,
+          summary: [
+            { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
+            { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },
+            { key: 'level', value: fixtures.edgeFunctionConsole.level },
+            { key: 'line', value: fixtures.edgeFunctionConsole.line },
+            { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource },
+            { key: 'source', value: fixtures.edgeFunctionConsole.source }
+          ],
           ts: fixtures.edgeFunctionConsole.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }

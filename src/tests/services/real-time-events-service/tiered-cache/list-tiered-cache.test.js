@@ -95,16 +95,15 @@ describe('tieredCacheServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.tieredCache.configurationId,
-          host: fixtures.tieredCache.host,
-          requestUri: fixtures.tieredCache.requestUri,
-          requestMethod: fixtures.tieredCache.requestMethod,
-          upstreamCacheStatus: {
-            content: fixtures.tieredCache.upstreamCacheStatus,
-            severity: 'info'
-          },
-          proxyHost: fixtures.tieredCache.proxyHost,
-          source: fixtures.tieredCache.source,
+          summary: [
+            { key: 'configurationId', value: fixtures.tieredCache.configurationId },
+            { key: 'host', value: fixtures.tieredCache.host },
+            { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
+            { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
+            { key: 'requestUri', value: fixtures.tieredCache.requestUri },
+            { key: 'source', value: fixtures.tieredCache.source },
+            { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus }
+          ],
           ts: fixtures.tieredCache.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }

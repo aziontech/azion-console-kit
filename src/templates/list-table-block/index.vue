@@ -124,7 +124,7 @@
       <Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 3rem"
+        :headerStyle="`width: ${frozenSize}`"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -325,6 +325,10 @@
     },
     hiddenHeader: {
       type: Boolean
+    },
+    frozenSize: {
+      type: String,
+      default: () => '13rem'
     },
     columns: {
       type: Array,

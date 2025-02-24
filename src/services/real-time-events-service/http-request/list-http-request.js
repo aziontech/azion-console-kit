@@ -28,12 +28,23 @@ const adapt = (filter) => {
   const table = {
     dataset: 'httpEvents',
     limit: 10000,
-    fields: ['configurationId', 'host', 'requestId','httpUserAgent', 'requestMethod', 'status', 'ts', 'upstreamBytesSent', 'sslProtocol', 'wafLearning', 'requestTime'],
+    fields: [
+      'configurationId',
+      'host',
+      'requestId',
+      'httpUserAgent',
+      'requestMethod',
+      'status',
+      'ts',
+      'upstreamBytesSent',
+      'sslProtocol',
+      'wafLearning',
+      'requestTime'
+    ],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
 }
-
 
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
@@ -42,6 +53,7 @@ const adaptResponse = (httpResponse) => {
   const data = body.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(httpEventItem),
+    ts: httpEventItem.ts,
     tsFormat: convertValueToDate(httpEventItem.ts)
   }))
 

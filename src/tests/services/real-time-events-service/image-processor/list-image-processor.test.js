@@ -96,13 +96,15 @@ describe('ImageProcessorServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.imageProcessor.configurationId,
-          host: fixtures.imageProcessor.host,
-          requestUri: fixtures.imageProcessor.requestUri,
-          status: fixtures.imageProcessor.status,
-          bytesSent: fixtures.imageProcessor.bytesSent,
-          httpReferer: fixtures.imageProcessor.httpReferer,
-          httpUserAgent: fixtures.imageProcessor.httpUserAgent,
+          summary: [
+            { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
+            { key: 'configurationId', value: fixtures.imageProcessor.configurationId },
+            { key: 'host', value: fixtures.imageProcessor.host },
+            { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
+            { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
+            { key: 'requestUri', value: fixtures.imageProcessor.requestUri },
+            { key: 'status', value: fixtures.imageProcessor.status }
+          ],
           ts: fixtures.imageProcessor.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }

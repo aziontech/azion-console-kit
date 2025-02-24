@@ -113,7 +113,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
         },
         tooltipText: data.tooltipText
       })
-    case 'log-body': 
+    case 'log-body':
       return h(LogBody, {
         value: data
       })
