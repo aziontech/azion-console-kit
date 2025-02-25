@@ -1,17 +1,22 @@
 import { defineConfig } from 'azion'
 import process from 'node:process'
 
-const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env;
+const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
-    return origin?.map((origin) => ({
-      ...origin,
-      hostHeader: `stage-${origin.hostHeader}`,
-      addresses: origin.addresses?.map((addr) => `stage-${addr}`)
-    }))
+    return origin?.map(({ hostHeader, addresses, ...rest }) => {
+      const isCitiesDomain = hostHeader === 'cities.azion.com'
+      const transform = (addr) => `stage-${isCitiesDomain ? addr.replace('.com', '.net') : addr}`
+
+      return {
+        ...rest,
+        hostHeader: transform(hostHeader),
+        addresses: addresses?.map(transform)
+      }
+    })
   }
   return origin
 }
@@ -313,30 +318,14 @@ const config = {
         }
       },
       {
-        name: 'Route GraphQL Billing Queries to Manager Origin',
-        description: 'Routes GraphQL Billing queries to the Manager, updating the URI accordingly',
-        match: '^/graphql/billing',
+        name: 'API Version 4 Routing',
+        description: 'Directs API version 4 requests to the designated API origin for handling.',
+        match: '^/v4',
         behavior: {
-          forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-api',
             type: 'single_origin'
-          },
-          rewrite: '/billing/graphql'
-        }
-      },
-      {
-        name: 'Route GraphQL Accounting Queries to Manager Origin',
-        description:
-          'Routes GraphQL Accounting queries to the Manager, updating the URI accordingly',
-        match: '^/graphql/accounting',
-        behavior: {
-          forwardCookies: true,
-          setOrigin: {
-            name: 'origin-manager',
-            type: 'single_origin'
-          },
-          rewrite: '/accounting/graphql'
+          }
         }
       },
       {

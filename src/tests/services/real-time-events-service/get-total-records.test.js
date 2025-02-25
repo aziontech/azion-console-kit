@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listTieredCache } from '@/services/real-time-events-service/tiered-cache'
+import { getTotalRecords } from '@/services/real-time-events-service/get-total-records'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -10,35 +10,28 @@ const fixtures = {
       tsRangeEnd: '2024-02-23T19:07:25'
     }
   },
-  tieredCache: {
-    configurationId: 'config-001',
-    host: 'example.com',
-    requestUri: '/example',
-    requestMethod: 'GET',
-    upstreamCacheStatus: 'HIT',
-    proxyHost: 'proxy.example.com',
-    source: 'CDN',
-    ts: '2024-02-23T18:07:25.000Z'
+  httpRequest: {
+    count: 100000
   }
 }
 
 const makeSut = () => {
-  const sut = listTieredCache
+  const sut = getTotalRecords
 
   return {
     sut
   }
 }
 
-describe('tieredCacheServices', () => {
+describe('getTotalRecords', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { l2CacheEvents: [] } }
+      body: { data: { events: [{ count: 0 }] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'l2CacheEvents'
-    await sut(fixtures.filter)
+    const datasetName = 'events'
+    await sut({ filter: fixtures.filter, dataset: datasetName })
 
     const query = [
       `query (`,
@@ -47,19 +40,14 @@ describe('tieredCacheServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\taggregate: {`,
+      `count: rows`,
+      `\t\t}`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
       `\t) {`,
-      `\t\tconfigurationId`,
-      `\t\thost`,
-      `\t\trequestUri`,
-      `\t\trequestMethod`,
-      `\t\tupstreamCacheStatus`,
-      `\t\tts`,
-      `\t\tproxyHost`,
-      `\t\tsource`,
+      `\t\tcount`,
       `\t}`,
       `}`
     ].join('\n')
@@ -68,7 +56,6 @@ describe('tieredCacheServices', () => {
       url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
-      baseURL: '/',
       body: {
         query,
         variables: {
@@ -86,30 +73,13 @@ describe('tieredCacheServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { l2CacheEvents: [fixtures.tieredCache] } }
+      body: { data: { httpEvents: [fixtures.httpRequest] } }
     })
+    const datasetName = 'httpEvents'
 
     const { sut } = makeSut()
-    const response = await sut(fixtures.filter)
+    const response = await sut({ filter: fixtures.filter, dataset: datasetName })
 
-    expect(response).toEqual({
-      data: [
-        {
-          id: 'mocked-timestamp',
-          configurationId: fixtures.tieredCache.configurationId,
-          host: fixtures.tieredCache.host,
-          requestUri: fixtures.tieredCache.requestUri,
-          requestMethod: fixtures.tieredCache.requestMethod,
-          upstreamCacheStatus: {
-            content: fixtures.tieredCache.upstreamCacheStatus,
-            severity: 'info'
-          },
-          proxyHost: fixtures.tieredCache.proxyHost,
-          source: fixtures.tieredCache.source,
-          ts: fixtures.tieredCache.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
-        }
-      ]
-    })
+    expect(response).toEqual('100.000')
   })
 })

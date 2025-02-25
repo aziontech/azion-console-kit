@@ -65,9 +65,10 @@ describe('edgeDns', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -105,12 +106,11 @@ describe('edgeDns', () => {
           source: fixtures.edgeDns.source,
           solutionId: fixtures.edgeDns.solutionId,
           ts: fixtures.edgeDns.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM',
+          tsFormat: 'February 23, 2024 at 06:07:25 PM',
           uuid: fixtures.edgeDns.uuid,
           zoneId: fixtures.edgeDns.zoneId
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

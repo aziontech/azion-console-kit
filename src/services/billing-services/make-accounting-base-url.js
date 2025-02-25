@@ -1,3 +1,3 @@
 export const makeAccountingBaseUrl = () => {
-  return 'accounting'
+  return 'v4/accounting/graphql'
 }

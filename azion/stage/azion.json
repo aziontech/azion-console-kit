@@ -2,7 +2,6 @@
   "name": "console-kit-2024-08-21-stage",
   "bucket": "console-kit-2024-08-21-stage",
   "preset": "vue",
-  "mode": "deliver",
   "env": "production",
   "prefix": "20240821142547",
   "not-first-run": true,
@@ -124,11 +123,6 @@
         "phase": "request"
       },
       {
-        "id": 277559,
-        "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": "request"
-      },
-      {
         "id": 277563,
         "name": "Secure Headers",
         "phase": "response"
@@ -141,11 +135,6 @@
       {
         "id": 312030,
         "name": "Route API Identity Providers",
-        "phase": "request"
-      },
-      {
-        "id": 317377,
-        "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
       },
       {
@@ -177,6 +166,11 @@
         "id": 368018,
         "name": "Rewrite azat Cookie in azionedge.net",
         "phase": "response"
+      },
+      {
+        "id": 371432,
+        "name": "API Version 4 Routing",
+        "phase": "request"
       }
     ]
   },

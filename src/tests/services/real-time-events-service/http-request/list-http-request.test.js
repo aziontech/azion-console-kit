@@ -63,9 +63,10 @@ describe('HttpRequestServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -100,10 +101,9 @@ describe('HttpRequestServices', () => {
           host: fixtures.httpRequest.host,
           requestId: fixtures.httpRequest.requestId,
           ts: fixtures.httpRequest.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

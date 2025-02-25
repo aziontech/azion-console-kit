@@ -10,6 +10,11 @@ const TABS_EVENTS = {
     tabRouter: 'http-requests',
     columns: [
       {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
+      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
@@ -17,11 +22,6 @@ const TABS_EVENTS = {
         field: 'host',
         header: 'Host'
       },
-      {
-        field: 'requestUri',
-        header: 'Request Uri'
-      },
-
       {
         field: 'requestMethod',
         header: 'Request Method'
@@ -31,9 +31,8 @@ const TABS_EVENTS = {
         header: 'Status'
       },
       {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
+        field: 'requestUri',
+        header: 'Request Uri'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -48,6 +47,11 @@ const TABS_EVENTS = {
     dataset: 'edgeFunctionsEvents',
     tabRouter: 'edge-functions',
     columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
       {
         field: 'configurationId',
         header: 'Configuration ID'
@@ -71,11 +75,6 @@ const TABS_EVENTS = {
       {
         field: 'edgeFunctionsTime',
         header: 'Edge Functions Time'
-      },
-      {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -91,6 +90,11 @@ const TABS_EVENTS = {
     dataset: 'cellsConsoleEvents',
     tabRouter: 'edge-functions-console',
     columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
       {
         field: 'configurationId',
         header: 'Configuration ID'
@@ -128,11 +132,6 @@ const TABS_EVENTS = {
         filterPath: 'line',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -151,20 +150,17 @@ const TABS_EVENTS = {
     tabRouter: 'image-processor',
     columns: [
       {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
+      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
       {
         field: 'host',
         header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri',
-        type: 'component',
-        filterPath: 'requestUri',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'status',
@@ -175,9 +171,12 @@ const TABS_EVENTS = {
         header: 'Bytes Sent'
       },
       {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
+        field: 'requestUri',
+        header: 'Request Uri',
+        type: 'component',
+        filterPath: 'requestUri',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -193,16 +192,17 @@ const TABS_EVENTS = {
     tabRouter: 'tiered-cache',
     columns: [
       {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
+      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
       {
         field: 'host',
         header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri'
       },
       {
         field: 'requestMethod',
@@ -220,9 +220,8 @@ const TABS_EVENTS = {
           })
       },
       {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
+        field: 'requestUri',
+        header: 'Request Uri'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -237,6 +236,11 @@ const TABS_EVENTS = {
     dataset: 'idnsQueriesEvents',
     tabRouter: 'edge-dns',
     columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
       {
         field: 'level',
         header: 'Level',
@@ -263,11 +267,6 @@ const TABS_EVENTS = {
       {
         field: 'solutionId',
         header: 'Solution ID'
-      },
-      {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -282,6 +281,11 @@ const TABS_EVENTS = {
     dataset: 'dataStreamedEvents',
     tabRouter: 'data-stream',
     columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
       {
         field: 'configurationId',
         header: 'Configuration ID'
@@ -315,11 +319,6 @@ const TABS_EVENTS = {
       {
         field: 'statusCode',
         header: 'Status Code'
-      },
-      {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -336,6 +335,11 @@ const TABS_EVENTS = {
     dataset: 'activityHistoryEvents',
     tabRouter: 'activity-history',
     columns: [
+      {
+        field: 'tsFormat',
+        sortField: 'ts',
+        header: 'TS'
+      },
       {
         field: 'userIp',
         header: 'User IP'
@@ -359,11 +363,6 @@ const TABS_EVENTS = {
       {
         field: 'resourceId',
         header: 'Resource ID'
-      },
-      {
-        field: 'tsFormat',
-        sortField: 'ts',
-        header: 'TS'
       }
     ],
     customColumnMapper: (rowData) => ({
