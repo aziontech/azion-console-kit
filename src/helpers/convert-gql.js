@@ -106,9 +106,10 @@ const convertGQLTotalRecords = (filter, table) => {
   if (!table) throw new Error('Table parameter is required')
 
   let variables = {}
+  const fields = filter?.fields || []
   const filterQuery = buildFilterQuery(filter, variables)
   const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
-  const filterParameter = formatFilterParameter(variables)
+  const filterParameter = formatFilterParameter(variables, fields)
   variables = formatValueContainOperator(variables)
 
   const queryConfig = {
