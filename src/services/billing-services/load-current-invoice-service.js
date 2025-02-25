@@ -1,5 +1,4 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
@@ -10,14 +9,12 @@ export const loadCurrentInvoiceService = async () => {
   const payload = getQueryByAccountType(accountIsNotRegular)
   const url = accountIsNotRegular ? `${makeBillingBaseUrl()}` : `${makeAccountingBaseUrl()}`
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url,
+    method: 'POST',
+    body: payload
+  })
 
   httpResponse = adapt(httpResponse, accountIsNotRegular)
 
