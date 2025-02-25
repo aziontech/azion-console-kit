@@ -102,7 +102,7 @@ describe('ImageProcessorServices', () => {
       sslSessionReused: fixtures.imageProcessor.sslSessionReused,
       status: fixtures.imageProcessor.status,
       tcpinfoRtt: fixtures.imageProcessor.tcpinfoRtt,
-      ts: 'February 23, 2024 at 06:07 PM',
+      ts: 'February 23, 2024 at 06:07:25 PM',
       upstreamCacheStatus: fixtures.imageProcessor.upstreamCacheStatus,
       upstreamResponseTime: fixtures.imageProcessor.upstreamResponseTime,
       upstreamResponseTimeStr: fixtures.imageProcessor.upstreamResponseTimeStr,

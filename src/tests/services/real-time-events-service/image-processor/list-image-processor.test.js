@@ -105,10 +105,9 @@ describe('ImageProcessorServices', () => {
           httpReferer: fixtures.imageProcessor.httpReferer,
           httpUserAgent: fixtures.imageProcessor.httpUserAgent,
           ts: fixtures.imageProcessor.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

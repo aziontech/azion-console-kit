@@ -80,7 +80,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       lineSource: fixtures.edgeFunctionConsole.lineSource,
       solutionId: fixtures.edgeFunctionConsole.solutionId,
       source: fixtures.edgeFunctionConsole.source,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

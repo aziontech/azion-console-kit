@@ -79,7 +79,7 @@ describe('DataStreamingServices', () => {
       source: fixtures.dataStreaming.source,
       statusCode: fixtures.dataStreaming.statusCode,
       streamedLines: fixtures.dataStreaming.streamedLines,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

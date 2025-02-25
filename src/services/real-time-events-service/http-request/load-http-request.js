@@ -1,6 +1,6 @@
-import convertGQL from '@/helpers/convert-gql'
+import { convertGQL } from '@/helpers/convert-gql'
 import { convertValueToDate } from '@/helpers/convert-date'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadHttpRequest = async (filter) => {

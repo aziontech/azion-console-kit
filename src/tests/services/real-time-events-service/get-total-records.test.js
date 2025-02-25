@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listEdgeFunctions } from '@/services/real-time-events-service/edge-functions'
+import { getTotalRecords } from '@/services/real-time-events-service/get-total-records'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -10,33 +10,28 @@ const fixtures = {
       tsRangeEnd: '2024-02-23T19:07:25'
     }
   },
-  edgeFunction: {
-    configurationId: '123',
-    functionLanguage: 'JavaScript',
-    edgeFunctionsInitiatorTypeList: ['typeA', 'typeB'],
-    edgeFunctionsList: 'function-1; function-2; function-3',
-    edgeFunctionsTime: '1000',
-    ts: '2024-02-23T18:07:25'
+  httpRequest: {
+    count: 100000
   }
 }
 
 const makeSut = () => {
-  const sut = listEdgeFunctions
+  const sut = getTotalRecords
 
   return {
     sut
   }
 }
 
-describe('EdgeFunctionsServices', () => {
+describe('getTotalRecords', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctions: [] } }
+      body: { data: { events: [{ count: 0 }] } }
     })
     const { sut } = makeSut()
-    const datasetName = 'edgeFunctionsEvents'
-    await sut(fixtures.filter)
+    const datasetName = 'events'
+    await sut({ filter: fixtures.filter, dataset: datasetName })
 
     const query = [
       `query (`,
@@ -45,26 +40,22 @@ describe('EdgeFunctionsServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\taggregate: {`,
+      `count: rows`,
+      `\t\t}`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
       `\t) {`,
-      `\t\tconfigurationId`,
-      `\t\tfunctionLanguage`,
-      `\t\tedgeFunctionsInitiatorTypeList`,
-      `\t\tedgeFunctionsList`,
-      `\t\tedgeFunctionsTime`,
-      `\t\tts`,
+      `\t\tcount`,
       `\t}`,
       `}`
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/events/graphql',
+      url: 'v3/events/graphql',
       method: 'POST',
       signal: undefined,
-      baseURL: '/',
       body: {
         query,
         variables: {
@@ -82,25 +73,13 @@ describe('EdgeFunctionsServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { edgeFunctionsEvents: [fixtures.edgeFunction] } }
+      body: { data: { httpEvents: [fixtures.httpRequest] } }
     })
+    const datasetName = 'httpEvents'
 
     const { sut } = makeSut()
-    const response = await sut(fixtures.filter)
+    const response = await sut({ filter: fixtures.filter, dataset: datasetName })
 
-    expect(response).toEqual({
-      data: [
-        {
-          id: 'mocked-timestamp',
-          configurationId: fixtures.edgeFunction.configurationId,
-          functionLanguage: fixtures.edgeFunction.functionLanguage,
-          edgeFunctionsInitiatorTypeList: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList,
-          edgeFunctionsList: ['function-1', ' function-2', ' function-3'],
-          edgeFunctionsTime: `${fixtures.edgeFunction.edgeFunctionsTime}ms`,
-          ts: fixtures.edgeFunction.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
-        }
-      ]
-    })
+    expect(response).toEqual('100.000')
   })
 })

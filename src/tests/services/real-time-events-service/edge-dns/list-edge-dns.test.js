@@ -106,12 +106,11 @@ describe('edgeDns', () => {
           source: fixtures.edgeDns.source,
           solutionId: fixtures.edgeDns.solutionId,
           ts: fixtures.edgeDns.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM',
+          tsFormat: 'February 23, 2024 at 06:07:25 PM',
           uuid: fixtures.edgeDns.uuid,
           zoneId: fixtures.edgeDns.zoneId
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })
