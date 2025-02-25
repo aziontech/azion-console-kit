@@ -6,8 +6,7 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
   import CodeEditor from './components/code-editor.vue'
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
+  import SelectButton from 'primevue/selectbutton'
   import { useGraphQLStore } from '@/stores/graphql-query'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
@@ -30,22 +29,11 @@
   })
 
   const code = ref('')
+  const currentSelection = ref('Wizard')
+  const options = ref(['Wizard', 'Graphql'])
 
   onMounted(() => {
     filter.value.isUserUsingGraphqlQuery = false
-  })
-
-  const filter = computed({
-    get: () => {
-      return props.filterData
-    },
-    set: (value) => {
-      emit('update:filterData', value)
-    }
-  })
-
-  const isFields = computed(() => {
-    return props.fieldsInFilter?.length === 0
   })
 
   const filterSearch = () => {
@@ -79,15 +67,65 @@
 
     return updatedQuery.trim()
   }
+
+  const filter = computed({
+    get: () => {
+      return props.filterData
+    },
+    set: (value) => {
+      emit('update:filterData', value)
+    }
+  })
+
+  const isFields = computed(() => {
+    return props.fieldsInFilter?.length === 0
+  })
+
+  const isSearchByWizard = computed(() => currentSelection.value === 'Wizard')
+
+  const isSearchByGraphql = computed(() => currentSelection.value === 'Graphql')
 </script>
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
+    <div class="flex justify-between">
+      <SelectButton
+        v-model="currentSelection"
+        :options="options"
+        class="max-w-max"
+      />
+
+      <div
+        class="flex gap-2 align-items-center"
+        v-if="isSearchByGraphql"
+      >
+        <PrimeButton
+          class="h-auto w-full md:max-w-fit p-datatable"
+          outlined
+          size="small"
+          icon-pos="right"
+          icon="pi pi-external-link"
+          label="Open in GraphiQL Playground"
+          @click="eventsPlaygroundOpener"
+        />
+        <PrimeButton
+          outlined
+          size="small"
+          icon="pi pi-download"
+          v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+          @click="downloadCSV"
+        />
+      </div>
+    </div>
     <IntervalFilterBlock
       v-model:filterDate="filter.tsRange"
       @applyTSRange="filterSearch"
+      v-if="isSearchByWizard"
     />
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
+    <div
+      class="flex w-full flex-column gap-6 md:gap-2 md:flex-row"
+      v-if="isSearchByWizard"
+    >
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
@@ -114,17 +152,17 @@
       </div>
     </div>
 
-    <div class="flex flex-col items-end gap-2">
-      <Accordion class="w-full">
-        <AccordionTab header="Query Graphql">
-          <CodeEditor
-            v-model="code"
-            :initialValue="replaceVariablesInQuery(getLastQuery.query, getLastQuery.variables)"
-          />
-        </AccordionTab>
-      </Accordion>
+    <div
+      class="flex flex-col items-start gap-2"
+      v-if="isSearchByGraphql"
+    >
+      <CodeEditor
+        v-model="code"
+        :initialValue="replaceVariablesInQuery(getLastQuery.query, getLastQuery.variables)"
+        ref="monacoEditor"
+      />
       <PrimeButton
-        label="Search By Query"
+        label="Search"
         size="small"
         class="h-auto w-full md:max-w-fit"
         data-testid="search-filter-search-button"
