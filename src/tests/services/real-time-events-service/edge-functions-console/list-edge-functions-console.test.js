@@ -55,7 +55,6 @@ describe('EdgeFunctionsConsoleServices', () => {
       `\t\tfunctionId`,
       `\t\tid`,
       `\t\tlevel`,
-      `\t\tline`,
       `\t\tlineSource`,
       `\t\tsource`,
       `\t\tts`,

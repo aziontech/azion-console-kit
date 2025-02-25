@@ -29,7 +29,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'cellsConsoleEvents',
     limit: 10000,
-    fields: ['configurationId', 'functionId', 'id', 'level', 'line', 'lineSource', 'source', 'ts'],
+    fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'source', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)

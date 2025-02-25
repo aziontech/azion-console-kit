@@ -31,7 +31,6 @@ const adapt = (filter) => {
     fields: [
       'configurationId',
       'host',
-      'requestUri',
       'requestMethod',
       'upstreamCacheStatus',
       'ts',

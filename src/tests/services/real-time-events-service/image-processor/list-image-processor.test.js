@@ -59,7 +59,6 @@ describe('ImageProcessorServices', () => {
       `\t\tstatus`,
       `\t\tbytesSent`,
       `\t\thttpReferer`,
-      `\t\thttpUserAgent`,
       `\t\tts`,
       `\t}`,
       `}`

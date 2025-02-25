@@ -54,7 +54,6 @@ describe('tieredCacheServices', () => {
       `\t) {`,
       `\t\tconfigurationId`,
       `\t\thost`,
-      `\t\trequestUri`,
       `\t\trequestMethod`,
       `\t\tupstreamCacheStatus`,
       `\t\tts`,

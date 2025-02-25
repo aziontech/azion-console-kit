@@ -22,7 +22,7 @@ export const listEdgeDNS = async (filter) => {
   })
 
   return adaptResponse(response)
-} 
+}
 
 const adapt = (filter) => {
   const table = {

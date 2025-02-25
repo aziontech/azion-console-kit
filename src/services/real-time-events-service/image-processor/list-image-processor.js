@@ -28,16 +28,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'imagesProcessedEvents',
     limit: 10000,
-    fields: [
-      'configurationId',
-      'host',
-      'requestUri',
-      'status',
-      'bytesSent',
-      'httpReferer',
-      'httpUserAgent',
-      'ts'
-    ],
+    fields: ['configurationId', 'host', 'requestUri', 'status', 'bytesSent', 'httpReferer', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
