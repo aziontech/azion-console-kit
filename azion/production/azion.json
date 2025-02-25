@@ -123,11 +123,6 @@
         "phase": "request"
       },
       {
-        "id": 269759,
-        "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": "request"
-      },
-      {
         "id": 269763,
         "name": "Secure Headers",
         "phase": "response"
@@ -140,11 +135,6 @@
       {
         "id": 313139,
         "name": "Route API Identity Providers",
-        "phase": "request"
-      },
-      {
-        "id": 318350,
-        "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
       },
       {
@@ -176,6 +166,11 @@
         "id": 368280,
         "name": "Rewrite azat Cookie in azionedge.net",
         "phase": "response"
+      },
+      {
+        "id": 372222,
+        "name": "API Version 4 Routing",
+        "phase": "request"
       }
     ]
   },
