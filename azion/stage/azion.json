@@ -123,11 +123,6 @@
         "phase": "request"
       },
       {
-        "id": 277559,
-        "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": "request"
-      },
-      {
         "id": 277563,
         "name": "Secure Headers",
         "phase": "response"
@@ -140,11 +135,6 @@
       {
         "id": 312030,
         "name": "Route API Identity Providers",
-        "phase": "request"
-      },
-      {
-        "id": 317377,
-        "name": "Route GraphQL Accounting Queries to Manager Origin",
         "phase": "request"
       },
       {
