@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listActivityHistory } from '@/services/real-time-events-service/activity-history'
+import { getTotalRecords } from '@/services/real-time-events-service/get-total-records'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -10,35 +10,28 @@ const fixtures = {
       tsRangeEnd: '2024-02-23T19:07:25'
     }
   },
-  activityHistory: {
-    userIp: 'userIp',
-    authorName: 'name',
-    title: 'title',
-    resourceType: 'resourceType',
-    resourceId: 'resourceId',
-    userId: 'userId',
-    ts: '2024-02-23T18:07:25.000Z'
+  httpRequest: {
+    count: 100000
   }
 }
 
 const makeSut = () => {
-  const sut = listActivityHistory
+  const sut = getTotalRecords
 
   return {
     sut
   }
 }
 
-describe('ActivityHistoryServices', () => {
+describe('getTotalRecords', () => {
   it('should call GraphQL with correct filter', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { activityHistoryEvents: [] } }
+      body: { data: { events: [{ count: 0 }] } }
     })
-
-    const datasetName = 'activityHistoryEvents'
     const { sut } = makeSut()
-    await sut(fixtures.filter)
+    const datasetName = 'events'
+    await sut({ filter: fixtures.filter, dataset: datasetName })
 
     const query = [
       `query (`,
@@ -47,18 +40,14 @@ describe('ActivityHistoryServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\taggregate: {`,
+      `count: rows`,
+      `\t\t}`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
       `\t) {`,
-      `\t\tuserIp`,
-      `\t\tauthorName`,
-      `\t\ttitle`,
-      `\t\tresourceType`,
-      `\t\tresourceId`,
-      `\t\tuserId`,
-      `\t\tts`,
+      `\t\tcount`,
       `\t}`,
       `}`
     ].join('\n')
@@ -84,26 +73,13 @@ describe('ActivityHistoryServices', () => {
     }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: { activityHistoryEvents: [fixtures.activityHistory] } }
+      body: { data: { httpEvents: [fixtures.httpRequest] } }
     })
+    const datasetName = 'httpEvents'
 
     const { sut } = makeSut()
-    const response = await sut(fixtures.filter)
+    const response = await sut({ filter: fixtures.filter, dataset: datasetName })
 
-    expect(response).toEqual({
-      data: [
-        {
-          id: 'mocked-timestamp',
-          userIp: fixtures.activityHistory.userIp,
-          authorName: fixtures.activityHistory.authorName,
-          title: fixtures.activityHistory.title,
-          resourceType: fixtures.activityHistory.resourceType,
-          resourceId: fixtures.activityHistory.resourceId,
-          userId: fixtures.activityHistory.userId,
-          ts: fixtures.activityHistory.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
-        }
-      ]
-    })
+    expect(response).toEqual('100.000')
   })
 })

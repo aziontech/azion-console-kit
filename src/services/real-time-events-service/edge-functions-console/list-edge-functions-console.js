@@ -1,11 +1,10 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import * as Errors from '@/services/axios/errors'
-import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -69,7 +68,6 @@ const levelMap = {
 
 const adaptResponse = (body) => {
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
-  const totalRecords = cellsConsoleEventsList?.length
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
         configurationId: cellsConsoleEvents.configurationId,
@@ -89,8 +87,7 @@ const adaptResponse = (body) => {
     : []
 
   return {
-    data: parser,
-    recordsFound: getRecordsFound(totalRecords)
+    data: parser
   }
 }
 

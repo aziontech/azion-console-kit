@@ -108,8 +108,7 @@ describe('tieredCacheServices', () => {
           ts: fixtures.tieredCache.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

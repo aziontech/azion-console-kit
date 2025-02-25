@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import convertGQL from '@/helpers/convert-gql'
+import { convertGQL } from '@/helpers/convert-gql'
 
 const fixtures = {
   table: {
