@@ -78,7 +78,7 @@ describe('DataStreamingServices', () => {
       functionLanguage: fixtures.edgeFunction.functionLanguage,
       source: fixtures.edgeFunction.source,
       virtualHostId: fixtures.edgeFunction.virtualhostid,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })
