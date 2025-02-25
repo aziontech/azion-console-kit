@@ -11,6 +11,7 @@ export const getTotalRecords = async ({ filter, dataset }) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const httpResponse = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload

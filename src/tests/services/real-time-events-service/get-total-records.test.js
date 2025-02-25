@@ -56,6 +56,7 @@ describe('getTotalRecords', () => {
       url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
