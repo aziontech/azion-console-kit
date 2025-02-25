@@ -7,10 +7,12 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
+  cy.get(selectors.form.actionsSkipButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -31,7 +33,7 @@ describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
     fixtures.deviceGroupName = generateUniqueName('DeviceGroup')
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAccelerator')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('applicationAcceleratorEnabled')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Device Groups')).click()

@@ -10,6 +10,9 @@ import * as ErrorResponsesService from '@/services/edge-application-error-respon
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
+import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
+import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
+import * as DomainServicesV4 from '@/services/domains-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -39,7 +42,7 @@ export const edgeApplicationRoutes = {
       name: 'create-edge-application',
       component: () => import('@views/EdgeApplications/CreateView.vue'),
       props: {
-        createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService
+        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -55,13 +58,56 @@ export const edgeApplicationRoutes = {
       }
     },
     {
+      path: 'config/:id',
+      name: 'config-edge-application',
+      component: () => import('@views/EdgeApplications/Config/ConfigView.vue'),
+      props: {
+        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
+        domainsService: {
+          listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
+          createDomainService: DomainServicesV4.createDomainService,
+
+          loadEdgeApplicationsService:
+            EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService,
+          listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
+          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
+          listDigitalCertificatesService:
+            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
+          loadDigitalCertificatesService:
+            DigitalCertificatesServicesV4.loadDigitalCertificateService
+        },
+        cacheSettingsServices: {
+          createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService
+        },
+        originsServices: {
+          createOriginService: OriginsService.createOriginService
+        },
+        rulesEngineServices: {
+          editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
+          listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll
+        }
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Applications',
+            to: '/edge-applications'
+          },
+          {
+            label: 'Config Edge Application',
+            to: '/edge-applications/config'
+          }
+        ]
+      }
+    },
+    {
       path: 'edit/:id/:tab?',
       name: 'edit-edge-application',
       component: () => import('@views/EdgeApplications/TabsView.vue'),
       props: {
         edgeApplicationServices: {
-          editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
-          loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
+          editEdgeApplication: EdgeApplicationsServiceV4.editEdgeApplicationsService,
+          loadEdgeApplication: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
           updatedRedirect: 'list-edge-applications',
           contactSalesEdgeApplicationService:
             EdgeApplicationsService.contactSalesEdgeApplicationService

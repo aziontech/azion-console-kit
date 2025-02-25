@@ -1,4 +1,4 @@
-import { makeDomainsBaseUrl } from '@/services/domains-services/v4/make-domains-service'
+import { makeDomainsBaseUrl } from '@/services/domains-services/v4/make-domains-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {

@@ -162,9 +162,16 @@
 
   const initialValues = {
     name: '',
-    environment: 'production',
+    environment: '1',
     edgeApplication: null,
     edgeFirewall: null,
+    deliveryProtocol: 'https',
+    httpPort: [{ name: '80 (Default)', value: 80 }],
+    httpsPort: [{ name: '443 (Default)', value: 443 }],
+    quicPort: [{ name: '443 (Default)', value: 443 }],
+    minimumTlsVersion: 'tls_1_2',
+    useHttps: false,
+    useHttp3: false,
     cnames: '',
     cnameAccessOnly: true,
     mtlsIsEnabled: false,
@@ -198,6 +205,22 @@
         message: `Space characters aren't allowed.`,
         test: (value) => value?.includes(' ') === false
       }),
+    httpsPort: yup.array().when('useHttps', {
+      is: true,
+      then: (schema) => schema.min(1, 'At least one port is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    minimumTlsVersion: yup.string().when('useHttps', {
+      is: true,
+      then: (schema) => schema.required().label('TLS Version'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    httpPort: yup.array().min(1).required(),
+    quicPort: yup.array().when('useHtpp3', {
+      is: true,
+      then: (schema) => schema.min(1, 'At least one port is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
     cnameAccessOnly: yup.boolean(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),

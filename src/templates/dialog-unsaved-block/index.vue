@@ -1,8 +1,9 @@
 <script setup>
-  import { computed, ref, watch, inject } from 'vue'
+  import { computed, ref, watch, inject, onMounted } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
+  import { disabledBackButton } from '@/helpers'
 
   defineOptions({ name: 'dialog-unsaved-block' })
   const emit = defineEmits(['update:visible'])
@@ -113,6 +114,10 @@
 
   watch(formDrawerHasUpdated, () => {
     openDialogUnsaved(true)
+  })
+
+  onMounted(() => {
+    disabledBackButton()
   })
 </script>
 

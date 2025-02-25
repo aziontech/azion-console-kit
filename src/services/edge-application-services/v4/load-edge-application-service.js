@@ -3,7 +3,7 @@ import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-ur
 
 export const loadEdgeApplicationsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${id}?fields=id,name`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${id}`,
     method: 'GET'
   })
 
@@ -13,10 +13,17 @@ export const loadEdgeApplicationsService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
-  const data = httpResponse.body?.data
+  const edgeApplication = httpResponse.body?.data
   const parsedEdgeApplications = {
-    id: data.id,
-    name: data.name
+    id: edgeApplication.id,
+    name: edgeApplication.name,
+    edgeCacheEnabled: edgeApplication.modules.edge_cache_enabled,
+    edgeFunctionsEnabled: edgeApplication.modules.edge_functions_enabled,
+    applicationAcceleratorEnabled: edgeApplication.modules.application_accelerator_enabled,
+    imageProcessorEnabled: edgeApplication.modules.image_processor_enabled,
+    tieredCacheEnabled: edgeApplication.modules.tiered_cache_enabled,
+    isActive: edgeApplication.active,
+    debug: edgeApplication.debug
   }
 
   return {

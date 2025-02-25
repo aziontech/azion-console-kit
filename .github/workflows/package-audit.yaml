@@ -5,9 +5,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
+      - redesigning-the-flow-of-the-user-journey-in-domain-and-edge-app
   push:
     branches:
       - dev
+      - redesigning-the-flow-of-the-user-journey-in-domain-and-edge-app
   workflow_dispatch:
 
 env:

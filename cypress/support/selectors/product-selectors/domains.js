@@ -1,6 +1,15 @@
 export default {
   createButton: '[data-testid="create_Domain_button"]',
   nameInput: '[data-testid="domains-form__name-field__input"]',
+  portHttp: '[data-testid="form-horizontal-delivery-settings-http-ports-multi-select"]',
+  portHttps: '[data-testid="form-horizontal-delivery-settings-https-ports-multi-select"]',
+  useHttpsField: '[data-testid="domains-form__use-https-field"]',
+  useHttp3Field: '[data-testid="domains-form__use-http3-field"]',
+  dropdownSelectPort: '.p-multiselect-items-wrapper ul',
+  dropdownSelectTls: '.p-dropdown-items-wrapper #minimumTlsVersion_list',
+  dropdownSelectCipher: '.p-dropdown-items-wrapper #supportedCiphers_list',
+  cipherSuite: '[data-testid="form-horizontal-delivery-settings-cipher-suite-field-dropdown__dropdown"]',
+  tlsVersion: '[data-testid="form-horizontal-delivery-settings-tls-version-field-dropdown__dropdown"]',
   edgeApplicationField: '[data-testid="domains-form__edge-application-field__dropdown"]',
   edgeApplicationDropdownFilter:
     '[data-testid="domains-form__edge-application-field__dropdown-filter-input"]',

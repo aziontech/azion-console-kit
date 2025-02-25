@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { loadEdgeApplicationsService } from '@/services/edge-application-services/v4'
+import { loadEdgeApplicationsDropdownService } from '@/services/edge-application-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -10,14 +10,14 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadEdgeApplicationsService
+  const sut = loadEdgeApplicationsDropdownService
 
   return {
     sut
   }
 }
 
-describe('EdgeApplicationServices', () => {
+describe('EdgeApplicationServicesV4', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
