@@ -89,7 +89,7 @@ const getConfig = () => {
           target: `${URLStartPrefix}manager.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
-        },
+        }
       }
     }
   }
