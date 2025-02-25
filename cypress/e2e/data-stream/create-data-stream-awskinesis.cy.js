@@ -49,11 +49,4 @@ describe('Data Stream spec', { tags: ['@dev2'] }, () => {
     )
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
   })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
-      cy.verifyToast('Data Stream successfully deleted')
-    })
-  })
 })

@@ -39,6 +39,13 @@ const fixtures = {
     bucketName: 'my-bucket',
     prefix: '/test'
   },
+  requestPayloadMockLiveIngest: {
+    id: '0000000-00000000-00a0a00s0as0-000000',
+    edgeApplicationId: 123,
+    name: 'New Origin',
+    originType: 'live_ingest',
+    streamingEndpoint: 'br-east-1.azioningest.net'
+  },
   emptyPrefixOrigin: {
     id: '0000000-00000000-00a0a00s0as0-000000',
     edgeApplicationId: 123,
@@ -120,6 +127,28 @@ describe('EdgeApplicationOriginsServices', () => {
       }
     })
   })
+
+  it('should call API with correct params when origin type is live ingest', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+
+    await sut(fixtures.requestPayloadMockLiveIngest)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/edge_applications/${fixtures.requestPayloadMockLiveIngest.edgeApplicationId}/origins/${fixtures.requestPayloadMockLiveIngest.id}`,
+      method: 'PATCH',
+      body: {
+        origin_type: fixtures.requestPayloadMockLiveIngest.originType,
+        name: fixtures.requestPayloadMockLiveIngest.name,
+        streaming_endpoint: fixtures.requestPayloadMockLiveIngest.streamingEndpoint
+      }
+    })
+  })
+
   it('should adapt prefix to / when the field is empty', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200

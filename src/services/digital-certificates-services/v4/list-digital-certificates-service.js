@@ -69,6 +69,13 @@ const adapt = (httpResponse) => {
           trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
         }
 
+        const formattedStatus = item?.status ? parseStatusData(item.status) : '-'
+
+        let statusColumn = {
+          status: formattedStatus,
+          statusDetail: item?.status_detail
+        }
+
         return {
           id: checkIfFieldExist(item?.id, null),
           name: checkIfFieldExist(item?.name),
@@ -76,7 +83,7 @@ const adapt = (httpResponse) => {
           subjectName: subjectNames,
           type: checkIfFieldExist(typeMap[item?.type]),
           validity: item?.validity ? parseValidityDate(item.validity) : '-',
-          status: item?.status ? parseStatusData(item.status) : '-'
+          status: statusColumn
         }
       })
     : []

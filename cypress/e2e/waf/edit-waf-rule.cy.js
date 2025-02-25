@@ -79,11 +79,4 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     )
     cy.get(selectors.wafs.listRow('active')).should('have.text', 'Active')
   })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
-  })
 })

@@ -468,13 +468,14 @@ ts
     }
   },
   {
-    id: '357825388709151309',
-    label: 'Requests by Method',
+    id: '357825388709151310',
+    label: 'Average Request Time',
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
+        limit: 10000
+        aggregate: {avg: requestTime 
+}
         groupBy: [ts]
         orderBy: [ts_ASC]
         filter: {
@@ -486,11 +487,70 @@ end: $tsRange_end
 
         }
         ) {
-          requestsHttpMethodGet
-requestsHttpMethodPost
-requestsHttpMethodHead
-requestsHttpMethodOthers
+          avg
 ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357825388709151312',
+    label: 'Requests by Scheme',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, scheme]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
+ts
+scheme
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357825388709151309',
+    label: 'Requests by Method',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, requestMethod]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
+ts
+requestMethod
         }
       }`,
       variables: {
@@ -505,9 +565,10 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
-        groupBy: [ts]
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, status]
         orderBy: [ts_ASC]
         filter: {
           tsRange: {
@@ -515,14 +576,17 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+statusRange: {
+begin: 200
+end: 299
+
+}
 
         }
         ) {
-          requestsStatusCode200
-requestsStatusCode204
-requestsStatusCode206
-requestsStatusCode2xx
+          sum
 ts
+status
         }
       }`,
       variables: {
@@ -537,9 +601,10 @@ ts
     gqlQuery: {
       query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
       httpMetrics (
-        limit: 5000
-        
-        groupBy: [ts]
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, status]
         orderBy: [ts_ASC]
         filter: {
           tsRange: {
@@ -547,14 +612,17 @@ begin: $tsRange_begin
 end: $tsRange_end
 
 }
+statusRange: {
+begin: 300
+end: 399
+
+}
 
         }
         ) {
-          requestsStatusCode301
-requestsStatusCode302
-requestsStatusCode304
-requestsStatusCode3xx
+          sum
 ts
+status
         }
       }`,
       variables: {
@@ -1000,6 +1068,135 @@ ts
     }
   },
   {
+    id: '357842851576414806',
+    label: 'Top WAF Threat Requests by Country',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 20
+        aggregate: {sum: requests 
+}
+        groupBy: [geolocCountryName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+geolocCountryName
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414807',
+    label: 'Top WAF Threat Requests by Country',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 20
+        aggregate: {sum: requests 
+}
+        groupBy: [geolocCountryName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+geolocCountryName
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414808',
+    label: 'WAF Threat Requests by Family Attack',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [wafAttackFamily]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+wafAttackFamily
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357842851576414809',
+    label: 'WAF Threat Requests by Host',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [ts, host]
+        orderBy: [ts_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+wafBlock: "1"
+wafLearning: "0"
+
+        }
+        ) {
+          sum
+ts
+host
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
     id: '357843490139298789',
     label: 'Total Queries',
     gqlQuery: {
@@ -1174,6 +1371,36 @@ end: $tsRange_end
         ) {
           sum
 ts
+classified
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '329891149133127509',
+    label: 'Top Bot Traffic',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      botManagerMetrics (
+        limit: 10000
+        aggregate: {sum: requests 
+}
+        groupBy: [classified]
+        orderBy: [sum_ASC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          sum
 classified
         }
       }`,
@@ -1514,6 +1741,104 @@ end: $tsRange_end
         ) {
           sum
 ts
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '424388331488145487',
+    label: 'Top WAF Threat Requests by IP',
+    description: 'Top 10 IPs that generated the most threats identified by the WAF',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpBreakdownMetrics (
+        limit: 10
+        aggregate: {sum: wafThreatRequests 
+}
+        groupBy: [remoteAddress]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          remoteAddress
+sum
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357825388709151322',
+    label: 'Top WAF Threat Requests by IP',
+    description: 'Top 10 IPs that generated the most threats identified by the WAF',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [status, upstreamStatus]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          status
+upstreamStatus
+sum
+        }
+      }`,
+      variables: {
+        tsRange_begin: '2024-01-01T12:00:00',
+        tsRange_end: '2024-12-01T12:00:00'
+      }
+    }
+  },
+  {
+    id: '357825388709151326',
+    label: 'IP Address Information',
+    description:
+      'Displays the distribution of requests by region, country, ASN, and individual IP address.',
+    gqlQuery: {
+      query: `query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {
+      httpBreakdownMetrics (
+        limit: 10
+        aggregate: {sum: requests 
+}
+        groupBy: [remoteAddress, geolocAsn, geolocCountryName, geolocRegionName]
+        orderBy: [sum_DESC]
+        filter: {
+          tsRange: {
+begin: $tsRange_begin
+end: $tsRange_end
+
+}
+
+        }
+        ) {
+          remoteAddress
+geolocAsn
+geolocCountryName
+geolocRegionName
+sum
         }
       }`,
       variables: {

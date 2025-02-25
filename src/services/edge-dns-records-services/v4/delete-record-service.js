@@ -1,6 +1,7 @@
 import * as Errors from '@/services/axios/errors'
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const deleteRecordsService = async ({ recordID, edgeDNSID }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -19,19 +20,11 @@ export const deleteRecordsService = async ({ recordID, edgeDNSID }) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 204:
+    case 200:
       return 'Edge DNS Record successfully deleted'
-    case 400:
-      throw new Errors.NotFoundError().message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(extractApiError(httpResponse)).message
   }
 }

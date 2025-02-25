@@ -38,11 +38,4 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.nameRow).should('have.text', `${networkListName}`)
     cy.get(selectors.networkLists.typeRow).should('have.text', 'Countries')
   })
-
-  afterEach(() => {
-    // Delete the network list
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Network list successfully deleted')
-    })
-  })
 })

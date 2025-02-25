@@ -73,7 +73,7 @@ jobs:
 
       - name: Notify test completion in Slack
         if: ${{ always() && github.event_name == 'schedule' && env.SLACK_WEBHOOK_URL != ''}}
-        uses: 8398a7/action-slack@v4
+        uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           job_name: Run Local Prod E2E Tests
