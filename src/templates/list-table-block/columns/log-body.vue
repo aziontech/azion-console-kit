@@ -4,8 +4,8 @@
       v-for="(item, index) in value"
       :key="index"
     >
-      <span class="font-bold text-secondary bg-secondary">{{ item.key }}:</span>
-      <span class="ml-1 w-24 overflow-hidden text-ellipsis whitespace-nowrap">{{
+      <span class="code-log-body">{{ item.key }}:</span>
+      <span class="ml-1 w-24 overflow-hidden text-ellipsis whitespace-nowrap value-code-log-body">{{
         item.value
       }}</span>
       <span
