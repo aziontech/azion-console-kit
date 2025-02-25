@@ -2,7 +2,6 @@
   "name": "console-kit-2024-08-21-stage",
   "bucket": "console-kit-2024-08-21-stage",
   "preset": "vue",
-  "mode": "deliver",
   "env": "production",
   "prefix": "20240821142547",
   "not-first-run": true,
@@ -177,6 +176,11 @@
         "id": 368018,
         "name": "Rewrite azat Cookie in azionedge.net",
         "phase": "response"
+      },
+      {
+        "id": 371432,
+        "name": "API Version 4 Routing",
+        "phase": "request"
       }
     ]
   },
