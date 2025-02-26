@@ -20,7 +20,7 @@
           :service="props.listDomainsService"
           :loadService="props.loadDomainService"
           optionLabel="name"
-          optionValue="id"
+          optionValue=""
           :value="valueDomainId"
           appendTo="self"
           class="w-full sm:max-w-xs overflow-hidden"
@@ -127,7 +127,8 @@
     v-model:visible="showDetailsOfAttack"
     :listService="handleListWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
-    :domains="domainNames"
+    :domains="selectedDomains"
+    :logBody="logBody"
     :netWorkList="netWorkListName"
     :time="timeName"
     @attack-on="createAllowedByAttack"
@@ -222,6 +223,7 @@
   })
   const selectedEvents = ref([])
   const totalRecordsFound = ref(0)
+  const logBody = ref(null)
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
@@ -229,7 +231,7 @@
   const netWorkListOptions = ref({ options: [], done: true })
   const domainsOptions = ref({ options: [], done: true })
   const tuningSelected = ref(null)
-  const domainNames = ref('')
+  const selectedDomains = ref([])
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
@@ -361,7 +363,8 @@
   }
 
   const setDomainsSelectedOptions = (value) => {
-    selectedFilter.value.domains = value
+    selectedDomains.value = value
+    selectedFilter.value.domains = value.map((item) => item.id)
     filterTuning()
   }
 
@@ -376,12 +379,6 @@
       detail: summary,
       closable: true
     })
-  }
-
-  const getDomainNames = () => {
-    domainNames.value = domainsOptions.value.options
-      .filter((domain) => selectedFilter.value.domains.includes(domain.id))
-      .map((domain) => domain.name)
   }
 
   const openDialog = (origin = 'page') => {
@@ -401,7 +398,6 @@
   }
 
   const openMoreDetails = (tuning) => {
-    getDomainNames()
     tuningSelected.value = tuning
     showDetailsOfAttack.value = true
   }
