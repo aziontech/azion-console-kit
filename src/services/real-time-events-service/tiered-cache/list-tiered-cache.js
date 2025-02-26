@@ -5,6 +5,7 @@ import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
 
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -30,7 +31,6 @@ const adapt = (filter) => {
     fields: [
       'configurationId',
       'host',
-      'requestUri',
       'requestMethod',
       'upstreamCacheStatus',
       'ts',
@@ -48,17 +48,8 @@ const adaptResponse = (response) => {
 
   const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     id: generateCurrentTimestamp(),
-    configurationId: tieredCacheEvents.configurationId,
-    host: tieredCacheEvents.host,
-    requestUri: tieredCacheEvents.requestUri,
-    requestMethod: tieredCacheEvents.requestMethod,
-    upstreamCacheStatus: {
-      content: tieredCacheEvents.upstreamCacheStatus,
-      severity: 'info'
-    },
+    summary: buildSummary(tieredCacheEvents),
     ts: tieredCacheEvents.ts,
-    proxyHost: tieredCacheEvents.proxyHost,
-    source: tieredCacheEvents.source,
     tsFormat: convertValueToDate(tieredCacheEvents.ts)
   }))
 

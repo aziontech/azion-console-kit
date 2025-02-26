@@ -10,30 +10,16 @@ const TABS_EVENTS = {
     tabRouter: 'http-requests',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'host',
-        header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri'
-      },
-
-      {
-        field: 'requestMethod',
-        header: 'Request Method'
-      },
-      {
-        field: 'status',
-        header: 'Status'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -49,33 +35,16 @@ const TABS_EVENTS = {
     tabRouter: 'edge-functions',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'functionLanguage',
-        header: 'Function Language'
-      },
-      {
-        field: 'edgeFunctionsInitiatorTypeList',
-        header: 'Edge Functions Initiator Type List'
-      },
-      {
-        field: 'edgeFunctionsList',
-        header: 'Edge Functions List',
-        filterPath: 'edgeFunctionsList',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
-      },
-      {
-        field: 'edgeFunctionsTime',
-        header: 'Edge Functions Time'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -92,47 +61,16 @@ const TABS_EVENTS = {
     tabRouter: 'edge-functions-console',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'functionId',
-        header: 'Function Id'
-      },
-      {
-        field: 'lineSource',
-        header: 'Line Source',
-        filterPath: 'lineSource.content',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'level',
-        header: 'Level',
-        type: 'component',
-        filterPath: 'level.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'line',
-        header: 'Line',
-        type: 'component',
-        filterPath: 'line',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -151,33 +89,16 @@ const TABS_EVENTS = {
     tabRouter: 'image-processor',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'host',
-        header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri',
-        type: 'component',
-        filterPath: 'requestUri',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'status',
-        header: 'Status'
-      },
-      {
-        field: 'bytesSent',
-        header: 'Bytes Sent'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -193,36 +114,16 @@ const TABS_EVENTS = {
     tabRouter: 'tiered-cache',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'host',
-        header: 'Host'
-      },
-      {
-        field: 'requestUri',
-        header: 'Request Uri'
-      },
-      {
-        field: 'requestMethod',
-        header: 'Request Method'
-      },
-      {
-        field: 'upstreamCacheStatus',
-        header: 'Upstream Cache Status',
-        type: 'component',
-        filterPath: 'upstreamCacheStatus.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -238,36 +139,16 @@ const TABS_EVENTS = {
     tabRouter: 'edge-dns',
     columns: [
       {
-        field: 'level',
-        header: 'Level',
-        type: 'component',
-        filterPath: 'level.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'zoneId',
-        header: 'Zone ID'
-      },
-      {
-        field: 'qtype',
-        header: 'Q Type'
-      },
-      {
-        field: 'resolutionType',
-        header: 'Resolution Type'
-      },
-      {
-        field: 'solutionId',
-        header: 'Solution ID'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -283,43 +164,16 @@ const TABS_EVENTS = {
     tabRouter: 'data-stream',
     columns: [
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
-        field: 'jobName',
-        header: 'Job Name',
-        type: 'component',
-        filterPath: 'jobName.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'endpointType',
-        header: 'Endpoint Type',
-        type: 'component',
-        filterPath: 'endpointType.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'url',
-        header: 'URL'
-      },
-      {
-        field: 'statusCode',
-        header: 'Status Code'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({
@@ -337,33 +191,16 @@ const TABS_EVENTS = {
     tabRouter: 'activity-history',
     columns: [
       {
-        field: 'userIp',
-        header: 'User IP'
-      },
-      {
-        field: 'authorName',
-        header: 'Author Name'
-      },
-      {
-        field: 'title',
-        header: 'Title',
-        type: 'component',
-        filterPath: 'title',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
-      },
-      {
-        field: 'resourceType',
-        header: 'Resource Type'
-      },
-      {
-        field: 'resourceId',
-        header: 'Resource ID'
-      },
-      {
         field: 'tsFormat',
         sortField: 'ts',
         header: 'TS'
+      },
+      {
+        field: 'summary',
+        header: 'Log Body',
+        filterPath: 'summary',
+        type: 'component',
+        component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
     customColumnMapper: (rowData) => ({

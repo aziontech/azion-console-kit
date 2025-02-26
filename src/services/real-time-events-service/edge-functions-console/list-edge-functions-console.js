@@ -6,6 +6,7 @@ import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import * as Errors from '@/services/axios/errors'
 import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -28,43 +29,10 @@ const adapt = (filter) => {
   const table = {
     dataset: 'cellsConsoleEvents',
     limit: 10000,
-    fields: ['configurationId', 'functionId', 'id', 'level', 'line', 'lineSource', 'source', 'ts'],
+    fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'source', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
-}
-
-const levelMap = {
-  DEBUG: {
-    content: 'Debug',
-    severity: 'success',
-    icon: 'pi pi-check-circle'
-  },
-  ERROR: {
-    content: 'Error',
-    severity: 'danger',
-    icon: 'pi pi-times-circle'
-  },
-  WARN: {
-    content: 'Warning',
-    severity: 'warning',
-    icon: 'pi pi-exclamation-triangle'
-  },
-  INFO: {
-    content: 'Info',
-    severity: 'info',
-    icon: 'pi pi-info-circle'
-  },
-  LOG: {
-    content: 'Log',
-    severity: 'info',
-    icon: 'pi pi-code'
-  },
-  MDN: {
-    content: 'MDN',
-    severity: 'info',
-    icon: 'pi pi-code'
-  }
 }
 
 const adaptResponse = (body) => {
@@ -72,17 +40,8 @@ const adaptResponse = (body) => {
   const totalRecords = cellsConsoleEventsList?.length
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
-        configurationId: cellsConsoleEvents.configurationId,
-        functionId: cellsConsoleEvents.functionId,
+        summary: buildSummary(cellsConsoleEvents),
         id: generateCurrentTimestamp(),
-        originalId: cellsConsoleEvents.id,
-        level: levelMap[cellsConsoleEvents.level],
-        line: cellsConsoleEvents.line,
-        lineSource: {
-          content: cellsConsoleEvents.lineSource,
-          severity: 'info'
-        },
-        source: cellsConsoleEvents.source,
         tsFormat: convertValueToDate(cellsConsoleEvents.ts),
         ts: cellsConsoleEvents.ts
       }))

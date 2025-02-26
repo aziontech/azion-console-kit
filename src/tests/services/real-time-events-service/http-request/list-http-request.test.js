@@ -54,10 +54,14 @@ describe('HttpRequestServices', () => {
       `\t\tconfigurationId`,
       `\t\thost`,
       `\t\trequestId`,
-      `\t\trequestUri`,
+      `\t\thttpUserAgent`,
       `\t\trequestMethod`,
       `\t\tstatus`,
       `\t\tts`,
+      `\t\tupstreamBytesSent`,
+      `\t\tsslProtocol`,
+      `\t\twafLearning`,
+      `\t\trequestTime`,
       `\t}`,
       `}`
     ].join('\n')
@@ -93,12 +97,14 @@ describe('HttpRequestServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.httpRequest.configurationId,
-          requestMethod: fixtures.httpRequest.requestMethod,
-          requestUri: fixtures.httpRequest.requestUri,
-          status: fixtures.httpRequest.status,
-          host: fixtures.httpRequest.host,
-          requestId: fixtures.httpRequest.requestId,
+          summary: [
+            { key: 'configurationId', value: fixtures.httpRequest.configurationId },
+            { key: 'host', value: fixtures.httpRequest.host },
+            { key: 'requestId', value: fixtures.httpRequest.requestId },
+            { key: 'requestMethod', value: fixtures.httpRequest.requestMethod },
+            { key: 'requestUri', value: fixtures.httpRequest.requestUri },
+            { key: 'status', value: fixtures.httpRequest.status }
+          ],
           ts: fixtures.httpRequest.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }

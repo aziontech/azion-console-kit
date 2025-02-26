@@ -55,54 +55,19 @@ describe('RealTimeEventsModule', () => {
       expect(httpRequests.title).toBe('HTTP Requests')
       expect(httpRequests.dataset).toBe('httpEvents')
       expect(httpRequests.tabRouter).toBe('http-requests')
-      expect(httpRequests.columns.length).toBe(6)
+      expect(httpRequests.columns.length).toBe(2)
     })
 
     it('should have the correct columns for each tab', () => {
       const expectedColumns = {
-        httpRequests: [
-          'configurationId',
-          'host',
-          'requestUri',
-          'requestMethod',
-          'status',
-          'tsFormat'
-        ],
-        edgeFunctions: [
-          'configurationId',
-          'functionLanguage',
-          'edgeFunctionsInitiatorTypeList',
-          'edgeFunctionsList',
-          'edgeFunctionsTime',
-          'tsFormat'
-        ],
-        edgeFunctionsConsole: [
-          'configurationId',
-          'functionId',
-          'lineSource',
-          'level',
-          'line',
-          'tsFormat'
-        ],
-        imageProcessor: [
-          'configurationId',
-          'host',
-          'requestUri',
-          'status',
-          'bytesSent',
-          'tsFormat'
-        ],
-        tieredCache: [
-          'configurationId',
-          'host',
-          'requestUri',
-          'requestMethod',
-          'upstreamCacheStatus',
-          'tsFormat'
-        ],
-        edgeDNS: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'tsFormat'],
-        dataStream: ['configurationId', 'jobName', 'endpointType', 'url', 'statusCode', 'tsFormat'],
-        activityHistory: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'tsFormat']
+        httpRequests: ['tsFormat', 'summary'],
+        edgeFunctions: ['tsFormat', 'summary'],
+        edgeFunctionsConsole: ['tsFormat', 'summary'],
+        imageProcessor: ['tsFormat', 'summary'],
+        tieredCache: ['tsFormat', 'summary'],
+        edgeDNS: ['tsFormat', 'summary'],
+        dataStream: ['tsFormat', 'summary'],
+        activityHistory: ['tsFormat', 'summary']
       }
 
       Object.entries(TABS_EVENTS).forEach(([tabName, tabData]) => {

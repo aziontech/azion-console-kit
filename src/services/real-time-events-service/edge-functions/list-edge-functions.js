@@ -5,6 +5,7 @@ import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -46,11 +47,7 @@ const adaptResponse = (response) => {
 
   const data = body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
-    configurationId: edgeFunctionsEvents.configurationId,
-    functionLanguage: edgeFunctionsEvents.functionLanguage,
-    edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
-    edgeFunctionsTime: `${edgeFunctionsEvents.edgeFunctionsTime}ms`,
+    summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
     tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
   }))

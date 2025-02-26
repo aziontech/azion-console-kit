@@ -91,11 +91,16 @@ describe('EdgeFunctionsServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.edgeFunction.configurationId,
-          functionLanguage: fixtures.edgeFunction.functionLanguage,
-          edgeFunctionsInitiatorTypeList: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList,
-          edgeFunctionsList: ['function-1', ' function-2', ' function-3'],
-          edgeFunctionsTime: `${fixtures.edgeFunction.edgeFunctionsTime}ms`,
+          summary: [
+            { key: 'configurationId', value: fixtures.edgeFunction.configurationId },
+            {
+              key: 'edgeFunctionsInitiatorTypeList',
+              value: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList
+            },
+            { key: 'edgeFunctionsList', value: 'function-1; function-2; function-3' },
+            { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
+            { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage }
+          ],
           ts: fixtures.edgeFunction.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
