@@ -17,10 +17,11 @@
     editEdgeNodeService: { type: Function, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
-    createServiceEdgeNodeService: { type: Function, required: true },
+    unbindServiceEdgeNodeService: { type: Function, required: true },
+    bindServiceEdgeNodeService: { type: Function, required: true },
     loadServiceEdgeNodeService: { type: Function, required: true },
     editServiceEdgeNodeService: { type: Function, required: true },
+    listEdgeServiceServices: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -135,11 +136,12 @@
           <ListViewServices
             v-if="mapTabs.services === activeTab"
             :edgeNodeId="edgeNodeId"
-            :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
+            :listEdgeServiceServices="props.listEdgeServiceServices"
+            :bindServiceEdgeNodeService="props.bindServiceEdgeNodeService"
             :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
             :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
             :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-            :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
+            :unbindServiceEdgeNodeService="props.unbindServiceEdgeNodeService"
             :documentationServiceServices="props.documentationServiceServices"
           />
         </TabPanel>

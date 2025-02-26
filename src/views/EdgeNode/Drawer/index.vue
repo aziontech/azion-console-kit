@@ -14,7 +14,7 @@
       type: String,
       required: true
     },
-    createServiceEdgeNodeService: {
+    bindServiceEdgeNodeService: {
       type: Function,
       required: true
     },
@@ -26,7 +26,7 @@
       type: Function,
       required: true
     },
-    listServiceEdgeNodeService: {
+    listEdgeServiceServices: {
       type: Function,
       required: true
     }
@@ -42,21 +42,11 @@
 
   const initialValues = {
     serviceId: 0,
-    variables: '',
     id: props.edgeNodeId
-  }
-
-  const validateCode = (val = '') => {
-    const split = val.split(/\s*\n+\s*/).filter((row) => !!row)
-    const isValid = split.every((row) => /^\w+\s*=[^]+$/.test(row))
-    return isValid
   }
 
   const validationSchema = yup.object({
     serviceId: yup.number().required().label('Service'),
-    variables: yup
-      .string()
-      .test('validateFilePath', 'The format provided is invalid', validateCode),
     id: yup.string().required()
   })
 
@@ -100,7 +90,7 @@
   <CreateDrawerBlock
     v-if="loadCreateServiceDrawer"
     v-model:visible="showCreateServiceDrawer"
-    :createService="createServiceEdgeNodeService"
+    :createService="bindServiceEdgeNodeService"
     :schema="validationSchema"
     :isOverlapped="isOverlapped"
     :initialValues="initialValues"
@@ -111,7 +101,7 @@
       <FormFieldsDrawerService
         :edgeNodeId="edgeNodeId"
         @toggleDrawer="handleToggleDrawer"
-        :listServicesHandle="listServiceEdgeNodeService"
+        :listServicesHandle="listEdgeServiceServices"
         :disabledFields="disabledFields"
         :bound="false"
       />
@@ -132,7 +122,7 @@
       <FormFieldsDrawerService
         :edgeNodeId="edgeNodeId"
         @toggleDrawer="handleToggleDrawer"
-        :listServicesHandle="listServiceEdgeNodeService"
+        :listServicesHandle="listEdgeServiceServices"
         :disabledFields="disabledFields"
         bound
       />
