@@ -1,5 +1,6 @@
 <template>
   <LabelBlock
+    v-if="props.label"
     :for="props.name"
     :label="props.label"
     :isRequired="$attrs.required"
@@ -16,6 +17,7 @@
     :optionDisabled="props.optionDisabled"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
+    :showClear="props.enableClearOption"
     @change="emitChange"
     @blur="emitBlur"
     :class="errorMessage ? 'p-invalid' : ''"
@@ -145,6 +147,14 @@
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
+    },
+    enableClearOption: {
+      type: Boolean,
+      default: false
+    },
+    disableEmitFirstRender: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -166,6 +176,7 @@
   const page = ref(INITIAL_PAGE)
   const search = ref('')
   const focusSearch = ref(null)
+  const disableEmitInit = ref(props.disableEmitFirstRender)
 
   onMounted(async () => {
     await fetchData()
@@ -197,6 +208,10 @@
     )
 
     emit('onChange', inputValue.value)
+
+    if (inputValue.value === null) {
+      emit('onClear')
+    }
 
     if (selectedOption) {
       emit('onSelectOption', selectedOption)
@@ -288,6 +303,11 @@
 
       if (!optionExists) {
         data.value = [newOption, ...data.value]
+      }
+
+      if (disableEmitInit.value) {
+        disableEmitInit.value = false
+        return
       }
       emitChange()
     } finally {

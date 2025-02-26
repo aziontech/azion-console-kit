@@ -2,7 +2,6 @@
   "name": "console_kit_31-07-2024",
   "bucket": "consolekit31-07-2024",
   "preset": "vue",
-  "mode": "deliver",
   "env": "production",
   "prefix": "20240731102422",
   "not-first-run": true,
@@ -124,26 +123,6 @@
         "phase": "request"
       },
       {
-        "id": 269759,
-        "name": "Route GraphQL Billing Queries to Manager Origin",
-        "phase": "request"
-      },
-      {
-        "id": 269760,
-        "name": "Rewrite _azrt Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269761,
-        "name": "Rewrite azsid Cookie",
-        "phase": "response"
-      },
-      {
-        "id": 269762,
-        "name": "Rewrite _azat Cookie",
-        "phase": "response"
-      },
-      {
         "id": 269763,
         "name": "Secure Headers",
         "phase": "response"
@@ -159,8 +138,38 @@
         "phase": "request"
       },
       {
-        "id": 318350,
-        "name": "Route GraphQL Accounting Queries to Manager Origin",
+        "id": 368275,
+        "name": "Rewrite azrt Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368276,
+        "name": "Rewrite azrt Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368277,
+        "name": "Rewrite azsid Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368278,
+        "name": "Rewrite azsid Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 368279,
+        "name": "Rewrite azat Cookie in azion.com",
+        "phase": "response"
+      },
+      {
+        "id": 368280,
+        "name": "Rewrite azat Cookie in azionedge.net",
+        "phase": "response"
+      },
+      {
+        "id": 372222,
+        "name": "API Version 4 Routing",
         "phase": "request"
       }
     ]
@@ -169,10 +178,6 @@
     {
       "id": 161051,
       "name": "Statics - Cache"
-    },
-    {
-      "id": 161052,
-      "name": "Marketplace - Cache"
     },
     {
       "id": 161053,

@@ -9,6 +9,15 @@ const shouldReplaceString = (value) => {
 }
 
 /**
+ * Check if the input is a string and does not start with '$'
+ * @param {any} value - The input to be checked
+ * @returns {boolean} - Returns true if the input is a string and does not start with '$', otherwise returns false
+ */
+function isValidString(value) {
+  return typeof value === 'string' && value.charAt(0) !== '$'
+}
+
+/**
  * Generates the GraphQL string for a filter.
  *
  * @param {string} name - The name of the filter.
@@ -37,6 +46,8 @@ export default function FiltersToGraphQLString(name, value) {
     // escape strings
     if (shouldReplaceString(value)) {
       queryValue = `"${value.replace(/^\\\$/, '$')}"`
+    } else if (isValidString(value)) {
+      queryValue = `"${value}"`
     }
     result += queryValue
   }

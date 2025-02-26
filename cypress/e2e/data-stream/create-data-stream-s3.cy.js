@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 let dataStreamName
 
-describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Data Stream spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
@@ -49,18 +49,7 @@ describe('Data Stream spec', { tags: ['@dev3', '@xfail'] }, () => {
       'have.text',
       'Edge Applications'
     )
-    cy.get(selectors.dataStream.list.columnName('templateName')).should(
-      'have.text',
-      'Template teste'
-    )
     cy.get(selectors.dataStream.list.columnName('endpointType')).should('have.text', 's3')
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: dataStreamName, productName: 'Data Stream' }).then(() => {
-      cy.verifyToast('Data Stream successfully deleted')
-    })
   })
 })

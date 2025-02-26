@@ -12,6 +12,10 @@
       type: Function,
       required: true
     },
+    getTotalRecords: {
+      type: Function,
+      required: true
+    },
     listService: {
       type: Function
     },
@@ -28,6 +32,7 @@
   const listTableBlockRef = ref(null)
   const drawerRef = ref(null)
   const filterData = ref(null)
+  const recordsFound = ref(0)
 
   const defaultFilter = {
     tsRange: {},
@@ -76,7 +81,13 @@
   }
 
   const listProvider = async () => {
-    return await props.listService({ ...filterData.value })
+    const [response, total] = await Promise.all([
+      props.listService({ ...filterData.value }),
+      props.getTotalRecords({ filter: { ...filterData.value }, dataset: props.tabSelected.dataset })
+    ])
+
+    recordsFound.value = total
+    return response.data
   }
 
   onBeforeMount(() => {
@@ -108,6 +119,7 @@
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
         :downloadCSV="exportTableCSV"
+        :recordsFound="recordsFound"
         @updatedFilter="reloadListTableWithHash"
       />
     </div>

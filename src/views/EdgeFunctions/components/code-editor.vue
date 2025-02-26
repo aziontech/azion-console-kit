@@ -21,6 +21,10 @@
   const props = defineProps({
     modelValue: String,
     initialValue: String,
+    minimap: {
+      type: Boolean,
+      default: true
+    },
     readOnly: {
       type: Boolean
     },
@@ -41,6 +45,7 @@
 
   const code = ref(props.initialValue)
   const EDITOR_OPTIONS = ref({
+    minimap: { enabled: props.minimap },
     tabSize: 2,
     formatOnPaste: true,
     readOnly: props.readOnly

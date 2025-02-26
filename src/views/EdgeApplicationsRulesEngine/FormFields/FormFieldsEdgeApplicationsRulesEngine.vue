@@ -215,7 +215,7 @@
   const placeholderBehaviors = (behavior) => {
     const placeholders = {
       add_request_cookie: 'cookie-name=value',
-      add_request_header: 'header-name=value',
+      add_request_header: 'header-name: value',
       filter_request_cookie: 'cookie-name or cookie-name=cookie-value',
       filter_request_header: 'header-name',
       redirect_to_301: 'location',
@@ -853,7 +853,7 @@
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
-                :value="behaviors[behaviorIndex].value.cacheId"
+                :value="`${behaviors[behaviorIndex].value.cacheId}`"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               >
                 <template #footer>
@@ -878,18 +878,16 @@
               </FieldDropdown>
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
-              <div class="flex flex-col w-full">
+              <div class="flex gap-3 flex-col w-full">
                 <FieldText
-                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].captured_array`"
                   :key="behaviorItem.key"
-                  placeholder="captured array name"
+                  placeholder="Captured array name"
                   :value="behaviors[behaviorIndex].value.captured_array"
                   :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
                 />
                 <FieldText
                   placeholder="Subject"
-                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.subject"
@@ -897,7 +895,6 @@
                 />
                 <FieldText
                   placeholder="Regex"
-                  class="w-full"
                   :name="`behaviors[${behaviorIndex}].regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.regex"

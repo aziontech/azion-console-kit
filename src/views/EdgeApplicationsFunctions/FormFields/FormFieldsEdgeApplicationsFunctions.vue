@@ -1,7 +1,7 @@
 <script setup>
-  import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import PrimeButton from 'primevue/button'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
@@ -31,8 +31,6 @@
     edgeFunctionID.value = response.functionId
   }
 
-  const store = useAccountStore()
-
   const changeArgs = (target) => {
     if (target?.args) {
       args.value = target?.args
@@ -46,19 +44,12 @@
     })
   }
 
-  const editorOptions = computed(() => {
-    return {
-      minimap: { enabled: false },
-      tabSize: 2,
-      formatOnPaste: true
-    }
-  })
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
-  const { value: args } = useField('args')
+  const { value: args, errorMessage: argsError } = useField('args')
 
-  const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  const hasArgsError = computed(() => {
+    return !!argsError.value
   })
 
   watch(
@@ -109,6 +100,7 @@
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionService"
           :moreOptions="['args']"
+          disableEmitFirstRender
           optionLabel="label"
           optionValue="value"
           :value="edgeFunctionID"
@@ -138,18 +130,19 @@
       </div>
 
       <div class="flex flex-col gap-2 w-full">
-        <label
-          for="arguments"
-          class="text-color text-sm font-medium leading-5"
-          >Arguments</label
-        >
-        <vue-monaco-editor
-          v-model:value="args"
+        <CodeEditor
+          v-model="args"
           language="json"
-          :theme="theme"
-          :options="editorOptions"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
+          :errors="hasArgsError"
+          :minimap="false"
         />
+        <small
+          v-if="argsError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ argsError }}
+        </small>
         <small class="text-xs text-color-secondary font-normal leading-5">
           Customize the arguments in JSON format. Once set, they can be called in code using
           <code>event.args("arg_name")</code>.

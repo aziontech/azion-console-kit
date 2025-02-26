@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
@@ -14,6 +14,7 @@ export const listImageProcessor = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -44,7 +45,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+  const data = body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,
@@ -56,4 +57,8 @@ const adaptResponse = (response) => {
     ts: imagesProcessedEvents.ts,
     tsFormat: convertValueToDate(imagesProcessedEvents.ts)
   }))
+
+  return {
+    data
+  }
 }

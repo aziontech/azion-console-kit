@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
@@ -14,6 +14,7 @@ export const listEdgeDNS = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -70,7 +71,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
+  const data = body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
     level: getLevelDNS(edgeDnsQueriesEvents.level),
     zoneId: edgeDnsQueriesEvents.zoneId,
@@ -82,4 +83,8 @@ const adaptResponse = (response) => {
     tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
     uuid: edgeDnsQueriesEvents.uuid
   }))
+
+  return {
+    data
+  }
 }

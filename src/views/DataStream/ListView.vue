@@ -6,6 +6,16 @@
     <template #content>
       <div class="flex flex-col gap-3 items-start">
         <InlineMessage
+          v-if="hasNoPermissionToCreateDataStream"
+          class="w-fit"
+          severity="info"
+          data-testid="permission-rule-message-data-stream"
+        >
+          This account has <strong>View Data Stream</strong> permission only. It allows viewing the
+          account’s streams but doesn't permit creating, editing, or deleting streams.
+        </InlineMessage>
+
+        <InlineMessage
           v-if="isMaxDomainsReached"
           severity="info"
         >
@@ -14,7 +24,7 @@
         </InlineMessage>
         <div class="w-full">
           <ListTableBlock
-            :disabledList="disabledList"
+            :disabledList="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
@@ -56,6 +66,8 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsService } from '@/services/workloads-services'
+  import { useAccountStore } from '@/stores/account'
+
   defineOptions({ name: 'data-stream-view' })
 
   const props = defineProps({
@@ -72,6 +84,9 @@
       type: Function
     }
   })
+
+  const store = useAccountStore()
+  const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
 
   const domainsCount = ref(0)
   const domainsLoading = ref(true)

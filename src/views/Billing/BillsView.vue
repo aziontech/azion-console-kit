@@ -13,7 +13,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
-            :disabled="currentInvoice.billId"
+            :disabled="!currentInvoice.billId"
           />
         </div>
         <div class="flex justify-between mt-4">

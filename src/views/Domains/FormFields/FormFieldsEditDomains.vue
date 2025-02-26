@@ -2,10 +2,10 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import InputText from 'primevue/inputtext'
   import PrimeTag from 'primevue/tag'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import Drawer from '@/views/EdgeApplications/Drawer'
@@ -303,6 +303,7 @@
         />
         <FieldDropdownLazyLoader
           label="Edge Firewall"
+          enableClearOption
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"

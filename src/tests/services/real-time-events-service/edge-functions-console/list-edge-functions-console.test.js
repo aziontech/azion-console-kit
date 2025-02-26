@@ -64,9 +64,10 @@ describe('EdgeFunctionsConsoleServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -90,22 +91,24 @@ describe('EdgeFunctionsConsoleServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        configurationId: fixtures.edgeFunctionConsole.configurationId,
-        functionId: fixtures.edgeFunctionConsole.functionId,
-        id: 'mocked-timestamp',
-        level: {
-          content: 'Info',
-          severity: 'info',
-          icon: 'pi pi-info-circle'
-        },
-        line: fixtures.edgeFunctionConsole.line,
-        lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
-        source: fixtures.edgeFunctionConsole.source,
-        ts: fixtures.edgeFunctionConsole.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          configurationId: fixtures.edgeFunctionConsole.configurationId,
+          functionId: fixtures.edgeFunctionConsole.functionId,
+          id: 'mocked-timestamp',
+          level: {
+            content: 'Info',
+            severity: 'info',
+            icon: 'pi pi-info-circle'
+          },
+          line: fixtures.edgeFunctionConsole.line,
+          lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
+          source: fixtures.edgeFunctionConsole.source,
+          ts: fixtures.edgeFunctionConsole.ts,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+        }
+      ]
+    })
   })
 })

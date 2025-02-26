@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import * as yup from 'yup'
   // Import the components
   import FormFieldsDataStream from './FormFields/FormFieldsDataStream'
@@ -8,6 +8,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
     listDataStreamTemplateService: {
@@ -32,6 +33,10 @@
     }
   })
 
+  const store = useAccountStore()
+  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
+  const hasAccessToSampling = computed(() => store.hasSamplingFlag)
+
   // Schema de Validação
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -43,7 +48,7 @@
     status: yup.boolean(),
     hasSampling: yup.boolean(),
     samplingPercentage: yup.number().when('hasSampling', {
-      is: true,
+      is: true && hasAccessToSampling.value,
       then: (schema) =>
         schema
           .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
@@ -140,7 +145,7 @@
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('API Key is a required field')
+      then: (schema) => schema.required('Encoded API Key is a required field')
     }),
 
     // splunk
@@ -244,7 +249,10 @@
             :listDataStreamDomainsService="props.listDataStreamDomainsService"
           />
         </template>
-        <template #action-bar="{ onSubmit, onCancel, loading, values }">
+        <template
+          v-if="hasNoPermissionToEditDataStream"
+          #action-bar="{ onSubmit, onCancel, loading, values }"
+        >
           <ActionBarBlockWithTeleport
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"

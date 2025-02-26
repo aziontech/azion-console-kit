@@ -15,6 +15,9 @@ export default {
   cityOption: (optionIdx) => `#city_${optionIdx}`,
   address: '[data-testid="account-settings__address__input"]',
   complement: '[data-testid="account-settings__complement__input"]',
+  countryLoading: '[data-testid="account-settings__country__loading-icon"]',
+  regionLoading: '[data-testid="account-settings__region__loading-icon"]',
+  cityLoading: '[data-testid="account-settings__city__loading-icon"]',
   socialLogin:
     '[data-testid="account-settings__login-settings__switch-isSocialLoginEnabled__switch"] > .p-inputswitch-slider',
   enforceMfa:

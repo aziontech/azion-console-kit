@@ -55,25 +55,45 @@ const phaseAsTag = (phase) => {
   }
 }
 
-const adapt = (results, statusCode) => {
-  const parsedRulesEngine = results.map((rules) => {
-    return {
-      id: rules.id,
-      name: rules.name,
-      phase: phaseAsTag(rules.phase),
-      behaviors: rules.behaviors,
-      criteria: rules.criteria,
-      status: STATUS_AS_TAG[rules.active],
-      order: rules.order,
-      description: rules.description || '-'
-    }
-  })
-
-  const count = results.length
+const countPhases = (results) => {
+  const { countRequest, countResponse } = results.reduce(
+    (counts, { phase }) => {
+      if (phase === 'request') counts.countRequest++
+      if (phase === 'response') counts.countResponse++
+      return counts
+    },
+    { countRequest: 0, countResponse: 0 }
+  )
 
   return {
-    count,
-    body: parsedRulesEngine,
+    default: { max: 0, min: 0 },
+    request: { max: countRequest, min: 1 },
+    response: { max: countRequest + countResponse, min: countRequest + 1 }
+  }
+}
+
+const getMaxOrderType = (phase, types) => types[`${phase}`]
+
+const adapt = (results, statusCode) => {
+  const typesRules = countPhases(results)
+
+  return {
+    count: results.length,
+    body: results.map((rule, index) => ({
+      id: rule.id,
+      name: rule.name,
+      phase: phaseAsTag(rule.phase),
+      behaviors: rule.behaviors,
+      criteria: rule.criteria,
+      status: STATUS_AS_TAG[rule.active],
+      position: {
+        value: index,
+        immutableValue: index,
+        altered: false,
+        ...getMaxOrderType(rule.phase, typesRules)
+      },
+      description: rule.description || '-'
+    })),
     statusCode
   }
 }

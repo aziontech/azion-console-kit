@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
-describe('Digital Certificates spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Digital Certificates')
@@ -40,15 +40,5 @@ describe('Digital Certificates spec', { tags: ['@dev3', '@xfail'] }, () => {
     )
     cy.get(selectors.digitalCertificates.copyCsrButton).click()
     cy.get(selectors.digitalCertificates.copyCsrMessage).should('have.text', 'Successfully copied!')
-  })
-
-  afterEach(() => {
-    // Delete the digital certificate
-    cy.deleteEntityFromList({
-      entityName: digitalCertificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
   })
 })

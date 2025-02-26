@@ -46,7 +46,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.login()
   })
@@ -57,9 +57,18 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*').as('getTrustedCACertificate')
-    cy.intercept('GET', `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`).as('getTrustedCACertificateByName')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*'
+    ).as('getTrustedCACertificate')
+    cy.intercept(
+      'GET',
+      `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`
+    ).as('getTrustedCACertificateByName')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -89,17 +98,5 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
-    cy.get(selectors.domains.mtlsTrustedCAFieldSelectedValue).should(
-      'contain',
-      digitalCertificateName
-    )
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

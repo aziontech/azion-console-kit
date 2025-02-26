@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderDinaminc.vue'
   import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -9,10 +10,7 @@
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
-  import { computed, ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-
-  const toast = useToast()
+  import { computed, nextTick, ref, onMounted } from 'vue'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
@@ -34,6 +32,10 @@
     listNetworkListService: {
       type: Function,
       required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -53,6 +55,20 @@
   const conditionalMenuRef = ref({})
   const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
+  const networkList = ref([])
+
+  onMounted(async () => {
+    await listNetworkList()
+  })
+
+  const listNetworkList = async () => {
+    networkList.value = await props.listNetworkListService({
+      ordering: 'name',
+      pageSize: 100,
+      page: 1
+    })
+    return networkList.value
+  }
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
@@ -103,7 +119,7 @@
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
           { label: 'starts with', value: 'starts_with' },
-          { label: 'does not start with', value: 'does_not_starts_with' },
+          { label: 'does not start with', value: 'does_not_start_with' },
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
@@ -146,25 +162,20 @@
   const showArgumentBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaRow = criteria.value[criteriaIndex].value[criteriaInnerRowIndex]
     return (
-      criteriaRow.operator !== 'exists' &&
-      criteriaRow.operator !== 'does_not_exist' &&
-      criteriaRow.variable !== 'ssl_verification_status' &&
-      criteriaRow.variable !== 'network'
+      criteriaRow.operator !== '${exists}' &&
+      criteriaRow.operator !== '${does_not_exist}' &&
+      criteriaRow.variable !== '${ssl_verification_status}' &&
+      criteriaRow.variable !== '${network}'
     )
   }
   const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
-    return criteriaVariable === 'ssl_verification_status'
+    return criteriaVariable === '${ssl_verification_status}'
   }
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
-    const isCriteriaNetworkSelected = criteriaVariable === 'network'
-    const hasNetworkOptionsToSelect = networkListOptions.value.length
-
-    if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
-      setNetworkListOptions()
-    }
+    const isCriteriaNetworkSelected = criteriaVariable === '${network}'
 
     return isCriteriaNetworkSelected
   }
@@ -462,31 +473,15 @@
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
 
-  const networkListOptions = ref([])
-  const loadingNetworkList = ref(false)
-  const setNetworkListOptions = async () => {
-    try {
-      loadingNetworkList.value = true
-      const result = await props.listNetworkListService()
-      networkListOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      loadingNetworkList.value = false
-    }
-  }
-
   const clearCriteriaArgument = ({
     selectedCriteriaVariable,
     criteriaIndex,
     criteriaInnerRowIndex
   }) => {
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
-    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    nextTick(() => {
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
+      criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+    })
   }
 </script>
 <template>
@@ -558,7 +553,9 @@
             />
           </div>
 
-          <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col sm:flex-row">
+          <div
+            class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row items-end"
+          >
             <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
@@ -619,19 +616,19 @@
                 class="w-full"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
-              <FieldDropdown
+              <FieldDropdownLazyLoader
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
                 :data-testid="`edge-firewall-rules-form__network-list[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
-                :options="networkListOptions"
-                :loading="loadingNetworkList"
+                :service="listNetworkListService"
+                :loadService="loadNetworkListService"
                 placeholder="Select a Network"
                 optionLabel="name"
-                optionValue="stringId"
-                v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
+                optionValue="id"
+                :value="Number(criteria[criteriaIndex].value[criteriaInnerRowIndex].argument)"
                 inputClass="w-full"
-                :filter="true"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :initalData="networkList"
               />
             </div>
           </div>

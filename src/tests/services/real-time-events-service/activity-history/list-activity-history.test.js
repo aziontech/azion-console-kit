@@ -64,9 +64,10 @@ describe('ActivityHistoryServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -90,19 +91,20 @@ describe('ActivityHistoryServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-
-        userIp: fixtures.activityHistory.userIp,
-        authorName: fixtures.activityHistory.authorName,
-        title: fixtures.activityHistory.title,
-        resourceType: fixtures.activityHistory.resourceType,
-        resourceId: fixtures.activityHistory.resourceId,
-        userId: fixtures.activityHistory.userId,
-        ts: fixtures.activityHistory.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          userIp: fixtures.activityHistory.userIp,
+          authorName: fixtures.activityHistory.authorName,
+          title: fixtures.activityHistory.title,
+          resourceType: fixtures.activityHistory.resourceType,
+          resourceId: fixtures.activityHistory.resourceId,
+          userId: fixtures.activityHistory.userId,
+          ts: fixtures.activityHistory.ts,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+        }
+      ]
+    })
   })
 })

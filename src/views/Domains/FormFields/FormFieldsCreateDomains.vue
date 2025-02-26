@@ -25,10 +25,6 @@
       type: Function,
       required: true
     },
-    edgeFirewallsData: {
-      type: Array,
-      required: true
-    },
     isLoadingEdgeFirewalls: {
       type: Boolean,
       required: true
@@ -239,6 +235,7 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
           label="Edge Firewall"
+          enableClearOption
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"
@@ -355,7 +352,6 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <!-- domains-form__mtls-trusted-certificate-field__dropdown -->
         <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"

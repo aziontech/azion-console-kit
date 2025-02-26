@@ -14,7 +14,7 @@ export const networkListsRoutes = {
       component: () => import('@views/NetworkLists/ListView.vue'),
       props: {
         listNetworkListService: NetworkListsServiceV4.listNetworkListService,
-        deleteNetworkListService: NetworkListsService.deleteNetworkListService,
+        deleteNetworkListService: NetworkListsServiceV4.deleteNetworkListService,
         documentationService: Helpers.documentationCatalog.networkLists
       },
       meta: {
@@ -31,7 +31,7 @@ export const networkListsRoutes = {
       name: 'create-network-list',
       component: () => import('@views/NetworkLists/CreateView.vue'),
       props: {
-        createNetworkListService: NetworkListsService.createNetworkListService,
+        createNetworkListService: NetworkListsServiceV4.createNetworkListService,
         listCountriesService: NetworkListsService.listCountriesService
       },
       meta: {
@@ -52,8 +52,8 @@ export const networkListsRoutes = {
       name: 'edit-network-list',
       component: () => import('@views/NetworkLists/EditView.vue'),
       props: {
-        editNetworkListsService: NetworkListsService.editNetworkListService,
-        loadNetworkListsService: NetworkListsService.loadNetworkListService,
+        editNetworkListsService: NetworkListsServiceV4.editNetworkListService,
+        loadNetworkListsService: NetworkListsServiceV4.loadNetworkListService,
         listCountriesService: NetworkListsService.listCountriesService,
         updatedRedirect: 'list-network-list'
       },

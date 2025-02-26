@@ -1,6 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
 import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
+import * as DomainsServiceV4 from '@/services/domains-services/v4'
 
 import { listCountriesService } from '@/services/network-lists-services'
 
@@ -15,7 +16,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
         listWafRulesService: WafRulesServiceV4.listWafRulesService,
-        deleteWafRulesService: WafRulesService.deleteWafRulesService,
+        deleteWafRulesService: WafRulesServiceV4.deleteWafRulesService,
         documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
@@ -32,7 +33,7 @@ export const wafRulesRoutes = {
       name: 'create-waf-rules',
       component: () => import('@views/WafRules/CreateView.vue'),
       props: {
-        createWafRulesService: WafRulesService.createWafRulesService
+        createWafRulesService: WafRulesServiceV4.createWafRulesService
       },
       meta: {
         breadCrumbs: [
@@ -63,17 +64,20 @@ export const wafRulesRoutes = {
         },
         wafServices: {
           updatedRedirect: 'list-waf-rules',
-          editWafRulesService: WafRulesService.editWafRulesService,
-          loadWafRulesService: WafRulesService.loadWafRulesService
+          editWafRulesService: WafRulesServiceV4.editWafRulesService,
+          loadWafRulesService: WafRulesServiceV4.loadWafRulesService
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,
           listWafRulesTuningService: WafRulesService.listWafRulesTuningService,
-          listNetworkListService: WafRulesService.listNetworkListService,
+          listNetworkListService: WafRulesServiceV4.listNetworkListService,
           listCountriesService: listCountriesService,
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
           createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
-          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService
+          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService,
+          listDomainsService: DomainsServiceV4.listDomainsService,
+          loadDomainService: DomainsServiceV4.loadDomainService,
+          loadNetworkListService: WafRulesServiceV4.loadNetworkListService
         }
       },
       meta: {

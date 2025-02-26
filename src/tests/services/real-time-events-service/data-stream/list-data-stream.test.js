@@ -70,9 +70,10 @@ describe('DataStreamingServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -98,20 +99,22 @@ describe('DataStreamingServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        configurationId: fixtures.dataStreaming.configurationId,
-        jobName: { content: fixtures.dataStreaming.jobName, severity: 'info' },
-        endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
-        url: 'http://url.com',
-        statusCode: fixtures.dataStreaming.statusCode,
-        ts: fixtures.dataStreaming.ts,
-        dataStreamed: fixtures.dataStreaming.dataStreamed,
-        source: fixtures.dataStreaming.source,
-        streamedLines: fixtures.dataStreaming.streamedLines,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          configurationId: fixtures.dataStreaming.configurationId,
+          jobName: { content: fixtures.dataStreaming.jobName, severity: 'info' },
+          endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
+          url: 'http://url.com',
+          statusCode: fixtures.dataStreaming.statusCode,
+          ts: fixtures.dataStreaming.ts,
+          dataStreamed: fixtures.dataStreaming.dataStreamed,
+          source: fixtures.dataStreaming.source,
+          streamedLines: fixtures.dataStreaming.streamedLines,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+        }
+      ]
+    })
   })
 })

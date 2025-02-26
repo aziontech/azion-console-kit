@@ -75,7 +75,14 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.originActionBar)
       .find(selectors.form.actionsSubmitButton)
       .click()
+    cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should(
+      'have.text',
+      'Origin Key has been created'
+    )
+    cy.get(selectors.edgeApplication.origins.dialogCopyButton).click()
     cy.verifyToast('success', 'Your origin has been created')
+    cy.verifyToast('Successfully copied!')
+    cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
     cy.wait('@getOrigin')
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0))
@@ -88,20 +95,5 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     // Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.rulesEngineName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.rulesEngineName)
-
-    // Cleanup - Remove the rule engine
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rule successfully deleted')
-    })
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

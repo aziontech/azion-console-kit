@@ -27,6 +27,7 @@
   })
   const updateObject = ref({})
   const language = ref(null)
+  const name = ref('')
 
   const handleTrackSuccessEdit = () => {
     tracker.product
@@ -50,7 +51,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -67,7 +68,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Function">
+      <PageHeadingBlock :pageTitle="name">
         <MobileCodePreview
           :updateObject="updateObject"
           :language="language"
@@ -87,6 +88,7 @@
           <FormFieldsEditEdgeFunctions
             v-model:preview-data="updateObject"
             v-model:lang="language"
+            v-model:name="name"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
