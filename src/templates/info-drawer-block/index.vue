@@ -1,7 +1,8 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import Sidebar from 'primevue/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
+  import Button from 'primevue/button'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])
@@ -23,15 +24,40 @@
     }
   })
 
+  const handle = ref('right')
+
+  const handlePosition = () => {
+    if(handle.value === 'right') {
+      handle.value = 'full'
+    } else {
+      handle.value = 'right'
+    }
+  } 
+
+
+  const sizeSidebar = () => {
+    if(handle.value === 'right') {
+      return 'max-w-4xl w-full p-0'
+    }
+    return 'w-full p-0'
+  }
+
+  const iconExpand = computed(() => {
+    if(handle.value === 'right') {
+      return 'pi pi-window-maximize'
+    }
+    return 'pi pi-window-minimize'
+  })
+ 
   defineExpose({})
 </script>
 
 <template>
   <Sidebar
     v-model:visible="visibleDrawer"
-    position="right"
+    :position="handle"
     :pt="{
-      root: { class: 'max-w-4xl w-full p-0' },
+      root: { class: sizeSidebar() },
       header: { class: 'flex justify-between font-medium px-8' },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       closeButton: { class: 'border surface-border' },
@@ -43,7 +69,10 @@
   >
     <template #header>
       <h2 class="text-xl">{{ props.title }}</h2>
-      <ConsoleFeedback />
+      <div class="flex gap-2 items-center">
+        <ConsoleFeedback />
+        <Button outlined :icon="iconExpand" @click="handlePosition"></Button>
+      </div>
     </template>
 
     <slot name="body"></slot>

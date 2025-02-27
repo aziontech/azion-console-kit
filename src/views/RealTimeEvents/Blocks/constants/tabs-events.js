@@ -19,6 +19,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -44,6 +45,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -70,6 +72,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -98,6 +101,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -123,6 +127,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -148,6 +153,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -173,6 +179,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],
@@ -200,6 +207,7 @@ const TABS_EVENTS = {
         header: 'Log Body',
         filterPath: 'summary',
         type: 'component',
+        disableSort: true,
         component: (columnData) => columnBuilder({ data: columnData, columnAppearance: 'log-body' })
       }
     ],

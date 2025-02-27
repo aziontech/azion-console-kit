@@ -52,6 +52,8 @@ const adaptResponse = (httpResponse) => {
 
   const data = body.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
+    configurationId: httpEventItem.configurationId,
+    requestId: httpEventItem.requestId,
     summary: buildSummary(httpEventItem),
     ts: httpEventItem.ts,
     tsFormat: convertValueToDate(httpEventItem.ts)
