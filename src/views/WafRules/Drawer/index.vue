@@ -6,6 +6,7 @@
   import GoBack from '@/templates/action-bar-block/go-back'
   import InputText from 'primevue/inputtext'
   import EmptyDrawer from '@/templates/empty-drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import WithSelectionBehavior from '@/templates/list-table-block/with-selection-behavior.vue'
 
   defineOptions({
@@ -74,7 +75,6 @@
       loading.value = true
       const response = await props.listService(namePath)
       possibleAttacks.value = response
-      console.log(possibleAttacks.value)
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -133,17 +133,26 @@
     {
       field: 'topIps',
       header: 'Top 10 IPs',
-      sortable: true
+      sortable: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
       field: 'topCountries',
       header: 'Top 10 Countries',
-      sortable: true
+      sortable: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
       field: 'topPaths',
       header: 'Top 10 Paths',
-      sortable: true
+      sortable: true,
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     }
   ]
 </script>
