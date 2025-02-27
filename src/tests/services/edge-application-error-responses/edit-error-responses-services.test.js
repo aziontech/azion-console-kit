@@ -63,7 +63,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
             uri: errorResponse.uri
           }
         ],
-        origin_id: fixtures.errorResponsePayload.originId
+        origin_id: null
       }
     })
   })
@@ -90,7 +90,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
             uri: null
           }
         ],
-        origin_id: fixtures.errorResponsePayload.originId
+        origin_id: null
       }
     })
   })

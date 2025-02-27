@@ -33,8 +33,9 @@ const adapt = (payload) => {
       })
     }
   })
+  
   return {
-    origin_id: payload.originId,
+    origin_id: errorResponses.length === 1 ? null : payload.originId,
     error_responses: errorResponses
   }
 }
