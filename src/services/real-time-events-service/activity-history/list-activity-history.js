@@ -41,6 +41,7 @@ const adaptResponse = (response) => {
   const data = body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(activityHistoryEvents),
+    userId: activityHistoryEvents.userId,
     ts: activityHistoryEvents.ts,
     tsFormat: convertValueToDate(activityHistoryEvents.ts)
   }))

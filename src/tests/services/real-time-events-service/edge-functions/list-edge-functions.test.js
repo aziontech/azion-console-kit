@@ -91,6 +91,7 @@ describe('EdgeFunctionsServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.edgeFunction.configurationId,
           summary: [
             { key: 'configurationId', value: fixtures.edgeFunction.configurationId },
             {

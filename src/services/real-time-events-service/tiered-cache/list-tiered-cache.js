@@ -47,6 +47,10 @@ const adaptResponse = (response) => {
   const totalRecords = body.data.l2CacheEvents?.length
 
   const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
+    configurationId: tieredCacheEvents.configurationId,
+    source: tieredCacheEvents.source,
+    host: tieredCacheEvents.host,
+    proxyHost: tieredCacheEvents.proxyHost,
     id: generateCurrentTimestamp(),
     summary: buildSummary(tieredCacheEvents),
     ts: tieredCacheEvents.ts,

@@ -28,7 +28,16 @@ const adapt = (filter) => {
   const table = {
     dataset: 'imagesProcessedEvents',
     limit: 10000,
-    fields: ['configurationId', 'host', 'requestUri', 'status', 'bytesSent', 'httpReferer', 'ts'],
+    fields: [
+      'configurationId',
+      'host',
+      'requestUri',
+      'status',
+      'bytesSent',
+      'httpReferer',
+      'ts',
+      'httpUserAgent'
+    ],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -40,6 +49,9 @@ const adaptResponse = (response) => {
 
   const data = body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
+    configurationId: imagesProcessedEvents.configurationId,
+    httpUserAgent: imagesProcessedEvents.httpUserAgent,
+    httpReferer: imagesProcessedEvents.httpReferer,
     summary: buildSummary(imagesProcessedEvents),
     ts: imagesProcessedEvents.ts,
     tsFormat: convertValueToDate(imagesProcessedEvents.ts)

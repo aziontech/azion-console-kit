@@ -2,8 +2,9 @@
   import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import TableEvents from './tableEvents.vue'
+  import Skeleton from 'primevue/skeleton'
 
   defineOptions({ name: 'drawer-events-functions-console' })
 
@@ -15,10 +16,17 @@
   })
   const details = ref({})
   const showDrawer = ref(false)
+  const loading = ref(false)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
-    details.value = await props.loadService(item)
+    loading.value = true
+
+    try {
+      details.value = await props.loadService(item)
+    } finally {
+      loading.value = false
+    }
   }
 
   watch(
@@ -59,21 +67,22 @@
           :title="`Line Source - ${details.lineSource ?? ''}`"
           :date="details.ts"
           :tags="tags"
+          :loading="loading"
+        />
+        <TableEvents
+          v-if="!loading"
+          :data="details.data"
+        />
+        <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
+          v-else
         >
-          <template #body>
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Line">{{ details.line }}</TextInfo>
-                <TextInfo label="ID">{{ details.id }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Solution ID">{{ details.solutionId }}</TextInfo>
-                <TextInfo label="Function ID">{{ details.functionId }}</TextInfo>
-                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
+        </div>
       </div>
     </template>
   </InfoDrawerBlock>

@@ -121,6 +121,7 @@ describe('ActivityHistoryServices', () => {
             }
           ],
           ts: fixtures.activityHistory.ts,
+          userId: fixtures.activityHistory.userId,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
       ],

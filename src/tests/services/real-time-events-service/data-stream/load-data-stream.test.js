@@ -19,7 +19,8 @@ const fixtures = {
     source: 'source',
     statusCode: 'statusCode',
     streamedLines: 'streamedLines',
-    ts: '2024-02-23T18:07:25'
+    ts: '2024-02-23T18:07:25',
+    url: 'https://azion-datastreaming-lbs3-qradar'
   }
 }
 
@@ -67,18 +68,22 @@ describe('DataStreamingServices', () => {
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
-      configurationId: fixtures.dataStreaming.configurationId,
       url: fixtures.dataStreaming.url,
-      dataStreamed: fixtures.dataStreaming.dataStreamed,
-      endpointType: fixtures.dataStreaming.endpointType,
       jobName: {
         content: fixtures.dataStreaming.jobName,
         severity: 'info'
       },
-      source: fixtures.dataStreaming.source,
-      statusCode: fixtures.dataStreaming.statusCode,
-      streamedLines: fixtures.dataStreaming.streamedLines,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07 PM',
+      data: [
+        { key: 'configurationId', value: fixtures.dataStreaming.configurationId },
+        { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },
+        { key: 'endpointType', value: fixtures.dataStreaming.endpointType },
+        { key: 'jobName', value: 'jobName' },
+        { key: 'source', value: fixtures.dataStreaming.source },
+        { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
+        { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
+        { key: 'url', value: fixtures.dataStreaming.url }
+      ]
     })
   })
 })

@@ -49,7 +49,8 @@ const adaptResponse = (response) => {
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
-    tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
+    tsFormat: convertValueToDate(edgeFunctionsEvents.ts),
+    configurationId: edgeFunctionsEvents.configurationId
   }))
 
   return {

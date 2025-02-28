@@ -94,6 +94,10 @@ describe('tieredCacheServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.tieredCache.configurationId,
+          source: fixtures.tieredCache.source,
+          host: fixtures.tieredCache.host,
+          proxyHost: fixtures.tieredCache.proxyHost,
           summary: [
             { key: 'configurationId', value: fixtures.tieredCache.configurationId },
             { key: 'host', value: fixtures.tieredCache.host },

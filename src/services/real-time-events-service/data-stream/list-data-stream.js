@@ -49,6 +49,7 @@ const adaptResponse = (response) => {
   const totalRecords = body.data.dataStreamedEvents?.length
 
   const data = body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+    configurationId: dataStreamedEvents.configurationId,
     id: generateCurrentTimestamp(),
     summary: buildSummary(dataStreamedEvents),
     ts: dataStreamedEvents.ts,

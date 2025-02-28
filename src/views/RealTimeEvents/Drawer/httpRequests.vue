@@ -1,7 +1,6 @@
 <script setup>
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import tableEvents from './tableEvents.vue'
+  import TableEvents from './tableEvents.vue'
   import { computed, ref, watch } from 'vue'
   import Skeleton from 'primevue/skeleton'
 
@@ -65,50 +64,21 @@
           :title="details.host"
           :date="details.ts"
           :tags="hostTag"
-          v-if="!loading"
-        >
-          <template #body>
-            <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Request ID">{{ details.requestId }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
-                <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
-
-        <div
-          v-else
-          class="w-full flex flex-col md:flex-row md:gap-8 gap-3"
-        >
-          <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-            <Skeleton class="w-full h-12 mt-7" />
-          </div>
-          <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-            <Skeleton class="w-full h-12 mt-7" />
-            <Skeleton class="w-full h-12 mt-7" />
-          </div>
-        </div>
-
-        <tableEvents
+          :loading="loading"
+        />
+        <TableEvents
           v-if="!loading"
           :data="details.data"
-        ></tableEvents>
-
+        />
         <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
           v-else
-          class="w-full flex"
         >
-          <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-            <Skeleton
-              class="w-full h-12 mt-7"
-              v-for="skeletonItem in 10"
-              :key="skeletonItem"
-            />
-          </div>
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
         </div>
       </div>
     </template>

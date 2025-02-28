@@ -42,7 +42,9 @@ const adaptResponse = (response) => {
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeDnsQueriesEvents),
     ts: edgeDnsQueriesEvents.ts,
-    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts)
+    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
+    uuid: edgeDnsQueriesEvents.uuid,
+    source: edgeDnsQueriesEvents.source
   }))
 
   return {

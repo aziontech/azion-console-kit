@@ -27,28 +27,27 @@
   const handle = ref('right')
 
   const handlePosition = () => {
-    if(handle.value === 'right') {
+    if (handle.value === 'right') {
       handle.value = 'full'
     } else {
       handle.value = 'right'
     }
-  } 
-
+  }
 
   const sizeSidebar = () => {
-    if(handle.value === 'right') {
+    if (handle.value === 'right') {
       return 'max-w-4xl w-full p-0'
     }
     return 'w-full p-0'
   }
 
   const iconExpand = computed(() => {
-    if(handle.value === 'right') {
+    if (handle.value === 'right') {
       return 'pi pi-window-maximize'
     }
     return 'pi pi-window-minimize'
   })
- 
+
   defineExpose({})
 </script>
 
@@ -71,7 +70,11 @@
       <h2 class="text-xl">{{ props.title }}</h2>
       <div class="flex gap-2 items-center">
         <ConsoleFeedback />
-        <Button outlined :icon="iconExpand" @click="handlePosition"></Button>
+        <Button
+          outlined
+          :icon="iconExpand"
+          @click="handlePosition"
+        ></Button>
       </div>
     </template>
 
