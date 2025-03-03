@@ -5,6 +5,8 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TableEvents from './tableEvents.vue'
   import Skeleton from 'primevue/skeleton'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
 
   defineOptions({ name: 'drawer-events-functions-console' })
 
@@ -69,10 +71,17 @@
           :tags="tags"
           :loading="loading"
         />
-        <TableEvents
+        <TabView
+          class="w-full h-full"
           v-if="!loading"
-          :data="details.data"
-        />
+        >
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <h4>Cards</h4>
+          </TabPanel>
+        </TabView>
         <div
           class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
           v-else

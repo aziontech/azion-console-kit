@@ -12,7 +12,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -38,7 +38,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -65,7 +65,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -94,7 +94,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -120,7 +120,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -146,7 +146,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -172,7 +172,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',
@@ -200,7 +200,7 @@ const TABS_EVENTS = {
       {
         field: 'tsFormat',
         sortField: 'ts',
-        header: 'TS'
+        header: 'Time'
       },
       {
         field: 'summary',

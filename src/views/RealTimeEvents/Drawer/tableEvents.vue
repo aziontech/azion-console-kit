@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-4">
     <DataTable
       :value="data"
       v-model:filters="filters"

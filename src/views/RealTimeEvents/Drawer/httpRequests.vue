@@ -3,6 +3,8 @@
   import TableEvents from './tableEvents.vue'
   import { computed, ref, watch } from 'vue'
   import Skeleton from 'primevue/skeleton'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
 
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
@@ -66,10 +68,17 @@
           :tags="hostTag"
           :loading="loading"
         />
-        <TableEvents
+        <TabView
+          class="w-full h-full"
           v-if="!loading"
-          :data="details.data"
-        />
+        >
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <h4>Cards</h4>
+          </TabPanel>
+        </TabView>
         <div
           class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
           v-else

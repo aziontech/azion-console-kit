@@ -62,6 +62,16 @@ describe('HttpRequestServices', () => {
       `\t\tsslProtocol`,
       `\t\twafLearning`,
       `\t\trequestTime`,
+      '\t\tserverProtocol',
+      '\t\tupstreamCacheStatus',
+      '\t\thttpReferer',
+      '\t\tremoteAddress',
+      '\t\twafMatch',
+      '\t\tserverPort',
+      '\t\tsslCipher',
+      '\t\twafEvheaders',
+      '\t\tserverAddr',
+      '\t\tscheme',
       `\t}`,
       `}`
     ].join('\n')

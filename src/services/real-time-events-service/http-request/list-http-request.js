@@ -39,7 +39,17 @@ const adapt = (filter) => {
       'upstreamBytesSent',
       'sslProtocol',
       'wafLearning',
-      'requestTime'
+      'requestTime',
+      'serverProtocol',
+      'upstreamCacheStatus',
+      'httpReferer',
+      'remoteAddress',
+      'wafMatch',
+      'serverPort',
+      'sslCipher',
+      'wafEvheaders',
+      'serverAddr',
+      'scheme'
     ],
     orderBy: 'ts_ASC'
   }
