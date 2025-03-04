@@ -34,26 +34,26 @@ const CYPRESS_TOKEN = process.env.CI
   : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 30 }
+  cypress: { token: CYPRESS_TOKEN, wait_time: 15 }
 }
 
 const entities = [
+  { name: 'credentials', url: `${URL}/credentials`, version: 3 },
   {
-    name: 'variables',
-    url: `${URL}/variables`,
+    name: 'data_streaming',
+    url: `${URL}/data_streaming/streamings`,
     version: 3
   },
-  { name: 'credentials', url: `${URL}/credentials`, version: 3 },
-  //{
-  //  name: 'data_streaming',
-  //  url: `${URL}/data_streaming/streamings`,
-  //  version: 3
-  //},
   {
     name: 'edge_applications',
     url: `${URL}/edge_applications`,
     version: 3,
     exclude: [1718380244, 340244]
+  },
+  {
+    name: 'variables',
+    url: `${URL}/variables`,
+    version: 3
   },
   { name: 'edge_firewall', url: `${URL}/edge_firewall`, version: 3 },
   { name: 'edge_sql', url: `${URL_v4}/edge_sql/databases`, version: 4 },
