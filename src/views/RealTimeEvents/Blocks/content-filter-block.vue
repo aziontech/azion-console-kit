@@ -1,11 +1,11 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import AdvancedFilterGraphql from './advanced-filter-graphql.vue'
   import { computed, onMounted, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
   import SelectButton from 'primevue/selectbutton'
+  import AzionQueryLanguage from './azion-query-language.vue'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -65,15 +65,19 @@
       aria-labelledby="basic"
       class="w-fit"
     />
-    <div
-      class="flex w-full flex-column gap-6 md:gap-2 md:flex-row"
-      v-if="filterMode === 'Wizard'"
-    >
+    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-start">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
         :disabled="isFields"
         @applyFilter="filterSearch"
+        v-if="filterMode === 'Wizard'"
+      />
+      <AzionQueryLanguage
+        :fieldsInFilter="props.fieldsInFilter"
+        :searchAdvancedFilter="searchAdvancedFilter"
+        :filterAdvanced="filter.fields"
+        v-else
       />
       <div class="flex gap-2 align-items-center">
         <PrimeButton
@@ -94,11 +98,5 @@
         />
       </div>
     </div>
-    <AdvancedFilterGraphql
-      :fieldsInFilter="props.fieldsInFilter"
-      :searchAdvancedFilter="searchAdvancedFilter"
-      :filterAdvanced="filter.fields"
-      v-else
-    />
   </div>
 </template>
