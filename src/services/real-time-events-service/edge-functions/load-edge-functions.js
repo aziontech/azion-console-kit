@@ -50,6 +50,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [edgeFunctionsEvents = {}] = body.data.edgeFunctionsEvents
+  edgeFunctionsEvents.edgeFunctionsList = edgeFunctionsEvents.edgeFunctionsList?.split(';')
 
   return {
     id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,

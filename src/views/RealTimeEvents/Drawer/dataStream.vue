@@ -5,6 +5,8 @@
   import TableEvents from './tableEvents.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
 
   import { computed, ref, watch } from 'vue'
 
@@ -20,6 +22,10 @@
   const details = ref({})
   const showDrawer = ref(false)
   const loading = ref(false)
+  const streamedLinesTooltip =
+    'Total amount of lines streamed to the configured endpoint. Maximum value of 2000. This field is the result of a sum.'
+  const dataStreamedTooltip =
+    'Total amount of data streamed, in bytes, to the configured endpoint. This field is the result of a sum.'
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
@@ -30,6 +36,11 @@
     } finally {
       loading.value = false
     }
+  }
+
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
   }
 
   watch(
@@ -80,7 +91,42 @@
             <TableEvents :data="details.data" />
           </TabPanel>
           <TabPanel header="Cards">
-            <h4>Cards</h4>
+            <InfoSection class="mt-4">
+              <template #body>
+                <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+                  <BigNumber
+                    label="Streamed Lines"
+                    sufix="lines"
+                    class="flex-1"
+                    :tooltipMessage="streamedLinesTooltip"
+                  >
+                    {{ getValueByKey('streamedLines') }}
+                  </BigNumber>
+                  <BigNumber
+                    label="Data Streamed"
+                    sufix="bytes"
+                    class="flex-1"
+                    :tooltipMessage="dataStreamedTooltip"
+                  >
+                    {{ getValueByKey('dataStreamed') }}
+                  </BigNumber>
+                </div>
+
+                <Divider />
+
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Configuration ID">{{
+                      getValueByKey('configurationId')
+                    }}</TextInfo>
+                    <TextInfo label="Status Code">{{ getValueByKey('statusCode') }}</TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Endpoint Type">{{ getValueByKey('endpointType') }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
           </TabPanel>
         </TabView>
         <div

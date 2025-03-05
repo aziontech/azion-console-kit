@@ -6,6 +6,7 @@
   import Skeleton from 'primevue/skeleton'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
 
   defineOptions({ name: 'drawer-events-image-processor' })
 
@@ -29,6 +30,11 @@
     } finally {
       loading.value = false
     }
+  }
+
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
   }
 
   watch(
@@ -78,7 +84,21 @@
             <TableEvents :data="details.data" />
           </TabPanel>
           <TabPanel header="Cards">
-            <h4>Cards</h4>
+            <InfoSection class="mt-4">
+              <template #body>
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Author Name">{{ getValueByKey('authorName') }}</TextInfo>
+                    <TextInfo label="Account ID">{{ getValueByKey('accountId') }}</TextInfo>
+                    <TextInfo label="User ID">{{ getValueByKey('userId') }}</TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Author E-mail">{{ getValueByKey('authorEmail') }}</TextInfo>
+                    <TextInfo label="Comment">{{ getValueByKey('comment') }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
           </TabPanel>
         </TabView>
         <div

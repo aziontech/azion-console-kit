@@ -7,6 +7,8 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
 
   defineOptions({ name: 'DrawerEventsFunctions' })
 
@@ -31,6 +33,11 @@
     } finally {
       loading.value = false
     }
+  }
+
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
   }
 
   watch(showDrawer, (isVisible) => {
@@ -68,7 +75,56 @@
             <TableEvents :data="details.data" />
           </TabPanel>
           <TabPanel header="Cards">
-            <h4>Cards</h4>
+            <InfoSection class="mt-4">
+              <template #body>
+                <div class="gap-8 flex flex-col sm:flex-row w-full">
+                  <TextInfo
+                    label="Edge Functions List"
+                    class="w-full sm:w-5/12 flex-1"
+                  >
+                    <ul>
+                      <li
+                        :key="index"
+                        v-for="(functionType, index) in getValueByKey('edgeFunctionsList')"
+                      >
+                        {{ functionType }}
+                      </li>
+                    </ul>
+                  </TextInfo>
+                  <BigNumber
+                    class="flex-1"
+                    label="Edge Functions Time"
+                    sufix="s"
+                    :tooltipMessage="edgeFunctionsTime"
+                    >{{ getValueByKey('edgeFunctionsTime') }}</BigNumber
+                  >
+                </div>
+
+                <Divider />
+
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 flex-1">
+                    <TextInfo label="Edge Functions Initiator Type List">
+                      {{ getValueByKey('edgeFunctionsInitiatorTypeList') }}
+                    </TextInfo>
+                    <TextInfo label="Edge Functions Instance ID List">
+                      {{ getValueByKey('edgeFunctionsInstanceIdList') }}
+                    </TextInfo>
+                    <TextInfo label="Edge Functions Solution ID">
+                      {{ getValueByKey('edgeFunctionsSolutionId') }}
+                    </TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Virtual Host ID">{{
+                      getValueByKey('virtualHostId')
+                    }}</TextInfo>
+                    <TextInfo label="Configuration ID">{{
+                      getValueByKey('configurationId')
+                    }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
           </TabPanel>
         </TabView>
         <div

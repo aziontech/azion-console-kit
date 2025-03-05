@@ -69,6 +69,8 @@ describe('ImageProcessorServices', () => {
     expect(response).toEqual({
       qtype: fixtures.edgeDns.qtype,
       ts: fixtures.edgeDns.ts,
+      qTypeDescription:
+        'Address Mapping record (A Record), also known as a DNS host record, stores a hostname and its corresponding IPv4 address.',
       data: [
         { key: 'level', value: fixtures.edgeDns.level },
         { key: 'qtype', value: fixtures.edgeDns.qtype },

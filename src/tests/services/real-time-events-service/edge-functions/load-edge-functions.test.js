@@ -80,7 +80,7 @@ describe('DataStreamingServices', () => {
           key: 'edgeFunctionsInstanceIdList',
           value: fixtures.edgeFunction.edgeFunctionsInstanceIdList
         },
-        { key: 'edgeFunctionsList', value: 'function-1; function-2; function-3' },
+        { key: 'edgeFunctionsList', value: ['function-1', ' function-2', ' function-3'] },
         { key: 'edgeFunctionsSolutionId', value: fixtures.edgeFunction.edgeFunctionsSolutionId },
         { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
         { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage },

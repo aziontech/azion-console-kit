@@ -29,13 +29,16 @@
 
 <template>
   <div
-    class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
+    class="flex max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
   >
     <div
-      v-if="!loading"
+      v-if="!loading && props.title"
       class="whitespace-nowrap flex-col justify-center items-start gap-3 flex"
     >
-      <div class="flex flex-wrap gap-2">
+      <div
+        class="flex flex-wrap gap-2"
+        v-if="props.title"
+      >
         <h2 class="whitespace-normal text-color text-xl font-medium">
           {{ props.title }}
         </h2>
@@ -58,11 +61,11 @@
     </div>
 
     <Skeleton
-      v-else
+      v-else-if="props.title"
       class="w-full h-12 mt-7"
     />
 
-    <Divider v-if="!loading" />
+    <Divider v-if="!loading && props.title" />
     <slot name="body"></slot>
   </div>
 </template>
