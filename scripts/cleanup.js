@@ -34,7 +34,7 @@ const CYPRESS_TOKEN = process.env.CI
   : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 15 }
+  cypress: { token: CYPRESS_TOKEN, wait_time: 10 }
 }
 
 const entities = [
@@ -132,7 +132,7 @@ const deleteResources = async (
 }
 
 const getCountFunctions = {
-  credentials: (data) => (data.credentials ? data.credentials.length : 0),
+  credentials: (data) => (data.results ? data.results.length : 0),
   data_streaming: (data) => (data.results ? data.results.length : 0),
   edge_applications: (data) => (data.count ? data.count : 0),
   edge_firewall: (data) => (data.count ? data.count : 0),
@@ -143,7 +143,7 @@ const getCountFunctions = {
 }
 
 const getResultsFunctions = {
-  credentials: (data) => data.credentials || [],
+  credentials: (data) => data.results|| [],
   data_streaming: (data) => data.results || [],
   edge_applications: (data) => data.results || [],
   edge_firewall: (data) => data.results || [],
