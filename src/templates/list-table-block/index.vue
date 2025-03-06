@@ -465,7 +465,7 @@
       return
     }
     const columnMapper = props.csvMapper(rowData)
-    if (columnMapper?.summary && Array.isArray(columnMapper.summary)) {
+    if (rowData.field === 'summary') {
       const values = [...columnMapper.summary]
       columnMapper.summary = formatSummaryToCSV(values)
     }

@@ -24,25 +24,25 @@
     }
   })
 
-  const handle = ref('right')
+  const handlePositionDrawer = ref('right')
 
   const handlePosition = () => {
-    if (handle.value === 'right') {
-      handle.value = 'full'
+    if (handlePositionDrawer.value === 'right') {
+      handlePositionDrawer.value = 'full'
     } else {
-      handle.value = 'right'
+      handlePositionDrawer.value = 'right'
     }
   }
 
   const sizeSidebar = () => {
-    if (handle.value === 'right') {
+    if (handlePositionDrawer.value === 'right') {
       return 'max-w-4xl w-full p-0'
     }
     return 'w-full p-0'
   }
 
   const iconExpand = computed(() => {
-    if (handle.value === 'right') {
+    if (handlePositionDrawer.value === 'right') {
       return 'pi pi-window-maximize'
     }
     return 'pi pi-window-minimize'
