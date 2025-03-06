@@ -54,7 +54,7 @@
 <template>
   <Sidebar
     v-model:visible="visibleDrawer"
-    :position="handle"
+    :position="handlePositionDrawer"
     :pt="{
       root: { class: sizeSidebar() },
       header: { class: 'flex justify-between font-medium px-8' },
