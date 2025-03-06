@@ -34,7 +34,7 @@ const CYPRESS_TOKEN = process.env.CI
   : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 60 }
+  cypress: { token: CYPRESS_TOKEN, wait_time: 30 }
 }
 
 const entities = [
@@ -68,18 +68,35 @@ const entities = [
     url: `${URL}/network_lists`,
     version: 3,
     exclude: [66, 2]
+  },
+  {
+    name: 'edge_functions',
+    url: `${URL}/edge_functions`,
+    version: 3
+  },
+  {
+    name: 'teams',
+    url: `${URL}/iam/teams`,
+    version: 3
+  },
+  {
+    name: 'users',
+    url: `${URL}/iam/users`,
+    version: 3
   }
 ]
 
 const deleteResources = async (
   url,
   headers,
-  wait_time,
+  defaultWaitTime,
   getCount,
   getResults,
   getSingleUrl,
-  excludeIds = []
+  excludeIds = [],
+  entityWaitTime
 ) => {
+  const wait_time = entityWaitTime || defaultWaitTime
   let hasResource = true
 
   while (hasResource) {
@@ -105,6 +122,11 @@ const deleteResources = async (
 
     for (const resource of results) {
       if (!excludeIds.includes(resource.id)) {
+        if (url.includes('/iam/users') && resource.is_owner) {
+          console.log(`🚫 Skipping deletion for owner user with ID ${resource.id}`)
+          continue
+        }
+
         try {
           const singleResourceUrl = getSingleUrl(resource)
           const deleteResponse = await axios.delete(singleResourceUrl, {
@@ -139,7 +161,10 @@ const getCountFunctions = {
   edge_sql: (data) => (data.count ? data.count : 0),
   waf_rulesets: (data) => (data.count ? data.count : 0),
   digital_certificates: (data) => (data.count ? data.count : 0),
-  network_lists: (data) => (data.count ? data.count : 0)
+  network_lists: (data) => (data.count ? data.count : 0),
+  edge_functions: (data) => (data.count ? data.count : 0),
+  teams: (data) => (data.count ? data.count : 0),
+  users: (data) => (data.count ? data.count : 0)
 }
 
 const getResultsFunctions = {
@@ -150,7 +175,10 @@ const getResultsFunctions = {
   edge_sql: (data) => data.results || [],
   waf_rulesets: (data) => data.results || [],
   digital_certificates: (data) => data.results || [],
-  network_lists: (data) => data.results || []
+  network_lists: (data) => data.results || [],
+  edge_functions: (data) => data.results || [],
+  teams: (data) => data.results || [],
+  users: (data) => data.results || []
 }
 
 ;(async () => {
@@ -179,7 +207,8 @@ const getResultsFunctions = {
         getCount,
         getResults,
         (resource) => `${entity.url}/${resource.id}`,
-        entity.exclude || []
+        entity.exclude || [],
+        entity.wait_time
       )
     }
   }
