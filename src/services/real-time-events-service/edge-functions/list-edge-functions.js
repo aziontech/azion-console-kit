@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
@@ -14,6 +14,7 @@ export const listEdgeFunctions = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -42,7 +43,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+  const data = body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: edgeFunctionsEvents.configurationId,
     functionLanguage: edgeFunctionsEvents.functionLanguage,
@@ -52,4 +53,8 @@ const adaptResponse = (response) => {
     ts: edgeFunctionsEvents.ts,
     tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
   }))
+
+  return {
+    data
+  }
 }

@@ -9,6 +9,7 @@ import istanbul from 'vite-plugin-istanbul'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
 
   return {
     plugins: [
@@ -45,14 +46,9 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
         },
         '/graphql/cities': {
-          target: `${URLStartPrefix}cities.azion.com`,
+          target: `${URLStartPrefix}cities.azion.${DomainSuffix}`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
-        },
-        '/graphql/billing': {
-          target: `${URLStartPrefix}manager.azion.com`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
         '/api/webhook/console_feedback': {
           target: `https://automate.azion.net/`,
@@ -69,6 +65,10 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
+        '/v4': {
+          target: `${URLStartPrefix}api.azion.com`,
+          changeOrigin: true
+        },
         '/webpagetest': {
           target: `https://www.azion.com/api/webpagetest`,
           changeOrigin: true,
@@ -83,12 +83,7 @@ const getConfig = () => {
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '')
-        },
-        '/graphql/accounting': {
-          target: `${URLStartPrefix}manager.azion.com`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
-        },
+        }
       }
     }
   }

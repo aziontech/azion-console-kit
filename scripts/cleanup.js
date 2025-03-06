@@ -1,46 +1,41 @@
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
-import console from 'console';
-import { setTimeout } from 'timers/promises';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import axios from 'axios'
+import fs from 'fs'
+import path from 'path'
+import process from 'process'
+import console from 'console'
+import { setTimeout } from 'timers/promises'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const readCypressEnv = () => {
-  const cypressEnvPath = path.resolve(__dirname, '../cypress.env.json');
+  const cypressEnvPath = path.resolve(__dirname, '../cypress.env.json')
   if (fs.existsSync(cypressEnvPath)) {
-    const rawdata = fs.readFileSync(cypressEnvPath);
-    return JSON.parse(rawdata);
+    const rawdata = fs.readFileSync(cypressEnvPath)
+    return JSON.parse(rawdata)
   } else {
-    console.error('⚠️ cypress.env.json file not found.');
-    process.exit(1);
+    console.error('⚠️ cypress.env.json file not found.')
+    process.exit(1)
   }
-};
+}
 
-const cypressEnv = process.env.CI ? {} : readCypressEnv();
+const cypressEnv = process.env.CI ? {} : readCypressEnv()
 
-
-const ENV = process.argv[2] ? process.argv[2].toUpperCase() : 'STAGE';
-const API_v3 =
-  ENV === 'PROD' ? 'https://api.azionapi.net' : 'https://stage-api.azion.net';
-const API_v4 =
-  ENV === 'PROD'
-    ? 'https://api.azion.com/v4'
-    : 'https://stage-api.azion.com/v4';
-const URL = `${API_v3}`;
-const URL_v4 = `${API_v4}`;
+const ENV = process.argv[2] ? process.argv[2].toUpperCase() : 'STAGE'
+const API_v3 = ENV === 'PROD' ? 'https://api.azionapi.net' : 'https://stage-api.azion.net'
+const API_v4 = ENV === 'PROD' ? 'https://api.azion.com/v4' : 'https://stage-api.azion.com/v4'
+const URL = `${API_v3}`
+const URL_v4 = `${API_v4}`
 
 const CYPRESS_TOKEN = process.env.CI
   ? process.env[`${ENV}_CYPRESS_TOKEN`]
-  : cypressEnv[`${ENV}_CYPRESS_TOKEN`];
+  : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 10 }
-};
+  cypress: { token: CYPRESS_TOKEN, wait_time: 60 }
+}
 
 const entities = [
   { name: 'credentials', url: `${URL}/credentials`, version: 3 },
@@ -54,6 +49,11 @@ const entities = [
     url: `${URL}/edge_applications`,
     version: 3,
     exclude: [1718380244, 340244]
+  },
+  {
+    name: 'variables',
+    url: `${URL}/variables`,
+    version: 3
   },
   { name: 'edge_firewall', url: `${URL}/edge_firewall`, version: 3 },
   { name: 'edge_sql', url: `${URL_v4}/edge_sql/databases`, version: 4 },
@@ -69,7 +69,7 @@ const entities = [
     version: 3,
     exclude: [66, 2]
   }
-];
+]
 
 const deleteResources = async (
   url,
@@ -80,99 +80,96 @@ const deleteResources = async (
   getSingleUrl,
   excludeIds = []
 ) => {
-  let hasResource = true;
+  let hasResource = true
 
   while (hasResource) {
-    const response = await axios.get(url, { headers });
-    const count = getCount(response.data);
-    const results = getResults(response.data);
+    const response = await axios.get(url, { headers })
+    const count = getCount(response.data)
+    const results = getResults(response.data)
 
-    console.log(`\n🗑️ Total of ${count} resources to be deleted.`);
+    console.log(`\n🗑️ Total of ${count} resources to be deleted.`)
 
     if (count === 0) {
-      console.log('✅ No more resources to delete.');
-      break;
+      console.log('✅ No more resources to delete.')
+      break
     }
 
-    hasResource = results.length > 0;
+    hasResource = results.length > 0
 
     if (!hasResource) {
-      console.log('✅ No more resources to delete.');
-      break;
+      console.log('✅ No more resources to delete.')
+      break
     }
 
-    let deletedCount = 0;
+    let deletedCount = 0
 
     for (const resource of results) {
       if (!excludeIds.includes(resource.id)) {
         try {
-          const singleResourceUrl = getSingleUrl(resource);
+          const singleResourceUrl = getSingleUrl(resource)
           const deleteResponse = await axios.delete(singleResourceUrl, {
             headers
-          });
+          })
           console.log(
             `🗑️ Deleted resource: ${singleResourceUrl} - Status code: ${deleteResponse.status}`
-          );
-          deletedCount++;
+          )
+          deletedCount++
+          console.log(`⏳ Waiting for ${wait_time} seconds before continuing...`)
+          await setTimeout(wait_time * 1000)
         } catch (error) {
-          console.error(
-            `❌ Error deleting resource with ID ${resource.id}: ${error.message}`
-          );
+          console.error(`❌ Error deleting resource with ID ${resource.id}: ${error.message}`)
         }
       } else {
-        console.log(`🚫 Skipping deletion for resource with ID ${resource.id}`);
+        console.log(`🚫 Skipping deletion for resource with ID ${resource.id}`)
       }
     }
 
     if (deletedCount === 0) {
-      console.log('✅ No resources deleted in this iteration.');
-      break;
+      console.log('✅ No resources deleted in this iteration.')
+      break
     }
-
-    console.log(`⏳ Waiting for ${wait_time} seconds before continuing...`);
-    await setTimeout(wait_time * 1000);
   }
-};
+}
 
 const getCountFunctions = {
-  credentials: data => (data.credentials ? data.credentials.length : 0),
-  data_streaming: data => (data.results ? data.results.length : 0),
-  edge_applications: data => (data.count ? data.count : 0),
-  edge_firewall: data => (data.count ? data.count : 0),
-  edge_sql: data => (data.count ? data.count : 0),
-  waf_rulesets: data => (data.count ? data.count : 0),
-  digital_certificates: data => (data.count ? data.count : 0),
-  network_lists: data => (data.count ? data.count : 0)
-};
+  credentials: (data) => (data.credentials ? data.credentials.length : 0),
+  data_streaming: (data) => (data.results ? data.results.length : 0),
+  edge_applications: (data) => (data.count ? data.count : 0),
+  edge_firewall: (data) => (data.count ? data.count : 0),
+  edge_sql: (data) => (data.count ? data.count : 0),
+  waf_rulesets: (data) => (data.count ? data.count : 0),
+  digital_certificates: (data) => (data.count ? data.count : 0),
+  network_lists: (data) => (data.count ? data.count : 0)
+}
 
 const getResultsFunctions = {
-  credentials: data => data.credentials || [],
-  data_streaming: data => data.results || [],
-  edge_applications: data => data.results || [],
-  edge_firewall: data => data.results || [],
-  edge_sql: data => data.results || [],
-  waf_rulesets: data => data.results || [],
-  digital_certificates: data => data.results || [],
-  network_lists: data => data.results || []
-};
+  credentials: (data) => data.credentials || [],
+  data_streaming: (data) => data.results || [],
+  edge_applications: (data) => data.results || [],
+  edge_firewall: (data) => data.results || [],
+  edge_sql: (data) => data.results || [],
+  waf_rulesets: (data) => data.results || [],
+  digital_certificates: (data) => data.results || [],
+  network_lists: (data) => data.results || []
+}
 
-(async () => {
+;(async () => {
   for (const userType in credentials) {
-    const { token, wait_time } = credentials[userType];
+    const { token, wait_time } = credentials[userType]
     const headers = {
       Accept: 'application/json; version=3',
       'Content-Type': 'application/json',
       Authorization: `token ${token}`
-    };
+    }
 
     for (const entity of entities) {
-      console.log(`\n🔄 Processing ${entity.name}...`);
-      const getCount = getCountFunctions[entity.name.split('/')[0]];
-      const getResults = getResultsFunctions[entity.name.split('/')[0]];
+      console.log(`\n🔄 Processing ${entity.name}...`)
+      const getCount = getCountFunctions[entity.name.split('/')[0]]
+      const getResults = getResultsFunctions[entity.name.split('/')[0]]
 
       if (!getCount || !getResults) {
-        console.error(`⚠️ No functions found for entity: ${entity.name}`);
-        continue;
+        console.error(`⚠️ No functions found for entity: ${entity.name}`)
+        continue
       }
 
       await deleteResources(
@@ -181,9 +178,9 @@ const getResultsFunctions = {
         wait_time,
         getCount,
         getResults,
-        resource => `${entity.url}/${resource.id}`,
+        (resource) => `${entity.url}/${resource.id}`,
         entity.exclude || []
-      );
+      )
     }
   }
-})();
+})()

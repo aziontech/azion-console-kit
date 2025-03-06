@@ -23,7 +23,7 @@ const makeSut = () => {
   }
 }
 
-describe('NetworkListsServices', () => {
+describe('NetworkListsServicesV4', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })

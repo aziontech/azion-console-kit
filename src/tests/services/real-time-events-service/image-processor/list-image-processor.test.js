@@ -66,9 +66,10 @@ describe('ImageProcessorServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -92,19 +93,21 @@ describe('ImageProcessorServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual([
-      {
-        id: 'mocked-timestamp',
-        configurationId: fixtures.imageProcessor.configurationId,
-        host: fixtures.imageProcessor.host,
-        requestUri: fixtures.imageProcessor.requestUri,
-        status: fixtures.imageProcessor.status,
-        bytesSent: fixtures.imageProcessor.bytesSent,
-        httpReferer: fixtures.imageProcessor.httpReferer,
-        httpUserAgent: fixtures.imageProcessor.httpUserAgent,
-        ts: fixtures.imageProcessor.ts,
-        tsFormat: 'February 23, 2024 at 06:07 PM'
-      }
-    ])
+    expect(response).toEqual({
+      data: [
+        {
+          id: 'mocked-timestamp',
+          configurationId: fixtures.imageProcessor.configurationId,
+          host: fixtures.imageProcessor.host,
+          requestUri: fixtures.imageProcessor.requestUri,
+          status: fixtures.imageProcessor.status,
+          bytesSent: fixtures.imageProcessor.bytesSent,
+          httpReferer: fixtures.imageProcessor.httpReferer,
+          httpUserAgent: fixtures.imageProcessor.httpUserAgent,
+          ts: fixtures.imageProcessor.ts,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+        }
+      ]
+    })
   })
 })

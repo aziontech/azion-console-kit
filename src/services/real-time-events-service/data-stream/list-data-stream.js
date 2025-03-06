@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -14,6 +14,7 @@ export const listDataStream = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -45,7 +46,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+  const data = body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: dataStreamedEvents.configurationId,
     jobName: {
@@ -64,4 +65,8 @@ const adaptResponse = (response) => {
     streamedLines: dataStreamedEvents.streamedLines,
     tsFormat: convertValueToDate(dataStreamedEvents.ts)
   }))
+
+  return {
+    data
+  }
 }

@@ -9,7 +9,9 @@ const fixtures = {
     name: 'Rules Engine teste',
     description: 'My description',
     active: true,
-    criteria: [{ conditional: 'if', input: '${uri}', comparison: 'starts_with', subject: '/api' }],
+    criteria: [
+      [{ conditional: 'if', input: '${uri}', comparison: 'starts_with', subject: '/api' }]
+    ],
     behaviors: [
       { name: 'run_function', functionId: 'abc123' },
       { name: 'set_waf_ruleset', mode: 'blocking', waf_id: 'def456' },
@@ -121,5 +123,54 @@ describe('EdgeFirewallRulesEngineService', () => {
     const expectedError = new Errors.InternalServerError().message
 
     await expect(apiErrorResponse).rejects.toThrow(expectedError)
+  })
+  it('should correctly convert the criteria variable to number and not modify other criteria', async () => {
+    const originalCriteria = [
+      {
+        conditional: 'and',
+        variable: '${network}',
+        comparison: 'is_equal',
+        argument: '10'
+      },
+      {
+        conditional: 'or',
+        variable: '${region}',
+        comparison: 'is_not_equal',
+        argument: 'us-east-1'
+      }
+    ]
+
+    fixtures.payload.criteria = [originalCriteria]
+
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 202
+    })
+
+    const { sut } = makeSut()
+
+    await sut(fixtures)
+
+    const expectedCriteria = [
+      {
+        conditional: 'and',
+        variable: '${network}',
+        comparison: 'is_equal',
+        argument: 10
+      },
+      {
+        conditional: 'or',
+        variable: '${region}',
+        comparison: 'is_not_equal',
+        argument: 'us-east-1'
+      }
+    ]
+
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          criteria: [expectedCriteria]
+        })
+      })
+    )
   })
 })

@@ -58,9 +58,10 @@ describe('ImageProcessorServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -101,7 +102,7 @@ describe('ImageProcessorServices', () => {
       sslSessionReused: fixtures.imageProcessor.sslSessionReused,
       status: fixtures.imageProcessor.status,
       tcpinfoRtt: fixtures.imageProcessor.tcpinfoRtt,
-      ts: 'February 23, 2024 at 06:07 PM',
+      ts: 'February 23, 2024 at 06:07:25 PM',
       upstreamCacheStatus: fixtures.imageProcessor.upstreamCacheStatus,
       upstreamResponseTime: fixtures.imageProcessor.upstreamResponseTime,
       upstreamResponseTimeStr: fixtures.imageProcessor.upstreamResponseTimeStr,

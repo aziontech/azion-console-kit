@@ -541,7 +541,7 @@
                     deleteService: action.service,
                     rerender: Math.random()
                   },
-                  onClose: (opt) => opt.data.updated && reload()
+                  onClose: (opt) => opt.data.updated && reload() && updateDataTablePagination()
                 }
                 openDialog(DeleteDialog, bodyDelete)
               }
@@ -625,6 +625,10 @@
   }
 
   const reload = async (query = {}) => {
+    if (!savedOrdering.value) {
+      savedOrdering.value = props.defaultOrderingFieldName
+    }
+
     const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,
@@ -674,7 +678,6 @@
     const firstPage = 1
     firstItemIndex.value = firstPage
     await reload({ ordering })
-
     savedOrdering.value = ordering
     sortFieldValue.value = sortField
     sortOrderValue.value = sortOrder
@@ -686,6 +689,11 @@
     const firstPage = 1
     firstItemIndex.value = firstPage
     reload()
+  }
+
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 1
+    firstItemIndex.value = FIRST_NUMBER_PAGE
   }
 
   const handleSearchValue = () => {

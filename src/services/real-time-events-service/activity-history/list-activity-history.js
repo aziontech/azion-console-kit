@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
@@ -14,6 +14,7 @@ export const listActivityHistory = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -35,7 +36,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+  const data = body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
     userIp: activityHistoryEvents.userIp,
     authorName: activityHistoryEvents.authorName,
@@ -46,4 +47,8 @@ const adaptResponse = (response) => {
     ts: activityHistoryEvents.ts,
     tsFormat: convertValueToDate(activityHistoryEvents.ts)
   }))
+
+  return {
+    data
+  }
 }

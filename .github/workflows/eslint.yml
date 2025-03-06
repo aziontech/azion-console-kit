@@ -1,0 +1,45 @@
+name: Run Linters And Checking Build Integrity
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - dev
+      - UXE-6333-real-time-event-improvement-fork
+env:
+  HUSKY: 0
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    container:
+      image: node:18-alpine3.18
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install SO Dependencies
+        run: apk add --no-cache curl bash git
+
+      - uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Dependencies
+        run: yarn ci
+
+      - name: Checking Build Integrity
+        run: |
+          echo "checking build integrity"
+          yarn build
+          rm -rf dist
+          rm -rf coverage
+
+      - name: Run ESLint
+        run: yarn lint
+
+      - name: Run Prettier Formatting
+        run: yarn prettier --check src/

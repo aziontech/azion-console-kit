@@ -20,7 +20,9 @@ export const useAccountStore = defineStore({
       FULL_CONSOLE_ACCESS: 'allow_console',
       SSO_MANAGEMENT: 'federated_auth',
       DATA_STREAM_SAMPLING: 'data_streaming_sampling',
-      MARKETPLACE_PRODUCTS: 'marketplace_products'
+      MARKETPLACE_PRODUCTS: 'marketplace_products',
+      HIDE_CREATE_OPTIONS: 'hide_create_options',
+      FORCE_REDIRECT_TO_CONSOLE: 'force_redirect_to_console'
     }
   }),
   getters: {
@@ -32,9 +34,10 @@ export const useAccountStore = defineStore({
     },
     hasPermissionToEditDataStream(state) {
       const permissionToEditDataStream = 'Edit Data Stream'
-      return !!state.account.permissions?.some(
+      const hasPermissionToEdit = !!state.account.permissions?.some(
         (permission) => permission.name === permissionToEditDataStream
       )
+      return hasPermissionToEdit || state.account.is_account_owner
     },
     hasPermissionToViewDataStream(state) {
       return !!state.account.permissions.find(
@@ -58,6 +61,10 @@ export const useAccountStore = defineStore({
     hasAccessConsole(state) {
       const { client_flags = [], isDeveloperSupportPlan } = state.account
       return client_flags.includes(state.flags.FULL_CONSOLE_ACCESS) || !!isDeveloperSupportPlan
+    },
+    isBannerVisible(state) {
+      const { client_flags = [] } = state.account
+      return !client_flags.includes(state.flags.FORCE_REDIRECT_TO_CONSOLE)
     },
     currentTheme(state) {
       return state.account?.colorTheme
@@ -100,6 +107,10 @@ export const useAccountStore = defineStore({
     },
     accountIsNotRegular(state) {
       return state.account?.status !== state.accountStatuses.REGULAR
+    },
+
+    hasHideCreateOptionsFlag(state) {
+      return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
     }
   },
   actions: {

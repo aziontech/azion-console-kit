@@ -12,7 +12,8 @@ const fixtures = {
     subject_name: ['Subject 1', 'Subject 2'],
     type: 'edge_certificate',
     validity: new Date(2023, 10, 10),
-    status: 'active'
+    status: 'active',
+    status_detail: ''
   },
   trustedCertificateMock: {
     id: 3,
@@ -21,15 +22,17 @@ const fixtures = {
     subject_name: ['Subject 1', 'Subject 2'],
     type: 'trusted_ca_certificate',
     validity: new Date(2023, 10, 10),
-    status: 'active'
+    status: 'active',
+    status_detail: ''
   },
   certificateWithMissingData: {
     id: 2,
     name: 'Certificate 2',
-    subject_name: [],
+    subject_name: null,
     type: null,
     validity: null,
-    status: 'pending'
+    status: 'pending',
+    status_detail: 'Pending by error'
   }
 }
 
@@ -90,8 +93,11 @@ describe('DigitalCertificatesServices', () => {
       subjectName: 'Subject 1,Subject 2',
       validity: 'Nov 10, 2023, 12:00 AM',
       status: {
-        content: 'Active',
-        severity: 'success'
+        status: {
+          content: 'Active',
+          severity: 'success'
+        },
+        statusDetail: ''
       }
     })
     expect(parsedDomainMissingValues).toEqual({
@@ -99,8 +105,11 @@ describe('DigitalCertificatesServices', () => {
       issuer: '-',
       name: 'Certificate 2',
       status: {
-        content: 'Pending',
-        severity: 'danger'
+        status: {
+          content: 'Pending',
+          severity: 'danger'
+        },
+        statusDetail: 'Pending by error'
       },
       subjectName: '-',
       type: '-',
@@ -141,8 +150,11 @@ describe('DigitalCertificatesServices', () => {
         issuer: '-',
         name: 'Certificate 2',
         status: {
-          content: 'Inactive',
-          severity: 'danger'
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
         },
         subjectName: '-',
         type: '-',
@@ -161,6 +173,72 @@ describe('DigitalCertificatesServices', () => {
         }
       })
     })
+  })
+
+  it('should return correct certificates when search parameters are provided', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.certificateMock]
+      }
+    })
+    const { sut } = makeSut()
+    const result = await sut({ search: 'Certificate1' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v4/digital_certificates/certificates?ordering=name&page=1&page_size=10&fields=&search=Certificate1`,
+      method: 'GET'
+    })
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
+        }
+      }
+    ])
+  })
+
+  it('should return correct certificates when ordering parameters are provided', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.certificateMock]
+      }
+    })
+    const { sut } = makeSut()
+    const result = await sut({ ordering: 'issuer' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v4/digital_certificates/certificates?ordering=issuer&page=1&page_size=10&fields=&search=`,
+      method: 'GET'
+    })
+    expect(result).toEqual([
+      {
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'TLS Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
+        }
+      }
+    ])
   })
 
   it.each([

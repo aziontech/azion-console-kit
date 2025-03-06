@@ -42,9 +42,10 @@ describe('ActivityHistoryServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -74,7 +75,7 @@ describe('ActivityHistoryServices', () => {
       userId: fixtures.activityHistory.userId,
       title: fixtures.activityHistory.title,
       comment: fixtures.activityHistory.comment,
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

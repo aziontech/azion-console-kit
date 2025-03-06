@@ -1,56 +1,87 @@
 <template>
-  <div class="flex gap-6 mt-4 flex-col sm:flex-row">
-    <Dropdown
-      appendTo="self"
-      optionValue="value"
-      optionLabel="name"
-      :options="timeOptions"
-      v-model="selectedFilter.hourRange"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-    <MultiSelect
-      placeholder="Select domain"
-      resetFilterOnHide
-      autoFilterFocus
-      optionValue="id"
-      optionLabel="name"
-      filter
-      :options="domainsOptions.options"
-      v-model="valueDomains"
-      :loading="domainsOptions.done"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-    <Dropdown
-      filter
-      autoFilterFocus
-      appendTo="self"
-      optionValue="value"
-      optionLabel="name"
-      placeholder="Select network list"
-      showClear
-      :options="netWorkListOptions.options"
-      v-model="valueNetwork"
-      :loading="netWorkListOptions.done"
-      @change="filterTuning"
-      class="w-full sm:max-w-xs"
-    />
-  </div>
   <div
-    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none"
+    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex flex-col gap-6 md:gap-4"
   >
-    <advancedFilter
-      v-model:externalFilter="selectedFilter"
-      v-model:filterAdvanced="selectedFilterAdvanced"
-      :fieldsInFilter="listFields"
-      @applyFilter="filterSearch"
-    />
+    <div class="w-full flex md:flex-row flex-col gap-4 md:items-center">
+      <div class="flex gap-6 flex-col sm:flex-row w-full">
+        <Dropdown
+          appendTo="self"
+          optionValue="value"
+          optionLabel="name"
+          :options="timeOptions"
+          v-model="selectedFilter.hourRange"
+          @change="filterTuning"
+          class="w-full sm:max-w-xs"
+        />
+
+        <FieldMultiselectLazyLoader
+          data-testid="waf-tuning-list__domains-field"
+          name="valueDomainId"
+          :service="props.listDomainsService"
+          :loadService="props.loadDomainService"
+          optionLabel="name"
+          optionValue="id"
+          :value="valueDomainId"
+          appendTo="self"
+          class="w-full sm:max-w-xs overflow-hidden"
+          placeholder="Select domain"
+          @onChange="setDomainsSelectedOptions"
+        />
+
+        <FieldDropdownLazyLoader
+          data-testid="waf-tuning-list__network-list-field"
+          name="valueNetworkId"
+          :service="props.listNetworkListService"
+          :loadService="props.loadNetworkListService"
+          optionLabel="name"
+          optionValue="id"
+          :value="valueNetworkId"
+          :moreOptions="['value']"
+          appendTo="self"
+          placeholder="Select an network list"
+          @onClear="setNetworkListSelectedOption(null)"
+          @onSelectOption="setNetworkListSelectedOption"
+          class="w-full sm:max-w-xs"
+          enableClearOption
+        />
+      </div>
+      <div class="flex items-center justify-end">
+        <PrimeTag
+          class="no-wrap whitespace-nowrap ml-auto"
+          :value="recordsFoundLabel"
+          severity="info"
+        />
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center gap-2">
+      <advancedFilter
+        v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
+        :fieldsInFilter="listFields"
+        @applyFilter="filterSearch"
+      />
+      <PrimeButton
+        class="md:hidden"
+        outlined
+        size="small"
+        label="Export to CSV"
+        icon="pi pi-download"
+        @click="downloadCSV"
+      />
+      <PrimeButton
+        class="hidden md:flex"
+        outlined
+        size="small"
+        icon="pi pi-download"
+        v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+        @click="downloadCSV"
+      />
+    </div>
   </div>
   <ListTableBlock
     v-show="showListTable"
     pageTitleDelete="WAF rules tuning"
-    :listService="props.listWafRulesTuningService"
+    :listService="listService"
     ref="listServiceWafTunningRef"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
@@ -67,7 +98,6 @@
     title="Select a domain to query data"
     description="To use this feature, a domain must be associated with the edge firewall that has a behavior running this WAF rule set."
     :documentationService="props.documentationServiceTuning"
-    inTabs
     noShowBorderTop
     class="!mt-0"
   >
@@ -118,17 +148,19 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import FieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 
   import advancedFilter from '@/templates/advanced-filter'
-  import MultiSelect from 'primevue/multiselect'
   import { useToast } from 'primevue/usetoast'
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import PrimeTag from 'primevue/tag'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -165,6 +197,18 @@
     listWafRulesTuningAttacksService: {
       type: Function,
       required: true
+    },
+    listDomainsService: {
+      type: Function,
+      required: true
+    },
+    loadDomainService: {
+      type: Function,
+      required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -177,6 +221,7 @@
     hourRange: '1'
   })
   const selectedEvents = ref([])
+  const totalRecordsFound = ref(0)
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
@@ -189,26 +234,12 @@
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
-  const valueDomains = computed({
-    get: () => {
-      if (domainsOptions.value.done) return []
-      return selectedFilter.value.domains
-    },
-    set: (value) => {
-      selectedFilter.value.domains = value
-    }
-  })
 
-  const valueNetwork = computed({
-    get: () => {
-      if (netWorkListOptions.value.done || !selectedFilter.value.network?.id) return null
-      return netWorkListOptions.value.options.find(
-        (item) => item.value.id === selectedFilter.value.network?.id
-      ).value
-    },
-    set: (value) => {
-      selectedFilter.value.network = value
-    }
+  const valueNetworkId = ref(null)
+  const valueDomainId = ref(null)
+
+  const recordsFoundLabel = computed(() => {
+    return `${totalRecordsFound.value} records found`
   })
 
   const timeName = computed(
@@ -318,6 +349,26 @@
     return selectedFilter.value.domains?.length
   })
 
+  const listService = async (params) => {
+    const response = await props.listWafRulesTuningService(params)
+    totalRecordsFound.value = response.recordsFound
+    return response.data
+  }
+
+  const setNetworkListSelectedOption = (value) => {
+    selectedFilter.value.network = value
+    filterTuning()
+  }
+
+  const setDomainsSelectedOptions = (value) => {
+    selectedFilter.value.domains = value
+    filterTuning()
+  }
+
+  const downloadCSV = () => {
+    listServiceWafTunningRef.value?.handleExportTableDataToCSV()
+  }
+
   const showToast = (summary, severity) => {
     return toast.add({
       severity,
@@ -421,7 +472,10 @@
   }
 
   const filterSearch = async (filter) => {
-    if (!selectedFilter.value.domains.length) return
+    if (!selectedFilter.value.domains.length) {
+      totalRecordsFound.value = 0
+      return
+    }
 
     tracker.product.clickedOn({ target: 'Search' }).track()
 
@@ -458,7 +512,7 @@
 
   const setNetWorkListOptions = async () => {
     try {
-      const response = await props.listNetworkListService()
+      const response = await props.listNetworkListService({ fields: '' })
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
@@ -469,8 +523,8 @@
 
   const setDomainsOptions = async () => {
     try {
-      const response = await props.listWafRulesDomainsService({ wafId: wafRuleId.value })
-      domainsOptions.value.options = response
+      const response = await props.listDomainsService({ fields: 'id,name,active' })
+      domainsOptions.value.options = response.body
     } catch (error) {
       showToast(error, 'error')
     } finally {

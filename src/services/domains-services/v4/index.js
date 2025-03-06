@@ -1,4 +1,5 @@
 import { listDomainsService } from './list-domain-service'
+import { loadDomainService } from './load-domain-service'
 
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
@@ -8,4 +9,4 @@ import { listDomainsService } from './list-domain-service'
 /**
  * @type {ExportedServicesType}
  */
-export { listDomainsService }
+export { listDomainsService, loadDomainService }

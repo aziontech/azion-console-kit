@@ -26,6 +26,21 @@ const scenarios = [
     expected: 'https://manager.azion.com'
   },
   {
+    section: 'managerEOL',
+    env: 'development',
+    expected: 'https://stage-manager.azion.com/home'
+  },
+  {
+    section: 'managerEOL',
+    env: 'stage',
+    expected: 'https://stage-manager.azion.com/home'
+  },
+  {
+    section: 'managerEOL',
+    env: 'production',
+    expected: 'https://manager.azion.com/home'
+  },
+  {
     section: 'billing',
     env: 'stage',
     expected: 'https://stage-manager.azion.com/billing-subscriptions'
@@ -38,17 +53,17 @@ const scenarios = [
   {
     section: 'playgroundMetrics',
     env: 'development',
-    expected: 'https://stage-manager.azion.com/metrics/graphql'
+    expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'playgroundMetrics',
     env: 'stage',
-    expected: 'https://stage-manager.azion.com/metrics/graphql'
+    expected: 'https://stage-api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'playgroundMetrics',
     env: 'production',
-    expected: 'https://manager.azion.com/metrics/graphql'
+    expected: 'https://api.azion.com/v4/metrics/graphql'
   },
   {
     section: 'helpCenter',

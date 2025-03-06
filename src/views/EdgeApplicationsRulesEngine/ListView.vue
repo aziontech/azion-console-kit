@@ -2,14 +2,19 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
+  import TableBlock from '@/templates/list-table-block/v2/index.vue'
+  import { useDialog } from 'primevue/usedialog'
+  import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { storeToRefs } from 'pinia'
+  import { useAccountStore } from '@/stores/account'
+  import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const { currentTheme } = storeToRefs(useAccountStore())
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -94,38 +99,39 @@
     'behaviors',
     'criteria',
     'active',
-    'order'
+    'order',
+    'last_modified',
+    'last_editor'
   ]
 
   const PARSE_PHASE = {
     'Request phase': 'request',
     'Response phase': 'response'
   }
-  const disabledOrdering = ref(true)
+
   const drawerRulesEngineRef = ref('')
   const hasContentToList = ref(true)
   const listRulesEngineRef = ref(null)
   const selectedPhase = ref('Request phase')
+  const dialog = useDialog()
   const toast = useToast()
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'phase.content',
+        header: 'phase',
+        disableSort: true,
+        hidden: true
+      },
       {
         field: 'name',
         header: 'Name',
         disableSort: true
       },
       {
-        field: 'phase',
-        header: 'Phase',
-        type: 'component',
-        filterPath: 'phase',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        },
+        field: 'description',
+        header: 'Description',
         disableSort: true
       },
       {
@@ -140,11 +146,6 @@
             columnAppearance: 'tag'
           })
         },
-        disableSort: true
-      },
-      {
-        field: 'description',
-        header: 'Description',
         disableSort: true
       }
     ]
@@ -167,10 +168,11 @@
   }
 
   const listRulesEngineWithDecorator = async (query) => {
-    return props.listRulesEngineService({
+    const data = await props.listRulesEngineService({
       id: props.edgeApplicationId,
       ...query
     })
+    return data
   }
 
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
@@ -211,42 +213,11 @@
     }
   ]
 
-  const checkOrderRules = async ({ event, data, moveItem }) => {
-    if (isLoadingButtonOrder.value) {
-      toast.add({
-        closable: true,
-        severity: 'info',
-        summary: 'info',
-        detail: 'Please wait until the current operation is completed'
-      })
-      return
-    }
-
-    const { dragIndex: originIndex, dropIndex: destinationIndex, value: updatedTable } = event
-
-    const reorderedData = moveItem(data.value, updatedTable, originIndex, destinationIndex)
-
-    const isFirstRuleNotDefault = reorderedData[0].name !== 'Default Rule'
-
-    if (isFirstRuleNotDefault) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'The default rule cannot be reordered'
-      })
-      return
-    }
-
-    data.value = reorderedData
-    disabledOrdering.value = false
-  }
-
   const isLoadingButtonOrder = ref(false)
 
-  const updateRulesOrder = async (data, reload) => {
-    disabledOrdering.value = true
+  const reorderDecoratorService = async (data, reload) => {
+    isLoadingButtonOrder.value = true
     try {
-      isLoadingButtonOrder.value = true
       await props.reorderRulesEngine(data, props.edgeApplicationId)
       toast.add({
         closable: true,
@@ -262,10 +233,34 @@
         detail: error
       })
     } finally {
-      await reload()
       isLoadingButtonOrder.value = false
+      reload()
     }
   }
+
+  const updateRulesOrder = async (rows, alteredRows, reload) => {
+    dialog.open(orderDialog, {
+      data: {
+        rules: alteredRows
+      },
+      onClose: ({ data }) => {
+        if (data?.updated || data?.reset) {
+          return reload()
+        }
+        if (data?.save) {
+          return reorderDecoratorService(rows, reload)
+        }
+      }
+    })
+  }
+
+  const badgeClass = computed(() => {
+    if (currentTheme.value !== 'dark') {
+      return 'p-badge-lg !text-black bg-white !border-surface h-5 min-w-[20px] !text-xl'
+    } else {
+      return 'p-badge-lg !text-white bg-black !border-surface h-5 min-w-[20px] !text-xl'
+    }
+  })
 </script>
 
 <template>
@@ -289,10 +284,9 @@
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
-  <FetchListTableBlock
-    :lazy="false"
+  <TableBlock
     ref="listRulesEngineRef"
-    :reorderableRows="true"
+    orderableRows
     :columns="getColumns"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
@@ -302,15 +296,16 @@
     }"
     emptyListMessage="No rules found."
     @on-before-go-to-edit="handleTrackEditEvent"
-    @onReorder="checkOrderRules"
     data-testid="rules-engine-list"
     :actions="actions"
     isTabs
     :apiFields="RULES_ENGINE_API_FIELDS"
     :defaultOrderingFieldName="''"
-    :rowsPerPageOptions="[2000]"
+    groupColumn="phase.content"
+    :expandedRowGroups="['Default', 'Request', 'Response']"
+    expandableRowGroups
   >
-    <template #addButton="{ reload, data }">
+    <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
         class="flex gap-4"
         data-testid="rules-engine-add-button"
@@ -318,28 +313,37 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
+          :disabled="columnOrderAltered"
           @click="openCreateRulesEngineDrawerByPhase"
           data-testid="rules-engine-create-button"
         />
-        <teleport to="#action-bar">
+        <teleport
+          to="#action-bar"
+          v-if="columnOrderAltered"
+        >
           <div
-            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+            class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
+              class="bg-secondary"
               outlined
-              icon="pi pi-save"
-              class="bg-primary"
-              :disabled="disabledOrdering"
-              :pt="{
-                label: { class: 'text-[var(--surface-section)]' },
-                icon: { class: 'text-[var(--surface-section)]' },
-                loadingIcon: { class: 'text-[var(--surface-section)]' }
-              }"
-              label="Save order"
+              label="Cancel"
+              @click="reload"
+              :disabled="isLoadingButtonOrder"
+              data-testid="rules-engine-cancel-order-button"
+            />
+
+            <PrimeButton
+              label="Review Changes"
+              class="bg-surface"
+              :badgeClass="badgeClass"
               :loading="isLoadingButtonOrder"
+              :disabled="isLoadingButtonOrder"
               data-testid="rules-engine-save-order-button"
-              @click="updateRulesOrder(data, reload)"
-              v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
+              size="small"
+              type="button"
+              @click="updateRulesOrder(data, alteredRows, reload)"
+              :badge="alteredRows.length"
             />
           </div>
         </teleport>
@@ -369,5 +373,5 @@
         </template>
       </EmptyResultsBlock>
     </template>
-  </FetchListTableBlock>
+  </TableBlock>
 </template>

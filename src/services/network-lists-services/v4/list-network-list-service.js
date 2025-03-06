@@ -10,7 +10,14 @@ export const listNetworkListService = async ({
   page = 1,
   pageSize = 10
 }) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+  const searchParams = makeListServiceQueryParams({
+    fields,
+    ordering,
+    page,
+    pageSize,
+    search
+  })
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'

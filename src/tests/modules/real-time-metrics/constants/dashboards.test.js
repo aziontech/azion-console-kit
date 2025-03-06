@@ -43,6 +43,12 @@ describe('RealTimeMetricsModule', () => {
                   label: 'Bandwidth Saving',
                   path: 'bandwidth-saving',
                   dataset: 'httpMetrics'
+                },
+                {
+                  dataset: 'httpBreakdownMetrics',
+                  id: '357549179454620240',
+                  label: 'Request Breakdown',
+                  path: 'request-breakdown'
                 }
               ]
             },
@@ -140,6 +146,20 @@ describe('RealTimeMetricsModule', () => {
                   label: 'Breakdown',
                   path: 'breakdown',
                   dataset: 'botManagerBreakdownMetrics'
+                }
+              ]
+            },
+            {
+              id: 10,
+              label: 'Threats Breakdown',
+              path: 'threats',
+              groupId: 2,
+              dashboards: [
+                {
+                  id: '357548675837198934',
+                  label: 'Threats Breakdown',
+                  path: 'breakdown',
+                  dataset: 'httpBreakdownMetrics'
                 }
               ]
             }

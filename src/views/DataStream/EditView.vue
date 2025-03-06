@@ -33,6 +33,10 @@
     }
   })
 
+  const store = useAccountStore()
+  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
+  const hasAccessToSampling = computed(() => store.hasSamplingFlag)
+
   // Schema de Validação
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -44,7 +48,7 @@
     status: yup.boolean(),
     hasSampling: yup.boolean(),
     samplingPercentage: yup.number().when('hasSampling', {
-      is: true,
+      is: true && hasAccessToSampling.value,
       then: (schema) =>
         schema
           .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
@@ -141,7 +145,7 @@
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('API Key is a required field')
+      then: (schema) => schema.required('Encoded API Key is a required field')
     }),
 
     // splunk
@@ -216,9 +220,6 @@
       then: (schema) => schema.required('Blob SAS Token is a required field')
     })
   })
-
-  const store = useAccountStore()
-  const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
   const displaySamplingDialog = ref(false)
   const formSubmit = (onSubmit, values) => {

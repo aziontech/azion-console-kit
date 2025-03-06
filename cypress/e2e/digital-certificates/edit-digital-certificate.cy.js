@@ -48,14 +48,4 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.list.filteredRow.column('name')).contains(certificateName)
     cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({
-      entityName: certificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
-  })
 })

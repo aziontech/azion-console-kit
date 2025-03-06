@@ -6,6 +6,7 @@
   import { eventsPlaygroundOpener } from '@/helpers'
   import SelectButton from 'primevue/selectbutton'
   import AzionQueryLanguage from './azion-query-language.vue'
+  import PrimeTag from 'primevue/tag'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -19,6 +20,10 @@
     },
     fieldsInFilter: {
       type: Array,
+      required: true
+    },
+    recordsFound: {
+      type: String,
       required: true
     }
   })
@@ -51,21 +56,35 @@
     filter.value.fields = filters
     emit('updatedFilter')
   }
+
+  const totalRecordsFound = computed(() => {
+    return `${props.recordsFound} records found`
+  })
 </script>
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <IntervalFilterBlock
-      v-model:filterDate="filter.tsRange"
-      @applyTSRange="filterSearch"
-    />
+    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+      <div class="w-full">
+        <IntervalFilterBlock
+          v-model:filterDate="filter.tsRange"
+          @applyTSRange="filterSearch"
+        />
+      </div>
+      <div class="flex justify-end w-full">
+        <PrimeTag
+          :value="totalRecordsFound"
+          severity="info"
+        />
+      </div>
+    </div>
     <SelectButton
       v-model="filterMode"
       :options="options"
       aria-labelledby="basic"
       class="w-fit"
     />
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-start">
+    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"

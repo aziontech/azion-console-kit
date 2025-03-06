@@ -38,6 +38,7 @@ const parseStatusData = (status) => {
 
   return parsedStatus
 }
+
 const parseValidityDate = (validity) => {
   const formatOptions = {
     month: 'short',
@@ -53,29 +54,45 @@ const parseValidityDate = (validity) => {
   return dateFormatted
 }
 
+const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
+
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((item) => {
-    const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
-    const typeMap = {
-      edge_certificate: EDGE_CERTIFICATE,
-      trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
-    }
-    return {
-      id: item.id,
-      name: item.name,
-      issuer: item.issuer || '-',
-      subjectName: subjectNames === '' ? '-' : subjectNames,
-      type: typeMap[item.type] || '-',
-      validity: item.validity === null ? '-' : parseValidityDate(item.validity),
-      status: parseStatusData(item.status)
-    }
-  })
+  const isArray = Array.isArray(httpResponse.body?.results)
+
+  const parsedDigitalCertificates = isArray
+    ? httpResponse.body.results?.map((item) => {
+        const subjectNames = checkIfFieldExist(
+          item?.subject_name?.map((subject) => subject)?.join(',')
+        )
+        const typeMap = {
+          edge_certificate: EDGE_CERTIFICATE,
+          trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
+        }
+
+        const formattedStatus = item?.status ? parseStatusData(item.status) : '-'
+
+        let statusColumn = {
+          status: formattedStatus,
+          statusDetail: item?.status_detail
+        }
+
+        return {
+          id: checkIfFieldExist(item?.id, null),
+          name: checkIfFieldExist(item?.name),
+          issuer: checkIfFieldExist(item?.issuer),
+          subjectName: subjectNames,
+          type: checkIfFieldExist(typeMap[item?.type]),
+          validity: item?.validity ? parseValidityDate(item.validity) : '-',
+          status: statusColumn
+        }
+      })
+    : []
 
   const count = httpResponse.body?.count ?? 0
 
   return {
     count,
-    body: parsedDomains,
+    body: parsedDigitalCertificates,
     statusCode: httpResponse.statusCode
   }
 }

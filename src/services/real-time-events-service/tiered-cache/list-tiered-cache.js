@@ -1,5 +1,5 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
@@ -14,6 +14,7 @@ export const listTieredCache = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -44,7 +45,7 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
+  const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
@@ -59,4 +60,8 @@ const adaptResponse = (response) => {
     source: tieredCacheEvents.source,
     tsFormat: convertValueToDate(tieredCacheEvents.ts)
   }))
+
+  return {
+    data
+  }
 }

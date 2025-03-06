@@ -1,9 +1,10 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import * as Errors from '@/services/axios/errors'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -14,12 +15,13 @@ export const listEdgeFunctionsConsole = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -65,22 +67,48 @@ const levelMap = {
   }
 }
 
-const adaptResponse = (response) => {
-  const { body } = response
+const adaptResponse = (body) => {
+  const cellsConsoleEventsList = body.data?.cellsConsoleEvents
+  const parser = cellsConsoleEventsList?.length
+    ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
+        configurationId: cellsConsoleEvents.configurationId,
+        functionId: cellsConsoleEvents.functionId,
+        id: generateCurrentTimestamp(),
+        originalId: cellsConsoleEvents.id,
+        level: levelMap[cellsConsoleEvents.level],
+        line: cellsConsoleEvents.line,
+        lineSource: {
+          content: cellsConsoleEvents.lineSource,
+          severity: 'info'
+        },
+        source: cellsConsoleEvents.source,
+        tsFormat: convertValueToDate(cellsConsoleEvents.ts),
+        ts: cellsConsoleEvents.ts
+      }))
+    : []
 
-  return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
-    configurationId: cellsConsoleEvents.configurationId,
-    functionId: cellsConsoleEvents.functionId,
-    id: generateCurrentTimestamp(),
-    originalId: cellsConsoleEvents.id,
-    level: levelMap[cellsConsoleEvents.level],
-    line: cellsConsoleEvents.line,
-    lineSource: {
-      content: cellsConsoleEvents.lineSource,
-      severity: 'info'
-    },
-    source: cellsConsoleEvents.source,
-    tsFormat: convertValueToDate(cellsConsoleEvents.ts),
-    ts: cellsConsoleEvents.ts
-  }))
+  return {
+    data: parser
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
+  }
 }

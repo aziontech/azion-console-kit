@@ -2,7 +2,7 @@ import * as MarketplaceService from '@/services/marketplace-services'
 import * as TemplateEngineService from '@/services/template-engine-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
 import { windowOpen } from '@/helpers/window-open'
-
+import { openMarketplaceIntegrationsDocumentation } from '@/helpers'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const marketplaceRoutes = {
   path: '/marketplace',
@@ -27,6 +27,9 @@ export const marketplaceRoutes = {
         listEdgeApplicationsAvailablesService:
           MarketplaceService.listEdgeApplicationsAvailablesService,
         windowOpen,
+        windowManager: {
+          openMarketplaceIntegrationsDocumentation
+        },
         getTemplateService: TemplateEngineService.getTemplate,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
         checkStatusScriptRunnerService: ScriptRunnerService.checkStatusScriptRunnerService

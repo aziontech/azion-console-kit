@@ -3,14 +3,10 @@ name: Pre-merge
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - dev
-      - freezing
-      - main
   push:
     branches:
       - dev
-      - freezing
+      - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 
 env:

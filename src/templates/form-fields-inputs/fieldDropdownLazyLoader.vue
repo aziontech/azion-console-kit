@@ -1,5 +1,6 @@
 <template>
   <LabelBlock
+    v-if="props.label"
     :for="props.name"
     :label="props.label"
     :isRequired="$attrs.required"
@@ -16,6 +17,7 @@
     :optionDisabled="props.optionDisabled"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
+    :showClear="props.enableClearOption"
     @change="emitChange"
     @blur="emitBlur"
     :class="errorMessage ? 'p-invalid' : ''"
@@ -146,6 +148,10 @@
       type: Boolean,
       default: false
     },
+    enableClearOption: {
+      type: Boolean,
+      default: false
+    },
     disableEmitFirstRender: {
       type: Boolean,
       default: false
@@ -202,6 +208,10 @@
     )
 
     emit('onChange', inputValue.value)
+
+    if (inputValue.value === null) {
+      emit('onClear')
+    }
 
     if (selectedOption) {
       emit('onSelectOption', selectedOption)

@@ -99,12 +99,4 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
   })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
-  })
 })
