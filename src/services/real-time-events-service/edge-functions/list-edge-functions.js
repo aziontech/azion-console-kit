@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -33,7 +34,10 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsList',
       'edgeFunctionsTime',
-      'ts'
+      'ts',
+      'virtualhostid',
+      'edgeFunctionsInstanceIdList',
+      'source'
     ],
     orderBy: 'ts_ASC'
   }
@@ -45,13 +49,10 @@ const adaptResponse = (response) => {
 
   const data = body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
-    configurationId: edgeFunctionsEvents.configurationId,
-    functionLanguage: edgeFunctionsEvents.functionLanguage,
-    edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
-    edgeFunctionsTime: `${edgeFunctionsEvents.edgeFunctionsTime}ms`,
+    summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
-    tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
+    tsFormat: convertValueToDate(edgeFunctionsEvents.ts),
+    configurationId: edgeFunctionsEvents.configurationId
   }))
 
   return {

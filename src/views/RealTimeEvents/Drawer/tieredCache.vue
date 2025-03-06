@@ -1,13 +1,14 @@
 <script setup>
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
+  import TableEvents from './tableEvents.vue'
+  import Skeleton from 'primevue/skeleton'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
-  import { useToast } from 'primevue/usetoast'
+
   import { computed, ref, watch } from 'vue'
-  import * as Helpers from '@/helpers'
 
   defineOptions({ name: 'drawer-events-tiered-cache' })
 
@@ -17,6 +18,10 @@
       required: true
     }
   })
+
+  const details = ref({})
+  const showDrawer = ref(false)
+  const loading = ref(false)
 
   const upstreamConnectTimeTooltip =
     'Time it takes for the edge to establish a connection with the origin in seconds. In the case of TLS, it includes time spent on handshake.'
@@ -36,22 +41,20 @@
   const cacheTtlTooltip =
     'Time, in seconds, the cached object is considered valid (not expired). After the time expiration, when a new request occurs, L2 Caching queries the data on the origin (upstream).'
 
-  const details = ref({})
-  const showDrawer = ref(false)
-  const toast = useToast()
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
+  }
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
-    details.value = await props.loadService(item)
-  }
+    loading.value = true
 
-  const copyCacheKey = () => {
-    Helpers.clipboardWrite(details.value.cacheKey)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
+    try {
+      details.value = await props.loadService(item)
+    } finally {
+      loading.value = false
+    }
   }
 
   watch(
@@ -62,25 +65,6 @@
       }
     }
   )
-
-  const referenceErrorTag = computed(() => {
-    const statusCode = details.value.status
-
-    const isClientError = statusCode >= 400 && statusCode < 500
-    const isServerError = statusCode >= 500 && statusCode < 600
-
-    if (isServerError || isClientError) {
-      return [{ text: 'Reference Error', severity: 'danger', icon: 'pi pi-times-circle' }]
-    }
-    return []
-  })
-
-  const upstreamCacheStatusTag = computed(() => {
-    if (details.value.upstreamCacheStatus) {
-      return [{ text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}` }]
-    }
-    return []
-  })
 
   const proxyTag = computed(() => {
     let tags = []
@@ -109,164 +93,196 @@
           :title="details.proxyHost"
           :date="details.ts"
           :tags="proxyTag"
+          :loading="loading"
+        />
+        <TabView
+          class="w-full h-full"
+          v-if="!loading"
         >
-          <template #body>
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full items-center">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1 items-center">
-                <TextInfo label="Cache Key">
-                  <template #default>
-                    <p>
-                      {{ details.cacheKey }}
-                    </p>
-                  </template>
-                  <template #button>
-                    <PrimeButton
-                      label="Copy"
-                      class="items-center min-w-min"
-                      icon="pi pi-copy"
-                      @click="copyCacheKey"
-                      outlined
-                    />
-                  </template>
-                </TextInfo>
-              </div>
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <div class="w-full flex flex-col gap-8 max-md:gap-6 mt-4">
+              <InfoSection>
+                <template #body>
+                  <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full items-center">
+                    <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1 items-center">
+                      <TextInfo label="Cache Key">
+                        <template #default>
+                          <p>
+                            {{ getValueByKey('cacheKey') }}
+                          </p>
+                        </template>
+                        <template #button>
+                          <PrimeButton
+                            label="Copy"
+                            class="items-center min-w-min"
+                            icon="pi pi-copy"
+                            @click="copyCacheKey"
+                            outlined
+                          />
+                        </template>
+                      </TextInfo>
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                    <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                      <TextInfo label="Host">{{ getValueByKey('host') }}</TextInfo>
+                      <TextInfo label="Proxy Host">{{ getValueByKey('proxyHost') }}</TextInfo>
+                      <TextInfo label="Remote Addr">{{ getValueByKey('remoteAddr') }}</TextInfo>
+                      <TextInfo label="Remote Port">{{ getValueByKey('remotePort') }}</TextInfo>
+                    </div>
+                    <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                      <TextInfo label="Client ID">{{ getValueByKey('clientId') }}</TextInfo>
+                      <TextInfo label="Solution">{{ getValueByKey('solution') }}</TextInfo>
+                      <TextInfo label="Configuration ID">{{
+                        getValueByKey('configurationId')
+                      }}</TextInfo>
+                    </div>
+                  </div>
+                </template>
+              </InfoSection>
+
+              <InfoSection
+                title="Request Data"
+                :tags="referenceErrorTag"
+              >
+                <template #body>
+                  <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+                    <BigNumber
+                      label="Request Time"
+                      sufix="s"
+                      :tooltipMessage="requestTimeTooltip"
+                    >
+                      {{ getValueByKey('requestTime') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="TCP Info RTT"
+                      sufix="µs"
+                      :tooltipMessage="tcpInfoRttTooltip"
+                    >
+                      {{ getValueByKey('tcpinfoRtt') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Request Length"
+                      sufix="lines"
+                      :tooltipMessage="requestLengthTooltip"
+                    >
+                      {{ getValueByKey('requestLength') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Bytes Sent"
+                      sufix="bytes"
+                      :tooltipMessage="bytesSentTooltip"
+                    >
+                      {{ getValueByKey('bytesSent') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Cache TTL"
+                      sufix="s"
+                      :tooltipMessage="cacheTtlTooltip"
+                    >
+                      {{ getValueByKey('cacheTtl') }}
+                    </BigNumber>
+                  </div>
+                  <Divider />
+                  <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                    <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                      <TextInfo label="Reference Error">{{
+                        getValueByKey('referenceError')
+                      }}</TextInfo>
+                      <TextInfo label="Request Method">{{
+                        getValueByKey('requestMethod')
+                      }}</TextInfo>
+                      <TextInfo label="Request URI">{{ getValueByKey('requestUri') }}</TextInfo>
+                    </div>
+                    <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                      <TextInfo label="Sent HTTP Content Type">{{
+                        getValueByKey('sentHttpContentType')
+                      }}</TextInfo>
+                      <TextInfo label="Proxy Upstream">{{
+                        getValueByKey('proxyUpstream')
+                      }}</TextInfo>
+                      <TextInfo label="Proxy Status">{{ getValueByKey('proxyStatus') }}</TextInfo>
+                      <TextInfo label="Status">{{ getValueByKey('status') }}</TextInfo>
+                    </div>
+                  </div>
+                </template>
+              </InfoSection>
+
+              <InfoSection
+                title="Upstream Data"
+                :tags="upstreamCacheStatusTag"
+              >
+                <template #body>
+                  <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+                    <BigNumber
+                      label="Upstream Connect Time"
+                      sufix="s"
+                      class="flex-1"
+                      :tooltipMessage="upstreamConnectTimeTooltip"
+                    >
+                      {{ getValueByKey('upstreamConnectTime') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Upstream Header Time"
+                      sufix="s"
+                      class="flex-1"
+                      :tooltipMessage="upstreamHeaderTimeTooltip"
+                    >
+                      {{ getValueByKey('upstreamHeaderTime') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Upstream Response Time"
+                      sufix="s"
+                      class="flex-1"
+                      :tooltipMessage="upstreamResponseTimeTooltip"
+                    >
+                      {{ getValueByKey('upstreamResponseTime') }}
+                    </BigNumber>
+                    <BigNumber
+                      label="Upstream Bytes Received"
+                      sufix="bytes"
+                      class="flex-1"
+                      :tooltipMessage="upstreamBytesReceivedTooltip"
+                    >
+                      {{ getValueByKey('upstreamBytesReceived') }}
+                    </BigNumber>
+                  </div>
+
+                  <Divider />
+
+                  <div class="w-full flex sm:flex-row flex-col gap-3">
+                    <TextInfo
+                      class="w-full sm:w-5/12 flex-1"
+                      label="Upstream Addr"
+                      >{{ getValueByKey('remoteAddr') }}</TextInfo
+                    >
+                    <TextInfo
+                      class="w-full sm:w-5/12 flex-1"
+                      label="Upstream Status"
+                      >{{ getValueByKey('upstreamStatus') }}</TextInfo
+                    >
+                  </div>
+                </template>
+              </InfoSection>
             </div>
-
-            <Divider />
-
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Host">{{ details.host }}</TextInfo>
-                <TextInfo label="Proxy Host">{{ details.proxyHost }}</TextInfo>
-                <TextInfo label="Remote Addr">{{ details.remoteAddr }}</TextInfo>
-                <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Client ID">{{ details.clientId }}</TextInfo>
-                <TextInfo label="Solution">{{ details.solution }}</TextInfo>
-                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
-
-        <InfoSection
-          title="Request Data"
-          :tags="referenceErrorTag"
+          </TabPanel>
+        </TabView>
+        <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
+          v-else
         >
-          <template #body>
-            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
-              <BigNumber
-                label="Request Time"
-                sufix="s"
-                :tooltipMessage="requestTimeTooltip"
-              >
-                {{ details.requestTime }}
-              </BigNumber>
-              <BigNumber
-                label="TCP Info RTT"
-                sufix="µs"
-                :tooltipMessage="tcpInfoRttTooltip"
-              >
-                {{ details.tcpinfoRtt }}
-              </BigNumber>
-              <BigNumber
-                label="Request Length"
-                sufix="lines"
-                :tooltipMessage="requestLengthTooltip"
-              >
-                {{ details.requestLength }}
-              </BigNumber>
-              <BigNumber
-                label="Bytes Sent"
-                sufix="bytes"
-                :tooltipMessage="bytesSentTooltip"
-              >
-                {{ details.bytesSent }}
-              </BigNumber>
-              <BigNumber
-                label="Cache TTL"
-                sufix="s"
-                :tooltipMessage="cacheTtlTooltip"
-              >
-                {{ details.cacheTtl }}
-              </BigNumber>
-            </div>
-            <Divider />
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
-                <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Sent HTTP Content Type">{{
-                  details.sentHttpContentType
-                }}</TextInfo>
-                <TextInfo label="Proxy Upstream">{{ details.proxyUpstream }}</TextInfo>
-                <TextInfo label="Proxy Status">{{ details.proxyStatus }}</TextInfo>
-                <TextInfo label="Status">{{ details.status }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
-
-        <InfoSection
-          title="Upstream Data"
-          :tags="upstreamCacheStatusTag"
-        >
-          <template #body>
-            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
-              <BigNumber
-                label="Upstream Connect Time"
-                sufix="s"
-                class="flex-1"
-                :tooltipMessage="upstreamConnectTimeTooltip"
-              >
-                {{ details.upstreamConnectTime }}
-              </BigNumber>
-              <BigNumber
-                label="Upstream Header Time"
-                sufix="s"
-                class="flex-1"
-                :tooltipMessage="upstreamHeaderTimeTooltip"
-              >
-                {{ details.upstreamHeaderTime }}
-              </BigNumber>
-              <BigNumber
-                label="Upstream Response Time"
-                sufix="s"
-                class="flex-1"
-                :tooltipMessage="upstreamResponseTimeTooltip"
-              >
-                {{ details.upstreamResponseTime }}
-              </BigNumber>
-              <BigNumber
-                label="Upstream Bytes Received"
-                sufix="bytes"
-                class="flex-1"
-                :tooltipMessage="upstreamBytesReceivedTooltip"
-              >
-                {{ details.upstreamBytesReceived }}
-              </BigNumber>
-            </div>
-
-            <Divider />
-
-            <div class="w-full flex sm:flex-row flex-col gap-3">
-              <TextInfo
-                class="w-full sm:w-5/12 flex-1"
-                label="Upstream Addr"
-                >{{ details.remoteAddr }}</TextInfo
-              >
-              <TextInfo
-                class="w-full sm:w-5/12 flex-1"
-                label="Upstream Status"
-                >{{ details.upstreamStatus }}</TextInfo
-              >
-            </div>
-          </template>
-        </InfoSection>
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
+        </div>
       </div>
     </template>
   </InfoDrawerBlock>

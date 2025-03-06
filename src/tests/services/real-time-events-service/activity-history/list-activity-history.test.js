@@ -59,6 +59,13 @@ describe('ActivityHistoryServices', () => {
       `\t\tresourceId`,
       `\t\tuserId`,
       `\t\tts`,
+      `\t\tcomment`,
+      `\t\tauthorEmail`,
+      `\t\taccountId`,
+      `\t\trequestData`,
+      `\t\tuserAgent`,
+      `\t\tremotePort`,
+      `\t\trefererHeader`,
       `\t}`,
       `}`
     ].join('\n')
@@ -95,13 +102,34 @@ describe('ActivityHistoryServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          userIp: fixtures.activityHistory.userIp,
-          authorName: fixtures.activityHistory.authorName,
-          title: fixtures.activityHistory.title,
-          resourceType: fixtures.activityHistory.resourceType,
-          resourceId: fixtures.activityHistory.resourceId,
-          userId: fixtures.activityHistory.userId,
+          summary: [
+            {
+              key: 'authorName',
+              value: fixtures.activityHistory.authorName
+            },
+            {
+              key: 'resourceId',
+              value: fixtures.activityHistory.resourceId
+            },
+            {
+              key: 'resourceType',
+              value: fixtures.activityHistory.resourceType
+            },
+            {
+              key: 'title',
+              value: fixtures.activityHistory.title
+            },
+            {
+              key: 'userId',
+              value: fixtures.activityHistory.userId
+            },
+            {
+              key: 'userIp',
+              value: fixtures.activityHistory.userIp
+            }
+          ],
           ts: fixtures.activityHistory.ts,
+          userId: fixtures.activityHistory.userId,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ]

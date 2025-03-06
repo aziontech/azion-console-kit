@@ -2,8 +2,12 @@
   import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import TableEvents from './tableEvents.vue'
+  import Skeleton from 'primevue/skeleton'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
 
   defineOptions({ name: 'drawer-events-functions-console' })
 
@@ -15,10 +19,17 @@
   })
   const details = ref({})
   const showDrawer = ref(false)
+  const loading = ref(false)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
-    details.value = await props.loadService(item)
+    loading.value = true
+
+    try {
+      details.value = await props.loadService(item)
+    } finally {
+      loading.value = false
+    }
   }
 
   watch(
@@ -29,6 +40,11 @@
       }
     }
   )
+
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
+  }
 
   const tags = computed(() => {
     if (details.value.level) {
@@ -59,21 +75,45 @@
           :title="`Line Source - ${details.lineSource ?? ''}`"
           :date="details.ts"
           :tags="tags"
+          :loading="loading"
+        />
+        <TabView
+          class="w-full h-full"
+          v-if="!loading"
         >
-          <template #body>
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Line">{{ details.line }}</TextInfo>
-                <TextInfo label="ID">{{ details.id }}</TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Solution ID">{{ details.solutionId }}</TextInfo>
-                <TextInfo label="Function ID">{{ details.functionId }}</TextInfo>
-                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <InfoSection class="mt-4">
+              <template #body>
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Line">{{ getValueByKey('line') }}</TextInfo>
+                    <TextInfo label="ID">{{ getValueByKey('id') }}</TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Solution ID">{{ getValueByKey('solutionId') }}</TextInfo>
+                    <TextInfo label="Function ID">{{ getValueByKey('functionId') }}</TextInfo>
+                    <TextInfo label="Configuration ID">{{
+                      getValueByKey('configurationId')
+                    }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
+          </TabPanel>
+        </TabView>
+        <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
+          v-else
+        >
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
+        </div>
       </div>
     </template>
   </InfoDrawerBlock>

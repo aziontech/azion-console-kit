@@ -60,6 +60,8 @@ describe('edgeDns', () => {
       `\t\tts`,
       `\t\tsource`,
       `\t\tuuid`,
+      `\t\tstatusCode`,
+      `\t\tversion`,
       `\t}`,
       `}`
     ].join('\n')
@@ -96,19 +98,19 @@ describe('edgeDns', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          level: {
-            content: 'Error',
-            icon: 'pi pi-times-circle',
-            severity: 'danger'
-          },
-          qtype: fixtures.edgeDns.qtype,
-          resolutionType: fixtures.edgeDns.resolutionType,
           source: fixtures.edgeDns.source,
-          solutionId: fixtures.edgeDns.solutionId,
-          ts: fixtures.edgeDns.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM',
+          summary: [
+            { key: 'level', value: fixtures.edgeDns.level },
+            { key: 'qtype', value: fixtures.edgeDns.qtype },
+            { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
+            { key: 'solutionId', value: fixtures.edgeDns.solutionId },
+            { key: 'source', value: fixtures.edgeDns.source },
+            { key: 'uuid', value: fixtures.edgeDns.uuid },
+            { key: 'zoneId', value: fixtures.edgeDns.zoneId }
+          ],
           uuid: fixtures.edgeDns.uuid,
-          zoneId: fixtures.edgeDns.zoneId
+          ts: fixtures.edgeDns.ts,
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ]
     })

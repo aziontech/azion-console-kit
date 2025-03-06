@@ -102,16 +102,19 @@ describe('DataStreamingServices', () => {
     expect(response).toEqual({
       data: [
         {
-          id: 'mocked-timestamp',
           configurationId: fixtures.dataStreaming.configurationId,
-          jobName: { content: fixtures.dataStreaming.jobName, severity: 'info' },
-          endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
-          url: 'http://url.com',
-          statusCode: fixtures.dataStreaming.statusCode,
+          id: 'mocked-timestamp',
+          summary: [
+            { key: 'configurationId', value: fixtures.dataStreaming.configurationId },
+            { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },
+            { key: 'endpointType', value: fixtures.dataStreaming.endpointType },
+            { key: 'jobName', value: fixtures.dataStreaming.jobName },
+            { key: 'source', value: fixtures.dataStreaming.source },
+            { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
+            { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
+            { key: 'url', value: 'http://url.com' }
+          ],
           ts: fixtures.dataStreaming.ts,
-          dataStreamed: fixtures.dataStreaming.dataStreamed,
-          source: fixtures.dataStreaming.source,
-          streamedLines: fixtures.dataStreaming.streamedLines,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ]

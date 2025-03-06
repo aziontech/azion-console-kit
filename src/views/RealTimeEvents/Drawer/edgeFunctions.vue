@@ -2,12 +2,15 @@
   import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
+  import TableEvents from './tableEvents.vue'
+  import Skeleton from 'primevue/skeleton'
+  import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
 
-  import Divider from 'primevue/divider'
-  import InfoDrawerBlock from '@/templates/info-drawer-block'
-  defineOptions({ name: 'drawer-events-functions' })
+  defineOptions({ name: 'DrawerEventsFunctions' })
 
   const props = defineProps({
     loadService: {
@@ -16,41 +19,38 @@
     }
   })
 
-  const edgeFunctionsTime =
-    'Total execution time, in seconds, for the function during its processing. This field is the result of a sum.'
-
   const details = ref({})
   const showDrawer = ref(false)
+  const loading = ref(false)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
-    details.value = await props.loadService(item)
+    loading.value = true
+
+    try {
+      const response = await props.loadService(item)
+      details.value = response
+    } finally {
+      loading.value = false
+    }
   }
 
-  watch(
-    () => showDrawer.value,
-    (value) => {
-      if (!value) {
-        details.value = {}
-      }
-    }
-  )
+  const getValueByKey = (key) => {
+    const item = details.value.data.find((obj) => obj.key === key)
+    return item ? item.value : '-'
+  }
+
+  watch(showDrawer, (isVisible) => {
+    if (!isVisible) details.value = {}
+  })
 
   const tags = computed(() => {
-    if (details.value.functionLanguage) {
-      return [
-        {
-          icon: 'pi pi-code',
-          text: details.value.functionLanguage
-        }
-      ]
-    }
-    return []
+    return details.value.functionLanguage
+      ? [{ icon: 'pi pi-code', text: details.value.functionLanguage }]
+      : []
   })
 
-  defineExpose({
-    openDetailDrawer
-  })
+  defineExpose({ openDetailDrawer })
 </script>
 
 <template>
@@ -64,52 +64,79 @@
           title="Function Language"
           :date="details.ts"
           :tags="tags"
+          :loading="loading"
+        />
+
+        <TabView
+          class="w-full h-full"
+          v-if="!loading"
         >
-          <template #body>
-            <div class="gap-8 flex flex-col sm:flex-row w-full">
-              <TextInfo
-                label="Edge Functions List"
-                class="w-full sm:w-5/12 flex-1"
-              >
-                <ul>
-                  <li
-                    :key="index"
-                    v-for="(functionType, index) in details.edgeFunctionsList"
+          <TabPanel header="Table">
+            <TableEvents :data="details.data" />
+          </TabPanel>
+          <TabPanel header="Cards">
+            <InfoSection class="mt-4">
+              <template #body>
+                <div class="gap-8 flex flex-col sm:flex-row w-full">
+                  <TextInfo
+                    label="Edge Functions List"
+                    class="w-full sm:w-5/12 flex-1"
                   >
-                    {{ functionType }}
-                  </li>
-                </ul>
-              </TextInfo>
-              <BigNumber
-                class="flex-1"
-                label="Edge Functions Time"
-                sufix="s"
-                :tooltipMessage="edgeFunctionsTime"
-                >{{ details.edgeFunctionsTime }}</BigNumber
-              >
-            </div>
+                    <ul>
+                      <li
+                        :key="index"
+                        v-for="(functionType, index) in getValueByKey('edgeFunctionsList')"
+                      >
+                        {{ functionType }}
+                      </li>
+                    </ul>
+                  </TextInfo>
+                  <BigNumber
+                    class="flex-1"
+                    label="Edge Functions Time"
+                    sufix="s"
+                    :tooltipMessage="edgeFunctionsTime"
+                    >{{ getValueByKey('edgeFunctionsTime') }}</BigNumber
+                  >
+                </div>
 
-            <Divider />
+                <Divider />
 
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 flex-1">
-                <TextInfo label="Edge Functions Initiator Type List">
-                  {{ details.edgeFunctionsInitiatorTypeList }}
-                </TextInfo>
-                <TextInfo label="Edge Functions Instance ID List">
-                  {{ details.edgeFunctionsInstanceIdList }}
-                </TextInfo>
-                <TextInfo label="Edge Functions Solution ID">
-                  {{ details.edgeFunctionsSolutionId }}
-                </TextInfo>
-              </div>
-              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Virtual Host ID">{{ details.virtualHostId }}</TextInfo>
-                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-              </div>
-            </div>
-          </template>
-        </InfoSection>
+                <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+                  <div class="flex flex-col gap-3 flex-1">
+                    <TextInfo label="Edge Functions Initiator Type List">
+                      {{ getValueByKey('edgeFunctionsInitiatorTypeList') }}
+                    </TextInfo>
+                    <TextInfo label="Edge Functions Instance ID List">
+                      {{ getValueByKey('edgeFunctionsInstanceIdList') }}
+                    </TextInfo>
+                    <TextInfo label="Edge Functions Solution ID">
+                      {{ getValueByKey('edgeFunctionsSolutionId') }}
+                    </TextInfo>
+                  </div>
+                  <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                    <TextInfo label="Virtual Host ID">{{
+                      getValueByKey('virtualHostId')
+                    }}</TextInfo>
+                    <TextInfo label="Configuration ID">{{
+                      getValueByKey('configurationId')
+                    }}</TextInfo>
+                  </div>
+                </div>
+              </template>
+            </InfoSection>
+          </TabPanel>
+        </TabView>
+        <div
+          class="flex flex-col gap-3 w-full flex-1 border rounded-md surface-border p-4"
+          v-else
+        >
+          <Skeleton
+            class="w-full h-5 mt-7"
+            v-for="skeletonItem in 10"
+            :key="skeletonItem"
+          />
+        </div>
       </div>
     </template>
   </InfoDrawerBlock>

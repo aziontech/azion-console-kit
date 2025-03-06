@@ -4,6 +4,7 @@ import { convertValueToDate } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
 
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -47,22 +48,10 @@ const adaptResponse = (response) => {
   const { body } = response
 
   const data = body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
-    id: generateCurrentTimestamp(),
     configurationId: dataStreamedEvents.configurationId,
-    jobName: {
-      content: dataStreamedEvents.jobName,
-      severity: 'info'
-    },
-    endpointType: {
-      content: dataStreamedEvents.endpointType,
-      severity: 'info'
-    },
-    url: dataStreamedEvents.url,
-    statusCode: dataStreamedEvents.statusCode,
+    id: generateCurrentTimestamp(),
+    summary: buildSummary(dataStreamedEvents),
     ts: dataStreamedEvents.ts,
-    dataStreamed: dataStreamedEvents.dataStreamed,
-    source: dataStreamedEvents.source,
-    streamedLines: dataStreamedEvents.streamedLines,
     tsFormat: convertValueToDate(dataStreamedEvents.ts)
   }))
 
