@@ -2426,10 +2426,10 @@ axios@^1.7.4:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-azion-theme@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.10.0.tgz#4309fc61b9a18956e2a639c538d9a36153381c58"
-  integrity sha512-K0vp8nUNsKO/9bDLJfM4RQiGDHmajuUKZbvWw8kvId92RLTTUnKn0d47N1nBjlA7rrf3Y8c3qUj8VO5mJJQ7iA==
+azion-theme@^1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.10.1.tgz#635439edc215b41566d55a3f8348065f8f8fcaaf"
+  integrity sha512-fHkIDRUvFTpw3txg29wKH4LFXUs4ZwpLZzJ8yfmhZZTDO02/qU88hx0mmNIRWRDqWr8fRQuJoe+Cegh/Y8xd9A==
 
 balanced-match@^1.0.0:
   version "1.0.2"
