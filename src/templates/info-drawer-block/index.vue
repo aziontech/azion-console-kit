@@ -34,19 +34,13 @@
     }
   }
 
-  const sizeSidebar = () => {
-    if (handlePositionDrawer.value === 'right') {
-      return 'max-w-4xl w-full p-0'
-    }
-    return 'w-full p-0'
-  }
+  const sizeSidebar = computed(() =>
+    handlePositionDrawer.value === 'right' ? 'max-w-4xl w-full p-0' : 'w-full p-0'
+  )
 
-  const iconExpand = computed(() => {
-    if (handlePositionDrawer.value === 'right') {
-      return 'pi pi-window-maximize'
-    }
-    return 'pi pi-window-minimize'
-  })
+  const iconExpand = computed(
+    () => `pi pi-window-${handlePositionDrawer.value === 'right' ? 'maximize' : 'minimize'}`
+  )
 
   defineExpose({})
 </script>
@@ -56,7 +50,7 @@
     v-model:visible="visibleDrawer"
     :position="handlePositionDrawer"
     :pt="{
-      root: { class: sizeSidebar() },
+      root: { class: sizeSidebar },
       header: { class: 'flex justify-between font-medium px-8' },
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       closeButton: { class: 'border surface-border' },
