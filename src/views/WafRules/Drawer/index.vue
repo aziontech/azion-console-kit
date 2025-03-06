@@ -1,20 +1,22 @@
 <script setup>
   import { computed, onBeforeMount, ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Divider from 'primevue/divider'
   import GoBack from '@/templates/action-bar-block/go-back'
-  import InputText from 'primevue/inputtext'
   import EmptyDrawer from '@/templates/empty-drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import WithSelectionBehavior from '@/templates/list-table-block/with-selection-behavior.vue'
+  import advancedFilter from '@/templates/advanced-filter'
+  import Dropdown from 'primevue/dropdown'
+  import PrimeTag from 'primevue/tag'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({
     name: 'more-details'
   })
 
   const emit = defineEmits(['update:visible', 'attack-on'])
-  const toast = useToast()
   const props = defineProps({
     visible: {
       type: Boolean,
@@ -29,9 +31,8 @@
       default: () => [],
       required: true
     },
-    netWorkList: {
-      type: String,
-      default: '',
+    listCountriesService: {
+      type: Function,
       required: true
     },
     time: {
@@ -39,29 +40,42 @@
       default: '',
       required: true
     },
+    wafRuleId: {
+      type: String,
+      required: true
+    },
     tuningObject: {
       type: Object,
       default: () => {},
       required: true
+    },
+    parentSelectedFilter: {
+      type: Object,
+      required: true
+    },
+    parentSelectedFilterAdvanced: {
+      type: Object,
+      required: true
+    },
+    listNetworkListService: {
+      type: Function,
+      required: true
+    },
+    loadNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
-  const loading = ref(false)
   const showGoBack = ref(false)
-  const possibleAttacks = ref([])
   const selectedAttack = ref([])
-  const searchByPath = ref('')
-  const pathSearched = ref('')
+  const selectedFilter = ref({
+    hourRange: '1'
+  })
 
-  const showToast = (severity, summary) => {
-    const options = {
-      closable: true,
-      severity: severity,
-      summary: summary
-    }
-
-    toast.add(options)
-  }
+  const selectedFilterAdvanced = ref([])
+  const totalRecordsFound = ref(0)
+  const listTableRef = ref(null)
 
   const visibleDrawer = computed({
     get: () => props.visible,
@@ -70,22 +84,173 @@
     }
   })
 
-  const loadInitialData = async (namePath = '') => {
-    try {
-      loading.value = true
-      const response = await props.listService(namePath)
-      possibleAttacks.value = response
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      loading.value = false
+  const recordsFoundLabel = computed(() => {
+    return `${totalRecordsFound.value} records found`
+  })
+
+  const timeOptions = ref([
+    { name: 'Last 1 hour', value: '1' },
+    { name: 'Last 3 hours', value: '3' },
+    { name: 'Last 6 hours', value: '6' },
+    { name: 'Last 12 hours', value: '12' },
+    { name: 'Last day', value: '24' },
+    { name: 'Last 2 days', value: '48' },
+    { name: 'Last 3 days', value: '72' }
+  ])
+
+  const valueNetworkId = ref(null)
+
+  const listFields = ref([
+    {
+      label: 'Country',
+      value: 'country',
+      description: '',
+      operator: [
+        {
+          value: 'In',
+          type: 'ArrayObject',
+          props: {
+            placeholder: 'Select Country',
+            services: props.listCountriesService,
+            payload: { label: 'name', value: 'value' }
+          }
+        }
+      ]
+    },
+    {
+      label: 'IP Address',
+      value: 'ip_address',
+      description: '',
+      operator: [
+        { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
+        { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter IP Address' } }
+      ]
+    },
+    {
+      label: 'Path',
+      value: 'pathsList',
+      description: '',
+      operator: [{ value: 'Eq', type: 'String', props: { placeholder: 'Enter Path' } }]
     }
+  ])
+
+  const toast = useToast()
+  const advancedFilterRef = ref(null)
+
+  const setNetworkListSelectedOption = (value) => {
+    selectedFilter.value.network = value
+
+    listFields.value = listFields.value.map((item) => {
+      if (item.value === 'ip_address') {
+        return {
+          ...item,
+          networkListDisabled: value?.value?.disabledIP,
+          disabled: value?.value?.disabledIP
+        }
+      }
+      if (item.value === 'country') {
+        return {
+          ...item,
+          networkListDisabled: value?.value?.disabledCountries,
+          disabled: value?.value?.disabledCountries
+        }
+      }
+      return item
+    })
+
+    const hasIpFilter = selectedFilterAdvanced.value.some(
+      (item) => item.valueField === 'ip_address'
+    )
+
+    const hasCountryFilter = selectedFilterAdvanced.value.some(
+      (item) => item.valueField === 'country'
+    )
+
+    if (value?.value?.disabledIP) {
+      const validFilters = selectedFilterAdvanced.value.filter(
+        (item) => item.valueField !== 'ip_address'
+      )
+      advancedFilterRef.value?.clearSpecificFilter('ip_address')
+      selectedFilterAdvanced.value = validFilters
+
+      if (hasIpFilter) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'The ip addres field cannot be used together with an IP/CIDR Network List filter.'
+        })
+      }
+    }
+
+    if (value?.value?.disabledCountries) {
+      const validFilters = selectedFilterAdvanced.value.filter(
+        (item) => item.valueField !== 'country'
+      )
+      advancedFilterRef.value?.clearSpecificFilter('country')
+      selectedFilterAdvanced.value = validFilters
+
+      if (hasCountryFilter) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'The country field cannot be used together with a Country Network List filter.'
+        })
+      }
+    }
+
+    filterTuning()
   }
 
-  const filterAttackByPath = async () => {
-    possibleAttacks.value = []
-    await loadInitialData(searchByPath.value)
-    pathSearched.value = searchByPath.value
+  const filterSearch = async (filter) => {
+    const query = {
+      hourRange: selectedFilter.value.hourRange,
+      matchesOn: props.tuningObject.matchesOn,
+      matchZone: props.tuningObject.matchZone,
+      network: selectedFilter.value.network?.id,
+      ipsList: filter.filter((item) => item.valueField === 'ip_address')[0]?.value,
+      countries: filter
+        .filter((item) => item.valueField === 'country')[0]
+        ?.value.map((country) => country.name)
+        .join(','),
+      pathsList: filter.filter((item) => item.valueField === 'pathsList')[0]?.value
+    }
+    listTableRef.value?.reload({ filters: query })
+  }
+
+  const listAttacks = async (params) => {
+    let query
+
+    if (!params.filters) {
+      const hourRange = selectedFilter.value.hourRange
+      query = {
+        hourRange: hourRange,
+        matchesOn: props.tuningObject.matchesOn,
+        matchZone: props.tuningObject.matchZone,
+        ipsList: selectedFilterAdvanced.value.filter((item) => item.valueField === 'ip_address')[0]
+          ?.value,
+        countries: selectedFilterAdvanced.value
+          .filter((item) => item.valueField === 'country')[0]
+          ?.value.map((country) => country.name)
+          .join(','),
+        pathsList: selectedFilterAdvanced.value.filter((item) => item.valueField === 'pathsList')[0]
+          ?.value,
+        network: selectedFilter.value.network?.id
+      }
+    } else {
+      query = params.filters
+    }
+    query.domains = encodeURIComponent(props.domains.join(','))
+    const response = await props.listService({
+      wafId: props.wafRuleId,
+      tuningId: props.tuningObject.id,
+      query: query
+    })
+    totalRecordsFound.value = response.length
+    return response
+  }
+
+  const filterTuning = async () => {
+    filterSearch(selectedFilterAdvanced.value)
   }
 
   const toggleDrawerVisibility = (isVisible) => {
@@ -104,10 +269,6 @@
   const createAllowed = () => {
     emit('attack-on', selectedAttack.value)
   }
-
-  onBeforeMount(async () => {
-    await loadInitialData()
-  })
 
   const tableColumns = [
     {
@@ -155,6 +316,19 @@
         columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     }
   ]
+
+  onBeforeMount(() => {
+    valueNetworkId.value = props.parentSelectedFilter.network?.id
+    selectedFilter.value = props.parentSelectedFilter
+    const { disabledIP, disabledCountries } = selectedFilter.value.network?.value || {}
+    listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
+    listFields.value.find((item) => item.value === 'ip_address').networkListDisabled = disabledIP
+    listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
+    listFields.value.find((item) => item.value === 'ip_address').networkListDisabled =
+      disabledCountries
+
+    selectedFilterAdvanced.value = props.parentSelectedFilterAdvanced
+  })
 </script>
 
 <template>
@@ -197,22 +371,59 @@
                   Select fields to create allowed rules in the WAF.
                 </div>
               </div>
-              <div class="w-full sm:max-w-xs">
-                <span class="p-input-icon-left flex">
-                  <i class="pi pi-search" />
-                  <InputText
-                    class="w-full"
-                    placeholder="Search by path"
-                    v-model="searchByPath"
-                    @keyup.enter="filterAttackByPath"
+
+              <div class="flex flex-col md:flex-row gap-4 w-full">
+                <Dropdown
+                  appendTo="self"
+                  optionValue="value"
+                  optionLabel="name"
+                  :options="timeOptions"
+                  v-model="selectedFilter.hourRange"
+                  @change="filterTuning"
+                  class="w-full sm:max-w-xs"
+                />
+                <FieldDropdownLazyLoader
+                  data-testid="waf-tuning-list__network-list-field"
+                  name="valueNetworkId"
+                  :service="props.listNetworkListService"
+                  :loadService="props.loadNetworkListService"
+                  optionLabel="name"
+                  optionValue="id"
+                  :value="valueNetworkId"
+                  :moreOptions="['value']"
+                  appendTo="self"
+                  placeholder="Select an network list"
+                  @onClear="setNetworkListSelectedOption(null)"
+                  @onSelectOption="setNetworkListSelectedOption"
+                  class="w-full sm:max-w-xs"
+                  enableClearOption
+                />
+                <div class="flex items-center ml-auto">
+                  <PrimeTag
+                    class="no-wrap whitespace-nowrap ml-auto"
+                    :value="recordsFoundLabel"
+                    severity="info"
                   />
-                </span>
+                </div>
               </div>
+
+              <div class="flex flex-col md:flex-row md:items-center gap-2">
+                <advancedFilter
+                  v-model:externalFilter="selectedFilter"
+                  v-model:filterAdvanced="selectedFilterAdvanced"
+                  :hashUpdatable="false"
+                  :fieldsInFilter="listFields"
+                  @applyFilter="filterSearch"
+                  ref="advancedFilterRef"
+                />
+              </div>
+
               <WithSelectionBehavior
+                ref="listTableRef"
                 v-model:selectedItensData="selectedAttack"
                 :columns="tableColumns"
-                :tableData="possibleAttacks"
-                :externalLoading="loading"
+                :listService="listAttacks"
+                :hasListService="true"
                 hiddenHeader
               />
             </div>

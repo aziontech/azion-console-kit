@@ -20,7 +20,7 @@
           :service="props.listDomainsService"
           :loadService="props.loadDomainService"
           optionLabel="name"
-          optionValue=""
+          optionValue="id"
           :value="valueDomainId"
           appendTo="self"
           class="w-full sm:max-w-xs overflow-hidden"
@@ -55,6 +55,7 @@
     </div>
     <div class="flex flex-col md:flex-row md:items-center gap-2">
       <advancedFilter
+        ref="advancedFilterRef"
         v-model:externalFilter="selectedFilter"
         v-model:filterAdvanced="selectedFilterAdvanced"
         :fieldsInFilter="listFields"
@@ -124,13 +125,17 @@
 
   <MoreDetailsDrawer
     v-if="showDetailsOfAttack"
+    :wafRuleId="wafRuleId"
     v-model:visible="showDetailsOfAttack"
-    :listService="handleListWafRulesTuningAttacksService"
+    :listService="props.listWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
     :domains="selectedDomains"
-    :logBody="logBody"
-    :netWorkList="netWorkListName"
     :time="timeName"
+    :listNetworkListService="props.listNetworkListService"
+    :loadNetworkListService="props.loadNetworkListService"
+    :listCountriesService="props.listCountriesService"
+    :parentSelectedFilter="selectedFilter"
+    :parentSelectedFilterAdvanced="selectedFilterAdvanced"
     @attack-on="createAllowedByAttack"
   >
   </MoreDetailsDrawer>
@@ -223,7 +228,6 @@
   })
   const selectedEvents = ref([])
   const totalRecordsFound = ref(0)
-  const logBody = ref(null)
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
@@ -240,6 +244,8 @@
   const valueNetworkId = ref(null)
   const valueDomainId = ref(null)
 
+  const advancedFilterRef = ref(null)
+
   const recordsFoundLabel = computed(() => {
     return `${totalRecordsFound.value} records found`
   })
@@ -247,15 +253,6 @@
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
   )
-
-  const netWorkListName = computed(() => {
-    if (selectedFilter.value.network?.id) {
-      return netWorkListOptions.value.options.find(
-        (network) => network.value.id === selectedFilter.value.network?.id
-      ).name
-    }
-    return ''
-  })
 
   const listFields = ref([
     {
@@ -359,12 +356,70 @@
 
   const setNetworkListSelectedOption = (value) => {
     selectedFilter.value.network = value
+
+    listFields.value = listFields.value.map((item) => {
+      if (item.value === 'ip_address') {
+        return {
+          ...item,
+          networkListDisabled: value?.value?.disabledIP,
+          disabled: value?.value?.disabledIP
+        }
+      }
+      if (item.value === 'country') {
+        return {
+          ...item,
+          networkListDisabled: value?.value?.disabledCountries,
+          disabled: value?.value?.disabledCountries
+        }
+      }
+      return item
+    })
+
+    const hasIpFilter = selectedFilterAdvanced.value.some(
+      (item) => item.valueField === 'ip_address'
+    )
+    const hasCountryFilter = selectedFilterAdvanced.value.some(
+      (item) => item.valueField === 'country'
+    )
+
+    if (value?.value?.disabledIP) {
+      const validFilters = selectedFilterAdvanced.value.filter(
+        (item) => item.valueField !== 'ip_address'
+      )
+      advancedFilterRef.value?.clearSpecificFilter('ip_address')
+      selectedFilterAdvanced.value = validFilters
+
+      if (hasIpFilter) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'The ip addres field cannot be used together with an IP/CIDR Network List filter.'
+        })
+      }
+    }
+
+    if (value?.value?.disabledCountries) {
+      const validFilters = selectedFilterAdvanced.value.filter(
+        (item) => item.valueField !== 'country'
+      )
+      advancedFilterRef.value?.clearSpecificFilter('country')
+      selectedFilterAdvanced.value = validFilters
+
+      if (hasCountryFilter) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'The country field cannot be used together with a Country Network List filter.'
+        })
+      }
+    }
+
     filterTuning()
   }
 
   const setDomainsSelectedOptions = (value) => {
     selectedDomains.value = value
-    selectedFilter.value.domains = value.map((item) => item.id)
+    selectedFilter.value.domains = value
     filterTuning()
   }
 
@@ -472,11 +527,6 @@
 
     tracker.product.clickedOn({ target: 'Search' }).track()
 
-    const { disabledIP, disabledCountries } = selectedFilter.value.network || {}
-
-    listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
-    listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
-
     const queryFields = {
       wafId: wafRuleId.value,
       domains: selectedFilter.value.domains,
@@ -486,21 +536,6 @@
     }
 
     listServiceWafTunningRef.value.reload(queryFields)
-  }
-
-  const handleListWafRulesTuningAttacksService = async (path = '') => {
-    const domainsId = encodeURIComponent(selectedFilter.value.domains)
-    const matchesOn = `matches_on=${tuningSelected.value.matchesOn}`
-    const matchesZone = `match_zone=${tuningSelected.value.matchZone}`
-    const pathsList = path ? `&paths_list=${path}` : ''
-
-    const query = `?hour_range=${selectedFilter.value.hourRange}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}${pathsList}`
-
-    return await props.listWafRulesTuningAttacksService({
-      wafId: wafRuleId.value,
-      tuningId: tuningSelected.value.id,
-      query
-    })
   }
 
   const setNetWorkListOptions = async () => {

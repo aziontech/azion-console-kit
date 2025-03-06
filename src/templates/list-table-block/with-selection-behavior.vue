@@ -317,8 +317,8 @@
       type: Function
     },
     listService: {
-      type: Function,
-      required: false
+      required: true,
+      type: Function
     },
     addButtonLabel: {
       type: String,
@@ -343,14 +343,6 @@
     pt: {
       type: Object,
       default: () => ({})
-    },
-    tableData: {
-      type: Array,
-      default: () => []
-    },
-    externalLoading: {
-      type: Boolean,
-      default: false
     }
   })
 
@@ -364,7 +356,7 @@
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
-  const loading = ref(false)
+  const isLoading = ref(false)
   const data = ref([])
   const selectedColumns = ref([])
   const columnSelectorPanel = ref(null)
@@ -381,10 +373,6 @@
     set: (value) => {
       emit('update:selectedItensData', value)
     }
-  })
-
-  const isLoading = computed(() => {
-    return props.externalLoading || loading.value
   })
 
   onMounted(() => {
@@ -451,30 +439,24 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    try {
-      loading.value = true
-
-      if (props.tableData.length > 0) {
-        data.value = props.tableData
-        return
-      }
-
-      if (props.listService) {
+    if (props.listService) {
+      try {
+        isLoading.value = true
         const response = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
         data.value = response
+      } catch (error) {
+        const errorMessage = error.message || error
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: errorMessage
+        })
+      } finally {
+        isLoading.value = false
       }
-    } catch (error) {
-      const errorMessage = error.message || error
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: errorMessage
-      })
-    } finally {
-      loading.value = false
     }
   }
 
@@ -547,14 +529,4 @@
     const hasData = currentState?.length > 0
     emit('on-load-data', !!hasData)
   })
-
-  watch(
-    () => props.tableData,
-    (newValue) => {
-      if (newValue.length > 0) {
-        data.value = newValue
-      }
-    },
-    { immediate: true }
-  )
 </script>

@@ -206,20 +206,6 @@
       totalCount.value = response.count
 
       let results = response.body?.map((item) => {
-        if (props.optionValue === '') {
-          return {
-            [props.optionLabel]: item.name,
-            ...item,
-            ...props?.moreOptions?.reduce(
-              (additionalFields, option) => ({
-                ...additionalFields,
-                [option]: item[option]
-              }),
-              {}
-            )
-          }
-        }
-
         return {
           [props.optionLabel]: item.name,
           [props.optionValue]: item.id,

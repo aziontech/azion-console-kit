@@ -20,6 +20,10 @@
       type: Array,
       required: true
     },
+    hashUpdatable: {
+      type: Boolean,
+      default: true
+    },
     disabled: {
       type: Boolean
     },
@@ -80,9 +84,16 @@
     refDialogFilter.value.show(item)
   }
 
-  const removeItemFilter = (index, event) => {
-    refDialogFilter.value.hide(event)
-    displayFilter.value.splice(index, 1)
+  const removeItemFilter = (position) => {
+    displayFilter.value.splice(position, 1)
+
+    const adaptFilter = adapterApply(displayFilter.value)
+    emit('update:filterAdvanced', adaptFilter)
+    emit('applyFilter', adaptFilter)
+
+    if (props.hashUpdatable) {
+      updateHash(adaptFilter, props.externalFilter)
+    }
   }
 
   const removeValueItemFilter = (index, idx, event) => {
@@ -105,6 +116,14 @@
 
   const updateFilter = (value) => {
     setFilter(value)
+
+    const adaptFilter = adapterApply(displayFilter.value)
+    emit('update:filterAdvanced', adaptFilter)
+    emit('applyFilter', adaptFilter)
+
+    if (props.hashUpdatable) {
+      updateHash(adaptFilter, props.externalFilter)
+    }
   }
 
   const adapterApply = (displayFilter) => {
@@ -142,14 +161,16 @@
   }
 
   const updateHash = (filter, external) => {
-    const { params } = route
-    const query = {
-      filters: encodeFilter({
-        external,
-        filter
-      })
+    if (props.hashUpdatable) {
+      const { params } = route
+      const query = {
+        filters: encodeFilter({
+          external,
+          filter
+        })
+      }
+      router.push({ params, query })
     }
-    router.push({ params, query })
   }
 
   const setFilter = (value) => {
@@ -235,12 +256,23 @@
     }
   )
 
+  const clearSpecificFilter = (fieldToRemove) => {
+    if (!displayFilter.value.length) return
+
+    displayFilter.value = displayFilter.value.filter((item) => item.valueField !== fieldToRemove)
+
+    const adaptFilter = adapterApply(displayFilter.value)
+    emit('update:filterAdvanced', adaptFilter)
+    updateHash(adaptFilter, props.externalFilter)
+  }
+
   onMounted(() => {
     loadFilter()
   })
 
   defineExpose({
-    clearDisplayFilter
+    clearDisplayFilter,
+    clearSpecificFilter
   })
 </script>
 <template>
