@@ -34,7 +34,7 @@ const CYPRESS_TOKEN = process.env.CI
   : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 60 }
+  cypress: { token: CYPRESS_TOKEN, wait_time: 30 }
 }
 
 const entities = [
@@ -82,8 +82,7 @@ const entities = [
   {
     name: 'users',
     url: `${URL}/iam/users`,
-    version: 3,
-    wait_time: 120
+    version: 3
   }
 ]
 
