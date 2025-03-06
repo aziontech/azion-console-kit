@@ -13,7 +13,7 @@ import { localeMock } from '../utils/localeMock'
 describe('convertDate', () => {
   it('should convert a given value to a date string in a specific format', () => {
     const value = '2022-01-01T00:00:00'
-    const expectedDate = 'January 1, 2022 at 12:00 AM'
+    const expectedDate = 'January 1, 2022 at 12:00:00 AM'
 
     expect(convertValueToDate(value)).toBe(expectedDate)
   })

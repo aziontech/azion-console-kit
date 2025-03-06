@@ -1,6 +1,5 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 
 export const listServiceAndProductsChangesService = async (billID) => {
@@ -98,14 +97,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
     }
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeBillingBaseUrl()}`,
-      method: 'POST',
-      body: graphQLPayload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeBillingBaseUrl()}`,
+    method: 'POST',
+    body: graphQLPayload
+  })
 
   httpResponse = adapt(httpResponse)
 

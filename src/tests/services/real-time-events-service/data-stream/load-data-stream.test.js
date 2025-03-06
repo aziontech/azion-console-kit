@@ -43,9 +43,10 @@ describe('DataStreamingServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -73,7 +74,7 @@ describe('DataStreamingServices', () => {
         content: fixtures.dataStreaming.jobName,
         severity: 'info'
       },
-      ts: 'February 23, 2024 at 06:07 PM',
+      ts: 'February 23, 2024 at 06:07:25 PM',
       data: [
         { key: 'configurationId', value: fixtures.dataStreaming.configurationId },
         { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },

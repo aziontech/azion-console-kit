@@ -20,8 +20,12 @@ export const editEdgeFunctionsService = async (payload) => {
  */
 const extractErrorKey = (errorSchema, key) => {
   if (key === 'user_has_no_product') {
-    const noProductErrorMessage =
-      'In order to perform this action, you must first have access to the product Tiered Cache'
+    const isWebSocket = errorSchema?.[key]?.includes('Websocket')
+
+    const noProductErrorMessage = !isWebSocket
+      ? 'In order to perform this action, you must first have access to the product Tiered Cache'
+      : 'WebSocket support is not available for Developer and Business plans. Please contact sales'
+
     return `${key}: ${noProductErrorMessage}`
   }
 

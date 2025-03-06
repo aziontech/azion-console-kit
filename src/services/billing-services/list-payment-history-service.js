@@ -3,7 +3,6 @@ import { makePaymentBaseUrl } from './make-payment-base-url'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { formatDateToUS, getStaticUrlsByEnvironment } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
-import graphQLApi from '../axios/makeGraphQl'
 import { getLastDayMonth } from '@/helpers/payment-history'
 
 const PAGE_SIZE = 200
@@ -67,14 +66,12 @@ const listPaymentHistoryForRegularAccounts = async () => {
         }`
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeAccountingBaseUrl()}`,
-      method: 'POST',
-      body: payload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeAccountingBaseUrl()}`,
+    method: 'POST',
+    body: payload
+  })
 
   return adaptPaymentHistoryForRegularAccounts(httpResponse)
 }

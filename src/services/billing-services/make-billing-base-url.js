@@ -1,3 +1,3 @@
 export const makeBillingBaseUrl = () => {
-  return 'billing'
+  return 'v4/billing/graphql'
 }

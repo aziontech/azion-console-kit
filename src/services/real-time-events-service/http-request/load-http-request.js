@@ -1,6 +1,6 @@
-import convertGQL from '@/helpers/convert-gql'
+import { convertGQL } from '@/helpers/convert-gql'
 import { convertValueToDate } from '@/helpers/convert-date'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 
@@ -10,6 +10,7 @@ export const loadHttpRequest = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const httpResponse = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload

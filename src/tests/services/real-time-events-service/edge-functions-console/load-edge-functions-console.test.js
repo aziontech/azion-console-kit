@@ -42,9 +42,10 @@ describe('EdgeFunctionsConsoleServices', () => {
     await sut(fixtures.filter)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query: expect.any(String),
         variables: {
@@ -83,7 +84,7 @@ describe('EdgeFunctionsConsoleServices', () => {
         { key: 'solutionId', value: fixtures.edgeFunctionConsole.solutionId },
         { key: 'source', value: fixtures.edgeFunctionConsole.source }
       ],
-      ts: 'February 23, 2024 at 06:07 PM'
+      ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })
 })

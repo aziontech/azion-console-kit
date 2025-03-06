@@ -71,9 +71,10 @@ describe('ActivityHistoryServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -129,10 +130,9 @@ describe('ActivityHistoryServices', () => {
           ],
           ts: fixtures.activityHistory.ts,
           userId: fixtures.activityHistory.userId,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })
