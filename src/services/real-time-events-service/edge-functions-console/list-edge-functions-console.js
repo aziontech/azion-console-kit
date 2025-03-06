@@ -39,14 +39,14 @@ const adaptResponse = (body) => {
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
-      summary: buildSummary(cellsConsoleEvents),
-      configurationId: cellsConsoleEvents.configurationId,
-      source: cellsConsoleEvents.source,
-      line: cellsConsoleEvents.line,
-      id: generateCurrentTimestamp(),
-      tsFormat: convertValueToDate(cellsConsoleEvents.ts),
-      ts: cellsConsoleEvents.ts
-    }))
+        summary: buildSummary(cellsConsoleEvents),
+        configurationId: cellsConsoleEvents.configurationId,
+        source: cellsConsoleEvents.source,
+        line: cellsConsoleEvents.line,
+        id: generateCurrentTimestamp(),
+        tsFormat: convertValueToDate(cellsConsoleEvents.ts),
+        ts: cellsConsoleEvents.ts
+      }))
     : []
 
   return {

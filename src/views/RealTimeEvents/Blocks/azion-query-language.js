@@ -4,65 +4,73 @@ export default class Aql {
   }
 
   parse(query, suggestions, domains) {
-    const expressions = query.split(/and/i).map(exp => exp.trim())
+    const expressions = query.split(/and/i).map((exp) => exp.trim())
 
-    const output = expressions.map(exp => {
-      const regex = /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
-      const match = exp.match(regex)
-      if (match) {
-        let field = match[1] || match[2] || match[3]
-        field = field.trim()
+    const output = expressions
+      .map((exp) => {
+        const regex =
+          /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
+        const match = exp.match(regex)
+        if (match) {
+          let field = match[1] || match[2] || match[3]
+          field = field.trim()
 
-        const suggestion = suggestions.find(item => item.label.toLowerCase() === field.toLowerCase())
-        if (suggestion) {
-          field = suggestion.label
-        }
+          const suggestion = suggestions.find(
+            (item) => item.label.toLowerCase() === field.toLowerCase()
+          )
+          if (suggestion) {
+            field = suggestion.label
+          }
 
-        let operator = match[4]
-        let value = match[5].trim()
+          let operator = match[4]
+          let value = match[5].trim()
 
-        const operatorInfo = this.operatorInfo(suggestion.value.operator, this.mapOperatorValue(operator))
+          const operatorInfo = this.operatorInfo(
+            suggestion.value.operator,
+            this.mapOperatorValue(operator)
+          )
 
-        if (operator.toUpperCase() === 'BETWEEN') {
-          const values = value.split(/\s+and\s+/i);
-          if (values.length === 2) {
-            let val1, val2;
-            if (suggestion && suggestion.value.type.toLowerCase() === 'int') {
-              val1 = Number(values[0].trim())
-              val2 = Number(values[1].trim())
-            } else {
-              val1 = values[0].replace(/^["']|["']$/g, '').trim()
-              val2 = values[1].replace(/^["']|["']$/g, '').trim()
-            }
-            return {
-              field: field,
-              value: [val1, val2],
-              operator: operatorInfo.value,
-              valueField: this.formatFieldName(field),
-              type: operatorInfo.type ?? 'Int'
+          if (operator.toUpperCase() === 'BETWEEN') {
+            const values = value.split(/\s+and\s+/i)
+            if (values.length === 2) {
+              let val1, val2
+              if (suggestion && suggestion.value.type.toLowerCase() === 'int') {
+                val1 = Number(values[0].trim())
+                val2 = Number(values[1].trim())
+              } else {
+                val1 = values[0].replace(/^["']|["']$/g, '').trim()
+                val2 = values[1].replace(/^["']|["']$/g, '').trim()
+              }
+              return {
+                field: field,
+                value: [val1, val2],
+                operator: operatorInfo.value,
+                valueField: this.formatFieldName(field),
+                type: operatorInfo.type ?? 'Int'
+              }
             }
           }
-        }
 
-        let parsedValue;
-        if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
-          parsedValue = Number(value);
-        } else if (operator.toUpperCase() === 'IN' && field.toLowerCase() === 'domain') {
-          parsedValue = this.formatDomainValues(query, domains)
-        } else {
-          parsedValue = value.replace(/^["']|["']$/g, '')
-        }
+          let parsedValue
+          if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
+            parsedValue = Number(value)
+          } else if (operator.toUpperCase() === 'IN' && field.toLowerCase() === 'domain') {
+            parsedValue = this.formatDomainValues(query, domains)
+          } else {
+            parsedValue = value.replace(/^["']|["']$/g, '')
+          }
 
-        return {
-          field: field,
-          value: parsedValue,
-          operator: operatorInfo.value,
-          valueField: this.formatFieldName(field),
-          type: operatorInfo.type ?? 'Int'
-        };
-      }
-      return null
-    }).filter(item => item !== null)
+          return {
+            field: field,
+            value: parsedValue,
+            operator: operatorInfo.value,
+            valueField: this.formatFieldName(field),
+            type: operatorInfo.type ?? 'Int'
+          }
+        }
+        return null
+      })
+      .filter((item) => item !== null)
 
     return output
   }
@@ -86,40 +94,53 @@ export default class Aql {
 
     const tokens = parenMatch[1]
       .split(',')
-      .map(token => token.trim())
-      .filter(token => token !== '')
+      .map((token) => token.trim())
+      .filter((token) => token !== '')
 
-    const result = tokens.map(token => {
-      const found = domains.find(domain => domain?.label?.toLowerCase() === token.toLowerCase())
-      return found ? { label: found.label, value: found.id } : null
-    }).filter(item => item !== null)
+    const result = tokens
+      .map((token) => {
+        const found = domains.find((domain) => domain?.label?.toLowerCase() === token.toLowerCase())
+        return found ? { label: found.label, value: found.id } : null
+      })
+      .filter((item) => item !== null)
 
     return result
   }
 
   operatorInfo(operators, operator) {
-    return operators.find(op => op.label === operator)?.value
+    return operators.find((op) => op.label === operator)?.value
   }
 
   mapOperatorValue(op) {
     switch (op) {
-      case 'in': return 'In';
-      case '=': return 'Equals';
-      case '<>': return 'Not Equals';
-      case 'like': return 'Contains';
-      case 'ilike': return 'Not Contains';
-      case 'between': return 'Between';
-      case '<': return 'Less Than';
-      case '<=': return 'Less Than or Equal';
-      case '>': return 'Greater Than';
-      case '>=': return 'Greater Than or Equal';
-      default: return op;
+      case 'in':
+        return 'In'
+      case '=':
+        return 'Equals'
+      case '<>':
+        return 'Not Equals'
+      case 'like':
+        return 'Contains'
+      case 'ilike':
+        return 'Not Contains'
+      case 'between':
+        return 'Between'
+      case '<':
+        return 'Less Than'
+      case '<=':
+        return 'Less Than or Equal'
+      case '>':
+        return 'Greater Than'
+      case '>=':
+        return 'Greater Than or Equal'
+      default:
+        return op
     }
   }
 
   selectSuggestion(suggestion, query, step, fieldName) {
     if (step === 'field') {
-      let newQuery;
+      let newQuery
       if (query?.toLowerCase().includes(' and ')) {
         const parts = query.split(/\s+and\s+/i)
         let newField = suggestion.label.toLowerCase()
@@ -128,21 +149,33 @@ export default class Aql {
         }
         parts[parts.length - 1] = newField
         newQuery = parts.join(' and ') + ' '
-        return { query: `${newQuery} `, nextStep: 'operator', label: suggestion.label.toLowerCase() }
+        return {
+          query: `${newQuery} `,
+          nextStep: 'operator',
+          label: suggestion.label.toLowerCase()
+        }
       } else {
         let newField = suggestion.label.toLowerCase()
         if (newField.includes(' ')) {
           newQuery = `"${newField}"`
-          return { query: `${newQuery} `, nextStep: 'operator', label: suggestion.label.toLowerCase() }
+          return {
+            query: `${newQuery} `,
+            nextStep: 'operator',
+            label: suggestion.label.toLowerCase()
+          }
         } else {
-          return { query: `${newField} `, nextStep: 'operator', label: suggestion.label.toLowerCase() }
+          return {
+            query: `${newField} `,
+            nextStep: 'operator',
+            label: suggestion.label.toLowerCase()
+          }
         }
       }
     } else if (step === 'operator') {
       const newQuery = `${query} ${suggestion.label} `
       return { query: newQuery, nextStep: 'value', label: fieldName }
     } else if (step === 'value') {
-      let newQuery;
+      let newQuery
       if (fieldName === 'domain') {
         if (query.endsWith(' ')) {
           newQuery = `(${suggestion.label})`
@@ -174,7 +207,9 @@ export default class Aql {
     const tokenForMatch = tokenRaw.replace(/^["']|["']$/g, '').toLowerCase()
     const fieldComplete = query.endsWith(' ')
 
-    const matchingFields = suggestions.filter((item) => item.label.toLowerCase().startsWith(tokenForMatch))
+    const matchingFields = suggestions.filter((item) =>
+      item.label.toLowerCase().startsWith(tokenForMatch)
+    )
     let operatorFound = operadores.find((op) => tokenForMatch.toLowerCase().includes(op))
 
     const hasValueAfterOperator = operatorFound ? tokenRaw.split(operatorFound)[1] : null
@@ -183,7 +218,9 @@ export default class Aql {
       const matchedField = matchingFields[0]
 
       if (matchedField.label.includes(' ')) {
-        const tokenIsComplete = (tokenRaw.startsWith('"') && tokenRaw.endsWith('"')) || (tokenRaw.startsWith("'") && tokenRaw.endsWith("'"))
+        const tokenIsComplete =
+          (tokenRaw.startsWith('"') && tokenRaw.endsWith('"')) ||
+          (tokenRaw.startsWith("'") && tokenRaw.endsWith("'"))
 
         if (fieldComplete && tokenIsComplete) {
           return { operator: 'operator', selectedField: matchedField.label.toLowerCase() }
@@ -292,7 +329,9 @@ export default class Aql {
 
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
-      const operatorFound = operadores.find(op => new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression))
+      const operatorFound = operadores.find((op) =>
+        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression)
+      )
 
       let fieldPart
       if (operatorFound) {
@@ -321,21 +360,22 @@ export default class Aql {
   queryValidationForInOperator(queryText) {
     let errors = []
     // Se a query não contém o operador in, não há nada para validar
-    if (!/\bin\b/i.test(queryText) || queryText.endsWith(' ') || queryText.endsWith('and')) return errors
+    if (!/\bin\b/i.test(queryText) || queryText.endsWith(' ') || queryText.endsWith('and'))
+      return errors
 
     // Divide a query por "and" (ignorando caixa) para validar cada expressão individualmente
-    const expressions = queryText.split(/\s+and\s+/i);
+    const expressions = queryText.split(/\s+and\s+/i)
 
     expressions.forEach((expression) => {
       // Se a expressão não contém o operador in (como palavra inteira), ignora
-      if (!/\bin\b/i.test(expression)) return;
+      if (!/\bin\b/i.test(expression)) return
 
       // Extrai a parte que vem após o operador "in".
       // A regex abaixo captura tudo que vem depois de "in", ignorando espaços:
-      const regex = /\bin\b\s*(.+)$/i;
-      const match = expression.match(regex);
+      const regex = /\bin\b\s*(.+)$/i
+      const match = expression.match(regex)
       if (match) {
-        let valuePart = match[1].trim(); // Ex: "(domain1, domain2)" ou possivelmente "domain1, domain2"
+        let valuePart = match[1].trim() // Ex: "(domain1, domain2)" ou possivelmente "domain1, domain2"
 
         // Validação 1: Os valores precisam estar entre parênteses.
         if (!(valuePart.startsWith('(') && valuePart.endsWith(')'))) {
@@ -354,8 +394,8 @@ export default class Aql {
           }
           // Opcional: Você pode também verificar se cada valor está presente
           // e não vazio, por exemplo:
-          const values = inner.split(',').map(val => val.trim())
-          if (values.some(val => val === '')) {
+          const values = inner.split(',').map((val) => val.trim())
+          if (values.some((val) => val === '')) {
             if (!errors.includes('in-operator-empty-value-error')) {
               errors.push('in-operator-empty-value-error')
             }
