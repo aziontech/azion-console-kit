@@ -30,7 +30,8 @@ const adapt = (filter) => {
       'statusCode',
       'resolutionType',
       'solutionId',
-      'source'
+      'source',
+      'version'
     ],
     orderBy: 'ts_ASC'
   }

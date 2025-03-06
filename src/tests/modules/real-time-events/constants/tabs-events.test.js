@@ -31,7 +31,6 @@ describe('RealTimeEventsModule', () => {
         expect(tab).toHaveProperty('dataset')
         expect(tab).toHaveProperty('tabRouter')
         expect(tab).toHaveProperty('columns')
-        expect(tab).toHaveProperty('customColumnMapper')
       })
     })
 

@@ -59,6 +59,13 @@ describe('ActivityHistoryServices', () => {
       `\t\tresourceId`,
       `\t\tuserId`,
       `\t\tts`,
+      `\t\tcomment`,
+      `\t\tauthorEmail`,
+      `\t\taccountId`,
+      `\t\trequestData`,
+      `\t\tuserAgent`,
+      `\t\tremotePort`,
+      `\t\trefererHeader`,
       `\t}`,
       `}`
     ].join('\n')

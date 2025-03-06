@@ -28,7 +28,22 @@ const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
     limit: 10000,
-    fields: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'userId', 'ts'],
+    fields: [
+      'userIp',
+      'authorName',
+      'title',
+      'resourceType',
+      'resourceId',
+      'userId',
+      'ts',
+      'comment',
+      'authorEmail',
+      'accountId',
+      'requestData',
+      'userAgent',
+      'remotePort',
+      'refererHeader'
+    ],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)

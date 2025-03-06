@@ -34,7 +34,10 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsList',
       'edgeFunctionsTime',
-      'ts'
+      'ts',
+      'virtualhostid',
+      'edgeFunctionsInstanceIdList',
+      'source'
     ],
     orderBy: 'ts_ASC'
   }

@@ -56,6 +56,9 @@ describe('EdgeFunctionsServices', () => {
       `\t\tedgeFunctionsList`,
       `\t\tedgeFunctionsTime`,
       `\t\tts`,
+      `\t\tvirtualhostid`,
+      `\t\tedgeFunctionsInstanceIdList`,
+      `\t\tsource`,
       `\t}`,
       `}`
     ].join('\n')

@@ -449,6 +449,14 @@
     selectedColumns.value = props.columns
   })
 
+  const formatSummaryToCSV = (summary) => {
+    const summaryValue = summary
+      .map((item) => `${item.key}: ${item.value.replace(/"/g, '""')}`)
+      .join(' | ')
+    const csvString = `"${summaryValue}"`
+
+    return csvString
+  }
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -457,6 +465,10 @@
       return
     }
     const columnMapper = props.csvMapper(rowData)
+    if (columnMapper?.summary && Array.isArray(columnMapper.summary)) {
+      const values = [...columnMapper.summary]
+      columnMapper.summary = formatSummaryToCSV(values)
+    }
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 

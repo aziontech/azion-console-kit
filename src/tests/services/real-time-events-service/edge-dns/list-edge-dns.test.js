@@ -60,6 +60,8 @@ describe('edgeDns', () => {
       `\t\tts`,
       `\t\tsource`,
       `\t\tuuid`,
+      `\t\tstatusCode`,
+      `\t\tversion`,
       `\t}`,
       `}`
     ].join('\n')

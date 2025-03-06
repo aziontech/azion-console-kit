@@ -24,7 +24,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      tsFormat: rowData.data
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   edgeFunctions: {
@@ -50,7 +51,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      edgeFunctionsList: rowData.data.value
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   edgeFunctionsConsole: {
@@ -77,9 +79,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      lineSource: rowData.data.content,
-      level: rowData.data.content,
-      line: rowData.data.value
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   imageProcessor: {
@@ -106,7 +107,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      requestUri: rowData.data.value
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   tieredCache: {
@@ -132,7 +134,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      upstreamCacheStatus: rowData.data.content
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   edgeDNS: {
@@ -158,7 +161,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      level: rowData.data.content
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   dataStream: {
@@ -184,8 +188,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      jobName: rowData.data.content,
-      endpointType: rowData.data.content
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   },
   activityHistory: {
@@ -212,7 +216,8 @@ const TABS_EVENTS = {
       }
     ],
     customColumnMapper: (rowData) => ({
-      title: rowData.data.value
+      tsFormat: rowData.data,
+      summary: rowData.data
     })
   }
 }
