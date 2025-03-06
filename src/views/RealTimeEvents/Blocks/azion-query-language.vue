@@ -41,6 +41,20 @@
           Atenção: alguns campos fornecidos não correspondem aos disponíveis atualmente. Por favor,
           verifique e tente novamente.
         </small>
+        <small
+          v-if="formattedQuery.includes('in-operator-parentheses-error')"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          Atenção: existe campos com operador in que precisam está dentro de parênteses. Por favor,
+          verifique e tente novamente. ex: domain in (domain1, domain2)
+        </small>
+        <small
+          v-if="formattedQuery.includes('in-operator-trailing-comma-error')"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          Atenção: campos com operador in que precisa ser removido a virgula no final dos valores em
+          pareênteses. Por favor, verifique e tente novamente.
+        </small>
       </div>
     </div>
 
@@ -50,24 +64,34 @@
       class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-2xl"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
-    />
+    >
+      <template
+        #loader
+        v-if="loading"
+      >
+        loading....
+      </template>
+    </Listbox>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
   import { onClickOutside } from '@vueuse/core'
+  import { listWorkloadsService } from '@/services/workloads-services/list-workloads-service.js'
 
   const AzionQueryLanguage = new Aql()
 
   const queryText = ref('')
   const currentStep = ref('field')
   const highlightedIndex = ref(0)
+  const domains = ref({})
+  const loading = ref(false)
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
@@ -87,6 +111,10 @@
       type: Array,
       required: true
     }
+  })
+
+  onMounted(async () => {
+    await loaderDomainWorkloads()
   })
 
   const suggestionsData = computed(() => {
@@ -155,10 +183,29 @@
         label: op.value.format
       }))
     } else if (currentStep.value === 'value') {
+      if (selectedFieldName.value === 'domain') {
+        return domains.value
+      }
       return []
+    } else if (currentStep.value === 'logicOperator') {
+      return [{ label: 'AND' }]
     }
     return []
   })
+
+  const loaderDomainWorkloads = async () => {
+    try {
+      const response = await listWorkloadsService({ fields: 'id,name' })
+      domains.value = response.results.map((el) => {
+        return {
+          label: el.name,
+          id: el.id
+        }
+      })
+    } catch (error) {
+      return []
+    }
+  }
 
   const selectedFieldName = ref('')
 
@@ -172,20 +219,15 @@
   }
 
   const selectSuggestion = (suggestion) => {
-    if (currentStep.value === 'field') {
-      queryText.value = AzionQueryLanguage.selectSuggestion(suggestion, queryText.value, 'field')
-      selectedFieldName.value = suggestion.label.toLowerCase()
-      changeCurrentStep('operator')
-    } else if (currentStep.value === 'operator') {
-      // Atualiza o input com o operador selecionado e passa para valor
-      queryText.value += suggestion.label + ' '
-      changeCurrentStep('value')
-    } else if (currentStep.value === 'value') {
-      // Para o valor, dependendo do tipo, pode ser necessário tratar "between" (vários valores)
-      queryText.value += suggestion + ' '
-      // Se for operador BETWEEN, você pode precisar de um estado interno para armazenar os dois valores
-    }
-    // Reseta o índice destacado
+    const data = AzionQueryLanguage.selectSuggestion(
+      suggestion,
+      queryText.value,
+      currentStep.value,
+      selectedFieldName.value
+    )
+    queryText.value = data?.query
+    selectedFieldName.value = data?.label
+    changeCurrentStep(data?.nextStep)
     highlightedIndex.value = 0
   }
 
@@ -209,7 +251,7 @@
   }
 
   const executeQuery = () => {
-    const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value)
+    const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
   }
 
