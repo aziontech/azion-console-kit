@@ -62,6 +62,16 @@ describe('HttpRequestServices', () => {
       `\t\tsslProtocol`,
       `\t\twafLearning`,
       `\t\trequestTime`,
+      '\t\tserverProtocol',
+      '\t\tupstreamCacheStatus',
+      '\t\thttpReferer',
+      '\t\tremoteAddress',
+      '\t\twafMatch',
+      '\t\tserverPort',
+      '\t\tsslCipher',
+      '\t\twafEvheaders',
+      '\t\tserverAddr',
+      '\t\tscheme',
       `\t}`,
       `}`
     ].join('\n')
@@ -97,6 +107,8 @@ describe('HttpRequestServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.httpRequest.configurationId,
+          requestId: fixtures.httpRequest.requestId,
           summary: [
             { key: 'configurationId', value: fixtures.httpRequest.configurationId },
             { key: 'host', value: fixtures.httpRequest.host },

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap max-w-7xl">
+  <div class="flex flex-wrap max-w-full">
     <span
       v-for="(item, index) in value"
       :key="index"

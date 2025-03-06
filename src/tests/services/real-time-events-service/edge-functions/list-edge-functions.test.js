@@ -56,6 +56,9 @@ describe('EdgeFunctionsServices', () => {
       `\t\tedgeFunctionsList`,
       `\t\tedgeFunctionsTime`,
       `\t\tts`,
+      `\t\tvirtualhostid`,
+      `\t\tedgeFunctionsInstanceIdList`,
+      `\t\tsource`,
       `\t}`,
       `}`
     ].join('\n')
@@ -91,6 +94,7 @@ describe('EdgeFunctionsServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.edgeFunction.configurationId,
           summary: [
             { key: 'configurationId', value: fixtures.edgeFunction.configurationId },
             {

@@ -31,7 +31,6 @@ describe('RealTimeEventsModule', () => {
         expect(tab).toHaveProperty('dataset')
         expect(tab).toHaveProperty('tabRouter')
         expect(tab).toHaveProperty('columns')
-        expect(tab).toHaveProperty('customColumnMapper')
       })
     })
 
@@ -81,7 +80,7 @@ describe('RealTimeEventsModule', () => {
         const tsFormatColumn = tabData.columns.find((column) => column.field === 'tsFormat')
         expect(tsFormatColumn).toBeDefined()
         expect(tsFormatColumn.field).toBe('tsFormat')
-        expect(tsFormatColumn.header).toBe('TS')
+        expect(tsFormatColumn.header).toBe('Time')
       })
     })
   })

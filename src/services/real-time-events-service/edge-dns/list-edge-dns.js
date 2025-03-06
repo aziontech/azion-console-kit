@@ -28,7 +28,18 @@ const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
     limit: 10000,
-    fields: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'ts', 'source', 'uuid'],
+    fields: [
+      'level',
+      'zoneId',
+      'qtype',
+      'resolutionType',
+      'solutionId',
+      'ts',
+      'source',
+      'uuid',
+      'statusCode',
+      'version'
+    ],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -42,7 +53,9 @@ const adaptResponse = (response) => {
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeDnsQueriesEvents),
     ts: edgeDnsQueriesEvents.ts,
-    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts)
+    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
+    uuid: edgeDnsQueriesEvents.uuid,
+    source: edgeDnsQueriesEvents.source
   }))
 
   return {

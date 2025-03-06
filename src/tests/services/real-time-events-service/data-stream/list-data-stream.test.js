@@ -101,6 +101,7 @@ describe('DataStreamingServices', () => {
     expect(response).toEqual({
       data: [
         {
+          configurationId: fixtures.dataStreaming.configurationId,
           id: 'mocked-timestamp',
           summary: [
             { key: 'configurationId', value: fixtures.dataStreaming.configurationId },

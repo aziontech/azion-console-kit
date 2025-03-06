@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -87,11 +88,6 @@ const adaptResponse = (response) => {
     lineSource: cellsConsoleEvents.lineSource,
     level: levelMap[cellsConsoleEvents.level],
     ts: convertValueToDate(cellsConsoleEvents.ts),
-    line: cellsConsoleEvents.line,
-    id: cellsConsoleEvents.id,
-    solutionId: cellsConsoleEvents.solutionId,
-    functionId: cellsConsoleEvents.functionId,
-    configurationId: cellsConsoleEvents.configurationId,
-    source: cellsConsoleEvents.source
+    data: buildSummary(cellsConsoleEvents)
   }
 }

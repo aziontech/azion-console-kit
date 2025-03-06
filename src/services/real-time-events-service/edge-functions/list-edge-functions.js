@@ -34,7 +34,10 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsList',
       'edgeFunctionsTime',
-      'ts'
+      'ts',
+      'virtualhostid',
+      'edgeFunctionsInstanceIdList',
+      'source'
     ],
     orderBy: 'ts_ASC'
   }
@@ -49,7 +52,8 @@ const adaptResponse = (response) => {
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
-    tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
+    tsFormat: convertValueToDate(edgeFunctionsEvents.ts),
+    configurationId: edgeFunctionsEvents.configurationId
   }))
 
   return {

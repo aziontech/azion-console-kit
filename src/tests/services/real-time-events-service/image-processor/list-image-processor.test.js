@@ -60,6 +60,7 @@ describe('ImageProcessorServices', () => {
       `\t\tbytesSent`,
       `\t\thttpReferer`,
       `\t\tts`,
+      `\t\thttpUserAgent`,
       `\t}`,
       `}`
     ].join('\n')
@@ -95,6 +96,9 @@ describe('ImageProcessorServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.imageProcessor.configurationId,
+          httpReferer: fixtures.imageProcessor.httpReferer,
+          httpUserAgent: fixtures.imageProcessor.httpUserAgent,
           summary: [
             { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
             { key: 'configurationId', value: fixtures.imageProcessor.configurationId },

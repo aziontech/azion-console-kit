@@ -67,20 +67,20 @@ describe('ImageProcessorServices', () => {
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
-      level: {
-        content: 'Error',
-        icon: 'pi pi-times-circle',
-        severity: 'danger'
-      },
       qtype: fixtures.edgeDns.qtype,
-      resolutionType: fixtures.edgeDns.resolutionType,
+      ts: fixtures.edgeDns.ts,
       qTypeDescription:
         'Address Mapping record (A Record), also known as a DNS host record, stores a hostname and its corresponding IPv4 address.',
-      solutionId: fixtures.edgeDns.solutionId,
-      ts: fixtures.edgeDns.ts,
-      uuid: fixtures.edgeDns.uuid,
-      zoneId: fixtures.edgeDns.zoneId,
-      statusCode: fixtures.edgeDns.statusCode
+      data: [
+        { key: 'level', value: fixtures.edgeDns.level },
+        { key: 'qtype', value: fixtures.edgeDns.qtype },
+        { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
+        { key: 'solutionId', value: fixtures.edgeDns.solutionId },
+        { key: 'source', value: fixtures.edgeDns.source },
+        { key: 'statusCode', value: fixtures.edgeDns.statusCode },
+        { key: 'uuid', value: fixtures.edgeDns.uuid },
+        { key: 'zoneId', value: fixtures.edgeDns.zoneId }
+      ]
     })
   })
 })

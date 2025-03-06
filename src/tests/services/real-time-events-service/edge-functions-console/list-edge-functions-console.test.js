@@ -58,6 +58,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       `\t\tlineSource`,
       `\t\tsource`,
       `\t\tts`,
+      `\t\tline`,
       `\t}`,
       `}`
     ].join('\n')
@@ -93,6 +94,9 @@ describe('EdgeFunctionsConsoleServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          configurationId: fixtures.edgeFunctionConsole.configurationId,
+          source: fixtures.edgeFunctionConsole.source,
+          line: fixtures.edgeFunctionConsole.line,
           summary: [
             { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
             { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },

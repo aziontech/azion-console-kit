@@ -60,6 +60,8 @@ describe('edgeDns', () => {
       `\t\tts`,
       `\t\tsource`,
       `\t\tuuid`,
+      `\t\tstatusCode`,
+      `\t\tversion`,
       `\t}`,
       `}`
     ].join('\n')
@@ -95,6 +97,7 @@ describe('edgeDns', () => {
       data: [
         {
           id: 'mocked-timestamp',
+          source: fixtures.edgeDns.source,
           summary: [
             { key: 'level', value: fixtures.edgeDns.level },
             { key: 'qtype', value: fixtures.edgeDns.qtype },
@@ -104,6 +107,7 @@ describe('edgeDns', () => {
             { key: 'uuid', value: fixtures.edgeDns.uuid },
             { key: 'zoneId', value: fixtures.edgeDns.zoneId }
           ],
+          uuid: fixtures.edgeDns.uuid,
           ts: fixtures.edgeDns.ts,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }

@@ -59,6 +59,13 @@ describe('ActivityHistoryServices', () => {
       `\t\tresourceId`,
       `\t\tuserId`,
       `\t\tts`,
+      `\t\tcomment`,
+      `\t\tauthorEmail`,
+      `\t\taccountId`,
+      `\t\trequestData`,
+      `\t\tuserAgent`,
+      `\t\tremotePort`,
+      `\t\trefererHeader`,
       `\t}`,
       `}`
     ].join('\n')
@@ -121,6 +128,7 @@ describe('ActivityHistoryServices', () => {
             }
           ],
           ts: fixtures.activityHistory.ts,
+          userId: fixtures.activityHistory.userId,
           tsFormat: 'February 23, 2024 at 06:07 PM'
         }
       ],

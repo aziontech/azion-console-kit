@@ -69,15 +69,24 @@ describe('DataStreamingServices', () => {
 
     expect(response).toEqual({
       id: '2024-02-23T18:07:25.000Z123',
-      configurationId: fixtures.edgeFunction.configurationId,
-      edgeFunctionsInstanceIdList: fixtures.edgeFunction.edgeFunctionsInstanceIdList,
-      edgeFunctionsInitiatorTypeList: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList,
-      edgeFunctionsList: ['function-1', ' function-2', ' function-3'],
-      edgeFunctionsSolutionId: fixtures.edgeFunction.edgeFunctionsSolutionId,
-      edgeFunctionsTime: fixtures.edgeFunction.edgeFunctionsTime,
       functionLanguage: fixtures.edgeFunction.functionLanguage,
-      source: fixtures.edgeFunction.source,
-      virtualHostId: fixtures.edgeFunction.virtualhostid,
+      data: [
+        { key: 'configurationId', value: fixtures.edgeFunction.configurationId },
+        {
+          key: 'edgeFunctionsInitiatorTypeList',
+          value: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList
+        },
+        {
+          key: 'edgeFunctionsInstanceIdList',
+          value: fixtures.edgeFunction.edgeFunctionsInstanceIdList
+        },
+        { key: 'edgeFunctionsList', value: ['function-1', ' function-2', ' function-3'] },
+        { key: 'edgeFunctionsSolutionId', value: fixtures.edgeFunction.edgeFunctionsSolutionId },
+        { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
+        { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage },
+        { key: 'source', value: fixtures.edgeFunction.source },
+        { key: 'virtualhostid', value: fixtures.edgeFunction.virtualhostid }
+      ],
       ts: 'February 23, 2024 at 06:07 PM'
     })
   })
