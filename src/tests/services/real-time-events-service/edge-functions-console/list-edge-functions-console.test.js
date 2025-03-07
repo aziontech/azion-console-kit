@@ -64,9 +64,10 @@ describe('EdgeFunctionsConsoleServices', () => {
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -105,10 +106,9 @@ describe('EdgeFunctionsConsoleServices', () => {
           lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
           source: fixtures.edgeFunctionConsole.source,
           ts: fixtures.edgeFunctionConsole.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
 })

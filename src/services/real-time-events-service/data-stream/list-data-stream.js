@@ -1,10 +1,9 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
-import { getRecordsFound } from '@/helpers/get-records-found'
 
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -15,6 +14,7 @@ export const listDataStream = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -45,7 +45,6 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const totalRecords = body.data.dataStreamedEvents?.length
 
   const data = body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     id: generateCurrentTimestamp(),
@@ -68,7 +67,6 @@ const adaptResponse = (response) => {
   }))
 
   return {
-    data,
-    recordsFound: getRecordsFound(totalRecords)
+    data
   }
 }

@@ -12,6 +12,10 @@
       type: Function,
       required: true
     },
+    getTotalRecords: {
+      type: Function,
+      required: true
+    },
     listService: {
       type: Function
     },
@@ -77,8 +81,12 @@
   }
 
   const listProvider = async () => {
-    const response = await props.listService({ ...filterData.value })
-    recordsFound.value = response.recordsFound
+    const [response, total] = await Promise.all([
+      props.listService({ ...filterData.value }),
+      props.getTotalRecords({ filter: { ...filterData.value }, dataset: props.tabSelected.dataset })
+    ])
+
+    recordsFound.value = total
     return response.data
   }
 

@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - dev
+      - UXE-6333-real-time-event-improvement-fork
 env:
   HUSKY: 0
 

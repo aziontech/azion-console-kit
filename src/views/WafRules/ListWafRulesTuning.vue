@@ -527,7 +527,10 @@
   }
 
   const filterSearch = async (filter) => {
-    if (!selectedFilter.value.domains.length) return
+    if (!selectedFilter.value.domains.length) {
+      totalRecordsFound.value = 0
+      return
+    }
 
     tracker.product.clickedOn({ target: 'Search' }).track()
 
