@@ -39,10 +39,23 @@ describe('WafRulesService', () => {
       body: { results: [fixtures.wafRulesMock] }
     })
     const { sut } = makeSut()
-    await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704', tuningId: 10011 })
+    await sut({
+      wafId: 4044,
+      tuningId: 10011,
+      query: {
+        domains: '1705587704',
+        hourRange: '48',
+        network: null,
+        countries: null,
+        ipsList: null,
+        matchesOn: null,
+        matchZone: null,
+        pathsList: null
+      }
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/4044/waf_events/1001?hour_range=48&domains_ids=1705587704',
+      url: `v3/waf/4044/waf_events/1001?domains_ids=1705587704&hour_range=48`,
       method: 'GET'
     })
   })
@@ -56,8 +69,17 @@ describe('WafRulesService', () => {
 
     const result = await sut({
       wafId: 4044,
-      query: '?hour_range=48&domains_ids=1705587704',
-      tuningId: 10011
+      tuningId: 10011,
+      query: {
+        domains: '1705587704',
+        hourRange: '48',
+        network: null,
+        countries: null,
+        ipsList: null,
+        matchesOn: null,
+        matchZone: null,
+        pathsList: null
+      }
     })
 
     expect(result).toEqual([
@@ -71,7 +93,6 @@ describe('WafRulesService', () => {
         pathCount: fixtures.wafRulesMock.path_count,
         topCountries: ['Brazil (10 hits)'],
         matchesOn: fixtures.wafRulesMock.matches_on,
-        ruleDescription: fixtures.wafRulesMock.rule_description,
         countryCount: fixtures.wafRulesMock.country_count,
         topPaths: ['/get (10 hits)'],
         matchValue: fixtures.wafRulesMock.match_value

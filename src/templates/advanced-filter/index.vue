@@ -87,7 +87,6 @@
   const removeItemFilter = (index, event) => {
     refDialogFilter.value.hide(event)
     displayFilter.value.splice(index, 1)
-    searchFilter()
   }
 
   const removeValueItemFilter = (index, idx, event) => {
@@ -259,7 +258,9 @@
   defineExpose({
     displayFilter,
     clearDisplayFilter,
-    clearSpecificFilter
+    clearSpecificFilter,
+    updateDisplayFilter,
+    searchFilter
   })
 </script>
 <template>

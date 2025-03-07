@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onBeforeMount, ref } from 'vue'
+  import { computed, onBeforeMount, ref, nextTick } from 'vue'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Divider from 'primevue/divider'
   import GoBack from '@/templates/action-bar-block/go-back'
@@ -11,6 +11,7 @@
   import PrimeTag from 'primevue/tag'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import { useToast } from 'primevue/usetoast'
+  import PrimeButton from 'primevue/button'
 
   defineOptions({
     name: 'more-details'
@@ -28,7 +29,10 @@
     },
     domains: {
       type: Array,
-      default: () => [],
+      required: true
+    },
+    domainNames: {
+      type: Array,
       required: true
     },
     listCountriesService: {
@@ -305,6 +309,10 @@
     }
   ]
 
+  const downloadCSV = () => {
+    listTableRef.value?.handleExportTableDataToCSV()
+  }
+
   onBeforeMount(() => {
     valueNetworkId.value = props.parentSelectedFilter.network?.id
     selectedFilter.value = props.parentSelectedFilter
@@ -312,10 +320,16 @@
     listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
     listFields.value.find((item) => item.value === 'ip_address').networkListDisabled = disabledIP
     listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
-    listFields.value.find((item) => item.value === 'ip_address').networkListDisabled =
+    listFields.value.find((item) => item.value === 'country').networkListDisabled =
       disabledCountries
 
     selectedFilterAdvanced.value = props.parentSelectedFilterAdvanced
+    nextTick(() => {
+      if (advancedFilterRef.value) {
+        advancedFilterRef.value.updateDisplayFilter(props.parentSelectedFilterAdvanced)
+        advancedFilterRef.value.searchFilter()
+      }
+    })
   })
 </script>
 
@@ -344,9 +358,7 @@
             <Divider></Divider>
             <div class="flex gap-2">
               <span class="text-color font-medium">Domains:</span>
-              <span class="text-color-secondary">{{
-                props.domains.map((domain) => domain.name).join(', ')
-              }}</span>
+              <span class="text-color-secondary">{{ props.domainNames }}</span>
             </div>
           </div>
           <div
@@ -403,6 +415,22 @@
                   :fieldsInFilter="listFields"
                   @applyFilter="filterSearch"
                   ref="advancedFilterRef"
+                />
+                <PrimeButton
+                  class="md:hidden"
+                  outlined
+                  size="small"
+                  label="Export to CSV"
+                  icon="pi pi-download"
+                  @click="downloadCSV"
+                />
+                <PrimeButton
+                  class="hidden md:flex"
+                  outlined
+                  size="small"
+                  icon="pi pi-download"
+                  v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+                  @click="downloadCSV"
                 />
               </div>
 
