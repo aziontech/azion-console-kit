@@ -128,6 +128,7 @@
       hiddenHeader
       :pt="{ root: { class: 'rounded-t-none' } }"
       isGraphql
+      frozenSize="3rem"
       ref="listTableBlockRef"
       :listService="listProvider"
       :columns="props.tabSelected.columns"

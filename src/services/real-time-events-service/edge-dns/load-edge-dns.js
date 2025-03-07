@@ -1,6 +1,7 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadEdgeDNS = async (filter) => {
   const payload = adapt(filter)
@@ -30,7 +31,7 @@ const adapt = (filter) => {
       'statusCode',
       'resolutionType',
       'solutionId',
-      'source'
+      'version'
     ],
     orderBy: 'ts_ASC'
   }
@@ -39,39 +40,10 @@ const adapt = (filter) => {
     fields: filter.fields,
     and: {
       uuidEq: filter.uuid,
-      sourceEq: filter.source,
       tsEq: filter.ts
     }
   }
   return convertGQL(formatFilter, table)
-}
-
-const levelMap = {
-  ERROR: {
-    content: 'Error',
-    severity: 'danger',
-    icon: 'pi pi-times-circle'
-  },
-  WARN: {
-    content: 'Warning',
-    severity: 'warning',
-    icon: 'pi pi-exclamation-triangle'
-  },
-  INFO: {
-    content: 'Info',
-    severity: 'info',
-    icon: 'pi pi-info-circle'
-  },
-  DEBUG: {
-    content: 'Debug',
-    severity: 'success',
-    icon: 'pi pi-check-circle'
-  },
-  TRACE: {
-    content: 'Trace',
-    severity: 'info',
-    icon: 'pi pi-code'
-  }
 }
 
 const qtypeMap = (value) => {
@@ -101,14 +73,9 @@ const adaptResponse = (response) => {
   const [edgeDnsQueriesEvents = {}] = body.data.idnsQueriesEvents
 
   return {
-    level: levelMap[edgeDnsQueriesEvents.level],
     ts: edgeDnsQueriesEvents.ts,
     qtype: edgeDnsQueriesEvents.qtype,
     qTypeDescription: qtypeMap(edgeDnsQueriesEvents.qtype),
-    uuid: edgeDnsQueriesEvents.uuid,
-    zoneId: edgeDnsQueriesEvents.zoneId,
-    statusCode: edgeDnsQueriesEvents.statusCode,
-    resolutionType: edgeDnsQueriesEvents.resolutionType,
-    solutionId: edgeDnsQueriesEvents.solutionId
+    data: buildSummary(edgeDnsQueriesEvents)
   }
 }

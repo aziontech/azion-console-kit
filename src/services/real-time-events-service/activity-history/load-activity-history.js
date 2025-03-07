@@ -1,7 +1,7 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
-import { capitalizeFirstLetter } from '@/helpers'
+import { buildSummary, capitalizeFirstLetter } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadActivityHistory = async (filter) => {
@@ -23,7 +23,22 @@ const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
     limit: 10000,
-    fields: ['title', 'type', 'ts', 'authorName', 'accountId', 'userId', 'authorEmail', 'comment'],
+    fields: [
+      'userIp',
+      'authorName',
+      'title',
+      'resourceType',
+      'resourceId',
+      'userId',
+      'ts',
+      'comment',
+      'authorEmail',
+      'accountId',
+      'requestData',
+      'userAgent',
+      'remotePort',
+      'refererHeader'
+    ],
     orderBy: 'ts_ASC'
   }
   const formatFilter = {
@@ -45,10 +60,6 @@ const adaptResponse = (response) => {
     title: activityHistoryEvents.title,
     type: capitalizeFirstLetter(activityHistoryEvents.type),
     ts: convertValueToDate(activityHistoryEvents.ts),
-    authorName: activityHistoryEvents.authorName,
-    accountId: activityHistoryEvents.accountId,
-    userId: activityHistoryEvents.userId,
-    authorEmail: activityHistoryEvents.authorEmail,
-    comment: activityHistoryEvents.comment
+    data: buildSummary(activityHistoryEvents)
   }
 }

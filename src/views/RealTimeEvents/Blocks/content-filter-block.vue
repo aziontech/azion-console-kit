@@ -1,9 +1,11 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import { computed } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import SelectButton from 'primevue/selectbutton'
+  import AzionQueryLanguage from './azion-query-language.vue'
   import PrimeTag from 'primevue/tag'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
@@ -26,6 +28,13 @@
     }
   })
 
+  onMounted(() => {
+    filter.value.isUserUsingGraphqlQuery = false
+  })
+
+  const filterMode = ref('Wizard')
+  const options = ref(['Wizard', 'Advanced'])
+
   const filter = computed({
     get: () => {
       return props.filterData
@@ -43,6 +52,11 @@
     emit('updatedFilter')
   }
 
+  const searchAdvancedFilter = (filters) => {
+    filter.value.fields = filters
+    emit('updatedFilter')
+  }
+
   const totalRecordsFound = computed(() => {
     return `${props.recordsFound} records found`
   })
@@ -50,7 +64,7 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+    <div class="flex flex-col gap-2 md:flex-row justify-between">
       <div class="w-full">
         <IntervalFilterBlock
           v-model:filterDate="filter.tsRange"
@@ -64,12 +78,25 @@
         />
       </div>
     </div>
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
+    <SelectButton
+      v-model="filterMode"
+      :options="options"
+      aria-labelledby="basic"
+      class="w-fit"
+    />
+    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-baseline">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
         :disabled="isFields"
         @applyFilter="filterSearch"
+        v-if="filterMode === 'Wizard'"
+      />
+      <AzionQueryLanguage
+        :fieldsInFilter="props.fieldsInFilter"
+        :searchAdvancedFilter="searchAdvancedFilter"
+        :filterAdvanced="filter.fields"
+        v-else
       />
       <div class="flex gap-2 align-items-center">
         <PrimeButton

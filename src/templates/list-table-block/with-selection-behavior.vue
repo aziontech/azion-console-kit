@@ -447,6 +447,7 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
+        data.value = []
         const errorMessage = error.message || error
         toast.add({
           closable: true,

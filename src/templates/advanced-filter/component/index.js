@@ -35,3 +35,16 @@ export const OPERATOR_MAPPING = {
   Gt: { value: 'Gt', label: 'Greater Than', format: '>' },
   Gte: { value: 'Gte', label: 'Greater Than or Equal', format: '≥' }
 }
+
+export const OPERATOR_MAPPING_ADVANCED_FILTER = {
+  In: { value: 'In', label: 'In', format: 'in' },
+  Eq: { value: 'Eq', label: 'Equals', format: '=' },
+  Ne: { value: 'Ne', label: 'Not Equals', format: '<>' },
+  Like: { value: 'Like', label: 'Contains', format: 'like' },
+  Ilike: { value: 'Ilike', label: 'Not Contains', format: 'ilike' },
+  Range: { value: 'Range', label: 'Between', format: 'between' },
+  Lt: { value: 'Lt', label: 'Less Than', format: '<' },
+  Lte: { value: 'Lte', label: 'Less Than or Equal', format: '<=' },
+  Gt: { value: 'Gt', label: 'Greater Than', format: '>' },
+  Gte: { value: 'Gte', label: 'Greater Than or Equal', format: '≥' }
+}

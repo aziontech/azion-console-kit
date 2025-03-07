@@ -2,6 +2,7 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadHttpRequest = async (filter) => {
   const payload = adapt(filter)
@@ -78,7 +79,7 @@ const adapt = (filter) => {
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
   const [httpEventItem = {}] = body.data.httpEvents
-  return {
+  const adapt = {
     httpReferer: httpEventItem.httpReferer,
     scheme: httpEventItem.scheme?.toUpperCase(),
     ts: convertValueToDate(httpEventItem.ts),
@@ -93,7 +94,6 @@ const adaptResponse = (httpResponse) => {
     upstreamResponseTime: httpEventItem.upstreamResponseTime,
     wafTotalProcessed: httpEventItem.wafTotalProcessed,
     configurationId: httpEventItem.configurationId,
-    source: httpEventItem.source,
     requestTime: httpEventItem.requestTime,
     tcpinfoRtt: httpEventItem.tcpinfoRtt,
     requestLength: httpEventItem.requestLength,
@@ -117,5 +117,15 @@ const adaptResponse = (httpResponse) => {
     geolocRegionName: httpEventItem.geolocRegionName,
     upstreamCacheStatus: httpEventItem.upstreamCacheStatus,
     serverProtocol: httpEventItem.serverProtocol
+  }
+
+  return {
+    host: adapt.host,
+    ts: adapt.ts,
+    requestId: adapt.requestId,
+    remoteAddress: adapt.remoteAddress,
+    remotePort: adapt.remotePort,
+    scheme: adapt.scheme,
+    data: buildSummary(adapt)
   }
 }

@@ -1,9 +1,13 @@
 <script setup>
   import Divider from 'primevue/divider'
   import PrimeTag from 'primevue/tag'
+  import Skeleton from 'primevue/skeleton'
 
   defineOptions({ name: 'info-section' })
   const props = defineProps({
+    hideDivider: {
+      type: Boolean
+    },
     date: {
       type: String
     },
@@ -17,6 +21,9 @@
       validator: (tags) => {
         return tags.every((tag) => typeof tag === 'object' && tag !== null)
       }
+    },
+    loading: {
+      type: Boolean
     }
   })
 
@@ -25,10 +32,16 @@
 
 <template>
   <div
-    class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
+    class="flex max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
   >
-    <div class="whitespace-nowrap flex-col justify-center items-start gap-3 flex">
-      <div class="flex flex-wrap gap-2">
+    <div
+      v-if="!loading && props.title"
+      class="whitespace-nowrap flex-col justify-center items-start gap-3 flex"
+    >
+      <div
+        class="flex flex-wrap gap-2"
+        v-if="props.title"
+      >
         <h2 class="whitespace-normal text-color text-xl font-medium">
           {{ props.title }}
         </h2>
@@ -50,7 +63,12 @@
       </div>
     </div>
 
-    <Divider />
+    <Skeleton
+      v-else-if="loading"
+      class="w-full h-12 mt-7"
+    />
+
+    <Divider v-if="!loading && !props.hideDivider" />
     <slot name="body"></slot>
   </div>
 </template>

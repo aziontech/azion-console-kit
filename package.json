@@ -41,7 +41,7 @@
     "analytics": "^0.8.11",
     "axios": "^1.7.4",
     "azion": "^1.15.0",
-    "azion-theme": "^1.8.0",
+    "azion-theme": "^1.10.1",
     "c3": "^0.7.20",
     "deep-chat": "^1.4.11",
     "find-cypress-specs": "^1.44.11",

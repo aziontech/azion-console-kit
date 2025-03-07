@@ -17,7 +17,6 @@ const fixtures = {
     requestMethod: 'GET',
     upstreamCacheStatus: 'HIT',
     proxyHost: 'proxy.example.com',
-    source: 'CDN',
     ts: '2024-02-23T18:07:25.000Z'
   }
 }
@@ -52,14 +51,36 @@ describe('tieredCacheServices', () => {
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
       `\t) {`,
+      `\t\tbytesSent`,
+      `\t\tcacheKey`,
+      `\t\tcacheTtl`,
       `\t\tconfigurationId`,
       `\t\thost`,
-      `\t\trequestUri`,
-      `\t\trequestMethod`,
-      `\t\tupstreamCacheStatus`,
-      `\t\tts`,
       `\t\tproxyHost`,
-      `\t\tsource`,
+      `\t\tproxyStatus`,
+      `\t\tproxyUpstream`,
+      `\t\treferenceError`,
+      `\t\tremoteAddr`,
+      `\t\tremotePort`,
+      `\t\trequestLength`,
+      `\t\trequestMethod`,
+      `\t\trequestTime`,
+      `\t\trequestUri`,
+      `\t\tscheme`,
+      `\t\tsentHttpContentType`,
+      `\t\tserverProtocol`,
+      `\t\tsolution`,
+      `\t\tstatus`,
+      `\t\ttcpinfoRtt`,
+      `\t\tts`,
+      `\t\tupstreamBytesReceived`,
+      `\t\tupstreamBytesReceivedStr`,
+      `\t\tupstreamCacheStatus`,
+      `\t\tupstreamConnectTime`,
+      `\t\tupstreamHeaderTime`,
+      `\t\tupstreamResponseTime`,
+      `\t\tupstreamStatus`,
+      `\t\tclientId`,
       `\t}`,
       `}`
     ].join('\n')
@@ -98,14 +119,15 @@ describe('tieredCacheServices', () => {
           id: 'mocked-timestamp',
           configurationId: fixtures.tieredCache.configurationId,
           host: fixtures.tieredCache.host,
-          requestUri: fixtures.tieredCache.requestUri,
-          requestMethod: fixtures.tieredCache.requestMethod,
-          upstreamCacheStatus: {
-            content: fixtures.tieredCache.upstreamCacheStatus,
-            severity: 'info'
-          },
           proxyHost: fixtures.tieredCache.proxyHost,
-          source: fixtures.tieredCache.source,
+          summary: [
+            { key: 'configurationId', value: fixtures.tieredCache.configurationId },
+            { key: 'host', value: fixtures.tieredCache.host },
+            { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
+            { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
+            { key: 'requestUri', value: fixtures.tieredCache.requestUri },
+            { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus }
+          ],
           ts: fixtures.tieredCache.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }

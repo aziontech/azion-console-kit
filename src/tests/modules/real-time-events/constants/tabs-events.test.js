@@ -31,7 +31,6 @@ describe('RealTimeEventsModule', () => {
         expect(tab).toHaveProperty('dataset')
         expect(tab).toHaveProperty('tabRouter')
         expect(tab).toHaveProperty('columns')
-        expect(tab).toHaveProperty('customColumnMapper')
       })
     })
 
@@ -55,54 +54,19 @@ describe('RealTimeEventsModule', () => {
       expect(httpRequests.title).toBe('HTTP Requests')
       expect(httpRequests.dataset).toBe('httpEvents')
       expect(httpRequests.tabRouter).toBe('http-requests')
-      expect(httpRequests.columns.length).toBe(6)
+      expect(httpRequests.columns.length).toBe(2)
     })
 
     it('should have the correct columns for each tab', () => {
       const expectedColumns = {
-        httpRequests: [
-          'tsFormat',
-          'configurationId',
-          'host',
-          'requestMethod',
-          'status',
-          'requestUri'
-        ],
-        edgeFunctions: [
-          'tsFormat',
-          'configurationId',
-          'functionLanguage',
-          'edgeFunctionsInitiatorTypeList',
-          'edgeFunctionsList',
-          'edgeFunctionsTime'
-        ],
-        edgeFunctionsConsole: [
-          'tsFormat',
-          'configurationId',
-          'functionId',
-          'lineSource',
-          'level',
-          'line'
-        ],
-        imageProcessor: [
-          'tsFormat',
-          'configurationId',
-          'host',
-          'status',
-          'bytesSent',
-          'requestUri'
-        ],
-        tieredCache: [
-          'tsFormat',
-          'configurationId',
-          'host',
-          'requestMethod',
-          'upstreamCacheStatus',
-          'requestUri'
-        ],
-        edgeDNS: ['tsFormat', 'level', 'zoneId', 'qtype', 'resolutionType', 'solutionId'],
-        dataStream: ['tsFormat', 'configurationId', 'jobName', 'endpointType', 'url', 'statusCode'],
-        activityHistory: ['tsFormat', 'userIp', 'authorName', 'title', 'resourceType', 'resourceId']
+        httpRequests: ['tsFormat', 'summary'],
+        edgeFunctions: ['tsFormat', 'summary'],
+        edgeFunctionsConsole: ['tsFormat', 'summary'],
+        imageProcessor: ['tsFormat', 'summary'],
+        tieredCache: ['tsFormat', 'summary'],
+        edgeDNS: ['tsFormat', 'summary'],
+        dataStream: ['tsFormat', 'summary'],
+        activityHistory: ['tsFormat', 'summary']
       }
 
       Object.entries(TABS_EVENTS).forEach(([tabName, tabData]) => {
@@ -116,7 +80,7 @@ describe('RealTimeEventsModule', () => {
         const tsFormatColumn = tabData.columns.find((column) => column.field === 'tsFormat')
         expect(tsFormatColumn).toBeDefined()
         expect(tsFormatColumn.field).toBe('tsFormat')
-        expect(tsFormatColumn.header).toBe('TS')
+        expect(tsFormatColumn.header).toBe('Time')
       })
     })
   })
