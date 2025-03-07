@@ -94,7 +94,6 @@ const adaptResponse = (httpResponse) => {
     upstreamResponseTime: httpEventItem.upstreamResponseTime,
     wafTotalProcessed: httpEventItem.wafTotalProcessed,
     configurationId: httpEventItem.configurationId,
-    source: httpEventItem.source,
     requestTime: httpEventItem.requestTime,
     tcpinfoRtt: httpEventItem.tcpinfoRtt,
     requestLength: httpEventItem.requestLength,

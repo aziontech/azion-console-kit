@@ -63,9 +63,10 @@
     <template #header>
       <h2 class="text-xl">{{ props.title }}</h2>
       <div class="flex gap-2 items-center">
-        <ConsoleFeedback />
+        <ConsoleFeedback styleTextColor="text-color" />
         <Button
           outlined
+          class="text-color"
           :icon="iconExpand"
           @click="handlePosition"
         ></Button>

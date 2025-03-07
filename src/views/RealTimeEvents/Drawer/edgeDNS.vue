@@ -75,6 +75,7 @@
           :date="details.ts"
           :tags="tags"
           :loading="loading"
+          hideDivider
         />
         <TabView
           class="w-full h-full"
@@ -84,7 +85,10 @@
             <TableEvents :data="details.data" />
           </TabPanel>
           <TabPanel header="Cards">
-            <InfoSection class="mt-4">
+            <InfoSection
+              class="mt-4"
+              hideDivider
+            >
               <template #body>
                 <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
                   <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">

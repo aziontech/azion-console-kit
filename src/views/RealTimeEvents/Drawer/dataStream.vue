@@ -81,6 +81,7 @@
           :date="details.ts"
           :tags="tags"
           :loading="loading"
+          hideDivider
         />
 
         <TabView
@@ -91,7 +92,10 @@
             <TableEvents :data="details.data" />
           </TabPanel>
           <TabPanel header="Cards">
-            <InfoSection class="mt-4">
+            <InfoSection
+              class="mt-4"
+              hideDivider
+            >
               <template #body>
                 <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
                   <BigNumber

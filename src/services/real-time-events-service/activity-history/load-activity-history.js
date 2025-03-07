@@ -23,7 +23,22 @@ const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
     limit: 10000,
-    fields: ['title', 'type', 'ts', 'authorName', 'accountId', 'userId', 'authorEmail', 'comment'],
+    fields: [
+      'userIp',
+      'authorName',
+      'title',
+      'resourceType',
+      'resourceId',
+      'userId',
+      'ts',
+      'comment',
+      'authorEmail',
+      'accountId',
+      'requestData',
+      'userAgent',
+      'remotePort',
+      'refererHeader'
+    ],
     orderBy: 'ts_ASC'
   }
   const formatFilter = {
