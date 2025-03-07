@@ -53,8 +53,7 @@ const adapt = (filter) => {
       'upstreamHeaderTime',
       'upstreamResponseTime',
       'upstreamStatus',
-      'clientId',
-      'source'
+      'clientId'
     ],
     orderBy: 'ts_ASC'
   }
@@ -64,7 +63,6 @@ const adapt = (filter) => {
     and: {
       configurationIdEq: filter.configurationId,
       tsEq: filter.ts,
-      sourceEq: filter.source,
       hostEq: filter.host,
       proxyHostEq: filter.proxyHost
     }

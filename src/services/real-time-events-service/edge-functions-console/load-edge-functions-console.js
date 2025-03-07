@@ -31,8 +31,7 @@ const adapt = (filter) => {
       'id',
       'solutionId',
       'functionId',
-      'configurationId',
-      'source'
+      'configurationId'
     ],
     orderBy: 'ts_ASC'
   }
@@ -41,7 +40,6 @@ const adapt = (filter) => {
     fields: filter.fields,
     and: {
       configurationIdEq: filter.configurationId,
-      sourceEq: filter.source,
       lineEq: filter.line
     }
   }

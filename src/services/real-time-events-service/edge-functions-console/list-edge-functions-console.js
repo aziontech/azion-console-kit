@@ -29,7 +29,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'cellsConsoleEvents',
     limit: 10000,
-    fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'source', 'ts', 'line'],
+    fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'ts', 'line'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -41,7 +41,6 @@ const adaptResponse = (body) => {
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
         summary: buildSummary(cellsConsoleEvents),
         configurationId: cellsConsoleEvents.configurationId,
-        source: cellsConsoleEvents.source,
         line: cellsConsoleEvents.line,
         id: generateCurrentTimestamp(),
         tsFormat: convertValueToDate(cellsConsoleEvents.ts),

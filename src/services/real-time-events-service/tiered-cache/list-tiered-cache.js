@@ -58,8 +58,7 @@ const adapt = (filter) => {
       'upstreamHeaderTime',
       'upstreamResponseTime',
       'upstreamStatus',
-      'clientId',
-      'source'
+      'clientId'
     ],
     orderBy: 'ts_ASC'
   }
@@ -71,7 +70,6 @@ const adaptResponse = (response) => {
 
   const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     configurationId: tieredCacheEvents.configurationId,
-    source: tieredCacheEvents.source,
     host: tieredCacheEvents.host,
     proxyHost: tieredCacheEvents.proxyHost,
     id: generateCurrentTimestamp(),
