@@ -60,7 +60,7 @@ const adapt = (filter) => {
       'upstreamStatus',
       'clientId'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }

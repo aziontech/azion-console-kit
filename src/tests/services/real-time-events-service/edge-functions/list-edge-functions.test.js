@@ -45,7 +45,7 @@ describe('EdgeFunctionsServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
