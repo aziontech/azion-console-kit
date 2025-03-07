@@ -10,9 +10,9 @@
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
-          @keydown.tab="onSelectSuggestionWithTab"
+          @keydown.tab.prevent="onSelectSuggestionWithTab"
           @input="handleInput"
-          placeholder="Digite sua Azion Query Language"
+          placeholder="Azion Query Language"
           @focus="showSuggestionsFocusInput = true"
           class="w-full"
           ref="ignoreClickOutside"
@@ -60,11 +60,23 @@
 
     <Listbox
       :options="filteredSuggestions"
+      ref="listboxRef"
       optionLabel="label"
       class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-2xl"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
     >
+      <template #option="slotProps">
+        <div
+          class="w-full rounded-md"
+          :class="[
+            'p-2 cursor-pointer',
+            { 'bg-blue-500 text-white': slotProps.index === highlightedIndex }
+          ]"
+        >
+          {{ slotProps.option.label }}
+        </div>
+      </template>
       <template
         #loader
         v-if="loading"
@@ -76,7 +88,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, nextTick } from 'vue'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
@@ -90,6 +102,7 @@
   const queryText = ref('')
   const currentStep = ref('field')
   const highlightedIndex = ref(0)
+  const listboxRef = ref(null)
   const domains = ref({})
   const loading = ref(false)
 
@@ -231,15 +244,29 @@
     highlightedIndex.value = 0
   }
 
+  const scrollToHighlighted = () => {
+    nextTick(() => {
+      const container = listboxRef.value?.$el || listboxRef.value
+      if (container) {
+        const highlightedItem = container.querySelector('.bg-blue-500')
+        if (highlightedItem) {
+          highlightedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        }
+      }
+    })
+  }
+
   const highlightNext = () => {
     if (highlightedIndex.value < filteredSuggestions.value.length - 1) {
       highlightedIndex.value++
+      scrollToHighlighted()
     }
   }
 
   const highlightPrev = () => {
     if (highlightedIndex.value > 0) {
       highlightedIndex.value--
+      scrollToHighlighted()
     }
   }
 
@@ -247,6 +274,8 @@
     const suggestion = filteredSuggestions.value[highlightedIndex.value]
     if (suggestion) {
       selectSuggestion(suggestion)
+    } else {
+      executeQuery()
     }
   }
 
