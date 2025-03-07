@@ -17,7 +17,14 @@ const FILTER_BLACK_LIST = [
   'actionIlike',
   'actionIn',
   'actionNotIn',
-  'actionIsNull'
+  'actionIsNull',
+  'sourceEq',
+  'sourceNe',
+  'sourceLike',
+  'sourceIlike',
+  'sourceIn',
+  'sourceNotIn',
+  'source'
 ]
 
 const SUPPORTED_FILTER_TYPE = ['String', 'Int', 'Float', 'IntRange', 'FloatRange', 'GenericScalar']

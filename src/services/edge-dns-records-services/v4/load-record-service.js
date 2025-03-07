@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadRecordsService = async ({ id, edgeDNSId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -13,6 +14,10 @@ export const loadRecordsService = async ({ id, edgeDNSId }) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const record = httpResponse.body.data
 
   const parsedRecord = {

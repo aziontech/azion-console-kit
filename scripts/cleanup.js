@@ -114,6 +114,8 @@ const deleteResources = async (
             `🗑️ Deleted resource: ${singleResourceUrl} - Status code: ${deleteResponse.status}`
           )
           deletedCount++
+          console.log(`⏳ Waiting for ${wait_time} seconds before continuing...`)
+          await setTimeout(wait_time * 1000)
         } catch (error) {
           console.error(`❌ Error deleting resource with ID ${resource.id}: ${error.message}`)
         }
@@ -126,9 +128,6 @@ const deleteResources = async (
       console.log('✅ No resources deleted in this iteration.')
       break
     }
-
-    console.log(`⏳ Waiting for ${wait_time} seconds before continuing...`)
-    await setTimeout(wait_time * 1000)
   }
 }
 

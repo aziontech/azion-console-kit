@@ -24,10 +24,20 @@
       id: accountId,
       client_id: clientId,
       email,
-      name
+      name,
+      kind: accountType,
+      status
     } = accountStore.account
 
-    const defaultTraits = { client_id: clientId, email, name, account_id: accountId }
+    const defaultTraits = {
+      client_id: clientId,
+      email,
+      account_id: accountId,
+      account_name: name,
+      account_type: accountType,
+      client_status: status
+    }
+
     tracker.assignGroupTraits(defaultTraits)
     tracker.identify(userID)
   }

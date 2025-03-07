@@ -83,6 +83,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '')
+        },
+        '/graphql/accounting': {
+          target: `${URLStartPrefix}manager.azion.com`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
         }
       }
     }

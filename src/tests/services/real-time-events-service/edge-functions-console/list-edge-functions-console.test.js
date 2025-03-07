@@ -16,7 +16,6 @@ const fixtures = {
     level: 'INFO',
     line: 42,
     lineSource: 'test linesource',
-    source: 'edge-functions-console.js',
     ts: '2024-02-23T18:07:25'
   }
 }
@@ -46,7 +45,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
@@ -55,10 +54,9 @@ describe('EdgeFunctionsConsoleServices', () => {
       `\t\tfunctionId`,
       `\t\tid`,
       `\t\tlevel`,
-      `\t\tline`,
       `\t\tlineSource`,
-      `\t\tsource`,
       `\t\tts`,
+      `\t\tline`,
       `\t}`,
       `}`
     ].join('\n')
@@ -94,17 +92,16 @@ describe('EdgeFunctionsConsoleServices', () => {
     expect(response).toEqual({
       data: [
         {
-          configurationId: fixtures.edgeFunctionConsole.configurationId,
-          functionId: fixtures.edgeFunctionConsole.functionId,
           id: 'mocked-timestamp',
-          level: {
-            content: 'Info',
-            severity: 'info',
-            icon: 'pi pi-info-circle'
-          },
+          configurationId: fixtures.edgeFunctionConsole.configurationId,
           line: fixtures.edgeFunctionConsole.line,
-          lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
-          source: fixtures.edgeFunctionConsole.source,
+          summary: [
+            { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
+            { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },
+            { key: 'level', value: fixtures.edgeFunctionConsole.level },
+            { key: 'line', value: fixtures.edgeFunctionConsole.line },
+            { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource }
+          ],
           ts: fixtures.edgeFunctionConsole.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }

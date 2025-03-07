@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -34,10 +35,10 @@ const adapt = (filter) => {
       'status',
       'bytesSent',
       'httpReferer',
-      'httpUserAgent',
-      'ts'
+      'ts',
+      'httpUserAgent'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
@@ -48,12 +49,9 @@ const adaptResponse = (response) => {
   const data = body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: imagesProcessedEvents.configurationId,
-    host: imagesProcessedEvents.host,
-    requestUri: imagesProcessedEvents.requestUri,
-    status: imagesProcessedEvents.status,
-    bytesSent: imagesProcessedEvents.bytesSent,
-    httpReferer: imagesProcessedEvents.httpReferer,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
+    httpReferer: imagesProcessedEvents.httpReferer,
+    summary: buildSummary(imagesProcessedEvents),
     ts: imagesProcessedEvents.ts,
     tsFormat: convertValueToDate(imagesProcessedEvents.ts)
   }))

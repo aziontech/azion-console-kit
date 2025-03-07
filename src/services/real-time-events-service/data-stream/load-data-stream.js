@@ -2,6 +2,7 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -29,7 +30,6 @@ const adapt = (filter) => {
       'streamedLines',
       'dataStreamed',
       'configurationId',
-      'source',
       'endpointType',
       'statusCode'
     ],
@@ -53,15 +53,10 @@ const adaptResponse = (response) => {
   return {
     url: dataStreamedEvents.url,
     ts: convertValueToDate(dataStreamedEvents.ts),
-    streamedLines: dataStreamedEvents.streamedLines,
-    dataStreamed: dataStreamedEvents.dataStreamed,
-    configurationId: dataStreamedEvents.configurationId,
-    source: dataStreamedEvents.source,
-    statusCode: dataStreamedEvents.statusCode,
-    endpointType: dataStreamedEvents.endpointType,
     jobName: {
       content: dataStreamedEvents.jobName,
       severity: 'info'
-    }
+    },
+    data: buildSummary(dataStreamedEvents)
   }
 }

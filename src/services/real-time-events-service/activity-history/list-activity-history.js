@@ -4,6 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
+import { buildSummary } from '@/helpers'
 
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -27,8 +28,23 @@ const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
     limit: 10000,
-    fields: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'userId', 'ts'],
-    orderBy: 'ts_ASC'
+    fields: [
+      'userIp',
+      'authorName',
+      'title',
+      'resourceType',
+      'resourceId',
+      'userId',
+      'ts',
+      'comment',
+      'authorEmail',
+      'accountId',
+      'requestData',
+      'userAgent',
+      'remotePort',
+      'refererHeader'
+    ],
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
@@ -38,11 +54,7 @@ const adaptResponse = (response) => {
 
   const data = body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
-    userIp: activityHistoryEvents.userIp,
-    authorName: activityHistoryEvents.authorName,
-    title: activityHistoryEvents.title,
-    resourceType: activityHistoryEvents.resourceType,
-    resourceId: activityHistoryEvents.resourceId,
+    summary: buildSummary(activityHistoryEvents),
     userId: activityHistoryEvents.userId,
     ts: activityHistoryEvents.ts,
     tsFormat: convertValueToDate(activityHistoryEvents.ts)

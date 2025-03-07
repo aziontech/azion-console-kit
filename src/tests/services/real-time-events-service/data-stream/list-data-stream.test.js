@@ -19,7 +19,6 @@ const fixtures = {
     statusCode: 'statusCode',
     ts: '2024-02-23T18:07:25',
     dataStreamed: 'dataStreamed',
-    source: 'source',
     streamedLines: 'streamedLines'
   }
 }
@@ -51,7 +50,7 @@ describe('DataStreamingServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
@@ -63,7 +62,6 @@ describe('DataStreamingServices', () => {
       `\t\tstatusCode`,
       `\t\tts`,
       `\t\tdataStreamed`,
-      `\t\tsource`,
       `\t\tstreamedLines`,
       `\t}`,
       `}`
@@ -102,16 +100,18 @@ describe('DataStreamingServices', () => {
     expect(response).toEqual({
       data: [
         {
-          id: 'mocked-timestamp',
           configurationId: fixtures.dataStreaming.configurationId,
-          jobName: { content: fixtures.dataStreaming.jobName, severity: 'info' },
-          endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
-          url: 'http://url.com',
-          statusCode: fixtures.dataStreaming.statusCode,
+          id: 'mocked-timestamp',
+          summary: [
+            { key: 'configurationId', value: fixtures.dataStreaming.configurationId },
+            { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },
+            { key: 'endpointType', value: fixtures.dataStreaming.endpointType },
+            { key: 'jobName', value: fixtures.dataStreaming.jobName },
+            { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
+            { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
+            { key: 'url', value: 'http://url.com' }
+          ],
           ts: fixtures.dataStreaming.ts,
-          dataStreamed: fixtures.dataStreaming.dataStreamed,
-          source: fixtures.dataStreaming.source,
-          streamedLines: fixtures.dataStreaming.streamedLines,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ]

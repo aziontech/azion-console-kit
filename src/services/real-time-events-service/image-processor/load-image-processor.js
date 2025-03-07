@@ -2,6 +2,7 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -67,29 +68,9 @@ const adaptResponse = (response) => {
   const { body } = response
   const [imagesProcessedEvents = {}] = body.data.imagesProcessedEvents
   return {
-    bytesSent: imagesProcessedEvents.bytesSent,
-    configurationId: imagesProcessedEvents.configurationId,
-    host: imagesProcessedEvents.host,
-    httpReferer: imagesProcessedEvents.httpReferer,
-    httpUserAgent: imagesProcessedEvents.httpUserAgent,
-    referenceError: imagesProcessedEvents.referenceError,
-    remoteAddr: imagesProcessedEvents.remoteAddr,
-    remotePort: imagesProcessedEvents.remotePort,
-    requestMethod: imagesProcessedEvents.requestMethod,
-    requestTime: imagesProcessedEvents.requestTime,
-    requestUri: imagesProcessedEvents.requestUri,
     scheme: imagesProcessedEvents.scheme?.toUpperCase(),
-    solution: imagesProcessedEvents.solution,
-    sslCipher: imagesProcessedEvents.sslCipher,
-    sslProtocol: imagesProcessedEvents.sslProtocol,
-    sslSessionReused: imagesProcessedEvents.sslSessionReused,
-    status: imagesProcessedEvents.status,
-    tcpinfoRtt: imagesProcessedEvents.tcpinfoRtt,
+    host: imagesProcessedEvents.host,
     ts: convertValueToDate(imagesProcessedEvents.ts),
-    upstreamCacheStatus: imagesProcessedEvents.upstreamCacheStatus,
-    upstreamResponseTime: imagesProcessedEvents.upstreamResponseTime,
-    upstreamResponseTimeStr: imagesProcessedEvents.upstreamResponseTimeStr,
-    upstreamStatus: imagesProcessedEvents.upstreamStatus,
-    upstreamStatusStr: imagesProcessedEvents.upstreamStatusStr
+    data: buildSummary(imagesProcessedEvents)
   }
 }
