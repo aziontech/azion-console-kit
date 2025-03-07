@@ -30,7 +30,6 @@ const adapt = (filter) => {
       'streamedLines',
       'dataStreamed',
       'configurationId',
-      'source',
       'endpointType',
       'statusCode'
     ],

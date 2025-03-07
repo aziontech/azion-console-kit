@@ -32,7 +32,6 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsInstanceIdList',
       'edgeFunctionsSolutionId',
-      'source',
       'virtualhostid',
       'configurationId'
     ],

@@ -17,7 +17,6 @@ const fixtures = {
     resolutionType: 'RESOLVED',
     solutionId: 'sol-123',
     ts: '2024-02-23T18:07:25.000Z',
-    source: 'internal',
     uuid: 'uuid-12345'
   }
 }
@@ -58,7 +57,6 @@ describe('edgeDns', () => {
       `\t\tresolutionType`,
       `\t\tsolutionId`,
       `\t\tts`,
-      `\t\tsource`,
       `\t\tuuid`,
       `\t\tstatusCode`,
       `\t\tversion`,
@@ -98,13 +96,11 @@ describe('edgeDns', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          source: fixtures.edgeDns.source,
           summary: [
             { key: 'level', value: fixtures.edgeDns.level },
             { key: 'qtype', value: fixtures.edgeDns.qtype },
             { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
             { key: 'solutionId', value: fixtures.edgeDns.solutionId },
-            { key: 'source', value: fixtures.edgeDns.source },
             { key: 'uuid', value: fixtures.edgeDns.uuid },
             { key: 'zoneId', value: fixtures.edgeDns.zoneId }
           ],

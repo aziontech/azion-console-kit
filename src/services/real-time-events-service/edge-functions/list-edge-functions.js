@@ -36,8 +36,7 @@ const adapt = (filter) => {
       'edgeFunctionsTime',
       'ts',
       'virtualhostid',
-      'edgeFunctionsInstanceIdList',
-      'source'
+      'edgeFunctionsInstanceIdList'
     ],
     orderBy: 'ts_ASC'
   }

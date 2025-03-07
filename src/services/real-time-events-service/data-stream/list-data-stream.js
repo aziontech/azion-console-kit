@@ -36,7 +36,6 @@ const adapt = (filter) => {
       'statusCode',
       'ts',
       'dataStreamed',
-      'source',
       'streamedLines'
     ],
     orderBy: 'ts_ASC'

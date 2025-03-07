@@ -82,7 +82,6 @@ describe('tieredCacheServices', () => {
       `\t\tupstreamResponseTime`,
       `\t\tupstreamStatus`,
       `\t\tclientId`,
-      `\t\tsource`,
       `\t}`,
       `}`
     ].join('\n')
@@ -120,7 +119,6 @@ describe('tieredCacheServices', () => {
         {
           id: 'mocked-timestamp',
           configurationId: fixtures.tieredCache.configurationId,
-          source: fixtures.tieredCache.source,
           host: fixtures.tieredCache.host,
           proxyHost: fixtures.tieredCache.proxyHost,
           summary: [

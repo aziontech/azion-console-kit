@@ -16,7 +16,6 @@ const fixtures = {
     level: 'INFO',
     line: 42,
     lineSource: 'test linesource',
-    source: 'edge-functions-console.js',
     ts: '2024-02-23T18:07:25'
   }
 }
@@ -56,7 +55,6 @@ describe('EdgeFunctionsConsoleServices', () => {
       `\t\tid`,
       `\t\tlevel`,
       `\t\tlineSource`,
-      `\t\tsource`,
       `\t\tts`,
       `\t\tline`,
       `\t}`,
@@ -96,15 +94,13 @@ describe('EdgeFunctionsConsoleServices', () => {
         {
           id: 'mocked-timestamp',
           configurationId: fixtures.edgeFunctionConsole.configurationId,
-          source: fixtures.edgeFunctionConsole.source,
           line: fixtures.edgeFunctionConsole.line,
           summary: [
             { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
             { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },
             { key: 'level', value: fixtures.edgeFunctionConsole.level },
             { key: 'line', value: fixtures.edgeFunctionConsole.line },
-            { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource },
-            { key: 'source', value: fixtures.edgeFunctionConsole.source }
+            { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource }
           ],
           ts: fixtures.edgeFunctionConsole.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'

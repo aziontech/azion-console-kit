@@ -31,7 +31,6 @@ const adapt = (filter) => {
       'statusCode',
       'resolutionType',
       'solutionId',
-      'source',
       'version'
     ],
     orderBy: 'ts_ASC'
@@ -41,7 +40,6 @@ const adapt = (filter) => {
     fields: filter.fields,
     and: {
       uuidEq: filter.uuid,
-      sourceEq: filter.source,
       tsEq: filter.ts
     }
   }

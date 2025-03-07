@@ -35,7 +35,6 @@ const adapt = (filter) => {
       'resolutionType',
       'solutionId',
       'ts',
-      'source',
       'uuid',
       'statusCode',
       'version'
@@ -53,8 +52,7 @@ const adaptResponse = (response) => {
     summary: buildSummary(edgeDnsQueriesEvents),
     ts: edgeDnsQueriesEvents.ts,
     tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
-    uuid: edgeDnsQueriesEvents.uuid,
-    source: edgeDnsQueriesEvents.source
+    uuid: edgeDnsQueriesEvents.uuid
   }))
 
   return {
