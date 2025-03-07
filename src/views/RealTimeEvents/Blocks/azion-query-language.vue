@@ -192,9 +192,24 @@
 
       if (!selectedField) return []
 
-      return selectedField.value.operator.map((op) => ({
-        label: op.value.format
-      }))
+      const fieldRegex = new RegExp(
+        `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
+        'i'
+      )
+      const operatorMatch = queryText.value.match(fieldRegex)
+      const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
+
+      return selectedField.value.operator
+        .filter((op) => {
+          if (op.value.format.toLowerCase() === 'in') return true
+          if (operatorAlreadyTyped && op.value.format.toLowerCase() === operatorAlreadyTyped) {
+            return false
+          }
+          return true
+        })
+        .map((op) => ({
+          label: op.value.format
+        }))
     } else if (currentStep.value === 'value') {
       if (selectedFieldName.value === 'domain') {
         return domains.value
