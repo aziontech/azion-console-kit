@@ -15,7 +15,6 @@ const fixtures = {
     level: 'ERROR',
     qtype: 'A',
     resolutionType: 'RESOLVED',
-    source: 'internal',
     solutionId: 'sol-123',
     ts: '2024-02-23T18:07:25.000Z',
     uuid: 'uuid-12345',
@@ -77,7 +76,6 @@ describe('ImageProcessorServices', () => {
         { key: 'qtype', value: fixtures.edgeDns.qtype },
         { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
         { key: 'solutionId', value: fixtures.edgeDns.solutionId },
-        { key: 'source', value: fixtures.edgeDns.source },
         { key: 'statusCode', value: fixtures.edgeDns.statusCode },
         { key: 'uuid', value: fixtures.edgeDns.uuid },
         { key: 'zoneId', value: fixtures.edgeDns.zoneId }

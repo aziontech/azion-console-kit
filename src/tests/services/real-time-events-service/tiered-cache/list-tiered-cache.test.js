@@ -17,7 +17,6 @@ const fixtures = {
     requestMethod: 'GET',
     upstreamCacheStatus: 'HIT',
     proxyHost: 'proxy.example.com',
-    source: 'CDN',
     ts: '2024-02-23T18:07:25.000Z'
   }
 }
@@ -127,7 +126,6 @@ describe('tieredCacheServices', () => {
             { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
             { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
             { key: 'requestUri', value: fixtures.tieredCache.requestUri },
-            { key: 'source', value: fixtures.tieredCache.source },
             { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus }
           ],
           ts: fixtures.tieredCache.ts,

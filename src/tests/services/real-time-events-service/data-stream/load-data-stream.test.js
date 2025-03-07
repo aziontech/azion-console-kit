@@ -16,7 +16,6 @@ const fixtures = {
     dataStreamed: 'dataStreamed',
     endpointType: 'endpointType',
     jobName: 'jobName',
-    source: 'source',
     statusCode: 'statusCode',
     streamedLines: 'streamedLines',
     ts: '2024-02-23T18:07:25',
@@ -80,7 +79,6 @@ describe('DataStreamingServices', () => {
         { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },
         { key: 'endpointType', value: fixtures.dataStreaming.endpointType },
         { key: 'jobName', value: 'jobName' },
-        { key: 'source', value: fixtures.dataStreaming.source },
         { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
         { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
         { key: 'url', value: fixtures.dataStreaming.url }

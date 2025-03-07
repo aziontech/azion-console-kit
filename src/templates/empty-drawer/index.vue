@@ -72,7 +72,7 @@
       <template #header>
         <h2>{{ title }}</h2>
         <div class="flex items-center gap-2">
-          <ConsoleFeedback />
+          <ConsoleFeedback styleTextColor="text-color" />
           <PrimeButton
             @click="toggleExpandDrawer"
             outlined

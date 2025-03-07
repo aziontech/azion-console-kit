@@ -131,41 +131,39 @@
   })
 
   const suggestionsData = computed(() => {
-    return (
-      props.fieldsInFilter
-        // .filter((item) => !item.label.includes('Domain'))
-        .map(({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
-          return {
+    return props.fieldsInFilter.map(
+      ({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
+        return {
+          label,
+          mostRelevant,
+          value: {
+            disabled,
+            description,
+            value,
             label,
-            mostRelevant,
-            value: {
-              disabled,
-              description,
-              value,
-              label,
-              operator: operator.map(
-                ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
-                  const {
+            operator: operator.map(
+              ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
+                const {
+                  value: valueLabel,
+                  label: labelOp,
+                  format
+                } = OPERATOR_MAPPING_ADVANCED_FILTER[valueOp]
+                return {
+                  label: labelOp,
+                  value: {
+                    disabled: disabledOp,
+                    placeholder,
                     value: valueLabel,
-                    label: labelOp,
-                    format
-                  } = OPERATOR_MAPPING_ADVANCED_FILTER[valueOp]
-                  return {
-                    label: labelOp,
-                    value: {
-                      disabled: disabledOp,
-                      placeholder,
-                      value: valueLabel,
-                      props,
-                      format,
-                      type
-                    }
+                    props,
+                    format,
+                    type
                   }
                 }
-              )
-            }
+              }
+            )
           }
-        })
+        }
+      }
     )
   })
 

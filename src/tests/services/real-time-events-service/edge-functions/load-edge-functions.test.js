@@ -20,7 +20,6 @@ const fixtures = {
     edgeFunctionsTime: new Date().toISOString(),
     functionLanguage: 'JavaScript',
     ts: '2024-02-23T18:07:25.000Z',
-    source: 'source',
     virtualhostid: 213
   }
 }
@@ -85,7 +84,6 @@ describe('DataStreamingServices', () => {
         { key: 'edgeFunctionsSolutionId', value: fixtures.edgeFunction.edgeFunctionsSolutionId },
         { key: 'edgeFunctionsTime', value: fixtures.edgeFunction.edgeFunctionsTime },
         { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage },
-        { key: 'source', value: fixtures.edgeFunction.source },
         { key: 'virtualhostid', value: fixtures.edgeFunction.virtualhostid }
       ],
       ts: 'February 23, 2024 at 06:07:25 PM'

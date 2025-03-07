@@ -41,8 +41,7 @@ const fixtures = {
     upstreamConnectTime: 0.1,
     upstreamHeaderTime: 0.2,
     upstreamResponseTime: 0.3,
-    upstreamStatus: 200,
-    source: 'CDN'
+    upstreamStatus: 200
   }
 }
 
@@ -115,7 +114,6 @@ describe('tieredCacheServices', () => {
         { key: 'sentHttpContentType', value: fixtures.tieredCache.sentHttpContentType },
         { key: 'serverProtocol', value: fixtures.tieredCache.serverProtocol },
         { key: 'solution', value: fixtures.tieredCache.solution },
-        { key: 'source', value: fixtures.tieredCache.source },
         { key: 'status', value: fixtures.tieredCache.status },
         { key: 'tcpinfoRtt', value: fixtures.tieredCache.tcpinfoRtt },
         { key: 'upstreamBytesReceived', value: fixtures.tieredCache.upstreamBytesReceived },
