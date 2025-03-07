@@ -39,7 +39,7 @@ const adapt = (filter) => {
       'statusCode',
       'version'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }

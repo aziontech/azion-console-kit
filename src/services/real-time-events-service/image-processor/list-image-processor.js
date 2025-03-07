@@ -38,7 +38,7 @@ const adapt = (filter) => {
       'ts',
       'httpUserAgent'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }

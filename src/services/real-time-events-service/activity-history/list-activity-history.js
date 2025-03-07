@@ -44,7 +44,7 @@ const adapt = (filter) => {
       'remotePort',
       'refererHeader'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }

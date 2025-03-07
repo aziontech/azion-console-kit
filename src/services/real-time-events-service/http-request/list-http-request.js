@@ -50,7 +50,7 @@ const adapt = (filter) => {
       'serverAddr',
       'scheme'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }

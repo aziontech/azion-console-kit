@@ -38,7 +38,7 @@ const adapt = (filter) => {
       'virtualhostid',
       'edgeFunctionsInstanceIdList'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
