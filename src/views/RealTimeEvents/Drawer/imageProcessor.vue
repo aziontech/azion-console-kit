@@ -82,6 +82,7 @@
           :date="details.ts"
           :tags="schemeTag"
           :loading="loading"
+          hideDivider
         />
         <TabView
           class="w-full h-full"
@@ -92,7 +93,7 @@
           </TabPanel>
           <TabPanel header="Cards">
             <div class="w-full flex flex-col gap-8 max-md:gap-6 mt-4">
-              <InfoSection>
+              <InfoSection hideDivider>
                 <template #body>
                   <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
                     <div class="flex flex-col w-full sm:w-5/12 gap-3 flex-1">

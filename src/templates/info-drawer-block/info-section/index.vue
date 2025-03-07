@@ -5,6 +5,9 @@
 
   defineOptions({ name: 'info-section' })
   const props = defineProps({
+    hideDivider: {
+      type: Boolean
+    },
     date: {
       type: String
     },
@@ -65,7 +68,7 @@
       class="w-full h-12 mt-7"
     />
 
-    <Divider v-if="!loading && props.title" />
+    <Divider v-if="!loading && !props.hideDivider" />
     <slot name="body"></slot>
   </div>
 </template>

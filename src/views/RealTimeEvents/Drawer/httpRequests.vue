@@ -91,6 +91,7 @@
           :date="details.ts"
           :tags="hostTag"
           :loading="loading"
+          hideDivider
         />
         <TabView
           class="w-full h-full"
@@ -101,7 +102,10 @@
           </TabPanel>
           <TabPanel header="Cards">
             <div class="w-full flex flex-col gap-8 max-md:gap-6">
-              <InfoSection class="mt-4">
+              <InfoSection
+                class="mt-4"
+                hideDivider
+              >
                 <template #body>
                   <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
                     <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
