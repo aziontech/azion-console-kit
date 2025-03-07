@@ -32,28 +32,28 @@
           v-if="formattedQuery.includes('quote-error')"
           class="p-error text-xs font-normal leading-tight"
         >
-          Atenção: os campos compostos devem ser incluídos entre aspas. Exemplo: "Upstream Status".
+          Attention: composite fields must be included in quotes. e.g: "Upstream Status".
         </small>
         <small
           v-if="formattedQuery.includes('not-exists-field-error')"
           class="p-error text-xs font-normal leading-tight"
         >
-          Atenção: alguns campos fornecidos não correspondem aos disponíveis atualmente. Por favor,
-          verifique e tente novamente.
+          Attention: some provided fields do not match the currently available ones. Please, check
+          and try again.
         </small>
         <small
           v-if="formattedQuery.includes('in-operator-parentheses-error')"
           class="p-error text-xs font-normal leading-tight"
         >
-          Atenção: existe campos com operador in que precisam está dentro de parênteses. Por favor,
-          verifique e tente novamente. ex: domain in (domain1, domain2)
+          Attention: there are fields with 'in' operator that need to be inside parentheses. Please,
+          check and try again. e.g: domain in (domain1, domain2)
         </small>
         <small
           v-if="formattedQuery.includes('in-operator-trailing-comma-error')"
           class="p-error text-xs font-normal leading-tight"
         >
-          Atenção: campos com operador in que precisa ser removido a virgula no final dos valores em
-          pareênteses. Por favor, verifique e tente novamente.
+          Attention: fields with 'in' operator that need the comma removed at the end of the values
+          in parentheses. Please, check and try again.
         </small>
       </div>
     </div>
@@ -71,7 +71,7 @@
           class="w-full rounded-md"
           :class="[
             'p-2 cursor-pointer',
-            { 'bg-blue-500 text-white': slotProps.index === highlightedIndex }
+            { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
           ]"
         >
           {{ slotProps.option.label }}

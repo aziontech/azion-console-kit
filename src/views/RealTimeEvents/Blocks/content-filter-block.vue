@@ -32,7 +32,7 @@
     filter.value.isUserUsingGraphqlQuery = false
   })
 
-  const filterMode = ref('Advanced')
+  const filterMode = ref('Wizard')
   const options = ref(['Wizard', 'Advanced'])
 
   const filter = computed({
@@ -64,7 +64,7 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+    <div class="flex flex-col gap-2 md:flex-row justify-between">
       <div class="w-full">
         <IntervalFilterBlock
           v-model:filterDate="filter.tsRange"
@@ -84,7 +84,7 @@
       aria-labelledby="basic"
       class="w-fit"
     />
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
+    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-baseline">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
