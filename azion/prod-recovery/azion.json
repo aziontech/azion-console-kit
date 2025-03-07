@@ -1,0 +1,177 @@
+{
+  "name": "console-recovery-2024-12-05",
+  "bucket": "console-recovery-2024-12-05",
+  "preset": "vue",
+  "mode": "deliver",
+  "env": "production",
+  "prefix": "20241205093530",
+  "not-first-run": true,
+  "function": {
+    "id": 33277,
+    "name": "__DEFAULT__",
+    "file": ".edge/worker.js",
+    "args": "azion/prod-recovery/args.json",
+    "instance-id": 32005,
+    "instance-name": "__DEFAULT__",
+    "cache-id": 0
+  },
+  "application": {
+    "id": 1733402149,
+    "name": "__DEFAULT__"
+  },
+  "domain": {
+    "id": 1733407786,
+    "name": "console-recovery-2024-12-05",
+    "domain_name": "gu1kbeuq0v.map.azionedge.net",
+    "url": "https://gu1kbeuq0v.map.azionedge.net"
+  },
+  "rt-purge": {
+    "purge_on_publish": true
+  },
+  "origin": [
+    {
+      "origin-id": 171000,
+      "origin-key": "75f0c9e3-a051-4d34-80af-fb54075c83b7",
+      "name": "origin-storage-default"
+    },
+    {
+      "origin-id": 171001,
+      "origin-key": "aafdd126-aa1d-4b61-b90a-2a44fef231dd",
+      "name": "origin-manager"
+    },
+    {
+      "origin-id": 171002,
+      "origin-key": "b1e91a2a-3061-4e89-8d4f-55d647f4a741",
+      "name": "origin-marketplace"
+    },
+    {
+      "origin-id": 171003,
+      "origin-key": "bde36cbc-3cf3-4059-81b4-b8f5f349c0d5",
+      "name": "origin-cities"
+    },
+    {
+      "origin-id": 171004,
+      "origin-key": "dc0ee69c-bec9-4a45-be1e-63471bf33dd1",
+      "name": "origin-sso"
+    },
+    {
+      "origin-id": 171005,
+      "origin-key": "e4439a3f-ff24-491f-92cd-dada322e4df0",
+      "name": "origin-api"
+    },
+    {
+      "origin-id": 171006,
+      "origin-key": "095cf35e-44c7-487c-b873-48bef29daace",
+      "name": "origin-console-feedback"
+    }
+  ],
+  "rules-engine": {
+    "created": false,
+    "rules": [
+      {
+        "id": 331561,
+        "name": "Apply Common Configuration for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 331562,
+        "name": "Set Storage Origin for All Requests",
+        "phase": "request"
+      },
+      {
+        "id": 331563,
+        "name": "Deliver Static Assets from Storage",
+        "phase": "request"
+      },
+      {
+        "id": 331564,
+        "name": "Redirect All Non-Asset Requests to to index.html",
+        "phase": "request"
+      },
+      {
+        "id": 331565,
+        "name": "Route API Default Requests to API Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331566,
+        "name": "Route Specific API Services to Marketplace Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331567,
+        "name": "Route Specific API Services to Template Engine Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331568,
+        "name": "Route Specific API Services to Script Runner Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331569,
+        "name": "Route User Authentication and Account Management to SSO Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331570,
+        "name": "Route GraphQL City Queries to Cities Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331571,
+        "name": "Route GraphQL Billing Queries to Manager Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331572,
+        "name": "Route GraphQL Accounting Queries to Manager Origin",
+        "phase": "request"
+      },
+      {
+        "id": 331573,
+        "name": "Route Send Feedback",
+        "phase": "request"
+      },
+      {
+        "id": 331574,
+        "name": "Route API Identity Providers",
+        "phase": "request"
+      },
+      {
+        "id": 331575,
+        "name": "Rewrite _azrt Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 331576,
+        "name": "Rewrite azsid Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 331577,
+        "name": "Rewrite _azat Cookie",
+        "phase": "response"
+      },
+      {
+        "id": 331578,
+        "name": "Secure Headers",
+        "phase": "response"
+      }
+    ]
+  },
+  "cache-settings": [
+    {
+      "id": 192777,
+      "name": "Statics - Cache"
+    },
+    {
+      "id": 192778,
+      "name": "Marketplace - Cache"
+    },
+    {
+      "id": 192779,
+      "name": "Cities - Cache"
+    }
+  ]
+}
