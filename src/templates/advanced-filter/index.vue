@@ -84,16 +84,10 @@
     refDialogFilter.value.show(item)
   }
 
-  const removeItemFilter = (position) => {
-    displayFilter.value.splice(position, 1)
-
-    const adaptFilter = adapterApply(displayFilter.value)
-    emit('update:filterAdvanced', adaptFilter)
-    emit('applyFilter', adaptFilter)
-
-    if (props.hashUpdatable) {
-      updateHash(adaptFilter, props.externalFilter)
-    }
+  const removeItemFilter = (index, event) => {
+    refDialogFilter.value.hide(event)
+    displayFilter.value.splice(index, 1)
+    searchFilter()
   }
 
   const removeValueItemFilter = (index, idx, event) => {
@@ -116,14 +110,6 @@
 
   const updateFilter = (value) => {
     setFilter(value)
-
-    const adaptFilter = adapterApply(displayFilter.value)
-    emit('update:filterAdvanced', adaptFilter)
-    emit('applyFilter', adaptFilter)
-
-    if (props.hashUpdatable) {
-      updateHash(adaptFilter, props.externalFilter)
-    }
   }
 
   const adapterApply = (displayFilter) => {
@@ -271,6 +257,7 @@
   })
 
   defineExpose({
+    displayFilter,
     clearDisplayFilter,
     clearSpecificFilter
   })

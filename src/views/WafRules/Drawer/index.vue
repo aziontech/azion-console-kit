@@ -140,6 +140,16 @@
   const setNetworkListSelectedOption = (value) => {
     selectedFilter.value.network = value
 
+    const displayFilters = advancedFilterRef.value?.displayFilter || []
+
+    const hasIpFilter = displayFilters.some(
+      (item) => item.valueField === 'ip_address' && item.value && item.value !== ''
+    )
+
+    const hasCountryFilter = displayFilters.some(
+      (item) => item.valueField === 'country' && Array.isArray(item.value) && item.value.length > 0
+    )
+
     listFields.value = listFields.value.map((item) => {
       if (item.value === 'ip_address') {
         return {
@@ -158,44 +168,22 @@
       return item
     })
 
-    const hasIpFilter = selectedFilterAdvanced.value.some(
-      (item) => item.valueField === 'ip_address'
-    )
-
-    const hasCountryFilter = selectedFilterAdvanced.value.some(
-      (item) => item.valueField === 'country'
-    )
-
-    if (value?.value?.disabledIP) {
-      const validFilters = selectedFilterAdvanced.value.filter(
-        (item) => item.valueField !== 'ip_address'
-      )
+    if (value?.value?.disabledIP && hasIpFilter) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'The ip address field cannot be used together with an IP/CIDR Network List filter.'
+      })
       advancedFilterRef.value?.clearSpecificFilter('ip_address')
-      selectedFilterAdvanced.value = validFilters
-
-      if (hasIpFilter) {
-        toast.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'The ip addres field cannot be used together with an IP/CIDR Network List filter.'
-        })
-      }
     }
 
-    if (value?.value?.disabledCountries) {
-      const validFilters = selectedFilterAdvanced.value.filter(
-        (item) => item.valueField !== 'country'
-      )
+    if (value?.value?.disabledCountries && hasCountryFilter) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'The country field cannot be used together with a Country Network List filter.'
+      })
       advancedFilterRef.value?.clearSpecificFilter('country')
-      selectedFilterAdvanced.value = validFilters
-
-      if (hasCountryFilter) {
-        toast.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'The country field cannot be used together with a Country Network List filter.'
-        })
-      }
     }
 
     filterTuning()

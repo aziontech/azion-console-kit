@@ -56,6 +56,7 @@
     <div class="flex flex-col md:flex-row md:items-center gap-2">
       <advancedFilter
         ref="advancedFilterRef"
+        :hashUpdatable="false"
         v-model:externalFilter="selectedFilter"
         v-model:filterAdvanced="selectedFilterAdvanced"
         :fieldsInFilter="listFields"
@@ -375,11 +376,14 @@
       return item
     })
 
-    const hasIpFilter = selectedFilterAdvanced.value.some(
-      (item) => item.valueField === 'ip_address'
+    const displayFilters = advancedFilterRef.value?.displayFilter || []
+
+    const hasIpFilter = displayFilters.some(
+      (item) => item.valueField === 'ip_address' && item.value && item.value !== ''
     )
-    const hasCountryFilter = selectedFilterAdvanced.value.some(
-      (item) => item.valueField === 'country'
+
+    const hasCountryFilter = displayFilters.some(
+      (item) => item.valueField === 'country' && Array.isArray(item.value) && item.value.length > 0
     )
 
     if (value?.value?.disabledIP) {
