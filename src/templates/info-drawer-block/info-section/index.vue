@@ -61,7 +61,7 @@
     </div>
 
     <Skeleton
-      v-else-if="props.title"
+      v-else-if="loading"
       class="w-full h-12 mt-7"
     />
 
