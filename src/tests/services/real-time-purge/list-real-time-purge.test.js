@@ -28,6 +28,7 @@ const purge = [
 const fixtures = {
   realTimePurgeMock: {
     arguments: ['www.vicva.com'],
+    disabled: false,
     layer: 'edge_cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
@@ -69,7 +70,7 @@ describe('ListRealTimePurgeService', () => {
     )
     const payload = {
       operatioName: 'ActivityHistory',
-      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard"] }, orderBy: [ts_DESC] ) { resourceType
+      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} resourceTypeIn: ["Purge:cachekey", "Purge:url", "Purge:wildcard", "Purge:l2cachekey"] }, orderBy: [ts_DESC] ) { resourceType
       ts
       title
       comment
@@ -105,6 +106,7 @@ describe('ListRealTimePurgeService', () => {
         id: idExpected,
         type: 'URL',
         arguments: fixtures.realTimePurgeMock.arguments,
+        disabled: false,
         layer: 'Edge Cache',
         user: fixtures.realTimePurgeMock.user,
         time: fixtures.realTimePurgeMock.time

@@ -127,6 +127,7 @@
       type: 'dialog',
       label: 'Repurge',
       icon: 'pi pi-refresh',
+      disabled: (rowData) => rowData.disabled,
       dialog: {
         component: DialogPurge,
         body: (item) => ({
