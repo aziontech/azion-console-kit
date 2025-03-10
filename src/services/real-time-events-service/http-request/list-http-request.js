@@ -71,3 +71,5 @@ const adaptResponse = (httpResponse) => {
     data
   }
 }
+
+
