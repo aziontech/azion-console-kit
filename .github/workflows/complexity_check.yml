@@ -1,0 +1,96 @@
+name: SCC Complexity Check
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  scc-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies and SCC
+        run: |
+          # Ensure jq and curl are installed
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+          # Verify jq and curl installation
+          jq --version
+          curl --version
+
+          # Create bin directory if it doesn't exist
+          mkdir -p $HOME/bin
+
+          # Download and install SCC - using the latest release URL
+          LATEST_SCC_VERSION=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest | jq -r '.tag_name')
+          curl -sSLf https://github.com/boyter/scc/releases/download/${LATEST_SCC_VERSION}/scc_Linux_x86_64.tar.gz -o scc.tar.gz
+
+          mkdir -p scc_temp && tar -xzf scc.tar.gz -C scc_temp
+          mv scc_temp/scc $HOME/bin/
+          rm -rf scc_temp scc.tar.gz
+          chmod +x $HOME/bin/scc
+          export PATH=$HOME/bin:$PATH
+          echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+
+          # Verify SCC installation
+          scc --version
+
+      # Checkout target branch (base_ref)
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          fetch-depth: 0
+
+      - name: Debug target branch SCC
+        run: scc
+
+      - name: Calculate target branch complexity
+        id: target-complexity
+        run: |
+          echo "TARGET_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
+          echo "TARGET_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
+
+      # Checkout source branch (head_ref)
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Debug source branch SCC
+        run: scc
+
+      - name: Calculate source branch complexity
+        id: source-complexity
+        run: |
+          echo "SOURCE_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
+          echo "SOURCE_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
+
+      - name: Calculate differences
+        id: calculate-diff
+        run: |
+          echo "COMPLEXITY_DIFF=$(($SOURCE_COMPLEXITY - $TARGET_COMPLEXITY))" >> $GITHUB_ENV
+          echo "CODE_DIFF=$(($SOURCE_CODE - $TARGET_CODE))" >> $GITHUB_ENV
+
+      - name: Add PR comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo } } = context;
+
+            github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `## SCC Complexity Analysis
+            - Title: ${{ github.event.pull_request.title }}
+            - Author: ${{ github.event.pull_request.user.login }}
+
+            | Metric | Source Branch (${{ github.head_ref }}) | Target Branch (${{ github.base_ref }}) | Difference |
+            |--------|--------------|--------------|------------|
+            | Complexity | ${{ env.SOURCE_COMPLEXITY }} | ${{ env.TARGET_COMPLEXITY }} | ${{ env.COMPLEXITY_DIFF }} |
+            | Code | ${{ env.SOURCE_CODE }} | ${{ env.TARGET_CODE }} | ${{ env.CODE_DIFF }} |`
+            });
