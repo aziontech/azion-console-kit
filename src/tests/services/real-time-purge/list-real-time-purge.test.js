@@ -32,7 +32,7 @@ const fixtures = {
     layer: 'edge_cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
-    user: 'paulo.ferreira+teste1@azion.com',
+    user: 'paulo.ferreira+teste1@azion.com'
   }
 }
 

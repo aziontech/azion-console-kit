@@ -1,9 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEventsListBaseUrl } from './make-events-list-service'
 import graphQLApi from '../axios/makeEventsApi'
-
-const DEFAULT_VALUE = '-';
-const DATE_LOCALE = 'us'
+import { formatExhibitionDate } from '@/helpers/convert-date'
 
 export const listRealTimePurgeService = async (
   apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
@@ -50,18 +48,16 @@ const MAPTYPE = {
   url: 'URL'
 }
 
-const formatDate = (timestamp) => {
-  return new Intl.DateTimeFormat(DATE_LOCALE, {
-    dateStyle: 'full',
-    timeStyle: 'short'
-  }).format(new Date(timestamp))
-}
-
 const adapt = (httpResponse) => {
+  const DEFAULT_VALUE = '-'
+
   const requestData = httpResponse.body.data?.activityHistoryEvents.map((item, index) => {
     const id = `${item.ts}-${index}`
     const [, type] = item.resourceType.split(':')
-    const data = item?.requestData && item?.requestData !== DEFAULT_VALUE ? JSON.parse(JSON.parse(item.requestData)) : null
+    const data =
+      item?.requestData && item?.requestData !== DEFAULT_VALUE
+        ? JSON.parse(JSON.parse(item.requestData))
+        : null
 
     return {
       id,
@@ -70,7 +66,7 @@ const adapt = (httpResponse) => {
       layer: data?.layer ? MAPLAYER[data.layer] : DEFAULT_VALUE,
       user: item.authorEmail,
       disabled: !data,
-      time: formatDate(item.ts)
+      time: formatExhibitionDate(item.ts, 'full', 'short')
     }
   })
   return {
