@@ -2,7 +2,7 @@ name: SCC Complexity Check
 
 on:
   pull_request:
-    branches: [main, dev]
+    branches: [main]
 
 jobs:
   scc-check:
