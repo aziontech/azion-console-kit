@@ -34,7 +34,7 @@
     },
     {
       label: 'Get Assistance (Support)',
-      link: 'https://azion.freshworks.com/login/auth/1621629799053?client_id=41441690836303948&redirect_uri=https://tickets.azion.com/freshid/customer_authorize_callback',
+      open: 'copilot',
       isLinkExternal: true
     }
   ])
