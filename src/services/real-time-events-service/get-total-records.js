@@ -1,12 +1,9 @@
 import { convertGQLTotalRecords } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
-import { useGraphQLStore } from '@/stores/graphql-query'
 
 export const getTotalRecords = async ({ filter, dataset }) => {
   const payload = adapt(filter, dataset)
-  const graphqlStore = useGraphQLStore()
-  graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
