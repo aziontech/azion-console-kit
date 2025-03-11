@@ -47,7 +47,7 @@ const getConfig = () => {
         '^/api/template-engine': {
           target: `${URLStartPrefix}template-engine.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/template-engine/, '/api')
+          rewrite: (path) => path.replace(/^\/api\/template-engine/, '/template-engine/api')
         },
         '^/api/iam': {
           target: `${URLStartPrefix}iam-api.azion.net/`,

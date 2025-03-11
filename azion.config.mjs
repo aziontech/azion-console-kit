@@ -277,7 +277,7 @@ const config = {
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/api/%{captured[1]}`,
+          rewrite: `/template-engine/api/%{captured[1]}`,
           bypassCache: true
         }
       },
