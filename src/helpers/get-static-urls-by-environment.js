@@ -2,16 +2,16 @@ import { getEnvironment } from './get-environment'
 
 const urls = {
   manager: {
-    stage: 'https://stage-manager.azion.com',
-    production: 'https://manager.azion.com'
+    stage: 'https://stage-console.azion.com',
+    production: 'https://console.azion.com'
   },
   managerEOL: {
-    stage: 'https://stage-manager.azion.com/home',
-    production: 'https://manager.azion.com/home'
+    stage: 'https://stage-console.azion.com/home',
+    production: 'https://console.azion.com/home'
   },
   billing: {
-    stage: 'https://stage-manager.azion.com/billing-subscriptions',
-    production: 'https://manager.azion.com/billing-subscriptions'
+    stage: 'https://stage-console.azion.com/billing-subscriptions',
+    production: 'https://console.azion.com/billing-subscriptions'
   },
   playgroundMetrics: {
     stage: 'https://stage-api.azion.com/v4/metrics/graphql',
