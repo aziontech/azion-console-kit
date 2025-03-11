@@ -158,7 +158,7 @@
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied'])
 
   const PAGE_INCREMENT = 1
   const PAGE_SIZE = 100
@@ -172,6 +172,7 @@
   const slots = useSlots()
   const data = ref([])
   const loading = ref(false)
+  const hasEdgeFirewallAccess = ref(true)
   const totalCount = ref(0)
   const page = ref(INITIAL_PAGE)
   const search = ref('')
@@ -273,6 +274,9 @@
 
         data.value = [...data.value, ...uniqueResults]
       }
+    } catch (error) {
+      hasEdgeFirewallAccess.value = false
+      emit('onAccessDenied')
     } finally {
       loading.value = false
     }

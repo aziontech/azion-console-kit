@@ -70,6 +70,7 @@
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
+  const hasEdgeFirewallAccess = ref(true)
 
   const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
@@ -81,6 +82,10 @@
 
   const openDrawerEdgeFirewall = () => {
     drawerEdgeFirewallRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
   }
 
   const handleEdgeApplicationCreated = (id) => {
@@ -240,6 +245,8 @@
           name="edgeFirewall"
           :service="listEdgeFirewallService"
           :loadService="loadEdgeFirewallService"
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
