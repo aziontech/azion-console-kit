@@ -368,7 +368,7 @@ const config = {
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/api/%{captured[1]}`
+          rewrite: `/iam/api/%{captured[1]}`
         }
       }
     ],

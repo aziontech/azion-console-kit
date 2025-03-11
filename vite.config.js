@@ -52,7 +52,7 @@ const getConfig = () => {
         '^/api/iam': {
           target: `${URLStartPrefix}iam-api.azion.net/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/iam/, '/dapi')
+          rewrite: (path) => path.replace(/^\/api\/iam/, '/iam/api')
         },
         '^/api/vcs': { 
           target: `${URLStartPrefix}vcs-api.azion.net/`,
