@@ -92,10 +92,22 @@ const config = {
         type: 'object_storage'
       },
       {
-        name: 'origin-manager',
+        name: 'origin-script-runner',
         type: 'single_origin',
-        hostHeader: `manager.azion.com`,
-        addresses: [`manager.azion.com`]
+        hostHeader: `script-runner.azion.com`,
+        addresses: [`script-runner.azion.com`]
+      },
+      {
+        name: 'origin-template-engine',
+        type: 'single_origin',
+        hostHeader: `template-engine.azion.com`,
+        addresses: [`template-engine.azion.com`]
+      },
+      {
+        name: 'origin-iam-api',
+        type: 'single_origin',
+        hostHeader: `iam-api.azion.net`,
+        addresses: [`iam-api.azion.net`]
       },
       {
         name: 'origin-marketplace',
@@ -252,11 +264,11 @@ const config = {
       {
         name: 'Route Specific API Services to Template Engine Origin',
         description:
-          'Routes template-engine API services to the manager origin, forwarding cookies and bypassing cache.',
+          'Routes template-engine API services to the template engine origin, forwarding cookies and bypassing cache.',
         match: '^/api/template-engine',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-template-engine',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -265,7 +277,7 @@ const config = {
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/template-engine/api/%{captured[1]}`,
+          rewrite: `/api/%{captured[1]}`,
           bypassCache: true
         }
       },
@@ -276,7 +288,7 @@ const config = {
         match: '^/api/script-runner',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-script-runner',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -285,7 +297,7 @@ const config = {
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/script-runner/api/%{captured[1]}`,
+          rewrite: `/api/%{captured[1]}`,
           bypassCache: true
         }
       },
@@ -348,7 +360,7 @@ const config = {
         behavior: {
           forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-iam-api',
             type: 'single_origin'
           },
           capture: {
@@ -356,7 +368,7 @@ const config = {
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/iam/api/%{captured[1]}`
+          rewrite: `/api/%{captured[1]}`
         }
       }
     ],
