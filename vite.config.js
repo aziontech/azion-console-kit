@@ -34,11 +34,25 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/(marketplace|script-runner|template-engine|iam)': {
-          target: `${URLStartPrefix}manager.azion.com/`,
+        '^/api/marketplace': {
+          target: `${URLStartPrefix}marketplace.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine|iam)/, '/$1/api')
+          rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
+        },
+        '^/api/script-runner': {
+          target: `${URLStartPrefix}script-runner.azion.com/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/script-runner/, '/api')
+        },
+        '^/api/template-engine': {
+          target: `${URLStartPrefix}template-engine.azion.com/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/template-engine/, '/api')
+        },
+        '^/api/iam': {
+          target: `${URLStartPrefix}iam-api.azion.net/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/iam/, '/api')
         },
         '^/api/vcs': {
           target: `${URLStartPrefix}vcs-api.azion.net/`,
@@ -85,7 +99,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/ai/, '')
         },
         '/graphql/accounting': {
-          target: `${URLStartPrefix}manager.azion.com`,
+          target: `${URLStartPrefix}console.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
         }
