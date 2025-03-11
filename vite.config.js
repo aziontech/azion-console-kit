@@ -42,7 +42,7 @@ const getConfig = () => {
         '^/api/script-runner': {
           target: `${URLStartPrefix}script-runner.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/script-runner/, '/api')
+          rewrite: (path) => path.replace(/^\/api\/script-runner/, '/script-runner/api')
         },
         '^/api/template-engine': {
           target: `${URLStartPrefix}template-engine.azion.com/`,
@@ -52,9 +52,9 @@ const getConfig = () => {
         '^/api/iam': {
           target: `${URLStartPrefix}iam-api.azion.net/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/iam/, '/api')
+          rewrite: (path) => path.replace(/^\/api\/iam/, '/dapi')
         },
-        '^/api/vcs': {
+        '^/api/vcs': { 
           target: `${URLStartPrefix}vcs-api.azion.net/`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
