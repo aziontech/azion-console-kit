@@ -1,3 +1,8 @@
+/**
+ * DEPRECATED: This module is no longer in use and has been deprecated.
+ * It was previously used to redirect users to the classic interface but is now obsolete.
+ */
+
 import { getEnvironment } from './get-environment'
 export const goToClassicInterface = () => {
   const environment = getEnvironment()
