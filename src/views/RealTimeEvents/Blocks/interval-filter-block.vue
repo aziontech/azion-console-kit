@@ -75,7 +75,7 @@
       updatedTimeRange(props.filterDate)
       return
     }
-    interval.value = intervalOptions[1]
+    interval.value = intervalOptions[0]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
     setDateTimeFilters(begin, end)
