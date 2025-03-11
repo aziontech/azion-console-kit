@@ -85,7 +85,7 @@ describe('BillingServices', () => {
           value: 'visa Ending in 4242'
         },
         disabled: false,
-        invoiceUrl: "https://console.azion.com/v4/billing/invoices/07-2024",
+        invoiceUrl: 'https://console.azion.com/v4/billing/invoices/07-2024',
         status: {
           content: 'Paid',
           icon: 'pi pi-check-circle',
@@ -172,7 +172,7 @@ describe('BillingServices', () => {
         },
         paymentDate: '07/01/2024',
         disabled: false,
-        invoiceUrl: "https://console.azion.com/v4/billing/invoices/07-2024"
+        invoiceUrl: 'https://console.azion.com/v4/billing/invoices/07-2024'
       }
     ])
   })
