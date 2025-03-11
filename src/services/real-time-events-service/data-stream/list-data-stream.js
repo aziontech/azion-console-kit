@@ -5,6 +5,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
+import * as Errors from '@/services/axios/errors'
 
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -21,7 +22,7 @@ export const listDataStream = async (filter) => {
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -44,9 +45,7 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const { body } = response
-
-  const data = body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+  const data = response.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     configurationId: dataStreamedEvents.configurationId,
     id: generateCurrentTimestamp(),
     summary: buildSummary(dataStreamedEvents),
@@ -56,5 +55,28 @@ const adaptResponse = (response) => {
 
   return {
     data
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
   }
 }
