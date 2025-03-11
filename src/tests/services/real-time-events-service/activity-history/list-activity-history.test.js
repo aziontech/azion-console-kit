@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listActivityHistory } from '@/services/real-time-events-service/activity-history'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   filter: {
@@ -135,4 +136,58 @@ describe('ActivityHistoryServices', () => {
       ]
     })
   })
+
+  it.each([
+    {
+      apiErrorMock: 'Access denied. You do not have permission to access this resource.',
+      statusCode: 403
+    },
+    {
+      apiErrorMock: 'You have exceeded the limit amount allowed for selected fields (37 fields)',
+      statusCode: 400
+    }
+  ])('Should return an API error for an $statusCode', async ({ statusCode, apiErrorMock }) => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: statusCode,
+      body: {
+        detail: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.variableMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.filter)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })
