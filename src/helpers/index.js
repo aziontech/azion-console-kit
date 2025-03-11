@@ -38,6 +38,8 @@ import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
 import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
 import { buildSummary } from './build-summary'
+import INFORMATION_TEXTS from './azion-information-texts'
+
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -82,5 +84,6 @@ export {
   eventsPlaygroundOpener,
   setRedirectRoute,
   getRedirectRoute,
-  buildSummary
+  buildSummary,
+  INFORMATION_TEXTS
 }
