@@ -31,7 +31,8 @@ const fixtures = {
     productChanges: '---',
     servicePlan: '---',
     total: '0.00',
-    temporaryBill: true
+    temporaryBill: true,
+    invoiceDownloadURL: "https://console.azion.com/v4/billing/invoices/07-2024"
   },
   mockError: [{ message: 'Error' }]
 }

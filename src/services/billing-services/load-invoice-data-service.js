@@ -1,8 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-import { formatDateToUSBilling } from '@/helpers/convert-date'
+import { formatDateToUSBilling, formatDateToMonthYear } from '@/helpers/convert-date'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { useAccountStore } from '@/stores/account'
+import { getLinkDownloadInvoice } from '@/helpers/invoice'
 
 export const loadInvoiceDataService = async (invoiceId) => {
   const { accountIsNotRegular } = useAccountStore()
@@ -26,9 +27,9 @@ const adapt = (httpResponse, accountIsNotRegular) => {
     body: { data },
     statusCode
   } = httpResponse
-
   const invoiceData = accountIsNotRegular ? data?.billDetail : data?.accountingDetail
   const parseInvoice = invoiceData?.map((invoice) => {
+    const period = formatDateToMonthYear(invoice.periodFrom)
     if (accountIsNotRegular) {
       return {
         billId: invoice.billId,
@@ -41,7 +42,8 @@ const adapt = (httpResponse, accountIsNotRegular) => {
         productChanges: '---',
         servicePlan: '---',
         creditUsedForPayment: 0.0,
-        temporaryBill: invoice.temporaryBill
+        temporaryBill: invoice.temporaryBill,
+        invoiceDownloadURL: getLinkDownloadInvoice(period)
       }
     }
     return {
@@ -49,7 +51,8 @@ const adapt = (httpResponse, accountIsNotRegular) => {
       invoiceId: invoice.invoiceNumber,
       billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
         invoice.periodTo
-      )}`
+      )}`,
+      invoiceDownloadURL: getLinkDownloadInvoice(period)
     }
   })
   return {

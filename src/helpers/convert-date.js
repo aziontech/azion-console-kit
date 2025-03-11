@@ -155,6 +155,16 @@ const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
   }).format(new Date(dateString))
 }
 
+const formatDateToMonthYear = (date) => {
+  if (!date) return ''
+
+  const dateParts = date.split('-')
+  const year = dateParts?.[0]
+  const month = dateParts?.[1]
+
+  return `${month}-${year}`
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -162,5 +172,6 @@ export {
   formatDateToUS,
   formatDateToUSBilling,
   getCurrentMonthStartEnd,
-  formatExhibitionDate
+  formatExhibitionDate,
+  formatDateToMonthYear
 }

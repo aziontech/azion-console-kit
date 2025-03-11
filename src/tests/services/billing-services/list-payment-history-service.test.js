@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listPaymentHistoryService } from '@/services/billing-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
-import { getStaticUrlsByEnvironment } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 
@@ -11,7 +10,6 @@ const fixtures = {
     amount_with_currency: 'BRL 19,904.73',
     card_brand: 'visa',
     invoice_number: '*--*-0001a062024',
-    invoice_url: '/account/6/invoice?billing_month=2024-06',
     payment_due: '2024-07-01',
     payment_method_details: 'Ending in 4242',
     status: 'Paid'
@@ -86,9 +84,8 @@ describe('BillingServices', () => {
           cardBrand: 'visa',
           value: 'visa Ending in 4242'
         },
-        invoiceUrl: `${getStaticUrlsByEnvironment(
-          'manager'
-        )}/account/6/invoice?billing_month=2024-06`,
+        disabled: false,
+        invoiceUrl: "https://console.azion.com/v4/billing/invoices/07-2024",
         status: {
           content: 'Paid',
           icon: 'pi pi-check-circle',
@@ -173,8 +170,9 @@ describe('BillingServices', () => {
         invoiceNumber: {
           content: 'BILL-123'
         },
-        invoiceUrl: null,
-        paymentDate: '07/01/2024'
+        paymentDate: '07/01/2024',
+        disabled: false,
+        invoiceUrl: "https://console.azion.com/v4/billing/invoices/07-2024"
       }
     ])
   })
