@@ -75,7 +75,7 @@
       updatedTimeRange(props.filterDate)
       return
     }
-    interval.value = intervalOptions[0]
+    interval.value = intervalOptions[1]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
     setDateTimeFilters(begin, end)
@@ -90,11 +90,11 @@
   }
 
   const checkIfDatesAreEqual = (begin, end) => {
-    const isoBegin = begin.toISOString().slice(0, 13)
-    const isoEnd = end.toISOString().slice(0, 13)
+    const isoBegin = begin.toISOString().slice(0, 16)
+    const isoEnd = end.toISOString().slice(0, 16)
 
-    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
-    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
+    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 16)
+    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 16)
 
     return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
