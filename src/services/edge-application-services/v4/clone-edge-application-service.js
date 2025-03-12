@@ -51,6 +51,7 @@ const extractApiError = (httpResponse) => {
  * @throws {Error} If there is an error with the response.
  */
 const parseHttpResponse = (httpResponse) => {
+  let apiError = null
   switch (httpResponse.statusCode) {
     case 202:
       return {
@@ -59,15 +60,16 @@ const parseHttpResponse = (httpResponse) => {
         applicationId: httpResponse.body.data.id
       }
     case 400:
-      const apiError = extractApiError(httpResponse)
+      apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
     case 409:
-      const apiErro = extractApiError(httpResponse)
-      throw new Error(apiErro).message
+      apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
-      throw new Errors.PermissionError().message
+      apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:

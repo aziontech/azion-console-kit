@@ -1,6 +1,6 @@
-const LOCKED_MESSAGE = `This configuration is currently managed by Azion. Any changes you make will not take effect, contact your account administrator instead.`
+const LOCKED_MESSAGE = `This instance is locked and managed by Azion. Any changes made won’t take effect. Contact the account administrator for assistance.`
 const LOCKED_MESSAGE_TOOLTIP =
-  'This configuration is managed by Azion and cannot be modified. Contact your account administrator for more details.'
+  'This instance is locked and managed by Azion. Any changes made won’t take effect. Contact the account administrator for assistance.'
 
 const INFORMATION_TEXTS = {
   LOCKED_MESSAGE,
