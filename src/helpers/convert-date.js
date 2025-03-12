@@ -1,7 +1,6 @@
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
 
-
 /**
  * Converts a given value to a date string in a specific format.
  *

@@ -42,13 +42,13 @@ const adaptResponse = (body) => {
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
-      summary: buildSummary(cellsConsoleEvents),
-      configurationId: cellsConsoleEvents.configurationId,
-      line: cellsConsoleEvents.line,
-      id: generateCurrentTimestamp(),
-      tsFormat: convertValueToDateByUserTimezone(cellsConsoleEvents.ts, timezone),
-      ts: cellsConsoleEvents.ts
-    }))
+        summary: buildSummary(cellsConsoleEvents),
+        configurationId: cellsConsoleEvents.configurationId,
+        line: cellsConsoleEvents.line,
+        id: generateCurrentTimestamp(),
+        tsFormat: convertValueToDateByUserTimezone(cellsConsoleEvents.ts, timezone),
+        ts: cellsConsoleEvents.ts
+      }))
     : []
 
   return {
