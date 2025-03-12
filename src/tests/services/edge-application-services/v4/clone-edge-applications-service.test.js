@@ -73,6 +73,11 @@ describe('EdgeApplicationServices', () => {
       apiErrorMock: 'invalid_request'
     },
     {
+      statusCode: 403,
+      errorKey: 'detail',
+      apiErrorMock: 'locked'
+    },
+    {
       statusCode: 409,
       errorKey: 'conflict',
       apiErrorMock: 'conflict'
@@ -101,10 +106,6 @@ describe('EdgeApplicationServices', () => {
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
