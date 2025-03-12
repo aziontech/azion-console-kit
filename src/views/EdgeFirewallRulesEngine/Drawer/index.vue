@@ -63,7 +63,6 @@
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
   const edgeFirewallFunctionsOptions = ref([])
-  const wafRulesOptions = ref([])
 
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
@@ -217,19 +216,6 @@
     }
   }
 
-  const listWafRulesOptions = async () => {
-    try {
-      const result = await props.listWafRulesService()
-      wafRulesOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    }
-  }
-
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
     return await props.createService({
       edgeFirewallId: props.edgeFirewallId,
@@ -250,7 +236,7 @@
     })
   }
   onMounted(async () => {
-    await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
+    await Promise.all([listEdgeFirewallFunctionsOptions()])
   })
 
   defineExpose({
@@ -274,7 +260,7 @@
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :wafRulesOptions="wafRulesOptions"
+        :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
       />
@@ -296,7 +282,7 @@
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :wafRulesOptions="wafRulesOptions"
+        :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
       />
