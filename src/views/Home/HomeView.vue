@@ -12,8 +12,6 @@
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import { useLayout } from '@/composables/use-layout'
-  import InlineMessage from 'primevue/inlinemessage'
-  import { getStaticUrlsByEnvironment } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -42,7 +40,7 @@
   const router = useRouter()
   const route = useRoute()
   const dialog = useDialog()
-  const { accountData, isBannerVisible } = useAccountStore()
+  const { accountData } = useAccountStore()
   const user = accountData
 
   const teams = ref([])
@@ -116,11 +114,7 @@
     }
   }
 
-  const openRTM = async () => {
-    const urlEOL = getStaticUrlsByEnvironment('managerEOL')
-    await tracker.product.clickedTo({ target: 'RTM' }).track()
-    window.location.href = `${urlEOL}?disableRedirect=true`
-  }
+ 
 
   onMounted(async () => {
     teams.value = await props.listTeamsService()
@@ -135,24 +129,6 @@
   <ContentBlock>
     <template #content>
       <section class="w-full flex flex-col gap-6 lg:gap-8">
-        <InlineMessage
-          v-if="isBannerVisible"
-          class="p-3 gap-1"
-          severity="info"
-          data-testid="message-deprecation"
-        >
-          Azion Console is now the primary way to access Azion's platform.
-          <PrimeButton
-            label="Real-Time Manager (RTM)"
-            @click="openRTM"
-            iconPos="right"
-            class="p-0"
-            size="small"
-            link
-          />
-          will be deprecated soon, and access will only be available for a limited time through this
-          link.
-        </InlineMessage>
 
         <div
           v-if="showExperimental"

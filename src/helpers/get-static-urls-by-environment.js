@@ -1,13 +1,9 @@
 import { getEnvironment } from './get-environment'
 
 const urls = {
-  manager: {
+  console: {
     stage: 'https://stage-console.azion.com',
     production: 'https://console.azion.com'
-  },
-  managerEOL: {
-    stage: 'https://stage-console.azion.com/home',
-    production: 'https://console.azion.com/home'
   },
   billing: {
     stage: 'https://stage-console.azion.com/billing-subscriptions',

@@ -77,7 +77,7 @@ const listPaymentHistoryForRegularAccounts = async () => {
 }
 
 const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
-  const managerUrl = getStaticUrlsByEnvironment('manager')
+  const managerUrl = getStaticUrlsByEnvironment('console')
 
   const parseBilling = httpResponse.body.results?.map((card) => {
     const typeCard = card.card_brand?.toLowerCase()
