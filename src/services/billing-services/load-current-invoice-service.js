@@ -32,8 +32,8 @@ const adapt = (httpResponse, accountIsNotRegular) => {
   const billingPeriod =
     invoiceData?.periodFrom && invoiceData?.periodTo
       ? `${formatDateToUSBilling(invoiceData.periodFrom)} - ${formatDateToUSBilling(
-        invoiceData.periodTo
-      )}`
+          invoiceData.periodTo
+        )}`
       : emptyDefaultValue
   const parseInvoice = {
     billId: invoiceData?.billId || emptyDefaultValue,

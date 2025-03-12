@@ -188,15 +188,19 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
 }
 
 const joinEdgeApplicationWithTieredCache = (services) => {
-  const edgeApp = services.find(service => service.slug === 'edge_application')
-  const tieredCacheIndex = services.findIndex(service => service.slug === 'tiered_cache')
+  const edgeApp = services.find((service) => service.slug === 'edge_application')
+  const tieredCacheIndex = services.findIndex((service) => service.slug === 'tiered_cache')
 
   if (!edgeApp || tieredCacheIndex === -1) return services
 
-  const edgeApplicationDataDesc = edgeApp.descriptions.find(desc => desc.slug === 'data_transferred')
+  const edgeApplicationDataDesc = edgeApp.descriptions.find(
+    (desc) => desc.slug === 'data_transferred'
+  )
 
   const tieredCache = services[tieredCacheIndex]
-  const tieredDataDesc = tieredCache.descriptions.find(desc => desc.slug === 'tiered_cache_data_transferred')
+  const tieredDataDesc = tieredCache.descriptions.find(
+    (desc) => desc.slug === 'tiered_cache_data_transferred'
+  )
 
   if (!edgeApplicationDataDesc || !tieredDataDesc) return services
 
@@ -208,9 +212,11 @@ const joinEdgeApplicationWithTieredCache = (services) => {
 
   edgeApplicationDataDesc.quantity = formatUnitValue(total, 'GB')
 
-  tieredDataDesc.data.forEach(tieredItem => {
+  tieredDataDesc.data.forEach((tieredItem) => {
     const tieredQty = parseQuantity(tieredItem.quantity)
-    const edgeItem = edgeApplicationDataDesc.data.find(item => item.country === tieredItem.country)
+    const edgeItem = edgeApplicationDataDesc.data.find(
+      (item) => item.country === tieredItem.country
+    )
 
     if (edgeItem) {
       const edgeQty = parseQuantity(edgeItem.quantity)
