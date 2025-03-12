@@ -70,8 +70,9 @@ const adapt = ({ body, statusCode }) => {
   ])
 
   const adaptedBody = mapProducts(productsGrouped, productsGroupedByRegion)
+  const data = joinEdgeApplicationWithTieredCache(adaptedBody)
 
-  return { body: adaptedBody, statusCode }
+  return { body: data, statusCode }
 }
 
 const PRODUCT_NAMES = {
@@ -184,4 +185,56 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
     }
     return list
   }, [])
+}
+
+const joinEdgeApplicationWithTieredCache = (services) => {
+  const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
+  const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
+
+  if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
+
+  const edgeDataTransferDescription = edgeApplicationService.descriptions.find(
+    (desc) => desc.slug === 'data_transferred'
+  )
+
+  const tieredCacheService = services[tieredCacheServiceIndex]
+  const tieredCacheDataTransferDescription = tieredCacheService.descriptions.find(
+    (desc) => desc.slug === 'tiered_cache_data_transferred'
+  )
+
+  if (!edgeDataTransferDescription || !tieredCacheDataTransferDescription) return services
+
+  const parseQuantityValue = (qtd) => parseFloat(qtd.replace(/,/g, '').replace(' GB', ''))
+
+  const edgeTotalDataTransfer = parseQuantityValue(edgeDataTransferDescription.quantity)
+  const tieredCacheTotalDataTransfer = parseQuantityValue(
+    tieredCacheDataTransferDescription.quantity
+  )
+  const combinedTotalDataTransfer = edgeTotalDataTransfer + tieredCacheTotalDataTransfer
+
+  edgeDataTransferDescription.quantity = formatUnitValue(combinedTotalDataTransfer, 'GB')
+
+  tieredCacheDataTransferDescription.data.forEach((tieredCountryData) => {
+    const tieredCountryTransfer = parseQuantityValue(tieredCountryData.quantity)
+    const edgeCountryData = edgeDataTransferDescription.data.find(
+      (item) => item.country === tieredCountryData.country
+    )
+
+    if (edgeCountryData) {
+      const edgeQty = parseQuantityValue(edgeCountryData.quantity)
+      const newQty = edgeQty + tieredCountryTransfer
+      edgeCountryData.quantity = formatUnitValue(newQty, 'GB')
+    } else {
+      edgeDataTransferDescription.data.push({
+        country: tieredCountryData.country,
+        quantity: formatUnitValue(tieredCountryTransfer, 'GB'),
+        price: tieredCountryData.price,
+        slug: 'data_transferred'
+      })
+    }
+  })
+
+  services.splice(tieredCacheServiceIndex, 1)
+
+  return services
 }
