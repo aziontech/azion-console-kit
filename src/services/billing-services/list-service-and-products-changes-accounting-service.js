@@ -70,8 +70,9 @@ const adapt = ({ body, statusCode }) => {
   ])
 
   const adaptedBody = mapProducts(productsGrouped, productsGroupedByRegion)
+  const data = joinEdgeApplicationWithTieredCache(adaptedBody)
 
-  return { body: adaptedBody, statusCode }
+  return { body: data, statusCode }
 }
 
 const PRODUCT_NAMES = {
@@ -184,4 +185,48 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
     }
     return list
   }, [])
+}
+
+const joinEdgeApplicationWithTieredCache = (services) => {
+  const edgeApp = services.find(service => service.slug === 'edge_application')
+  const tieredCacheIndex = services.findIndex(service => service.slug === 'tiered_cache')
+
+  if (!edgeApp || tieredCacheIndex === -1) return services
+
+  const edgeApplicationDataDesc = edgeApp.descriptions.find(desc => desc.slug === 'data_transferred')
+
+  const tieredCache = services[tieredCacheIndex]
+  const tieredDataDesc = tieredCache.descriptions.find(desc => desc.slug === 'tiered_cache_data_transferred')
+
+  if (!edgeApplicationDataDesc || !tieredDataDesc) return services
+
+  const parseQuantity = (qty) => parseFloat(qty.replace(/,/g, '').replace(' GB', ''))
+
+  const edgeQuantity = parseQuantity(edgeApplicationDataDesc.quantity)
+  const tieredQuantity = parseQuantity(tieredDataDesc.quantity)
+  const total = edgeQuantity + tieredQuantity
+
+  edgeApplicationDataDesc.quantity = formatUnitValue(total, 'GB')
+
+  tieredDataDesc.data.forEach(tieredItem => {
+    const tieredQty = parseQuantity(tieredItem.quantity)
+    const edgeItem = edgeApplicationDataDesc.data.find(item => item.country === tieredItem.country)
+
+    if (edgeItem) {
+      const edgeQty = parseQuantity(edgeItem.quantity)
+      const newQty = edgeQty + tieredQty
+      edgeItem.quantity = formatUnitValue(newQty, 'GB')
+    } else {
+      edgeApplicationDataDesc.data.push({
+        country: tieredItem.country,
+        quantity: formatUnitValue(tieredQty, 'GB'),
+        price: tieredItem.price,
+        slug: 'data_transferred'
+      })
+    }
+  })
+
+  services.splice(tieredCacheIndex, 1)
+
+  return services
 }
