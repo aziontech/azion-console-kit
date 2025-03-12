@@ -114,8 +114,6 @@
     }
   }
 
- 
-
   onMounted(async () => {
     teams.value = await props.listTeamsService()
     showOnboardingSchedulingDialog()
@@ -129,7 +127,6 @@
   <ContentBlock>
     <template #content>
       <section class="w-full flex flex-col gap-6 lg:gap-8">
-
         <div
           v-if="showExperimental"
           class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"

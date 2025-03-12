@@ -11,17 +11,17 @@ const makeSut = () => {
 
 const scenarios = [
   {
-    section: 'manager',
+    section: 'console',
     env: 'development',
     expected: 'https://stage-console.azion.com'
   },
   {
-    section: 'manager',
+    section: 'console',
     env: 'stage',
     expected: 'https://stage-console.azion.com'
   },
   {
-    section: 'manager',
+    section: 'console',
     env: 'production',
     expected: 'https://console.azion.com'
   },
