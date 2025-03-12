@@ -59,7 +59,6 @@ const adapt = (filter) => {
 const adaptResponse = (httpResponse) => {
   const data = httpResponse.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
-    configurationId: httpEventItem.configurationId,
     requestId: httpEventItem.requestId,
     summary: buildSummary(httpEventItem),
     ts: httpEventItem.ts,
