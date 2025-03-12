@@ -27,7 +27,7 @@ export const listHttpRequest = async (filter) => {
 const adapt = (filter) => {
   const table = {
     dataset: 'httpEvents',
-    limit: 10000,
+    limit: 1000,
     fields: [
       'configurationId',
       'host',
