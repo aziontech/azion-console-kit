@@ -62,6 +62,8 @@ const parseHttpResponse = (response) => {
     case 400:
       const apiError = body.detail
       throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
     case 403:
       const forbiddenError = body.detail
       throw new Error(forbiddenError).message

@@ -1,5 +1,9 @@
 const DATE_TIME_INTERVALS = [
   {
+    name: 'Last 5 Minutes',
+    code: '0.08'
+  },
+  {
     name: 'Last 15 Minutes',
     code: '0.25'
   },

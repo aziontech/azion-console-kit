@@ -158,7 +158,7 @@
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption', 'onAccessDenied'])
 
   const PAGE_INCREMENT = 1
   const PAGE_SIZE = 100
@@ -273,6 +273,8 @@
 
         data.value = [...data.value, ...uniqueResults]
       }
+    } catch (error) {
+      emit('onAccessDenied')
     } finally {
       loading.value = false
     }
