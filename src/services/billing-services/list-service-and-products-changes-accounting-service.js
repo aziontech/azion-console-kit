@@ -207,7 +207,9 @@ const joinEdgeApplicationWithTieredCache = (services) => {
   const parseQuantityValue = (qtd) => parseFloat(qtd.replace(/,/g, '').replace(' GB', ''))
 
   const edgeTotalDataTransfer = parseQuantityValue(edgeDataTransferDescription.quantity)
-  const tieredCacheTotalDataTransfer = parseQuantityValue(tieredCacheDataTransferDescription.quantity)
+  const tieredCacheTotalDataTransfer = parseQuantityValue(
+    tieredCacheDataTransferDescription.quantity
+  )
   const combinedTotalDataTransfer = edgeTotalDataTransfer + tieredCacheTotalDataTransfer
 
   edgeDataTransferDescription.quantity = formatUnitValue(combinedTotalDataTransfer, 'GB')
