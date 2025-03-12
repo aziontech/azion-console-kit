@@ -67,7 +67,6 @@ const adapt = (filter) => {
   const formatFilter = {
     tsRange: filter.tsRange,
     and: {
-      configurationIdEq: filter.configurationId,
       tsEq: filter.ts,
       requestIdEq: filter.requestId
     }
