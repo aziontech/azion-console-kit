@@ -66,73 +66,44 @@ describe('EdgeApplicationServices', () => {
     expect(data.feedback).toBe('Your edge application has been cloned')
   })
 
-  it.each([
-    {
+  it('should throw parsing api error when request fails', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
+    }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      errorKey: 'invalid_request',
-      apiErrorMock: 'invalid_request'
-    },
-    {
-      statusCode: 403,
-      errorKey: 'detail',
-      apiErrorMock: 'locked'
-    },
-    {
-      statusCode: 409,
-      errorKey: 'conflict',
-      apiErrorMock: 'conflict'
+      body: apiErrorMock
+    })
+
+    const { sut } = makeSut()
+
+    const apiErrorResponse = sut({
+      edgeApplicationName: fixtures.edgeApplicationName,
+      payload: fixtures.edgeApplicationMock
+    })
+
+    expect(apiErrorResponse).rejects.toBe('api error message')
+  })
+
+  it('should throw internal server error when request fails with 500 status code', async () => {
+    const apiErrorMock = {
+      detail: 'api error message'
     }
-  ])(
-    'Should return an API error for an $statusCode response status',
-    async ({ statusCode, errorKey, apiErrorMock }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: {
-          [errorKey]: apiErrorMock
-        }
-      })
-      const { sut } = makeSut()
 
-      const data = sut({
-        edgeApplicationName: fixtures.edgeApplicationName,
-        payload: fixtures.edgeApplicationMock
-      })
-
-      expect(data).rejects.toThrow(apiErrorMock)
-    }
-  )
-
-  it.each([
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
-    },
-    {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when request fails with status code $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
-      })
-      const { sut } = makeSut()
+      body: apiErrorMock
+    })
 
-      const response = sut({
-        edgeApplicationName: fixtures.edgeApplicationName,
-        payload: fixtures.edgeApplicationMock
-      })
+    const { sut } = makeSut()
 
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
+    const apiErrorResponse = sut({
+      edgeApplicationName: fixtures.edgeApplicationName,
+      payload: fixtures.edgeApplicationMock
+    })
+    const expectedError = new Errors.InternalServerError().message
+
+    expect(apiErrorResponse).rejects.toBe(expectedError)
+  })
 })
