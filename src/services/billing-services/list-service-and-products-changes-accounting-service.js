@@ -188,51 +188,51 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
 }
 
 const joinEdgeApplicationWithTieredCache = (services) => {
-  const edgeApp = services.find((service) => service.slug === 'edge_application')
-  const tieredCacheIndex = services.findIndex((service) => service.slug === 'tiered_cache')
+  const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
+  const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
 
-  if (!edgeApp || tieredCacheIndex === -1) return services
+  if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
 
-  const edgeApplicationDataDesc = edgeApp.descriptions.find(
+  const edgeDataTransferDescription = edgeApplicationService.descriptions.find(
     (desc) => desc.slug === 'data_transferred'
   )
 
-  const tieredCache = services[tieredCacheIndex]
-  const tieredDataDesc = tieredCache.descriptions.find(
+  const tieredCacheService = services[tieredCacheServiceIndex]
+  const tieredCacheDataTransferDescription = tieredCacheService.descriptions.find(
     (desc) => desc.slug === 'tiered_cache_data_transferred'
   )
 
-  if (!edgeApplicationDataDesc || !tieredDataDesc) return services
+  if (!edgeDataTransferDescription || !tieredCacheDataTransferDescription) return services
 
-  const parseQuantity = (qty) => parseFloat(qty.replace(/,/g, '').replace(' GB', ''))
+  const parseQuantityValue = (qtd) => parseFloat(qtd.replace(/,/g, '').replace(' GB', ''))
 
-  const edgeQuantity = parseQuantity(edgeApplicationDataDesc.quantity)
-  const tieredQuantity = parseQuantity(tieredDataDesc.quantity)
-  const total = edgeQuantity + tieredQuantity
+  const edgeTotalDataTransfer = parseQuantityValue(edgeDataTransferDescription.quantity)
+  const tieredCacheTotalDataTransfer = parseQuantityValue(tieredCacheDataTransferDescription.quantity)
+  const combinedTotalDataTransfer = edgeTotalDataTransfer + tieredCacheTotalDataTransfer
 
-  edgeApplicationDataDesc.quantity = formatUnitValue(total, 'GB')
+  edgeDataTransferDescription.quantity = formatUnitValue(combinedTotalDataTransfer, 'GB')
 
-  tieredDataDesc.data.forEach((tieredItem) => {
-    const tieredQty = parseQuantity(tieredItem.quantity)
-    const edgeItem = edgeApplicationDataDesc.data.find(
-      (item) => item.country === tieredItem.country
+  tieredCacheDataTransferDescription.data.forEach((tieredCountryData) => {
+    const tieredCountryTransfer = parseQuantityValue(tieredCountryData.quantity)
+    const edgeCountryData = edgeDataTransferDescription.data.find(
+      (item) => item.country === tieredCountryData.country
     )
 
-    if (edgeItem) {
-      const edgeQty = parseQuantity(edgeItem.quantity)
-      const newQty = edgeQty + tieredQty
-      edgeItem.quantity = formatUnitValue(newQty, 'GB')
+    if (edgeCountryData) {
+      const edgeQty = parseQuantityValue(edgeCountryData.quantity)
+      const newQty = edgeQty + tieredCountryTransfer
+      edgeCountryData.quantity = formatUnitValue(newQty, 'GB')
     } else {
-      edgeApplicationDataDesc.data.push({
-        country: tieredItem.country,
-        quantity: formatUnitValue(tieredQty, 'GB'),
-        price: tieredItem.price,
+      edgeDataTransferDescription.data.push({
+        country: tieredCountryData.country,
+        quantity: formatUnitValue(tieredCountryTransfer, 'GB'),
+        price: tieredCountryData.price,
         slug: 'data_transferred'
       })
     }
   })
 
-  services.splice(tieredCacheIndex, 1)
+  services.splice(tieredCacheServiceIndex, 1)
 
   return services
 }
