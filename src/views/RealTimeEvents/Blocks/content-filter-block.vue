@@ -7,6 +7,8 @@
   import SelectButton from 'primevue/selectbutton'
   import AzionQueryLanguage from './azion-query-language.vue'
   import PrimeTag from 'primevue/tag'
+  import { useAccountStore } from '@/stores/account'
+  import { removeAmountOfHours, updatedTimeRange } from './constants/filter-time'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -34,6 +36,8 @@
 
   const filterMode = ref('Wizard')
   const options = ref(['Wizard', 'Advanced'])
+  const accountStore = useAccountStore()
+  const userUTC = accountStore.accountUtcOffset
 
   const filter = computed({
     get: () => {
@@ -48,7 +52,16 @@
     return props.fieldsInFilter?.length === 0
   })
 
+  const updatedTime = () => {
+    const [begin, end] = removeAmountOfHours(filter.value.tsRange.meta.option, userUTC)
+    const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(begin, end, userUTC)
+
+    filter.value.tsRange.tsRangeBegin = tsRangeBegin
+    filter.value.tsRange.tsRangeEnd = tsRangeEnd
+  }
+
   const filterSearch = () => {
+    updatedTime()
     emit('updatedFilter')
   }
 
