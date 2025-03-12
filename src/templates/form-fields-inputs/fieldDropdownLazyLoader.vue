@@ -172,7 +172,6 @@
   const slots = useSlots()
   const data = ref([])
   const loading = ref(false)
-  const hasEdgeFirewallAccess = ref(true)
   const totalCount = ref(0)
   const page = ref(INITIAL_PAGE)
   const search = ref('')
@@ -275,7 +274,6 @@
         data.value = [...data.value, ...uniqueResults]
       }
     } catch (error) {
-      hasEdgeFirewallAccess.value = false
       emit('onAccessDenied')
     } finally {
       loading.value = false
