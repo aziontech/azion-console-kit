@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { buildSummary, capitalizeFirstLetter } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -55,11 +56,12 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [activityHistoryEvents = {}] = body.data.activityHistoryEvents
+  const timezone = getUserTimezone()
 
   return {
     title: activityHistoryEvents.title,
     type: capitalizeFirstLetter(activityHistoryEvents.type),
-    ts: convertValueToDate(activityHistoryEvents.ts),
+    ts: convertValueToDateByUserTimezone(activityHistoryEvents.ts, timezone),
     data: buildSummary(activityHistoryEvents)
   }
 }

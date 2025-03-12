@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadHttpRequest = async (filter) => {
   const payload = adapt(filter)
@@ -77,10 +78,12 @@ const adapt = (filter) => {
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
   const [httpEventItem = {}] = body.data.httpEvents
+  const timezone = getUserTimezone()
+
   const adapt = {
     httpReferer: httpEventItem.httpReferer,
     scheme: httpEventItem.scheme?.toUpperCase(),
-    ts: convertValueToDate(httpEventItem.ts),
+    ts: convertValueToDateByUserTimezone(httpEventItem.ts, timezone),
     httpUserAgent: httpEventItem.httpUserAgent,
     remoteAddress: httpEventItem.remoteAddress,
     host: httpEventItem.host,
