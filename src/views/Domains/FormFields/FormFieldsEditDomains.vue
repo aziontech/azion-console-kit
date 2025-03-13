@@ -76,6 +76,12 @@
     emit('edgeFirewallCreated')
   }
 
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
+
+  const hasEdgeFirewallAccess = ref(true)
+
   const mtlsModeRadioOptions = ref([
     {
       title: 'Enforce',
@@ -304,6 +310,8 @@
         <FieldDropdownLazyLoader
           label="Edge Firewall"
           enableClearOption
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          v-if="hasEdgeFirewallAccess"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"
