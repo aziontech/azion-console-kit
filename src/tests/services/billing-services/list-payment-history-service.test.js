@@ -87,7 +87,7 @@ describe('BillingServices', () => {
           value: 'visa Ending in 4242'
         },
         invoiceUrl: `${getStaticUrlsByEnvironment(
-          'manager'
+          'console'
         )}/account/6/invoice?billing_month=2024-06`,
         status: {
           content: 'Paid',
