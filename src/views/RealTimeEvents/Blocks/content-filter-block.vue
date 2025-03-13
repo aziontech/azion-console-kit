@@ -62,12 +62,17 @@
 
   const filterSearch = () => {
     updatedTime()
+    emitUpdatedFilter()
+  }
+
+  const emitUpdatedFilter = () => {
     emit('updatedFilter')
   }
 
   const searchAdvancedFilter = (filters) => {
     filter.value.fields = filters
-    emit('updatedFilter')
+    updatedTime()
+    emitUpdatedFilter()
   }
 
   const totalRecordsFound = computed(() => {
@@ -81,7 +86,7 @@
       <div class="w-full">
         <IntervalFilterBlock
           v-model:filterDate="filter.tsRange"
-          @applyTSRange="filterSearch"
+          @applyTSRange="emitUpdatedFilter"
         />
       </div>
       <div class="flex justify-end w-full">
