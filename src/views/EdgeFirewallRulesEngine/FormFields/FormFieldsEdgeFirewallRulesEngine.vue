@@ -29,6 +29,10 @@
       type: Object,
       required: true
     },
+    hasEdgeFunctionsProductAccess: {
+      type: Boolean,
+      default: true
+    },
     listNetworkListService: {
       type: Function,
       required: true
@@ -407,7 +411,10 @@
         label: `${
           hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
         }`,
-        disabled: runFunctionBehaviorIsAlreadySelected || !hasEdgeFunctionsModuleEnabled
+        disabled:
+          runFunctionBehaviorIsAlreadySelected ||
+          !hasEdgeFunctionsModuleEnabled ||
+          !props.hasEdgeFunctionsProductAccess
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]

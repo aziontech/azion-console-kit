@@ -54,11 +54,6 @@
       "name": "origin-api"
     },
     {
-      "origin-id": 146193,
-      "origin-key": "bded9065-b277-4e7b-b55a-bdb0b0064b21",
-      "name": "origin-manager"
-    },
-    {
       "origin-id": 146195,
       "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
       "name": "origin-cities"
@@ -67,6 +62,21 @@
       "origin-id": 153761,
       "origin-key": "f1f976fb-0558-4592-a930-dcad70ab2e7c",
       "name": "origin-console-feedback"
+    },
+    {
+      "origin-id": 198604,
+      "origin-key": "265d39ed-7ff8-4329-9e91-864ab678beb3",
+      "name": "origin-script-runner"
+    },
+    {
+      "origin-id": 198606,
+      "origin-key": "5e9245bf-39c5-4722-bc4e-b7389204f012",
+      "name": "origin-iam-api"
+    },
+    {
+      "origin-id": 198605,
+      "origin-key": "e967f66e-0198-4d32-93b6-1f2f3f5a2571",
+      "name": "origin-template-engine"
     }
   ],
   "rules-engine": {

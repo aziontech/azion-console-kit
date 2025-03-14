@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -73,11 +74,12 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [l2CacheEvents = {}] = body.data.l2CacheEvents
+  const timezone = getUserTimezone()
 
   return {
     scheme: l2CacheEvents.scheme?.toUpperCase(),
     proxyHost: l2CacheEvents.proxyHost,
-    ts: convertValueToDate(l2CacheEvents.ts),
+    ts: convertValueToDateByUserTimezone(l2CacheEvents.ts, timezone),
     serverProtocol: l2CacheEvents.serverProtocol?.toUpperCase(),
     data: buildSummary(l2CacheEvents)
   }
