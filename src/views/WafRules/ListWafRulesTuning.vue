@@ -570,7 +570,7 @@
     try {
       domainsOptions.value.done = false
 
-      const domains = await props.listDomainsService({ wafId: wafRuleId })
+      const domains = await props.listDomainsService({ wafId: wafRuleId.value })
 
       domainsOptions.value.options = domains
     } finally {
