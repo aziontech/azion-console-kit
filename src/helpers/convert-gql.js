@@ -220,14 +220,6 @@ const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
 
-    // if (operator === 'Ilike') {
-    //   filter[filterKey] = {
-    //     ...filter[filterKey],
-    //     [`${valueField}Like`]: value
-    //   }
-    //   return
-    // }
-
     filter[filterKey] = {
       ...filter[filterKey],
       [`${valueField}${operator}`]: value
