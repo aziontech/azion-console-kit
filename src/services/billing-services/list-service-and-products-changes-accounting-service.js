@@ -87,7 +87,6 @@ const PRODUCT_NAMES = {
   data_stream: 'Data Stream',
   real_time_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
@@ -193,6 +192,7 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
 const joinEdgeApplicationWithTieredCache = (services) => {
   const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
+  const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
 
   if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
 
@@ -238,6 +238,7 @@ const joinEdgeApplicationWithTieredCache = (services) => {
   })
 
   services.splice(tieredCacheServiceIndex, 1)
+  services.splice(edgeStorageServiceIndex, 1)
 
   return services
 }
