@@ -191,7 +191,6 @@ const joinEdgeApplicationWithTieredCache = (services) => {
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
   const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
 
-
   if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
 
   const edgeDataTransferDescription = edgeApplicationService.descriptions.find(
