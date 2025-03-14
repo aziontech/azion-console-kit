@@ -361,7 +361,7 @@ const config = {
           setOrigin: {
             name: 'origin-api',
             type: 'single_origin'
-          },
+          }
         }
       },
       {
