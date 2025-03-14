@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -67,10 +68,12 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [imagesProcessedEvents = {}] = body.data.imagesProcessedEvents
+  const timezone = getUserTimezone()
+
   return {
     scheme: imagesProcessedEvents.scheme?.toUpperCase(),
     host: imagesProcessedEvents.host,
-    ts: convertValueToDate(imagesProcessedEvents.ts),
+    ts: convertValueToDateByUserTimezone(imagesProcessedEvents.ts, timezone),
     data: buildSummary(imagesProcessedEvents)
   }
 }
