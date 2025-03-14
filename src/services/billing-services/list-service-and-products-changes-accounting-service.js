@@ -114,7 +114,7 @@ const METRIC_SLUGS = {
   ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
   ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
   ddos_protection_unlimited: { title: 'DDoS Protection Unlimited', unit: 'Days' },
-  compute_time: { title: 'Compute Time' },
+  compute_time: { title: 'Compute Time', unit: 'ms' },
   invocations: { title: 'Invocations' },
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
