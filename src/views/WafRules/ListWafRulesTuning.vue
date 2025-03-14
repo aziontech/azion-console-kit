@@ -14,18 +14,30 @@
           class="w-full sm:max-w-xs"
         />
 
-        <FieldMultiselectLazyLoader
+        <MultiSelect
           data-testid="waf-tuning-list__domains-field"
-          name="valueDomainId"
-          :service="adaptDomainsService"
-          :loadService="props.loadDomainService"
+          appendTo="body"
           optionLabel="name"
           optionValue="id"
-          :value="valueDomainId"
-          appendTo="self"
-          class="w-full sm:max-w-xs overflow-hidden"
-          placeholder="Select domain"
-          @onChange="setDomainsSelectedOptions"
+          :options="domainsOptions.options"
+          :loading="!domainsOptions.done"
+          v-model="selectedDomainIds"
+          @change="setDomainsSelectedOptions"
+          class="w-full sm:max-w-xs"
+           placeholder="Select domain"
+          filter
+          display="chip"
+          scrollHeight="250px"
+          :maxSelectedLabels="3"
+          :virtualScrollerOptions="{ itemSize: 38 }"
+          :pt="{
+            panel: { class: 'surface-section shadow-2 border-none' },
+            item: { class: 'hover:surface-hover' },
+            wrapper: { class: 'w-full' },
+            list: { class: 'p-0 list-none' },
+            filterInput: { class: 'surface-ground' }
+          }"
+          style="--p-multiselect-overlay-width: 100%"
         />
 
         <FieldDropdownLazyLoader
@@ -130,7 +142,7 @@
     v-model:visible="showDetailsOfAttack"
     :listService="props.listWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
-    :domains="selectedDomains"
+    :domains="selectedFilter.domains"
     :time="timeName"
     :listNetworkListService="props.listNetworkListService"
     :loadNetworkListService="props.loadNetworkListService"
@@ -156,11 +168,11 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import FieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
-
+ 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
+  import MultiSelect from 'primevue/multiselect'
 
   import advancedFilter from '@/templates/advanced-filter'
   import { useToast } from 'primevue/usetoast'
@@ -186,8 +198,8 @@
       type: Function
     },
     listNetworkListService: {
-      type: Function,
-      required: true
+      required: true,
+      type: Function
     },
     listWafRulesDomainsService: {
       required: true,
@@ -234,16 +246,15 @@
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
-  const domainsOptions = ref({ options: [], done: true })
+  const domainsOptions = ref({ options: [], done: false })
   const tuningSelected = ref(null)
-  const selectedDomains = ref([])
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
 
   const valueNetworkId = ref(null)
-  const valueDomainId = ref(null)
+  const selectedDomainIds = ref([])
 
   const advancedFilterRef = ref(null)
 
@@ -421,10 +432,9 @@
     filterTuning()
   }
 
-  const setDomainsSelectedOptions = (value) => {
-    selectedDomains.value = value
-    selectedFilter.value.domains = value
-    filterTuning()
+  const setDomainsSelectedOptions = () => {
+    selectedFilter.value.domains = selectedDomainIds.value || [];
+    filterTuning();
   }
 
   const downloadCSV = () => {
@@ -558,66 +568,35 @@
 
   const setDomainsOptions = async () => {
     try {
-      domainsOptions.value.done = true
-      const response = await props.listDomainsService({ fields: 'id,name,is_active' })
-      domainsOptions.value.options = response.results
-        ? response.results.map((domain) => ({
-            id: domain.id,
-            name: domain.name,
-            active: domain.is_active
-          }))
-        : []
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      domainsOptions.value.done = false
-    }
-  }
+   
+      domainsOptions.value.done = false;
+      
+      const params = { fields: 'id,name,active' };
+      const response = await props.listDomainsService(params);
 
-  const adaptDomainsService = async (params) => {
-    try {
-      const apiParams = {
-        page: params.page || 1,
-        page_size: params.pageSize || 100,
-        search: params.search || '',
-        orderBy: params.ordering || 'name',
-        sort: 'asc',
-        fields: typeof params.fields === 'string' ? params.fields : 'id,name,is_active'
-      }
-
-      const response = await props.listDomainsService(apiParams)
-
+      
       if (Array.isArray(response)) {
-        return {
-          body: response.map((domain) => ({
-            id: domain.id,
-            name: domain.name || domain.domain_name || '',
-            active: domain.is_active !== undefined ? domain.is_active : true
-          })),
-          count: response.length
-        }
+        domainsOptions.value.options = response;
+      } else if (response && response.results && Array.isArray(response.results)) {
+        domainsOptions.value.options = response.results;
+      } else {
+        domainsOptions.value.options = [];
       }
+      
 
-      // Fallback
-      if (response && response.results && Array.isArray(response.results)) {
-        return {
-          body: response.results.map((domain) => ({
-            id: domain.id,
-            name: domain.name || domain.domain_name || '',
-            active: domain.is_active !== undefined ? domain.is_active : true
-          })),
-          count: response.count || response.results.length
-        }
-      }
-
-      return { body: [], count: 0 }
     } catch (error) {
-      return { body: [], count: 0 }
+
+      domainsOptions.value.options = [];
+    } finally {
+      domainsOptions.value.done = true;
     }
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions()
-    await setDomainsOptions()
+    await setNetWorkListOptions();
+    await setDomainsOptions();
+
   })
+
+
 </script>
