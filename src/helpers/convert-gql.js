@@ -150,7 +150,7 @@ const convertGQL = (filter, table) => {
     dataset: table.dataset,
     limit: table.limit,
     orderBy: table.orderBy,
-    filterQuery,
+    filterQuery: formatFilter(filterQuery),
     fields: fieldsFormat
   }
 
@@ -219,6 +219,14 @@ const separateFieldsByType = (fields) => {
 const mergeFieldsIntoFilter = (fields, filter) => {
   fields.forEach(({ operator, valueField, value }) => {
     const filterKey = operator === 'In' ? 'in' : 'and'
+
+    // if (operator === 'Ilike') {
+    //   filter[filterKey] = {
+    //     ...filter[filterKey],
+    //     [`${valueField}Like`]: value
+    //   }
+    //   return
+    // }
 
     filter[filterKey] = {
       ...filter[filterKey],
@@ -291,6 +299,20 @@ const formatFilterParameter = (variables, fields) => {
     }
 
     return `\t$${key}: ${type}!`
+  })
+}
+
+const formatFilter = (filters) => {
+  return filters.map(filter => {
+    if (filter.toLocaleLowerCase().includes('ilike')) {
+      const parts = filter.split(':')
+      if (parts.length) {
+        const operator = parts[0].toLocaleLowerCase().replace('ilike', '')
+        const value = parts[1].trim()
+        return `not: { ${operator}Like: ${value} }`;
+      }
+    }
+    return filter
   })
 }
 
