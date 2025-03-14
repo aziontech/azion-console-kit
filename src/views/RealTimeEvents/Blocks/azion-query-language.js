@@ -248,8 +248,9 @@ export default class Aql {
 
   queryValidationForCompoundFields(queryText) {
     let erros = []
-    const operadores = ['=', '<>', '<', '>', '<=', '>=', 'like', 'ilike', 'between', 'in']
+    const operadores = ['=', '<>', '<', '>', '<=', '>=', 'ilike', 'like', 'between', 'in']
     if (!queryText) return []
+
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {

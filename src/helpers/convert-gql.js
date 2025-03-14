@@ -150,7 +150,7 @@ const convertGQL = (filter, table) => {
     dataset: table.dataset,
     limit: table.limit,
     orderBy: table.orderBy,
-    filterQuery,
+    filterQuery: formatFilter(filterQuery),
     fields: fieldsFormat
   }
 
@@ -291,6 +291,20 @@ const formatFilterParameter = (variables, fields) => {
     }
 
     return `\t$${key}: ${type}!`
+  })
+}
+
+const formatFilter = (filters) => {
+  return filters.map((filter) => {
+    if (filter.toLocaleLowerCase().includes('ilike')) {
+      const parts = filter.split(':')
+      if (parts.length) {
+        const operator = parts[0].replace(/ilike/i, '')
+        const value = parts[1].trim()
+        return `not: { ${operator}Like: ${value} }`
+      }
+    }
+    return filter
   })
 }
 
