@@ -36,7 +36,7 @@ const fixtures = {
         currency: 0,
         descriptions: [
           {
-            service: 'Total Requests (per 10,000)',
+            service: 'Total Requests',
             slug: 'requests',
             quantity: '848,506',
             price: 0,
@@ -50,7 +50,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Data Transfered (per GB)',
+            service: 'Total Data Transfered',
             slug: 'data_transferred',
             quantity: '1.727 GB',
             price: 0,
