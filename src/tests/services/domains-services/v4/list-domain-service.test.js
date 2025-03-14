@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   domainMock: {
+    product_version: 'custom',
     id: 1718802691,
     name: 'variable-deploy-azion-20240619134303',
     alternate_domains: ['CName 1', 'CName 2'],
@@ -16,6 +17,7 @@ const fixtures = {
     ]
   },
   disabledDomainMock: {
+    product_version: '1.0',
     id: 4132123,
     name: 'Edge App Y',
     alternate_domains: ['CName 3', 'CName 4'],
@@ -67,7 +69,17 @@ describe('DomainsServices', () => {
     expect(result).toEqual([
       {
         id: fixtures.domainMock.id,
-        name: fixtures.domainMock.name,
+        name: {
+          tagProps: {
+            icon: 'pi pi-lock',
+            value: 'Locked',
+            outlined: true,
+            severity: 'warning'
+          },
+          text: fixtures.domainMock.name
+        },
+        disableEditClick: true,
+        isLocked: true,
         domainName: {
           content: fixtures.domainMock.domains[0].domain
         },
@@ -80,7 +92,12 @@ describe('DomainsServices', () => {
       },
       {
         id: fixtures.disabledDomainMock.id,
-        name: fixtures.disabledDomainMock.name,
+        name: {
+          tagProps: {},
+          text: fixtures.disabledDomainMock.name
+        },
+        disableEditClick: false,
+        isLocked: false,
         domainName: {
           content: fixtures.disabledDomainMock.domains[0].domain
         },
