@@ -21,8 +21,8 @@
       type: Array,
       required: true
     },
-    wafRulesOptions: {
-      type: Array,
+    listWafRulesService: {
+      type: Function,
       required: true
     },
     enabledModules: {
@@ -56,9 +56,10 @@
   const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const networkList = ref([])
-
+  const wafRulesOptions = ref([])
+  const hasWafAccess = ref(true)
   onMounted(async () => {
-    await listNetworkList()
+    await Promise.all([listNetworkList(), listWafRulesOptions()])
   })
 
   const listNetworkList = async () => {
@@ -68,6 +69,24 @@
       page: 1
     })
     return networkList.value
+  }
+
+  const listWafRulesOptions = async () => {
+    try {
+      const result = await props.listWafRulesService()
+      wafRulesOptions.value = result
+    } catch (error) {
+      hasWafAccess.value = false
+      const wafBehavior = behaviors.value.find(
+        (behavior) => behavior.value?.name === 'set_waf_ruleset'
+      )
+      if (wafBehavior.value && !hasWafAccess.value) {
+        wafRulesOptions.value.push({
+          id: wafBehavior.value.waf_id,
+          name: wafBehavior.value.waf_id
+        })
+      }
+    }
   }
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
@@ -378,7 +397,10 @@
             ? 'Set WAF Rule Set'
             : 'Set WAF Rule Set - requires WAF'
         }`,
-        disabled: wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled
+        disabled:
+          wafBehaviorIsAlreadySelected ||
+          !hasWebApplicationFirewallModuleEnabled ||
+          !hasWafAccess.value
       },
       {
         value: 'run_function',

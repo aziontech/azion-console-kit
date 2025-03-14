@@ -46,7 +46,7 @@ describe('HttpRequestServices', () => {
       `\t$tsRange_end: DateTime!`,
       `) {`,
       `\t${datasetName} (`,
-      `\t\tlimit: 10000`,
+      `\t\tlimit: 1000`,
       `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
@@ -109,7 +109,6 @@ describe('HttpRequestServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.httpRequest.configurationId,
           requestId: fixtures.httpRequest.requestId,
           summary: [
             { key: 'configurationId', value: fixtures.httpRequest.configurationId },
