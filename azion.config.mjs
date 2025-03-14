@@ -92,6 +92,12 @@ const config = {
         type: 'object_storage'
       },
       {
+        name: 'origin-billing',
+        type: 'single_origin',
+        hostHeader: `billing-api.azion.net`,
+        addresses: [`billing-api.azion.net`]
+      },
+      {
         name: 'origin-script-runner',
         type: 'single_origin',
         hostHeader: `script-runner.azion.com`,
@@ -330,6 +336,24 @@ const config = {
         }
       },
       {
+        name: 'Billing PDF',
+        description: 'Enable users do download billing PDF.',
+        match: '^/billing/invoices',
+        behavior: {
+          setOrigin: {
+            name: 'origin-billing',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/billing/invoices/([0-9]{2}-[0-9]{4})',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/billing/invoices/%{captured[1]}`,
+          forwardCookies: true,
+        }
+      },
+      {
         name: 'API Version 4 Routing',
         description: 'Directs API version 4 requests to the designated API origin for handling.',
         match: '^/v4',
@@ -337,7 +361,7 @@ const config = {
           setOrigin: {
             name: 'origin-api',
             type: 'single_origin'
-          }
+          },
         }
       },
       {
