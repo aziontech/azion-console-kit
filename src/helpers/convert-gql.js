@@ -299,7 +299,7 @@ const formatFilter = (filters) => {
     if (filter.toLocaleLowerCase().includes('ilike')) {
       const parts = filter.split(':')
       if (parts.length) {
-        const operator = parts[0].toLocaleLowerCase().replace('ilike', '')
+        const operator = parts[0].replace(/ilike/i, '')
         const value = parts[1].trim()
         return `not: { ${operator}Like: ${value} }`
       }
