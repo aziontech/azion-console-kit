@@ -15,7 +15,8 @@
                 outlined
                 size="small"
                 label="Export"
-                :disabled="invoiceData?.temporaryBill || !accountIsNotRegular"
+                @click="invoiceDownload"
+                :disabled="!invoiceData?.billId"
               />
             </div>
             <div class="flex justify-between mt-4">
@@ -164,6 +165,7 @@
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
   import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'
+  import { windowOpen } from '@/helpers/window-open'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -241,5 +243,9 @@
       severity: 'success',
       summary: 'Successfully copied!'
     })
+  }
+
+  const invoiceDownload = () => {
+    windowOpen(invoiceData.value.invoiceDownloadURL, '_blank')
   }
 </script>
