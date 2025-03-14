@@ -1,7 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
 import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
-import * as DomainsServiceV4 from '@/services/domains-services/v4'
+import * as DomainsService from '@/services/domains-services'
 
 import { listCountriesService } from '@/services/network-lists-services'
 
@@ -75,8 +75,8 @@ export const wafRulesRoutes = {
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
           createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
           listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService,
-          listDomainsService: DomainsServiceV4.listDomainsService,
-          loadDomainService: DomainsServiceV4.loadDomainService,
+          listDomainsService: DomainsService.listDomainsService,
+          loadDomainService: DomainsService.loadDomainService,
           loadNetworkListService: WafRulesServiceV4.loadNetworkListService
         }
       },

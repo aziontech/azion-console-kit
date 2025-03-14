@@ -17,7 +17,7 @@
         <FieldMultiselectLazyLoader
           data-testid="waf-tuning-list__domains-field"
           name="valueDomainId"
-          :service="props.listDomainsService"
+          :service="adaptDomainsService"
           :loadService="props.loadDomainService"
           optionLabel="name"
           optionValue="id"
@@ -186,8 +186,8 @@
       type: Function
     },
     listNetworkListService: {
-      required: true,
-      type: Function
+      type: Function,
+      required: true
     },
     listWafRulesDomainsService: {
       required: true,
@@ -558,12 +558,61 @@
 
   const setDomainsOptions = async () => {
     try {
-      const response = await props.listDomainsService({ fields: 'id,name,active' })
-      domainsOptions.value.options = response.body
+      domainsOptions.value.done = true
+      const response = await props.listDomainsService({ fields: 'id,name,is_active' })
+      domainsOptions.value.options = response.results
+        ? response.results.map((domain) => ({
+            id: domain.id,
+            name: domain.name,
+            active: domain.is_active
+          }))
+        : []
     } catch (error) {
       showToast(error, 'error')
     } finally {
       domainsOptions.value.done = false
+    }
+  }
+
+  const adaptDomainsService = async (params) => {
+    try {
+      const apiParams = {
+        page: params.page || 1,
+        page_size: params.pageSize || 100,
+        search: params.search || '',
+        orderBy: params.ordering || 'name',
+        sort: 'asc',
+        fields: typeof params.fields === 'string' ? params.fields : 'id,name,is_active'
+      }
+
+      const response = await props.listDomainsService(apiParams)
+
+      if (Array.isArray(response)) {
+        return {
+          body: response.map((domain) => ({
+            id: domain.id,
+            name: domain.name || domain.domain_name || '',
+            active: domain.is_active !== undefined ? domain.is_active : true
+          })),
+          count: response.length
+        }
+      }
+
+      // Fallback
+      if (response && response.results && Array.isArray(response.results)) {
+        return {
+          body: response.results.map((domain) => ({
+            id: domain.id,
+            name: domain.name || domain.domain_name || '',
+            active: domain.is_active !== undefined ? domain.is_active : true
+          })),
+          count: response.count || response.results.length
+        }
+      }
+
+      return { body: [], count: 0 }
+    } catch (error) {
+      return { body: [], count: 0 }
     }
   }
 
