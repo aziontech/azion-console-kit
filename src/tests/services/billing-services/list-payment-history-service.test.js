@@ -22,7 +22,8 @@ const fixtures = {
     regionName: 'US',
     productSlug: 'product-1',
     metricSlug: 'metric-1'
-  }
+  },
+  environment: 'production'
 }
 
 const makeSut = () => {
@@ -64,6 +65,7 @@ describe('BillingServices', () => {
   })
 
   it('should parse correctly all returned payment history', async () => {
+    vi.stubEnv('VITE_ENVIRONMENT', fixtures.environment)
     localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -153,6 +155,7 @@ describe('BillingServices', () => {
   })
 
   it('should parse correctly payment history for regular accounts', async () => {
+    vi.stubEnv('VITE_ENVIRONMENT', fixtures.environment)
     useAccountStore.mockReturnValue({
       accountIsNotRegular: false
     })

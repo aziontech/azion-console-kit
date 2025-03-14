@@ -34,7 +34,8 @@ const fixtures = {
     temporaryBill: true,
     invoiceDownloadURL: 'https://console.azion.com/v4/billing/invoices/07-2024'
   },
-  mockError: [{ message: 'Error' }]
+  mockError: [{ message: 'Error' }],
+  environment: 'production'
 }
 
 const makeSut = () => {
@@ -47,6 +48,7 @@ const makeSut = () => {
 
 describe('BillingServices', () => {
   it('should return correct data on success', async () => {
+    vi.stubEnv('VITE_ENVIRONMENT', fixtures.environment)
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: fixtures.mockResponse
