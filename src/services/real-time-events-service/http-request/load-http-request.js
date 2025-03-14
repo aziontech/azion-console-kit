@@ -5,79 +5,91 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
 import { getUserTimezone } from '../get-timezone'
 
-export const loadHttpRequest = async (filter) => {
-  const payload = adapt(filter)
+const fieldsByRequest = [
+  [
+    'httpReferer',
+    'scheme',
+    'ts',
+    'httpUserAgent',
+    'remoteAddress',
+    'host',
+    'remotePort',
+    'upstreamBytesReceived',
+    'configurationId',
+    'requestTime',
+    'requestLength',
+    'bytesSent',
+    'upstreamResponseTime',
+    'sentHttpContentType',
+    'requestId',
+    'sslCipher',
+    'requestMethod',
+    'upstreamBytesSent',
+    'requestUri',
+    'sslProtocol',
+    'upstreamAddr',
+    'upstreamStatus',
+    'status',
+    'wafScore',
+    'wafTotalProcessed',
+    'wafTotalBlocked',
+    'wafLearning',
+    'wafBlock',
+    'debugLog',
+    'wafMatch',
+    'geolocAsn',
+    'stacktrace',
+    'geolocCountryName',
+    'geolocRegionName',
+    'upstreamCacheStatus',
+    'serverProtocol'
+  ],
+  ['serverAddr', 'serverPort']
+]
 
+const mergeHttpEvents = (responses) => {
+  return responses
+    .flatMap((res) => res.body?.data?.httpEvents || [])
+    .reduce((acc, event) => {
+      Object.entries(event).forEach(([key, value]) => {
+        acc[key] = acc[key] ? [].concat(acc[key], value) : value
+      })
+      return acc
+    }, {})
+}
+
+const createPayload = (filter, fields) => {
+  return convertGQL(
+    {
+      tsRange: filter.tsRange,
+      and: { tsEq: filter.ts, requestIdEq: filter.requestId }
+    },
+    {
+      dataset: 'httpEvents',
+      limit: 10000,
+      fields,
+      orderBy: 'ts_ASC'
+    }
+  )
+}
+
+export const loadHttpRequest = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
-  const httpResponse = await decorator.request({
-    baseURL: '/',
-    url: makeRealTimeEventsBaseUrl(),
-    method: 'POST',
-    body: payload
-  })
+  const requests = fieldsByRequest.map((fields) =>
+    decorator.request({
+      baseURL: '/',
+      url: makeRealTimeEventsBaseUrl(),
+      method: 'POST',
+      body: createPayload(filter, fields)
+    })
+  )
 
-  return adaptResponse(httpResponse)
+  const httpResponses = await Promise.all(requests)
+  return adaptResponse(mergeHttpEvents(httpResponses))
 }
 
-const adapt = (filter) => {
-  const table = {
-    dataset: 'httpEvents',
-    limit: 10000,
-    fields: [
-      'httpReferer',
-      'scheme',
-      'ts',
-      'httpUserAgent',
-      'remoteAddress',
-      'host',
-      'remotePort',
-      'upstreamBytesReceived',
-      'configurationId',
-      'requestTime',
-      'requestLength',
-      'bytesSent',
-      'upstreamResponseTime',
-      'sentHttpContentType',
-      'requestId',
-      'sslCipher',
-      'requestMethod',
-      'upstreamBytesSent',
-      'requestUri',
-      'sslProtocol',
-      'upstreamAddr',
-      'upstreamStatus',
-      'status',
-      'wafScore',
-      'wafTotalProcessed',
-      'wafTotalBlocked',
-      'wafLearning',
-      'wafBlock',
-      'debugLog',
-      'wafMatch',
-      'geolocAsn',
-      'stacktrace',
-      'geolocCountryName',
-      'geolocRegionName',
-      'upstreamCacheStatus',
-      'serverProtocol'
-    ],
-    orderBy: 'ts_ASC'
-  }
-
-  const formatFilter = {
-    tsRange: filter.tsRange,
-    and: {
-      tsEq: filter.ts,
-      requestIdEq: filter.requestId
-    }
-  }
-  return convertGQL(formatFilter, table)
-}
-
-const adaptResponse = (httpResponse) => {
-  const { body } = httpResponse
-  const [httpEventItem = {}] = body.data.httpEvents
+const adaptResponse = (httpEventItem) => {
   const timezone = getUserTimezone()
 
   const adapt = {
@@ -117,7 +129,9 @@ const adaptResponse = (httpResponse) => {
     geolocCountryName: httpEventItem.geolocCountryName,
     geolocRegionName: httpEventItem.geolocRegionName,
     upstreamCacheStatus: httpEventItem.upstreamCacheStatus,
-    serverProtocol: httpEventItem.serverProtocol
+    serverProtocol: httpEventItem.serverProtocol,
+    serverAddr: httpEventItem.serverAddr,
+    serverPort: httpEventItem.serverPort
   }
 
   return {

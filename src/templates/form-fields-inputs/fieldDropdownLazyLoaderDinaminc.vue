@@ -55,6 +55,7 @@
             v-model="search"
             placeholder="Search"
             class="w-full rounded-r-none"
+            :disabled="!hasServiceAccess"
             ref="focusSearch"
             :data-testid="customTestId.search"
           />
@@ -172,6 +173,7 @@
   const SEARCH_MAX_WAIT = 1000
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
+  const hasServiceAccess = ref(true)
 
   const name = toRef(props, 'name')
   const slots = useSlots()
@@ -311,6 +313,13 @@
         return
       }
       emitChange()
+    } catch {
+      const newOption = {
+        [props.optionLabel]: id,
+        [props.optionValue]: id
+      }
+      data.value = [newOption, ...data.value]
+      hasServiceAccess.value = false
     } finally {
       loading.value = false
     }
