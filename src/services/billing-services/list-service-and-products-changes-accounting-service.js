@@ -155,9 +155,9 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
 }
 
 const mapDescriptions = (product, productsGrouped, productsGroupedByRegion) => {
-  // console.log(productsGroupedByRegion)
-  productsGroupedByRegion.sort((regionA, regionB) => regionA.regionName.localeCompare(regionB.regionName))
-  // productsGroupedByRegion.sort((regionA, regionB) => regionA.regionName.localeCompare(regionB.regionName))
+  productsGroupedByRegion.sort((regionA, regionB) =>
+    regionA.regionName.localeCompare(regionB.regionName)
+  )
   return productsGrouped.reduce((list, metric) => {
     if (metric.productSlug === product.productSlug) {
       const unit = METRIC_SLUGS[metric.metricSlug]?.unit
