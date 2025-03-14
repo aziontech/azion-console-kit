@@ -87,7 +87,6 @@ const PRODUCT_NAMES = {
   data_stream: 'Data Stream',
   real_time_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
