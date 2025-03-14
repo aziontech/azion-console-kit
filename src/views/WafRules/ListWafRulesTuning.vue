@@ -24,7 +24,7 @@
           v-model="selectedDomainIds"
           @change="setDomainsSelectedOptions"
           class="w-full sm:max-w-xs"
-           placeholder="Select domain"
+          placeholder="Select domain"
           filter
           display="chip"
           scrollHeight="250px"
@@ -168,7 +168,7 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
- 
+
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
@@ -433,8 +433,8 @@
   }
 
   const setDomainsSelectedOptions = () => {
-    selectedFilter.value.domains = selectedDomainIds.value || [];
-    filterTuning();
+    selectedFilter.value.domains = selectedDomainIds.value || []
+    filterTuning()
   }
 
   const downloadCSV = () => {
@@ -566,37 +566,20 @@
     }
   }
 
-  const setDomainsOptions = async () => {
+  const listDomainsOptions = async () => {
     try {
-   
-      domainsOptions.value.done = false;
-      
-      const params = { fields: 'id,name,active' };
-      const response = await props.listDomainsService(params);
+      domainsOptions.value.done = false
 
-      
-      if (Array.isArray(response)) {
-        domainsOptions.value.options = response;
-      } else if (response && response.results && Array.isArray(response.results)) {
-        domainsOptions.value.options = response.results;
-      } else {
-        domainsOptions.value.options = [];
-      }
-      
+      const domains = await props.listDomainsService({ wafId: wafRuleId })
 
-    } catch (error) {
-
-      domainsOptions.value.options = [];
+      domainsOptions.value.options = domains
     } finally {
-      domainsOptions.value.done = true;
+      domainsOptions.value.done = true
     }
   }
 
   onMounted(async () => {
-    await setNetWorkListOptions();
-    await setDomainsOptions();
-
+    await setNetWorkListOptions()
+    await listDomainsOptions()
   })
-
-
 </script>

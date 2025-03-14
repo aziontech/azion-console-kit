@@ -75,7 +75,7 @@ export const wafRulesRoutes = {
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
           createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
           listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService,
-          listDomainsService: DomainsService.listDomainsService,
+          listDomainsService: WafRulesService.listWafRulesDomainsService,
           loadDomainService: DomainsService.loadDomainService,
           loadNetworkListService: WafRulesServiceV4.loadNetworkListService
         }
