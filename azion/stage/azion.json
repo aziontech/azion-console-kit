@@ -54,11 +54,6 @@
       "name": "origin-api"
     },
     {
-      "origin-id": 146193,
-      "origin-key": "bded9065-b277-4e7b-b55a-bdb0b0064b21",
-      "name": "origin-manager"
-    },
-    {
       "origin-id": 146195,
       "origin-key": "c92f57e1-79d6-4bcc-9493-2af4ad9f4dd5",
       "name": "origin-cities"
