@@ -29,7 +29,6 @@ const adapt = (httpResponse, accountIsNotRegular) => {
   } = httpResponse
   const invoiceData = accountIsNotRegular ? data?.billDetail : data?.accountingDetail
   const parseInvoice = invoiceData?.map((invoice) => {
-    const period = formatDateToMonthYear(invoice.periodFrom)
     if (accountIsNotRegular) {
       return {
         billId: invoice.billId,
@@ -43,7 +42,7 @@ const adapt = (httpResponse, accountIsNotRegular) => {
         servicePlan: '---',
         creditUsedForPayment: 0.0,
         temporaryBill: invoice.temporaryBill,
-        invoiceDownloadURL: getLinkDownloadInvoice(period)
+        invoiceDownloadURL: getLinkDownloadInvoice(formatDateToMonthYear(invoice.periodFrom))
       }
     }
     return {
@@ -52,7 +51,7 @@ const adapt = (httpResponse, accountIsNotRegular) => {
       billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
         invoice.periodTo
       )}`,
-      invoiceDownloadURL: getLinkDownloadInvoice(period)
+      invoiceDownloadURL: getLinkDownloadInvoice(formatDateToMonthYear(invoice.periodTo))
     }
   })
   return {

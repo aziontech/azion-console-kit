@@ -158,11 +158,10 @@ const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
 const formatDateToMonthYear = (date) => {
   if (!date) return ''
 
-  const dateParts = date.split('-')
-  const year = dateParts?.[0]
-  const month = dateParts?.[1]
+  const [year, month] = date.split('-') ?? []
+  if (year && month) return `${month}-${year}`
 
-  return `${month}-${year}`
+  return []
 }
 
 export {
