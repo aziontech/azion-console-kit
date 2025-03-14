@@ -14,18 +14,30 @@
           class="w-full sm:max-w-xs"
         />
 
-        <FieldMultiselectLazyLoader
+        <MultiSelect
           data-testid="waf-tuning-list__domains-field"
-          name="valueDomainId"
-          :service="props.listDomainsService"
-          :loadService="props.loadDomainService"
+          appendTo="body"
           optionLabel="name"
           optionValue="id"
-          :value="valueDomainId"
-          appendTo="self"
-          class="w-full sm:max-w-xs overflow-hidden"
+          :options="domainsOptions.options"
+          :loading="!domainsOptions.done"
+          v-model="selectedDomainIds"
+          @change="setDomainsSelectedOptions"
+          class="w-full sm:max-w-xs"
           placeholder="Select domain"
-          @onChange="setDomainsSelectedOptions"
+          filter
+          display="chip"
+          scrollHeight="250px"
+          :maxSelectedLabels="3"
+          :virtualScrollerOptions="{ itemSize: 38 }"
+          :pt="{
+            panel: { class: 'surface-section shadow-2 border-none' },
+            item: { class: 'hover:surface-hover' },
+            wrapper: { class: 'w-full' },
+            list: { class: 'p-0 list-none' },
+            filterInput: { class: 'surface-ground' }
+          }"
+          style="--p-multiselect-overlay-width: 100%"
         />
 
         <FieldDropdownLazyLoader
@@ -130,7 +142,7 @@
     v-model:visible="showDetailsOfAttack"
     :listService="props.listWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
-    :domains="selectedDomains"
+    :domains="selectedFilter.domains"
     :time="timeName"
     :listNetworkListService="props.listNetworkListService"
     :loadNetworkListService="props.loadNetworkListService"
@@ -156,11 +168,11 @@
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import FieldMultiselectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader'
 
   import ListTableBlock from '@templates/list-table-block/with-selection-behavior'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
+  import MultiSelect from 'primevue/multiselect'
 
   import advancedFilter from '@/templates/advanced-filter'
   import { useToast } from 'primevue/usetoast'
@@ -234,16 +246,15 @@
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const netWorkListOptions = ref({ options: [], done: true })
-  const domainsOptions = ref({ options: [], done: true })
+  const domainsOptions = ref({ options: [], done: false })
   const tuningSelected = ref(null)
-  const selectedDomains = ref([])
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
   const listServiceWafTunningRef = ref('')
   const allowRuleOrigin = ref('')
 
   const valueNetworkId = ref(null)
-  const valueDomainId = ref(null)
+  const selectedDomainIds = ref([])
 
   const advancedFilterRef = ref(null)
 
@@ -421,9 +432,8 @@
     filterTuning()
   }
 
-  const setDomainsSelectedOptions = (value) => {
-    selectedDomains.value = value
-    selectedFilter.value.domains = value
+  const setDomainsSelectedOptions = () => {
+    selectedFilter.value.domains = selectedDomainIds.value || []
     filterTuning()
   }
 
@@ -556,19 +566,20 @@
     }
   }
 
-  const setDomainsOptions = async () => {
+  const listDomainsOptions = async () => {
     try {
-      const response = await props.listDomainsService({ fields: 'id,name,active' })
-      domainsOptions.value.options = response.body
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
       domainsOptions.value.done = false
+
+      const domains = await props.listDomainsService({ wafId: wafRuleId.value })
+
+      domainsOptions.value.options = domains
+    } finally {
+      domainsOptions.value.done = true
     }
   }
 
   onMounted(async () => {
     await setNetWorkListOptions()
-    await setDomainsOptions()
+    await listDomainsOptions()
   })
 </script>
