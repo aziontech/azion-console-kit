@@ -93,6 +93,13 @@
     emit('edgeApplicationCreated')
   }
 
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await props.listEdgeApplicationsService({
+      ...queryParams,
+      isDropdown: true
+    })
+  }
+
   const handleEdgeFirewallCreated = (id) => {
     edgeFirewall.value = id
   }
@@ -208,7 +215,7 @@
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :service="listEdgeApplicationsService"
+          :service="listEdgeApplicationsDecorator"
           :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"

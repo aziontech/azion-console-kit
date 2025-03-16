@@ -8,16 +8,23 @@ export const listEdgeApplicationsService = async ({
   search = '',
   ordering = '',
   page = 1,
-  pageSize = 10
+  pageSize = 10,
+  isDropdown = false
 }) => {
-  const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
+  const searchParams = makeListServiceQueryParams({
+    fields,
+    ordering,
+    page,
+    pageSize,
+    search
+  })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationV4BaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
-  httpResponse = adapt(httpResponse)
+  httpResponse = adapt(httpResponse, isDropdown)
 
   return parseHttpResponse(httpResponse)
 }
@@ -37,11 +44,11 @@ const parseName = (edgeApplication) => {
   return nameProps
 }
 
-const adapt = (httpResponse) => {
+const adapt = (httpResponse, isDropdown) => {
   const parsedEdgeApplications = httpResponse.body.results?.map((edgeApplication) => {
     return {
       id: edgeApplication.id,
-      name: parseName(edgeApplication),
+      name: isDropdown ? edgeApplication.name : parseName(edgeApplication),
       disableEditClick: edgeApplication.product_version === LOCKED_VALUE,
       lastEditor: edgeApplication.last_editor,
       lastModify: dateFormat(edgeApplication.last_modified),
