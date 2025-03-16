@@ -16,8 +16,7 @@ export const listEdgeApplicationsService = async ({
     ordering,
     page,
     pageSize,
-    search,
-    isDropdown
+    search
   })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
