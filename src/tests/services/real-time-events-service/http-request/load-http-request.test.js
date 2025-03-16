@@ -11,7 +11,7 @@ const fixtures = {
       tsRangeEnd: '2024-02-23T19:07:25'
     }
   },
-  httpRequest: {
+  httpRequestFirst: {
     httpReferer: 'https://example.com',
     scheme: 'HTTPS',
     ts: '2024-02-23T18:07:25.000Z',
@@ -47,23 +47,31 @@ const fixtures = {
     stacktrace: null,
     geolocCountryName: 'United States',
     geolocRegionName: 'California'
+  },
+  httpRequestSecond: {
+    serverAddr: '10.0.0.1',
+    serverPort: '443'
   }
 }
 
 const makeSut = () => {
   const sut = loadHttpRequest
-
-  return {
-    sut
-  }
+  return { sut }
 }
 
 describe('HttpRequestServices', () => {
   it('should call GraphQL with correct filter', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: { httpEvents: [] } }
-    })
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { httpEvents: [] } }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { httpEvents: [] } }
+      })
+
     const { sut } = makeSut()
     await sut(fixtures.filter)
 
@@ -83,60 +91,68 @@ describe('HttpRequestServices', () => {
     })
   })
 
-  it('should parsed correctly each event', async () => {
+  it('should parse and merge events correctly', async () => {
     localeMock()
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { data: { httpEvents: [fixtures.httpRequest] } }
-    })
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { httpEvents: [fixtures.httpRequestFirst] } }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { data: { httpEvents: [fixtures.httpRequestSecond] } }
+      })
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
       data: [
-        { key: 'bytesSent', value: fixtures.httpRequest.bytesSent },
-        { key: 'configurationId', value: fixtures.httpRequest.configurationId },
+        { key: 'bytesSent', value: fixtures.httpRequestFirst.bytesSent },
+        { key: 'configurationId', value: fixtures.httpRequestFirst.configurationId },
         { key: 'debugLog', value: '-' },
-        { key: 'geolocAsn', value: fixtures.httpRequest.geolocAsn },
-        { key: 'geolocCountryName', value: fixtures.httpRequest.geolocCountryName },
-        { key: 'geolocRegionName', value: fixtures.httpRequest.geolocRegionName },
-        { key: 'host', value: fixtures.httpRequest.host },
-        { key: 'httpReferer', value: fixtures.httpRequest.httpReferer },
-        { key: 'httpUserAgent', value: fixtures.httpRequest.httpUserAgent },
-        { key: 'remoteAddress', value: fixtures.httpRequest.remoteAddress },
-        { key: 'remotePort', value: fixtures.httpRequest.remotePort },
-        { key: 'requestId', value: fixtures.httpRequest.requestId },
-        { key: 'requestLength', value: fixtures.httpRequest.requestLength },
-        { key: 'requestMethod', value: fixtures.httpRequest.requestMethod },
-        { key: 'requestTime', value: fixtures.httpRequest.requestTime },
-        { key: 'requestUri', value: fixtures.httpRequest.requestUri },
-        { key: 'scheme', value: fixtures.httpRequest.scheme },
-        { key: 'sentHttpContentType', value: fixtures.httpRequest.sentHttpContentType },
+        { key: 'geolocAsn', value: fixtures.httpRequestFirst.geolocAsn },
+        { key: 'geolocCountryName', value: fixtures.httpRequestFirst.geolocCountryName },
+        { key: 'geolocRegionName', value: fixtures.httpRequestFirst.geolocRegionName },
+        { key: 'host', value: fixtures.httpRequestFirst.host },
+        { key: 'httpReferer', value: fixtures.httpRequestFirst.httpReferer },
+        { key: 'httpUserAgent', value: fixtures.httpRequestFirst.httpUserAgent },
+        { key: 'remoteAddress', value: fixtures.httpRequestFirst.remoteAddress },
+        { key: 'remotePort', value: fixtures.httpRequestFirst.remotePort },
+        { key: 'requestId', value: fixtures.httpRequestFirst.requestId },
+        { key: 'requestLength', value: fixtures.httpRequestFirst.requestLength },
+        { key: 'requestMethod', value: fixtures.httpRequestFirst.requestMethod },
+        { key: 'requestTime', value: fixtures.httpRequestFirst.requestTime },
+        { key: 'requestUri', value: fixtures.httpRequestFirst.requestUri },
+        { key: 'scheme', value: fixtures.httpRequestFirst.scheme },
+        { key: 'sentHttpContentType', value: fixtures.httpRequestFirst.sentHttpContentType },
+        { key: 'serverAddr', value: fixtures.httpRequestSecond.serverAddr },
+        { key: 'serverPort', value: fixtures.httpRequestSecond.serverPort },
         { key: 'serverProtocol', value: '-' },
-        { key: 'sslCipher', value: fixtures.httpRequest.sslCipher },
-        { key: 'sslProtocol', value: fixtures.httpRequest.sslProtocol },
+        { key: 'sslCipher', value: fixtures.httpRequestFirst.sslCipher },
+        { key: 'sslProtocol', value: fixtures.httpRequestFirst.sslProtocol },
         { key: 'stacktrace', value: '-' },
-        { key: 'status', value: fixtures.httpRequest.status },
-        { key: 'tcpinfoRtt', value: fixtures.httpRequest.tcpinfoRtt },
-        { key: 'upstreamAddr', value: fixtures.httpRequest.upstreamAddr },
-        { key: 'upstreamBytesReceived', value: fixtures.httpRequest.upstreamBytesReceived },
-        { key: 'upstreamBytesSent', value: fixtures.httpRequest.upstreamBytesSent },
+        { key: 'status', value: fixtures.httpRequestFirst.status },
+        { key: 'tcpinfoRtt', value: fixtures.httpRequestFirst.tcpinfoRtt },
+        { key: 'upstreamAddr', value: fixtures.httpRequestFirst.upstreamAddr },
+        { key: 'upstreamBytesReceived', value: fixtures.httpRequestFirst.upstreamBytesReceived },
+        { key: 'upstreamBytesSent', value: fixtures.httpRequestFirst.upstreamBytesSent },
         { key: 'upstreamCacheStatus', value: '-' },
-        { key: 'upstreamResponseTime', value: fixtures.httpRequest.upstreamResponseTime },
-        { key: 'upstreamStatus', value: fixtures.httpRequest.upstreamStatus },
+        { key: 'upstreamResponseTime', value: fixtures.httpRequestFirst.upstreamResponseTime },
+        { key: 'upstreamStatus', value: fixtures.httpRequestFirst.upstreamStatus },
         { key: 'wafBlock', value: '-' },
         { key: 'wafLearning', value: '-' },
         { key: 'wafMatch', value: '-' },
         { key: 'wafScore', value: '-' },
         { key: 'wafTotalBlocked', value: '-' },
-        { key: 'wafTotalProcessed', value: fixtures.httpRequest.wafTotalProcessed }
+        { key: 'wafTotalProcessed', value: fixtures.httpRequestFirst.wafTotalProcessed }
       ],
-      host: fixtures.httpRequest.host,
-      remoteAddress: fixtures.httpRequest.remoteAddress,
-      remotePort: fixtures.httpRequest.remotePort,
-      requestId: fixtures.httpRequest.requestId,
-      scheme: fixtures.httpRequest.scheme,
+      host: fixtures.httpRequestFirst.host,
+      remoteAddress: fixtures.httpRequestFirst.remoteAddress,
+      remotePort: fixtures.httpRequestFirst.remotePort,
+      requestId: fixtures.httpRequestFirst.requestId,
+      scheme: fixtures.httpRequestFirst.scheme,
       ts: 'February 23, 2024 at 06:07:25 PM'
     })
   })

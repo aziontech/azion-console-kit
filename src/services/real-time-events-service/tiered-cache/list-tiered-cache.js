@@ -2,10 +2,11 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate } from '@/helpers'
+import { convertValueToDateByUserTimezone } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
+import { getUserTimezone } from '../get-timezone'
 
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -67,6 +68,8 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
+  const timezone = getUserTimezone()
+
   const data = response.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
@@ -74,7 +77,7 @@ const adaptResponse = (response) => {
     id: generateCurrentTimestamp(),
     summary: buildSummary(tieredCacheEvents),
     ts: tieredCacheEvents.ts,
-    tsFormat: convertValueToDate(tieredCacheEvents.ts)
+    tsFormat: convertValueToDateByUserTimezone(tieredCacheEvents.ts, timezone)
   }))
 
   return {

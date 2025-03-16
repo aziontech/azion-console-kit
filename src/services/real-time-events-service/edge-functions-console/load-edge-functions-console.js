@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -82,11 +83,12 @@ const levelMap = {
 const adaptResponse = (response) => {
   const { body } = response
   const [cellsConsoleEvents = {}] = body.data.cellsConsoleEvents
+  const timezone = getUserTimezone()
 
   return {
     lineSource: cellsConsoleEvents.lineSource,
     level: levelMap[cellsConsoleEvents.level],
-    ts: convertValueToDate(cellsConsoleEvents.ts),
+    ts: convertValueToDateByUserTimezone(cellsConsoleEvents.ts, timezone),
     data: buildSummary(cellsConsoleEvents)
   }
 }

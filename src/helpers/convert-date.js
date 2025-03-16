@@ -155,6 +155,30 @@ const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
   }).format(new Date(dateString))
 }
 
+const formatDateToMonthYear = (date) => {
+  if (!date) return ''
+
+  const [year, month] = date.split('-') ?? []
+  if (year && month) return `${month}-${year}`
+
+  return []
+}
+
+const convertValueToDateByUserTimezone = (value, timezone) => {
+  const date = new Date(value)
+  const options = {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }
+  return date.toLocaleString('en-US', options)
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -162,5 +186,7 @@ export {
   formatDateToUS,
   formatDateToUSBilling,
   getCurrentMonthStartEnd,
-  formatExhibitionDate
+  formatExhibitionDate,
+  formatDateToMonthYear,
+  convertValueToDateByUserTimezone
 }

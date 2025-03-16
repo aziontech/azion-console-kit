@@ -5,7 +5,6 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -56,8 +55,6 @@
     }
   })
 
-  const toast = useToast()
-
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
@@ -87,6 +84,8 @@
       }
     ]
   })
+
+  const hasEdgeFunctionsProductAccess = ref(true)
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -207,12 +206,8 @@
     try {
       const result = await listFunctionsServiceWithDecorator()
       edgeFirewallFunctionsOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+    } catch {
+      hasEdgeFunctionsProductAccess.value = false
     }
   }
 
@@ -259,6 +254,7 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
@@ -281,6 +277,7 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"

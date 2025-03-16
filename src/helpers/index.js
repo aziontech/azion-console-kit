@@ -25,7 +25,12 @@ import InviteSession from './invite-session'
 import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
-import { convertValueToDate, convertDateToLocalTimezone, formatDateToUS } from './convert-date'
+import {
+  convertValueToDate,
+  convertDateToLocalTimezone,
+  formatDateToUS,
+  convertValueToDateByUserTimezone
+} from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
@@ -85,5 +90,6 @@ export {
   setRedirectRoute,
   getRedirectRoute,
   buildSummary,
-  INFORMATION_TEXTS
+  INFORMATION_TEXTS,
+  convertValueToDateByUserTimezone
 }

@@ -11,44 +11,29 @@ const makeSut = () => {
 
 const scenarios = [
   {
-    section: 'manager',
+    section: 'console',
     env: 'development',
-    expected: 'https://stage-manager.azion.com'
+    expected: 'https://stage-console.azion.com'
   },
   {
-    section: 'manager',
+    section: 'console',
     env: 'stage',
-    expected: 'https://stage-manager.azion.com'
+    expected: 'https://stage-console.azion.com'
   },
   {
-    section: 'manager',
+    section: 'console',
     env: 'production',
-    expected: 'https://manager.azion.com'
-  },
-  {
-    section: 'managerEOL',
-    env: 'development',
-    expected: 'https://stage-manager.azion.com/home'
-  },
-  {
-    section: 'managerEOL',
-    env: 'stage',
-    expected: 'https://stage-manager.azion.com/home'
-  },
-  {
-    section: 'managerEOL',
-    env: 'production',
-    expected: 'https://manager.azion.com/home'
+    expected: 'https://console.azion.com'
   },
   {
     section: 'billing',
     env: 'stage',
-    expected: 'https://stage-manager.azion.com/billing-subscriptions'
+    expected: 'https://stage-console.azion.com/billing-subscriptions'
   },
   {
     section: 'billing',
     env: 'production',
-    expected: 'https://manager.azion.com/billing-subscriptions'
+    expected: 'https://console.azion.com/billing-subscriptions'
   },
   {
     section: 'playgroundMetrics',

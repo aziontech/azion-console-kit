@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-service'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+const LOCKED_VALUE = 'custom'
 
 export const listDomainsService = async ({
   search = '',
@@ -20,11 +21,28 @@ export const listDomainsService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+const parseName = (domain) => {
+  const nameProps = { text: domain.name, tagProps: {} }
+
+  if (domain?.product_version === LOCKED_VALUE) {
+    nameProps.tagProps = {
+      icon: 'pi pi-lock',
+      value: 'Locked',
+      outlined: true,
+      severity: 'warning'
+    }
+  }
+
+  return nameProps
+}
+
 const adapt = async (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((domain) => {
     return {
       id: domain.id,
-      name: domain.name,
+      name: parseName(domain),
+      isLocked: domain.product_version === LOCKED_VALUE,
+      disableEditClick: domain.product_version === LOCKED_VALUE,
       active: domain.active
         ? {
             content: 'Active',

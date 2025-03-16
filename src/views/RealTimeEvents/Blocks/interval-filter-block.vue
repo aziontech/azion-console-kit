@@ -4,6 +4,7 @@
   import Dropdown from 'primevue/dropdown'
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import DATE_TIME_INTERVALS from '@/views/RealTimeEvents/Blocks/constants/date-time-interval'
+  import { removeAmountOfHours } from './constants/filter-time'
 
   const accountStore = useAccountStore()
 
@@ -76,13 +77,13 @@
       return
     }
     interval.value = intervalOptions[0]
-    const [begin, end] = removeAmountOfHours(interval.value?.code)
+    const [begin, end] = removeAmountOfHours(interval.value?.code, userUTC)
     dates.value = [begin, end]
     setDateTimeFilters(begin, end)
   }
 
   const handleSelect = (offset) => {
-    const [begin, end] = removeAmountOfHours(offset)
+    const [begin, end] = removeAmountOfHours(offset, userUTC)
 
     if (checkIfDatesAreEqual(begin, end)) return true
 
@@ -111,14 +112,6 @@
 
     lastFilteredDate.value = { begin, end }
     setTimeRange.value = { ...tsRange }
-  }
-
-  const removeAmountOfHours = (offset) => {
-    const date = new Date()
-    const begin = date.removeSelectedAmountOfHours(offset)
-    const end = date.removeSelectedAmountOfHours(0)
-
-    return [begin.toUTC(userUTC), end.toUTC(userUTC)]
   }
 
   const dropdownChange = ({ value }) => {

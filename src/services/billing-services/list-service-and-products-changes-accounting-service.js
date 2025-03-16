@@ -87,7 +87,6 @@ const PRODUCT_NAMES = {
   data_stream: 'Data Stream',
   real_time_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
@@ -102,19 +101,19 @@ const PRODUCT_NAMES = {
 }
 
 const METRIC_SLUGS = {
-  application_accelerator_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  requests: { title: 'Total Requests (per 10,000)' },
-  data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  data_stream_requests: { title: 'Total Requests (per 10,000)' },
-  network_layer_protection_requests: { title: 'Total Requests (per 10,000)' },
-  tiered_cache_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  load_balancer_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  waf_requests: { title: 'Total Requests (per 10,000)' },
+  application_accelerator_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  requests: { title: 'Total Requests' },
+  data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  data_stream_requests: { title: 'Total Requests' },
+  network_layer_protection_requests: { title: 'Total Requests' },
+  tiered_cache_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  load_balancer_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  waf_requests: { title: 'Total Requests' },
   ddos_protection_20gbps: { title: 'DDoS Protection 20Gbps' },
   ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
-  ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  ddos_protection_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
   ddos_protection_unlimited: { title: 'DDoS Protection Unlimited', unit: 'Days' },
-  compute_time: { title: 'Compute Time' },
+  compute_time: { title: 'Compute Time', unit: 'ms' },
   invocations: { title: 'Invocations' },
   images_processed: { title: 'Images Processed' },
   hosted_zones: { title: 'Hosted Zones' },
@@ -155,6 +154,9 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
 }
 
 const mapDescriptions = (product, productsGrouped, productsGroupedByRegion) => {
+  productsGroupedByRegion.sort((regionA, regionB) =>
+    regionA.regionName.localeCompare(regionB.regionName)
+  )
   return productsGrouped.reduce((list, metric) => {
     if (metric.productSlug === product.productSlug) {
       const unit = METRIC_SLUGS[metric.metricSlug]?.unit
@@ -190,6 +192,7 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
 const joinEdgeApplicationWithTieredCache = (services) => {
   const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
+  const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
 
   if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
 
@@ -235,6 +238,7 @@ const joinEdgeApplicationWithTieredCache = (services) => {
   })
 
   services.splice(tieredCacheServiceIndex, 1)
+  services.splice(edgeStorageServiceIndex, 1)
 
   return services
 }

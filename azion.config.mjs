@@ -92,10 +92,28 @@ const config = {
         type: 'object_storage'
       },
       {
-        name: 'origin-manager',
+        name: 'origin-billing',
         type: 'single_origin',
-        hostHeader: `manager.azion.com`,
-        addresses: [`manager.azion.com`]
+        hostHeader: `billing-api.azion.net`,
+        addresses: [`billing-api.azion.net`]
+      },
+      {
+        name: 'origin-script-runner',
+        type: 'single_origin',
+        hostHeader: `script-runner.azion.com`,
+        addresses: [`script-runner.azion.com`]
+      },
+      {
+        name: 'origin-template-engine',
+        type: 'single_origin',
+        hostHeader: `template-engine.azion.com`,
+        addresses: [`template-engine.azion.com`]
+      },
+      {
+        name: 'origin-iam-api',
+        type: 'single_origin',
+        hostHeader: `iam-api.azion.net`,
+        addresses: [`iam-api.azion.net`]
       },
       {
         name: 'origin-marketplace',
@@ -252,11 +270,11 @@ const config = {
       {
         name: 'Route Specific API Services to Template Engine Origin',
         description:
-          'Routes template-engine API services to the manager origin, forwarding cookies and bypassing cache.',
+          'Routes template-engine API services to the template engine origin, forwarding cookies and bypassing cache.',
         match: '^/api/template-engine',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-template-engine',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -276,7 +294,7 @@ const config = {
         match: '^/api/script-runner',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-script-runner',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -318,6 +336,24 @@ const config = {
         }
       },
       {
+        name: 'Billing PDF',
+        description: 'Enable users do download billing PDF.',
+        match: '^/billing/invoices',
+        behavior: {
+          setOrigin: {
+            name: 'origin-billing',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/billing/invoices/([0-9]{2}-[0-9]{4})',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/billing/invoices/%{captured[1]}`,
+          forwardCookies: true,
+        }
+      },
+      {
         name: 'API Version 4 Routing',
         description: 'Directs API version 4 requests to the designated API origin for handling.',
         match: '^/v4',
@@ -348,7 +384,7 @@ const config = {
         behavior: {
           forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-iam-api',
             type: 'single_origin'
           },
           capture: {

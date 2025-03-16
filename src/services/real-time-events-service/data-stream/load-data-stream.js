@@ -1,8 +1,9 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
+import { getUserTimezone } from '../get-timezone'
 
 export const loadDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -49,10 +50,11 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [dataStreamedEvents = {}] = body.data.dataStreamedEvents
+  const timezone = getUserTimezone()
 
   return {
     url: dataStreamedEvents.url,
-    ts: convertValueToDate(dataStreamedEvents.ts),
+    ts: convertValueToDateByUserTimezone(dataStreamedEvents.ts, timezone),
     jobName: {
       content: dataStreamedEvents.jobName,
       severity: 'info'
