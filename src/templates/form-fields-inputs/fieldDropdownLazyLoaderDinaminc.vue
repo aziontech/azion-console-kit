@@ -185,7 +185,7 @@
   const focusSearch = ref(null)
   const disableEmitInit = ref(props.disableEmitFirstRender)
 
-  onMounted(async () => {
+  onMounted(() => {
     loadSelectedValue(props.value)
   })
 
@@ -384,7 +384,8 @@
 
       data.value = results
       totalCount.value = newValue.count
-    }
+    },
+    { immediate: true }
   )
 
   watchDebounced(
