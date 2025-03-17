@@ -295,11 +295,12 @@ const formatFilterParameter = (variables, fields) => {
 }
 
 const formatFilter = (filters, fields) => {
+  if (!filters.length && !fields.length) return []
   return filters.map((filter) => {
     const [key, value] = filter.split(':')
     const currentFilter = key.trim()
 
-    const matchingField = fields.find(field => (`${field.valueField}${field.operator}`).toLowerCase() === currentFilter.toLowerCase())
+    const matchingField = fields?.find(field => (`${field.valueField}${field.operator}`).toLowerCase() === currentFilter.toLowerCase())
 
     if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
       return `not: { ${matchingField.valueField}Like: ${value} }`
