@@ -44,6 +44,7 @@ import { eventsPlaygroundOpener } from './events-playground-opener'
 import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
 import { buildSummary } from './build-summary'
 import INFORMATION_TEXTS from './azion-information-texts'
+import { getCurrentTimezone } from './account-timezone'
 
 export {
   InviteSession,
@@ -91,5 +92,6 @@ export {
   getRedirectRoute,
   buildSummary,
   INFORMATION_TEXTS,
-  convertValueToDateByUserTimezone
+  convertValueToDateByUserTimezone,
+  getCurrentTimezone
 }

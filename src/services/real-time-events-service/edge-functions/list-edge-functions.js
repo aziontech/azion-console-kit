@@ -2,11 +2,10 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDateByUserTimezone } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
-import { getUserTimezone } from '../get-timezone'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -46,13 +45,11 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const timezone = getUserTimezone()
-
   const data = response.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeFunctionsEvents),
     ts: edgeFunctionsEvents.ts,
-    tsFormat: convertValueToDateByUserTimezone(edgeFunctionsEvents.ts, timezone),
+    tsFormat: getCurrentTimezone(edgeFunctionsEvents.ts),
     configurationId: edgeFunctionsEvents.configurationId
   }))
 

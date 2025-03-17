@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 import { capitalizeFirstLetter } from '@/helpers'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listDigitalCertificatesService = async ({
   search = '',
@@ -39,21 +40,6 @@ const parseStatusData = (status) => {
   return parsedStatus
 }
 
-const parseValidityDate = (validity) => {
-  const formatOptions = {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
-  }
-
-  const dateFormatted = new Intl.DateTimeFormat('en-US', formatOptions).format(new Date(validity))
-
-  return dateFormatted
-}
-
 const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
 
 const adapt = (httpResponse) => {
@@ -82,7 +68,7 @@ const adapt = (httpResponse) => {
           issuer: checkIfFieldExist(item?.issuer),
           subjectName: subjectNames,
           type: checkIfFieldExist(typeMap[item?.type]),
-          validity: item?.validity ? parseValidityDate(item.validity) : '-',
+          validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
           status: statusColumn
         }
       })
