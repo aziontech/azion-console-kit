@@ -34,10 +34,18 @@ const CYPRESS_TOKEN = process.env.CI
   : cypressEnv[`${ENV}_CYPRESS_TOKEN`]
 
 const credentials = {
-  cypress: { token: CYPRESS_TOKEN, wait_time: 60 }
+  cypress: { token: CYPRESS_TOKEN, wait_time: 1 }
 }
 
 const entities = [
+  {
+    name: 'personal_tokens',
+    url: `${URL_v4}/iam/personal_tokens`,
+    version: 4,
+    idPropertyName: 'uuid',
+    exclude: ['2a456daa-99a1-4203-8788-e86bea95fe9b']
+  },
+  { name: 'variables', url: `${URL}/variables`, version: 3, idPropertyName: 'uuid' },
   { name: 'credentials', url: `${URL}/credentials`, version: 3 },
   {
     name: 'data_streaming',
@@ -78,7 +86,8 @@ const deleteResources = async (
   getCount,
   getResults,
   getSingleUrl,
-  excludeIds = []
+  excludeIds = [],
+  idPropertyName
 ) => {
   let hasResource = true
 
@@ -104,7 +113,7 @@ const deleteResources = async (
     let deletedCount = 0
 
     for (const resource of results) {
-      if (!excludeIds.includes(resource.id)) {
+      if (!excludeIds.includes(resource[idPropertyName])) {
         try {
           const singleResourceUrl = getSingleUrl(resource)
           const deleteResponse = await axios.delete(singleResourceUrl, {
@@ -132,6 +141,8 @@ const deleteResources = async (
 }
 
 const getCountFunctions = {
+  personal_tokens: (data) => (data ? data.count : 0),
+  variables: (data) => (data ? data.length : 0),
   credentials: (data) => (data.credentials ? data.credentials.length : 0),
   data_streaming: (data) => (data.results ? data.results.length : 0),
   edge_applications: (data) => (data.count ? data.count : 0),
@@ -143,6 +154,8 @@ const getCountFunctions = {
 }
 
 const getResultsFunctions = {
+  personal_tokens: (data) => data.results || [],
+  variables: (data) => data || [],
   credentials: (data) => data.credentials || [],
   data_streaming: (data) => data.results || [],
   edge_applications: (data) => data.results || [],
@@ -178,8 +191,13 @@ const getResultsFunctions = {
         wait_time,
         getCount,
         getResults,
-        (resource) => `${entity.url}/${resource.id}`,
-        entity.exclude || []
+        (resource) => {
+          return `${entity.url}/${
+            entity.idPropertyName ? resource[entity.idPropertyName] : resource.id
+          }`
+        },
+        entity.exclude || [],
+        entity.idPropertyName || 'id'
       )
     }
   }
