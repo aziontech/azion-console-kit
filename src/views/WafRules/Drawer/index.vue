@@ -231,7 +231,7 @@
     } else {
       query = params.filters
     }
-    query.domains = encodeURIComponent(props.domains.join(','))
+    query.domains = props.domains.join(',')
     const response = await props.listService({
       wafId: props.wafRuleId,
       tuningId: props.tuningObject.id,
