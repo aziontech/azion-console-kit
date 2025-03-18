@@ -634,7 +634,8 @@ describe('RealTimeMetricsModule', () => {
             'Displays the distribution of requests by region, country, ASN, and individual IP address.',
           fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
           groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
-          helpCenterPath: '/real-time-metrics/edge-applications/request-breakdown/ip-address-information',
+          helpCenterPath:
+            '/real-time-metrics/edge-applications/request-breakdown/ip-address-information',
           id: '357825388709151326',
           isTopX: false,
           label: 'IP Address Information',
@@ -931,7 +932,8 @@ describe('RealTimeMetricsModule', () => {
             wafLearning: '0'
           },
           groupBy: ['geolocCountryName'],
-          helpCenterPath: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph',
+          helpCenterPath:
+            '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph',
           id: '357842851576414806',
           isTopX: true,
           label: 'Top WAF Threat Requests by Country',
@@ -963,7 +965,8 @@ describe('RealTimeMetricsModule', () => {
             wafLearning: '0'
           },
           groupBy: ['geolocCountryName'],
-          helpCenterPath: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
+          helpCenterPath:
+            '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
           id: '357842851576414807',
           isTopX: true,
           label: 'Top WAF Threat Requests by Country',

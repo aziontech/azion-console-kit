@@ -37,7 +37,8 @@ const HELP_CENTER_URLS = {
       totalRequestsPerSecond:
         '/real-time-metrics/edge-applications/requests/total-requests-per-second',
       totalRequests: '/real-time-metrics/edge-applications/requests/total-requests',
-      ipAdressInformation: '/real-time-metrics/edge-applications/request-breakdown/ip-address-information'
+      ipAdressInformation:
+        '/real-time-metrics/edge-applications/request-breakdown/ip-address-information'
     },
     statusCodes: {
       httpStatusCodes2xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
@@ -79,9 +80,12 @@ const HELP_CENTER_URLS = {
         '/real-time-metrics/waf/threats/remote-file-inclusion-rfi-threats',
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
       threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests',
-      wafThreatsRequestsByFamilyAttack: '/real-time-metrics/waf/threats/waf-threat-requests-by-family-attack',
-      wafThreatsRequestsByCountryBarChart: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
-      wafThreatsRequestsByCountryPieChart: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph'
+      wafThreatsRequestsByFamilyAttack:
+        '/real-time-metrics/waf/threats/waf-threat-requests-by-family-attack',
+      wafThreatsRequestsByCountryBarChart:
+        '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
+      wafThreatsRequestsByCountryPieChart:
+        '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph'
     }
   },
   botManager: {
