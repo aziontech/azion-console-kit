@@ -48,7 +48,7 @@ const entities = [
     url: `${URL_v4}/iam/personal_tokens`,
     version: 4,
     idPropertyName: 'uuid',
-    exclude: ['02c52935-837d-47e9-8deb-8247e4c08171']
+    exclude: ['5d0a26b7-f98a-4b8b-9022-488384653ed9']
   },
   { name: 'variables', url: `${URL}/variables`, version: 3, idPropertyName: 'uuid' },
   { name: 'credentials', url: `${URL}/credentials`, version: 3 },
