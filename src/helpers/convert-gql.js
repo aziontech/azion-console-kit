@@ -295,7 +295,7 @@ const formatFilterParameter = (variables, fields) => {
 }
 
 const formatFilter = (filters, fields) => {
-  if (!filters.length && !fields.length) return []
+  if (!filters?.length && !fields?.length) return []
   return filters.map((filter) => {
     const [key, value] = filter.split(':')
     const currentFilter = key.trim()
