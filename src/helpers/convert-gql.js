@@ -300,7 +300,10 @@ const formatFilter = (filters, fields) => {
     const [key, value] = filter.split(':')
     const currentFilter = key.trim()
 
-    const matchingField = fields?.find(field => (`${field.valueField}${field.operator}`).toLowerCase() === currentFilter.toLowerCase())
+    const matchingField = fields?.find(
+      (field) =>
+        `${field.valueField}${field.operator}`.toLowerCase() === currentFilter.toLowerCase()
+    )
 
     if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
       return `not: { ${matchingField.valueField}Like: ${value} }`
