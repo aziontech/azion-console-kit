@@ -15,6 +15,8 @@
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')
   const { value: ttl } = useField('ttl')
+  const { value: weight } = useField('weight')
+  const { value: description } = useField('description')
 
   const edgeDNSStore = useEdgeDNSStore()
 
@@ -249,6 +251,7 @@
             description="Specify the weight for each record. Accepts integers between 0 and 255."
             placeholder="Weight"
             showButtons
+            :value="weight"
             :disabled="!enableTTLField"
             :min="0"
             :max="255"
@@ -265,6 +268,7 @@
         <FieldTextArea
           label="Description"
           required
+          :value="description"
           name="description"
           placeholder="add the description"
           description="Differentiate records with the same Name and Type by adding a description that identifies each one. Accepts up to 45 characters."
