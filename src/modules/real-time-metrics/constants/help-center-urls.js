@@ -27,7 +27,7 @@ const HELP_CENTER_URLS = {
       missedRequests: '/real-time-metrics/edge-applications/requests/missed-requests',
       requestsByMethod: '/real-time-metrics/edge-applications/requests/requests-by-method',
       averageRequestTime: '/real-time-metrics/edge-applications/requests/average-request-time',
-      requestByScheme: '/real-time-metrics/edge-applications/requests/request-by-scheme',
+      requestByScheme: '/real-time-metrics/edge-applications/requests/requests-by-scheme',
       requestsOffloaded: '/real-time-metrics/edge-applications/requests/requests-offloaded',
       requestsPerSecondOffloaded:
         '/real-time-metrics/edge-applications/requests/requests-per-second-offloaded',
@@ -36,7 +36,8 @@ const HELP_CENTER_URLS = {
       savedRequests: '/real-time-metrics/edge-applications/requests/saved-requests',
       totalRequestsPerSecond:
         '/real-time-metrics/edge-applications/requests/total-requests-per-second',
-      totalRequests: '/real-time-metrics/edge-applications/requests/total-requests'
+      totalRequests: '/real-time-metrics/edge-applications/requests/total-requests',
+      ipAdressInformation: '/real-time-metrics/edge-applications/request-breakdown/ip-address-information'
     },
     statusCodes: {
       httpStatusCodes2xx: '/real-time-metrics/edge-applications/status-codes/http-status-codes-2xx',
@@ -77,7 +78,10 @@ const HELP_CENTER_URLS = {
       remoteFileInclusionRfiThreats:
         '/real-time-metrics/waf/threats/remote-file-inclusion-rfi-threats',
       sqlInjectionThreats: '/real-time-metrics/waf/threats/sql-injection-threats',
-      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests'
+      threatsVsRequests: '/real-time-metrics/waf/threats/threats-vs-requests',
+      wafThreatsRequestsByFamilyAttack: '/real-time-metrics/waf/threats/waf-threat-requests-by-family-attack',
+      wafThreatsRequestsByCountryBarChart: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
+      wafThreatsRequestsByCountryPieChart: '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph'
     }
   },
   botManager: {
@@ -103,7 +107,7 @@ const HELP_CENTER_URLS = {
     }
   },
   threatsBreakdown: {
-    threatsRequestsByIps: '/real-time-metrics/threats/breakdown'
+    topWAFThreatRequestsByIP: '/real-time-metrics/threats/breakdown/top-waf-threat-requests-by-ip'
   }
 }
 
