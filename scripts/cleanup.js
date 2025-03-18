@@ -39,11 +39,16 @@ const credentials = {
 
 const entities = [
   {
+    name: 'domains',
+    url: `${URL}/domains`,
+    version: 3
+  },
+  {
     name: 'personal_tokens',
     url: `${URL_v4}/iam/personal_tokens`,
     version: 4,
     idPropertyName: 'uuid',
-    exclude: ['2a456daa-99a1-4203-8788-e86bea95fe9b']
+    exclude: ['02c52935-837d-47e9-8deb-8247e4c08171']
   },
   { name: 'variables', url: `${URL}/variables`, version: 3, idPropertyName: 'uuid' },
   { name: 'credentials', url: `${URL}/credentials`, version: 3 },
@@ -141,6 +146,7 @@ const deleteResources = async (
 }
 
 const getCountFunctions = {
+  domains: (data) => (data ? data.count : 0),
   personal_tokens: (data) => (data ? data.count : 0),
   variables: (data) => (data ? data.length : 0),
   credentials: (data) => (data.credentials ? data.credentials.length : 0),
@@ -154,6 +160,7 @@ const getCountFunctions = {
 }
 
 const getResultsFunctions = {
+  domains: (data) => data.results || [],
   personal_tokens: (data) => data.results || [],
   variables: (data) => data || [],
   credentials: (data) => data.credentials || [],
