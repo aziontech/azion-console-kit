@@ -86,8 +86,8 @@
     '${status}',
     '${tcpinfo_rtt}',
     '${upstream_addr}',
-    '${upstream_cookie_name}',
-    '${upstream_http_name}',
+    '${upstream_cookie_}',
+    '${upstream_http_}',
     '${upstream_status}'
   ]
 
