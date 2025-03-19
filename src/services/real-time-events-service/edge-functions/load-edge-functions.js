@@ -1,7 +1,5 @@
 import { convertGQL } from '@/helpers/convert-gql'
-import { convertValueToDateByUserTimezone } from '@/helpers/convert-date'
-import { getUserTimezone } from '../get-timezone'
-
+import { getCurrentTimezone } from '@/helpers'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { buildSummary } from '@/helpers'
@@ -53,12 +51,11 @@ const adaptResponse = (response) => {
   const { body } = response
   const [edgeFunctionsEvents = {}] = body.data.edgeFunctionsEvents
   edgeFunctionsEvents.edgeFunctionsList = edgeFunctionsEvents.edgeFunctionsList?.split(';')
-  const timezone = getUserTimezone()
 
   return {
     id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,
     data: buildSummary(edgeFunctionsEvents),
     functionLanguage: edgeFunctionsEvents.functionLanguage,
-    ts: convertValueToDateByUserTimezone(edgeFunctionsEvents.ts, timezone)
+    ts: getCurrentTimezone(edgeFunctionsEvents.ts)
   }
 }
