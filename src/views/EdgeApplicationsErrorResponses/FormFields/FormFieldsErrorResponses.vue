@@ -145,6 +145,14 @@
   onMounted(async () => {
     await getOrigins()
   })
+
+  const removeErrosResponses = async (index) => {
+    await removeErrorResponse(index)
+
+    if (!disableOriginKey.value) {
+      originId.value = null
+    }
+  }
 </script>
 
 <template>
@@ -205,7 +213,7 @@
               Custom Error Response
             </Divider>
             <PrimeButton
-              @click="removeErrorResponse(index)"
+              @click="removeErrosResponses(index)"
               outlined
               icon="pi pi-trash"
             />
