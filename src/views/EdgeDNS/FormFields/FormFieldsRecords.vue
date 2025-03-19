@@ -9,7 +9,7 @@
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
-  import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
   import LabelBlock from '@/templates/label-block'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
@@ -17,11 +17,9 @@
   const { value: ttl } = useField('ttl')
   const { value: weight } = useField('weight')
   const { value: description } = useField('description')
-
   const edgeDNSStore = useEdgeDNSStore()
 
   const RECORD_TYPE_WITH_DEFAULT_TTL = 'ANAME'
-  const TTL_DEFAULT_VALUE = 20
 
   const policyList = ref([
     { label: 'Simple', value: 'simple' },
@@ -51,7 +49,7 @@
   })
 
   const setTtlByRecordType = () => {
-    if (!enableTTLField.value) ttl.value = TTL_DEFAULT_VALUE
+    if (!enableTTLField.value) ttl.value = TTL_DEFAULT
   }
 
   const RECORD_TYPES_VALUE_FIELD_INFOS = {
@@ -193,6 +191,7 @@
             placeholder="TTL (seconds):"
             :min="0"
             :max="TTL_MAX_VALUE_RECORDS"
+            :value="ttl"
             showButtons
             :disabled="!enableTTLField"
             :step="1"
