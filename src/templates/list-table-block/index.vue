@@ -451,7 +451,7 @@
 
   const formatSummaryToCSV = (summary) => {
     const summaryValue = summary
-      .map((item) => `${item.key}: ${item.value.replace(/"/g, '""')}`)
+      .map((item) => `${item.key}: ${item.value.toString().replace(/"/g, '""')}`)
       .join(' | ')
     const csvString = `"${summaryValue}"`
 
