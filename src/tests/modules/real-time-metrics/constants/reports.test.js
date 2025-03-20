@@ -438,7 +438,7 @@ describe('RealTimeMetricsModule', () => {
               variable: 'requests'
             }
           ],
-          helpCenterPath: '/real-time-metrics/edge-applications/requests/request-by-scheme',
+          helpCenterPath: '/real-time-metrics/edge-applications/requests/requests-by-scheme',
           id: '357825388709151312',
           variationType: 'inverse',
           isTopX: false,
@@ -634,7 +634,8 @@ describe('RealTimeMetricsModule', () => {
             'Displays the distribution of requests by region, country, ASN, and individual IP address.',
           fields: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
           groupBy: ['remoteAddress', 'geolocAsn', 'geolocCountryName', 'geolocRegionName'],
-          helpCenterPath: '/real-time-metrics/edge-applications/requests/average-request-time',
+          helpCenterPath:
+            '/real-time-metrics/edge-applications/request-breakdown/ip-address-information',
           id: '357825388709151326',
           isTopX: false,
           label: 'IP Address Information',
@@ -931,7 +932,8 @@ describe('RealTimeMetricsModule', () => {
             wafLearning: '0'
           },
           groupBy: ['geolocCountryName'],
-          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          helpCenterPath:
+            '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-pie-graph',
           id: '357842851576414806',
           isTopX: true,
           label: 'Top WAF Threat Requests by Country',
@@ -963,7 +965,8 @@ describe('RealTimeMetricsModule', () => {
             wafLearning: '0'
           },
           groupBy: ['geolocCountryName'],
-          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country',
+          helpCenterPath:
+            '/real-time-metrics/waf/threats/top-waf-threat-requests-by-country-bar-graph',
           id: '357842851576414807',
           isTopX: true,
           label: 'Top WAF Threat Requests by Country',
@@ -995,7 +998,7 @@ describe('RealTimeMetricsModule', () => {
             wafLearning: '0'
           },
           groupBy: ['wafAttackFamily'],
-          helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack',
+          helpCenterPath: '/real-time-metrics/waf/threats/waf-threat-requests-by-family-attack',
           id: '357842851576414808',
           isTopX: true,
           label: 'WAF Threat Requests by Family Attack',
@@ -1551,7 +1554,7 @@ describe('RealTimeMetricsModule', () => {
           orderDirection: 'DESC',
           dashboardId: '357548675837198934',
           variationType: 'regular',
-          helpCenterPath: '/real-time-metrics/threats/breakdown'
+          helpCenterPath: '/real-time-metrics/threats/breakdown/top-waf-threat-requests-by-ip'
         }
       ]
 

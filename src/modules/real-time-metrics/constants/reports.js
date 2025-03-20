@@ -652,7 +652,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     variationType: 'inverse',
     dashboardId: '357549179454620240',
-    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.averageRequestTime
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.ipAdressInformation
   },
 
   /**
@@ -960,7 +960,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '357548675837198933',
     variationType: 'regular',
-    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByCountryPieChart
   },
   {
     id: '357842851576414807',
@@ -992,7 +992,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '357548675837198933',
     variationType: 'regular',
-    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-country'
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByCountryBarChart
   },
   {
     id: '357842851576414808',
@@ -1024,7 +1024,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '357548675837198933',
     variationType: 'regular',
-    helpCenterPath: '/real-time-metrics/waf/threats/top-threat-requests-by-family-attack'
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.wafThreatsRequestsByFamilyAttack
   },
   {
     id: '357842851576414809',
@@ -1579,7 +1579,7 @@ const REPORTS = [
     orderDirection: 'DESC',
     dashboardId: '357548675837198934',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.threatsBreakdown.threatsRequestsByIps
+    helpCenterPath: HELP_CENTER_URLS.threatsBreakdown.topWAFThreatRequestsByIP
   }
 ]
 

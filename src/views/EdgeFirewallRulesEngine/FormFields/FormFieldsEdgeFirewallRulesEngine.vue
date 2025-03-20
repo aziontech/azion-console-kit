@@ -582,10 +582,8 @@
             />
           </div>
 
-          <div
-            class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row items-end"
-          >
-            <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
+          <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
+            <div class="flex flex-col h-fit sm:max-w-lg w-full">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"

@@ -116,7 +116,7 @@ const convertGQLTotalRecords = (filter, table) => {
     filterParameter,
     dataset: table.dataset,
     limit: table.limit,
-    filterQuery,
+    filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
   }
 
@@ -150,7 +150,7 @@ const convertGQL = (filter, table) => {
     dataset: table.dataset,
     limit: table.limit,
     orderBy: table.orderBy,
-    filterQuery: formatFilter(filterQuery),
+    filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
   }
 
@@ -294,18 +294,33 @@ const formatFilterParameter = (variables, fields) => {
   })
 }
 
-const formatFilter = (filters) => {
-  return filters.map((filter) => {
-    if (filter.toLocaleLowerCase().includes('ilike')) {
-      const parts = filter.split(':')
-      if (parts.length) {
-        const operator = parts[0].replace(/ilike/i, '')
-        const value = parts[1].trim()
-        return `not: { ${operator}Like: ${value} }`
-      }
+const formatFilter = (filters, fields) => {
+  const filtersNotContains = []
+  const appliedFilters = []
+
+  if (!filters?.length && !fields?.length) return []
+
+  for (const filter of filters) {
+    const [key, value] = filter.split(':')
+    const currentFilter = key.trim()
+
+    const matchingField = fields?.find(
+      (field) =>
+        `${field.valueField}${field.operator}`.toLowerCase() === currentFilter.toLowerCase()
+    )
+
+    if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
+      filtersNotContains.push(`${matchingField.valueField}Like: ${value}`)
+    } else {
+      appliedFilters.push(filter)
     }
-    return filter
-  })
+  }
+
+  if (filtersNotContains.length) {
+    appliedFilters.push(`not: { ${filtersNotContains.join(', ')} }`)
+  }
+
+  return appliedFilters
 }
 
 export { convertGQL, convertGQLTotalRecords }

@@ -14,4 +14,8 @@ describe('Constants Test', () => {
   it('TTL_MAX_VALEU_RECORDS should be 604800', () => {
     expect(constants.TTL_MAX_VALUE_RECORDS).toBe(604800)
   })
+
+  it('TTL_DEFAULT should be 3600', () => {
+    expect(constants.TTL_DEFAULT).toBe(3600)
+  })
 })

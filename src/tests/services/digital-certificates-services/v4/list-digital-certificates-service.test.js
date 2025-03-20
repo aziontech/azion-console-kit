@@ -91,7 +91,7 @@ describe('DigitalCertificatesServices', () => {
       issuer: fixtures.certificateMock.issuer,
       type: 'TLS Certificate',
       subjectName: 'Subject 1,Subject 2',
-      validity: 'Nov 10, 2023, 12:00 AM',
+      validity: 'November 10, 2023 at 12:00:00 AM',
       status: {
         status: {
           content: 'Active',
@@ -139,7 +139,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           content: 'Active',
           severity: 'success'
@@ -166,7 +166,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.trustedCertificate.issuer,
         type: 'Trusted CA Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           content: 'Active',
           severity: 'success'
@@ -196,7 +196,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           status: {
             content: 'Active',
@@ -229,7 +229,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           status: {
             content: 'Active',

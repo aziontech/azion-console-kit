@@ -1,12 +1,11 @@
 import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDateByUserTimezone } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
-import { getUserTimezone } from '../get-timezone'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listDataStream = async (filter) => {
   const payload = adapt(filter)
@@ -46,14 +45,12 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (response) => {
-  const timezone = getUserTimezone()
-
   const data = response.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     configurationId: dataStreamedEvents.configurationId,
     id: generateCurrentTimestamp(),
     summary: buildSummary(dataStreamedEvents),
     ts: dataStreamedEvents.ts,
-    tsFormat: convertValueToDateByUserTimezone(dataStreamedEvents.ts, timezone)
+    tsFormat: getCurrentTimezone(dataStreamedEvents.ts)
   }))
 
   return {

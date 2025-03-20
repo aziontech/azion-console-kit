@@ -2,11 +2,10 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDateByUserTimezone } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import * as Errors from '@/services/axios/errors'
 import { buildSummary } from '@/helpers'
-import { getUserTimezone } from '../get-timezone'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -37,8 +36,6 @@ const adapt = (filter) => {
 }
 
 const adaptResponse = (body) => {
-  const timezone = getUserTimezone()
-
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
@@ -46,7 +43,7 @@ const adaptResponse = (body) => {
         configurationId: cellsConsoleEvents.configurationId,
         line: cellsConsoleEvents.line,
         id: generateCurrentTimestamp(),
-        tsFormat: convertValueToDateByUserTimezone(cellsConsoleEvents.ts, timezone),
+        tsFormat: getCurrentTimezone(cellsConsoleEvents.ts),
         ts: cellsConsoleEvents.ts
       }))
     : []
