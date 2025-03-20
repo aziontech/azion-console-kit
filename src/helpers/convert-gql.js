@@ -116,7 +116,7 @@ const convertGQLTotalRecords = (filter, table) => {
     filterParameter,
     dataset: table.dataset,
     limit: table.limit,
-    filterQuery: formatFilter(filterQuery),
+    filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
   }
 
