@@ -295,8 +295,12 @@ const formatFilterParameter = (variables, fields) => {
 }
 
 const formatFilter = (filters, fields) => {
+  const filtersWithNot = []
+  const newFilters = []
+
   if (!filters?.length && !fields?.length) return []
-  return filters.map((filter) => {
+
+  for (const filter of filters) {
     const [key, value] = filter.split(':')
     const currentFilter = key.trim()
 
@@ -306,10 +310,17 @@ const formatFilter = (filters, fields) => {
     )
 
     if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
-      return `not: { ${matchingField.valueField}Like: ${value} }`
+      filtersWithNot.push(`${matchingField.valueField}Like: ${value}`)
+    } else {
+      newFilters.push(filter)
     }
-    return filter
-  })
+  }
+
+  if (filtersWithNot.length) {
+    newFilters.push(`not: { ${filtersWithNot.join(', ')} }`)
+  }
+
+  return newFilters
 }
 
 export { convertGQL, convertGQLTotalRecords }
