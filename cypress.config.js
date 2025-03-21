@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
-import codeCoverageTask from '@cypress/code-coverage/task'
-import registerCypressGrep from '@cypress/grep/src/plugin'
+import codeCoverageTask from '@cypress/code-coverage/task.js'
+import registerCypressGrep from '@cypress/grep/src/plugin.js'
 import fs from 'fs'
 
 export default defineConfig({
