@@ -1,9 +1,8 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
+import codeCoverageTask from '@cypress/code-coverage/task'
+import registerCypressGrep from '@cypress/grep/src/plugin'
 import fs from 'fs'
-
-const codeCoverageTask = require('@cypress/code-coverage/task')
-const registerCypressGrep = require('@cypress/grep/src/plugin')
 
 export default defineConfig({
   projectId: 'azion-console-kit',
