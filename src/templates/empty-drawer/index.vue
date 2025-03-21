@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted, onUnmounted } from 'vue'
   import Sidebar from 'primevue/sidebar'
   import PrimeButton from 'primevue/button'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
@@ -44,6 +44,20 @@
   const toggleDrawerVisibility = (isVisible) => {
     emit('update:visible', isVisible)
   }
+
+  const handleKeydown = (event) => {
+    if (event.key === 'Escape' && visibleDrawer.value) {
+      toggleDrawerVisibility(false)
+    }
+  }
+
+  onMounted(() => {
+    document.addEventListener('keydown', handleKeydown)
+  })
+
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
+  })
 </script>
 
 <template>
