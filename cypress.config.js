@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress'
-import codeCoverageTask from '@cypress/code-coverage/task.js'
+import codeCoverageTask from '@cypress/code-coverage/dist/task.js'
 import registerCypressGrep from '@cypress/grep/src/plugin/index.js'
 import fs from 'fs'
 
