@@ -253,6 +253,10 @@
       isSliceL2CachingEnabled.value = false
     }
   })
+
+  watch(browserCacheSettings, (cacheSettings) => {
+    if (cacheSettings === 'no-cache') browserCacheSettingsMaximumTtl.value = 0
+  })
 </script>
 
 <template>
@@ -280,7 +284,7 @@
     description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
     :isDrawer="true"
   >
-    <template #inputs>
+  <template #inputs>
       <FieldGroupRadio
         label="Browser Cache Settings"
         nameField="browserCacheSettings"
