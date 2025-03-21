@@ -3,7 +3,7 @@ import generateUniqueName from '../../support/utils'
 
 let fixtures = {}
 
-//TODO: Remove xfail tag when edge service resource api is fixed
+//TODO: Remove xfail tag when edge service resource api is fixed (ENG-33291)
 describe('Edge Services spec', { tags: ['@dev6', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
