@@ -3,7 +3,8 @@ import generateUniqueName from '../../support/utils'
 
 let fixtures = {}
 
-describe('Edge Services spec', { tags: ['@dev6'] }, () => {
+//TODO: Remove xfail tag when edge service resource api is fixed
+describe('Edge Services spec', { tags: ['@dev6', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')
