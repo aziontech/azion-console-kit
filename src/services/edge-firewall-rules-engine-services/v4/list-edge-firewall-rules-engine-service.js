@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from '../../edge-firewall-services/v4/make-edge-firewall-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
-import { formatExhibitionDate } from '@/helpers/convert-date'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeFirewallRulesEngineService = async ({ id, fields = '', search = '' }) => {
   let allData = []
@@ -53,7 +53,7 @@ const adapt = (results, statusCode) => {
       id: rules.id,
       name: rules.name,
       description: rules.description || '',
-      lastModified: formatExhibitionDate(rules.last_modified, 'long', 'short'),
+      lastModified: getCurrentTimezone(rules.last_modified),
       lastEditor: rules.last_editor,
       status: STATUS_AS_TAG[rules.active],
       position: {
