@@ -41,7 +41,7 @@
         <a
           class="flex h-9"
           v-bind="props.action"
-          @click="redirectToRoute(item)"
+          @click.prevent="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
           :href="item.to"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
