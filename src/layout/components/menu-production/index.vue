@@ -43,6 +43,7 @@
           v-bind="props.action"
           @click="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
+          :href="item.to"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
           v-if="item?.clientFlag ? checkFlag(item?.clientFlag) : true"
         >
@@ -106,4 +107,4 @@
 
     return response.body.menus
   })
-</script>
+</script>¬
