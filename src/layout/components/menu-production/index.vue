@@ -107,4 +107,4 @@
 
     return response.body.menus
   })
-</script>¬
+</script>
