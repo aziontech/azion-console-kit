@@ -116,7 +116,7 @@ const convertGQLTotalRecords = (filter, table) => {
     filterParameter,
     dataset: table.dataset,
     limit: table.limit,
-    filterQuery,
+    filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
   }
 
@@ -295,8 +295,12 @@ const formatFilterParameter = (variables, fields) => {
 }
 
 const formatFilter = (filters, fields) => {
+  const filtersNotContains = []
+  const appliedFilters = []
+
   if (!filters?.length && !fields?.length) return []
-  return filters.map((filter) => {
+
+  for (const filter of filters) {
     const [key, value] = filter.split(':')
     const currentFilter = key.trim()
 
@@ -306,10 +310,17 @@ const formatFilter = (filters, fields) => {
     )
 
     if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
-      return `not: { ${matchingField.valueField}Like: ${value} }`
+      filtersNotContains.push(`${matchingField.valueField}Like: ${value}`)
+    } else {
+      appliedFilters.push(filter)
     }
-    return filter
-  })
+  }
+
+  if (filtersNotContains.length) {
+    appliedFilters.push(`not: { ${filtersNotContains.join(', ')} }`)
+  }
+
+  return appliedFilters
 }
 
 export { convertGQL, convertGQLTotalRecords }
