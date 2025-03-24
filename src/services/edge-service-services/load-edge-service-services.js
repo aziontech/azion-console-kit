@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadEdgeServiceServices = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -16,6 +17,10 @@ const convertVariablesToString = (variables) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const { id, name, active, variables } = httpResponse.body
   const parsedBody = {
     id,

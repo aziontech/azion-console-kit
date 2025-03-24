@@ -86,4 +86,15 @@ describe('EdgeApplicationOriginsServices', () => {
       hmacSecretKey: fixtures.originMock.hmac_secret_key
     })
   })
+
+  it('should return an error when the request fails with status 400', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: { detail: 'Bad Request' }
+    })
+
+    const { sut } = makeSut()
+
+    await expect(sut(123123, 'invalid-id')).rejects.toThrow('Bad Request')
+  })
 })
