@@ -56,7 +56,7 @@ const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConf
         captured: `${cookieName}_arr`,
         subject: `upstream_cookie_${formattedCookieName}`
       },
-      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]}; ${hasConfigMaxAge ? 'Max-Age=1209600;' : ''} Path=/; SameSite=Lax; Secure; Domain=${domain}`,
+      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]};${hasConfigMaxAge ? ' Max-Age=1209600; ' : ' '}Path=/; SameSite=Lax; Secure; Domain=${domain}`,
       ...(hasConfigMaxAge ? { filterCookie: formattedCookieName } : {})
     }
   }))
