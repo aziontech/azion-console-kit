@@ -371,7 +371,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Danger Zone"
-    class="bg-[#F2646420] border-[#C4170B]"
+    severity="danger"
     description="Careful! This actions are irreversible."
   >
     <template #inputs>
@@ -387,6 +387,7 @@
         </div>
         <div>
           <PrimeButton
+            data-testid="account-settings__delete-account"
             label="Delete my account"
             severity="danger"
             @click="openDeleteDialog"

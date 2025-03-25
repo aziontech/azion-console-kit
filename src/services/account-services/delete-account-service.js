@@ -14,7 +14,7 @@ export const deleteAccountService = async () => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Digital certificate successfully deleted!'
+      return 'Your account has been deleted'
     case 500:
       throw new Errors.InternalServerError().message
     default:
