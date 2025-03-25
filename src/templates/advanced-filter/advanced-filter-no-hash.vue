@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, onMounted } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { OPERATOR_MAPPING } from './component'
@@ -29,6 +29,10 @@
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
   const displayFilter = ref([])
   const refDialogFilter = ref()
+
+  onMounted(() => {
+    if (props.fieldsInFilter.length) updateDisplayFilter(props.filterAdvanced)
+  })
 
   const disabledSearch = computed(() => {
     return props.disabled

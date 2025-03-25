@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index.js'
+
 export default class Aql {
   constructor() {
     // Inicializações se necessário
@@ -406,5 +409,24 @@ export default class Aql {
     })
 
     return errors
+  }
+
+  handleInicialQuery(filters, fieldsInFilter) {
+    if (!filters || !filters.length || !fieldsInFilter.length) return ''
+
+    const conditions = filters.map(filter => {
+      const operator = OPERATOR_MAPPING_ADVANCED_FILTER[filter.operator]?.format
+      const matchedField = fieldsInFilter.find((field) => field.value === filter.valueField)
+
+      if (!operator) console.error(`invalid operator "${filter.operator}"`)
+      if (!matchedField) console.error(`we could not find the field corresponding to your selection ("${filter.valueField}")`)
+
+      const fieldLowerCase = matchedField.label.toLowerCase()
+      const formattedField = fieldLowerCase.includes(' ') ? `'${fieldLowerCase}'` : fieldLowerCase
+
+      return `${formattedField} ${operator} ${filter.value}`
+    })
+
+    return conditions.join(' AND ')
   }
 }
