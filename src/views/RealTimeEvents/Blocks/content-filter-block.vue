@@ -53,6 +53,7 @@
   })
 
   const updatedTime = () => {
+    if (filter.value.tsRange.meta.option === 'custom') return
     const [begin, end] = removeAmountOfHours(filter.value.tsRange.meta.option, userUTC)
     const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(begin, end, userUTC)
 
