@@ -25,7 +25,7 @@ const addStageSuffixToCookies = (cookieName) => {
   return environment === 'stage' ? `${cookieName}_stg` : cookieName
 }
 
-const createCookieRewriteRule = (cookieName, description, prefix = '') => {
+const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConfigMaxAge }) => {
   const formattedCookieName = prefix + addStageSuffixToCookies(cookieName)
 
   const domains = [
@@ -56,27 +56,31 @@ const createCookieRewriteRule = (cookieName, description, prefix = '') => {
         captured: `${cookieName}_arr`,
         subject: `upstream_cookie_${formattedCookieName}`
       },
-      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure; Domain=${domain}`,
-      filterCookie: formattedCookieName
+      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]};${hasConfigMaxAge ? ' Max-Age=1209600; ' : ' '}Path=/; SameSite=Lax; Secure; Domain=${domain}`,
+      ...(hasConfigMaxAge ? { filterCookie: formattedCookieName } : {})
     }
   }))
 }
 
 const cookieRewriteRules = [
-  ...createCookieRewriteRule(
-    'azrt',
-    'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
-    '_'
-  ),
-  ...createCookieRewriteRule(
-    'azsid',
-    'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.'
-  ),
-  ...createCookieRewriteRule(
-    'azat',
-    'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
-    '_'
-  )
+  ...createCookieRewriteRule({
+    cookieName: 'azrt',
+    description: 'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
+    prefix: '_',
+    hasConfigMaxAge: true
+  }),
+  ...createCookieRewriteRule({
+    cookieName: 'azsid',
+    description: 'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
+    prefix: '',
+    hasConfigMaxAge: false
+  }),
+  ...createCookieRewriteRule({
+    cookieName: 'azat',
+    description: 'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
+    prefix: '_',
+    hasConfigMaxAge: true
+  })
 ]
 
 const config = {

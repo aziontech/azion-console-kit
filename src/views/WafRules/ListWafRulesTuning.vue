@@ -13,7 +13,6 @@
           @change="filterTuning"
           class="w-full sm:max-w-xs"
         />
-
         <MultiSelect
           data-testid="waf-tuning-list__domains-field"
           appendTo="body"
@@ -139,6 +138,7 @@
   <MoreDetailsDrawer
     v-if="showDetailsOfAttack"
     :wafRuleId="wafRuleId"
+    :domainNames="parsedDomainsNames"
     v-model:visible="showDetailsOfAttack"
     :listService="props.listWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
@@ -241,6 +241,7 @@
   })
   const selectedEvents = ref([])
   const totalRecordsFound = ref(0)
+  const selectedDomainsNames = ref([])
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const showDetailsOfAttack = ref(false)
@@ -260,6 +261,10 @@
 
   const recordsFoundLabel = computed(() => {
     return `${totalRecordsFound.value} records found`
+  })
+
+  const parsedDomainsNames = computed(() => {
+    return selectedDomainsNames.value.join(', ')
   })
 
   const timeName = computed(
@@ -433,6 +438,9 @@
   }
 
   const setDomainsSelectedOptions = () => {
+    selectedDomainsNames.value = domainsOptions.value.options
+      .filter((item) => selectedDomainIds.value.includes(item.id))
+      .map((domain) => domain.name)
     selectedFilter.value.domains = selectedDomainIds.value || []
     filterTuning()
   }
