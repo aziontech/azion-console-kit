@@ -28,8 +28,7 @@
           class="pt-4 text-color-secondary"
           data-testid="delete-dialog-warning-message-details"
         >
-          This {{ data.title }} will be deleted along with any associated settings or instances.
-          Check Help Center for more details.
+          {{ deleteMessage }}
         </p>
       </div>
 
@@ -42,7 +41,7 @@
             for="confirm-input"
             class="font-semibold text-sm"
             data-testid="delete-dialog-confirmation-input-label"
-            >Type “delete” to confirm:</label
+            >Type "delete" to confirm:</label
           >
           <InputText
             id="confirm-input"
@@ -132,6 +131,7 @@
       emit('successfullyDeleted')
       resetForm()
       dialogRef.value.close({ updated: true })
+      data.onSuccess()
     } catch (error) {
       showToast('error', 'Error', error)
     } finally {
@@ -159,6 +159,13 @@
 
   const isDisabled = computed(() => {
     return !meta.value.valid || loading.value
+  })
+
+  const deleteMessage = computed(() => {
+    return (
+      data.entityDeleteMessage ||
+      `This ${data.title} will be deleted along with any associated settings or instances. Check Help Center for more details.`
+    )
   })
 
   watch(

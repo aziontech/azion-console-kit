@@ -7,6 +7,11 @@
   import InputText from 'primevue/inputtext'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
+  import { useLoadingStore } from '@/stores/loading'
+  import { deleteAccountService } from '@/services/account-services/delete-account-service'
+  import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
+  import { useDialog } from 'primevue/usedialog'
+  import PrimeButton from 'primevue/button'
   import { onMounted, ref, watch, computed } from 'vue'
 
   const props = defineProps({
@@ -36,10 +41,14 @@
   const { value: address } = useField('address')
   const { value: complement } = useField('complement')
 
+  const ENTITY_DELETE_MESSAGE =
+    'Permanently remove your Personal Account and all of its contents from the Azion platform. This action is not reversible, so please continue with caution.'
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
 
+  const { startLoading } = useLoadingStore()
+  const dialog = useDialog()
   const toast = useToast()
   const showToast = (summary, severity) => {
     const options = {
@@ -79,6 +88,25 @@
     } finally {
       regionsOptions.value.done = true
     }
+  }
+
+  const logout = () => {
+    startLoading()
+    window.location.href = '/logout'
+  }
+
+  const openDeleteDialog = () => {
+    const bodyDelete = {
+      data: {
+        title: 'My Account',
+        deleteDialogVisible: true,
+        deleteService: deleteAccountService,
+        entityDeleteMessage: ENTITY_DELETE_MESSAGE,
+        rerender: Math.random(),
+        onSuccess: logout
+      }
+    }
+    dialog.open(DeleteDialog, bodyDelete)
   }
 
   const setCitiesOptions = async (regionId) => {
@@ -338,6 +366,32 @@
           :options="switchOptions"
           data-testid="account-settings__login-settings"
         />
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="Danger Zone"
+    class="bg-[#F2646420] border-[#C4170B]"
+    description="Careful! This actions are irreversible."
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-5 sm:max-w-lg">
+        <div class="flex flex-col gap-2">
+          <label class="text-color text-base font-medium leading-5 flex gap-1 align-items-center">
+            Remove Personal Account
+          </label>
+          <small class="text-sm text-color-secondary font-normal leading-5">
+            Permanently remove your Personal Account and all of its contents from the Azion
+            platform. This action is not reversible, so please continue with caution.
+          </small>
+        </div>
+        <div>
+          <PrimeButton
+            label="Delete my account"
+            severity="danger"
+            @click="openDeleteDialog"
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>
