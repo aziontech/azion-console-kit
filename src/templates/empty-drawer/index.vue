@@ -52,6 +52,7 @@
       v-model:visible="visibleDrawer"
       :update:visible="toggleDrawerVisibility"
       position="right"
+      tabindex="0"
       :pt="{
         root: {
           class: [
