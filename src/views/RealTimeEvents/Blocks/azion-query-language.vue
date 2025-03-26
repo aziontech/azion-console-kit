@@ -23,7 +23,7 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="handleErrrosQuery.length !== 0"
+            :disabled="handleErrrosQuery.length"
           />
         </div>
       </div>
