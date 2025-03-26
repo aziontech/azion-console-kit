@@ -9,7 +9,7 @@ const fixtures = {
     full_name: 'test/repository-test',
     private: false
   },
-  uuid: '7283j-j2j3l2-82736823-j2k4m2'
+  id: '7283j-j2j3l2-82736823-j2k4m2'
 }
 
 const makeSut = () => {
@@ -28,10 +28,10 @@ describe('VersionControlSystemService', () => {
     })
 
     const { sut } = makeSut()
-    await sut(fixtures.uuid)
+    await sut(fixtures.id)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/vcs/integrations/${fixtures.uuid}/repositories?page_size=200&ordering=name`,
+      url: `v4/vcs/integrations/${fixtures.id}/repositories?page_size=200&ordering=name`,
       method: 'GET'
     })
   })
@@ -44,7 +44,7 @@ describe('VersionControlSystemService', () => {
 
     const { sut } = makeSut()
 
-    const result = await sut(fixtures.uuid)
+    const result = await sut(fixtures.id)
 
     expect(result).toEqual([fixtures.repositoryMock])
   })

@@ -30,7 +30,7 @@ describe('VersionControlSystemService', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/vcs/platforms',
+      url: 'v4/vcs/providers',
       method: 'GET'
     })
   })
