@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeUserBaseUrl } from './make-user-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadUserService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,6 +13,9 @@ export const loadUserService = async () => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
   const responseData = httpResponse.body.data
   const parsedUser = {
     id: responseData.id,
