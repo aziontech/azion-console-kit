@@ -34,7 +34,7 @@
     filter.value.isUserUsingGraphqlQuery = false
   })
 
-  const filterMode = ref('Wizard')
+  const filterMode = ref('Advanced')
   const options = ref(['Wizard', 'Advanced'])
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
