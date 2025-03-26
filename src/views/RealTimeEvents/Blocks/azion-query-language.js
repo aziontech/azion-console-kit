@@ -242,14 +242,24 @@ export default class Aql {
     const hasErrorInFields = this.queryValidationIfFieldsExistInList(query, suggestions)
     const hasErrorInOperatorIn = this.queryValidationForInOperator(query, suggestions)
     const hasErrorNotSpace = this.queryValidatorNoSpaces(query)
-    const erros = [...hasErrorInCompoundFields, ...hasErrorInFields, ...hasErrorInOperatorIn, ...hasErrorNotSpace]
+    const erros = [
+      ...hasErrorInCompoundFields,
+      ...hasErrorInFields,
+      ...hasErrorInOperatorIn,
+      ...hasErrorNotSpace
+    ]
 
     const errorMessages = {
-      'quote-error': 'Attention: composite fields must be included in quotes. e.g: "Upstream Status".',
-      'not-exists-field-error': 'Attention: some provided fields do not match the currently available ones. Please, check and try again.',
-      'in-operator-parentheses-error': 'Attention: there are fields with \'in\' operator that need to be inside parentheses. Please, check and try again. e.g: domain in (domain1, domain2)',
-      'in-operator-trailing-comma-error': 'Attention: fields with \'in\' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.',
-      'no-space-error': 'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".'
+      'quote-error':
+        'Attention: composite fields must be included in quotes. e.g: "Upstream Status".',
+      'not-exists-field-error':
+        'Attention: some provided fields do not match the currently available ones. Please, check and try again.',
+      'in-operator-parentheses-error':
+        "Attention: there are fields with 'in' operator that need to be inside parentheses. Please, check and try again. e.g: domain in (domain1, domain2)",
+      'in-operator-trailing-comma-error':
+        "Attention: fields with 'in' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.",
+      'no-space-error':
+        'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".'
     }
 
     return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
@@ -416,11 +426,11 @@ export default class Aql {
   }
 
   queryValidatorNoSpaces(query) {
-    const expressions = query.split(/and/i).map(exp => exp.trim())
+    const expressions = query.split(/and/i).map((exp) => exp.trim())
     const errors = []
 
-    expressions.forEach(exp => {
-      this.operators.forEach(op => {
+    expressions.forEach((exp) => {
+      this.operators.forEach((op) => {
         const operator = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const hasSpaceBeforeOperator = new RegExp(`\\S${operator}`)
         const hasSpaceAfterOperator = new RegExp(`${operator}\\S`)
