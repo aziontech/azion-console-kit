@@ -42,7 +42,7 @@
   const { value: complement } = useField('complement')
 
   const ENTITY_DELETE_MESSAGE =
-    'Permanently remove your Personal Account and all of its contents from the Azion platform. This action is not reversible, so please continue with caution.'
+    "This action permanently deletes this Personal Account and all associated data from Azion's platform. It cannot be undone."
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
@@ -98,7 +98,7 @@
   const openDeleteDialog = () => {
     const bodyDelete = {
       data: {
-        title: 'My Account',
+        title: 'Personal Account',
         deleteDialogVisible: true,
         deleteService: deleteAccountService,
         entityDeleteMessage: ENTITY_DELETE_MESSAGE,
@@ -372,7 +372,7 @@
   <FormHorizontal
     title="Danger Zone"
     severity="danger"
-    description="Careful! This actions are irreversible."
+    description="Actions in this area are irreversible and may permanently impact the account and its data. Proceed with caution."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-5 sm:max-w-lg">
@@ -381,14 +381,14 @@
             Remove Personal Account
           </label>
           <small class="text-sm text-color-secondary font-normal leading-5">
-            Permanently remove your Personal Account and all of its contents from the Azion
-            platform. This action is not reversible, so please continue with caution.
+            This action permanently deletes this Personal Account and all associated data from
+            Azion's platform. It cannot be undone.
           </small>
         </div>
         <div>
           <PrimeButton
             data-testid="account-settings__delete-account"
-            label="Delete my account"
+            label="Delete account"
             severity="danger"
             @click="openDeleteDialog"
           />
