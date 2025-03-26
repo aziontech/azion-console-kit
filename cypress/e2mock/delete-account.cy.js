@@ -21,8 +21,14 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     cy.get(selectors.accountSettings.deleteAccount).click()
     cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
     cy.wait('@deleteAccount')
-    // Assert
-    cy.verifyToast('success', 'Your account has been deleted')
+
+    //Assert
+    cy.url().should('include', '/login')
+
+    // Clear session after account deletion
+    cy.clearAllSessionStorage()
+    cy.clearAllLocalStorage()
+    Cypress.session.clearAllSavedSessions()
   })
   it('should not delete account if user dos not has access', () => {
     cy.intercept('DELETE', '/api/v4/account/account', {
