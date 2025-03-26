@@ -23,7 +23,7 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="handleErrrosQuery"
+            :disabled="handleErrrosQuery.length !== 0"
           />
         </div>
       </div>
@@ -241,7 +241,7 @@
     nextTick(() => {
       const container = listboxRef.value?.$el || listboxRef.value
       if (container) {
-        const highlightedItem = container.querySelector('.bg-blue-500')
+        const highlightedItem = container.querySelector('.bg-orange-base')
         if (highlightedItem) {
           highlightedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
         }
