@@ -23,13 +23,13 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="handleErrrosQuery.length"
+            :disabled="handleErrosQuery.length"
           />
         </div>
       </div>
       <div class="flex flex-col mt-2 gap-1">
         <small
-          v-for="(error, index) in handleErrrosQuery"
+          v-for="(error, index) in handleErrosQuery"
           :key="index"
           class="p-error text-xs font-normal leading-tight"
         >
@@ -287,7 +287,7 @@
     }
   }
 
-  const handleErrrosQuery = computed(() =>
+  const handleErrosQuery = computed(() =>
     AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
   )
 
