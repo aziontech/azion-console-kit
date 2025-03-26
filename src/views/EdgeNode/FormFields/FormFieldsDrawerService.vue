@@ -1,5 +1,4 @@
 <script setup>
-  import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
@@ -7,7 +6,7 @@
   import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
 
   import { useField } from 'vee-validate'
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
   const emit = defineEmits(['toggleDrawer'])
 
@@ -41,10 +40,7 @@
   const getServices = async () => {
     try {
       loadingOptionsServices.value = true
-      listService.value = await props.listServicesHandle({
-        edgeNodeId: props.edgeNodeId,
-        bound: props.bound
-      })
+      listService.value = await props.listServicesHandle()
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -52,7 +48,6 @@
     }
   }
 
-  const { value: variables, errorMessage: variablesError } = useField('variables')
   const { value: serviceId } = useField('serviceId')
 
   const showToast = (severity, summary) => {
@@ -63,23 +58,9 @@
     })
   }
 
-  const editorOptions = computed(() => {
-    return {
-      minimap: { enabled: false },
-      tabSize: 2,
-      formatOnPaste: true,
-      readOnly: props.disabledFields
-    }
-  })
-
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
-
-  const store = useAccountStore()
-  const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
-  })
 
   watch(
     () => drawerRef.value.showCreateDrawer,
@@ -120,7 +101,7 @@
               :loading="loadingOptionsServices"
               :disabled="props.bound"
               optionLabel="name"
-              optionValue="serviceId"
+              optionValue="id"
               :value="serviceId"
               filter
               appendTo="self"
@@ -147,32 +128,6 @@
                 </ul>
               </template>
             </FieldDropdown>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col w-full gap-2">
-            <label class="text-color text-sm not-italic font-medium leading-5">Variables</label>
-            <div class="flex flex-col h-full gap-2">
-              <vue-monaco-editor
-                v-model:value="variables"
-                language="shell"
-                :theme="theme"
-                class="min-h-[200px] overflow-clip surface-border border rounded-md"
-                :class="{ 'border-red-500 border': variablesError }"
-                :options="editorOptions"
-              />
-              <small
-                v-if="variablesError"
-                class="p-error text-xs font-normal leading-tight"
-              >
-                {{ variablesError }}
-              </small>
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                Customize or keep the default values of the variables required to run the service.
-              </small>
-            </div>
           </div>
         </div>
       </div>
