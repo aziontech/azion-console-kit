@@ -1,11 +1,10 @@
 export default class Aql {
   constructor() {
-    // Inicializações se necessário
+    this.operators = ['=', '<>', '<', '>', '<=', '>=', 'like', 'ilike', 'between', 'in']
   }
 
   parse(query, suggestions, domains) {
     const expressions = query.split(/and/i).map((exp) => exp.trim())
-
     const output = expressions
       .map((exp) => {
         const regex =
@@ -242,19 +241,38 @@ export default class Aql {
     const hasErrorInCompoundFields = this.queryValidationForCompoundFields(query)
     const hasErrorInFields = this.queryValidationIfFieldsExistInList(query, suggestions)
     const hasErrorInOperatorIn = this.queryValidationForInOperator(query, suggestions)
+    const hasErrorNotSpace = this.queryValidatorNoSpaces(query)
+    const erros = [
+      ...hasErrorInCompoundFields,
+      ...hasErrorInFields,
+      ...hasErrorInOperatorIn,
+      ...hasErrorNotSpace
+    ]
 
-    return [...hasErrorInCompoundFields, ...hasErrorInFields, ...hasErrorInOperatorIn]
+    const errorMessages = {
+      'quote-error':
+        'Attention: composite fields must be included in quotes. e.g: "Upstream Status".',
+      'not-exists-field-error':
+        'Attention: some provided fields do not match the currently available ones. Please, check and try again.',
+      'in-operator-parentheses-error':
+        "Attention: there are fields with 'in' operator that need to be inside parentheses. Please, check and try again. e.g: domain in (domain1, domain2)",
+      'in-operator-trailing-comma-error':
+        "Attention: fields with 'in' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.",
+      'no-space-error':
+        'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".'
+    }
+
+    return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
   }
 
   queryValidationForCompoundFields(queryText) {
     let erros = []
-    const operadores = ['=', '<>', '<', '>', '<=', '>=', 'ilike', 'like', 'between', 'in']
     if (!queryText) return []
 
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        let operatorFound = operadores.find((op) => expression.toLowerCase().includes(op))
+        let operatorFound = this.operators.find((op) => expression.toLowerCase().includes(op))
         if (operatorFound) {
           let stringBeforeOperator = expression.split(operatorFound)[0].trim()
           if (stringBeforeOperator.includes(' ')) {
@@ -285,7 +303,7 @@ export default class Aql {
         }
       })
     } else {
-      let operatorFound = operadores.find((op) => queryText.toLowerCase().includes(op))
+      let operatorFound = this.operators.find((op) => queryText.toLowerCase().includes(op))
       if (operatorFound) {
         let stringBeforeOperator = queryText.split(operatorFound)[0].trim()
 
@@ -322,7 +340,6 @@ export default class Aql {
 
   queryValidationIfFieldsExistInList(query, suggestions) {
     let erros = []
-    const operadores = ['=', '<>', '<', '>', '<=', '>=', 'like', 'ilike', 'between', 'in']
 
     if (!query?.includes('and') && !query?.includes(' ')) return []
 
@@ -330,7 +347,7 @@ export default class Aql {
 
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
-      const operatorFound = operadores.find((op) =>
+      const operatorFound = this.operators.find((op) =>
         new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression)
       )
 
@@ -403,6 +420,27 @@ export default class Aql {
           }
         }
       }
+    })
+
+    return errors
+  }
+
+  queryValidatorNoSpaces(query) {
+    const expressions = query.split(/and/i).map((exp) => exp.trim())
+    const errors = []
+
+    expressions.forEach((exp) => {
+      this.operators.forEach((op) => {
+        const operator = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const hasSpaceBeforeOperator = new RegExp(`\\S${operator}`)
+        const hasSpaceAfterOperator = new RegExp(`${operator}\\S`)
+
+        if (hasSpaceBeforeOperator.test(exp) || hasSpaceAfterOperator.test(exp)) {
+          if (!errors.includes('no-space-error')) {
+            errors.push('no-space-error')
+          }
+        }
+      })
     })
 
     return errors
