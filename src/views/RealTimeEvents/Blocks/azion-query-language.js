@@ -30,23 +30,27 @@ export default class Aql {
           )
 
           if (operator.toUpperCase() === 'BETWEEN') {
-            const values = value.split(/\s+and\s+/i)
-            if (values.length === 2) {
-              let val1, val2
-              if (suggestion && suggestion.value.type.toLowerCase() === 'int') {
-                val1 = Number(values[0].trim())
-                val2 = Number(values[1].trim())
-              } else {
-                val1 = values[0].replace(/^["']|["']$/g, '').trim()
-                val2 = values[1].replace(/^["']|["']$/g, '').trim()
-              }
-              return {
-                field: field,
-                value: [val1, val2],
-                operator: operatorInfo.value,
-                valueField: this.formatFieldName(field),
-                type: operatorInfo.type ?? 'Int'
-              }
+            const [begin, end] = value
+              .replace(/[()]/g, '')
+              .split(',')
+              .map((val) => val.trim())
+            let beginFormatted = begin
+            let endFormatted = end
+
+            if (operatorInfo.type === 'IntRange') {
+              beginFormatted = parseInt(begin)
+              endFormatted = parseInt(end)
+            } else if (operatorInfo.type === 'FloatRange') {
+              beginFormatted = parseFloat(begin)
+              endFormatted = parseFloat(end)
+            }
+
+            return {
+              field: field,
+              value: { begin: beginFormatted, end: endFormatted },
+              operator: operatorInfo.value,
+              valueField: this.formatFieldName(field),
+              type: operatorInfo.type ?? 'Int'
             }
           }
 
@@ -200,7 +204,6 @@ export default class Aql {
   }
 
   handleInputMatching(query, suggestions) {
-    const operadores = ['=', '<>', '<', '>', '<=', '>=', 'like', 'ilike', 'between', 'in']
     const parts = query.split(/\s+and\s+/i)
     const tokenRaw = parts.pop().trim()
     const tokenForMatch = tokenRaw.replace(/^["']|["']$/g, '').toLowerCase()
@@ -209,7 +212,7 @@ export default class Aql {
     const matchingFields = suggestions.filter((item) =>
       item.label.toLowerCase().startsWith(tokenForMatch)
     )
-    let operatorFound = operadores.find((op) => tokenForMatch.toLowerCase().includes(op))
+    let operatorFound = this.operators.find((op) => tokenForMatch.toLowerCase().includes(op))
 
     const hasValueAfterOperator = operatorFound ? tokenRaw.split(operatorFound)[1] : null
 
@@ -242,11 +245,14 @@ export default class Aql {
     const hasErrorInFields = this.queryValidationIfFieldsExistInList(query, suggestions)
     const hasErrorInOperatorIn = this.queryValidationForInOperator(query, suggestions)
     const hasErrorNotSpace = this.queryValidatorNoSpaces(query)
+    const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(query)
+
     const erros = [
       ...hasErrorInCompoundFields,
       ...hasErrorInFields,
       ...hasErrorInOperatorIn,
-      ...hasErrorNotSpace
+      ...hasErrorNotSpace,
+      ...hasErrorBetweenOperator
     ]
 
     const errorMessages = {
@@ -259,7 +265,15 @@ export default class Aql {
       'in-operator-trailing-comma-error':
         "Attention: fields with 'in' operator that need the comma removed at the end of the values in parentheses. Please, check and try again.",
       'no-space-error':
-        'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".'
+        'Attention: please add spaces between the field, operator, and value. For example, write "status = 200" instead of "status=200".',
+      'between-operator-error':
+        'Attention: The BETWEEN operator requires its values to be enclosed in parentheses. For example: status between (200, 300).',
+      'between-operator-error-three-values':
+        'Attention: The BETWEEN operator must have exactly two values. For example: status between (200, 300).',
+      'between-operator-error-not-parentheses':
+        'Attention: Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).',
+      'between-operator-error-equal-values':
+        'Attention: The two values for the BETWEEN operator must be different. For example: status between (200, 300).'
     }
 
     return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
@@ -441,6 +455,41 @@ export default class Aql {
           }
         }
       })
+    })
+
+    return errors
+  }
+
+  queryValidatorBetweenOperators(query) {
+    const expressions = query.split(/and/i).map((exp) => exp.trim())
+    const errors = []
+
+    expressions.forEach((expression) => {
+      if (/between/i.test(expression)) {
+        const betweenMatch = expression.match(/between\s*\(([^)]+)\)/i)
+        if (betweenMatch) {
+          const extractedBetweenContent = betweenMatch[1]
+          const betweenValues = extractedBetweenContent.split(',').map((val) => val.trim())
+
+          if (betweenValues.length > 2) {
+            if (!errors.includes('between-operator-error-three-values')) {
+              errors.push('between-operator-error-three-values')
+            }
+          } else if (betweenValues.length === 1 || betweenValues.some((val) => val === '')) {
+            if (!errors.includes('between-operator-error')) {
+              errors.push('between-operator-error')
+            }
+          } else if (betweenValues[0] === betweenValues[1]) {
+            if (!errors.includes('between-operator-error-equal-values')) {
+              errors.push('between-operator-error-equal-values')
+            }
+          }
+        } else {
+          if (!errors.includes('between-operator-error-not-parentheses')) {
+            errors.push('between-operator-error-not-parentheses')
+          }
+        }
+      }
     })
 
     return errors
