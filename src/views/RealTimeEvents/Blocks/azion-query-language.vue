@@ -23,37 +23,17 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="formattedQuery.length !== 0"
+            :disabled="handleErrosQuery.length"
           />
         </div>
       </div>
       <div class="flex flex-col mt-2 gap-1">
         <small
-          v-if="formattedQuery.includes('quote-error')"
+          v-for="(error, index) in handleErrosQuery"
+          :key="index"
           class="p-error text-xs font-normal leading-tight"
         >
-          Attention: composite fields must be included in quotes. e.g: "Upstream Status".
-        </small>
-        <small
-          v-if="formattedQuery.includes('not-exists-field-error')"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          Attention: some provided fields do not match the currently available ones. Please, check
-          and try again.
-        </small>
-        <small
-          v-if="formattedQuery.includes('in-operator-parentheses-error')"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          Attention: there are fields with 'in' operator that need to be inside parentheses. Please,
-          check and try again. e.g: domain in (domain1, domain2)
-        </small>
-        <small
-          v-if="formattedQuery.includes('in-operator-trailing-comma-error')"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          Attention: fields with 'in' operator that need the comma removed at the end of the values
-          in parentheses. Please, check and try again.
+          {{ error }}
         </small>
       </div>
     </div>
@@ -261,7 +241,7 @@
     nextTick(() => {
       const container = listboxRef.value?.$el || listboxRef.value
       if (container) {
-        const highlightedItem = container.querySelector('.bg-blue-500')
+        const highlightedItem = container.querySelector('.bg-orange-base')
         if (highlightedItem) {
           highlightedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
         }
@@ -307,11 +287,9 @@
     }
   }
 
-  const formattedQuery = computed(() => {
-    let erros = AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
-
-    return erros
-  })
+  const handleErrosQuery = computed(() =>
+    AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
+  )
 
   onClickOutside(ignoreClickOutside, () => (showSuggestionsFocusInput.value = false))
 </script>

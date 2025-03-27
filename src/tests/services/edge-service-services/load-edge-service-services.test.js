@@ -41,6 +41,17 @@ describe('EdgeServiceServices', () => {
     })
   })
 
+  it('should return an error when the request fails with status 400', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: { detail: 'Bad Request' }
+    })
+
+    const { sut } = makeSut()
+
+    await expect(sut({ id: fixtures.mock.id })).rejects.toThrow('Bad Request')
+  })
+
   it('should parsed correctly the returned edge service', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
