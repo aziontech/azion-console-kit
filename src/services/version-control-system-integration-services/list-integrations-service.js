@@ -15,11 +15,11 @@ export const listIntegrationsService = async () => {
 const adapt = (httpResponse) => {
   const parsedIntegrations =
     httpResponse.body?.results?.map((integration) => {
-      const uri = integration.platform.callback_url.split('vcs')[1]
+      const uri = integration.provider.callback_url.split('vcs')[1]
 
       return {
         label: integration.scope,
-        value: integration.uuid,
+        value: integration.id,
         callbackUrl: uri
       }
     }) || []
