@@ -29,6 +29,7 @@ const STATUS_AS_TAG = {
 
 export const listPaymentHistoryService = async () => {
   const { accountIsNotRegular } = useAccountStore()
+
   let httpResponse = accountIsNotRegular
     ? await listPaymentHistoryForNotRegularAccounts()
     : await listPaymentHistoryForRegularAccounts()
@@ -79,24 +80,32 @@ const listPaymentHistoryForRegularAccounts = async () => {
 }
 
 const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
-  const parseBilling = httpResponse.body.results?.map((card) => {
-    const typeCard = card.card_brand?.toLowerCase()
-    return {
-      amount: card.amount_with_currency,
-      invoiceNumber: {
-        content: card.invoice_number
-      },
-      paymentMethod: {
-        cardNumber: card.payment_method_details,
-        cardBrand: typeCard,
-        value: `${typeCard} ${card.payment_method_details}`
-      },
-      disabled: !card.invoice_number,
-      invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
-      status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
-      paymentDate: formatDateToUS(card.payment_due)
-    }
-  })
+  const currentMonth = new Date().toISOString().slice(0, 7)
+
+  const parseBilling = httpResponse.body.results
+    ?.map((card) => {
+      const isCurrentMonth = card.payment_due.startsWith(currentMonth)
+
+      if (isCurrentMonth) return
+
+      const typeCard = card.card_brand?.toLowerCase()
+      return {
+        amount: card.amount_with_currency,
+        invoiceNumber: {
+          content: card.invoice_number
+        },
+        paymentMethod: {
+          cardNumber: card.payment_method_details,
+          cardBrand: typeCard,
+          value: `${typeCard} ${card.payment_method_details}`
+        },
+        disabled: !card.invoice_number,
+        invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
+        status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
+        paymentDate: formatDateToUS(card.payment_due)
+      }
+    })
+    .filter((item) => item)
 
   return {
     body: parseBilling || [],
@@ -110,7 +119,7 @@ const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
       invoiceNumber: {
         content: card.billId
       },
-      disabled: !card.billId,
+      disabled: true,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
       paymentDate: formatDateToUS(card.periodTo)
     }

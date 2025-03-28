@@ -193,6 +193,7 @@ const joinEdgeApplicationWithTieredCache = (services) => {
   const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
   const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
+  const botManagerServiceIndex = services.findIndex((service) => service.slug === 'bot_manager')
 
   if (!edgeApplicationService || tieredCacheServiceIndex === -1) return services
 
@@ -239,6 +240,7 @@ const joinEdgeApplicationWithTieredCache = (services) => {
 
   services.splice(tieredCacheServiceIndex, 1)
   services.splice(edgeStorageServiceIndex, 1)
+  services.splice(botManagerServiceIndex, 1)
 
   return services
 }
