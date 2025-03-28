@@ -30,7 +30,9 @@ const parsedBehavior = (behaviors) => {
     if (behavior.name === 'capture_match_groups') {
       behaviorItem = { ...behavior.argument }
     }
-
+    if (behavior.name === 'set_cache_policy' && typeof behavior.argument === 'number') {
+      behaviorItem = { cacheId: behavior.argument.toString() }
+    }
     if (behavior.name === 'set_origin' && typeof behavior.argument === 'number') {
       behaviorItem = { originId: behavior.argument.toString() }
     }
