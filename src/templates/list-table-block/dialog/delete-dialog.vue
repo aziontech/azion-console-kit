@@ -28,8 +28,8 @@
           class="pt-4 text-color-secondary"
           data-testid="delete-dialog-warning-message-details"
         >
-          This {{ data.title }} will be deleted along with any associated settings or instances.
-          Check Help Center for more details.
+          The selected {{ data.title }} will be deleted, along with all associated settings or
+          instances. Check the Help Center for more details.
         </p>
       </div>
 
