@@ -31,6 +31,7 @@
   const refDialogFilter = ref()
 
   onMounted(() => {
+    displayFilter.value = []
     if (props.fieldsInFilter.length) updateDisplayFilter(props.filterAdvanced)
   })
 
@@ -140,6 +141,10 @@
     emit('update:filterAdvanced', [])
   }
 
+  const hasItemFilterValue = (itemFilter) => {
+    return Object.keys(itemFilter).length
+  }
+
   watch(
     () => props.fieldsInFilter,
     () => {
@@ -186,6 +191,7 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeItemFilter="removeItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-default"
             />
           </li>
@@ -198,6 +204,7 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeItemFilter="removeItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-range"
             />
           </li>
@@ -211,11 +218,12 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeValueItemFilter="removeValueItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-in"
             />
           </li>
           <li
-            v-if="displayFilter.length > index + 1"
+            v-if="displayFilter.length > index + 1 && hasItemFilterValue(itemFilter)"
             data-testid="search-filter-chip-item"
           >
             and
