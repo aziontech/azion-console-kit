@@ -344,7 +344,7 @@
       to: '/users'
     },
     {
-      label: 'Billing & Subscriptions',
+      label: 'Billing',
       to: '/billing'
     },
     {

@@ -32,6 +32,7 @@ const adapt = (httpResponse, accountIsNotRegular) => {
     if (accountIsNotRegular) {
       return {
         billId: invoice.billId,
+        disabledExport: false,
         billDetailId: invoice.billDetailId,
         total: invoice.totalValue,
         currency: invoice.currency,
@@ -47,6 +48,7 @@ const adapt = (httpResponse, accountIsNotRegular) => {
     }
     return {
       billId: invoice.billId,
+      disabledExport: true,
       invoiceId: invoice.invoiceNumber,
       billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
         invoice.periodTo

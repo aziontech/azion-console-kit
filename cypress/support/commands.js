@@ -164,7 +164,7 @@ const sidebarProducts = [
 const accountProducts = [
   'Account Settings',
   'Users Management',
-  'Billing & Subscriptions',
+  'Billing',
   'Credentials',
   'Activity History',
   'Teams Permissions',
