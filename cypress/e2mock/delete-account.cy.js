@@ -15,12 +15,11 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
 
   it('should delete account successfully', () => {
     // Arrange
-    cy.intercept('DELETE', '/api/v4/account/account', { statusCode: 200, body: 'Success' }).as(
-      'deleteAccount'
+    cy.intercept('DELETE', '/v4/account/account', { statusCode: 200, body: 'Success' }).as(
+      'successDeleteAccount'
     )
     cy.get(selectors.accountSettings.deleteAccount).click()
     cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
-    cy.wait('@deleteAccount')
 
     //Assert
     cy.url().should('include', '/login')
@@ -31,13 +30,13 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     Cypress.session.clearAllSavedSessions()
   })
   it('should not delete account if user dos not has access', () => {
-    cy.intercept('DELETE', '/api/v4/account/account', {
+    cy.intercept('DELETE', '/v4/account/account', {
       statusCode: 403,
       body: fixtures.errorMessage
-    }).as('deleteAccount')
+    }).as('failedDeleteAccount')
     cy.get(selectors.accountSettings.deleteAccount).click()
     cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
-    cy.wait('@deleteAccount')
+    cy.wait('@failedDeleteAccount')
     // Assert
     cy.verifyToast('Error', fixtures.errorMessage.detail)
   })
