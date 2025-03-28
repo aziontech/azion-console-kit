@@ -18,7 +18,6 @@ export default {
   countryLoading: '[data-testid="account-settings__country__loading-icon"]',
   regionLoading: '[data-testid="account-settings__region__loading-icon"]',
   cityLoading: '[data-testid="account-settings__city__loading-icon"]',
-  deleteAccount: '[data-testid="account-settings__delete-account"]',
   socialLogin:
     '[data-testid="account-settings__login-settings__switch-isSocialLoginEnabled__switch"] > .p-inputswitch-slider',
   enforceMfa:
