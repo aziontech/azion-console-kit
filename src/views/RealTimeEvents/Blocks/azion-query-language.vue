@@ -273,6 +273,7 @@
   }
 
   const executeQuery = () => {
+    if (handleErrosQuery.value.length) return
     const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
   }
