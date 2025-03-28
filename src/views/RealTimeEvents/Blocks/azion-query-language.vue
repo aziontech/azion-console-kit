@@ -23,13 +23,13 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="handleErrosQuery.length"
+            :disabled="handleErrorsQuery.length"
           />
         </div>
       </div>
       <div class="flex flex-col mt-2 gap-1">
         <small
-          v-for="(error, index) in handleErrosQuery"
+          v-for="(error, index) in handleErrorsQuery"
           :key="index"
           class="p-error text-xs font-normal leading-tight"
         >
@@ -273,7 +273,7 @@
   }
 
   const executeQuery = () => {
-    if (handleErrosQuery.value.length) return
+    if (handleErrorsQuery.value.length) return
     const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
   }
@@ -288,7 +288,7 @@
     }
   }
 
-  const handleErrosQuery = computed(() =>
+  const handleErrorsQuery = computed(() =>
     AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
   )
 
