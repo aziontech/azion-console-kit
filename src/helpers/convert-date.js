@@ -28,7 +28,9 @@ const convertValueToDate = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUS = (value) => {
-  const date = new Date(value)
+  const [year, month, day] = value.split('-')
+
+  const date = new Date(year, month - 1, day)
 
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date')
