@@ -1,6 +1,8 @@
 import { formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
+const BOT_MANAGER_SLUG = 'bot_manager'
+const EDGE_STORAGE_SLUG = 'edge_storage'
 
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -63,13 +65,17 @@ const adapt = ({ body, statusCode }) => {
 
   const productsGrouped = groupBy(accountingDetail, ['productSlug', 'metricSlug'])
 
+  const filteredProducts = productsGrouped.filter(
+    (item) => ![BOT_MANAGER_SLUG, EDGE_STORAGE_SLUG].includes(item.productSlug)
+  )
+
   const productsGroupedByRegion = groupBy(accountingDetail, [
     'productSlug',
     'metricSlug',
     'regionName'
   ])
 
-  const adaptedBody = mapProducts(productsGrouped, productsGroupedByRegion)
+  const adaptedBody = mapProducts(filteredProducts, productsGroupedByRegion)
   const data = joinEdgeApplicationWithTieredCache(adaptedBody)
 
   return { body: data, statusCode }

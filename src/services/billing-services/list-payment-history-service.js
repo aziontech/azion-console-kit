@@ -114,11 +114,13 @@ const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
 
 const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
   const parseBilling = httpResponse.body.data.accountingDetail?.map((card) => {
+    const disabledOpenInvoice = true
+
     return {
       invoiceNumber: {
         content: card.billId
       },
-      disabled: true,
+      disabled: disabledOpenInvoice,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
       paymentDate: formatDateToUS(card.periodTo)
     }
