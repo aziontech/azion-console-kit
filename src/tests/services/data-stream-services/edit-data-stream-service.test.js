@@ -35,7 +35,8 @@ const fixtures = {
     dataSource: 'http',
     domains: [[], []],
     endpoint: 'qradar',
-    QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
+    QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456',
+    status: true
   }
 }
 
@@ -88,6 +89,8 @@ describe('DataStreamServices', () => {
       method: 'PUT',
       body: {
         name: fixtures.dataStreamCustomTemplateMock.name,
+        active: true,
+        data_source: 'http',
         template_model: JSON.stringify(
           JSON.parse(fixtures.dataStreamCustomTemplateMock.dataSet),
           null,

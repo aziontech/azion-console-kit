@@ -22,7 +22,9 @@ const adapt = (payload) => {
       template_model: JSON.stringify(JSON.parse(payload.dataSet), null, '\t'),
       all_domains: allDomains,
       domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
-      endpoint: getEndpoint(payload)
+      endpoint: getEndpoint(payload),
+      active: payload.status,
+      data_source: payload.dataSource
     }
   } else {
     parsedPayload = {
