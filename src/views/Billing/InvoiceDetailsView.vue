@@ -16,7 +16,7 @@
                 size="small"
                 label="Export"
                 @click="invoiceDownload"
-                :disabled="!invoiceData?.billId"
+                :disabled="invoiceData?.disabledExport"
               />
             </div>
             <div class="flex justify-between mt-4">
