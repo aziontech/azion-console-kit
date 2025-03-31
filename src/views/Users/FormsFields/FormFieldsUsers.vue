@@ -9,6 +9,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import MultiSelect from 'primevue/multiselect'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
 
@@ -136,7 +137,8 @@
         mobile: mobile.value,
         isAccountOwner: accountIsOwner.value,
         teamsIds: [defaultTeamId],
-        twoFactorEnabled: forceMfaEnabled
+        twoFactorEnabled: forceMfaEnabled,
+        isActive: true
       }
       props.resetForm({ values: initialValues })
       loadingCountry.value = false
@@ -393,4 +395,16 @@
       />
     </template>
   </FormHorizontal>
+  <form-horizontal title="Status">
+    <template #inputs>
+      <FieldSwitchBlock
+        data-testid="user-form__active-field"
+        nameField="isActive"
+        name="isActive"
+        auto
+        :isCard="false"
+        title="Active"
+      />
+    </template>
+  </form-horizontal>
 </template>
