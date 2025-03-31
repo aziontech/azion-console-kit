@@ -23,7 +23,8 @@ const adapt = (payload) => {
       all_domains: allDomains,
       domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
       endpoint: getEndpoint(payload),
-      active: payload.status
+      active: payload.status,
+      data_source: payload.dataSource
     }
   } else {
     parsedPayload = {
