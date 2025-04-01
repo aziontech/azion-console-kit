@@ -28,7 +28,6 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
   function checkAndReturnDefault(zone, hasMatchValue) {
     const defaultZone = 'conditional_request_header'
     const ZONES = hasMatchValue ? MAP_MATCH_ZONES_CONDITIONAL : MAP_MATCH_ZONES
-
     return ZONES[zone] || defaultZone
   }
 
@@ -42,12 +41,13 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
 
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     const hasMatchValue = !!attack.matchValue
-
     let matchZones = {
-      zone: checkAndReturnDefault(attack.matchZone, hasMatchValue),
+      zone:
+        attack.ruleId === 11
+          ? 'request_body'
+          : checkAndReturnDefault(attack.matchZone, hasMatchValue),
       matches_on: attack.matchesOn
     }
-
     if (hasMatchValue) {
       const isCookieZone = attack.matchZone === 'cookie'
       const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue

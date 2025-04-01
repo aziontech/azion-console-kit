@@ -1,0 +1,17 @@
+{
+  "results": [
+    {
+      "hit_count": 1,
+      "top_10_ips": [["11", "189.73.150.53", 1, "BODY", 0]],
+      "rule_id": 11,
+      "ip_count": 1,
+      "match_zone": "request_body",
+      "path_count": 1,
+      "top_10_countries": [["11", "Brazil", 1, "BODY", 0]],
+      "matches_on": "value",
+      "rule_description": "Validation of protocol compliance: missing or unknown Content-Type header in a POST (this rule applies only to Request Body match zone)",
+      "country_count": 1
+    }
+  ],
+  "schema_version": 3
+}

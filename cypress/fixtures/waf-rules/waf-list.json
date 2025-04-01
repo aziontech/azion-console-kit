@@ -1,0 +1,31 @@
+{
+  "count": 11,
+  "results": [
+    {
+      "id": 10981,
+      "active": true,
+      "name": "test waf",
+      "last_editor": null,
+      "last_modified": null,
+      "product_version": "1.0",
+      "threats_configuration": {
+        "cross_site_scripting": true,
+        "cross_site_scripting_sensitivity": "medium",
+        "directory_traversal": true,
+        "directory_traversal_sensitivity": "medium",
+        "evading_tricks": true,
+        "evading_tricks_sensitivity": "medium",
+        "file_upload": true,
+        "file_upload_sensitivity": "medium",
+        "identified_attack": true,
+        "identified_attack_sensitivity": "medium",
+        "remote_file_inclusion": true,
+        "remote_file_inclusion_sensitivity": "medium",
+        "sql_injection": true,
+        "sql_injection_sensitivity": "medium",
+        "unwanted_access": true,
+        "unwanted_access_sensitivity": "medium"
+      }
+    }
+  ]
+}

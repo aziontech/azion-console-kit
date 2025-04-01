@@ -7,7 +7,7 @@
     <DataTable
       v-if="!isLoading"
       ref="dataTableRef"
-      :pt="props.pt"
+      :pt="dataTestIdPt"
       class="overflow-clip rounded-md"
       scrollable
       removableSort
@@ -66,6 +66,9 @@
       <Column
         :class="{ '!hover:cursor-pointer': !disabledList }"
         selectionMode="multiple"
+        :pt="{
+          rowCheckbox: { 'data-testid': 'data-table-row-checkbox', class: 'bg-red' }
+        }"
         headerStyle="width: 3rem"
       />
       <Column
@@ -373,6 +376,12 @@
     set: (value) => {
       emit('update:selectedItensData', value)
     }
+  })
+
+  const dataTestIdPt = computed(() => {
+    const pt = props.pt
+    pt.rowCheckbox = { 'data-testid': 'data-table-row-checkbox' }
+    return pt
   })
 
   onMounted(() => {
