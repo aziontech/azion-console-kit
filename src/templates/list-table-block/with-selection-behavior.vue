@@ -67,7 +67,7 @@
         :class="{ '!hover:cursor-pointer': !disabledList }"
         selectionMode="multiple"
         :pt="{
-          rowCheckbox: { 'data-testid': 'data-table-row-checkbox', class: 'bg-red' }
+          rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
         }"
         headerStyle="width: 3rem"
       />
