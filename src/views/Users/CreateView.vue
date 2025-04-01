@@ -69,7 +69,6 @@
       required: true
     }
   })
-
   const validationSchema = yup.object({
     firstName: yup.string().required('First Name is a required field.').max(30),
     lastName: yup.string().required('Last Name is a required field.').max(30),
@@ -86,7 +85,8 @@
         is: true,
         then: () => yup.array()
       }),
-    twoFactorEnabled: yup.boolean()
+    twoFactorEnabled: yup.boolean(),
+    isActive: yup.boolean().required()
   })
 
   const handleTrackFailedCreation = (error) => {
