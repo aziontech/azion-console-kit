@@ -33,7 +33,22 @@ export const listPaymentHistoryService = async () => {
     ? await listPaymentHistoryForNotRegularAccounts()
     : await listPaymentHistoryForRegularAccounts()
 
+  httpResponse.body = removeCurrentPayment(httpResponse)
+
   return parseHttpResponse(httpResponse)
+}
+
+const removeCurrentPayment = (payments) => {
+  if (!payments.body.length) return payments.body
+
+  const currentMonth = new Date().toISOString().slice(0, 7)
+
+  return payments.body.filter((payment) => {
+    const [month, , year] = payment.paymentDate.split('/')
+    const formattedDate = `${year}-${month.padStart(2, '0')}`
+
+    return formattedDate !== currentMonth
+  })
 }
 
 const listPaymentHistoryForNotRegularAccounts = async () => {
@@ -79,32 +94,24 @@ const listPaymentHistoryForRegularAccounts = async () => {
 }
 
 const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
-  const currentMonth = new Date().toISOString().slice(0, 7)
-
-  const parseBilling = httpResponse.body.results
-    ?.map((card) => {
-      const isCurrentMonth = card.payment_due.startsWith(currentMonth)
-
-      if (isCurrentMonth) return
-
-      const typeCard = card.card_brand?.toLowerCase()
-      return {
-        amount: card.amount_with_currency,
-        invoiceNumber: {
-          content: card.invoice_number
-        },
-        paymentMethod: {
-          cardNumber: card.payment_method_details,
-          cardBrand: typeCard,
-          value: `${typeCard} ${card.payment_method_details}`
-        },
-        disabled: !card.invoice_number,
-        invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
-        status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
-        paymentDate: formatDateToUS(card.payment_due)
-      }
-    })
-    .filter((item) => item)
+  const parseBilling = httpResponse.body.results?.map((card) => {
+    const typeCard = card.card_brand?.toLowerCase()
+    return {
+      amount: card.amount_with_currency,
+      invoiceNumber: {
+        content: card.invoice_number
+      },
+      paymentMethod: {
+        cardNumber: card.payment_method_details,
+        cardBrand: typeCard,
+        value: `${typeCard} ${card.payment_method_details}`
+      },
+      disabled: !card.invoice_number,
+      invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.payment_due)),
+      status: STATUS_AS_TAG[card.status] || STATUS_AS_TAG.NotCharged,
+      paymentDate: formatDateToUS(card.payment_due)
+    }
+  })
 
   return {
     body: parseBilling || [],
