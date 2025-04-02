@@ -41,9 +41,10 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
 
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     const hasMatchValue = !!attack.matchValue
+    const REQUEST_BODY_EXCEPTION_RULE_ID = 11
     let matchZones = {
       zone:
-        attack.ruleId === 11
+        attack.ruleId === REQUEST_BODY_EXCEPTION_RULE_ID
           ? 'request_body'
           : checkAndReturnDefault(attack.matchZone, hasMatchValue),
       matches_on: attack.matchesOn
