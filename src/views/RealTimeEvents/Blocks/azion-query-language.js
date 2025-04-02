@@ -259,6 +259,10 @@ export default class Aql {
       const fieldLowerCase = matchedField.label.toLowerCase()
       const formattedField = fieldLowerCase.includes(' ') ? `'${fieldLowerCase}'` : fieldLowerCase
 
+      if (operator === 'between') {
+        return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
+      }
+
       return `${formattedField} ${operator} ${filter.value}`
     })
 
@@ -518,5 +522,98 @@ export default class Aql {
     })
 
     return errors
+  }
+
+  highlightQuerySyntax(query) {
+    const parts = query.split(/(\band\b)/gi)
+
+    const highlightedParts = parts.map(part => {
+      if (/^\band\b$/i.test(part.trim())) {
+        return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
+      } else {
+        return part.replace(
+          /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|in)/gi,
+          (match, field, space, operator) => {
+            return `<span style="color: var(--series-three-color);">${field}</span> <span style="color: var(--series-two-color);">${operator}</span>`
+          }
+        )
+      }
+    })
+
+    return highlightedParts.join('')
+  }
+
+  saveCursorPosition(element) {
+    let caretOffset = 0
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const preCaretRange = range.cloneRange()
+      preCaretRange.selectNodeContents(element)
+      preCaretRange.setEnd(range.endContainer, range.endOffset)
+      caretOffset = preCaretRange.toString().length
+    }
+
+    return caretOffset
+  }
+
+  restoreCursorPosition(element, offset) {
+    if (!element) return
+
+    const range = document.createRange()
+    const selection = window.getSelection()
+    let currentOffset = 0
+    let found = false
+
+    function traverse(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextOffset = currentOffset + node.textContent.length
+        if (nextOffset >= offset) {
+          range.setStart(node, offset - currentOffset)
+          range.collapse(true)
+          found = true
+        } else {
+          currentOffset = nextOffset
+        }
+      } else {
+        for (let interable = 0; interable < node.childNodes.length; interable++) {
+          traverse(node.childNodes[interable])
+          if (found) break
+        }
+      }
+    }
+
+    traverse(element)
+
+    if (!found) {
+      range.selectNodeContents(element)
+      range.collapse(false)
+    }
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
+  positionCursorAtEndOfElement = (element) => {
+    if (!element) return
+    element.focus()
+
+    if (window.getSelection && document.createRange) {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      range.collapse(false)
+
+      const selection = window.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    } else if (document.body.createTextRange) {
+      // Support for older versions of IE
+      const textRange = document.body.createTextRange()
+      textRange.moveToElementText(element)
+      textRange.collapse(false)
+      textRange.select()
+    }
   }
 }
