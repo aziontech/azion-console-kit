@@ -40,7 +40,7 @@
       :options="filteredSuggestions"
       ref="listboxRef"
       optionLabel="label"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-2xl"
+      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
     >

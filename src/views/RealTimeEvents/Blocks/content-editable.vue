@@ -4,7 +4,7 @@
     ref="editable"
     contenteditable
     placeholder="Azion Query Language"
-    class="contenteditable p-inputtext h-9 p-2 font-normal text-sm w-full font-mono"
+    class="contenteditable p-inputtext p-2 font-normal text-sm w-full h-auto font-mono"
     @input="handleInput"
     v-on="$attrs"
   />
