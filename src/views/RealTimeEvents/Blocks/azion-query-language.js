@@ -191,7 +191,7 @@ export default class Aql {
           if (match) {
             let domains = match[1]
 
-            const domainsArray = domains?.split(',').map(item => item.trim())
+            const domainsArray = domains?.split(',').map((item) => item.trim())
             if (!domainsArray.includes(suggestion.label.trim())) {
               domainsArray.push(suggestion.label)
               domains = domainsArray.join(', ')
@@ -269,7 +269,9 @@ export default class Aql {
       if (operator === 'between') {
         return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
       } else if (operator === 'in') {
-        return `${formattedField} ${operator} (${filter.value.map((item) => `${item.label}`).join(', ')})`
+        return `${formattedField} ${operator} (${filter.value
+          .map((item) => `${item.label}`)
+          .join(', ')})`
       }
 
       return `${formattedField} ${operator} ${filter.value}`
@@ -481,8 +483,8 @@ export default class Aql {
     const expressions = query?.split(/and/i).map((exp) => exp.trim())
     const errors = []
 
-    expressions.forEach(exp => {
-      this.operators.forEach(op => {
+    expressions.forEach((exp) => {
+      this.operators.forEach((op) => {
         const operatorEscaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const regex = new RegExp(operatorEscaped, 'g')
         let match
@@ -494,7 +496,7 @@ export default class Aql {
           const beforeChar = start === 0 ? ' ' : exp[start - 1]
           const afterChar = end >= exp.length ? ' ' : exp[end]
 
-          if (!(/\s/.test(beforeChar)) || !(/\s/.test(afterChar))) {
+          if (!/\s/.test(beforeChar) || !/\s/.test(afterChar)) {
             const validRegex = new RegExp(`(^|\\s)${operatorEscaped}(\\s|$)`)
             if (!validRegex.test(exp)) {
               if (!errors.includes('no-space-error')) {
@@ -548,7 +550,7 @@ export default class Aql {
   highlightQuerySyntax(query) {
     const parts = query.split(/(\band\b)/gi)
 
-    const highlightedParts = parts.map(part => {
+    const highlightedParts = parts.map((part) => {
       if (/^\band\b$/i.test(part.trim())) {
         return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
       } else {
