@@ -1,7 +1,7 @@
 <template>
   <fieldset
     class="flex max-w-screen-2xl-test mx-auto gap-8 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
-    :class="{ 'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer }"
+    :class="[{ 'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer }, severityClasses]"
   >
     <!-- title and description -->
     <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]">
@@ -27,9 +27,19 @@
   </fieldset>
 </template>
 <script setup>
+  import { computed } from 'vue'
+
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String },
-    isDrawer: { type: Boolean, default: false }
+    isDrawer: { type: Boolean, default: false },
+    severity: { type: String, default: '' }
+  })
+
+  const severityClasses = computed(() => {
+    if (props.severity === 'danger') {
+      return 'bg-[#F2646420] border-[#C4170B]'
+    }
+    return ''
   })
 </script>
