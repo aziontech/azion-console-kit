@@ -190,8 +190,12 @@ export default class Aql {
           let match = query.match(/\(([^)]+)\)/)
           if (match) {
             let domains = match[1]
-            domains += `, ${suggestion.label}`
 
+            const domainsArray = domains?.split(',').map((item) => item.trim())
+            if (!domainsArray.includes(suggestion.label.trim())) {
+              domainsArray.push(suggestion.label)
+              domains = domainsArray.join(', ')
+            }
             newQuery = query.replace(/\(([^)]+)\)/, `(${domains})`)
             return { query: `${newQuery}`, nextStep: 'value', label: fieldName }
           }
@@ -236,6 +240,9 @@ export default class Aql {
         }
       }
     } else if (operatorFound && operatorFound === 'in') {
+      if (query.endsWith(') ')) {
+        return { operator: 'logicOperator', selectedField: '' }
+      }
       return { operator: 'value', selectedField: operatorFound === 'in' ? 'domain' : '' }
     } else if (tokenForMatch && hasValueAfterOperator && query.endsWith(' ')) {
       return { operator: 'logicOperator', selectedField: '' }
@@ -258,6 +265,14 @@ export default class Aql {
 
       const fieldLowerCase = matchedField.label.toLowerCase()
       const formattedField = fieldLowerCase.includes(' ') ? `'${fieldLowerCase}'` : fieldLowerCase
+
+      if (operator === 'between') {
+        return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
+      } else if (operator === 'in') {
+        return `${formattedField} ${operator} (${filter.value
+          .map((item) => `${item.label}`)
+          .join(', ')})`
+      }
 
       return `${formattedField} ${operator} ${filter.value}`
     })
@@ -465,18 +480,30 @@ export default class Aql {
   }
 
   queryValidatorNoSpaces(query) {
-    const expressions = query.split(/and/i).map((exp) => exp.trim())
+    const expressions = query?.split(/and/i).map((exp) => exp.trim())
     const errors = []
 
     expressions.forEach((exp) => {
       this.operators.forEach((op) => {
-        const operator = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        const hasSpaceBeforeOperator = new RegExp(`\\S${operator}`)
-        const hasSpaceAfterOperator = new RegExp(`${operator}\\S`)
+        const operatorEscaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const regex = new RegExp(operatorEscaped, 'g')
+        let match
 
-        if (hasSpaceBeforeOperator.test(exp) || hasSpaceAfterOperator.test(exp)) {
-          if (!errors.includes('no-space-error')) {
-            errors.push('no-space-error')
+        while ((match = regex.exec(exp)) !== null) {
+          const start = match.index
+          const end = regex.lastIndex
+
+          const beforeChar = start === 0 ? ' ' : exp[start - 1]
+          const afterChar = end >= exp.length ? ' ' : exp[end]
+
+          if (!/\s/.test(beforeChar) || !/\s/.test(afterChar)) {
+            const validRegex = new RegExp(`(^|\\s)${operatorEscaped}(\\s|$)`)
+            if (!validRegex.test(exp)) {
+              if (!errors.includes('no-space-error')) {
+                errors.push('no-space-error')
+              }
+              break
+            }
           }
         }
       })
@@ -518,5 +545,98 @@ export default class Aql {
     })
 
     return errors
+  }
+
+  highlightQuerySyntax(query) {
+    const parts = query.split(/(\band\b)/gi)
+
+    const highlightedParts = parts.map((part) => {
+      if (/^\band\b$/i.test(part.trim())) {
+        return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
+      } else {
+        return part.replace(
+          /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi,
+          (match, field, space, operator) => {
+            return `<span style="color: var(--series-three-color);">${field}</span> <span style="color: var(--series-two-color);">${operator}</span>`
+          }
+        )
+      }
+    })
+
+    return highlightedParts.join('')
+  }
+
+  saveCursorPosition(element) {
+    let caretOffset = 0
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const preCaretRange = range.cloneRange()
+      preCaretRange.selectNodeContents(element)
+      preCaretRange.setEnd(range.endContainer, range.endOffset)
+      caretOffset = preCaretRange.toString().length
+    }
+
+    return caretOffset
+  }
+
+  restoreCursorPosition(element, offset) {
+    if (!element) return
+
+    const range = document.createRange()
+    const selection = window.getSelection()
+    let currentOffset = 0
+    let found = false
+
+    function traverse(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextOffset = currentOffset + node.textContent.length
+        if (nextOffset >= offset) {
+          range.setStart(node, offset - currentOffset)
+          range.collapse(true)
+          found = true
+        } else {
+          currentOffset = nextOffset
+        }
+      } else {
+        for (let interable = 0; interable < node.childNodes.length; interable++) {
+          traverse(node.childNodes[interable])
+          if (found) break
+        }
+      }
+    }
+
+    traverse(element)
+
+    if (!found) {
+      range.selectNodeContents(element)
+      range.collapse(false)
+    }
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
+  positionCursorAtEndOfElement = (element) => {
+    if (!element) return
+    element.focus()
+
+    if (window.getSelection && document.createRange) {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      range.collapse(false)
+
+      const selection = window.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    } else if (document.body.createTextRange) {
+      // Support for older versions of IE
+      const textRange = document.body.createTextRange()
+      textRange.moveToElementText(element)
+      textRange.collapse(false)
+      textRange.select()
+    }
   }
 }
