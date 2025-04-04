@@ -1,0 +1,30 @@
+{
+  "results": [
+    {
+      "id": 2,
+      "name": "Edge Applications Event Collector",
+      "template_model": "{ \"version\": \"$version\", \"time\": \"$time\", \"client\": \"$client\", \"configuration\": \"$configuration\", \"host\": \"$host\", \"request_time\": \"$request_time\", \"request_method\": \"$request_method\", \"upstream_cache_status\": \"$upstream_cache_status\", \"status\": \"$status\", \"proxy_status\": \"$proxy_status\", \"upstream_status\": \"$upstream_status\", \"upstream_bytes_received\": \"$upstream_bytes_received\", \"scheme\": \"$scheme\", \"request_uri\": \"$request_uri\", \"sent_http_content_type\": \"$sent_http_content_type\", \"server_protocol\": \"$server_protocol\", \"request_length\": \"$request_length\", \"bytes_sent\": \"$bytes_sent\", \"upstream_connect_time\": \"$upstream_connect_time\", \"upstream_header_time\": \"$upstream_header_time\", \"upstream_response_time\": \"$upstream_response_time\", \"tcpinfo_rtt\": \"$tcpinfo_rtt\", \"remote_addr\": \"$remote_addr\", \"remote_port\": \"$remote_port\", \"waf_attack_family\": \"$waf_attack_family\", \"waf_attack_action\": \"$waf_attack_action\", \"country\": \"$country\", \"state\": \"$state\", \"ssl_protocol\": \"$ssl_protocol\", \"ssl_cipher\": \"$ssl_cipher\", \"http_user_agent\": \"$http_user_agent\", \"http_referrer\": \"$http_referrer\", \"sent_http_x_original_image_size\": \"$sent_http_x_original_image_size\", \"requestPath\": \"$requestPath\", \"requestQuery\": \"$requestQuery\" }"
+    },
+    {
+      "id": 4,
+      "name": "WAF Event Collector",
+      "template_model": "{ \"version\": \"$version\", \"time\": \"$time\", \"client\": \"$client\", \"configuration\": \"$configuration\", \"host\": \"$host\", \"remote_addr\": \"$remote_addr\", \"server_protocol\": \"$server_protocol\", \"country\": \"$country\", \"waf_server\": \"$waf_server\", \"waf_uri\": \"$waf_uri\", \"waf_learning\": \"$waf_learning\", \"blocked\": \"$blocked\", \"waf_score\": \"$waf_score\", \"waf_match\": \"$waf_match\", \"waf_attack_family\": \"$waf_attack_family\", \"waf_attack_action\": \"$waf_attack_action\", \"headers\": \"-\", \"truncated_body\": \"$truncated_body\", \"waf_args\": \"$waf_args\", \"requestPath\": \"$requestPath\", \"requestQuery\": \"$requestQuery\" }"
+    },
+    {
+      "id": 86,
+      "name": "Edge Functions Event Collector",
+      "template_model": "{ \"time\": \"$time\", \"client\": \"$client\", \"configuration\": \"$global_id\", \"edgeFunctionID\": \"$edge_function_id\", \"requestID\": \"$request_id\", \"messageSource\": \"$message_source\", \"logLevel\": \"$log_level\", \"logMessage\": \"$log_message\" }"
+    },
+    {
+      "id": 184,
+      "name": "Edge Applications + WAF Event Collector",
+      "template_model": "{ \"time\": \"$time\", \"client\": \"$client\", \"session_id\": \"$session_id\", \"stream\": \"$stream\", \"host\": \"$host\", \"request_time\": \"$request_time\", \"request_method\": \"$request_method\", \"status\": \"$status\", \"proxy_status\": \"$proxy_status\", \"scheme\": \"$scheme\", \"request_uri\": \"$request_uri\", \"request_length\": \"$request_length\", \"bytes_sent\": \"$bytes_sent\", \"tcpinfo_rtt\": \"$tcpinfo_rtt\", \"upstream_cache_status\": \"$upstream_cache_status\", \"upstream_status\": \"$upstream_status\", \"upstream_bytes_received\": \"$upstream_bytes_received\", \"upstream_connect_time\": \"$upstream_connect_time\", \"upstream_header_time\": \"$upstream_header_time\", \"upstream_response_time\": \"$upstream_response_time\", \"upstream_addr\": \"$upstream_addr\", \"upstream_bytes_sent\": \"$upstream_bytes_sent\", \"sent_http_content_type\": \"$sent_http_content_type\", \"http_user_agent\": \"$http_user_agent\", \"http_referer\": \"$http_referrer\", \"sent_http_x_original_image_size\": \"$sent_http_x_original_image_size\", \"server_protocol\": \"$server_protocol\", \"server_port\": \"$server_port\", \"server_addr\": \"$server_addr\", \"remote_addr\": \"$remote_addr\", \"remote_port\": \"$remote_port\", \"waf_attack_family\": \"$waf_attack_family\", \"waf_attack_action\": \"$waf_attack_action\", \"waf_learning\": \"$waf_learning\", \"waf_block\": \"$waf_block\", \"waf_total_processed\": \"$waf_total_processed\", \"waf_total_blocked\": \"$waf_total_blocked\", \"waf_score\": \"$waf_score\", \"waf_match\": \"$waf_match\", \"waf_headers\": \"$waf_headers\", \"country\": \"$country\", \"state\": \"$state\", \"asn\": \"$asn\", \"ssl_protocol\": \"$ssl_protocol\", \"ssl_cipher\": \"$ssl_cipher\", \"ssl_session_reused\": \"$ssl_session_reused\", \"ssl_server_name\": \"$ssl_server_name\", \"request_id\": \"$request_id\", \"requestPath\": \"$requestPath\", \"requestQuery\": \"$requestQuery\", \"configuration\": \"$configuration\" }"
+    },
+    {
+      "id": 251,
+      "name": "Activity History Collector",
+      "template_model": "{ \"time\": \"$time\", \"client\": \"$client\", \"title\": \"$title\", \"comment\": \"$comment\", \"type\": \"$type\", \"author_name\": \"$author_name\", \"author_email\": \"$author_email\" }"
+    }
+  ],
+  "schema_version": 3
+}

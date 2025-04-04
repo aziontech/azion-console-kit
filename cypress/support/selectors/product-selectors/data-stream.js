@@ -80,6 +80,11 @@ export default {
     blobSasTokenInput:
       '[data-testid="data-stream-form__destination__azure-blob-storage-blob-token-field__input"]'
   },
+  sampling: {
+    enableSampling: '[data-testid="data-stream-form__sampling__active-field"]',
+    percentageField: '[data-testid="data-stream-form__sampling__percentage-field"]',
+    samplingDialog: '[data-testid="data-stream-form__sampling__dialog"]'
+  },
   statusSlider: '[data-testid="data-stream-form__section__status"] input',
   list: {
     columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`

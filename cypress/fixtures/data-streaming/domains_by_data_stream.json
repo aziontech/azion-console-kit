@@ -1,0 +1,26 @@
+{
+  "count": 3,
+  "total_pages": 1,
+  "schema_version": 3,
+  "links": {
+    "previous": null,
+    "next": null
+  },
+  "results": [
+    {
+      "domain_id": 1743095399,
+      "name": "gracious-caligari",
+      "selected": false
+    },
+    {
+      "domain_id": 1743105472,
+      "name": "unwavering-duck",
+      "selected": false
+    },
+    {
+      "domain_id": 1743165531,
+      "name": "fascinating-mermaid",
+      "selected": false
+    }
+  ]
+}
