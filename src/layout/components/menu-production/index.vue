@@ -36,7 +36,7 @@
       :pt="{
         submenuheader: { class: 'text-base font-medium leading-none mt-5 md:px-4' },
         action: { class: 'md:px-4' },
-        menu: { class: '' },
+        menu: { class: '' }
       }"
       class="w-full border-none pb-20 px-0 md:px-2 pt-1 md:pt-4 bg-transparent"
       :model="menus"
@@ -93,14 +93,14 @@
     nextTick(() => {
       const sidebarContent = document.querySelector('.p-sidebar-content')
       const focusedItem = document.querySelector('[data-p-focused="true"]')
-      
+
       if (sidebarContent && focusedItem) {
         const itemTop = focusedItem.offsetTop
         const itemHeight = focusedItem.offsetHeight
         const contentHeight = sidebarContent.offsetHeight
         const scrollTop = sidebarContent.scrollTop
         const padding = 64 // Pequeno padding para garantir visibilidade completa
-        
+
         if (itemTop < scrollTop + padding) {
           sidebarContent.scrollTop = Math.max(0, itemTop - padding)
         } else if (itemTop + itemHeight > scrollTop + contentHeight - padding) {
