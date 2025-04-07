@@ -5,17 +5,15 @@
   >
     <div class="relative">
       <div class="flex gap-2 items-center justify-center">
-        <InputText
-          v-model="queryText"
+        <ContentEditable
+          v-model="query"
+          @focus="showSuggestionsFocusInput = true"
+          @keydown.tab.prevent="onSelectSuggestionWithTab"
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
-          @keydown.tab.prevent="onSelectSuggestionWithTab"
-          @input="handleInput"
-          placeholder="Azion Query Language"
-          @focus="showSuggestionsFocusInput = true"
-          class="w-full"
-          ref="ignoreClickOutside"
+          :handleQuery="handleQuery"
+          ref="editable"
         />
         <div class="h-auto w-full md:max-w-fit">
           <PrimeButton
@@ -42,7 +40,7 @@
       :options="filteredSuggestions"
       ref="listboxRef"
       optionLabel="label"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-2xl"
+      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs py-2"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
     >
@@ -69,8 +67,8 @@
 
 <script setup>
   import { ref, computed, onMounted, nextTick, watch } from 'vue'
+  import ContentEditable from './content-editable.vue'
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
@@ -79,7 +77,7 @@
 
   const AzionQueryLanguage = new Aql()
 
-  const queryText = ref('')
+  const query = ref('')
   const currentStep = ref('field')
   const highlightedIndex = ref(0)
   const listboxRef = ref(null)
@@ -88,6 +86,8 @@
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
+
+  const editable = ref(null)
 
   defineOptions({ name: 'azion-query-language' })
 
@@ -149,7 +149,7 @@
   })
 
   const currentFieldToken = computed(() => {
-    const parts = queryText.value.split(/\s+and\s+/i)
+    const parts = query.value.split(/\s+and\s+/i)
     return parts.pop().trim().replace(/["']/g, '')
   })
 
@@ -175,7 +175,7 @@
         `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
         'i'
       )
-      const operatorMatch = queryText.value.match(fieldRegex)
+      const operatorMatch = query.value.match(fieldRegex)
       const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
 
       return selectedField.value.operator
@@ -216,9 +216,9 @@
 
   const selectedFieldName = ref('')
 
-  const handleInput = () => {
+  const handleQuery = () => {
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
-      queryText.value,
+      query.value,
       suggestionsData.value
     )
     changeCurrentStep(handleInputMaching.operator)
@@ -228,11 +228,11 @@
   const selectSuggestion = (suggestion) => {
     const data = AzionQueryLanguage.selectSuggestion(
       suggestion,
-      queryText.value,
+      query.value,
       currentStep.value,
       selectedFieldName.value
     )
-    queryText.value = data?.query
+    query.value = data?.query
     selectedFieldName.value = data?.label
     changeCurrentStep(data?.nextStep)
     highlightedIndex.value = 0
@@ -268,14 +268,14 @@
     const suggestion = filteredSuggestions.value[highlightedIndex.value]
     if (suggestion) {
       selectSuggestion(suggestion)
+      editable.value.restoreCursorPosition(true)
     } else {
       executeQuery()
     }
   }
 
   const executeQuery = () => {
-    if (handleErrorsQuery.value.length) return
-    const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value, domains.value)
+    const filter = AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
   }
 
@@ -286,18 +286,16 @@
   const onSelectSuggestionWithTab = () => {
     if (filteredSuggestions.value.length === 1) {
       selectSuggestion(filteredSuggestions.value[0])
+      editable.value.restoreCursorPosition(true)
     }
   }
 
   const handleErrorsQuery = computed(() =>
-    AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
+    AzionQueryLanguage.queryValidator(query.value, suggestionsData.value)
   )
 
   const handleInitialQuery = () => {
-    queryText.value = AzionQueryLanguage.handleInicialQuery(
-      props.filterAdvanced,
-      props.fieldsInFilter
-    )
+    query.value = AzionQueryLanguage.handleInicialQuery(props.filterAdvanced, props.fieldsInFilter)
   }
 
   watch(
