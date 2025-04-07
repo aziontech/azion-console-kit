@@ -46,7 +46,7 @@
     >
       <template #option="slotProps">
         <div
-          class="w-full rounded-md"
+          class="w-full rounded-md font-mono"
           :class="[
             'p-2 cursor-pointer',
             { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
