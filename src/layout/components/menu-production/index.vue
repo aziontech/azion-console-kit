@@ -43,7 +43,7 @@
     >
       <template #item="{ item, label, props }">
         <a
-          class="flex focus:outline-none"
+          class="flex h-9 focus:outline-none"
           v-bind="props.action"
           @click.prevent="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
@@ -98,7 +98,7 @@
         const itemHeight = focusedItem.offsetHeight
         const contentHeight = sidebarContent.offsetHeight
         const scrollTop = sidebarContent.scrollTop
-        const padding = 64 // Pequeno padding para garantir visibilidade completa
+        const padding = 64
 
         if (itemTop < scrollTop + padding) {
           sidebarContent.scrollTop = Math.max(0, itemTop - padding)
