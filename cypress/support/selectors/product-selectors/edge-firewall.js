@@ -48,11 +48,13 @@ export default {
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
   ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_2',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
+  scrollWafDropdown: '.p-dropdown-items-wrapper .p-virtualscroller',
+  selectTheLastWaf: '.p-dropdown-items-wrapper .p-virtualscroller ul li',
   rulesWafDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
   rulesWafDropdownFilter:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown-filter-input"]',
-  rulesWafFirstOption: '#behaviors\\[0\\]\\.waf_id_0',
+  rulesWafFirstOption: '#behaviors\\[0\\]\\.id_0',
   rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
   behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
   rulesWafModeDropdown:
