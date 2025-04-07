@@ -88,7 +88,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 
 const formatValueContainOperator = (variable) => {
   for (const key in variable) {
-    if (variable[key] && key.includes('Like') || key.includes('Ilike')) {
+    if ((variable[key] && key.includes('Like')) || key.includes('Ilike')) {
       variable[key] = `%${variable[key]}%`
     }
   }

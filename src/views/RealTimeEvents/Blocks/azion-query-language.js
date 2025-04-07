@@ -326,7 +326,9 @@ export default class Aql {
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        const escapedOperatorsRegex = new RegExp(this.operators.map(op => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1")).join("|"))
+        const escapedOperatorsRegex = new RegExp(
+          this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
+        )
         let match = expression.toLowerCase().match(escapedOperatorsRegex)
         let operatorFound = match ? match[0] : null
         if (operatorFound) {
@@ -359,7 +361,9 @@ export default class Aql {
         }
       })
     } else {
-      const escapedOperatorsRegex = new RegExp(this.operators.map(op => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1")).join("|"))
+      const escapedOperatorsRegex = new RegExp(
+        this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
+      )
       let match = queryText.toLowerCase().match(escapedOperatorsRegex)
       let operatorFound = match ? match[0] : null
       if (operatorFound) {
@@ -483,19 +487,19 @@ export default class Aql {
   }
 
   queryValidatorNoSpaces(query) {
-    const expressions = query?.split(/and/i).map(exp => exp.trim())
+    const expressions = query?.split(/and/i).map((exp) => exp.trim())
     const errors = []
 
     // eslint-disable-next-line id-length
     const sortedOperators = [...this.operators].sort((a, b) => b.length - a.length)
-    const escapedOperators = sortedOperators.map(op => {
+    const escapedOperators = sortedOperators.map((op) => {
       const opEscaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       return /^[a-zA-Z]+$/.test(op) ? `\\b${opEscaped}\\b` : opEscaped
     })
     const operatorPattern = escapedOperators.join('|')
     const regex = new RegExp(operatorPattern, 'g')
 
-    expressions.forEach(exp => {
+    expressions.forEach((exp) => {
       let match
       while ((match = regex.exec(exp)) !== null) {
         const start = match.index
