@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "id": 12836,
+      "name": "joijoi",
+      "template_id": 2,
+      "data_source": "http",
+      "active": true,
+      "endpoint": {
+        "endpoint_type": "standard",
+        "url": "exmaple.com",
+        "log_line_separator": "\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000
+      },
+      "sampling_percentage": 90,
+      "all_domains": true
+    }
+  ],
+  "schema_version": 3
+}
