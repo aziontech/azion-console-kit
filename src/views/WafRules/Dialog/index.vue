@@ -100,6 +100,7 @@
           label="Allow Rules"
           :loading="loading"
           :disabled="!name"
+          data-testid="allow-rules-button"
           @click="handleAllowRule"
           iconPos="right"
         />

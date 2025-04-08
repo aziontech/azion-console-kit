@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "match_zone": "request_body",
+      "top_10_ips": [
+        {
+          "ip": "189.73.150.53",
+          "hits": 1
+        }
+      ],
+      "match_value": "-",
+      "matches_on": "value",
+      "ip_count": 1,
+      "hit_count": 3,
+      "path_count": 1,
+      "top_10_countries": [
+        {
+          "country": "Brazil",
+          "hits": 1
+        }
+      ],
+      "top_10_paths": [
+        {
+          "path": "/post",
+          "hits": 1
+        }
+      ],
+      "rule_id": "11",
+      "country_count": 1
+    }
+  ],
+  "schema_version": 3
+}

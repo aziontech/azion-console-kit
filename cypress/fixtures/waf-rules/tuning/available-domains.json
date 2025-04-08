@@ -1,0 +1,17 @@
+{
+  "count": 1,
+  "total_pages": 1,
+  "schema_version": 3,
+  "links": {
+    "previous": null,
+    "next": null
+  },
+  "results": [
+    {
+      "id": 1732285438,
+      "name": "joyful-functions",
+      "domain": "teste.map.azionedge.net",
+      "cnames": []
+    }
+  ]
+}

@@ -28,10 +28,12 @@ import DOMAINS_PRODUCT_SELECTORS from './selectors/product-selectors/domains.js'
 import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selectors/digital-certificates.js'
 import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
 import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
+import WAF_TUNING_PRODUCT_SELECTORS from './selectors/product-selectors/waf-tuning.js'
 
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
+  wafTuning: WAF_TUNING_PRODUCT_SELECTORS,
   form: FORM_FIELDS_SELECTORS,
   login: LOGIN_VIEW_SELECTORS,
   menuSidebar: MENU_SIDEBAR_SELECTORS,
