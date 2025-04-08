@@ -95,7 +95,7 @@
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
-  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect } from 'vue'
+  import { computed, toRef, useSlots, useAttrs, ref, onMounted, watchEffect, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import LabelBlock from '@/templates/label-block'
 
@@ -349,6 +349,16 @@
       search: `${id}__dropdown-search`
     }
   })
+
+  watch(
+    () => props.value,
+    (newValue) => {
+      const existitemInList = data.value?.some((item) => item[props.optionValue] === newValue)
+      if (!existitemInList) {
+        loadSelectedValue(newValue)
+      }
+    }
+  )
 
   watchDebounced(
     search,
