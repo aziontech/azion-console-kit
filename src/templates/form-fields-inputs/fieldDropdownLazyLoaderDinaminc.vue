@@ -390,7 +390,6 @@
         }
       })
 
-      // Preserve any selected value that might exist in data.value
       const selectedItem = data.value?.find((item) => item[props.optionValue] === props.value)
       data.value = selectedItem ? [selectedItem, ...results] : results || []
       totalCount.value = (newValue && newValue.count) || 0
