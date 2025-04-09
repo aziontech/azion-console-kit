@@ -42,6 +42,8 @@ export default {
   ruleCriteriaInput: '[data-testid="edge-firewall-rules-form__argument[0][0]__input"]',
   ruleCriteriaNetworkListDropdown:
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"]',
+  ruleCriteriaNetworkListDropdownValue:
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown__value"]',
   ruleCriteriaNetworkListFilter:
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-search"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
@@ -78,7 +80,8 @@ export default {
   behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
 
   createRulesEngine: '[data-testid="rules-engine-create-button"] > .p-button-label',
-  inputNumberFirstPosition: '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+  inputNumberFirstPosition:
+    '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
   reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
   reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
   saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
