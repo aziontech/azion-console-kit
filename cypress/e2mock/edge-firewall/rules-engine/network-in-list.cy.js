@@ -1,7 +1,7 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
 import selectors from '../../../support/selectors'
 
-describe('Edge Firewall Rules Engine with Network List', () => {
+describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, () => {
   const MOCK_EDGE_FIREWALL_ID = '1234'
   const MOCK_RULE_ID = '5678'
   const MOCK_NETWORK_LIST_ID = '9012'
