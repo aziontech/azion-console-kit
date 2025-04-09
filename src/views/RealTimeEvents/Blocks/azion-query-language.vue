@@ -8,7 +8,7 @@
         <ContentEditable
           v-model="query"
           @focus="showSuggestionsFocusInput = true"
-          @keydown.tab.prevent="onSelectSuggestionWithTab"
+          @keydown.tab="onSelectSuggestionWithTab"
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
@@ -283,8 +283,9 @@
     currentStep.value = step
   }
 
-  const onSelectSuggestionWithTab = () => {
+  const onSelectSuggestionWithTab = (event) => {
     if (filteredSuggestions.value.length === 1) {
+      event.preventDefault()
       selectSuggestion(filteredSuggestions.value[0])
       editable.value.restoreCursorPosition(true)
     }
