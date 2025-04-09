@@ -41,6 +41,7 @@ describe('DomainsServices', () => {
         name: fixtures.domainMock.name,
         cname_access_only: fixtures.domainMock.cnameAccessOnly,
         cnames: [],
+        edge_firewall_id: null,
         edge_application_id: fixtures.domainMock.edgeApplication,
         digital_certificate_id: fixtures.domainMock.edgeCertificate,
         is_active: fixtures.domainMock.active,
