@@ -30,7 +30,7 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     Cypress.session.clearAllSavedSessions()
   })
   it('should not delete account if user dos not has access', () => {
-    cy.intercept('DELETE', '/v4/account/account', {
+    cy.intercept('DELETE', '/v3/account', {
       statusCode: 403,
       body: fixtures.errorMessage
     }).as('failedDeleteAccount')

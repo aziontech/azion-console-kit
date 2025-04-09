@@ -3,10 +3,10 @@ import { makeAccountDeleteBaseUrl } from './make-account-delete-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const deleteAccountService = async () => {
+export const deleteAccountService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    baseURL: '/',
-    url: `${makeAccountDeleteBaseUrl()}`,
+    
+    url: `${makeAccountDeleteBaseUrl()}/${id}`,
     method: 'DELETE'
   })
   return parseHttpResponse(httpResponse)
@@ -14,7 +14,7 @@ export const deleteAccountService = async () => {
 
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 204:
       return 'Your account has been deleted'
     case 500:
       throw new Errors.InternalServerError().message

@@ -13,6 +13,7 @@
   import { useDialog } from 'primevue/usedialog'
   import PrimeButton from 'primevue/button'
   import { onMounted, ref, watch, computed } from 'vue'
+  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
     listCountriesService: {
@@ -28,6 +29,8 @@
       required: true
     }
   })
+
+  const accountStore = useAccountStore()
 
   const { value: accountName } = useField('accountName')
   const { value: clientId } = useField('clientId')
@@ -95,12 +98,16 @@
     window.location.href = '/logout'
   }
 
+  const decorateDeleteService = () => {
+    return deleteAccountService(accountStore.account.id)
+  }
+
   const openDeleteDialog = () => {
     const bodyDelete = {
       data: {
         title: 'Personal Account',
         deleteDialogVisible: true,
-        deleteService: deleteAccountService,
+        deleteService: decorateDeleteService,
         entityDeleteMessage: ENTITY_DELETE_MESSAGE,
         rerender: Math.random(),
         onSuccess: logout
