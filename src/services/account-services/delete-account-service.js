@@ -5,7 +5,6 @@ import { extractApiError } from '@/helpers/extract-api-error'
 
 export const deleteAccountService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    
     url: `${makeAccountDeleteBaseUrl()}/${id}`,
     method: 'DELETE'
   })

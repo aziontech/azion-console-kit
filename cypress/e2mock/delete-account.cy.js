@@ -2,7 +2,7 @@
 import selectors from '../support/selectors'
 
 const fixtures = {
-  errorMessage: { detail: "You cannot delete an account that has vendor's edge functions." }
+  errorMessage: { detail: "This account is not allowed to be deleted." }
 }
 describe('Account Settings spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
 
   it('should delete account successfully', () => {
     // Arrange
-    cy.intercept('DELETE', '/v4/account/account', { statusCode: 200, body: 'Success' }).as(
+    cy.intercept('DELETE', '/api/v3/account/*', { statusCode: 204, body: 'Success' }).as(
       'successDeleteAccount'
     )
     cy.get(selectors.accountSettings.deleteAccount).click()
@@ -29,8 +29,9 @@ describe('Account Settings spec', { tags: ['@dev2'] }, () => {
     cy.clearAllLocalStorage()
     Cypress.session.clearAllSavedSessions()
   })
-  it('should not delete account if user dos not has access', () => {
-    cy.intercept('DELETE', '/v3/account', {
+
+  it('should not delete account if user does not have access', () => {
+    cy.intercept('DELETE', '/api/v3/account/*', {
       statusCode: 403,
       body: fixtures.errorMessage
     }).as('failedDeleteAccount')
