@@ -128,6 +128,28 @@ Cypress.Commands.add('verifyToast', (summary, detail = '') => {
     })
 })
 
+
+/**
+ * Verifies the visibility and content of a toast message.
+ *
+ * @param {string} summary - The summary text of the toast message.
+ * @param {string} [detail=''] - The detail text of the toast message (optional).
+ */
+Cypress.Commands.add('verifyToastDelete', (detail = '') => {
+  const messageText = `${detail}`
+  const customId = `[data-testid="toast-block__content__${messageText}"]`
+
+  cy.get(customId)
+    .should('be.visible')
+    .and('contain', messageText)
+    .then(($toast) => {
+      $toast.siblings('div').find('.p-toast-icon-close').trigger('click')
+    })
+    .then(() => {
+      cy.get(customId).should('not.be.visible')
+    })
+})
+
 /**
  * Asserts that the expected value has been copied to the clipboard.
  *
