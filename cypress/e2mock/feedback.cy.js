@@ -1,6 +1,6 @@
 import selectors from '../support/selectors'
 
-describe('Feedback Form Spec', { tags: ['@dev2'] }, () => {
+describe('Feedback Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.intercept('POST', '/api/webhook/console_feedback', {
