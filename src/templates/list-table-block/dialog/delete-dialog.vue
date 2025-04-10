@@ -47,6 +47,7 @@
             id="confirm-input"
             type="text"
             autofocus
+            :disabled="loading"
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
             data-testid="delete-dialog-confirmation-input-field"
