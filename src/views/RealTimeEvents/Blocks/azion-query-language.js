@@ -98,13 +98,64 @@ export default class Aql {
   }
 
   formatDomainValues(query, domains) {
-    const parenMatch = query.match(/\(([^)]+)\)/)
-    if (!parenMatch) return []
+    const extractDomainClauseContent = (query) => {
+      const indicator = 'domain in ('
+      const lowerQuery = query.toLowerCase()
+      const pos = lowerQuery.indexOf(indicator)
+      if (pos === -1) return null
 
-    const tokens = parenMatch[1]
-      .split(',')
-      .map((token) => token.trim())
-      .filter((token) => token !== '')
+      const startIndex = query.indexOf('(', pos)
+      if (startIndex === -1) return null
+
+      let counter = 0
+      let endIndex = -1
+      // eslint-disable-next-line id-length
+      for (let i = startIndex; i < query.length; i++) {
+        if (query[i] === '(') {
+          counter++
+        } else if (query[i] === ')') {
+          counter--
+          if (counter === 0) {
+            endIndex = i
+            break
+          }
+        }
+      }
+      if (endIndex === -1) {
+        return query.substring(startIndex + 1)
+      }
+      return query.substring(startIndex + 1, endIndex)
+    }
+
+    const splitByCommaNotInParens = (str) => {
+      const tokens = []
+      let token = ''
+      let nesting = 0
+      // eslint-disable-next-line id-length
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i]
+        if (char === ',' && nesting === 0) {
+          tokens.push(token.trim())
+          token = ''
+        } else {
+          token += char
+          if (char === '(') {
+            nesting++
+          } else if (char === ')') {
+            nesting--
+          }
+        }
+      }
+      if (token.trim().length > 0) {
+        tokens.push(token.trim())
+      }
+      return tokens
+    }
+
+    const domainClauseContent = extractDomainClauseContent(query)
+    if (!domainClauseContent) return []
+
+    const tokens = splitByCommaNotInParens(domainClauseContent)
 
     const result = tokens
       .map((token) => {
@@ -173,46 +224,21 @@ export default class Aql {
       }
       case 'value': {
         if (fieldName === 'domain') {
-          const inClauseRegex = /in\s*\(([^)]*)/
-          const match = query.match(inClauseRegex)
+          const suggestion = suggestionLabel.trim()
 
-          if (match) {
-            let domainsArray = match[1]
-              .split(',')
-              .map((item) => item.trim())
-              .filter(Boolean)
-
-            const isComplete = query.includes(')')
-
-            if (!isComplete) {
-              if (
-                domainsArray.length > 0 &&
-                suggestionLabel.startsWith(domainsArray[domainsArray.length - 1])
-              ) {
-                domainsArray.pop()
-              }
-              if (!domainsArray.includes(suggestionLabel.trim())) {
-                domainsArray.push(suggestionLabel.trim())
-              }
-              const newInClause = `in (${domainsArray.join(', ')})`
-              const newQuery = query.replace(inClauseRegex, newInClause)
-              return { query: newQuery, nextStep: 'value', label: fieldName }
-            } else {
-              if (!domainsArray.includes(suggestionLabel.trim())) {
-                domainsArray.push(suggestionLabel.trim())
-              }
-              const newQuery = query.replace(/\([^)]*\)/, `(${domainsArray.join(', ')})`)
-              return { query: newQuery, nextStep: 'value', label: fieldName }
-            }
-          } else {
-            if (query.endsWith(' ') || query.endsWith('in')) {
-              const newQuery = `${query} (${suggestionLabel.trim()})`
-              return { query: newQuery, nextStep: 'value', label: fieldName }
-            } else {
-              const newQuery = `${query} in (${suggestionLabel.trim()})`
-              return { query: newQuery, nextStep: 'value', label: fieldName }
-            }
+          let newQuery = ''
+          if (query.includes(suggestionLabel.trim())) {
+            return { query, nextStep: 'value', label: fieldName }
           }
+
+          if (query.endsWith(' ') || query.endsWith('in')) {
+            newQuery = `${query}(${suggestion})`
+          } else if (query.endsWith(',') || !query.endsWith(')')) {
+            newQuery = `${query}, ${suggestion})`
+          } else {
+            newQuery = `${query.slice(0, -1)}, ${suggestion})`
+          }
+          return { query: newQuery, nextStep: 'value', label: fieldName }
         } else {
           return { query: `${suggestionLabel} `, nextStep: 'value', label: fieldName }
         }
@@ -670,5 +696,49 @@ export default class Aql {
       textRange.collapse(false)
       textRange.select()
     }
+  }
+
+  getOperatorSuggestions = (query, suggestions, selectedFieldName) => {
+    const selectedField = suggestions.find(
+      (item) => item.value.label.toLowerCase() === selectedFieldName.toLowerCase()
+    )
+    if (!selectedField) return []
+
+    const fieldRegex = new RegExp(
+      `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
+      'i'
+    )
+    const operatorMatch = query.match(fieldRegex)
+    const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
+
+    return selectedField.value.operator
+      .filter((op) => {
+        if (op.value.format.toLowerCase() === 'in') return true
+        if (operatorAlreadyTyped && op.value.format.toLowerCase() === operatorAlreadyTyped) {
+          return false
+        }
+        return true
+      })
+      .map((op) => ({
+        label: op.value.format
+      }))
+  }
+
+  getValueSuggestions(domains, selectedFieldName) {
+    if (selectedFieldName === 'domain') {
+      return domains
+    }
+    return []
+  }
+
+  getFieldSuggestions(query, suggestions) {
+    const parts = query.split(/\s+and\s+/i)
+    const currentFieldToken = parts.pop().trim().replace(/["']/g, '')
+
+    const searchTerm = currentFieldToken.toLowerCase()
+
+    if (!searchTerm) return suggestions
+
+    return suggestions.filter((item) => item.label.toLowerCase().startsWith(searchTerm))
   }
 }

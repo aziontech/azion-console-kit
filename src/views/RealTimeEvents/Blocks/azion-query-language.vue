@@ -55,12 +55,6 @@
           {{ slotProps.option.label }}
         </div>
       </template>
-      <template
-        #loader
-        v-if="loading"
-      >
-        loading....
-      </template>
     </Listbox>
   </div>
 </template>
@@ -79,10 +73,10 @@
 
   const query = ref('')
   const currentStep = ref('field')
+  const selectedFieldName = ref('')
   const highlightedIndex = ref(0)
   const listboxRef = ref(null)
   const domains = ref({})
-  const loading = ref(false)
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
@@ -148,56 +142,22 @@
     )
   })
 
-  const currentFieldToken = computed(() => {
-    const parts = query.value.split(/\s+and\s+/i)
-    return parts.pop().trim().replace(/["']/g, '')
-  })
-
   const filteredSuggestions = computed(() => {
-    if (currentStep.value === 'field') {
-      const searchTerm = currentFieldToken.value.toLowerCase()
+    const suggestions = suggestionsData.value
+    const field = selectedFieldName.value
 
-      if (!searchTerm) {
-        return suggestionsData.value
-      } else {
-        return suggestionsData.value.filter((item) =>
-          item.label.toLowerCase().startsWith(searchTerm)
-        )
-      }
-    } else if (currentStep.value === 'operator') {
-      const selectedField = suggestionsData.value.find(
-        (item) => item.value.label.toLowerCase() === selectedFieldName.value.toLowerCase()
-      )
-
-      if (!selectedField) return []
-
-      const fieldRegex = new RegExp(
-        `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
-        'i'
-      )
-      const operatorMatch = query.value.match(fieldRegex)
-      const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
-
-      return selectedField.value.operator
-        .filter((op) => {
-          if (op.value.format.toLowerCase() === 'in') return true
-          if (operatorAlreadyTyped && op.value.format.toLowerCase() === operatorAlreadyTyped) {
-            return false
-          }
-          return true
-        })
-        .map((op) => ({
-          label: op.value.format
-        }))
-    } else if (currentStep.value === 'value') {
-      if (selectedFieldName.value === 'domain') {
-        return domains.value
-      }
-      return []
-    } else if (currentStep.value === 'logicOperator') {
-      return [{ label: 'AND' }]
+    switch (currentStep.value) {
+      case 'field':
+        return AzionQueryLanguage.getFieldSuggestions(query.value, suggestions)
+      case 'operator':
+        return AzionQueryLanguage.getOperatorSuggestions(query.value, suggestions, field)
+      case 'value':
+        return AzionQueryLanguage.getValueSuggestions(domains.value, field)
+      case 'logicOperator':
+        return [{ label: 'AND' }]
+      default:
+        return []
     }
-    return []
   })
 
   const loaderDomainWorkloads = async () => {
@@ -213,8 +173,6 @@
       return []
     }
   }
-
-  const selectedFieldName = ref('')
 
   const handleQuery = () => {
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
@@ -267,8 +225,10 @@
   const confirmSelection = () => {
     const suggestion = filteredSuggestions.value[highlightedIndex.value]
     if (suggestion) {
+      const restoreCursorInLastOffset = true
+
       selectSuggestion(suggestion)
-      editable.value.restoreCursorPosition(true)
+      editable.value.restoreCursorPosition(restoreCursorInLastOffset)
     } else {
       executeQuery()
     }
@@ -285,9 +245,10 @@
 
   const onSelectSuggestionWithTab = (event) => {
     if (filteredSuggestions.value.length === 1) {
+      const restoreCursorInLastOffset = true
       event.preventDefault()
       selectSuggestion(filteredSuggestions.value[0])
-      editable.value.restoreCursorPosition(true)
+      editable.value.restoreCursorPosition(restoreCursorInLastOffset)
     }
   }
 

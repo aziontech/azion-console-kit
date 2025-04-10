@@ -39,7 +39,7 @@
     editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
     emit('update:modelValue', newValue)
     props.handleQuery()
-    restoreCursorPosition(false)
+    restoreCursorPosition()
   }
 
   const restoreCursorPosition = (lastOffset = false) => {
