@@ -98,6 +98,13 @@ Cypress.Commands.add('openProductThroughSidebar', (productName) => {
 })
 
 /**
+ * Opens the feedback dialog.
+ */
+Cypress.Commands.add('openFeedback', () => {
+  cy.get(selectors.header.buttonFeedback.openFeedback).click()
+})
+
+/**
  * Opens an item through the account menu.
  *
  * @param {string} menuAccountLabel - The label of the item in the account menu.

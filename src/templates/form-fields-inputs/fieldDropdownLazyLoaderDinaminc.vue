@@ -368,7 +368,15 @@
   watch(
     () => props.initalData,
     (newValue) => {
-      let results = newValue.body?.map((item) => {
+      if (!newValue?.body) {
+        if (!props.value) {
+          data.value = []
+          totalCount.value = 0
+        }
+        return
+      }
+
+      let results = newValue.body.map((item) => {
         return {
           [props.optionLabel]: item.name,
           [props.optionValue]: item.id,
@@ -382,8 +390,9 @@
         }
       })
 
-      data.value = results
-      totalCount.value = newValue.count
+      const selectedItem = data.value?.find((item) => item[props.optionValue] === props.value)
+      data.value = selectedItem ? [selectedItem, ...results] : results || []
+      totalCount.value = (newValue && newValue.count) || 0
     },
     { immediate: true }
   )

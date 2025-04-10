@@ -24,6 +24,9 @@
     v-bind="$attrs"
     class="w-full"
     :pt="{
+      clearIcon: {
+        'data-testid': customTestId.clearIcon
+      },
       filterInput: {
         class: 'w-full',
         'data-testid': customTestId.filterInput
@@ -338,6 +341,7 @@
       label: `${id}__label`,
       dropdown: `${id}__dropdown`,
       value: `${id}__value`,
+      clearIcon: `${id}__clear-icon`,
       description: `${id}__description`,
       error: `${id}__error-message`,
       filterInput: `${id}__dropdown-filter-input`,
