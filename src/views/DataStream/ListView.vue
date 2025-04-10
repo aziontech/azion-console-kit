@@ -89,14 +89,7 @@
 
   const store = useAccountStore()
   const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
-  const DATA_STREAM_API_FIELDS = [
-    'id',
-    'name',
-    'data_source',
-    'active',
-    'data_set_id',
-    'endpoint'
-  ]
+  const DATA_STREAM_API_FIELDS = ['id', 'name', 'data_source', 'active', 'data_set_id', 'endpoint']
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -165,17 +158,17 @@
       {
         field: 'dataSource',
         header: 'Source',
-        disableSort: true,
+        disableSort: true
       },
       {
         field: 'templateName',
         header: 'Template',
-        disableSort: true,
+        disableSort: true
       },
       {
         field: 'endpointType',
         header: 'Connector',
-        disableSort: true,
+        disableSort: true
       },
       {
         field: 'active',
