@@ -98,8 +98,8 @@
     window.location.href = '/logout'
   }
 
-  const decorateDeleteService = () => {
-    return deleteAccountService(accountStore.account.id)
+  const decorateDeleteService = async () => {
+    return await deleteAccountService(accountStore.account.id)
   }
 
   const openDeleteDialog = () => {
