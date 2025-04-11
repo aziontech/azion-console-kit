@@ -5,7 +5,9 @@ export default {
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
     modulesSwitch: (moduleName) =>
-      `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`
+      `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
+    l2CachingSwitch:
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider'
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',
@@ -88,6 +90,13 @@ export default {
       `[data-testid="error-responses-form__error-response__${optionIdx}__path__input"]`
   },
   cacheSettings: {
+    tieredCacheRegionDropdown:
+      '[data-testid="edge-application-cache-settings-form__tiered-caching-region-field__dropdown"]',
+    largeFileOptimizationSwitch:
+      '[data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field__switch"] > .p-inputswitch-slider',
+    tieredCacheRegionOption: (option) => `#l2Region_${option}`,
+    enableTieredCachingSwitch:
+      '[data-testid="edge-application-cache-settings-form__tiered-caching-enabled-field__switch"] > .p-inputswitch-slider',
     createButton:
       '[data-testid="edge-application-cache-settings-list__create-cache-settings__button"]',
     nameInput: '[data-testid="edge-application-cache-settings-form__name-field__input"]',
