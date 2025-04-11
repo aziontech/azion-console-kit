@@ -10,10 +10,10 @@ describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
     cy.openProduct('WAF Rules')
 
     cy.wait('@wafListApi', { timeout: 30000 })
-    cy.intercept('GET', '/api/v4/edge_firewall/wafs/10981', {
+    cy.intercept('GET', '/api/v4/edge_firewall/wafs/6648', {
       fixture: '/waf-rules/waf-main-settings.json'
     }).as('wafMainSettings')
-    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.get(selectors.list.filteredRow.column('name')).first().click()
     cy.wait('@wafMainSettings', { timeout: 30000 })
   })
 
@@ -38,7 +38,7 @@ describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
     cy.get(selectors.wafTuning.dataTableRowCheckbox).eq(1).click()
     cy.get(selectors.wafTuning.submitButton).eq(1).click()
     cy.get('textarea').type('teste')
-    cy.intercept('POST', '/api/v4/edge_firewall/wafs/10981/exceptions', (req) => {
+    cy.intercept('POST', '/api/v4/edge_firewall/wafs/6648/exceptions', (req) => {
       expect(req.body).to.have.property('match_zones')
       expect(req.body.match_zones).to.be.an('array')
       expect(req.body.match_zones).to.deep.include({

@@ -13,9 +13,12 @@ const createWAFCase = () => {
 
   // Act
   cy.get(selectors.wafs.nameInput).type(wafName)
-  cy.intercept('GET', '/api/v3/waf/rulesets/*').as('wafRules')
+  cy.intercept('POST', '/api/v4/edge_firewall/wafs*').as('wafRules')
+  cy.intercept('GET', '/api/v4/edge_firewall/wafs/*').as('wafRulesGET')
+
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.verifyToast('success', 'Your waf rule has been created')
+  cy.wait('@wafRules')
+  cy.verifyToast('success', 'Your WAF Rule has been created')
 }
 // added @xfail due to a problem with edge firewall
 describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
@@ -28,9 +31,16 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
 
   it('should create an Edge Firewall with a rules engine using a WAF', () => {
     createWAFCase()
-    cy.wait('@wafRules')
+    cy.wait('@wafRulesGET')
     cy.openProduct('Edge Firewall')
 
+    cy.intercept('GET', 'api/v4/edge_firewall/wafs?ordering=name&page=1&page_size=100&fields=&search=', {
+      fixture: '/waf-rules/waf-list.json'
+    }).as('wafDropdown')
+
+    cy.intercept('GET', 'api/v4/edge_firewall/wafs?ordering=name&page=2&page_size=100&fields=&search=', {
+      fixture: '/waf-rules/waf-list-second-page.json'
+    }).as('wafDropdownSecondPage')
     // Act - create Edge Firewall
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
@@ -59,9 +69,11 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.behaviorsWafOption).click()
     cy.get(selectors.edgeFirewall.rulesWafDropdown).click()
-    cy.get(selectors.edgeFirewall.rulesWafDropdownFilter).clear()
-    cy.get(selectors.edgeFirewall.rulesWafDropdownFilter).type(wafName)
-    cy.get(selectors.edgeFirewall.rulesWafFirstOption).click()
+    cy.wait('@wafDropdown', { timeout: 3000 })
+    cy.get(selectors.edgeFirewall.scrollWafDropdown).scrollTo('bottom')
+    cy.wait('@wafDropdownSecondPage', { timeout: 3000 });
+    // eslint-disable-next-line cypress/unsafe-to-chain-command
+    cy.get(selectors.edgeFirewall.selectTheLastWaf).last().scrollIntoView().click();
     cy.get(selectors.edgeFirewall.rulesWafModeDropdown).click()
     cy.get(selectors.edgeFirewall.rulesWafFirstModeOption).click()
     cy.get(selectors.edgeFirewall.ruleSubmit).click()

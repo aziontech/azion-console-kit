@@ -12,7 +12,7 @@ const fixtures = {
     criteria: [{ conditional: 'if', input: '${uri}', comparison: 'starts_with', subject: '/api' }],
     behaviors: [
       { name: 'run_function', functionId: 'abc123' },
-      { name: 'set_waf_ruleset_and_waf_mode', mode: 'blocking', waf_id: 'def456' },
+      { name: 'set_waf_ruleset_and_waf_mode', mode: 'blocking', id: 'def456' },
       {
         name: 'set_rate_limit',
         type: 'second',

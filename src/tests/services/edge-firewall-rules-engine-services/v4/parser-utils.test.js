@@ -27,7 +27,7 @@ describe('parser-utils', () => {
     })
 
     it('should correctly parse set_waf_ruleset behavior', () => {
-      const behaviors = [{ name: 'set_waf_ruleset', mode: 'block', waf_id: 1 }]
+      const behaviors = [{ name: 'set_waf_ruleset', mode: 'block', id: 1 }]
       const expected = [{ name: 'set_waf_ruleset', argument: { mode: 'block', id: 1 } }]
       expect(parseBehaviors(behaviors)).toEqual(expected)
     })

@@ -52,6 +52,10 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    loadWafRulesService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -259,6 +263,7 @@
         :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
+        :loadWafRulesService="loadWafRulesService"
       />
     </template>
   </CreateDrawerBlock>
@@ -282,6 +287,7 @@
         :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
+        :loadWafRulesService="loadWafRulesService"
       />
     </template>
   </EditDrawerBlock>

@@ -169,7 +169,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
       {
         name: 'set_waf_ruleset_and_waf_mode',
         mode: 'blocking',
-        waf_id: 456
+        id: 456
       }
     ])
   })

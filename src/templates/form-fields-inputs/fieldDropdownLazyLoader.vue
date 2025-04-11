@@ -276,6 +276,9 @@
 
         data.value = [...data.value, ...uniqueResults]
       }
+      if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
+        await checkValueInList(props.value)
+      }
     } catch (error) {
       emit('onAccessDenied')
     } finally {
@@ -354,10 +357,7 @@
   watch(
     () => props.value,
     (newValue) => {
-      const existitemInList = data.value?.some((item) => item[props.optionValue] === newValue)
-      if (!existitemInList) {
-        loadSelectedValue(newValue)
-      }
+      checkValueInList(newValue)
     }
   )
 
@@ -386,5 +386,12 @@
     itemSize: 38,
     showLoader: true,
     loading
+  }
+
+  const checkValueInList = (value) => {
+    const existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+    if (!existitemInList) {
+      loadSelectedValue(value)
+    }
   }
 </script>

@@ -72,6 +72,10 @@
     reorderRulesEngine: {
       type: Function,
       required: true
+    },
+    loadWafRulesService: {
+      type: Function,
+      required: true
     }
   })
   const hasContentToList = ref(true)
@@ -252,6 +256,7 @@
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="listNetworkListService"
     :loadNetworkListService="loadNetworkListService"
+    :loadWafRulesService="loadWafRulesService"
     @onSuccess="reloadList"
   />
 
