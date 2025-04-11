@@ -136,13 +136,11 @@ const getHeaders = (payload) => {
   }
 }
 
-
 const handlesWorkloads = async (workloadsIds) => {
   const workloads = await listWorkloadsService({})
 
-  const filtered = workloads.filter(workload => workloadsIds.includes(workload.id))
-  const notFound = workloads.filter(workload => !workloadsIds.includes(workload.id))
+  const filtered = workloads.filter((workload) => workloadsIds.includes(workload.id))
+  const notFound = workloads.filter((workload) => !workloadsIds.includes(workload.id))
 
   return [filtered, notFound]
-  
 }
