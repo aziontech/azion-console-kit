@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DataStreamService from '@/services/data-stream-services'
+import * as DataStreamServiceV4 from '@/services/data-stream-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
@@ -11,7 +12,7 @@ export const dataStreamRoutes = {
       name: 'list-data-stream',
       component: () => import('@views/DataStream/ListView.vue'),
       props: {
-        listDataStreamService: DataStreamService.listDataStreamService,
+        listDataStreamService: DataStreamServiceV4.listDataStreamService,
         deleteDataStreamService: DataStreamService.deleteDataStreamService,
         documentationService: Helpers.documentationCatalog.dataStream
       },

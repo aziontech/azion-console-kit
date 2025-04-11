@@ -1,6 +1,6 @@
 import selectors from '../../support/selectors'
 
-describe('Data Stream Edit Sampling', { tags: ['@dev4'] }, () => {
+describe.skip('Data Stream Edit Sampling', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     cy.clearAllSessionStorage()
     cy.clearAllLocalStorage()

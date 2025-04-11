@@ -23,7 +23,7 @@
           through Azion Console. Please use the Data Stream API.
         </InlineMessage>
         <div class="w-full">
-          <ListTableBlock
+          <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
@@ -33,8 +33,10 @@
             :columns="getColumns"
             @on-load-data="handleLoadData"
             emptyListMessage="No streams found."
+            :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
-          ></ListTableBlock>
+            :defaultOrderingFieldName="'name'"
+          ></FetchListTableBlock>
           <EmptyResultsBlock
             v-else
             title="No stream has been created"
@@ -57,10 +59,10 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
   import { onBeforeRouteLeave } from 'vue-router'
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -87,7 +89,7 @@
 
   const store = useAccountStore()
   const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
-
+  const DATA_STREAM_API_FIELDS = ['id', 'name', 'data_source', 'active', 'data_set_id', 'endpoint']
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -155,15 +157,18 @@
       },
       {
         field: 'dataSource',
-        header: 'Source'
+        header: 'Source',
+        disableSort: true
       },
       {
         field: 'templateName',
-        header: 'Template'
+        header: 'Template',
+        disableSort: true
       },
       {
         field: 'endpointType',
-        header: 'Connector'
+        header: 'Connector',
+        disableSort: true
       },
       {
         field: 'active',
