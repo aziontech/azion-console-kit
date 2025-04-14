@@ -98,6 +98,7 @@
       :options="options"
       aria-labelledby="basic"
       class="w-fit"
+      data-testid="real-time-events-filter-options"
     />
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-baseline">
       <AdvancedFilter
