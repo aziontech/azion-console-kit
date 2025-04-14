@@ -22,9 +22,7 @@ const fixtures = {
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: '',
-    connectionTimeout: 60,
-    timeoutBetweenBytes: 35
+    hmacSecretKey: ''
   },
   requestPayloadMockLiveIngest: {
     name: 'New Origin',
@@ -48,9 +46,7 @@ const fixtures = {
     hmac_authentication: false,
     hmac_region_name: '',
     hmac_access_key: '',
-    hmac_secret_key: '',
-    connection_timeout: 60,
-    timeout_between_bytes: 35
+    hmac_secret_key: ''
   }
 }
 
