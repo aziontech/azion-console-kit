@@ -167,6 +167,7 @@
   const SEARCH_MAX_WAIT = 1000
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
+  const PERMISSION_DENIED = 'You do not have permission to do this action.'
 
   const name = toRef(props, 'name')
   const slots = useSlots()
@@ -277,6 +278,15 @@
         await checkValueInList(props.value)
       }
     } catch (error) {
+      //Here we check if the error was caused by a lack of permission. If that's not the case, we add the ID to avoid blocking the user's experience.
+      if (error === PERMISSION_DENIED) {
+        data.value = [
+          {
+            id: props.value,
+            name: props.value
+          }
+        ]
+      }
       emit('onAccessDenied')
     } finally {
       loading.value = false

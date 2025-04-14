@@ -1,7 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldDropdownLazyLoaderDinaminc from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderDinaminc.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
   import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
@@ -360,6 +359,10 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
+  const notPermission = () => {
+    hasWafAccess.value = false
+  }
+
   // Behaviors - extract to another form fields
   const {
     push: pushBehavior,
@@ -629,7 +632,7 @@
                 class="w-full"
                 :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
               />
-              <FieldDropdownLazyLoaderDinaminc
+              <FieldDropdownLazyLoader
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
                 :data-testid="`edge-firewall-rules-form__network-list[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
@@ -788,6 +791,7 @@
                 :name="`behaviors[${behaviorItemIndex}].id`"
                 :service="listWafRulesService"
                 :loadService="loadWafRulesService"
+                @onAccessDenied="notPermission"
                 placeholder="Select a Waf"
                 optionLabel="name"
                 optionValue="id"
