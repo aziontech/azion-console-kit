@@ -18,7 +18,7 @@ const adapt = async (httpResponse) => {
     throw new Error(extractApiError({ body: httpResponse.body })).message
   }
 
-  const payload = httpResponse.body.results
+  const payload = httpResponse.body.data
   const workloads = await handlesWorkloads(payload.filters.workloads)
 
   const parsedVariable = {
@@ -139,8 +139,8 @@ const getHeaders = (payload) => {
 const handlesWorkloads = async (workloadsIds) => {
   const workloads = await listWorkloadsService({})
 
-  const filtered = workloads.filter((workload) => workloadsIds.includes(workload.id))
-  const notFound = workloads.filter((workload) => !workloadsIds.includes(workload.id))
+  const filtered = workloads.results.filter((workload) => workloadsIds.includes(workload.id))
+  const notFound = workloads.results.filter((workload) => !workloadsIds.includes(workload.id))
 
   return [filtered, notFound]
 }

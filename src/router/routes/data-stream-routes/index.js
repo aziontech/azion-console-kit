@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DataStreamService from '@/services/data-stream-services'
+import * as DataStreamServiceV4 from '@/services/data-stream-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
@@ -53,7 +54,7 @@ export const dataStreamRoutes = {
       props: {
         listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
         listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        loadDataStreamService: DataStreamService.loadDataStreamService,
+        loadDataStreamService: DataStreamServiceV4.loadDataStreamService,
         editDataStreamService: DataStreamService.editDataStreamService,
         updatedRedirect: 'list-data-stream'
       },

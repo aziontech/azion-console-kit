@@ -117,7 +117,14 @@
           data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
-        <PickList
+
+        <fieldPickList
+          :dataPick="domains"
+          :disabled="hasNoPermissionToEditDataStream"
+          title="Domains"
+        ></fieldPickList>
+
+        <!-- <PickList
           v-model="domains"
           :disabled="hasNoPermissionToEditDataStream"
           :pt="{
@@ -157,7 +164,7 @@
               </div>
             </div>
           </template>
-        </PickList>
+        </PickList> -->
 
         <small
           class="text-xs text-color-secondary font-normal leading-5"
@@ -1075,7 +1082,8 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
-  import PickList from 'primevue/picklist'
+  // import PickList from 'primevue/picklist'
+  import fieldPickList from '@/templates/form-fields-inputs/fieldPickList.vue'
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -1421,5 +1429,7 @@
 
   onMounted(() => {
     initializeFormValues()
+
+    console.log('domains', domains)
   })
 </script>
