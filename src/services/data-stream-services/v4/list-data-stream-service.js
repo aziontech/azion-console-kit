@@ -13,6 +13,7 @@ export const listDataStreamService = async ({
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
     url: `${makeDataStreamBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
