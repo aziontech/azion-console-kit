@@ -132,7 +132,9 @@
       emit('successfullyDeleted')
       resetForm()
       dialogRef.value.close({ updated: true })
-      data.onSuccess()
+      if (data.onSuccess) {
+        data.onSuccess()
+      }
     } catch (error) {
       showToast('error', 'Error', error)
     } finally {
