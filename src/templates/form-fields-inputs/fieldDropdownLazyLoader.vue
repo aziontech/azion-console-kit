@@ -266,7 +266,7 @@
       })
 
       if (currentPage === INITIAL_PAGE) {
-        data.value = results
+        data.value = results ? results : []
       } else {
         const uniqueResults = results.filter(
           (newItem) =>
@@ -277,6 +277,7 @@
 
         data.value = [...data.value, ...uniqueResults]
       }
+
       if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
         await checkValueInList(props.value)
       }
@@ -400,6 +401,7 @@
 
   const checkValueInList = (value) => {
     const existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+
     if (!existitemInList) {
       loadSelectedValue(value)
     }
