@@ -90,9 +90,6 @@ const getQueryByAccountType = (accountIsNotRegular) => {
             periodTo,
             invoiceNumber,
             totalValue,
-            currency,
-            temporaryBill
-        }
       }`
     }
   } else {
