@@ -1,4 +1,4 @@
-import { getCurrentMonthStartEnd } from '@/helpers/get-current-month-start-end'
+import { getCurrentMonthStartEnd } from '../../../src/helpers/get-current-month-start-end'
 describe('Billing spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
