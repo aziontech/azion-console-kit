@@ -54,8 +54,10 @@ describe('Real-Time Events Advanced Filter', { tags: ['@dev3'] }, () => {
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.wait(2000)
+      cy.get(selectors.realTimeEvents.input).type('stat')
+      cy.wait(2000)
       // eslint-disable-next-line cypress/unsafe-to-chain-command
-      cy.get(selectors.realTimeEvents.input).type('stat').tab()
+      cy.get(selectors.realTimeEvents.input).tab()
       cy.get(selectors.realTimeEvents.input).should('have.text', 'status ')
     })
   })
