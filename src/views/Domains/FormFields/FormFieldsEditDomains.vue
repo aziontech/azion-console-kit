@@ -137,6 +137,10 @@
     drawerRef.value.openCreateDrawer()
   }
 
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
+  }
+
   const handleEdgeApplicationCreated = (id) => {
     edgeApplication.value = id
   }
@@ -318,6 +322,7 @@
           label="Edge Firewall"
           enableClearOption
           @onAccessDenied="handleEdgeFirewallAccessDenied"
+          @onClear="handleEdgeFirewallClear"
           v-if="hasEdgeFirewallAccess"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"

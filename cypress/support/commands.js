@@ -98,6 +98,13 @@ Cypress.Commands.add('openProductThroughSidebar', (productName) => {
 })
 
 /**
+ * Opens the feedback dialog.
+ */
+Cypress.Commands.add('openFeedback', () => {
+  cy.get(selectors.header.buttonFeedback.openFeedback).click()
+})
+
+/**
  * Opens an item through the account menu.
  *
  * @param {string} menuAccountLabel - The label of the item in the account menu.
@@ -115,6 +122,28 @@ Cypress.Commands.add('openItemThroughMenuAccount', (menuAccountLabel) => {
  */
 Cypress.Commands.add('verifyToast', (summary, detail = '') => {
   const messageText = `${summary}${detail}`
+  const customId = `[data-testid="toast-block__content__${messageText}"]`
+
+  cy.get(customId)
+    .should('be.visible')
+    .and('contain', messageText)
+    .then(($toast) => {
+      $toast.siblings('div').find('.p-toast-icon-close').trigger('click')
+    })
+    .then(() => {
+      cy.get(customId).should('not.be.visible')
+    })
+})
+
+
+/**
+ * Verifies the visibility and content of a toast message.
+ *
+ * @param {string} summary - The summary text of the toast message.
+ * @param {string} [detail=''] - The detail text of the toast message (optional).
+ */
+Cypress.Commands.add('verifyToastDelete', (detail = '') => {
+  const messageText = `${detail}`
   const customId = `[data-testid="toast-block__content__${messageText}"]`
 
   cy.get(customId)

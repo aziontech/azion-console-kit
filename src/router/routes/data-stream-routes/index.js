@@ -13,7 +13,7 @@ export const dataStreamRoutes = {
       component: () => import('@views/DataStream/ListView.vue'),
       props: {
         listDataStreamService: DataStreamServiceV4.listDataStreamService,
-        deleteDataStreamService: DataStreamService.deleteDataStreamService,
+        deleteDataStreamService: DataStreamServiceV4.deleteDataStreamService,
         documentationService: Helpers.documentationCatalog.dataStream
       },
       meta: {
