@@ -23,7 +23,7 @@ describe('DataStreamServices', () => {
     await sut(deleteIdMock)
 
     expect(httpClientSpy).toHaveBeenCalledWith({
-      baseURL: "/",
+      baseURL: '/',
       method: 'DELETE',
       url: `${version}/data_stream/streams/${deleteIdMock}`
     })

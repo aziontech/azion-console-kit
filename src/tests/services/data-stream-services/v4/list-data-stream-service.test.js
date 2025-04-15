@@ -58,7 +58,7 @@ describe('DataStreamServices', () => {
 
     expect(httpClientSpy).toHaveBeenCalledOnce()
     expect(httpClientSpy).toHaveBeenCalledWith({
-      baseURL: "/",
+      baseURL: '/',
       method: 'GET',
       url: `${version}/data_stream/streams?ordering=name&page=1&page_size=10&fields=&search=`
     })
