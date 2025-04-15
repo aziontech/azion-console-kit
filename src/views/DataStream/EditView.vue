@@ -30,6 +30,10 @@
     updatedRedirect: {
       type: String,
       required: true
+    },
+    listWorkloadsService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -247,6 +251,7 @@
           <FormFieldsDataStream
             :listDataStreamTemplateService="props.listDataStreamTemplateService"
             :listDataStreamDomainsService="props.listDataStreamDomainsService"
+            :listWorkloadsService="props.listWorkloadsService"
           />
         </template>
         <template

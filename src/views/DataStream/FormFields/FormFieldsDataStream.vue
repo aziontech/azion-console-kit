@@ -121,6 +121,7 @@
         <fieldPickList
           :dataPick="domains"
           :disabled="hasNoPermissionToEditDataStream"
+          :service="listWorkloadsService"
           title="Domains"
         ></fieldPickList>
 
@@ -1103,6 +1104,10 @@
       type: Function,
       required: true
     },
+    listWorkloadsService: {
+      type: Function,
+      required: true
+    },
     resetForm: {
       type: Function,
       required: false
@@ -1429,7 +1434,5 @@
 
   onMounted(() => {
     initializeFormValues()
-
-    console.log('domains', domains)
   })
 </script>

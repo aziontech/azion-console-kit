@@ -1,7 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as DataStreamService from '@/services/data-stream-services'
 import * as DataStreamServiceV4 from '@/services/data-stream-services/v4'
-
+import * as WorkloadsService from '@/services/workloads-services'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
   path: '/data-stream',
@@ -56,6 +56,7 @@ export const dataStreamRoutes = {
         listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
         loadDataStreamService: DataStreamServiceV4.loadDataStreamService,
         editDataStreamService: DataStreamService.editDataStreamService,
+        listWorkloadsService: WorkloadsService.listWorkloadsService,
         updatedRedirect: 'list-data-stream'
       },
       meta: {

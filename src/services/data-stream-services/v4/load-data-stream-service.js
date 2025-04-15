@@ -28,7 +28,7 @@ const adapt = async (httpResponse) => {
     dataSet: payload?.data_set,
     dataSource: payload.data_source,
     domains: workloads,
-    domainOption: payload.filters.sampling_enable,
+    domainOption: payload.filters.sampling_enable ? '1' : '0',
     status: payload.active,
     filters: payload.filters,
     endpoint: payload.endpoint.endpoint_type,
@@ -142,5 +142,5 @@ const handlesWorkloads = async (workloadsIds) => {
   const filtered = workloads.results.filter((workload) => workloadsIds.includes(workload.id))
   const notFound = workloads.results.filter((workload) => !workloadsIds.includes(workload.id))
 
-  return [filtered, notFound]
+  return [notFound, filtered]
 }
