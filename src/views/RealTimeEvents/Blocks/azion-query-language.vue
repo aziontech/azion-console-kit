@@ -14,6 +14,7 @@
           @keydown.enter.prevent="confirmSelection"
           :handleQuery="handleQuery"
           ref="editable"
+          data-testid="azion-query-language-input"
         />
         <div class="h-auto w-full md:max-w-fit">
           <PrimeButton
@@ -22,6 +23,7 @@
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
             :disabled="handleErrorsQuery.length"
+            data-testid="azion-query-language-search"
           />
         </div>
       </div>
@@ -30,6 +32,7 @@
           v-for="(error, index) in handleErrorsQuery"
           :key="index"
           class="p-error text-xs font-normal leading-tight"
+          data-testid="azion-query-language-errors"
         >
           {{ error }}
         </small>
@@ -43,10 +46,13 @@
       class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs py-2"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
+      data-testid="azion-query-language-suggestions"
+      :pt="{ list: { 'data-testid': 'azion-query-language-suggestions-list' } }"
     >
       <template #option="slotProps">
         <div
           class="w-full rounded-md font-mono"
+          :data-testid="`azion-query-language-list-item${slotProps.index}`"
           :class="[
             'p-2 cursor-pointer',
             { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
