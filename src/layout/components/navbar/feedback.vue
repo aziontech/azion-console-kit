@@ -12,11 +12,13 @@
     :class="props.class"
     @click="visible = true"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
+    data-testid="header-block__open-feedback-button"
   />
 
   <Dialog
     v-model:visible="visible"
     modal
+    @show="resetForm()"
     header="Report an issue"
     :style="{ width: '35rem' }"
   >
@@ -34,6 +36,7 @@
           optionValue="code"
           placeholder="Select one Type"
           class="max-w-[216px]"
+          data-testid="feedback-dialog__dialog-body__button-type-dropdown"
         />
       </div>
       <div class="flex flex-col gap-3">
@@ -46,6 +49,7 @@
           v-model="report"
           rows="5"
           cols="30"
+          data-testid="feedback-dialog__dialog-body__textarea-description"
         />
       </div>
     </div>
@@ -58,6 +62,7 @@
           size="small"
           class="w-20"
           @click="visible = false"
+          data-testid="feedback-dialog__dialog-footer__cancel-button"
         />
         <PrimeButton
           type="button"
@@ -68,6 +73,7 @@
           icon="pi pi-send"
           :loading="loading"
           @click="sendFeedback()"
+          data-testid="feedback-dialog__dialog-footer__confirm-button"
         />
       </div>
     </template>
@@ -114,6 +120,11 @@
     { name: 'Other', code: 'other' }
   ]
 
+  const resetForm = () => {
+    selectedIssueType.value = 'issue'
+    report.value = ''
+  }
+
   const sendFeedback = async () => {
     try {
       loading.value = true
@@ -132,6 +143,7 @@
         detail: 'Feedback sent successfully',
         life: 3000
       })
+      resetForm()
       visible.value = false
     } catch (error) {
       toast.add({

@@ -4,6 +4,7 @@ import FORM_FIELDS_SELECTORS from './selectors/block-selectors/form-fields-block
 import MENU_SIDEBAR_SELECTORS from './selectors/block-selectors/menu-sidebar.js'
 import MENU_ACCOUNT_SELECTORS from './selectors/block-selectors/menu-account.js'
 import TEAMS_BLOCK_SELECTORS from './selectors/block-selectors/teams-block.js'
+import HEADER_BLOCK_SELECTORS from './selectors/block-selectors/header-block.js'
 
 // Views
 import LOGIN_VIEW_SELECTORS from './selectors/view-selectors/login.js'
@@ -36,6 +37,7 @@ const selectors = {
   wafTuning: WAF_TUNING_PRODUCT_SELECTORS,
   form: FORM_FIELDS_SELECTORS,
   login: LOGIN_VIEW_SELECTORS,
+  header: HEADER_BLOCK_SELECTORS,
   menuSidebar: MENU_SIDEBAR_SELECTORS,
   menuAccount: MENU_ACCOUNT_SELECTORS,
   activityHistory: ACTIVITY_HISTORY_VIEW_SELECTORS,

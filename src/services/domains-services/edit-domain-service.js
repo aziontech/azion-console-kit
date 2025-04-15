@@ -22,11 +22,8 @@ const adapt = (payload) => {
     is_mtls_enabled: payload.mtlsIsEnabled,
     is_active: payload.active,
     mtls_verification: payload.mtlsVerification,
+    edge_firewall_id: payload.edgeFirewall || null,
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
-  }
-
-  if (payload.edgeFirewall) {
-    basePayload.edge_firewall_id = payload.edgeFirewall
   }
 
   return basePayload

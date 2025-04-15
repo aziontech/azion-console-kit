@@ -76,6 +76,10 @@
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
+  }
+
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
@@ -250,6 +254,7 @@
           enableClearOption
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
+          @onClear="handleEdgeFirewallClear"
           :service="listEdgeFirewallService"
           :loadService="loadEdgeFirewallService"
           @onAccessDenied="handleEdgeFirewallAccessDenied"
