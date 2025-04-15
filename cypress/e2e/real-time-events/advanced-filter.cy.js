@@ -50,7 +50,7 @@ describe('Real-Time Events Advanced Filter', { tags: ['@dev3'] }, () => {
       })
     })
 
-    it.only('should add the field when there is only one option using the tab key', () => {
+    it('should add the field when there is only one option using the tab key', () => {
       cy.get(selectors.realTimeEvents.input).click()
       cy.get(selectors.realTimeEvents.input).clear()
       cy.wait(2000)
