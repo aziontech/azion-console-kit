@@ -30,7 +30,7 @@
   import ToastBlock from '@/templates/toast-block'
   import AppSidebar from './app-sidebar.vue'
   import BannerFullBlock from '@/templates/banner-full-block'
-  
+
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
