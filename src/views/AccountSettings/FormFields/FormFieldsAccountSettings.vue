@@ -4,6 +4,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import { useRouter } from 'vue-router'
   import InputText from 'primevue/inputtext'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
@@ -31,7 +32,7 @@
   })
 
   const accountStore = useAccountStore()
-
+  const router = useRouter()
   const { value: accountName } = useField('accountName')
   const { value: clientId } = useField('clientId')
   const { value: companyName } = useField('companyName')
@@ -173,6 +174,10 @@
   const resetRegionAndCity = () => {
     region.value = ''
     city.value = ''
+  }
+
+  const navigateToMfaManagement = () => {
+    router.push('/mfa-management')
   }
 
   const hasNoCountryListOrNotSelected = computed(
@@ -373,6 +378,16 @@
           :options="switchOptions"
           data-testid="account-settings__login-settings"
         />
+      </div>
+      <div class="flex sm:max-w-lg">
+        <div>
+          <PrimeButton
+            data-testid="account-settings__delete-account"
+            label="Multi-Factor Authentication Management"
+            outlined
+            @click="navigateToMfaManagement"
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>
