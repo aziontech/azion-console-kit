@@ -9,7 +9,7 @@ import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-funct
 import * as EdgeFunctionServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
-import * as WafRulesServices from '@/services/waf-rules-services'
+import * as WafRulesServices from '@/services/waf-rules-services/v4'
 import * as NetworkListsServiceV4 from '@/services/network-lists-services/v4'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -94,6 +94,7 @@ export const edgeFirewallRoutes = {
 
           listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
           listWafRulesService: WafRulesServices.listWafRulesService,
+          loadWafRulesService: WafRulesServices.loadWafRulesService,
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine,
           reorderRulesEngine: EdgeFirewallRulesEngineServicesV4.reorderRulesEngine
         }
