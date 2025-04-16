@@ -67,14 +67,15 @@ const adapt = (httpResponse) => {
 
   const parsedWafRules = isArray
     ? httpResponse.body.results.map((waf) => {
-        const threatTypes = parseThreatTypes(waf.threats_configuration)
-        const parser = {
-          active: parseStatusData(waf.active),
-          id: waf.id,
-          name: waf.name,
-          threatsConfiguration: threatTypes
+        const threatTypes =
+          waf?.threats_configuration && parseThreatTypes(waf.threats_configuration)
+
+        return {
+          ...(waf?.id !== undefined && { id: waf.id }),
+          ...(waf?.name !== undefined && { name: waf.name }),
+          ...(waf?.active !== undefined && { active: parseStatusData(waf.active) }),
+          ...(threatTypes !== undefined && { threatsConfiguration: threatTypes })
         }
-        return parser
       })
     : []
 
