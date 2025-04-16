@@ -69,6 +69,10 @@
     await Promise.all([listNetworkList()])
   })
 
+  const listWafRulesServiceOptions = async (query) => {
+    return await props.listWafRulesService({ ...query, fields: 'name, id' })
+  }
+
   const listNetworkList = async () => {
     networkList.value = await props.listNetworkListService({
       ordering: 'name',
@@ -789,7 +793,7 @@
               <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
                 :name="`behaviors[${behaviorItemIndex}].id`"
-                :service="listWafRulesService"
+                :service="listWafRulesServiceOptions"
                 :loadService="loadWafRulesService"
                 @onAccessDenied="notPermission"
                 placeholder="Select a Waf"
