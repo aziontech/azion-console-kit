@@ -30,6 +30,7 @@ import DIGITAL_CERTIFICATES_PRODUCT_SELECTORS from './selectors/product-selector
 import EDGE_PURGE_PRODUCT_SELECTORS from './selectors/product-selectors/edge-purge.js'
 import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
 import WAF_TUNING_PRODUCT_SELECTORS from './selectors/product-selectors/waf-tuning.js'
+import REAL_TIME_EVENTS_SELECTORS from './selectors/product-selectors/real-time-events.js'
 
 const selectors = {
   billing: BILLING_SELECTORS,
@@ -58,7 +59,8 @@ const selectors = {
   digitalCertificates: DIGITAL_CERTIFICATES_PRODUCT_SELECTORS,
   purge: EDGE_PURGE_PRODUCT_SELECTORS,
   usersManagement: USERS_MANAGEMENT_VIEW_SELECTORS,
-  teams: TEAMS_BLOCK_SELECTORS
+  teams: TEAMS_BLOCK_SELECTORS,
+  realTimeEvents: REAL_TIME_EVENTS_SELECTORS
 }
 
 export default selectors

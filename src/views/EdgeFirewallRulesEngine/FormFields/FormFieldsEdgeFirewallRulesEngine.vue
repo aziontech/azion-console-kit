@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderDinaminc.vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
   import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -22,6 +22,10 @@
       required: true
     },
     listWafRulesService: {
+      type: Function,
+      required: true
+    },
+    loadWafRulesService: {
       type: Function,
       required: true
     },
@@ -60,10 +64,9 @@
   const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const networkList = ref([])
-  const wafRulesOptions = ref([])
   const hasWafAccess = ref(true)
   onMounted(async () => {
-    await Promise.all([listNetworkList(), listWafRulesOptions()])
+    await Promise.all([listNetworkList()])
   })
 
   const listNetworkList = async () => {
@@ -73,24 +76,6 @@
       page: 1
     })
     return networkList.value
-  }
-
-  const listWafRulesOptions = async () => {
-    try {
-      const result = await props.listWafRulesService()
-      wafRulesOptions.value = result
-    } catch (error) {
-      hasWafAccess.value = false
-      const wafBehavior = behaviors.value.find(
-        (behavior) => behavior.value?.name === 'set_waf_ruleset'
-      )
-      if (wafBehavior.value && !hasWafAccess.value) {
-        wafRulesOptions.value.push({
-          id: wafBehavior.value.waf_id,
-          name: wafBehavior.value.waf_id
-        })
-      }
-    }
   }
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
@@ -373,6 +358,10 @@
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
+
+  const notPermission = () => {
+    hasWafAccess.value = false
+  }
 
   // Behaviors - extract to another form fields
   const {
@@ -797,17 +786,18 @@
             </template>
 
             <template v-if="isWafBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
-                :key="`${behaviorItem.key}-waf_id`"
-                :name="`behaviors[${behaviorItemIndex}].waf_id`"
-                :options="wafRulesOptions"
-                :filter="true"
-                placeholder="Select a waf rule"
+                :name="`behaviors[${behaviorItemIndex}].id`"
+                :service="listWafRulesService"
+                :loadService="loadWafRulesService"
+                @onAccessDenied="notPermission"
+                placeholder="Select a Waf"
                 optionLabel="name"
                 optionValue="id"
-                v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
-                class="w-full mb-3"
+                class="mb-3"
+                :value="behaviors[behaviorItemIndex].value.id"
+                inputClass="w-full"
               />
               <FieldDropdown
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"
