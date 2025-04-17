@@ -382,7 +382,6 @@
       <div class="flex sm:max-w-lg">
         <div>
           <PrimeButton
-            data-testid="account-settings__delete-account"
             label="Multi-Factor Authentication Management"
             outlined
             @click="navigateToMfaManagement"
