@@ -54,7 +54,7 @@ describe('Data Stream spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.dataStream.list.columnName('active')).should('have.text', 'Active')
 
     cy.get(selectors.list.singleActionsMenu.button).click()
-    cy.intercept('api/v4/data_stream/streams/*').as('deleteDataStream')
+    cy.intercept('v4/data_stream/streams/*').as('deleteDataStream')
     cy.get(selectors.list.deleteDialog.confirmationInputField).type('delete{enter}')
 
     cy.wait('@deleteDataStream')

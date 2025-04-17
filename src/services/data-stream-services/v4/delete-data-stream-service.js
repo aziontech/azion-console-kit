@@ -5,6 +5,7 @@ import { extractApiError } from '@/helpers/extract-api-error'
 
 export const deleteDataStreamService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
     url: `${makeDataStreamBaseUrl()}/${id}`,
     method: 'DELETE'
   })
