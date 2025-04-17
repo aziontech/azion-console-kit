@@ -137,10 +137,37 @@ const getHeaders = (payload) => {
 }
 
 const handlesWorkloads = async (workloadsIds) => {
-  const workloads = await listWorkloadsService({})
+  const pageSize = 100;
+  let page = 1;
+  let allWorkloads = [];
+  let fetchedAll = false;
 
-  const filtered = workloads.results.filter((workload) => workloadsIds.includes(workload.id))
-  const notFound = workloads.results.filter((workload) => !workloadsIds.includes(workload.id))
+  const idsToFind = new Set(workloadsIds);
+  const foundMap = new Map();
 
-  return [notFound, filtered]
-}
+  while (!fetchedAll && foundMap.size < workloadsIds.length) {
+    const response = await listWorkloadsService({ page, page_size: pageSize });
+    const results = response.results;
+
+    allWorkloads = [...allWorkloads, ...results];
+
+    results.forEach((workload) => {
+      if (idsToFind.has(workload.id)) {
+        foundMap.set(workload.id, workload);
+      }
+    });
+
+    if (results.length < pageSize) {
+      fetchedAll = true;
+    }
+
+    page++;
+  }
+
+  const found = Array.from(foundMap.values());
+
+  const notFoundIds = allWorkloads.filter(workload => !workloadsIds.includes(workload.id));
+
+  return [notFoundIds, found];
+};
+

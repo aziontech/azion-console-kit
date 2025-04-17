@@ -134,7 +134,7 @@ const getEndpoint = (payload) => {
 }
 
 const getDomains = (domains) => {
-  return domains.map((domain) => domain.domain_id)
+  return domains.map((domain) => domain.id)
 }
 
 const getHeaders = (listHeaders) => {

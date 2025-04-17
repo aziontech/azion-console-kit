@@ -3,7 +3,7 @@ import { makeDataStreamDomainsBaseUrl } from './make-data-stream-domains-base-ur
 
 export const listDataStreamDomainsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamDomainsBaseUrl()}?page_size=2000`,
+    url: `${makeDataStreamDomainsBaseUrl()}?page_size=100`,
     method: 'GET'
   })
 

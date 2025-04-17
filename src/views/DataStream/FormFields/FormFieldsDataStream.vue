@@ -117,55 +117,12 @@
           data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
-
         <fieldPickList
           :dataPick="domains"
           :disabled="hasNoPermissionToEditDataStream"
           :service="listWorkloadsService"
           title="Domains"
         ></fieldPickList>
-
-        <!-- <PickList
-          v-model="domains"
-          :disabled="hasNoPermissionToEditDataStream"
-          :pt="{
-            sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] },
-            sourceWrapper: { class: 'max-w-[340px]' },
-            targetWrapper: { class: 'max-w-[340px]' }
-          }"
-          dataKey="domainID"
-          breakpoint="1400px"
-          :showSourceControls="false"
-          :showTargetControls="false"
-          data-testid="data-stream-form__domains__domains-field"
-          :move-all-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-source-btn'
-          }"
-          :move-all-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-target-btn'
-          }"
-          :move-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-target-btn'
-          }"
-          :move-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
-          }"
-        >
-          <template #sourceheader>Available Domains</template>
-          <template #targetheader>Chosen Domains</template>
-          <template #item="slotProps">
-            <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
-              <div class="flex-1 flex flex-column gap-2">
-                <span
-                  class="font-normal"
-                  data-testid="data-stream-form__domains__domains-name"
-                  >{{ slotProps.item.name }}</span
-                >
-              </div>
-            </div>
-          </template>
-        </PickList> -->
 
         <small
           class="text-xs text-color-secondary font-normal leading-5"

@@ -32,7 +32,8 @@ export const dataStreamRoutes = {
       props: {
         listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
         listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        createDataStreamService: DataStreamService.createDataStreamService
+        createDataStreamService: DataStreamService.createDataStreamService,
+        listWorkloadsService: WorkloadsService.listWorkloadsService
       },
       meta: {
         breadCrumbs: [

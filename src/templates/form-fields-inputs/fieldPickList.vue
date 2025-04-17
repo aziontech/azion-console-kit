@@ -108,6 +108,7 @@
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
+  const originalSource = ref([])
 
   const data = ref(props.dataPick)
   const loading = ref(false)
@@ -116,7 +117,7 @@
 
     itemsToAdd.forEach((item) => {
       if (!existingIds.has(item.id)) {
-        targetArray.push(item)
+        data.value[0].push(item)
       }
     })
   }
@@ -125,14 +126,17 @@
     if (!notRequest.value) {
       page.value += PAGE_INCREMENT
       await fetchData(page.value)
-    }
+      if(!searchSource.value) {
+        originalSource.value = [...data.value[0]]
+      }
+    } 
   }
 
   const handleScroll = (event) => {
     const element = event.target
     const isBottom = element.scrollTop + element.clientHeight >= element.scrollHeight
 
-    if (isBottom) {
+    if (isBottom && !loading.value) {
       handleLazyLoad()
     }
   }
@@ -147,21 +151,43 @@
     )
   })
 
+  const handleSelectItemWithSearch = () => {
+    const idsParaRemover = new Set(data.value[1].map(item => item.id));
+
+    data.value[0] = originalSource.value.filter(item => !idsParaRemover.has(item.id));
+    originalSource.value = data.value[0]
+  }
+
   function onPickListUpdate([newSource, newTarget]) {
     data.value[0] = newSource
     data.value[1] = newTarget
+    
+    if(searchSource.value) {
+      handleSelectItemWithSearch()
+    } else {
+      originalSource.value = [...data.value[0]]
+    }
   }
 
   const searchFilter = () => {
     data.value[0] = []
 
+    if(!searchSource.value) {
+      data.value[0] = [...originalSource.value]
+      return
+    }
+
     fetchData(1)
+  }
+
+  const loadingPickList = () => {
+    data.value[0].push({ id: 0, loading: true })
   }
 
   const fetchData = async (currentPage = 1) => {
     loading.value = true
-    addUniqueItems(data.value[0], [{ id: 0, loading: true }])
 
+    loadingPickList()
     try {
       const response = await props.service({
         pageSize: PAGE_SIZE,
@@ -171,9 +197,13 @@
       })
       // remove load item
       data.value[0].pop()
-      addUniqueItems(data.value[0], response.results)
+
+      const dataPicks = [...data.value[0], ...data.value[1]]
+
+      addUniqueItems(dataPicks, response.results)
     } catch (error) {
       notRequest.value = true
+      data.value[0].pop()
     } finally {
       loading.value = false
     }
@@ -192,6 +222,15 @@
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
 
+  const calculatePage = () => {
+    const sourceTotal = props.dataPick[0].length
+    const targetTotal = props.dataPick[1].length
+
+    const total = sourceTotal + targetTotal
+
+    page.value = Math.ceil(total / PAGE_SIZE)
+  }
+
   onMounted(async () => {
     await nextTick()
 
@@ -199,6 +238,25 @@
     if (scrollElement) {
       scrollElement.addEventListener('scroll', handleScroll)
     }
+
+    calculatePage()
+
+    originalSource.value = [...props.dataPick[0]]
+
+    if(props.dataPick[0].length < 6) {
+      const response = await props.service({
+        pageSize: PAGE_SIZE,
+        page: page.value,
+        ordering: 'name'
+      })
+
+      const dataPicks = [...data.value[0], ...data.value[1]]
+
+
+      addUniqueItems(dataPicks, response.results)
+
+      originalSource.value = [...data.value[0]]
+    } 
   })
 
   onBeforeUnmount(() => {
