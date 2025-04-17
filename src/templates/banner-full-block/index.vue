@@ -10,13 +10,14 @@
       <div class="flex md:flex-row flex-col items-start md:items-center gap-2 w-full">
         <LaunchweekLogo />
         <span class="font-normal text-sm text-color-secondary w-full text-balance"
-          >Join us for Product Launch Week and see what’s next for edge computing. Virtual and free.</span
+          >Join us for Product Launch Week and see what’s next for edge computing. Virtual and
+          free.</span
         >
       </div>
       <a
         class="p-button p-button-secondary p-button-sm mr-2 pr-3.5"
         target="_blank"
-        href="https://www.azion.com/en/azion-launch-week/"
+        href="https://www.azion.com/en/launch-week/"
         >Register</a
       >
     </div>
