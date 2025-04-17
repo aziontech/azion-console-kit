@@ -10,7 +10,7 @@
       <div class="flex md:flex-row flex-col items-start md:items-center gap-2 w-full">
         <LaunchweekLogo />
         <span class="font-normal text-sm text-color-secondary w-full text-balance"
-          >Register to join in Azion Product Launchweek May 2025. Virtual and free.</span
+          >Join us for Product Launch Week and see what’s next for edge computing. Virtual and free.</span
         >
       </div>
       <a
