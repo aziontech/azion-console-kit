@@ -27,15 +27,45 @@
         field="value"
         header="Value"
         style="width: 60%"
-      ></Column>
+      >
+        <template #body="slotProps">
+          <div
+            v-if="slotProps.data.value?.type === 'clipboard'"
+            class="flex gap-4 items-center w-full"
+          >
+            <div
+              class="w-full max-w-[200px] sm:max-w-sm overflow-y-scroll p-2"
+              data-testid="data-table-value"
+            >
+              {{ slotProps.data.value.value }}
+            </div>
+            <PrimeButton
+              outlined
+              icon="pi pi-copy"
+              class="max-md:w-full"
+              @click="handleCopy(slotProps.data.value.value)"
+              data-testid="data-table-copy-button"
+            />
+          </div>
+          <div
+            v-else
+            class="w-full"
+          >
+            {{ slotProps.data.value }}
+          </div>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
 <script setup>
+  import PrimeButton from 'primevue/button'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from 'primevue/api'
   import InputText from 'primevue/inputtext'
+  import { useToast } from 'primevue/usetoast'
+  import { clipboardWrite } from '@/helpers/clipboard'
 
   import { ref } from 'vue'
 
@@ -46,7 +76,19 @@
     }
   })
 
+  const toast = useToast()
+
   const filters = ref({
     global: { value: '', matchMode: FilterMatchMode.CONTAINS }
   })
+
+  const handleCopy = (value) => {
+    clipboardWrite(value)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Successfully copied!'
+    })
+  }
 </script>

@@ -1,0 +1,44 @@
+{
+  "statusCode": 200,
+  "body": {
+    "httpEvents": [{
+      "httpReferer": "-",
+      "scheme": "https",
+      "ts": "2025-04-12T17:13:35Z",
+      "httpUserAgent": "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)",
+      "remoteAddress": "47.128.49.219",
+      "host": "b4c16ips8y.map.azionedge.net",
+      "remotePort": 51662,
+      "upstreamBytesReceived": 1567,
+      "configurationId": "1741232370",
+      "requestTime": "0.739",
+      "requestLength": 268,
+      "bytesSent": 1345,
+      "upstreamResponseTime": "0.739",
+      "sentHttpContentType": "text/html",
+      "requestId": "d7bca718ff2d3bc1d5974cfb243846d2",
+      "sslCipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+      "requestMethod": "GET",
+      "upstreamBytesSent": 932,
+      "requestUri": "/robots.txt",
+      "sslProtocol": "TLSv1.2",
+      "upstreamAddr": "149.137.140.9:443",
+      "upstreamStatus": 200,
+      "status": 200,
+      "wafScore": "-",
+      "wafTotalProcessed": 0,
+      "wafTotalBlocked": 0,
+      "wafLearning": "-",
+      "wafBlock": "-",
+      "debugLog": "-",
+      "wafMatch": "-",
+      "geolocAsn": "AS16509 AMAZON-02",
+      "stacktrace": "{}",
+      "geolocCountryName": "Singapore",
+      "geolocRegionName": "-",
+      "upstreamCacheStatus": "-",
+      "serverProtocol": "HTTP/1.1"
+    }]
+  }
+}
+    

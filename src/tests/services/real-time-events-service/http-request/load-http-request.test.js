@@ -50,7 +50,8 @@ const fixtures = {
   },
   httpRequestSecond: {
     serverAddr: '10.0.0.1',
-    serverPort: '443'
+    serverPort: '443',
+    wafEvheaders: 'token'
   }
 }
 
@@ -142,6 +143,7 @@ describe('HttpRequestServices', () => {
         { key: 'upstreamResponseTime', value: fixtures.httpRequestFirst.upstreamResponseTime },
         { key: 'upstreamStatus', value: fixtures.httpRequestFirst.upstreamStatus },
         { key: 'wafBlock', value: '-' },
+        { key: 'wafEvheaders', value: { type: 'clipboard', value: 'token' } },
         { key: 'wafLearning', value: '-' },
         { key: 'wafMatch', value: '-' },
         { key: 'wafScore', value: '-' },

@@ -126,7 +126,7 @@
     <ListTableBlock
       lazyLoad
       hiddenHeader
-      :pt="{ root: { class: 'rounded-t-none' } }"
+      :pt="{ root: { class: 'rounded-t-none' }, bodyRow: { 'data-testid': 'table-body-row' } }"
       isGraphql
       frozenSize="3rem"
       ref="listTableBlockRef"
@@ -136,6 +136,7 @@
       emptyListMessage="No logs have been found for this period."
       :csvMapper="props.tabSelected.customColumnMapper"
       :exportFileName="`${props.tabSelected.tabRouter}-logs`"
+      data-testid="table-tab-panel-block"
     />
   </data>
 </template>
