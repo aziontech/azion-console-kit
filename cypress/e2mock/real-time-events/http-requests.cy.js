@@ -2,7 +2,7 @@ import loadHttpRequestsSecond from '../../fixtures/real-time-events/load-http-re
 import loadHttpRequests from '../../fixtures/real-time-events/load-http-requests.json'
 import listHttpRequests from '../../fixtures/real-time-events/list-http-requests.json'
 
-describe('HTTP Events - E2E', () => {
+describe('HTTP Events - E2E', { tags: ['@dev2'] }, () => {
   let fisrtRender = true
   beforeEach(() => {
     cy.login()
