@@ -143,7 +143,7 @@ describe('HttpRequestServices', () => {
         { key: 'upstreamResponseTime', value: fixtures.httpRequestFirst.upstreamResponseTime },
         { key: 'upstreamStatus', value: fixtures.httpRequestFirst.upstreamStatus },
         { key: 'wafBlock', value: '-' },
-        { key: 'wafEvheaders', value: { type: 'clipboard', value: 'token' } },
+        { key: 'wafEvheaders', value: { type: 'clipboard', content: 'token' } },
         { key: 'wafLearning', value: '-' },
         { key: 'wafMatch', value: '-' },
         { key: 'wafScore', value: '-' },

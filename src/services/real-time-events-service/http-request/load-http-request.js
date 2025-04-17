@@ -129,7 +129,7 @@ const adaptResponse = (httpEventItem) => {
     serverProtocol: httpEventItem.serverProtocol,
     serverAddr: httpEventItem.serverAddr,
     serverPort: httpEventItem.serverPort,
-    wafEvheaders: { value: httpEventItem.wafEvheaders, type: 'clipboard' }
+    wafEvheaders: { content: httpEventItem.wafEvheaders, type: 'clipboard' }
   }
 
   return {
