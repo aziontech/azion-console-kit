@@ -29,6 +29,7 @@ const getTemplateById = async (listIdTemplates) => {
   const templates = await Promise.all(
     listIdTemplates.map(async (id) => {
       let httpResponse = await AxiosHttpClientAdapter.request({
+        baseURL: '/',
         url: `${makeDataStreamSetsBaseUrl()}/${id}`,
         method: 'GET'
       })
