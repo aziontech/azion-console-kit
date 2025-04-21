@@ -122,6 +122,7 @@
           :disabled="hasNoPermissionToEditDataStream"
           :service="listWorkloadsService"
           title="Domains"
+          dataKey="domainID"
         ></fieldPickList>
 
         <small

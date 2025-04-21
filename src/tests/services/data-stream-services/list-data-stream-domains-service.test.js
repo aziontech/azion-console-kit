@@ -29,7 +29,7 @@ describe('DataStreamServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/data_streaming/domains?page_size=2000`,
+      url: `${version}/data_streaming/domains?page_size=100`,
       method: 'GET'
     })
   })

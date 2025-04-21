@@ -10,22 +10,22 @@
         sourceWrapper: { class: 'max-w-[340px]' },
         targetWrapper: { class: 'max-w-[340px]' }
       }"
-      dataKey="domainID"
+      :dataKey="dataKey"
       breakpoint="1400px"
       :showSourceControls="false"
       :showTargetControls="false"
-      data-testid="data-stream-form__domains__domains-field"
+      data-testid="picklist__field"
       :move-all-to-source-props="{
-        'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-source-btn'
+        'data-testid': 'picklist__move-all-to-source-btn'
       }"
       :move-all-to-target-props="{
-        'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-target-btn'
+        'data-testid': 'picklist__move-all-to-target-btn'
       }"
       :move-to-target-props="{
-        'data-testid': 'data-stream-form__domains-field-picklist__move-to-target-btn'
+        'data-testid': 'picklist__move-to-target-btn'
       }"
       :move-to-source-props="{
-        'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
+        'data-testid': 'picklist__move-to-source-btn'
       }"
     >
       <template #sourceheader>
@@ -34,7 +34,7 @@
           <InputText
             class="h-8 w-full md:min-w-[20rem]"
             v-model.trim="searchSource"
-            data-testid="data-table-search-input"
+            data-testid="search-input-source"
             placeholder="Search"
           />
         </div>
@@ -45,7 +45,7 @@
           <InputText
             class="h-8 w-full md:min-w-[20rem]"
             v-model.trim="searchTarget"
-            data-testid="data-table-search-input"
+            data-testid="search-input-target"
             placeholder="Search"
           />
         </div>
@@ -59,7 +59,7 @@
           >
             <span
               class="font-normal"
-              data-testid="data-stream-form__domains__domains-name"
+              data-testid="picklist_name-item"
               >{{ slotProps.item.name }}
             </span>
           </div>
@@ -89,6 +89,10 @@
       type: Array,
       default: () => [[], []]
     },
+    dataKey: {
+      type: String,
+      required: true
+    },
     title: {
       type: String
     },
@@ -98,20 +102,27 @@
   })
 
   let scrollElement = null
+  // Manage variables related to the loading state of the request
   const PAGE_SIZE = 100
   const page = ref(1)
   const PAGE_INCREMENT = 1
   const notRequest = ref(false)
-  const searchSource = ref('')
-  const searchTarget = ref('')
+
+  // variables related to search request
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
+
+  // variables related to filter itens
+  const searchSource = ref('')
+  const searchTarget = ref('')
   const originalSource = ref([])
+  const originalTargert = ref([])
 
   const data = ref(props.dataPick)
   const loading = ref(false)
+
   const addUniqueItems = (targetArray, itemsToAdd) => {
     const existingIds = new Set(targetArray.map((item) => item.id))
 
@@ -126,10 +137,10 @@
     if (!notRequest.value) {
       page.value += PAGE_INCREMENT
       await fetchData(page.value)
-      if(!searchSource.value) {
+      if (!searchSource.value) {
         originalSource.value = [...data.value[0]]
       }
-    } 
+    }
   }
 
   const handleScroll = (event) => {
@@ -152,36 +163,65 @@
   })
 
   const handleSelectItemWithSearch = () => {
-    const idsParaRemover = new Set(data.value[1].map(item => item.id));
+    const idsParaRemover = new Set(data.value[1].map((item) => item.id))
 
-    data.value[0] = originalSource.value.filter(item => !idsParaRemover.has(item.id));
+    data.value[0] = originalSource.value.filter((item) => !idsParaRemover.has(item.id))
     originalSource.value = data.value[0]
+  }
+
+  const setOrigionalTarget = (target) => {
+    originalTargert.value = target
+  }
+
+  const handleSelectItemWithSearchTarget = (targets) => {
+    const map = new Map()
+
+    originalTargert.value.forEach((item) => {
+      map.set(item.id, item)
+    })
+
+    targets.forEach((item) => {
+      map.set(item.id, item)
+    })
+
+    data.value[1] = Array.from(map.values())
   }
 
   function onPickListUpdate([newSource, newTarget]) {
     data.value[0] = newSource
     data.value[1] = newTarget
-    
-    if(searchSource.value) {
+
+    if (searchSource.value) {
       handleSelectItemWithSearch()
     } else {
       originalSource.value = [...data.value[0]]
     }
+
+    if (searchTarget.value) {
+      handleSelectItemWithSearchTarget(newTarget)
+    } else {
+      setOrigionalTarget(newTarget)
+    }
   }
 
   const searchFilter = () => {
+    const pageToSearch = 0
     data.value[0] = []
 
-    if(!searchSource.value) {
+    if (!searchSource.value) {
       data.value[0] = [...originalSource.value]
       return
     }
 
-    fetchData(1)
+    fetchData(pageToSearch)
   }
 
   const loadingPickList = () => {
     data.value[0].push({ id: 0, loading: true })
+  }
+
+  const removeLoadingPickList = () => {
+    data.value[0].pop()
   }
 
   const fetchData = async (currentPage = 1) => {
@@ -195,15 +235,16 @@
         search: searchSource.value,
         ordering: 'name'
       })
+
       // remove load item
-      data.value[0].pop()
+      removeLoadingPickList()
 
       const dataPicks = [...data.value[0], ...data.value[1]]
 
       addUniqueItems(dataPicks, response.results)
     } catch (error) {
       notRequest.value = true
-      data.value[0].pop()
+      removeLoadingPickList()
     } finally {
       loading.value = false
     }
@@ -242,8 +283,9 @@
     calculatePage()
 
     originalSource.value = [...props.dataPick[0]]
+    const shouldFetchMoreItems = props.dataPick[0].length < 6
 
-    if(props.dataPick[0].length < 6) {
+    if (shouldFetchMoreItems) {
       const response = await props.service({
         pageSize: PAGE_SIZE,
         page: page.value,
@@ -252,11 +294,10 @@
 
       const dataPicks = [...data.value[0], ...data.value[1]]
 
-
       addUniqueItems(dataPicks, response.results)
 
       originalSource.value = [...data.value[0]]
-    } 
+    }
   })
 
   onBeforeUnmount(() => {
