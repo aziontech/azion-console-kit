@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { deleteMfaService } from '@/services/mfa-management-services/delete-mfa-service'
+import { deleteMfaService } from '@/services/mfa-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {

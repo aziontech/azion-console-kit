@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Multi-Factor Authentication Management"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Multi-Factor Authentication Management" />
     </template>
     <template #content>
       <FetchListTableBlock
@@ -36,10 +36,20 @@
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { listMfaUsersService, deleteMfaService } from '@/services/mfa-management-services'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref } from 'vue'
+
+  const props = defineProps({
+    listMfaUsersService: {
+      type: Function,
+      required: true
+    },
+    deleteMfaService: {
+      type: Function,
+      required: true
+    }
+  })
 
   const hasContentToList = ref(true)
 
@@ -50,7 +60,7 @@
       type: 'delete',
       title: 'MFA',
       icon: 'pi pi-trash',
-      service: deleteMfaService
+      service: props.deleteMfaService
     }
   ]
 

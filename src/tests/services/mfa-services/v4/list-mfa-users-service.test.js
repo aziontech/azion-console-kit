@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listMfaUsersService } from '@/services/mfa-management-services/list-mfa-users-service'
+import { listMfaUsersService } from '@/services/mfa-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
