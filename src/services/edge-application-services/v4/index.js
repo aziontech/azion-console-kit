@@ -6,6 +6,7 @@ import { createEdgeApplicationService } from './create-edge-application-service'
 import { loadEdgeApplicationsService } from './load-edge-application-service'
 import { editEdgeApplicationsService } from './edit-edge-application-service'
 import { checkgeApplicationsLockedService } from './check-edge-application-locked-service'
+import { listEdgeApplicationsDropdownService } from './list-edge-application-dropdown-service'
 /**
  * @typedef {Object} ExportedServicesType - The type of the exported services
  * @property {typeof listEdgeApplicationsService} listEdgeApplicationsService - The listEdgeApplicationsService reference
@@ -22,5 +23,6 @@ export {
   createEdgeApplicationService,
   loadEdgeApplicationsService,
   editEdgeApplicationsService,
-  checkgeApplicationsLockedService
+  checkgeApplicationsLockedService,
+  listEdgeApplicationsDropdownService
 }

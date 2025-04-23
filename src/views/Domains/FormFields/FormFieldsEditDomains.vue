@@ -11,9 +11,11 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import InlineMessage from 'primevue/inlinemessage'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
+  import { INFORMATION_TEXTS } from '@/helpers'
 
   const props = defineProps({
     digitalCertificates: {
@@ -53,6 +55,7 @@
   const { value: quicPort, errorMessage: quicPortError } = useField('quicPort')
   const { value: minimumTlsVersion } = useField('minimumTlsVersion')
   const { value: supportedCiphers } = useField('supportedCiphers')
+  const { value: productVersion } = useField('productVersion')
 
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
@@ -149,6 +152,8 @@
 
   const showTlsAndCipherDropdown = computed(() => useHttps.value || useHttp3.value)
 
+  const isLocked = computed(() => productVersion.value === 'custom')
+
   watch(useHttp3, (newValue) => {
     if (newValue) {
       quicPort.value = HTTP3_PORT_LIST_OPTIONS
@@ -188,6 +193,13 @@
 </script>
 
 <template>
+  <InlineMessage
+    severity="warn"
+    v-if="isLocked"
+  >
+    <b>Warning</b>
+    {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
+  </InlineMessage>
   <form-horizontal
     title="General"
     description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."

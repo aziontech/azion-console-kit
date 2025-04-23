@@ -70,7 +70,8 @@ const adapt = (httpResponse) => {
     quicPort: handlerHttp(body.protocols.http.quic_ports, HTTP3_PORT_LIST_OPTIONS),
     httpPort: handlerHttp(body.protocols.http.http_ports, HTTP_PORT_LIST_OPTIONS),
     supportedCiphers: String(body.tls.ciphers),
-    minimumTlsVersion: String(body.tls.minimum_version)
+    minimumTlsVersion: String(body.tls.minimum_version),
+    productVersion: body.product_version
   }
 
   return {

@@ -5,8 +5,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { ref, provide, reactive, watch, onMounted, computed } from 'vue'
-  import { INFORMATION_TEXTS } from '@/helpers'
+  import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import EditView from './EditView.vue'
@@ -28,30 +27,9 @@
   const activeTab = ref(0)
   const domainId = ref(route.params.id)
   const domain = ref()
-  const isLocked = ref(false)
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
-
-  const checkLockedWorkload = async () => {
-    const workloadId = route.params.id
-    isLocked.value = await props.domainServices.checkWorkloadLockedService({
-      id: workloadId
-    })
-  }
-
-  const tagProps = {
-    value: 'Locked',
-    severity: 'warning',
-    tooltip: INFORMATION_TEXTS.LOCKED_MESSAGE_TOOLTIP
-  }
-
-  const tagLocked = computed(() => {
-    if (isLocked.value) {
-      return tagProps
-    }
-    return null
-  })
 
   const getDomain = async () => {
     try {
@@ -127,10 +105,6 @@
   })
 
   renderTabCurrentRouter()
-
-  onMounted(() => {
-    checkLockedWorkload()
-  })
 </script>
 
 <template>
