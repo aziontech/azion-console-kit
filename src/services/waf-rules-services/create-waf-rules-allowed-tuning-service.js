@@ -3,6 +3,7 @@ import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
 export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, name }) => {
+  // console.log('🚀 ~ createWafRulesAllowedTuningService ~ attackEvents:', attackEvents);
   const MAP_MATCH_ZONES_CONDITIONAL = {
     query_string: 'conditional_query_string',
     request_body: 'conditional_request_body',
@@ -39,8 +40,8 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
       .trim()
   }
 
-  const requestsAllowedRules = attackEvents.map((attack) => {
-    return attack?.top10Paths.map(async ({ path }) => {
+  const requestsAllowedRules = attackEvents.flatMap((attack) => {
+    return attack?.top10Paths.map(({ path }) => {
       const hasMatchValue = !!attack.matchValue
       const REQUEST_BODY_EXCEPTION_RULE_ID = 11
       let matchZones = {
@@ -64,13 +65,11 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
         name: removeEmptyLinesAndSpaces(name)
       }
 
-      const httpResponse = await AxiosHttpClientAdapter.request({
+      return AxiosHttpClientAdapter.request({
         url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
         method: 'POST',
         body: payload
-      })
-
-      return parseHttpResponse(httpResponse)
+      }).then(parseHttpResponse)
     })
   })
 
