@@ -205,7 +205,7 @@
   }
 
   const searchFilter = () => {
-    const pageToSearch = 0
+    const pageToSearch = 1
     data.value[0] = []
 
     if (!searchSource.value) {
@@ -231,6 +231,7 @@
     try {
       const response = await props.service({
         pageSize: PAGE_SIZE,
+        fields: 'id, name',
         page: currentPage,
         search: searchSource.value,
         ordering: 'name'
@@ -269,7 +270,9 @@
 
     const total = sourceTotal + targetTotal
 
-    page.value = Math.ceil(total / PAGE_SIZE)
+    const result = Math.ceil(total / PAGE_SIZE)
+
+    page.value = result > 1 ? result : 1
   }
 
   onMounted(async () => {
@@ -288,6 +291,7 @@
     if (shouldFetchMoreItems) {
       const response = await props.service({
         pageSize: PAGE_SIZE,
+        fields: 'id, name',
         page: page.value,
         ordering: 'name'
       })

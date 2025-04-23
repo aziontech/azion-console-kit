@@ -122,7 +122,7 @@
           :disabled="hasNoPermissionToEditDataStream"
           :service="listWorkloadsService"
           title="Domains"
-          dataKey="domainID"
+          dataKey="id"
         ></fieldPickList>
 
         <small
@@ -1187,8 +1187,13 @@
   }
 
   const loaderDataStreamDomains = async () => {
-    const domainResponse = await props.listDataStreamDomainsService()
-    return [domainResponse, []]
+    if (!props.resetForm) return
+    const domainResponse = await props.listWorkloadsService({
+      page: 1,
+      pageSize: 100,
+      fields: 'id, name'
+    })
+    return [domainResponse.results, []]
   }
 
   const addHeader = () => {

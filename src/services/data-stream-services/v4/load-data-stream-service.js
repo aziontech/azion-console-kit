@@ -146,7 +146,7 @@ const handlesWorkloads = async (workloadsIds) => {
   const foundMap = new Map()
 
   while (!fetchedAll && foundMap.size < workloadsIds.length) {
-    const response = await listWorkloadsService({ page, page_size: pageSize })
+    const response = await listWorkloadsService({ page, pageSize: pageSize, fields: 'id, name' })
     const results = response.results
 
     allWorkloads = [...allWorkloads, ...results]

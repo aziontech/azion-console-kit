@@ -14,6 +14,7 @@ export const editDataStreamService = async (payload) => {
 
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
+
   let parsedPayload
 
   if (payload.template === 'CUSTOM_TEMPLATE') {
