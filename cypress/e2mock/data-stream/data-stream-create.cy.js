@@ -21,14 +21,14 @@ describe('Data Stream Creation - Filter Domains Flow', { tags: ['@dev4'] }, () =
     cy.login()
     cy.wait('@accountInfo', { timeout: 30000 })
 
-    cy.intercept('GET', '/api/v3/data_streaming/templates/*', {
+    cy.intercept('GET', '/api/v4/data_stream/data_sets*', {
       fixture: '/data-streaming/data_stream_templates.json'
     }).as('getTemplates')
 
     cy.intercept('GET', '/api/v4/workspace/workloads?ordering=id&page=1&page_size=1&fields=id&search=')
       .as('getOneWorkload')
 
-    cy.intercept('GET', '/api/v3/data_streaming/streamings', {
+    cy.intercept('GET', '/v4/data_stream/streams?ordering=name&page=1&page_size=10&fields=id%2Cname%2Cdata_source%2Cactive%2Cdata_set_id%2Cendpoint&search=', {
       fixture: '/data-streaming/list-all.json'
     }).as('dataStreamList')
 
