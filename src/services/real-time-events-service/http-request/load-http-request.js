@@ -43,7 +43,7 @@ const fieldsByRequest = [
     'upstreamCacheStatus',
     'serverProtocol'
   ],
-  ['serverAddr', 'serverPort']
+  ['serverAddr', 'serverPort', 'wafEvheaders']
 ]
 
 const mergeHttpEvents = (responses) => {
@@ -128,7 +128,8 @@ const adaptResponse = (httpEventItem) => {
     upstreamCacheStatus: httpEventItem.upstreamCacheStatus,
     serverProtocol: httpEventItem.serverProtocol,
     serverAddr: httpEventItem.serverAddr,
-    serverPort: httpEventItem.serverPort
+    serverPort: httpEventItem.serverPort,
+    wafEvheaders: { content: httpEventItem.wafEvheaders, type: 'clipboard' }
   }
 
   return {
