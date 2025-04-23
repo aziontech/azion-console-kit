@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeMfaBaseUrl } from './make-mfa-management-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { loadUserService } from './load-user-service'
 
 export const listMfaUsersService = async ({
   search = '',
@@ -15,7 +16,7 @@ export const listMfaUsersService = async ({
     url: `${makeMfaBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
-  httpResponse = adapt(httpResponse)
+  httpResponse = await adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
@@ -31,18 +32,32 @@ const CONFIRMED_AS_TAG = {
   }
 }
 
-const adapt = (httpResponse) => {
+const loadUser = async (id) => {
+  const response = await loadUserService({ id })
+  return response?.email
+}
+
+const adapt = async (httpResponse) => {
   if (httpResponse.statusCode !== 200) {
     throw new Error(extractApiError({ body: httpResponse.body })).message
   }
 
-  const parsedMfaUsers = httpResponse.body.results?.map((user) => {
-    return {
+  let parsedMfaUsers = []
+
+  for (const user of httpResponse.body.results) {
+    user.confirmed = CONFIRMED_AS_TAG[user.confirmed]
+
+    if (!user.name) {
+      user.name = await loadUser(user.user_id)
+    }
+
+    parsedMfaUsers.push({
       id: user.id,
       email: user.name,
-      confirmed: CONFIRMED_AS_TAG[user.confirmed]
-    }
-  })
+      confirmed: user.confirmed
+    })
+  }
+
   const count = httpResponse.body?.count ?? 0
   return {
     count: count,
