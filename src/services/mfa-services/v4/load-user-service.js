@@ -14,7 +14,7 @@ export const loadUserService = async ({ id }) => {
 const adapt = (httpResponse) => {
   const responseData = httpResponse.body.data
   const parsedUser = {
-    email: responseData.email,
+    email: responseData.email
   }
 
   return {
