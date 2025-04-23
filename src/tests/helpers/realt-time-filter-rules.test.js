@@ -28,7 +28,14 @@ describe('RealTimeMetricsModule', () => {
           'actionIlike',
           'actionIn',
           'actionNotIn',
-          'actionIsNull'
+          'actionIsNull',
+          'sourceEq',
+          'sourceNe',
+          'sourceLike',
+          'sourceIlike',
+          'sourceIn',
+          'sourceNotIn',
+          'source'
         ],
         FILTER_WHITELIST: {
           SUPPORTED_FILTER_TYPE: [

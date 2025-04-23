@@ -7,6 +7,7 @@
   import Sidebar from 'primevue/sidebar'
   import { useField, useForm } from 'vee-validate'
   import { computed, ref } from 'vue'
+
   import * as yup from 'yup'
   import { FIELDS_MAPPING, OPERATOR_MAPPING } from './component'
 
@@ -45,12 +46,21 @@
   const hasDescriptionFilter = computed(() => filterSelected.value?.description)
   const options = computed(() => {
     return props.filtersOptions.map(
-      ({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
+      ({
+        label,
+        value,
+        description,
+        operator,
+        disabled,
+        networkListDisabled,
+        mostRelevant = 0
+      }) => {
         return {
           label,
           mostRelevant,
           value: {
             disabled,
+            networkListDisabled,
             description,
             value,
             label,
@@ -74,6 +84,25 @@
         }
       }
     )
+  })
+
+  const disabledOptionWarning = computed(() => {
+    const isIpDisabled =
+      options.value.filter(
+        (item) => item.value.networkListDisabled && item.value.value === 'ip_address'
+      ).length > 0
+    const isCountryDisabled =
+      options.value.filter(
+        (item) => item.value.networkListDisabled && item.value.value === 'country'
+      ).length > 0
+
+    if (isIpDisabled) {
+      return 'The ip addres field cannot be used together with an IP/CIDR Network List filter.'
+    } else if (isCountryDisabled) {
+      return 'The country field cannot be used together with a Country Network List filter.'
+    } else {
+      return undefined
+    }
   })
 
   const disabledSubmit = computed(() => {
@@ -262,6 +291,7 @@
             >
               Filter
             </label>
+
             <Dropdown
               appendTo="self"
               id="filter-field"
@@ -330,6 +360,13 @@
             </Dropdown>
           </div>
         </div>
+        <InlineMessage
+          class="p-2"
+          severity="info"
+          v-if="disabledOptionWarning"
+        >
+          {{ disabledOptionWarning }}
+        </InlineMessage>
       </div>
       <Divider
         v-if="operatorSelected"
@@ -346,8 +383,7 @@
           data-testid="filter-value-options"
         >
           <InlineMessage
-            class="p-2"
-            severity="info"
+            severity="warn"
             v-if="hasDescriptionFilter"
             data-testid="filter-value-description"
           >

@@ -1,17 +1,22 @@
 import { defineConfig } from 'azion'
 import process from 'node:process'
 
-const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env;
+const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
-    return origin?.map((origin) => ({
-      ...origin,
-      hostHeader: `stage-${origin.hostHeader}`,
-      addresses: origin.addresses?.map((addr) => `stage-${addr}`)
-    }))
+    return origin?.map(({ hostHeader, addresses, ...rest }) => {
+      const isCitiesDomain = hostHeader === 'cities.azion.com'
+      const transform = (addr) => `stage-${isCitiesDomain ? addr.replace('.com', '.net') : addr}`
+
+      return {
+        ...rest,
+        hostHeader: transform(hostHeader),
+        addresses: addresses?.map(transform)
+      }
+    })
   }
   return origin
 }
@@ -20,7 +25,7 @@ const addStageSuffixToCookies = (cookieName) => {
   return environment === 'stage' ? `${cookieName}_stg` : cookieName
 }
 
-const createCookieRewriteRule = (cookieName, description, prefix = '') => {
+const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConfigMaxAge }) => {
   const formattedCookieName = prefix + addStageSuffixToCookies(cookieName)
 
   const domains = [
@@ -51,27 +56,31 @@ const createCookieRewriteRule = (cookieName, description, prefix = '') => {
         captured: `${cookieName}_arr`,
         subject: `upstream_cookie_${formattedCookieName}`
       },
-      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure; Domain=${domain}`,
-      filterCookie: formattedCookieName
+      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]};${hasConfigMaxAge ? ' Max-Age=1209600; ' : ' '}Path=/; SameSite=Lax; Secure; Domain=${domain}`,
+      ...(hasConfigMaxAge ? { filterCookie: formattedCookieName } : {})
     }
   }))
 }
 
 const cookieRewriteRules = [
-  ...createCookieRewriteRule(
-    'azrt',
-    'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
-    '_'
-  ),
-  ...createCookieRewriteRule(
-    'azsid',
-    'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.'
-  ),
-  ...createCookieRewriteRule(
-    'azat',
-    'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
-    '_'
-  )
+  ...createCookieRewriteRule({
+    cookieName: 'azrt',
+    description: 'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
+    prefix: '_',
+    hasConfigMaxAge: true
+  }),
+  ...createCookieRewriteRule({
+    cookieName: 'azsid',
+    description: 'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
+    prefix: '',
+    hasConfigMaxAge: false
+  }),
+  ...createCookieRewriteRule({
+    cookieName: 'azat',
+    description: 'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
+    prefix: '_',
+    hasConfigMaxAge: true
+  })
 ]
 
 const config = {
@@ -87,10 +96,28 @@ const config = {
         type: 'object_storage'
       },
       {
-        name: 'origin-manager',
+        name: 'origin-billing',
         type: 'single_origin',
-        hostHeader: `manager.azion.com`,
-        addresses: [`manager.azion.com`]
+        hostHeader: `billing-api.azion.net`,
+        addresses: [`billing-api.azion.net`]
+      },
+      {
+        name: 'origin-script-runner',
+        type: 'single_origin',
+        hostHeader: `script-runner.azion.com`,
+        addresses: [`script-runner.azion.com`]
+      },
+      {
+        name: 'origin-template-engine',
+        type: 'single_origin',
+        hostHeader: `template-engine.azion.com`,
+        addresses: [`template-engine.azion.com`]
+      },
+      {
+        name: 'origin-iam-api',
+        type: 'single_origin',
+        hostHeader: `iam-api.azion.net`,
+        addresses: [`iam-api.azion.net`]
       },
       {
         name: 'origin-marketplace',
@@ -247,11 +274,11 @@ const config = {
       {
         name: 'Route Specific API Services to Template Engine Origin',
         description:
-          'Routes template-engine API services to the manager origin, forwarding cookies and bypassing cache.',
+          'Routes template-engine API services to the template engine origin, forwarding cookies and bypassing cache.',
         match: '^/api/template-engine',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-template-engine',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -271,7 +298,7 @@ const config = {
         match: '^/api/script-runner',
         behavior: {
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-script-runner',
             type: 'single_origin'
           },
           forwardCookies: true,
@@ -313,30 +340,32 @@ const config = {
         }
       },
       {
-        name: 'Route GraphQL Billing Queries to Manager Origin',
-        description: 'Routes GraphQL Billing queries to the Manager, updating the URI accordingly',
-        match: '^/graphql/billing',
+        name: 'Billing PDF',
+        description: 'Enable users do download billing PDF.',
+        match: '^/billing/invoices',
         behavior: {
-          forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-billing',
             type: 'single_origin'
           },
-          rewrite: '/billing/graphql'
+          capture: {
+            match: '/billing/invoices/([0-9]{2}-[0-9]{4})',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/billing/invoices/%{captured[1]}`,
+          forwardCookies: true,
         }
       },
       {
-        name: 'Route GraphQL Accounting Queries to Manager Origin',
-        description:
-          'Routes GraphQL Accounting queries to the Manager, updating the URI accordingly',
-        match: '^/graphql/accounting',
+        name: 'API Version 4 Routing',
+        description: 'Directs API version 4 requests to the designated API origin for handling.',
+        match: '^/v4',
         behavior: {
-          forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-api',
             type: 'single_origin'
-          },
-          rewrite: '/accounting/graphql'
+          }
         }
       },
       {
@@ -359,7 +388,7 @@ const config = {
         behavior: {
           forwardCookies: true,
           setOrigin: {
-            name: 'origin-manager',
+            name: 'origin-iam-api',
             type: 'single_origin'
           },
           capture: {

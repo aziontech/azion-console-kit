@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from '@/services/edge-application-services/v4/make-edge-application-v4-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 /**
  * @param {Object} payload - The error schema.
@@ -26,6 +27,10 @@ const parseDeviceGroups = (deviceGroupsIds) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const cacheSettings = httpResponse.body.data
   const parseHttpResponse = {
     id: cacheSettings.id,

@@ -7,7 +7,7 @@
     <DataTable
       v-if="!isLoading"
       ref="dataTableRef"
-      :pt="props.pt"
+      :pt="parsedDatatablePt"
       class="overflow-clip rounded-md"
       scrollable
       removableSort
@@ -66,6 +66,9 @@
       <Column
         :class="{ '!hover:cursor-pointer': !disabledList }"
         selectionMode="multiple"
+        :pt="{
+          rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+        }"
         headerStyle="width: 3rem"
       />
       <Column
@@ -375,6 +378,11 @@
     }
   })
 
+  const parsedDatatablePt = computed(() => ({
+    ...props.pt,
+    rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
+  }))
+
   onMounted(() => {
     if (!props.lazyLoad) {
       loadData({ page: 1 })
@@ -447,6 +455,7 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
+        data.value = []
         const errorMessage = error.message || error
         toast.add({
           closable: true,
@@ -498,7 +507,7 @@
     }
   }
 
-  defineExpose({ reload, data })
+  defineExpose({ reload, data, handleExportTableDataToCSV })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]

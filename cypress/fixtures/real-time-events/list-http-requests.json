@@ -1,0 +1,30 @@
+{
+  "statusCode": 200,
+  "body": {
+    "data": {
+      "httpEvents": [{
+        "configurationId": "1741232370",
+        "host": "b4c16ips8y.map.azionedge.net",
+        "requestId": "d7bca718ff2d3bc1d5974cfb243846d2",
+        "httpUserAgent": "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)",
+        "requestMethod": "GET",
+        "status": 200,
+        "ts": "2025-04-12T17:13:35Z",
+        "upstreamBytesSent": 932,
+        "sslProtocol": "TLSv1.2",
+        "wafLearning": "-",
+        "requestTime": "0.739",
+        "serverProtocol": "HTTP/1.1",
+        "upstreamCacheStatus": "-",
+        "httpReferer": "-",
+        "remoteAddress": "47.128.49.219",
+        "wafMatch": "-",
+        "serverPort": "443",
+        "sslCipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+        "wafEvheaders": "-",
+        "serverAddr": "186.195.65.65",
+        "scheme": "https"
+      }]
+    }
+  }
+}

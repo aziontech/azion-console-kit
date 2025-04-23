@@ -130,6 +130,22 @@ function formatPercentageDataUnit(data) {
   }).format(data / 100)
 }
 
+function calculateValueAndUnit(data, unit) {
+  if (data > CHART_RULES.DATA_VOLUME.tera) {
+    return { value: data / CHART_RULES.DATA_VOLUME.tera, formattedUnit: `tera${unit}` }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.giga) {
+    return { value: data / CHART_RULES.DATA_VOLUME.giga, formattedUnit: `giga${unit}` }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.mega) {
+    return { value: data / CHART_RULES.DATA_VOLUME.mega, formattedUnit: `mega${unit}` }
+  }
+  if (data > CHART_RULES.DATA_VOLUME.kilo) {
+    return { value: data / CHART_RULES.DATA_VOLUME.kilo, formattedUnit: `kilo${unit}` }
+  }
+  return { value: data, formattedUnit: unit }
+}
+
 /**
  * Format data for displaying byte unit
  * @param {number} data - The data to be formatted
@@ -137,39 +153,22 @@ function formatPercentageDataUnit(data) {
  * @returns {string} - Returns the formatted data for byte unit display
  */
 function formatBytesDataUnit(data, chartData) {
-  let value = data
-  let unit = 'byte'
+  const unit = chartData.dataUnit === 'bitsPerSecond' ? 'bit-per-second' : 'byte'
 
-  if (chartData.dataUnit === 'bitsPerSecond') {
-    unit = 'bit-per-second'
-  }
+  const { value, formattedUnit } = calculateValueAndUnit(Math.abs(data), unit)
 
-  if (data > CHART_RULES.DATA_VOLUME.tera) {
-    value = data / CHART_RULES.DATA_VOLUME.tera
-    unit = `tera${unit}`
-  } else if (data > CHART_RULES.DATA_VOLUME.giga) {
-    value = data / CHART_RULES.DATA_VOLUME.giga
-    unit = `giga${unit}`
-  } else if (data > CHART_RULES.DATA_VOLUME.mega) {
-    value = data / CHART_RULES.DATA_VOLUME.mega
-    unit = `mega${unit}`
-  } else if (data > CHART_RULES.DATA_VOLUME.kilo) {
-    value = data / CHART_RULES.DATA_VOLUME.kilo
-    unit = `kilo${unit}`
-  }
-
-  /**
-   * Formatter for byte display
-   */
-  const byteValueNumberFormatter = Intl.NumberFormat('en', {
+  const formattedData = Intl.NumberFormat('en', {
     notation: 'compact',
     style: 'unit',
-    unit,
+    unit: formattedUnit,
     unitDisplay: 'narrow',
     minimumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME,
     maximumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME
-  })
-  return byteValueNumberFormatter.format(value)
+  }).format(value)
+
+  const isNegativeData = data < 0
+
+  return isNegativeData ? `-${formattedData}` : formattedData
 }
 
 /**

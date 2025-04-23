@@ -5,7 +5,6 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -53,17 +52,18 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    loadWafRulesService: {
+      type: Function,
+      required: true
     }
   })
-
-  const toast = useToast()
 
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
   const edgeFirewallFunctionsOptions = ref([])
-  const wafRulesOptions = ref([])
 
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
@@ -88,6 +88,8 @@
       }
     ]
   })
+
+  const hasEdgeFunctionsProductAccess = ref(true)
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -208,25 +210,8 @@
     try {
       const result = await listFunctionsServiceWithDecorator()
       edgeFirewallFunctionsOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    }
-  }
-
-  const listWafRulesOptions = async () => {
-    try {
-      const result = await props.listWafRulesService()
-      wafRulesOptions.value = result
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+    } catch {
+      hasEdgeFunctionsProductAccess.value = false
     }
   }
 
@@ -250,7 +235,7 @@
     })
   }
   onMounted(async () => {
-    await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
+    await Promise.all([listEdgeFirewallFunctionsOptions()])
   })
 
   defineExpose({
@@ -273,10 +258,12 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :wafRulesOptions="wafRulesOptions"
+        :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
+        :loadWafRulesService="loadWafRulesService"
       />
     </template>
   </CreateDrawerBlock>
@@ -295,10 +282,12 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
+        :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :wafRulesOptions="wafRulesOptions"
+        :listWafRulesService="listWafRulesService"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
+        :loadWafRulesService="loadWafRulesService"
       />
     </template>
   </EditDrawerBlock>

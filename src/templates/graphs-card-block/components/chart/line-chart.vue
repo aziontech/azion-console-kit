@@ -14,6 +14,9 @@
     generateGraph()
   })
 
+  const calculateYMin = () =>
+    Math.min(0, ...props.resultChart.flat().filter((value) => typeof value === 'number'))
+
   const generateGraph = () => {
     const c3Props = FormatC3GraphProps({
       chartData: props.chartData,
@@ -21,6 +24,8 @@
       hasMeanLineTotal: props.hasMeanLineTotal,
       hasMeanLineSeries: props.hasMeanLineSeries
     })
+
+    c3Props.axis.y.min = calculateYMin()
 
     c3.generate({
       bindto: `#line-chart-${props.chartData?.id}`,

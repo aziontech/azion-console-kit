@@ -106,6 +106,8 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/TabsView.vue'),
       props: {
         edgeApplicationServices: {
+          checkgeApplicationsLockedService:
+            EdgeApplicationsServiceV4.checkgeApplicationsLockedService,
           editEdgeApplication: EdgeApplicationsServiceV4.editEdgeApplicationsService,
           loadEdgeApplication: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
           updatedRedirect: 'list-edge-applications',

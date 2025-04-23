@@ -7,7 +7,9 @@
       class="max-w-xl"
     >
       <template #header>
-        <h5 class="text-lg not-italic font-bold leading-5">Clone {{ edgeApplication.name }}</h5>
+        <h5 class="text-lg not-italic font-bold leading-5">
+          Clone {{ edgeApplication.name.text }}
+        </h5>
       </template>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -114,7 +116,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'Error',
+        detail: error
       })
     } finally {
       loading.value = false

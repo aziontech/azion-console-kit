@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   vcsMock: {
     scope: 'scopeteste',
-    uuid: '7283j-j2j3l2-82736823-j2k4m2',
-    platform: {
+    id: '7283j-j2j3l2-82736823-j2k4m2',
+    provider: {
       callback_url: 'https://api-teste.com/v4/vcs/integrations/oauth/github/callback'
     }
   }
@@ -48,8 +48,8 @@ describe('VersionControlSystemService', () => {
     expect(result).toEqual([
       {
         label: fixtures.vcsMock.scope,
-        value: fixtures.vcsMock.uuid,
-        callbackUrl: fixtures.vcsMock.platform.callback_url.split('vcs')[1]
+        value: fixtures.vcsMock.id,
+        callbackUrl: fixtures.vcsMock.provider.callback_url.split('vcs')[1]
       }
     ])
   })

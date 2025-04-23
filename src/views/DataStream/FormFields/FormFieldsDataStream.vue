@@ -497,7 +497,7 @@
             id="objectKey"
             v-model="objectKey"
             type="text"
-            placeholder="waf_logs_1622575860091_37d66e78-c308-4006-9d4d-1c013ed89276"
+            placeholder="user/logs/"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': objectKeyError }"
             :feedback="false"
@@ -516,8 +516,9 @@
             class="text-xs text-color-secondary font-normal leading-5"
             data-testid="data-stream-form__destination__object-key-prefix-field__description"
           >
-            Prefix added to the name of the uploaded object to appear on the files that'll be sent.
-            Composed of Prefix + Timestamp + UUID.
+            The prefix for the name of your uploaded object. The name consists of the Prefix, the
+            date and time the packets are sent in the YYYY/MM/DD/hh/mm/ format, and the UUID. <br />
+            Example: user/logs/2024/10/12/06/24/37d66e78-c308-4006-9d4d-1c013ed89276.
           </small>
           <small
             id="object-key-help"
@@ -551,8 +552,9 @@
               <label
                 class="text-color text-sm font-normal leading-tight"
                 data-testid="data-stream-form__destination__content-type-field__label"
-                >{{ contentTypeItem.label }}</label
               >
+                {{ contentTypeItem.label }}
+              </label>
             </div>
           </div>
         </div>
@@ -654,13 +656,13 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             :disabled="hasNoPermissionToEditDataStream"
-            label="API Key"
+            label="Encoded API Key"
             required
             name="apiKey"
             :value="apiKey"
             rows="5"
-            placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
-            description="API key used for Elasticsearch authorization in base64 encode format."
+            placeholder="VnVhQ2ZHY0JDZGJrUW0tZTVhT3g6dWkybHAyYXhUTm1zeWFrdzl0dk5udw=="
+            description="Base64 key corresponding to the encoded value generated while creating the API Key in ElasticSearch."
             data-testid="data-stream-form__destination__api-key-field"
           />
         </div>

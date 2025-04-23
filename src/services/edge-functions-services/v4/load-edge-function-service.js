@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadEdgeFunctionService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -35,6 +36,10 @@ const LANGUAGE_WITH_ICON = {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const { data } = httpResponse.body
   const parsedFunction = {
     id: data.id,

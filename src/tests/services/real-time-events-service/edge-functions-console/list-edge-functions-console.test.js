@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctionsConsole } from '@/services/real-time-events-service/edge-functions-console'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   filter: {
@@ -16,7 +17,6 @@ const fixtures = {
     level: 'INFO',
     line: 42,
     lineSource: 'test linesource',
-    source: 'edge-functions-console.js',
     ts: '2024-02-23T18:07:25'
   }
 }
@@ -46,7 +46,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       `) {`,
       `\t${datasetName} (`,
       `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
@@ -55,18 +55,18 @@ describe('EdgeFunctionsConsoleServices', () => {
       `\t\tfunctionId`,
       `\t\tid`,
       `\t\tlevel`,
-      `\t\tline`,
       `\t\tlineSource`,
-      `\t\tsource`,
       `\t\tts`,
+      `\t\tline`,
       `\t}`,
       `}`
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -93,22 +93,73 @@ describe('EdgeFunctionsConsoleServices', () => {
     expect(response).toEqual({
       data: [
         {
-          configurationId: fixtures.edgeFunctionConsole.configurationId,
-          functionId: fixtures.edgeFunctionConsole.functionId,
           id: 'mocked-timestamp',
-          level: {
-            content: 'Info',
-            severity: 'info',
-            icon: 'pi pi-info-circle'
-          },
+          configurationId: fixtures.edgeFunctionConsole.configurationId,
           line: fixtures.edgeFunctionConsole.line,
-          lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
-          source: fixtures.edgeFunctionConsole.source,
+          summary: [
+            { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },
+            { key: 'functionId', value: fixtures.edgeFunctionConsole.functionId },
+            { key: 'level', value: fixtures.edgeFunctionConsole.level },
+            { key: 'line', value: fixtures.edgeFunctionConsole.line },
+            { key: 'lineSource', value: fixtures.edgeFunctionConsole.lineSource }
+          ],
           ts: fixtures.edgeFunctionConsole.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
+  it.each([
+    {
+      apiErrorMock: 'Access denied. You do not have permission to access this resource.',
+      statusCode: 403
+    },
+    {
+      apiErrorMock: 'You have exceeded the limit amount allowed for selected fields (37 fields)',
+      statusCode: 400
+    }
+  ])('Should return an API error for an $statusCode', async ({ statusCode, apiErrorMock }) => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: statusCode,
+      body: {
+        detail: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.variableMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.filter)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

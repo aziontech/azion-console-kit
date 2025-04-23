@@ -42,17 +42,21 @@ export default {
   ruleCriteriaInput: '[data-testid="edge-firewall-rules-form__argument[0][0]__input"]',
   ruleCriteriaNetworkListDropdown:
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown"]',
+  ruleCriteriaNetworkListDropdownValue:
+    '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown__value"]',
   ruleCriteriaNetworkListFilter:
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-search"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
   ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
   ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_2',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
+  scrollWafDropdown: '.p-dropdown-items-wrapper .p-virtualscroller',
+  selectTheLastWaf: '.p-dropdown-items-wrapper .p-virtualscroller ul li',
   rulesWafDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown"] > .p-dropdown-label',
   rulesWafDropdownFilter:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown-filter-input"]',
-  rulesWafFirstOption: '#behaviors\\[0\\]\\.waf_id_0',
+  rulesWafFirstOption: '#behaviors\\[0\\]\\.id_0',
   rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
   behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
   rulesWafModeDropdown:
@@ -78,7 +82,8 @@ export default {
   behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
 
   createRulesEngine: '[data-testid="rules-engine-create-button"] > .p-button-label',
-  inputNumberFirstPosition: '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
+  inputNumberFirstPosition:
+    '#row-0 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
   reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
   reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
   saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'

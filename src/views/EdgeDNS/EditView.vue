@@ -19,7 +19,7 @@
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -163,7 +163,7 @@
     name: '',
     selectedRecordType: 'A',
     value: '',
-    ttl: TTL_MAX_VALUE_RECORDS,
+    ttl: TTL_DEFAULT,
     selectedPolicy: 'simple',
     weight: '100',
     description: '',

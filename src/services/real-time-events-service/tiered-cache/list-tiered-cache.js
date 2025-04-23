@@ -1,10 +1,11 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
-import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
+import * as Errors from '@/services/axios/errors'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -15,12 +16,13 @@ export const listTieredCache = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return adaptResponse(response)
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
@@ -28,42 +30,77 @@ const adapt = (filter) => {
     dataset: 'l2CacheEvents',
     limit: 10000,
     fields: [
+      'bytesSent',
+      'cacheKey',
+      'cacheTtl',
       'configurationId',
       'host',
-      'requestUri',
-      'requestMethod',
-      'upstreamCacheStatus',
-      'ts',
       'proxyHost',
-      'source'
+      'proxyStatus',
+      'proxyUpstream',
+      'referenceError',
+      'remoteAddr',
+      'remotePort',
+      'requestLength',
+      'requestMethod',
+      'requestTime',
+      'requestUri',
+      'scheme',
+      'sentHttpContentType',
+      'serverProtocol',
+      'solution',
+      'status',
+      'tcpinfoRtt',
+      'ts',
+      'upstreamBytesReceived',
+      'upstreamBytesReceivedStr',
+      'upstreamCacheStatus',
+      'upstreamConnectTime',
+      'upstreamHeaderTime',
+      'upstreamResponseTime',
+      'upstreamStatus',
+      'clientId'
     ],
-    orderBy: 'ts_ASC'
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const { body } = response
-  const totalRecords = body.data.l2CacheEvents?.length
-
-  const data = body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
-    id: generateCurrentTimestamp(),
+  const data = response.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
-    requestUri: tieredCacheEvents.requestUri,
-    requestMethod: tieredCacheEvents.requestMethod,
-    upstreamCacheStatus: {
-      content: tieredCacheEvents.upstreamCacheStatus,
-      severity: 'info'
-    },
-    ts: tieredCacheEvents.ts,
     proxyHost: tieredCacheEvents.proxyHost,
-    source: tieredCacheEvents.source,
-    tsFormat: convertValueToDate(tieredCacheEvents.ts)
+    id: generateCurrentTimestamp(),
+    summary: buildSummary(tieredCacheEvents),
+    ts: tieredCacheEvents.ts,
+    tsFormat: getCurrentTimezone(tieredCacheEvents.ts)
   }))
 
   return {
-    data,
-    recordsFound: getRecordsFound(totalRecords)
+    data
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
   }
 }

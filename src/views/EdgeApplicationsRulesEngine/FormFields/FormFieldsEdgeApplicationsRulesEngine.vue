@@ -79,6 +79,18 @@
     'capture_match_groups'
   ]
 
+  const VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS = ['${server_addr}', '${server_port}']
+
+  const VARIABLE_AUTOCOMPLETE_RESPONSE_OPTIONS = [
+    '${sent_http_name}',
+    '${status}',
+    '${tcpinfo_rtt}',
+    '${upstream_addr}',
+    '${upstream_cookie_}',
+    '${upstream_http_}',
+    '${upstream_status}'
+  ]
+
   const VARIABLE_AUTOCOMPLETE_OPTIONS = [
     '${arg_}',
     '${args}',
@@ -105,7 +117,6 @@
     '${request_uri}',
     '${request}',
     '${scheme}',
-    '${server_port}',
     '${uri}'
   ]
 
@@ -401,7 +412,15 @@
   const variableItems = ref([])
 
   const searchVariableOption = (event) => {
-    variableItems.value = VARIABLE_AUTOCOMPLETE_OPTIONS.filter((item) => item.includes(event.query))
+    let combinedOptions = [...VARIABLE_AUTOCOMPLETE_OPTIONS]
+
+    if (phase.value === 'request') {
+      combinedOptions = [...combinedOptions, ...VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS]
+    } else if (phase.value === 'response') {
+      combinedOptions = [...combinedOptions, ...VARIABLE_AUTOCOMPLETE_RESPONSE_OPTIONS]
+    }
+
+    variableItems.value = combinedOptions.filter((item) => item.includes(event.query))
   }
 
   const isNotLastCriteria = (criteriaIndex) => {
@@ -845,7 +864,7 @@
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
-                :value="`${behaviors[behaviorIndex].value.cacheId}`"
+                :value="behaviors[behaviorIndex].value.cacheId"
                 :data-testid="`edge-application-rule-form__cache-settings-item[${behaviorIndex}]`"
               >
                 <template #footer>

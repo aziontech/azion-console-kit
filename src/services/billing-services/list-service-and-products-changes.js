@@ -1,7 +1,8 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import graphQLApi from '../axios/makeGraphQl'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+const BOT_MANAGER_SLUG = 'bot_manager'
+const EDGE_STORAGE_SLUG = 'edge_storage'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -98,14 +99,12 @@ export const listServiceAndProductsChangesService = async (billID) => {
     }
   }
 
-  let httpResponse = await AxiosHttpClientAdapter.request(
-    {
-      url: `${makeBillingBaseUrl()}`,
-      method: 'POST',
-      body: graphQLPayload
-    },
-    graphQLApi
-  )
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    baseURL: '/',
+    url: `${makeBillingBaseUrl()}`,
+    method: 'POST',
+    body: graphQLPayload
+  })
 
   httpResponse = adapt(httpResponse)
 
@@ -138,7 +137,6 @@ const PRODUCT_NAMES = {
   data_stream: 'Data Stream',
   real_time_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
-  edge_storage: 'Edge Storage',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
   ddos_protection_data_transferred: 'DDoS Protection Data Transferred',
@@ -153,17 +151,17 @@ const PRODUCT_NAMES = {
 }
 
 const METRIC_SLUGS = {
-  application_accelerator_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  requests: { title: 'Total Requests (per 10,000)' },
-  data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  data_stream_requests: { title: 'Total Requests (per 10,000)' },
-  network_layer_protection_requests: { title: 'Total Requests (per 10,000)' },
-  tiered_cache_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  load_balancer_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
-  waf_requests: { title: 'Total Requests (per 10,000)' },
+  application_accelerator_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  requests: { title: 'Total Requests' },
+  data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  data_stream_requests: { title: 'Total Requests' },
+  network_layer_protection_requests: { title: 'Total Requests' },
+  tiered_cache_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  load_balancer_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
+  waf_requests: { title: 'Total Requests' },
   ddos_protection_20gbps: { title: 'DDoS Protection 20Gbps' },
   ddos_protection_50gbps: { title: 'DDoS Protection 50Gbps' },
-  ddos_protection_data_transferred: { title: 'Total Data Transfered (per GB)', unit: 'GB' },
+  ddos_protection_data_transferred: { title: 'Total Data Transfered', unit: 'GB' },
   ddos_protection_unlimited: { title: 'DDoS Protection Unlimited' },
   compute_time: { title: 'Compute Time' },
   invocations: { title: 'Invocations' },
@@ -231,8 +229,12 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  if (!products.length) {
-    return { body: products, statusCode }
+  const filteredProducts = products.filter(
+    (item) => ![BOT_MANAGER_SLUG, EDGE_STORAGE_SLUG].includes(item.productSlug)
+  )
+
+  if (!filteredProducts.length) {
+    return { body: filteredProducts, statusCode }
   }
 
   const groupedMetrics = groupBy(productMetricsValue, productMetricsAccounted, [
@@ -246,7 +248,7 @@ const adapt = ({ body, statusCode }) => {
     'regionName'
   ])
 
-  const data = mapProducts(products, groupedMetrics, groupedRegionMetrics)
+  const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
 
   return { body: data, statusCode }
 }

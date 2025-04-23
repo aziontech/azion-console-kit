@@ -471,7 +471,6 @@
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
       />
-
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"

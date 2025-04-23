@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-service'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadNetworkListService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,6 +13,10 @@ export const loadNetworkListService = async ({ id }) => {
 }
 
 const adapt = (httpResponse, id) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const networkList = {
     name: httpResponse.body.data.name,
     id: id,

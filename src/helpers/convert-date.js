@@ -15,6 +15,7 @@ const convertValueToDate = (value) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
     hour12: true
   }
   return date.toLocaleString('en-US', options)
@@ -27,7 +28,9 @@ const convertValueToDate = (value) => {
  * @returns {string} The formatted date in MM/DD/YYYY format.
  */
 const formatDateToUS = (value) => {
-  const date = new Date(value)
+  const [year, month, day] = value.split('-')
+
+  const date = new Date(year, month - 1, day)
 
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date')
@@ -154,6 +157,30 @@ const formatExhibitionDate = (dateString, dateStyle, timeStyle) => {
   }).format(new Date(dateString))
 }
 
+const formatDateToMonthYear = (date) => {
+  if (!date) return ''
+
+  const [year, month] = date.split('-') ?? []
+  if (year && month) return `${month}-${year}`
+
+  return []
+}
+
+const convertValueToDateByUserTimezone = (value, timezone) => {
+  const date = new Date(value)
+  const options = {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }
+  return date.toLocaleString('en-US', options)
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -161,5 +188,7 @@ export {
   formatDateToUS,
   formatDateToUSBilling,
   getCurrentMonthStartEnd,
-  formatExhibitionDate
+  formatExhibitionDate,
+  formatDateToMonthYear,
+  convertValueToDateByUserTimezone
 }

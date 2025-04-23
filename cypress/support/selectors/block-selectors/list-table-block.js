@@ -5,7 +5,7 @@ export default {
   showMore: '[data-testid="table-column-expand-text-column__show-more__toggle"]',
   filteredRow: {
     column: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
-    statusColumn: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+    statusColumn: '.p-tag-value',
     empty: '[data-testid="list-table-block__empty-message__text"]',
     lastEditorColumn: '[data-testid="list-table-block__column__lastEditor__row"]',
     lastModifiedColumn: '[data-testid="list-table-block__column__lastModified__row"]'

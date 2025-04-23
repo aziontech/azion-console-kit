@@ -4,7 +4,8 @@
     :class="{
       'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer,
       'border surface-border ': !noBorder,
-      'first:py-0': noBorder
+      'first:py-0': noBorder,
+      severityClasses
     }"
   >
     <!-- title and description -->
@@ -34,11 +35,21 @@
   </fieldset>
 </template>
 <script setup>
+  import { computed } from 'vue'
+
   const props = defineProps({
     title: { type: String, required: false },
     description: { type: String },
     isDrawer: { type: Boolean, default: false },
     hiddenTitle: { type: Boolean, default: false },
-    noBorder: { type: Boolean, default: false }
+    noBorder: { type: Boolean, default: false },
+    severity: { type: String, default: '' }
+  })
+
+  const severityClasses = computed(() => {
+    if (props.severity === 'danger') {
+      return 'bg-[#F2646420] border-[#C4170B]'
+    }
+    return ''
   })
 </script>

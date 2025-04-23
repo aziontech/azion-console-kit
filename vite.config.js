@@ -9,6 +9,7 @@ import istanbul from 'vite-plugin-istanbul'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
+  const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
 
   return {
     plugins: [
@@ -33,26 +34,35 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/(marketplace|script-runner|template-engine|iam)': {
-          target: `${URLStartPrefix}manager.azion.com/`,
+        '^/api/marketplace': {
+          target: `${URLStartPrefix}marketplace.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine|iam)/, '/$1/api')
+          rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
         },
-        '^/api/vcs': {
+        '^/api/script-runner': {
+          target: `${URLStartPrefix}script-runner.azion.com/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/script-runner/, '/script-runner/api')
+        },
+        '^/api/template-engine': {
+          target: `${URLStartPrefix}template-engine.azion.com/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/template-engine/, '/template-engine/api')
+        },
+        '^/api/iam': {
+          target: `${URLStartPrefix}iam-api.azion.net/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/iam/, '/iam/api')
+        },
+        '^/api/vcs': { 
           target: `${URLStartPrefix}vcs-api.azion.net/`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
         },
         '/graphql/cities': {
-          target: `${URLStartPrefix}cities.azion.com`,
+          target: `${URLStartPrefix}cities.azion.${DomainSuffix}`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
-        },
-        '/graphql/billing': {
-          target: `${URLStartPrefix}manager.azion.com`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/billing/, '/billing/graphql')
         },
         '/api/webhook/console_feedback': {
           target: `https://automate.azion.net/`,
@@ -68,6 +78,10 @@ const getConfig = () => {
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/v4': {
+          target: `${URLStartPrefix}api.azion.com`,
+          changeOrigin: true
         },
         '/webpagetest': {
           target: `https://www.azion.com/api/webpagetest`,
@@ -85,10 +99,10 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/ai/, '')
         },
         '/graphql/accounting': {
-          target: `${URLStartPrefix}manager.azion.com`,
+          target: `${URLStartPrefix}console.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
-        },
+        }
       }
     }
   }

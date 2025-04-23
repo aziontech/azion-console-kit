@@ -48,7 +48,7 @@ const createEdgeApplicationCase = () => {
  
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
   })

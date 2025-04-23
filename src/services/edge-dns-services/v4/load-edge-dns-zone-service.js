@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadEdgeDNSService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,6 +13,9 @@ export const loadEdgeDNSService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
   const edgeDNS = httpResponse.body?.data
 
   const parsedEdgeDNS = {

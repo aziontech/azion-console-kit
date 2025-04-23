@@ -149,7 +149,7 @@ const fixtures = {
         currency: 'BRL',
         descriptions: [
           {
-            service: 'Total Requests (per 10,000)',
+            service: 'Total Requests',
             slug: 'requests',
             quantity: '848,506',
             price: formatCurrencyString('BRL', 5.23),
@@ -169,7 +169,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Data Transfered (per GB)',
+            service: 'Total Data Transfered',
             slug: 'data_transferred',
             quantity: '1.727 GB',
             price: formatCurrencyString('BRL', 1.52),
@@ -211,7 +211,7 @@ const fixtures = {
             ]
           },
           {
-            service: 'Total Requests (per 10,000)',
+            service: 'Total Requests',
             slug: 'data_stream_requests',
             quantity: '0',
             price: formatCurrencyString('BRL', 0.0),
