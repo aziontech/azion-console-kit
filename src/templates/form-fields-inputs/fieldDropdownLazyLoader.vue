@@ -409,7 +409,6 @@
   }
 
   const checkValueInList = (value) => {
-    console.log('value', value)
     const existitemInList = data.value?.some((item) => item[props.optionValue] === value)
 
     if (!existitemInList) {
