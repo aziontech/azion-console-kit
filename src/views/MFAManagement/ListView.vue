@@ -8,13 +8,11 @@
         v-if="hasContentToList"
         :listService="listMfaUsersService"
         :columns="getColumns"
-        addButtonLabel="MFA"
-        createPagePath="mfa-management/create"
-        editPagePath="mfa-management/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No MFA users found."
         :actions="actions"
         :apiFields="MFA_USERS_API_FIELDS"
+        :enableEditClick="false"
       />
       <EmptyResultsBlock
         v-else
