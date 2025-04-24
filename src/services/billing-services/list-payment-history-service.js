@@ -28,12 +28,14 @@ const STATUS_AS_TAG = {
 
 export const listPaymentHistoryService = async () => {
   const { accountIsNotRegular } = useAccountStore()
-
+  const ACCOUNT_IS_REGULAR = !accountIsNotRegular
   let httpResponse = accountIsNotRegular
     ? await listPaymentHistoryForNotRegularAccounts()
     : await listPaymentHistoryForRegularAccounts()
 
-  httpResponse.body = removeCurrentPayment(httpResponse)
+  if (ACCOUNT_IS_REGULAR) {
+    httpResponse.body = removeCurrentPayment(httpResponse)
+  }
 
   return parseHttpResponse(httpResponse)
 }
