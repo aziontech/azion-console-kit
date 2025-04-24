@@ -3,7 +3,6 @@ import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
 export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, name }) => {
-  // console.log('🚀 ~ createWafRulesAllowedTuningService ~ attackEvents:', attackEvents);
   const MAP_MATCH_ZONES_CONDITIONAL = {
     query_string: 'conditional_query_string',
     request_body: 'conditional_request_body',
