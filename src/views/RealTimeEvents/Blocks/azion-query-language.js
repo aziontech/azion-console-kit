@@ -1,104 +1,161 @@
+/* eslint-disable no-console */
+import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index.js'
+
 export default class Aql {
   constructor() {
-    this.operators = ['=', '<>', '<', '>', '<=', '>=', 'like', 'ilike', 'between', 'in']
+    this.operators = ['<=', '>=', '=', '<>', '<', '>', 'like', 'ilike', 'between', 'in']
   }
 
   parse(query, suggestions, domains) {
-    const expressions = query.split(/and/i).map((exp) => exp.trim())
-    const output = expressions
-      .map((exp) => {
-        const regex =
-          /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
-        const match = exp.match(regex)
-        if (match) {
-          let field = match[1] || match[2] || match[3]
-          field = field.trim()
+    if (!query) return []
+    const expressions = query.split(/and/i).map((expr) => expr.trim())
+    const expressionRegex =
+      /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
 
-          const suggestion = suggestions.find(
-            (item) => item.label.toLowerCase() === field.toLowerCase()
-          )
-          if (suggestion) {
-            field = suggestion.label
-          }
+    const parsedExpressions = expressions
+      .map((expr) => {
+        const match = expr.match(expressionRegex)
+        if (!match) return null
 
-          let operator = match[4]
-          let value = match[5].trim()
+        let field = (match[1] || match[2] || match[3]).trim()
 
-          const operatorInfo = this.operatorInfo(
-            suggestion.value.operator,
-            this.mapOperatorValue(operator)
-          )
+        const suggestion = suggestions.find(
+          (item) => item.label.toLowerCase() === field.toLowerCase()
+        )
+        if (suggestion) {
+          field = suggestion.label
+        }
 
-          if (operator.toUpperCase() === 'BETWEEN') {
-            const [begin, end] = value
-              .replace(/[()]/g, '')
-              .split(',')
-              .map((val) => val.trim())
-            let beginFormatted = begin
-            let endFormatted = end
+        let operator = match[4]
+        let value = match[5].trim()
 
-            if (operatorInfo.type === 'IntRange') {
-              beginFormatted = parseInt(begin)
-              endFormatted = parseInt(end)
-            } else if (operatorInfo.type === 'FloatRange') {
-              beginFormatted = parseFloat(begin)
-              endFormatted = parseFloat(end)
-            }
+        const mappedOperator = this.mapOperatorValue(operator)
+        const operatorInfo = this.operatorInfo(suggestion.value.operator, mappedOperator)
 
-            return {
-              field: field,
-              value: { begin: beginFormatted, end: endFormatted },
-              operator: operatorInfo.value,
-              valueField: this.formatFieldName(field),
-              type: operatorInfo.type ?? 'Int'
-            }
-          }
+        if (operator.toUpperCase() === 'BETWEEN') {
+          const [begin, end] = value
+            .replace(/[()]/g, '')
+            .split(',')
+            .map((val) => val.trim())
+          let beginValue = begin
+          let endValue = end
 
-          let parsedValue
-          if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
-            parsedValue = Number(value)
-          } else if (operator.toUpperCase() === 'IN' && field.toLowerCase() === 'domain') {
-            parsedValue = this.formatDomainValues(query, domains)
-          } else {
-            parsedValue = value.replace(/^["']|["']$/g, '')
+          if (operatorInfo.type === 'IntRange') {
+            beginValue = parseInt(begin, 10)
+            endValue = parseInt(end, 10)
+          } else if (operatorInfo.type === 'FloatRange') {
+            beginValue = parseFloat(begin)
+            endValue = parseFloat(end)
           }
 
           return {
             field: field,
-            value: parsedValue,
+            value: { begin: beginValue, end: endValue },
             operator: operatorInfo.value,
-            valueField: this.formatFieldName(field),
-            type: operatorInfo.type ?? 'Int'
+            valueField: this.convertFieldToCamelCase(field),
+            type: operatorInfo.type || 'Int'
           }
         }
-        return null
+
+        let parsedValue
+        if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
+          parsedValue = Number(value)
+        } else if (operator.toUpperCase() === 'IN' && field.toLowerCase() === 'domain') {
+          parsedValue = this.formatDomainValues(query, domains)
+        } else {
+          parsedValue = value.replace(/^["']|["']$/g, '')
+        }
+
+        return {
+          field: field,
+          value: parsedValue,
+          operator: operatorInfo.value,
+          valueField: this.convertFieldToCamelCase(field),
+          type: operatorInfo.type || 'Int'
+        }
       })
       .filter((item) => item !== null)
 
-    return output
+    return parsedExpressions
   }
 
-  formatFieldName(field) {
-    if (field.toLowerCase() === 'domain') return 'configurationId'
-    const parts = field.split(' ')
-    if (parts) {
-      return parts
-        .map((part, index) =>
-          index === 0 ? part.toLowerCase() : part.charAt(0).toUpperCase() + part.slice(1)
-        )
-        .join('')
-    }
-    return field
+  convertFieldToCamelCase(field) {
+    if (!field) return field
+
+    const normalizedField = field.trim()
+
+    if (normalizedField.toLowerCase() === 'domain') return 'configurationId'
+
+    const words = normalizedField.split(/\s+/)
+
+    return words
+      .map((word, index) => (index === 0 ? word.toLowerCase() : this.capitalizeFirstLetter(word)))
+      .join('')
+  }
+
+  capitalizeFirstLetter(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   }
 
   formatDomainValues(query, domains) {
-    const parenMatch = query.match(/\(([^)]+)\)/)
-    if (!parenMatch) return []
+    const extractDomainClauseContent = (query) => {
+      const indicator = 'domain in ('
+      const lowerQuery = query.toLowerCase()
+      const pos = lowerQuery.indexOf(indicator)
+      if (pos === -1) return null
 
-    const tokens = parenMatch[1]
-      .split(',')
-      .map((token) => token.trim())
-      .filter((token) => token !== '')
+      const startIndex = query.indexOf('(', pos)
+      if (startIndex === -1) return null
+
+      let counter = 0
+      let endIndex = -1
+      // eslint-disable-next-line id-length
+      for (let i = startIndex; i < query.length; i++) {
+        if (query[i] === '(') {
+          counter++
+        } else if (query[i] === ')') {
+          counter--
+          if (counter === 0) {
+            endIndex = i
+            break
+          }
+        }
+      }
+      if (endIndex === -1) {
+        return query.substring(startIndex + 1)
+      }
+      return query.substring(startIndex + 1, endIndex)
+    }
+
+    const splitByCommaNotInParens = (str) => {
+      const tokens = []
+      let token = ''
+      let nesting = 0
+      // eslint-disable-next-line id-length
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i]
+        if (char === ',' && nesting === 0) {
+          tokens.push(token.trim())
+          token = ''
+        } else {
+          token += char
+          if (char === '(') {
+            nesting++
+          } else if (char === ')') {
+            nesting--
+          }
+        }
+      }
+      if (token.trim().length > 0) {
+        tokens.push(token.trim())
+      }
+      return tokens
+    }
+
+    const domainClauseContent = extractDomainClauseContent(query)
+    if (!domainClauseContent) return []
+
+    const tokens = splitByCommaNotInParens(domainClauseContent)
 
     const result = tokens
       .map((token) => {
@@ -142,64 +199,56 @@ export default class Aql {
   }
 
   selectSuggestion(suggestion, query, step, fieldName) {
-    if (step === 'field') {
-      let newQuery
-      if (query?.toLowerCase().includes(' and ')) {
-        const parts = query.split(/\s+and\s+/i)
-        let newField = suggestion.label.toLowerCase()
-        if (newField.includes(' ')) {
-          newField = `"${newField}"`
-        }
-        parts[parts.length - 1] = newField
-        newQuery = parts.join(' and ') + ' '
-        return {
-          query: `${newQuery} `,
-          nextStep: 'operator',
-          label: suggestion.label.toLowerCase()
-        }
-      } else {
-        let newField = suggestion.label.toLowerCase()
-        if (newField.includes(' ')) {
-          newQuery = `"${newField}"`
-          return {
-            query: `${newQuery} `,
-            nextStep: 'operator',
-            label: suggestion.label.toLowerCase()
-          }
+    const suggestionLabel = suggestion.label.toLowerCase()
+
+    const formatField = (field) => {
+      return field.includes(' ') ? `"${field}"` : field
+    }
+
+    switch (step) {
+      case 'field': {
+        const formattedField = formatField(suggestionLabel)
+        if (query && query.toLowerCase().includes(' and ')) {
+          const parts = query.split(/\s+and\s+/i)
+          parts[parts.length - 1] = formattedField
+          const newQuery = parts.join(' and ') + ' '
+          return { query: newQuery, nextStep: 'operator', label: suggestionLabel }
         } else {
-          return {
-            query: `${newField} `,
-            nextStep: 'operator',
-            label: suggestion.label.toLowerCase()
-          }
+          const newQuery = `${formattedField} `
+          return { query: newQuery, nextStep: 'operator', label: suggestionLabel }
         }
       }
-    } else if (step === 'operator') {
-      const newQuery = `${query} ${suggestion.label} `
-      return { query: newQuery, nextStep: 'value', label: fieldName }
-    } else if (step === 'value') {
-      let newQuery
-      if (fieldName === 'domain') {
-        if (query.endsWith(' ')) {
-          newQuery = `(${suggestion.label})`
-          return { query: `${query} ${newQuery}`, nextStep: 'value', label: fieldName }
-        } else if (query.endsWith(')')) {
-          let match = query.match(/\(([^)]+)\)/)
-          if (match) {
-            let domains = match[1]
-            domains += `, ${suggestion.label}`
-
-            newQuery = query.replace(/\(([^)]+)\)/, `(${domains})`)
-            return { query: `${newQuery}`, nextStep: 'value', label: fieldName }
-          }
-        }
-      } else {
-        return { query: `${suggestion} `, nextStep: 'value', label: fieldName }
+      case 'operator': {
+        const newQuery = `${query} ${suggestionLabel} `
+        return { query: newQuery, nextStep: 'value', label: fieldName }
       }
-    } else if (step === 'logicOperator') {
-      const newQuery = `${query} ${suggestion.label} `
+      case 'value': {
+        if (fieldName === 'domain') {
+          const suggestion = suggestionLabel.trim()
 
-      return { query: newQuery, nextStep: 'field', label: fieldName }
+          let newQuery = ''
+          if (query.includes(suggestionLabel.trim())) {
+            return { query, nextStep: 'value', label: fieldName }
+          }
+
+          if (query.endsWith(' ') || query.endsWith('in')) {
+            newQuery = `${query}(${suggestion})`
+          } else if (query.endsWith(',') || !query.endsWith(')')) {
+            newQuery = `${query}, ${suggestion})`
+          } else {
+            newQuery = `${query.slice(0, -1)}, ${suggestion})`
+          }
+          return { query: newQuery, nextStep: 'value', label: fieldName }
+        } else {
+          return { query: `${suggestionLabel} `, nextStep: 'value', label: fieldName }
+        }
+      }
+      case 'logicOperator': {
+        const newQuery = `${query} ${suggestionLabel} `
+        return { query: newQuery, nextStep: 'field', label: fieldName }
+      }
+      default:
+        return { query, nextStep: step, label: fieldName }
     }
   }
 
@@ -233,11 +282,48 @@ export default class Aql {
         }
       }
     } else if (operatorFound && operatorFound === 'in') {
+      if (query.endsWith(') ')) {
+        return { operator: 'logicOperator', selectedField: '' }
+      }
       return { operator: 'value', selectedField: operatorFound === 'in' ? 'domain' : '' }
     } else if (tokenForMatch && hasValueAfterOperator && query.endsWith(' ')) {
       return { operator: 'logicOperator', selectedField: '' }
     }
     return { operator: 'field', selectedField: '' }
+  }
+
+  handleInicialQuery(filters, fieldsInFilter) {
+    if (!filters || !filters.length || !fieldsInFilter.length) return ''
+
+    const conditions = filters.map((filter) => {
+      const operator = OPERATOR_MAPPING_ADVANCED_FILTER[filter.operator]?.format
+      const matchedField = fieldsInFilter.find((field) => field.value === filter.valueField)
+
+      if (!operator) {
+        console.error(`invalid operator "${filter.operator}"`)
+        return ''
+      }
+      if (!matchedField) {
+        console.error(
+          `we could not find the field corresponding to your selection ("${filter.valueField}")`
+        )
+        return ''
+      }
+      const fieldLowerCase = matchedField.label.toLowerCase()
+      const formattedField = fieldLowerCase.includes(' ') ? `'${fieldLowerCase}'` : fieldLowerCase
+
+      if (operator === 'between') {
+        return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
+      } else if (operator === 'in') {
+        return `${formattedField} ${operator} (${filter.value
+          .map((item) => `${item.label}`)
+          .join(', ')})`
+      }
+
+      return `${formattedField} ${operator} ${filter.value}`
+    })
+
+    return conditions.join(' AND ')
   }
 
   queryValidator(query, suggestions) {
@@ -286,7 +372,11 @@ export default class Aql {
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        let operatorFound = this.operators.find((op) => expression.toLowerCase().includes(op))
+        const escapedOperatorsRegex = new RegExp(
+          this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
+        )
+        let match = expression.toLowerCase().match(escapedOperatorsRegex)
+        let operatorFound = match ? match[0] : null
         if (operatorFound) {
           let stringBeforeOperator = expression.split(operatorFound)[0].trim()
           if (stringBeforeOperator.includes(' ')) {
@@ -317,10 +407,13 @@ export default class Aql {
         }
       })
     } else {
-      let operatorFound = this.operators.find((op) => queryText.toLowerCase().includes(op))
+      const escapedOperatorsRegex = new RegExp(
+        this.operators.map((op) => op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')).join('|')
+      )
+      let match = queryText.toLowerCase().match(escapedOperatorsRegex)
+      let operatorFound = match ? match[0] : null
       if (operatorFound) {
         let stringBeforeOperator = queryText.split(operatorFound)[0].trim()
-
         if (stringBeforeOperator.includes(' ')) {
           if (
             !(
@@ -358,6 +451,7 @@ export default class Aql {
     if (!query?.includes('and') && !query?.includes(' ')) return []
 
     const expressions = query?.split(/\s+and\s+/i)
+    if (!expressions) return []
 
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
@@ -397,6 +491,7 @@ export default class Aql {
 
     // Divide a query por "and" (ignorando caixa) para validar cada expressão individualmente
     const expressions = queryText.split(/\s+and\s+/i)
+    if (!expressions) return []
 
     expressions.forEach((expression) => {
       // Se a expressão não contém o operador in (como palavra inteira), ignora
@@ -440,21 +535,35 @@ export default class Aql {
   }
 
   queryValidatorNoSpaces(query) {
-    const expressions = query.split(/and/i).map((exp) => exp.trim())
+    const expressions = query?.split(/and/i).map((exp) => exp.trim())
+    if (!expressions) return []
     const errors = []
 
-    expressions.forEach((exp) => {
-      this.operators.forEach((op) => {
-        const operator = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        const hasSpaceBeforeOperator = new RegExp(`\\S${operator}`)
-        const hasSpaceAfterOperator = new RegExp(`${operator}\\S`)
+    // eslint-disable-next-line id-length
+    const sortedOperators = [...this.operators].sort((a, b) => b.length - a.length)
+    const escapedOperators = sortedOperators.map((op) => {
+      const opEscaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return /^[a-zA-Z]+$/.test(op) ? `\\b${opEscaped}\\b` : opEscaped
+    })
+    const operatorPattern = escapedOperators.join('|')
+    const regex = new RegExp(operatorPattern, 'g')
 
-        if (hasSpaceBeforeOperator.test(exp) || hasSpaceAfterOperator.test(exp)) {
+    expressions.forEach((exp) => {
+      let match
+      while ((match = regex.exec(exp)) !== null) {
+        const start = match.index
+        const op = match[0]
+        const end = start + op.length
+        const beforeChar = start === 0 ? ' ' : exp[start - 1]
+        const afterChar = end >= exp.length ? ' ' : exp[end]
+
+        if (!/\s/.test(beforeChar) || !/\s/.test(afterChar)) {
           if (!errors.includes('no-space-error')) {
             errors.push('no-space-error')
           }
+          break
         }
-      })
+      }
     })
 
     return errors
@@ -462,6 +571,7 @@ export default class Aql {
 
   queryValidatorBetweenOperators(query) {
     const expressions = query.split(/and/i).map((exp) => exp.trim())
+    if (!expressions) return []
     const errors = []
 
     expressions.forEach((expression) => {
@@ -493,5 +603,142 @@ export default class Aql {
     })
 
     return errors
+  }
+
+  highlightQuerySyntax(query) {
+    const parts = query.split(/(\band\b)/gi)
+
+    const highlightedParts = parts.map((part) => {
+      if (/^\band\b$/i.test(part.trim())) {
+        return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
+      } else {
+        return part.replace(
+          /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi,
+          (match, field, space, operator) => {
+            return `<span style="color: var(--series-three-color);">${field}</span> <span style="color: var(--series-two-color);">${operator}</span>`
+          }
+        )
+      }
+    })
+
+    return highlightedParts.join('')
+  }
+
+  saveCursorPosition(element) {
+    let caretOffset = 0
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const preCaretRange = range.cloneRange()
+      preCaretRange.selectNodeContents(element)
+      preCaretRange.setEnd(range.endContainer, range.endOffset)
+      caretOffset = preCaretRange.toString().length
+    }
+
+    return caretOffset
+  }
+
+  restoreCursorPosition(element, offset) {
+    if (!element) return
+
+    const range = document.createRange()
+    const selection = window.getSelection()
+    let currentOffset = 0
+    let found = false
+
+    function traverse(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextOffset = currentOffset + node.textContent.length
+        if (nextOffset >= offset) {
+          range.setStart(node, offset - currentOffset)
+          range.collapse(true)
+          found = true
+        } else {
+          currentOffset = nextOffset
+        }
+      } else {
+        for (let interable = 0; interable < node.childNodes.length; interable++) {
+          traverse(node.childNodes[interable])
+          if (found) break
+        }
+      }
+    }
+
+    traverse(element)
+
+    if (!found) {
+      range.selectNodeContents(element)
+      range.collapse(false)
+    }
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
+  positionCursorAtEndOfElement = (element) => {
+    if (!element) return
+    element.focus()
+
+    if (window.getSelection && document.createRange) {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      range.collapse(false)
+
+      const selection = window.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    } else if (document.body.createTextRange) {
+      // Support for older versions of IE
+      const textRange = document.body.createTextRange()
+      textRange.moveToElementText(element)
+      textRange.collapse(false)
+      textRange.select()
+    }
+  }
+
+  getOperatorSuggestions = (query, suggestions, selectedFieldName) => {
+    const selectedField = suggestions.find(
+      (item) => item.value.label.toLowerCase() === selectedFieldName.toLowerCase()
+    )
+    if (!selectedField) return []
+
+    const fieldRegex = new RegExp(
+      `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
+      'i'
+    )
+    const operatorMatch = query.match(fieldRegex)
+    const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
+
+    return selectedField.value.operator
+      .filter((op) => {
+        if (op.value.format.toLowerCase() === 'in') return true
+        if (operatorAlreadyTyped && op.value.format.toLowerCase() === operatorAlreadyTyped) {
+          return false
+        }
+        return true
+      })
+      .map((op) => ({
+        label: op.value.format
+      }))
+  }
+
+  getValueSuggestions(domains, selectedFieldName) {
+    if (selectedFieldName === 'domain') {
+      return domains
+    }
+    return []
+  }
+
+  getFieldSuggestions(query, suggestions) {
+    const parts = query.split(/\s+and\s+/i)
+    const currentFieldToken = parts.pop().trim().replace(/["']/g, '')
+
+    const searchTerm = currentFieldToken.toLowerCase()
+
+    if (!searchTerm) return suggestions
+
+    return suggestions.filter((item) => item.label.toLowerCase().startsWith(searchTerm))
   }
 }

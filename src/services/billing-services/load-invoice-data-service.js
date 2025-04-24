@@ -29,9 +29,11 @@ const adapt = (httpResponse, accountIsNotRegular) => {
   } = httpResponse
   const invoiceData = accountIsNotRegular ? data?.billDetail : data?.accountingDetail
   const parseInvoice = invoiceData?.map((invoice) => {
+    let disabledExport = false
     if (accountIsNotRegular) {
       return {
         billId: invoice.billId,
+        disabledExport,
         billDetailId: invoice.billDetailId,
         total: invoice.totalValue,
         currency: invoice.currency,
@@ -45,8 +47,10 @@ const adapt = (httpResponse, accountIsNotRegular) => {
         invoiceDownloadURL: getLinkDownloadInvoice(formatDateToMonthYear(invoice.periodFrom))
       }
     }
+    disabledExport = true
     return {
       billId: invoice.billId,
+      disabledExport,
       invoiceId: invoice.invoiceNumber,
       billingPeriod: `${formatDateToUSBilling(invoice.periodFrom)} - ${formatDateToUSBilling(
         invoice.periodTo

@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, onMounted } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { OPERATOR_MAPPING } from './component'
@@ -29,6 +29,11 @@
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
   const displayFilter = ref([])
   const refDialogFilter = ref()
+
+  onMounted(() => {
+    displayFilter.value = []
+    if (props.fieldsInFilter.length) updateDisplayFilter(props.filterAdvanced)
+  })
 
   const disabledSearch = computed(() => {
     return props.disabled
@@ -136,6 +141,10 @@
     emit('update:filterAdvanced', [])
   }
 
+  const hasItemFilterValue = (itemFilter) => {
+    return Object.keys(itemFilter).length
+  }
+
   watch(
     () => props.fieldsInFilter,
     () => {
@@ -182,6 +191,7 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeItemFilter="removeItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-default"
             />
           </li>
@@ -194,6 +204,7 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeItemFilter="removeItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-range"
             />
           </li>
@@ -207,11 +218,12 @@
               :position="index"
               :clickFilter="clickFilter"
               :removeValueItemFilter="removeValueItemFilter"
+              v-if="hasItemFilterValue(itemFilter)"
               data-testid="search-filter-chip-in"
             />
           </li>
           <li
-            v-if="displayFilter.length > index + 1"
+            v-if="displayFilter.length > index + 1 && hasItemFilterValue(itemFilter)"
             data-testid="search-filter-chip-item"
           >
             and

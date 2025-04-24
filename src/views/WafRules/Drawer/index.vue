@@ -335,6 +335,7 @@
 
 <template>
   <EmptyDrawer
+    data-testid="more-details-drawer"
     v-model:visible="visibleDrawer"
     title="More Details"
     expandable

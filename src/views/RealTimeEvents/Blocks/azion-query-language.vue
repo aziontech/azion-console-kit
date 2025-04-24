@@ -5,17 +5,16 @@
   >
     <div class="relative">
       <div class="flex gap-2 items-center justify-center">
-        <InputText
-          v-model="queryText"
+        <ContentEditable
+          v-model="query"
+          @focus="showSuggestionsFocusInput = true"
+          @keydown.tab="onSelectSuggestionWithTab"
           @keydown.down.prevent="highlightNext"
           @keydown.up.prevent="highlightPrev"
           @keydown.enter.prevent="confirmSelection"
-          @keydown.tab.prevent="onSelectSuggestionWithTab"
-          @input="handleInput"
-          placeholder="Azion Query Language"
-          @focus="showSuggestionsFocusInput = true"
-          class="w-full"
-          ref="ignoreClickOutside"
+          :handleQuery="handleQuery"
+          ref="editable"
+          data-testid="azion-query-language-input"
         />
         <div class="h-auto w-full md:max-w-fit">
           <PrimeButton
@@ -23,15 +22,17 @@
             size="small"
             class="h-auto w-full md:max-w-fit"
             @click="executeQuery"
-            :disabled="handleErrosQuery.length"
+            :disabled="handleErrorsQuery.length"
+            data-testid="azion-query-language-search"
           />
         </div>
       </div>
       <div class="flex flex-col mt-2 gap-1">
         <small
-          v-for="(error, index) in handleErrosQuery"
+          v-for="(error, index) in handleErrorsQuery"
           :key="index"
           class="p-error text-xs font-normal leading-tight"
+          data-testid="azion-query-language-errors"
         >
           {{ error }}
         </small>
@@ -42,13 +43,16 @@
       :options="filteredSuggestions"
       ref="listboxRef"
       optionLabel="label"
-      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-2xl"
+      class="w-full md:w-14rem max-h-60 overflow-y-auto absolute z-10 max-w-xs py-2"
       @update:modelValue="selectSuggestion"
       v-if="filteredSuggestions.length && showSuggestionsFocusInput"
+      data-testid="azion-query-language-suggestions"
+      :pt="{ list: { 'data-testid': 'azion-query-language-suggestions-list' } }"
     >
       <template #option="slotProps">
         <div
-          class="w-full rounded-md"
+          class="w-full rounded-md font-mono"
+          :data-testid="`azion-query-language-list-item${slotProps.index}`"
           :class="[
             'p-2 cursor-pointer',
             { 'bg-orange-base text-white': slotProps.index === highlightedIndex }
@@ -57,20 +61,14 @@
           {{ slotProps.option.label }}
         </div>
       </template>
-      <template
-        #loader
-        v-if="loading"
-      >
-        loading....
-      </template>
     </Listbox>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, nextTick } from 'vue'
+  import { ref, computed, onMounted, nextTick, watch } from 'vue'
+  import ContentEditable from './content-editable.vue'
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
@@ -79,15 +77,17 @@
 
   const AzionQueryLanguage = new Aql()
 
-  const queryText = ref('')
+  const query = ref('')
   const currentStep = ref('field')
+  const selectedFieldName = ref('')
   const highlightedIndex = ref(0)
   const listboxRef = ref(null)
   const domains = ref({})
-  const loading = ref(false)
 
   const showSuggestionsFocusInput = ref(false)
   const ignoreClickOutside = ref('ignoreClickOutside')
+
+  const editable = ref(null)
 
   defineOptions({ name: 'azion-query-language' })
 
@@ -107,6 +107,7 @@
   })
 
   onMounted(async () => {
+    if (props.fieldsInFilter.length) handleInitialQuery()
     await loaderDomainWorkloads()
   })
 
@@ -147,56 +148,22 @@
     )
   })
 
-  const currentFieldToken = computed(() => {
-    const parts = queryText.value.split(/\s+and\s+/i)
-    return parts.pop().trim().replace(/["']/g, '')
-  })
-
   const filteredSuggestions = computed(() => {
-    if (currentStep.value === 'field') {
-      const searchTerm = currentFieldToken.value.toLowerCase()
+    const suggestions = suggestionsData.value
+    const field = selectedFieldName.value
 
-      if (!searchTerm) {
-        return suggestionsData.value
-      } else {
-        return suggestionsData.value.filter((item) =>
-          item.label.toLowerCase().startsWith(searchTerm)
-        )
-      }
-    } else if (currentStep.value === 'operator') {
-      const selectedField = suggestionsData.value.find(
-        (item) => item.value.label.toLowerCase() === selectedFieldName.value.toLowerCase()
-      )
-
-      if (!selectedField) return []
-
-      const fieldRegex = new RegExp(
-        `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
-        'i'
-      )
-      const operatorMatch = queryText.value.match(fieldRegex)
-      const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
-
-      return selectedField.value.operator
-        .filter((op) => {
-          if (op.value.format.toLowerCase() === 'in') return true
-          if (operatorAlreadyTyped && op.value.format.toLowerCase() === operatorAlreadyTyped) {
-            return false
-          }
-          return true
-        })
-        .map((op) => ({
-          label: op.value.format
-        }))
-    } else if (currentStep.value === 'value') {
-      if (selectedFieldName.value === 'domain') {
-        return domains.value
-      }
-      return []
-    } else if (currentStep.value === 'logicOperator') {
-      return [{ label: 'AND' }]
+    switch (currentStep.value) {
+      case 'field':
+        return AzionQueryLanguage.getFieldSuggestions(query.value, suggestions)
+      case 'operator':
+        return AzionQueryLanguage.getOperatorSuggestions(query.value, suggestions, field)
+      case 'value':
+        return AzionQueryLanguage.getValueSuggestions(domains.value, field)
+      case 'logicOperator':
+        return [{ label: 'AND' }]
+      default:
+        return []
     }
-    return []
   })
 
   const loaderDomainWorkloads = async () => {
@@ -213,11 +180,9 @@
     }
   }
 
-  const selectedFieldName = ref('')
-
-  const handleInput = () => {
+  const handleQuery = () => {
     const handleInputMaching = AzionQueryLanguage.handleInputMatching(
-      queryText.value,
+      query.value,
       suggestionsData.value
     )
     changeCurrentStep(handleInputMaching.operator)
@@ -227,11 +192,11 @@
   const selectSuggestion = (suggestion) => {
     const data = AzionQueryLanguage.selectSuggestion(
       suggestion,
-      queryText.value,
+      query.value,
       currentStep.value,
       selectedFieldName.value
     )
-    queryText.value = data?.query
+    query.value = data?.query
     selectedFieldName.value = data?.label
     changeCurrentStep(data?.nextStep)
     highlightedIndex.value = 0
@@ -266,14 +231,17 @@
   const confirmSelection = () => {
     const suggestion = filteredSuggestions.value[highlightedIndex.value]
     if (suggestion) {
+      const restoreCursorInLastOffset = true
+
       selectSuggestion(suggestion)
+      editable.value.restoreCursorPosition(restoreCursorInLastOffset)
     } else {
       executeQuery()
     }
   }
 
   const executeQuery = () => {
-    const filter = AzionQueryLanguage.parse(queryText.value, suggestionsData.value, domains.value)
+    const filter = AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
   }
 
@@ -281,14 +249,29 @@
     currentStep.value = step
   }
 
-  const onSelectSuggestionWithTab = () => {
+  const onSelectSuggestionWithTab = (event) => {
     if (filteredSuggestions.value.length === 1) {
+      const restoreCursorInLastOffset = true
+      event.preventDefault()
       selectSuggestion(filteredSuggestions.value[0])
+      editable.value.restoreCursorPosition(restoreCursorInLastOffset)
     }
   }
 
-  const handleErrosQuery = computed(() =>
-    AzionQueryLanguage.queryValidator(queryText.value, suggestionsData.value)
+  const handleErrorsQuery = computed(() =>
+    AzionQueryLanguage.queryValidator(query.value, suggestionsData.value)
+  )
+
+  const handleInitialQuery = () => {
+    query.value = AzionQueryLanguage.handleInicialQuery(props.filterAdvanced, props.fieldsInFilter)
+  }
+
+  watch(
+    () => props.fieldsInFilter,
+    () => {
+      handleInitialQuery()
+    },
+    { deep: true }
   )
 
   onClickOutside(ignoreClickOutside, () => (showSuggestionsFocusInput.value = false))

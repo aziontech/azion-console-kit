@@ -1,7 +1,7 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
   import SelectButton from 'primevue/selectbutton'
@@ -28,10 +28,6 @@
       type: String,
       required: true
     }
-  })
-
-  onMounted(() => {
-    filter.value.isUserUsingGraphqlQuery = false
   })
 
   const filterMode = ref('Wizard')
@@ -102,6 +98,7 @@
       :options="options"
       aria-labelledby="basic"
       class="w-fit"
+      data-testid="real-time-events-filter-options"
     />
     <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-baseline">
       <AdvancedFilter

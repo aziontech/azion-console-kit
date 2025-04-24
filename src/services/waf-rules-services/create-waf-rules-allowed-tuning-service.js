@@ -28,7 +28,6 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
   function checkAndReturnDefault(zone, hasMatchValue) {
     const defaultZone = 'conditional_request_header'
     const ZONES = hasMatchValue ? MAP_MATCH_ZONES_CONDITIONAL : MAP_MATCH_ZONES
-
     return ZONES[zone] || defaultZone
   }
 
@@ -40,34 +39,37 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
       .trim()
   }
 
-  const requestsAllowedRules = attackEvents.map(async (attack) => {
-    const hasMatchValue = !!attack.matchValue
+  const requestsAllowedRules = attackEvents.flatMap((attack) => {
+    return attack?.top10Paths.map(({ path }) => {
+      const hasMatchValue = !!attack.matchValue
+      const REQUEST_BODY_EXCEPTION_RULE_ID = 11
+      let matchZones = {
+        zone:
+          attack.ruleId === REQUEST_BODY_EXCEPTION_RULE_ID
+            ? 'request_body'
+            : checkAndReturnDefault(attack.matchZone, hasMatchValue),
+        matches_on: attack.matchesOn
+      }
+      if (hasMatchValue) {
+        const isCookieZone = attack.matchZone === 'cookie'
+        const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
 
-    let matchZones = {
-      zone: checkAndReturnDefault(attack.matchZone, hasMatchValue),
-      matches_on: attack.matchesOn
-    }
+        matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
+      }
 
-    if (hasMatchValue) {
-      const isCookieZone = attack.matchZone === 'cookie'
-      const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
+      const payload = {
+        rule_id: attack.ruleId,
+        match_zones: [matchZones],
+        path,
+        name: removeEmptyLinesAndSpaces(name)
+      }
 
-      matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
-    }
-
-    const payload = {
-      rule_id: attack.ruleId,
-      match_zones: [matchZones],
-      name: removeEmptyLinesAndSpaces(name)
-    }
-
-    const httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
-      method: 'POST',
-      body: payload
+      return AxiosHttpClientAdapter.request({
+        url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
+        method: 'POST',
+        body: payload
+      }).then(parseHttpResponse)
     })
-
-    return parseHttpResponse(httpResponse)
   })
 
   return Promise.allSettled(requestsAllowedRules)

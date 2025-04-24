@@ -31,7 +31,11 @@
           :virtualScrollerOptions="{ itemSize: 38 }"
           :pt="{
             panel: { class: 'surface-section shadow-2 border-none' },
-            item: { class: 'hover:surface-hover' },
+            item: {
+              class: 'hover:surface-hover',
+              'data-testid': 'waf-tuning-list__domains-field-item'
+            },
+            closeButton: { 'data-testid': 'waf-tuning-list__domains-field-close-button' },
             wrapper: { class: 'w-full' },
             list: { class: 'p-0 list-none' },
             filterInput: { class: 'surface-ground' }

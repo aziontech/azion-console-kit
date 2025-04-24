@@ -1,0 +1,10 @@
+{
+  "statusCode": 200,
+  "body": {
+    "httpEvents": [{
+      "serverAddr": "186.195.65.65",
+      "serverPort": "443",
+      "wafEvheaders": "token copiado com sucesso."
+    }]
+  }
+}

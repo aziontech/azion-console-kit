@@ -1,11 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePaymentBaseUrl } from './make-payment-base-url'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
-import { formatDateToUS } from '@/helpers'
 import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
-import { formatDateToMonthYear } from '@/helpers/convert-date'
+import { formatDateToMonthYear, formatDateToUS } from '@/helpers/convert-date'
 
 const PAGE_SIZE = 200
 const ACCOUNTING_LIST_LIMIT = 12
@@ -29,11 +28,29 @@ const STATUS_AS_TAG = {
 
 export const listPaymentHistoryService = async () => {
   const { accountIsNotRegular } = useAccountStore()
+  const ACCOUNT_IS_REGULAR = !accountIsNotRegular
   let httpResponse = accountIsNotRegular
     ? await listPaymentHistoryForNotRegularAccounts()
     : await listPaymentHistoryForRegularAccounts()
 
+  if (ACCOUNT_IS_REGULAR) {
+    httpResponse.body = removeCurrentPayment(httpResponse)
+  }
+
   return parseHttpResponse(httpResponse)
+}
+
+const removeCurrentPayment = (payments) => {
+  if (!payments.body.length) return payments.body
+
+  const currentMonth = new Date().toISOString().slice(0, 7)
+
+  return payments.body.filter((payment) => {
+    const [month, , year] = payment.paymentDate.split('/')
+    const formattedDate = `${year}-${month.padStart(2, '0')}`
+
+    return formattedDate !== currentMonth
+  })
 }
 
 const listPaymentHistoryForNotRegularAccounts = async () => {
@@ -106,11 +123,13 @@ const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
 
 const adaptPaymentHistoryForRegularAccounts = (httpResponse) => {
   const parseBilling = httpResponse.body.data.accountingDetail?.map((card) => {
+    const disabledOpenInvoice = true
+
     return {
       invoiceNumber: {
         content: card.billId
       },
-      disabled: !card.billId,
+      disabled: disabledOpenInvoice,
       invoiceUrl: getLinkDownloadInvoice(formatDateToMonthYear(card.periodTo)),
       paymentDate: formatDateToUS(card.periodTo)
     }

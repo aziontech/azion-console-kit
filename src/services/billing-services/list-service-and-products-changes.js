@@ -1,6 +1,8 @@
 import { formatCurrencyString, formatUnitValue } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeBillingBaseUrl } from './make-billing-base-url'
+const BOT_MANAGER_SLUG = 'bot_manager'
+const EDGE_STORAGE_SLUG = 'edge_storage'
 
 export const listServiceAndProductsChangesService = async (billID) => {
   const BILL_DETAIL_QUERY = `
@@ -227,8 +229,12 @@ const adapt = ({ body, statusCode }) => {
     productMetricsRegionAccounted = []
   } = body.data
 
-  if (!products.length) {
-    return { body: products, statusCode }
+  const filteredProducts = products.filter(
+    (item) => ![BOT_MANAGER_SLUG, EDGE_STORAGE_SLUG].includes(item.productSlug)
+  )
+
+  if (!filteredProducts.length) {
+    return { body: filteredProducts, statusCode }
   }
 
   const groupedMetrics = groupBy(productMetricsValue, productMetricsAccounted, [
@@ -242,7 +248,7 @@ const adapt = ({ body, statusCode }) => {
     'regionName'
   ])
 
-  const data = mapProducts(products, groupedMetrics, groupedRegionMetrics)
+  const data = mapProducts(filteredProducts, groupedMetrics, groupedRegionMetrics)
 
   return { body: data, statusCode }
 }
