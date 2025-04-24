@@ -29,6 +29,9 @@ export const useAccountStore = defineStore({
     accountData(state) {
       return state.account
     },
+    userFlags(state) {
+      return state.account?.client_flags
+    },
     hasActiveUserId(state) {
       return !!state.account?.id
     },
