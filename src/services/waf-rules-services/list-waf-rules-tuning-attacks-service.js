@@ -64,6 +64,7 @@ const adapt = (httpResponse) => {
           matchesOn: event.matches_on,
           countryCount: event.country_count,
           topPaths: event.top_10_paths.map((path) => `${path.path} (${path.hits} hits)`),
+          top10Paths: event.top_10_paths,
           matchValue: event.match_value
         }
 
