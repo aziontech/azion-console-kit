@@ -3,7 +3,7 @@ import { useAccountStore } from '../stores/account'
 
 export function useFlag(flagName) {
   const accountStore = useAccountStore()
-  const flags = computed(() => accountStore.userFlags || [])
+  const flags = computed(() => accountStore.clientFlags || [])
   return computed(() => {
     if (!flagName) return false
     return flags.value.includes(flagName)
