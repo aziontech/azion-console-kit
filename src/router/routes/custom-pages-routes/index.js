@@ -13,7 +13,7 @@ export const customPagesRoutes = {
       props: {
         listCustomPagesService: CustomPagesServiceV4.listCustomPagesService,
         deleteCustomPagesService: CustomPagesServiceV4.deleteCustomPagesService,
-        documentationService: Helpers.documentationCatalog.dataStream
+        documentationService: Helpers.documentationCatalog.customPages
       },
       meta: {
         breadCrumbs: [
