@@ -16,8 +16,7 @@
       </div>
       <a
         class="p-button p-button-secondary p-button-sm mr-2 pr-3.5"
-        target="_blank"
-        href="https://www.azion.com/en/launch-week/"
+        @click="openLaunchWeek"
         >Register</a
       >
     </div>
@@ -27,5 +26,6 @@
 <script setup>
   import Message from 'primevue/message'
   import LaunchweekLogo from '@/assets/svg/launchweek-logo.vue'
+  import { openLaunchWeek } from '@/helpers/azion-documentation-window-opener'
   defineOptions({ name: 'BannerFullBlock' })
 </script>
