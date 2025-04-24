@@ -606,7 +606,7 @@
     emit('on-before-go-to-edit', item)
     if (props.editInDrawer) {
       props.editInDrawer(item)
-    } else if (props.enableEditClick) {
+    } else if (props.enableEditClick && !item?.disableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
     }
   }
@@ -625,6 +625,10 @@
   }
 
   const reload = async (query = {}) => {
+    if (!savedOrdering.value) {
+      savedOrdering.value = props.defaultOrderingFieldName
+    }
+
     const commonParams = {
       page: 1,
       pageSize: itemsByPage.value,

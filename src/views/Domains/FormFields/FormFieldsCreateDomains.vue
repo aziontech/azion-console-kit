@@ -70,9 +70,14 @@
   const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
   const drawerRef = ref('')
   const drawerEdgeFirewallRef = ref('')
+  const hasEdgeFirewallAccess = ref(true)
 
   const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
   }
 
   const openDrawer = () => {
@@ -83,9 +88,20 @@
     drawerEdgeFirewallRef.value.openCreateDrawer()
   }
 
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
+
   const handleEdgeApplicationCreated = (id) => {
     edgeApplication.value = id
     emit('edgeApplicationCreated')
+  }
+
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await props.listEdgeApplicationsService({
+      ...queryParams,
+      isDropdown: true
+    })
   }
 
   const handleEdgeFirewallCreated = (id) => {
@@ -203,7 +219,7 @@
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :service="listEdgeApplicationsService"
+          :service="listEdgeApplicationsDecorator"
           :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
@@ -238,8 +254,11 @@
           enableClearOption
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
+          @onClear="handleEdgeFirewallClear"
           :service="listEdgeFirewallService"
           :loadService="loadEdgeFirewallService"
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"

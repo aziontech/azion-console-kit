@@ -20,7 +20,6 @@ export const importGithubRoutes = {
         listIntegrationsService: VersionControlSystemService.listIntegrationsService,
         listRepositoriesService: VersionControlSystemService.listRepositoriesService,
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
-        getModesByPresetService: VulcanService.getModesByPresetService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
         createVariablesService: VariablesService.createVariablesService,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,

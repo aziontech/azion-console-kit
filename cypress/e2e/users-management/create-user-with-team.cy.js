@@ -50,11 +50,4 @@ describe('Users Management spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.usersManagement.listRow('status')).should('have.text', 'Inactive')
     cy.get(selectors.usersManagement.listRow('owner')).should('have.text', 'No')
   })
-
-  afterEach(() => {
-    // Delete the user
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('User successfully deleted')
-    })
-  })
 })

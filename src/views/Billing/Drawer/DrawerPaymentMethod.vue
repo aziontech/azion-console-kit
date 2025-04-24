@@ -39,13 +39,13 @@
   }
 
   const showPaymentMethod = () => {
-    if (route.query.paymentSession) {
+    if (route.query.paymentSession || route.query.payment) {
       openDrawer()
       router.push({ query: {} })
     }
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     showPaymentMethod()
   })
 

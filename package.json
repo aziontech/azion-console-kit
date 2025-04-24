@@ -1,6 +1,6 @@
 {
   "name": "azion-console-kit",
-  "version": "1.31.5",
+  "version": "1.37.0",
   "private": false,
   "type": "module",
   "repository": {
@@ -40,7 +40,8 @@
     "@vueuse/core": "^10.7.0",
     "analytics": "^0.8.11",
     "axios": "^1.7.4",
-    "azion-theme": "^1.8.0",
+    "azion": "^1.15.0",
+    "azion-theme": "^1.10.1",
     "c3": "^0.7.20",
     "deep-chat": "^1.4.11",
     "find-cypress-specs": "^1.44.11",
@@ -58,7 +59,7 @@
     "qrcode.vue": "^3.4.1",
     "recaptcha-v3": "^1.10.0",
     "vee-validate": "^4.11.1",
-    "vue": "^3.3.4",
+    "vue": "3.5.10",
     "vue-router": "^4.2.4",
     "yup": "^1.2.0"
   },
@@ -78,7 +79,8 @@
     "@vue/test-utils": "^2.4.1",
     "autoprefixer": "^10.4.14",
     "caniuse-lite": "^1.0.30001584",
-    "cypress": "13.9.0",
+    "cypress": "13.14.0",
+    "cypress-plugin-tab": "^1.0.5",
     "cypress-real-events": "^1.13.0",
     "eslint": "^8.45.0",
     "eslint-plugin-cypress": "^2.13.3",

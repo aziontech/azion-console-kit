@@ -18,12 +18,15 @@ const adapt = (payload) => {
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
     cname_access_only: payload.cnameAccessOnly,
     edge_application_id: payload.edgeApplication,
-    edge_firewall_id: payload.edgeFirewall,
     is_mtls_enabled: payload.mtlsIsEnabled,
     is_active: payload.active,
     mtls_verification: payload.mtlsVerification,
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate,
     environment: payload.environment
+  }
+
+  if (payload.edgeFirewall) {
+    dataRequest.edge_firewall_id = payload.edgeFirewall
   }
 
   if (payload.edgeCertificate !== 0) {

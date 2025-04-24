@@ -36,7 +36,7 @@ describe('RealTimeMetricsModule', () => {
           }
         ],
         RESAMPLING_INTERVALS: {
-          THREE_DAYS: 259200000,
+          TWO_AND_A_HALF_DAYS: 216000000,
           SIXTY_DAYS: 5184000000,
           INTERVAL_TO_BE_ADDED: {
             minute: 60000,

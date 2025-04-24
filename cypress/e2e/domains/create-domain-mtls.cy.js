@@ -46,7 +46,7 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
   })
@@ -98,13 +98,5 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

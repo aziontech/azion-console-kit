@@ -26,7 +26,6 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.domains.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
 
   cy.verifyToast('success', 'Your Edge Firewall has been created')
-
 }
 
 const createDigitalCertificateCase = () => {
@@ -45,7 +44,9 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as('getDigitalCertificatesApi')
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+    'getDigitalCertificatesApi'
+  )
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -67,9 +68,18 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
-    cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*').as('searchDigitalCertificatesApi')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+    ).as('getEdgeFirewallList')
+    cy.intercept(
+      'GET',
+      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+    ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
@@ -111,13 +121,5 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'Succesfully created!',
       'The domain is now available in the Domain management section.'
     )
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

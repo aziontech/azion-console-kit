@@ -51,8 +51,14 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.get(selectors.edgeFirewall.ruleDescriptionInput).type('My Rule Description')
 
     // Act - Set Criteria
-    cy.intercept('GET', '/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search=').as('networkList')
-    cy.intercept('GET', `/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search=${networkListName}`).as('networkListSearch')
+    cy.intercept(
+      'GET',
+      '/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('networkList')
+    cy.intercept(
+      'GET',
+      `/api/v4/workspace/network_lists?ordering=name&page=1&page_size=100&fields=&search=${networkListName}`
+    ).as('networkListSearch')
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdown).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaVariableDropdownNetworkLists).click()
     cy.get(selectors.edgeFirewall.ruleCriteriaOperatorDropdown).click()

@@ -4,6 +4,7 @@ import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
+import * as WorkloadService from '@/services/workloads-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -72,7 +73,8 @@ export const domainsRoutes = {
         clipboardWrite: Helpers.clipboardWrite,
         listDigitalCertificatesService:
           DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService,
+        checkWorkloadLockedService: WorkloadService.checkWorkloadLockedService
       },
       meta: {
         breadCrumbs: [

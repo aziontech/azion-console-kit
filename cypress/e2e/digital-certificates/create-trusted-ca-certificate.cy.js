@@ -31,14 +31,4 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     )
     cy.get(selectors.digitalCertificates.trustedCATextArea).should('have.text', '')
   })
-
-  afterEach(() => {
-    // Delete the digital certificate
-    cy.deleteEntityFromList({
-      entityName: digitalCertificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
-  })
 })

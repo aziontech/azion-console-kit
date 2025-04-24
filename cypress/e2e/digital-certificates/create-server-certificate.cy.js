@@ -27,14 +27,4 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast('success', 'Your digital certificate has been created!')
     cy.get(selectors.form.editPageTitle).should('have.text', 'Edit Digital Certificate')
   })
-
-  afterEach(() => {
-    // Delete the digital certificate
-    cy.deleteEntityFromList({
-      entityName: digitalCertificateName,
-      productName: 'Digital Certificates'
-    }).then(() => {
-      cy.verifyToast('Digital certificate successfully deleted!')
-    })
-  })
 })

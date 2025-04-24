@@ -1,10 +1,11 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
-import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
+import * as Errors from '@/services/axios/errors'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeDNS = async (filter) => {
   const payload = adapt(filter)
@@ -15,78 +16,68 @@ export const listEdgeDNS = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return adaptResponse(response)
-}
-
-const levelMap = {
-  ERROR: {
-    content: 'Error',
-    severity: 'danger',
-    icon: 'pi pi-times-circle'
-  },
-  WARN: {
-    content: 'Warning',
-    severity: 'warning',
-    icon: 'pi pi-exclamation-triangle'
-  },
-  INFO: {
-    content: 'Info',
-    severity: 'info',
-    icon: 'pi pi-info-circle'
-  },
-  DEBUG: {
-    content: 'Debug',
-    severity: 'success',
-    icon: 'pi pi-check-circle'
-  },
-  TRACE: {
-    content: 'Trace',
-    severity: 'info',
-    icon: 'pi pi-code'
-  }
-}
-
-const getLevelDNS = (level) => {
-  let words = level.trim().split(/\s+/)
-  let firstWord = words[0]
-
-  return levelMap[firstWord.toUpperCase()]
+  return parseHttpResponse(response)
 }
 
 const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
     limit: 10000,
-    fields: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'ts', 'source', 'uuid'],
-    orderBy: 'ts_ASC'
+    fields: [
+      'level',
+      'zoneId',
+      'qtype',
+      'resolutionType',
+      'solutionId',
+      'ts',
+      'uuid',
+      'statusCode',
+      'version'
+    ],
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const { body } = response
-  const totalRecords = body.data.idnsQueriesEvents?.length
-
-  const data = body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
+  const data = response.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
-    level: getLevelDNS(edgeDnsQueriesEvents.level),
-    zoneId: edgeDnsQueriesEvents.zoneId,
-    qtype: edgeDnsQueriesEvents.qtype,
-    resolutionType: edgeDnsQueriesEvents.resolutionType,
-    source: edgeDnsQueriesEvents.source,
-    solutionId: edgeDnsQueriesEvents.solutionId,
+    summary: buildSummary(edgeDnsQueriesEvents),
     ts: edgeDnsQueriesEvents.ts,
-    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
+    tsFormat: getCurrentTimezone(edgeDnsQueriesEvents.ts),
     uuid: edgeDnsQueriesEvents.uuid
   }))
 
   return {
-    data,
-    recordsFound: getRecordsFound(totalRecords)
+    data
+  }
+}
+
+const parseHttpResponse = (response) => {
+  const { body, statusCode } = response
+
+  switch (statusCode) {
+    case 200:
+      return adaptResponse(body)
+    case 400:
+      const apiError = body.detail
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      const forbiddenError = body.detail
+      throw new Error(forbiddenError).message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
   }
 }

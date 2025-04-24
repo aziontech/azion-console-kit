@@ -7,12 +7,15 @@
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
+  import InlineMessage from 'primevue/inlinemessage'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, ref, reactive, provide, watch, inject } from 'vue'
+  import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import { INFORMATION_TEXTS } from '@/helpers'
+
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -49,6 +52,7 @@
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
+  const isLocked = ref(false)
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
@@ -59,6 +63,12 @@
         productName: 'Error Responses'
       })
       .track()
+  }
+
+  const checkIsLocked = async () => {
+    isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
+      id: edgeApplicationId.value
+    })
   }
 
   const handleLoadEdgeApplication = async () => {
@@ -157,6 +167,19 @@
     tabHasUpdate,
     formHasUpdated,
     visibleOnSaved
+  })
+
+  const tagProps = {
+    value: 'Locked',
+    severity: 'warning',
+    tooltip: INFORMATION_TEXTS.LOCKED_MESSAGE_TOOLTIP
+  }
+
+  const tagLocked = computed(() => {
+    if (isLocked.value) {
+      return tagProps
+    }
+    return null
   })
 
   watch(activeTab, (newValue, oldValue) => {
@@ -265,6 +288,10 @@
   })
 
   renderTabByCurrentRouter()
+
+  onMounted(() => {
+    checkIsLocked()
+  })
 </script>
 
 <template>
@@ -272,6 +299,7 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="tabTitle"
+        :tag="tagLocked"
         data-testid="edge-application-details-heading"
       />
     </template>
@@ -296,6 +324,14 @@
           :key="index"
           :header="tab.header"
         >
+          <InlineMessage
+            class="mt-4 w-full"
+            severity="warn"
+            v-if="isLocked"
+          >
+            <b>Warning</b>
+            {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
+          </InlineMessage>
           <component
             :is="tab.component"
             v-if="tab.show"

@@ -42,6 +42,8 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { useToast } from 'primevue/usetoast'
+  import { INFORMATION_TEXTS } from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -69,13 +71,15 @@
   })
 
   const createDomainPath = 'domains/create?origin=list'
+  const toast = useToast()
   const DOMAINS_API_FIELDS = [
     'id',
     'name',
     'edge_application',
     'active',
     'alternate_domains',
-    'domains'
+    'domains',
+    'product_version'
   ]
 
   const hasContentToList = ref(true)
@@ -93,17 +97,40 @@
       productName: 'Domain'
     })
   }
-  const handleTrackEditEvent = () => {
+
+  const showLockedMessage = () => {
+    const options = {
+      closable: true,
+      severity: 'warn',
+      summary: 'Warning',
+      detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+    }
+
+    toast.add(options)
+  }
+
+  const handleTrackEditEvent = (domain) => {
     tracker.product.clickToEdit({
       productName: 'Domain'
     })
+    if (domain.isLocked) {
+      showLockedMessage()
+    }
   }
 
   const getColumns = computed(() => {
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        filterPath: 'name.text',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-tag'
+          })
+        }
       },
       {
         field: 'domainName',

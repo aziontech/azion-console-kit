@@ -20,6 +20,10 @@
       type: Array,
       required: true
     },
+    hashUpdatable: {
+      type: Boolean,
+      default: true
+    },
     disabled: {
       type: Boolean
     },
@@ -142,14 +146,16 @@
   }
 
   const updateHash = (filter, external) => {
-    const { params } = route
-    const query = {
-      filters: encodeFilter({
-        external,
-        filter
-      })
+    if (props.hashUpdatable) {
+      const { params } = route
+      const query = {
+        filters: encodeFilter({
+          external,
+          filter
+        })
+      }
+      router.push({ params, query })
     }
-    router.push({ params, query })
   }
 
   const setFilter = (value) => {
@@ -235,12 +241,26 @@
     }
   )
 
+  const clearSpecificFilter = (fieldToRemove) => {
+    if (!displayFilter.value.length) return
+
+    displayFilter.value = displayFilter.value.filter((item) => item.valueField !== fieldToRemove)
+
+    const adaptFilter = adapterApply(displayFilter.value)
+    emit('update:filterAdvanced', adaptFilter)
+    updateHash(adaptFilter, props.externalFilter)
+  }
+
   onMounted(() => {
     loadFilter()
   })
 
   defineExpose({
-    clearDisplayFilter
+    displayFilter,
+    clearDisplayFilter,
+    clearSpecificFilter,
+    updateDisplayFilter,
+    searchFilter
   })
 </script>
 <template>

@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const listEdgeFirewallService = async ({
   search = '',
@@ -21,6 +22,9 @@ export const listEdgeFirewallService = async ({
   return parseHttpResponse(httpResponse)
 }
 const adapt = async (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
   const parsedEdgeFirewalls = await Promise.all(
     httpResponse.body.results?.map(async (edgeFirewall) => {
       return {

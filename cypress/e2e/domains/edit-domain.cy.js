@@ -3,7 +3,7 @@ import generateUniqueName from '../../support/utils'
 
 let domainName
 let edgeAppName
-
+let firewallName
 let domainEditedName
 let digitalCertificateName
 
@@ -21,6 +21,20 @@ const createEdgeApplicationCase = () => {
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
+}
+
+const createEdgeFirewallCase = () => {
+  firewallName = generateUniqueName('edgeFirewall')
+  cy.openProduct('Edge Firewall')
+  cy.get(selectors.edgeFirewall.createButton).click()
+  cy.get(selectors.edgeFirewall.nameInput).clear()
+  cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+  cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
+  cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
+  cy.intercept('GET', '/api/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
+  cy.get(selectors.edgeFirewall.saveButton).click()
+  cy.verifyToast('success', 'Your Edge Firewall has been created')
+  cy.wait('@retrieveEdgeFirewall')
 }
 
 const createDigitalCertificate = () => {
@@ -42,7 +56,9 @@ const createDigitalCertificate = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as('getDigitalCertificatesApi')
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+    'getDigitalCertificatesApi'
+  )
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -53,7 +69,10 @@ const createDigitalCertificate = () => {
   cy.verifyToast('success', 'Your digital certificate has been created!')
   cy.wait('@getDigitalCertificatesApi')
 
-  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).should('have.text', digitalCertificateName)
+  cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).should(
+    'have.text',
+    digitalCertificateName
+  )
   cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()
   cy.get(selectors.domains.letsEncryptDropdownOption).click()
 }
@@ -64,17 +83,35 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
   })
 
   it('should edit a domain successfully', () => {
+    createEdgeFirewallCase()
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
 
     // Arrange
+    cy.intercept('GET', '/api/v4/edge_firewall/firewalls*').as('getEdgeFirewalls')
     cy.openProduct('Domains')
-    cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('GET', `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`).as('getEdgeApplicationListFilter')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+    ).as('getEdgeApplicationListFilter')
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
-
+    cy.wait('@getEdgeFirewalls')
     cy.wait('@getEdgeApplicationList')
+
+    cy.get(selectors.domains.edgeFirewallField).click()
+    cy.get(selectors.domains.edgeFirewallDropdownSearch).clear()
+    cy.intercept(
+      'GET',
+      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=${firewallName}`
+    ).as('getCreatedEdgeFirewall')
+    cy.get(selectors.domains.edgeFirewallDropdownSearch).type(firewallName)
+    cy.wait('@getCreatedEdgeFirewall')
+    cy.get(selectors.domains.edgeFirewallOption).click()
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
@@ -102,6 +139,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     // Act
     cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
     cy.get(selectors.domains.fieldTextInput).clear()
+    cy.get(selectors.domains.edgeFirewallClearIcon).click()
     cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
     cy.get(selectors.domains.cnamesField).clear()
     cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
@@ -111,7 +149,11 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.domainUri).should('be.disabled')
     cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
     cy.get(selectors.domains.activeSwitchEditForm).click()
+    cy.intercept('PATCH', '/api/v3/domains/*', (req) => {
+      expect(req.body).to.have.property('edge_firewall_id', null)
+    }).as('editDomain')
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@editDomain')
 
     // Assert
     cy.verifyToast('success', 'Your domain has been edited')
@@ -119,13 +161,5 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
     cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
     cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
-  })
-
-  afterEach(() => {
-    // Cleanup
-    cy.deleteEntityFromList({ entityName: domainName, productName: 'Domains' }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-    cy.deleteEntityFromList({ entityName: edgeAppName, productName: 'Edge Application' })
   })
 })

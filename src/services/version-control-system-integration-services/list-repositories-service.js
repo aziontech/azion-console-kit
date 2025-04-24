@@ -2,11 +2,11 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeVersionControlSystemBaseUrl } from './make-version-control-system-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const listRepositoriesService = async (uuid, { pageSize = 200, ordering = 'name' } = {}) => {
+export const listRepositoriesService = async (id, { pageSize = 200, ordering = 'name' } = {}) => {
   const searchParams = makeSearchParams({ pageSize, ordering })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeVersionControlSystemBaseUrl()}/integrations/${uuid}/repositories?${searchParams.toString()}`,
+    url: `${makeVersionControlSystemBaseUrl()}/integrations/${id}/repositories?${searchParams.toString()}`,
     method: 'GET'
   })
 

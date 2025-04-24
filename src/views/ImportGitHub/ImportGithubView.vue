@@ -38,10 +38,6 @@
       type: Function,
       required: true
     },
-    getModesByPresetService: {
-      type: Function,
-      required: true
-    },
     frameworkDetectorService: {
       type: Function,
       required: true
@@ -191,7 +187,6 @@
             :listRepositoriesService="listRepositoriesService"
             :postCallbackUrlService="postCallbackUrlService"
             :listVulcanPresetsService="listVulcanPresetsService"
-            :getModesByPresetService="getModesByPresetService"
             :frameworkDetectorService="frameworkDetectorService"
           />
         </template>

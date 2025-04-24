@@ -11,6 +11,7 @@
       :pt="props.pt"
       @rowReorder="onRowReorder"
       scrollable
+      :scrollHeight="props.scrollHeight"
       removableSort
       :value="data"
       dataKey="id"
@@ -123,7 +124,7 @@
       <Column
         :frozen="true"
         :alignFrozen="'right'"
-        headerStyle="width: 13rem"
+        :headerStyle="`width: ${frozenSize}`"
         data-testid="data-table-actions-column"
       >
         <template #header>
@@ -325,6 +326,10 @@
     hiddenHeader: {
       type: Boolean
     },
+    frozenSize: {
+      type: String,
+      default: () => '13rem'
+    },
     columns: {
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
@@ -353,6 +358,10 @@
     listService: {
       required: true,
       type: Function
+    },
+    scrollHeight: {
+      type: String,
+      default: () => ''
     },
     enableEditClick: {
       type: Boolean,
@@ -440,6 +449,14 @@
     selectedColumns.value = props.columns
   })
 
+  const formatSummaryToCSV = (summary) => {
+    const summaryValue = summary
+      .map((item) => `${item.key}: ${item.value.toString().replace(/"/g, '""')}`)
+      .join(' | ')
+    const csvString = `"${summaryValue}"`
+
+    return csvString
+  }
   /**
    * @param {import('primevue/datatable').DataTableExportFunctionOptions} rowData
    */
@@ -448,6 +465,10 @@
       return
     }
     const columnMapper = props.csvMapper(rowData)
+    if (rowData.field === 'summary') {
+      const values = [...columnMapper.summary]
+      columnMapper.summary = formatSummaryToCSV(values)
+    }
     return getCsvCellContentFromRowData({ columnMapper, rowData })
   }
 

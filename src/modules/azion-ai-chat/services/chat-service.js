@@ -15,7 +15,8 @@ export async function chatService({ parsedBody, server, signal, onMessage }) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(parsedBody),
-      signal
+      signal,
+      credentials: 'include'
     })
 
     if (!response.ok) throw new Error('Network response was not ok')

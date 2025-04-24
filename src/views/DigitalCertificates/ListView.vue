@@ -71,6 +71,7 @@
     'subject_name',
     'issuer',
     'status',
+    'status_detail',
     'validity',
     'type'
   ]
@@ -140,8 +141,8 @@
         type: 'component',
         component: (columnData) =>
           columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
+            data: { ...columnData.status, tooltipText: columnData.statusDetail },
+            columnAppearance: 'tag-with-tooltip'
           })
       }
     ]

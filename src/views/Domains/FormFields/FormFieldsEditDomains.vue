@@ -76,6 +76,19 @@
     emit('edgeFirewallCreated')
   }
 
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await props.listEdgeApplicationsService({
+      ...queryParams,
+      isDropdown: true
+    })
+  }
+
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
+
+  const hasEdgeFirewallAccess = ref(true)
+
   const mtlsModeRadioOptions = ref([
     {
       title: 'Enforce',
@@ -122,6 +135,10 @@
 
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
   }
 
   const handleEdgeApplicationCreated = (id) => {
@@ -266,7 +283,7 @@
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :service="listEdgeApplicationsService"
+          :service="listEdgeApplicationsDecorator"
           :loadService="loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
@@ -304,6 +321,9 @@
         <FieldDropdownLazyLoader
           label="Edge Firewall"
           enableClearOption
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          @onClear="handleEdgeFirewallClear"
+          v-if="hasEdgeFirewallAccess"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           :service="listEdgeFirewallService"

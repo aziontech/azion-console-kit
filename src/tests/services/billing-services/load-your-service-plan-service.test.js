@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadYourServicePlanService } from '@/services/billing-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import graphQLApi from '@/services/axios/makeGraphQl'
 
 const fixtures = {
   paymentMock: {
@@ -66,14 +65,12 @@ describe('BillingService', () => {
         }
       }`
     }
-    expect(requestSpy).toHaveBeenCalledWith(
-      {
-        url: '/billing',
-        method: 'POST',
-        body: payload
-      },
-      graphQLApi
-    )
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: 'v4/billing/graphql',
+      method: 'POST',
+      baseURL: '/',
+      body: payload
+    })
   })
   it('should return correct credit amount in the disclaimer message', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

@@ -16,7 +16,7 @@ const fixtures = {
     ],
     behaviors: [
       { name: 'run_function', functionId: '789' },
-      { name: 'set_waf_ruleset', mode: 'blocking', waf_id: '101112' },
+      { name: 'set_waf_ruleset', mode: 'blocking', id: '101112' },
       {
         name: 'set_rate_limit',
         type: 'second',

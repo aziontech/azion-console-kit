@@ -12,7 +12,8 @@ const fixtures = {
     subject_name: ['Subject 1', 'Subject 2'],
     type: 'edge_certificate',
     validity: new Date(2023, 10, 10),
-    status: 'active'
+    status: 'active',
+    status_detail: ''
   },
   trustedCertificateMock: {
     id: 3,
@@ -21,7 +22,8 @@ const fixtures = {
     subject_name: ['Subject 1', 'Subject 2'],
     type: 'trusted_ca_certificate',
     validity: new Date(2023, 10, 10),
-    status: 'active'
+    status: 'active',
+    status_detail: ''
   },
   certificateWithMissingData: {
     id: 2,
@@ -29,7 +31,8 @@ const fixtures = {
     subject_name: null,
     type: null,
     validity: null,
-    status: 'pending'
+    status: 'pending',
+    status_detail: 'Pending by error'
   }
 }
 
@@ -88,10 +91,13 @@ describe('DigitalCertificatesServices', () => {
       issuer: fixtures.certificateMock.issuer,
       type: 'TLS Certificate',
       subjectName: 'Subject 1,Subject 2',
-      validity: 'Nov 10, 2023, 12:00 AM',
+      validity: 'November 10, 2023 at 12:00:00 AM',
       status: {
-        content: 'Active',
-        severity: 'success'
+        status: {
+          content: 'Active',
+          severity: 'success'
+        },
+        statusDetail: ''
       }
     })
     expect(parsedDomainMissingValues).toEqual({
@@ -99,8 +105,11 @@ describe('DigitalCertificatesServices', () => {
       issuer: '-',
       name: 'Certificate 2',
       status: {
-        content: 'Pending',
-        severity: 'danger'
+        status: {
+          content: 'Pending',
+          severity: 'danger'
+        },
+        statusDetail: 'Pending by error'
       },
       subjectName: '-',
       type: '-',
@@ -130,7 +139,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           content: 'Active',
           severity: 'success'
@@ -141,8 +150,11 @@ describe('DigitalCertificatesServices', () => {
         issuer: '-',
         name: 'Certificate 2',
         status: {
-          content: 'Inactive',
-          severity: 'danger'
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
         },
         subjectName: '-',
         type: '-',
@@ -154,7 +166,7 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.trustedCertificate.issuer,
         type: 'Trusted CA Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
           content: 'Active',
           severity: 'success'
@@ -184,10 +196,13 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
-          content: 'Active',
-          severity: 'success'
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
         }
       }
     ])
@@ -214,10 +229,13 @@ describe('DigitalCertificatesServices', () => {
         issuer: fixtures.certificateMock.issuer,
         type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
-        validity: 'Nov 10, 2023, 12:00 AM',
+        validity: 'November 10, 2023 at 12:00:00 AM',
         status: {
-          content: 'Active',
-          severity: 'success'
+          status: {
+            content: 'Active',
+            severity: 'success'
+          },
+          statusDetail: ''
         }
       }
     ])

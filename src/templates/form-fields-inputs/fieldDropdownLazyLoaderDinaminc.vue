@@ -55,6 +55,7 @@
             v-model="search"
             placeholder="Search"
             class="w-full rounded-r-none"
+            :disabled="!hasServiceAccess"
             ref="focusSearch"
             :data-testid="customTestId.search"
           />
@@ -172,6 +173,7 @@
   const SEARCH_MAX_WAIT = 1000
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
+  const hasServiceAccess = ref(true)
 
   const name = toRef(props, 'name')
   const slots = useSlots()
@@ -183,7 +185,7 @@
   const focusSearch = ref(null)
   const disableEmitInit = ref(props.disableEmitFirstRender)
 
-  onMounted(async () => {
+  onMounted(() => {
     loadSelectedValue(props.value)
   })
 
@@ -311,6 +313,13 @@
         return
       }
       emitChange()
+    } catch {
+      const newOption = {
+        [props.optionLabel]: id,
+        [props.optionValue]: id
+      }
+      data.value = [newOption, ...data.value]
+      hasServiceAccess.value = false
     } finally {
       loading.value = false
     }
@@ -359,7 +368,15 @@
   watch(
     () => props.initalData,
     (newValue) => {
-      let results = newValue.body?.map((item) => {
+      if (!newValue?.body) {
+        if (!props.value) {
+          data.value = []
+          totalCount.value = 0
+        }
+        return
+      }
+
+      let results = newValue.body.map((item) => {
         return {
           [props.optionLabel]: item.name,
           [props.optionValue]: item.id,
@@ -373,9 +390,11 @@
         }
       })
 
-      data.value = results
-      totalCount.value = newValue.count
-    }
+      const selectedItem = data.value?.find((item) => item[props.optionValue] === props.value)
+      data.value = selectedItem ? [selectedItem, ...results] : results || []
+      totalCount.value = (newValue && newValue.count) || 0
+    },
+    { immediate: true }
   )
 
   watchDebounced(

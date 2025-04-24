@@ -26,10 +26,4 @@ describe('Edge Functions spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.functions.languageRow).should('have.text', 'JavaScript')
     cy.get(selectors.functions.initiatorTypeRow).should('have.text', 'edge_application')
   })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Edge Function successfully deleted')
-    })
-  })
 })

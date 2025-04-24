@@ -21,7 +21,14 @@ export async function billingGuard({ to, accountStore }) {
       if (to.name === 'billing-tabs') {
         return true
       }
+
+      if (to.name === 'account-settings') {
+        return true
+      }
     } else if (paymentReviewPending) {
+      if (to.name === 'account-settings') {
+        return true
+      }
       return BILLING_REDIRECT_OPTIONS
     }
   }

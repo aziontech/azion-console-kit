@@ -17,6 +17,7 @@
 import './commands'
 import './utils'
 import '@cypress/code-coverage/support'
+import 'cypress-plugin-tab'
 import registerCypressGrep from '@cypress/grep'
 
 registerCypressGrep()

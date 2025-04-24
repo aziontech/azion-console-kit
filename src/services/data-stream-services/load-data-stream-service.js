@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDataStreamBaseUrl } from './make-data-stream-base-url'
 import { makeDataStreamDomainsBaseUrl } from './make-data-stream-domains-base-url'
+import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadDataStreamService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -13,6 +14,10 @@ export const loadDataStreamService = async ({ id }) => {
 }
 
 const adapt = async (httpResponse) => {
+  if (httpResponse.statusCode !== 200) {
+    throw new Error(extractApiError({ body: httpResponse.body })).message
+  }
+
   const payload = httpResponse.body.results
   const domains = await getDomainsOnDataStream(payload.id)
 
@@ -26,7 +31,7 @@ const adapt = async (httpResponse) => {
     status: payload.active,
     domains,
     endpoint: payload.endpoint.endpoint_type,
-    hasSampling: payload.sampling_percentage !== null,
+    hasSampling: payload.sampling_percentage !== undefined,
     samplingPercentage: payload.sampling_percentage,
     ...getInfoByEndpoint(payload)
   }

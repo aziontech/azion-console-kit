@@ -7,6 +7,9 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import CloneDialog from './Dialog/Clone.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useToast } from 'primevue/usetoast'
+  import { INFORMATION_TEXTS } from '@/helpers'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -28,6 +31,7 @@
   })
 
   const hasContentToList = ref(true)
+  const toast = useToast()
   const actions = [
     {
       type: 'dialog',
@@ -49,6 +53,17 @@
     }
   ]
 
+  const showLockedMessage = () => {
+    const options = {
+      closable: true,
+      severity: 'warn',
+      summary: 'Warning',
+      detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+    }
+
+    toast.add(options)
+  }
+
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
@@ -58,17 +73,29 @@
     })
   }
 
-  const handleTrackEditEvent = () => {
+  const handleTrackEditEvent = (edgeApplication) => {
     tracker.product.clickToEdit({
       productName: 'Edge Application'
     })
+
+    if (edgeApplication.isLocked) {
+      showLockedMessage()
+    }
   }
 
   const getColumns = computed(() => {
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        filterPath: 'name.text',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-tag'
+          })
+        }
       },
       {
         field: 'lastEditor',
@@ -82,7 +109,14 @@
     ]
   })
 
-  const EDGE_APPLICATION_API_FIELDS = []
+  const EDGE_APPLICATION_API_FIELDS = [
+    'id',
+    'name',
+    'last_editor',
+    'last_modified',
+    'active',
+    'product_version'
+  ]
 </script>
 
 <template>

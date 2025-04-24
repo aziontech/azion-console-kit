@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderDinaminc.vue'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
   import FieldDropdownIcon from '@/templates/form-fields-inputs/fieldDropdownIcon.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -21,13 +21,21 @@
       type: Array,
       required: true
     },
-    wafRulesOptions: {
-      type: Array,
+    listWafRulesService: {
+      type: Function,
+      required: true
+    },
+    loadWafRulesService: {
+      type: Function,
       required: true
     },
     enabledModules: {
       type: Object,
       required: true
+    },
+    hasEdgeFunctionsProductAccess: {
+      type: Boolean,
+      default: true
     },
     listNetworkListService: {
       type: Function,
@@ -56,10 +64,14 @@
   const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const networkList = ref([])
-
+  const hasWafAccess = ref(true)
   onMounted(async () => {
-    await listNetworkList()
+    await Promise.all([listNetworkList()])
   })
+
+  const listWafRulesServiceOptions = async (query) => {
+    return await props.listWafRulesService({ ...query, fields: 'name, id' })
+  }
 
   const listNetworkList = async () => {
     networkList.value = await props.listNetworkListService({
@@ -351,6 +363,10 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
+  const notPermission = () => {
+    hasWafAccess.value = false
+  }
+
   // Behaviors - extract to another form fields
   const {
     push: pushBehavior,
@@ -378,14 +394,20 @@
             ? 'Set WAF Rule Set'
             : 'Set WAF Rule Set - requires WAF'
         }`,
-        disabled: wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled
+        disabled:
+          wafBehaviorIsAlreadySelected ||
+          !hasWebApplicationFirewallModuleEnabled ||
+          !hasWafAccess.value
       },
       {
         value: 'run_function',
         label: `${
           hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
         }`,
-        disabled: runFunctionBehaviorIsAlreadySelected || !hasEdgeFunctionsModuleEnabled
+        disabled:
+          runFunctionBehaviorIsAlreadySelected ||
+          !hasEdgeFunctionsModuleEnabled ||
+          !props.hasEdgeFunctionsProductAccess
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
@@ -553,10 +575,8 @@
             />
           </div>
 
-          <div
-            class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row items-end"
-          >
-            <div class="flex flex-col h-fit sm:max-w-lg w-full gap-2">
+          <div class="flex items-top gap-x-2 items-top mt-2 mb-4 flex-col gap-2 sm:flex-row">
+            <div class="flex flex-col h-fit sm:max-w-lg w-full">
               <FieldDropdownIcon
                 :data-testid="`edge-firewall-rules-form__variable[${criteriaInnerRowIndex}]`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
@@ -770,17 +790,18 @@
             </template>
 
             <template v-if="isWafBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
-                :key="`${behaviorItem.key}-waf_id`"
-                :name="`behaviors[${behaviorItemIndex}].waf_id`"
-                :options="wafRulesOptions"
-                :filter="true"
-                placeholder="Select a waf rule"
+                :name="`behaviors[${behaviorItemIndex}].id`"
+                :service="listWafRulesServiceOptions"
+                :loadService="loadWafRulesService"
+                @onAccessDenied="notPermission"
+                placeholder="Select a Waf"
                 optionLabel="name"
                 optionValue="id"
-                v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
-                class="w-full mb-3"
+                class="mb-3"
+                :value="behaviors[behaviorItemIndex].value.id"
+                inputClass="w-full"
               />
               <FieldDropdown
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"

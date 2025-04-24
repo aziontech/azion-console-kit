@@ -13,7 +13,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
-            :disabled="currentInvoice.billId"
+            :disabled="!currentInvoice.billId"
           />
         </div>
         <div class="flex justify-between mt-4">
@@ -346,7 +346,7 @@
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
-      disabled: (item) => !item.invoiceUrl,
+      disabled: (item) => item.disabled,
       commandAction: async (item) => {
         if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
       }

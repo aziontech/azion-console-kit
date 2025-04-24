@@ -220,15 +220,8 @@
     return options
   })
 
-  watch(adaptiveDeliveryAction, (value) => {
-    if (value === 'whitelist' && deviceGroup.value.length === 0) {
-      addDeviceGroup({ id: '' })
-    }
-  })
-
-  watch(l2CachingEnabled, (value) => {
+  const handleL2CachingToggle = (value) => {
     emit('l2-caching-enabled', value)
-
     if (value) {
       cdnCacheSettings.value = 'override'
       isSliceEdgeCachingEnabled.value = true
@@ -245,6 +238,11 @@
     if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {
       cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
     }
+  }
+  watch(adaptiveDeliveryAction, (value) => {
+    if (value === 'whitelist' && deviceGroup.value.length === 0) {
+      addDeviceGroup({ id: '' })
+    }
   })
 
   watch(sliceConfigurationEnabled, (value) => {
@@ -252,6 +250,10 @@
     if (!value) {
       isSliceL2CachingEnabled.value = false
     }
+  })
+
+  watch(browserCacheSettings, (cacheSettings) => {
+    if (cacheSettings === 'no-cache') browserCacheSettingsMaximumTtl.value = 0
   })
 </script>
 
@@ -364,6 +366,7 @@
         <FieldSwitchBlock
           nameField="l2CachingEnabled"
           name="l2CachingEnabled"
+          @onSwitchChange="handleL2CachingToggle"
           auto
           :isCard="false"
           title="Tiered Cache"

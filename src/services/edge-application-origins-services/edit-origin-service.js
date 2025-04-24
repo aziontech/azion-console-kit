@@ -52,9 +52,7 @@ const adapt = (payload) => {
     hmac_authentication: payload.hmacAuthentication,
     hmac_region_name: payload.hmacRegionName,
     hmac_access_key: payload.hmacAccessKey,
-    hmac_secret_key: payload.hmacSecretKey,
-    connection_timeout: payload.connectionTimeout,
-    timeout_between_bytes: payload.timeoutBetweenBytes
+    hmac_secret_key: payload.hmacSecretKey
   }
 
   if (payload.method) {

@@ -48,7 +48,7 @@
     status: yup.boolean(),
     hasSampling: yup.boolean(),
     samplingPercentage: yup.number().when('hasSampling', {
-      is: true && hasAccessToSampling.value,
+      is: (value) => value === true && hasAccessToSampling.value,
       then: (schema) =>
         schema
           .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
@@ -145,7 +145,7 @@
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('API Key is a required field')
+      then: (schema) => schema.required('Encoded API Key is a required field')
     }),
 
     // splunk
@@ -222,8 +222,8 @@
   })
 
   const displaySamplingDialog = ref(false)
-  const formSubmit = (onSubmit, values) => {
-    if (!values.hasSampling) {
+  const formSubmit = (onSubmit) => {
+    if (!hasAccessToSampling.value) {
       onSubmit()
     } else {
       displaySamplingDialog.value = true
@@ -259,6 +259,7 @@
             :loading="loading"
           />
           <SamplingDialog
+            data-testid="data-stream-form__sampling__dialog"
             v-model:visible="displaySamplingDialog"
             @confirm="onSubmit"
             @cancel="displaySamplingDialog = false"

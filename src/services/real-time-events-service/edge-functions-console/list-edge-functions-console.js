@@ -1,11 +1,11 @@
-import convertGQL from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-import { convertValueToDate } from '@/helpers'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import * as Errors from '@/services/axios/errors'
-import { getRecordsFound } from '@/helpers/get-records-found'
+import { buildSummary } from '@/helpers'
+import { getCurrentTimezone } from '@/helpers'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -16,6 +16,7 @@ export const listEdgeFunctionsConsole = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -28,69 +29,27 @@ const adapt = (filter) => {
   const table = {
     dataset: 'cellsConsoleEvents',
     limit: 10000,
-    fields: ['configurationId', 'functionId', 'id', 'level', 'line', 'lineSource', 'source', 'ts'],
-    orderBy: 'ts_ASC'
+    fields: ['configurationId', 'functionId', 'id', 'level', 'lineSource', 'ts', 'line'],
+    orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
-const levelMap = {
-  DEBUG: {
-    content: 'Debug',
-    severity: 'success',
-    icon: 'pi pi-check-circle'
-  },
-  ERROR: {
-    content: 'Error',
-    severity: 'danger',
-    icon: 'pi pi-times-circle'
-  },
-  WARN: {
-    content: 'Warning',
-    severity: 'warning',
-    icon: 'pi pi-exclamation-triangle'
-  },
-  INFO: {
-    content: 'Info',
-    severity: 'info',
-    icon: 'pi pi-info-circle'
-  },
-  LOG: {
-    content: 'Log',
-    severity: 'info',
-    icon: 'pi pi-code'
-  },
-  MDN: {
-    content: 'MDN',
-    severity: 'info',
-    icon: 'pi pi-code'
-  }
-}
-
 const adaptResponse = (body) => {
   const cellsConsoleEventsList = body.data?.cellsConsoleEvents
-  const totalRecords = cellsConsoleEventsList?.length
   const parser = cellsConsoleEventsList?.length
     ? cellsConsoleEventsList.map((cellsConsoleEvents) => ({
+        summary: buildSummary(cellsConsoleEvents),
         configurationId: cellsConsoleEvents.configurationId,
-        functionId: cellsConsoleEvents.functionId,
-        id: generateCurrentTimestamp(),
-        originalId: cellsConsoleEvents.id,
-        level: levelMap[cellsConsoleEvents.level],
         line: cellsConsoleEvents.line,
-        lineSource: {
-          content: cellsConsoleEvents.lineSource,
-          severity: 'info'
-        },
-        source: cellsConsoleEvents.source,
-        tsFormat: convertValueToDate(cellsConsoleEvents.ts),
+        id: generateCurrentTimestamp(),
+        tsFormat: getCurrentTimezone(cellsConsoleEvents.ts),
         ts: cellsConsoleEvents.ts
       }))
     : []
 
   return {
-    data: parser,
-    recordsFound: getRecordsFound(totalRecords)
+    data: parser
   }
 }
 
@@ -103,6 +62,8 @@ const parseHttpResponse = (response) => {
     case 400:
       const apiError = body.detail
       throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
     case 403:
       const forbiddenError = body.detail
       throw new Error(forbiddenError).message

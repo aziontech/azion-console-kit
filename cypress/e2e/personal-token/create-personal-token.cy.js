@@ -29,10 +29,4 @@ describe('Personal Token spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.personalTokens.searchInput).type(`${personalTokenName}{enter}`)
     cy.get(selectors.personalTokens.filteredRecordNameColumn).should('have.text', personalTokenName)
   })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Personal token successfully deleted')
-    })
-  })
 })

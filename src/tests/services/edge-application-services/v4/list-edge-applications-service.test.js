@@ -11,6 +11,7 @@ const localeMock = (locale = 'en') => {
 
 const fixtures = {
   edgeApplicationsMock: {
+    product_version: '1.0',
     id: 1239875,
     active: true,
     last_editor: 'az editor',
@@ -18,6 +19,7 @@ const fixtures = {
     name: 'edge app AZ'
   },
   disabledEdgeApplicationsMock: {
+    product_version: 'custom',
     id: 1239875,
     active: false,
     last_editor: 'az editor 2',
@@ -70,7 +72,12 @@ describe('EdgeApplicationServices', () => {
     expect(result).toEqual([
       {
         id: fixtures.edgeApplicationsMock.id,
-        name: fixtures.edgeApplicationsMock.name,
+        name: {
+          tagProps: {},
+          text: fixtures.edgeApplicationsMock.name
+        },
+        disableEditClick: false,
+        isLocked: false,
         active: fixtures.edgeApplicationsMock.active,
         lastEditor: 'az editor',
         lastModified: new Date('2023-11-10T00:00:00.000Z'),
@@ -78,7 +85,17 @@ describe('EdgeApplicationServices', () => {
       },
       {
         id: fixtures.disabledEdgeApplicationsMock.id,
-        name: fixtures.disabledEdgeApplicationsMock.name,
+        name: {
+          tagProps: {
+            icon: 'pi pi-lock',
+            value: 'Locked',
+            outlined: true,
+            severity: 'warning'
+          },
+          text: fixtures.disabledEdgeApplicationsMock.name
+        },
+        disableEditClick: true,
+        isLocked: true,
         active: fixtures.disabledEdgeApplicationsMock.active,
         lastEditor: 'az editor 2',
         lastModify: 'Sunday, December 10, 2023',

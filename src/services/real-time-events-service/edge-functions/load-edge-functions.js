@@ -1,8 +1,8 @@
-import convertGQL from '@/helpers/convert-gql'
-import { convertValueToDate } from '@/helpers/convert-date'
-
-import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertGQL } from '@/helpers/convert-gql'
+import { getCurrentTimezone } from '@/helpers'
+import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { buildSummary } from '@/helpers'
 
 export const loadEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -10,6 +10,7 @@ export const loadEdgeFunctions = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
+    baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
@@ -30,7 +31,6 @@ const adapt = (filter) => {
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsInstanceIdList',
       'edgeFunctionsSolutionId',
-      'source',
       'virtualhostid',
       'configurationId'
     ],
@@ -50,18 +50,12 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
   const [edgeFunctionsEvents = {}] = body.data.edgeFunctionsEvents
+  edgeFunctionsEvents.edgeFunctionsList = edgeFunctionsEvents.edgeFunctionsList?.split(';')
 
   return {
     id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,
+    data: buildSummary(edgeFunctionsEvents),
     functionLanguage: edgeFunctionsEvents.functionLanguage,
-    ts: convertValueToDate(edgeFunctionsEvents.ts),
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList?.split(';'),
-    edgeFunctionsTime: edgeFunctionsEvents.edgeFunctionsTime,
-    edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
-    edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
-    edgeFunctionsSolutionId: edgeFunctionsEvents.edgeFunctionsSolutionId,
-    source: edgeFunctionsEvents.source,
-    virtualHostId: edgeFunctionsEvents.virtualhostid,
-    configurationId: edgeFunctionsEvents.configurationId
+    ts: getCurrentTimezone(edgeFunctionsEvents.ts)
   }
 }

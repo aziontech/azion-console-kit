@@ -26,9 +26,7 @@ const fixtures = {
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: '',
-    connectionTimeout: 60,
-    timeoutBetweenBytes: 35
+    hmacSecretKey: ''
   },
   originTypeObjectStorage: {
     id: '0000000-00000000-00a0a00s0as0-000000',
@@ -99,9 +97,7 @@ describe('EdgeApplicationOriginsServices', () => {
         hmac_authentication: fixtures.originMock.hmacAuthentication,
         hmac_region_name: fixtures.originMock.hmacRegionName,
         hmac_access_key: fixtures.originMock.hmacAccessKey,
-        hmac_secret_key: fixtures.originMock.hmacSecretKey,
-        connection_timeout: fixtures.originMock.connectionTimeout,
-        timeout_between_bytes: fixtures.originMock.timeoutBetweenBytes
+        hmac_secret_key: fixtures.originMock.hmacSecretKey
       }
     })
   })

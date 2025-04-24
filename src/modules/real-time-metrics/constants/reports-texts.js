@@ -85,11 +85,11 @@ const REPORTS_TEXTS = {
     statusCodes: {
       httpStatusCodes2xx: {
         description:
-          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.'
+          'Indicates successful responses to user requests. Displays Request Status Code 200 and other 2xx status codes.'
       },
       httpStatusCodes3xx: {
         description:
-          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.'
+          'Indicates redirections that have occurred with user requests. Displays Request Status Code 300 and other 3xx status codes.'
       },
       httpStatusCodes4xx: {
         description:
@@ -98,6 +98,15 @@ const REPORTS_TEXTS = {
       httpStatusCodes5xx: {
         description:
           'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code 500, Requests Status Code 502, Requests Status Code 503, and Requests Status Code 5xx.'
+      },
+      statusUpstream: {
+        description: 'Top 10 Status and Upstream Status that had the most requests.'
+      }
+    },
+    requestBreakdown: {
+      iPAddressInformation: {
+        description:
+          'Displays the distribution of requests by region, country, ASN, and individual IP address.'
       }
     },
     waf: {
@@ -125,7 +134,11 @@ const REPORTS_TEXTS = {
     httpMethods: {
       requestsByMethod: {
         description:
-          'Total requests made to your domain divided by the HTTP method used. Displays methods Requests Http Method Get, Requests Http Method Post, Requests Http Method Head, and Requests Http Method Others.'
+          'Sum of requests for each HTTP method during the selected period. Displays the overall request count for each method.'
+      },
+      averageRequestTime: {
+        description:
+          'Average request duration over time. Displays how long requests take on average, in seconds.'
       }
     },
     bandwidthSaving: {

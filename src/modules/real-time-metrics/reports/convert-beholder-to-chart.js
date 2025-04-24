@@ -2,7 +2,6 @@
 
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { formatDataUnit } from '../chart/format-graph'
-import countries from '../helpers/countries-code.json'
 
 import {
   formatYAxisLabels,
@@ -416,6 +415,7 @@ const formatRotatedBarChartData = ({ report, data }) => {
   const values = [dataUnit]
 
   const TOP_IMPACTED_URLS_CHART = '1030427483148242'
+  const WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART = '357842851576414808'
 
   data[dataset].forEach((item) => {
     report.id !== TOP_IMPACTED_URLS_CHART
@@ -423,6 +423,13 @@ const formatRotatedBarChartData = ({ report, data }) => {
       : series.push(item[seriesName])
     values.push(item[aggregation] || item[fieldName])
   })
+
+  if (report.id === WAF_THREAT_REQUEST_BY_FAMILY_ATTACK_CHART) {
+    const newSeries = series.map((value) =>
+      typeof value === 'string' ? value.replaceAll('$', '') : value
+    )
+    return [newSeries, values]
+  }
 
   return [series, values]
 }
@@ -466,37 +473,33 @@ const formatBigNumbers = ({ report, data }) => {
  * @param {Array} data - The data to be formatted.
  */
 const formatListChart = ({ report, data }) => {
-  const dataset = Object.keys(data)
-  const fieldsRequest = Object.keys(data[dataset][0])
-  const fieldNames = report.fields
-  const fieldCountryName = report.groupBy[0]
+  const datasetKey = report.dataset
+  const dataset = data[datasetKey] || []
 
-  const dataValue = data[dataset].map((obj) => {
-    const extractedObj = {}
-    fieldNames.forEach((key) => {
-      extractedObj[key] = formatYAxisLabels(obj[key], report)
-      extractedObj[fieldCountryName] = {
-        code: countries[obj[fieldCountryName]] || '-',
-        country: obj[fieldCountryName]
-      }
-    })
+  if (!dataset.length) return { data: [], columns: [] }
 
-    return { ...obj, ...extractedObj }
-  })
+  const { fields, aggregations } = report
+  const fieldsHandle = [...new Set(fields)]
 
-  const header = fieldsRequest.map((field) => camelToTitle(field))
+  const aggregationKey = aggregations[0]?.aggregation
 
-  const columns = fieldsRequest.map((field, index) => ({
-    field: field,
-    header: header[index]
+  if (!aggregationKey) return { data: [], columns: [] }
+
+  // Formata os valores da agregação para exibição
+  const formattedData = dataset.map((item) => ({
+    ...item,
+    [aggregationKey]: formatDataUnit(item[aggregationKey], report)?.value
   }))
 
-  return [
-    {
-      data: dataValue,
-      columns
-    }
-  ]
+  fieldsHandle.push(aggregationKey)
+
+  // Define as colunas com os nomes corretos
+  const columns = fieldsHandle.map((field) => ({
+    field,
+    header: CHART_RULES.COLUMN_NAMES_FIELD[field] || camelToTitle(field)
+  }))
+
+  return [{ data: formattedData, columns }]
 }
 
 const formatMapChartData = ({ report, data }) => {

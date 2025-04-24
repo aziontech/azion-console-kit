@@ -28,6 +28,12 @@ describe('RealTimeMetricsModule', () => {
           ts: 'timeseries',
           cat: 'category'
         },
+        COLUMN_NAMES_FIELD: {
+          geolocAsn: 'ASN',
+          geolocCountryName: 'Country',
+          geolocRegionName: 'Region',
+          sum: 'Total'
+        },
         LABEL: {
           width: 50,
           rotatedWidth: 80,

@@ -72,7 +72,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
           id: fixtures.edgeFirewallRulesEngineMock.id,
           name: fixtures.edgeFirewallRulesEngineMock.name,
           description: fixtures.edgeFirewallRulesEngineMock.description,
-          lastModified: 'November 10, 2023 at 12:00 AM',
+          lastModified: 'November 10, 2023 at 12:00:00 AM',
           lastEditor: fixtures.edgeFirewallRulesEngineMock.last_editor,
           status: {
             content: 'Active',
@@ -108,7 +108,7 @@ describe('EdgeFirewallRulesEngineServices', () => {
           id: fixtures.edgeFirewallRulesEngineInactiveMock.id,
           name: fixtures.edgeFirewallRulesEngineInactiveMock.name,
           description: fixtures.edgeFirewallRulesEngineInactiveMock.description,
-          lastModified: 'November 11, 2023 at 12:00 AM',
+          lastModified: 'November 11, 2023 at 12:00:00 AM',
           lastEditor: fixtures.edgeFirewallRulesEngineInactiveMock.last_editor,
           status: {
             content: 'Inactive',

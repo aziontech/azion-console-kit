@@ -3,7 +3,8 @@ import generateUniqueName from '../../support/utils'
 
 let fixtures = {}
 
-describe('Edge Services spec', { tags: ['@dev6'] }, () => {
+//TODO: Remove xfail tag when edge service resource api is fixed (ENG-33291)
+describe('Edge Services spec', { tags: ['@dev6', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Edge Services')
@@ -87,11 +88,5 @@ describe('Edge Services spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeServices.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
     cy.get(selectors.edgeServices.listRow('labelActive')).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

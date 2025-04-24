@@ -132,7 +132,7 @@
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('API Key is a required field')
+      then: (schema) => schema.required('Encoded API Key is a required field')
     }),
 
     // splunk

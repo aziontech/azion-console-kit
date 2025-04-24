@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listHttpRequest } from '@/services/real-time-events-service/http-request'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   filter: {
@@ -45,8 +46,8 @@ describe('HttpRequestServices', () => {
       `\t$tsRange_end: DateTime!`,
       `) {`,
       `\t${datasetName} (`,
-      `\t\tlimit: 10000`,
-      `\t\torderBy: [ts_ASC]`,
+      `\t\tlimit: 1000`,
+      `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `\t\t}`,
@@ -54,18 +55,33 @@ describe('HttpRequestServices', () => {
       `\t\tconfigurationId`,
       `\t\thost`,
       `\t\trequestId`,
-      `\t\trequestUri`,
+      `\t\thttpUserAgent`,
       `\t\trequestMethod`,
       `\t\tstatus`,
       `\t\tts`,
+      `\t\tupstreamBytesSent`,
+      `\t\tsslProtocol`,
+      `\t\twafLearning`,
+      `\t\trequestTime`,
+      '\t\tserverProtocol',
+      '\t\tupstreamCacheStatus',
+      '\t\thttpReferer',
+      '\t\tremoteAddress',
+      '\t\twafMatch',
+      '\t\tserverPort',
+      '\t\tsslCipher',
+      '\t\twafEvheaders',
+      '\t\tserverAddr',
+      '\t\tscheme',
       `\t}`,
       `}`
     ].join('\n')
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/events/graphql',
+      url: 'v4/events/graphql',
       method: 'POST',
       signal: undefined,
+      baseURL: '/',
       body: {
         query,
         variables: {
@@ -93,17 +109,73 @@ describe('HttpRequestServices', () => {
       data: [
         {
           id: 'mocked-timestamp',
-          configurationId: fixtures.httpRequest.configurationId,
-          requestMethod: fixtures.httpRequest.requestMethod,
-          requestUri: fixtures.httpRequest.requestUri,
-          status: fixtures.httpRequest.status,
-          host: fixtures.httpRequest.host,
           requestId: fixtures.httpRequest.requestId,
+          summary: [
+            { key: 'configurationId', value: fixtures.httpRequest.configurationId },
+            { key: 'host', value: fixtures.httpRequest.host },
+            { key: 'requestId', value: fixtures.httpRequest.requestId },
+            { key: 'requestMethod', value: fixtures.httpRequest.requestMethod },
+            { key: 'requestUri', value: fixtures.httpRequest.requestUri },
+            { key: 'status', value: fixtures.httpRequest.status }
+          ],
           ts: fixtures.httpRequest.ts,
-          tsFormat: 'February 23, 2024 at 06:07 PM'
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
-      ],
-      recordsFound: '1'
+      ]
     })
   })
+
+  it.each([
+    {
+      apiErrorMock: 'Access denied. You do not have permission to access this resource.',
+      statusCode: 403
+    },
+    {
+      apiErrorMock: 'You have exceeded the limit amount allowed for selected fields (37 fields)',
+      statusCode: 400
+    }
+  ])('Should return an API error for an $statusCode', async ({ statusCode, apiErrorMock }) => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: statusCode,
+      body: {
+        detail: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.variableMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.filter)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

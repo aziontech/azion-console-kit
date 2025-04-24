@@ -1,10 +1,14 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import AdvancedFilter from '@/templates/advanced-filter/advanced-filter-no-hash'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/Blocks/interval-filter-block'
   import { eventsPlaygroundOpener } from '@/helpers'
+  import SelectButton from 'primevue/selectbutton'
+  import AzionQueryLanguage from './azion-query-language.vue'
   import PrimeTag from 'primevue/tag'
+  import { useAccountStore } from '@/stores/account'
+  import { removeAmountOfHours, updatedTimeRange } from './constants/filter-time'
 
   const emit = defineEmits(['update:filterData', 'updatedFilter'])
 
@@ -26,6 +30,11 @@
     }
   })
 
+  const filterMode = ref('Wizard')
+  const options = ref(['Wizard', 'Advanced'])
+  const accountStore = useAccountStore()
+  const userUTC = accountStore.accountUtcOffset
+
   const filter = computed({
     get: () => {
       return props.filterData
@@ -39,8 +48,28 @@
     return props.fieldsInFilter?.length === 0
   })
 
+  const updatedTime = () => {
+    if (filter.value.tsRange.meta.option === 'custom') return
+    const [begin, end] = removeAmountOfHours(filter.value.tsRange.meta.option, userUTC)
+    const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(begin, end, userUTC)
+
+    filter.value.tsRange.tsRangeBegin = tsRangeBegin
+    filter.value.tsRange.tsRangeEnd = tsRangeEnd
+  }
+
   const filterSearch = () => {
+    updatedTime()
+    emitUpdatedFilter()
+  }
+
+  const emitUpdatedFilter = () => {
     emit('updatedFilter')
+  }
+
+  const searchAdvancedFilter = (filters) => {
+    filter.value.fields = filters
+    updatedTime()
+    emitUpdatedFilter()
   }
 
   const totalRecordsFound = computed(() => {
@@ -50,11 +79,11 @@
 
 <template>
   <div class="flex flex-col gap-6 md:gap-4">
-    <div class="flex flex-col gap-2 md:flex-row justify-between items-center">
+    <div class="flex flex-col gap-2 md:flex-row justify-between">
       <div class="w-full">
         <IntervalFilterBlock
           v-model:filterDate="filter.tsRange"
-          @applyTSRange="filterSearch"
+          @applyTSRange="emitUpdatedFilter"
         />
       </div>
       <div class="flex justify-end w-full">
@@ -64,12 +93,26 @@
         />
       </div>
     </div>
-    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row">
+    <SelectButton
+      v-model="filterMode"
+      :options="options"
+      aria-labelledby="basic"
+      class="w-fit"
+      data-testid="real-time-events-filter-options"
+    />
+    <div class="flex w-full flex-column gap-6 md:gap-2 md:flex-row items-baseline">
       <AdvancedFilter
         v-model:filterAdvanced="filter.fields"
         :fieldsInFilter="props.fieldsInFilter"
         :disabled="isFields"
         @applyFilter="filterSearch"
+        v-if="filterMode === 'Wizard'"
+      />
+      <AzionQueryLanguage
+        :fieldsInFilter="props.fieldsInFilter"
+        :searchAdvancedFilter="searchAdvancedFilter"
+        :filterAdvanced="filter.fields"
+        v-else
       />
       <div class="flex gap-2 align-items-center">
         <PrimeButton

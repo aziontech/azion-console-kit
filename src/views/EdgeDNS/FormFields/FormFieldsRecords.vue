@@ -9,17 +9,17 @@
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
-  import { TTL_MAX_VALUE_RECORDS } from '@/utils/constants'
+  import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT, TTL_DEFAULT_ANAME } from '@/utils/constants'
   import LabelBlock from '@/templates/label-block'
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType } = useField('selectedRecordType')
   const { value: ttl } = useField('ttl')
-
+  const { value: weight } = useField('weight')
+  const { value: description } = useField('description')
   const edgeDNSStore = useEdgeDNSStore()
 
   const RECORD_TYPE_WITH_DEFAULT_TTL = 'ANAME'
-  const TTL_DEFAULT_VALUE = 20
 
   const policyList = ref([
     { label: 'Simple', value: 'simple' },
@@ -49,7 +49,7 @@
   })
 
   const setTtlByRecordType = () => {
-    if (!enableTTLField.value) ttl.value = TTL_DEFAULT_VALUE
+    ttl.value = enableTTLField.value ? TTL_DEFAULT : TTL_DEFAULT_ANAME
   }
 
   const RECORD_TYPES_VALUE_FIELD_INFOS = {
@@ -191,8 +191,8 @@
             placeholder="TTL (seconds):"
             :min="0"
             :max="TTL_MAX_VALUE_RECORDS"
+            :value="ttl"
             showButtons
-            :disabled="!enableTTLField"
             :step="1"
             data-testid="edge-dns-records-form__settings__ttl-field"
           />
@@ -249,6 +249,7 @@
             description="Specify the weight for each record. Accepts integers between 0 and 255."
             placeholder="Weight"
             showButtons
+            :value="weight"
             :disabled="!enableTTLField"
             :min="0"
             :max="255"
@@ -265,6 +266,7 @@
         <FieldTextArea
           label="Description"
           required
+          :value="description"
           name="description"
           placeholder="add the description"
           description="Differentiate records with the same Name and Type by adding a description that identifies each one. Accepts up to 45 characters."

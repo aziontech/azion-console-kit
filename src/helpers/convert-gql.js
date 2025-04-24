@@ -40,6 +40,33 @@ function isValidDate(dateString) {
  * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
  * @return {string} The constructed GraphQL query string.
  */
+function buildGraphQLQueryTotalRecords({ filterParameter, dataset, limit, filterQuery, fields }) {
+  const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
+  return [
+    `query (`,
+    filterParameter.join('\n'),
+    `) {`,
+    `\t${dataset} (`,
+    `\t\tlimit: ${limit}`,
+    `\t\taggregate: {`,
+    `count: rows`,
+    `\t\t}`,
+    `\t\tfilter: {`,
+    filter,
+    `\t\t}`,
+    `\t) {`,
+    fields,
+    `\t}`,
+    `}`
+  ].join('\n')
+}
+
+/**
+ * Builds a GraphQL query based on the provided parameters.
+ *
+ * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
+ * @return {string} The constructed GraphQL query string.
+ */
 function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
   const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
   return [
@@ -61,7 +88,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
 
 const formatValueContainOperator = (variable) => {
   for (const key in variable) {
-    if (variable[key] && key.includes('Like')) {
+    if (variable[key] && (key.includes('Like') || key.includes('Ilike'))) {
       variable[key] = `%${variable[key]}%`
     }
   }
@@ -75,13 +102,47 @@ const formatValueContainOperator = (variable) => {
  * @param {Object} table - Object with the table to query
  * @returns {Object} Returns the body of the gql query with variables
  */
+const convertGQLTotalRecords = (filter, table) => {
+  if (!table) throw new Error('Table parameter is required')
+
+  let variables = {}
+  const fields = filter?.fields || []
+  const filterQuery = buildFilterQuery(filter, variables)
+  const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
+  const filterParameter = formatFilterParameter(variables, fields)
+  variables = formatValueContainOperator(variables)
+
+  const queryConfig = {
+    filterParameter,
+    dataset: table.dataset,
+    limit: table.limit,
+    filterQuery: formatFilter(filterQuery, filter?.fields),
+    fields: fieldsFormat
+  }
+
+  const query = buildGraphQLQueryTotalRecords(queryConfig)
+
+  return {
+    query,
+    variables
+  }
+}
+
+/**
+ * Convert filter and table to gql body
+ *
+ * @param {Object} filter - Object with the filter to apply
+ * @param {Object} table - Object with the table to query
+ * @returns {Object} Returns the body of the gql query with variables
+ */
 const convertGQL = (filter, table) => {
   if (!table) throw new Error('Table parameter is required')
 
   let variables = {}
+  const fields = filter?.fields || []
   const filterQuery = buildFilterQuery(filter, variables)
   const fieldsFormat = table.fields.map((field) => `\t\t${field}`).join('\n')
-  const filterParameter = formatFilterParameter(variables)
+  const filterParameter = formatFilterParameter(variables, fields)
   variables = formatValueContainOperator(variables)
 
   const queryConfig = {
@@ -89,7 +150,7 @@ const convertGQL = (filter, table) => {
     dataset: table.dataset,
     limit: table.limit,
     orderBy: table.orderBy,
-    filterQuery,
+    filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat
   }
 
@@ -216,8 +277,50 @@ const buildFilterQueriesWithPrefix = (filter, variables, prefix) => {
  * @param {Object} variables
  * @returns {String} formattedFilterParameter
  */
-const formatFilterParameter = (variables) => {
-  return Object.keys(variables).map((key) => `\t$${key}: ${getGraphQLType(variables[key])}!`)
+const formatFilterParameter = (variables, fields) => {
+  return Object.keys(variables).map((key) => {
+    let type
+    if (key.startsWith('and_')) {
+      const fieldKey = key.replace('and_', '')
+      const field = fields.find(
+        ({ valueField, operator }) => `${valueField}${operator}` === fieldKey
+      )
+      type = field && field?.type ? field.type : getGraphQLType(variables[key])
+    } else {
+      type = getGraphQLType(variables[key])
+    }
+
+    return `\t$${key}: ${type}!`
+  })
 }
 
-export default convertGQL
+const formatFilter = (filters, fields) => {
+  const filtersNotContains = []
+  const appliedFilters = []
+
+  if (!filters?.length && !fields?.length) return []
+
+  for (const filter of filters) {
+    const [key, value] = filter.split(':')
+    const currentFilter = key.trim()
+
+    const matchingField = fields?.find(
+      (field) =>
+        `${field.valueField}${field.operator}`.toLowerCase() === currentFilter.toLowerCase()
+    )
+
+    if (matchingField && matchingField.operator.toLowerCase() === 'ilike') {
+      filtersNotContains.push(`${matchingField.valueField}Like: ${value}`)
+    } else {
+      appliedFilters.push(filter)
+    }
+  }
+
+  if (filtersNotContains.length) {
+    appliedFilters.push(`not: { ${filtersNotContains.join(', ')} }`)
+  }
+
+  return appliedFilters
+}
+
+export { convertGQL, convertGQLTotalRecords }

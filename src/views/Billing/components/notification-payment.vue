@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex flex-col">
-        <h4 class="text-lg font-bold">The Free Trial credit balance is running</h4>
+        <h4 class="text-lg font-bold">{{ title }}</h4>
         <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl text-sm">
           <slot
             name="textNotification"
@@ -53,7 +53,7 @@
   import Avatar from 'primevue/avatar'
   import PrimeButton from 'primevue/button'
   import { useAccountStore } from '@/stores/account'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
 
   defineOptions({
     name: 'notification-payment'
@@ -80,4 +80,11 @@
     .replace(/^Welcome to your trial period\. |<[^>]*>[^<]*<\/[^>]*>./g, '')
     .replace(/\bpayment method\b/i, '')
     .trim()
+
+  const title = computed(() => {
+    if (user.status === 'BLOCKED') {
+      return 'Account blocked due to some issues'
+    }
+    return 'The Free Trial credit balance is running'
+  })
 </script>

@@ -52,11 +52,4 @@ describe('Variables spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
   })
-
-  afterEach(() => {
-    // Delete the variable
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Variable successfully deleted')
-    })
-  })
 })

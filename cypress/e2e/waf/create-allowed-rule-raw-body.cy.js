@@ -62,11 +62,4 @@ describe('WAF spec', { tags: ['@dev7', '@dont_run_prod'] }, () => {
     cy.get(selectors.wafs.breadcrumbToList).click()
     cy.get(selectors.list.searchInput).type(`${wafName}{enter}`)
   })
-
-  afterEach(() => {
-    // Delete the waf
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('WAF rule successfully deleted')
-    })
-  })
 })
