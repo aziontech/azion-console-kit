@@ -16,10 +16,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No MFA users found."
-        description="Click the button below to create your first MFA user."
-        createButtonLabel="MFA"
-        createPagePath="mfa-management/create"
+        title="No MFA Management found."
+        description=""
+        :documentationService="documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -44,6 +43,10 @@
       required: true
     },
     deleteMfaService: {
+      type: Function,
+      required: true
+    },
+    documentationService: {
       type: Function,
       required: true
     }

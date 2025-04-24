@@ -1,5 +1,7 @@
 import { listMfaUsersService, deleteMfaService } from '@/services/mfa-services/v4'
 
+import * as Helpers from '@/helpers'
+
 export const mfaManagementRoutes = {
   path: '/mfa-management',
   name: 'mfa-management',
@@ -10,7 +12,8 @@ export const mfaManagementRoutes = {
       component: () => import('@views/MFAManagement/ListView.vue'),
       props: {
         listMfaUsersService: listMfaUsersService,
-        deleteMfaService: deleteMfaService
+        deleteMfaService: deleteMfaService,
+        documentationService: Helpers.documentationCatalog.mfaManagement
       },
       meta: {
         breadCrumbs: [
