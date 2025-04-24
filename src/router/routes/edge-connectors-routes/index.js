@@ -12,7 +12,7 @@ export const edgeConnectorsRoutes = {
       component: () => import('@views/EdgeConnectors/ListView.vue'),
       props: {
         listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService,
-        documentationService: Helpers.documentationCatalog.variables,
+        documentationService: Helpers.documentationCatalog.edgeConnectors,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
