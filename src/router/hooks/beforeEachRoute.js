@@ -6,7 +6,8 @@ import {
   billingGuard,
   redirectGuard,
   ssoManagementGuard,
-  domainsLimitGuard
+  domainsLimitGuard,
+  flagGuard
 } from '@/router/hooks/guards'
 import { useRouter } from 'vue-router'
 
@@ -22,7 +23,8 @@ export default async function beforeEachRoute(guardDependency) {
     billingGuard,
     redirectGuard,
     ssoManagementGuard,
-    domainsLimitGuard
+    domainsLimitGuard,
+    flagGuard
   ]
 
   for (const executeGuard of guards) {
