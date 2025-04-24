@@ -41,7 +41,7 @@
 
   defineOptions({ name: 'edge-connectors-view' })
 
-  defineProps({
+  const props = defineProps({
     listEdgeConnectorsService: {
       required: true,
       type: Function
@@ -49,11 +49,24 @@
     documentationService: {
       required: true,
       type: Function
+    },
+    deleteEdgeConnectorsService: {
+      required: true,
+      type: Function
     }
   })
 
   const refListTable = ref()
   const hasContentToList = ref(true)
+
+  const actions = [
+    {
+      type: 'delete',
+      title: 'Edge Connectors',
+      icon: 'pi pi-trash',
+      service: props.deleteEdgeConnectorsService
+    }
+  ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event

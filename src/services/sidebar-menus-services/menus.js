@@ -1,3 +1,5 @@
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 function createHomeItem() {
   return {
     label: 'Home',
@@ -149,6 +151,13 @@ function createEdgeLibrariesItems() {
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
+    },
+    {
+      label: 'Edge Connectors',
+      to: '/edge-connectors',
+      icon: 'ai ai-waf-rules',
+      id: 'edge-connectors',
+      visible: hasFlagBlockApiV4()
     }
   ]
 }

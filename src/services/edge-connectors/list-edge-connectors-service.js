@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationV4BaseUrl } from './make-edge-connectors-base-url'
+import { makeEdgeConnectorsV4BaseUrl } from './make-edge-connectors-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 import { getCurrentTimezone } from '@/helpers'
 
@@ -13,7 +13,7 @@ export const listEdgeConnectorsService = async ({
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}?${searchParams.toString()}`,
+    url: `${makeEdgeConnectorsV4BaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
