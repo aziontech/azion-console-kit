@@ -7,6 +7,8 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
+  import PrimeButton from 'primevue/button'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -24,10 +26,25 @@
     documentationService: {
       required: true,
       type: Function
+    },
+    createCustomPagesService: {
+      required: true,
+      type: Function
+    },
+    loadCustomPagesService: {
+      required: true,
+      type: Function
+    },
+    editCustomPagesService: {
+      required: true,
+      type: Function
     }
   })
 
   const hasContentToList = ref(true)
+  const listTableBlockRef = ref('')
+  const drawerRef = ref('')
+
   const actions = [
     {
       type: 'delete',
@@ -58,24 +75,30 @@
     return [
       {
         field: 'name',
-        header: 'Name',
-        filterPath: 'name.text',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
-          })
-        }
+        header: 'Name'
       },
       {
         field: 'lastEditor',
         header: 'Last Editor'
       },
       {
-        field: 'lastModify',
+        field: 'lastModified',
         sortField: 'lastModified',
         header: 'Last Modified'
+      },
+      {
+        field: 'active',
+        header: 'Active',
+        sortField: 'active',
+        filterPath: 'active',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        },
+        disableSort: true
       }
     ]
   })
@@ -88,9 +111,32 @@
     'active',
     'product_version'
   ]
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listTableBlockRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const openCreateDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+  const openEditDrawer = (item) => {
+    drawerRef.value.openEditDrawer(item.id)
+  }
 </script>
 
 <template>
+  <Drawer
+    ref="drawerRef"
+    :createService="createCustomPagesService"
+    :loadService="loadCustomPagesService"
+    :editService="editCustomPagesService"
+    @onSuccess="reloadList"
+  />
+
   <ContentBlock data-testid="custom-pages-content-block">
     <template #heading>
       <PageHeadingBlock
@@ -100,10 +146,10 @@
     </template>
     <template #content>
       <FetchListTableBlock
+        ref="listTableBlockRef"
         v-if="hasContentToList"
         addButtonLabel="Custom Page"
-        createPagePath="/custom-pages/create?origin=list"
-        editPagePath="/custom-pages/edit"
+        :editInDrawer="openEditDrawer"
         :listService="listCustomPagesService"
         :columns="getColumns"
         :apiFields="CUSTOM_PAGES_API_FIELDS"
@@ -114,18 +160,36 @@
         data-testid="custom-pages-list-table-block"
         :actions="actions"
         :defaultOrderingFieldName="'name'"
-      />
+      >
+        <template #addButton>
+          <PrimeButton
+            icon="pi pi-plus"
+            label="Custom Page"
+            @click="openCreateDrawer"
+            data-testid="custom-page-list__create-custom-page__button"
+          />
+        </template>
+      </FetchListTableBlock>
       <EmptyResultsBlock
         v-else
         title="No custom pages have been created"
         description="Click the button below to create your first custom page."
         createButtonLabel="Custom Page"
-        createPagePath="/custom-pages/create?origin=list"
         :documentationService="props.documentationService"
         data-testid="custom-pages-empty-results-block"
       >
         <template #illustration>
           <Illustration />
+        </template>
+        <template #default>
+          <PrimeButton
+            class="max-md:w-full w-fit"
+            severity="secondary"
+            icon="pi pi-plus"
+            label="Custom Page"
+            @click="openCreateDrawer"
+            data-testid="custom-page-list__create-custom-page__button"
+          />
         </template>
       </EmptyResultsBlock>
     </template>
