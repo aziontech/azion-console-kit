@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listDomainsService } from '@/services/domains-services/v4'
+import { listWorkloadsService } from '@/services/workloads-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -32,7 +32,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listDomainsService
+  const sut = listWorkloadsService
 
   return {
     sut

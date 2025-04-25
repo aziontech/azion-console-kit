@@ -63,7 +63,7 @@
     }
     const { query } = route
     router.push({
-      name: 'edit-domain',
+      name: 'edit-workload',
       params,
       query
     })

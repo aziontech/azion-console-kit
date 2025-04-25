@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { editDomainService } from '@/services/domains-services/v4'
+import { editWorkloadService } from '@/services/workloads-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -51,7 +51,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = editDomainService
+  const sut = editWorkloadService
 
   return {
     sut

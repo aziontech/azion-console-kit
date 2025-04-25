@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from '@/services/domains-services/v4/make-domains-base-url'
+import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
@@ -7,9 +7,9 @@ import { extractApiError } from '@/helpers/extract-api-error'
  * @param {string} id - The id of cache settings.
  * @returns {Promise<string>} The result message based on the status code.
  */
-export const deleteDomainService = async (id) => {
+export const deleteWorkloadService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}/${id}`,
+    url: `${makeWorkloadsBaseUrl()}/${id}`,
     method: 'DELETE'
   })
 

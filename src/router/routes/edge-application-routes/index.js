@@ -12,7 +12,7 @@ import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-sett
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
-import * as DomainServicesV4 from '@/services/domains-services/v4'
+import * as WorkloadServices from '@/services/workloads-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -63,9 +63,9 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/Config/ConfigView.vue'),
       props: {
         createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
-        domainsService: {
+        workloadService: {
           listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-          createDomainService: DomainServicesV4.createDomainService,
+          createDomainService: WorkloadServices.createDomainService,
 
           loadEdgeApplicationsService:
             EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService,

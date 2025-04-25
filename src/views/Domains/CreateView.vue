@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Domain"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Workload"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

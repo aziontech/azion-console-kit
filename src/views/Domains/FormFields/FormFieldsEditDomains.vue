@@ -220,7 +220,7 @@
 
   <form-horizontal
     title="Environment Type"
-    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
+    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment"
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
@@ -476,7 +476,7 @@
 
   <form-horizontal
     title="Settings"
-    description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
   >
     <template #inputs>
       <DigitalCertificatesDrawer
@@ -489,7 +489,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -500,7 +500,7 @@
           name="cnames"
           rows="2"
           :value="cnames"
-          description="List of CNAMEs to associate to the Azion domain. Separate each entry in a new line."
+          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
         />
       </div>
 

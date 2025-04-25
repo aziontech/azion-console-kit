@@ -12,6 +12,7 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   defineOptions({
     name: 'more-details'
@@ -358,7 +359,7 @@
             </div>
             <Divider></Divider>
             <div class="flex gap-2">
-              <span class="text-color font-medium">Domains:</span>
+              <span class="text-color font-medium">{{ TEXT_DOMAIN_WORKLOAD.singularTitle }}:</span>
               <span class="text-color-secondary">{{ props.domainNames }}</span>
             </div>
           </div>

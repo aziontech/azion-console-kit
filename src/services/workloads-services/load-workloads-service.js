@@ -1,9 +1,9 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../../axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 
-export const loadDomainService = async ({ id }) => {
+export const loadWorkloadService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}/${id}`,
+    url: `${makeWorkloadsBaseUrl()}/${id}`,
     method: 'GET'
   })
 

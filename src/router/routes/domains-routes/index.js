@@ -1,30 +1,31 @@
 import * as Helpers from '@/helpers'
-import * as DomainServicesV4 from '@/services/domains-services/v4'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
+import * as WorkloadServices from '@/services/workloads-services'
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
-  path: '/domains',
-  name: 'domains',
+  path: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+  name: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
   children: [
     {
       path: '',
-      name: 'list-domains',
+      name: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
       component: () => import('@views/Domains/ListView.vue'),
       props: {
-        listDomainsService: DomainServicesV4.listDomainsService,
-        deleteDomainService: DomainServicesV4.deleteDomainService,
+        listDomainsService: WorkloadServices.listWorkloadsService,
+        deleteDomainService: WorkloadServices.deleteWorkloadService,
         documentationService: Helpers.documentationCatalog.domains,
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
           {
-            label: 'Domains',
-            to: '/domains'
+            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
+            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
           }
         ]
       }
@@ -34,7 +35,7 @@ export const domainsRoutes = {
       name: 'create-domain',
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
-        createDomainService: DomainServicesV4.createDomainService,
+        createDomainService: WorkloadServices.createWorkloadService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
@@ -47,25 +48,25 @@ export const domainsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Domains',
-            to: '/domains'
+            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
+            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
           },
           {
-            label: 'Create Domain',
-            to: '/domains/create'
+            label: `Create ${TEXT_DOMAIN_WORKLOAD.singularTitle}`,
+            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create`
           }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
-      name: 'edit-domain',
+      name: `edit-${TEXT_DOMAIN_WORKLOAD.singularLabel}`,
       component: () => import('@views/Domains/TabsView.vue'),
       props: {
         domainServices: {
-          editDomainService: DomainServicesV4.editDomainService,
-          loadDomainService: DomainServicesV4.loadDomainService,
-          updatedRedirect: 'list-domains',
+          editDomainService: WorkloadServices.editWorkloadService,
+          loadDomainService: WorkloadServices.loadWorkloadService,
+          updatedRedirect: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
           clipboardWrite: Helpers.clipboardWrite,
           listDigitalCertificatesService:
             DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
@@ -86,11 +87,11 @@ export const domainsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Domains',
-            to: '/domains'
+            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
+            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
           },
           {
-            label: 'Edit Domain'
+            label: `Edit ${TEXT_DOMAIN_WORKLOAD.singularTitle}`
           }
         ]
       }

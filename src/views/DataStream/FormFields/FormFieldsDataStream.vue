@@ -92,8 +92,8 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Domains"
-    description="Associate domains with this stream to define the addresses from which the data will be collected."
+    :title="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
+    :description="`Associate ${TEXT_DOMAIN_WORKLOAD.singularLabel} with this stream to define the addresses from which the data will be collected.`"
     data-testid="data-stream-form__section__domains"
   >
     <template #inputs>
@@ -113,7 +113,7 @@
       >
         <LabelBlock
           for="domains"
-          label="Domains"
+          :label="`${TEXT_DOMAIN_WORKLOAD.pluralTitle}`"
           data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
@@ -144,8 +144,8 @@
             'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
           }"
         >
-          <template #sourceheader>Available Domains</template>
-          <template #targetheader>Chosen Domains</template>
+          <template #sourceheader>Available {{ TEXT_DOMAIN_WORKLOAD.pluralTitle }}</template>
+          <template #targetheader>Chosen {{ TEXT_DOMAIN_WORKLOAD.pluralTitle }}</template>
           <template #item="slotProps">
             <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
               <div class="flex-1 flex flex-column gap-2">
@@ -164,8 +164,9 @@
           data-testid="data-stream-form__domains__domains-description"
         >
           Select an item from the list and then use the arrows to move it between the available and
-          selected domains boxes. Use the double-line arrows to move all items or press the
-          <code>ctrl</code> or <code>command</code> keys to select multiple items.
+          selected {{ TEXT_DOMAIN_WORKLOAD.pluralLabel }} boxes. Use the double-line arrows to move
+          all items or press the <code>ctrl</code> or <code>command</code> keys to select multiple
+          items.
         </small>
       </div>
     </template>
@@ -1079,6 +1080,7 @@
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
@@ -1387,13 +1389,12 @@
 
   const domainsRadioOptions = [
     {
-      title: 'All Current and Future Domains',
+      title: `All Current and Future ${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
       inputValue: '1',
-      subtitle:
-        'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
+      subtitle: `By selecting the All Current and Future ${TEXT_DOMAIN_WORKLOAD.pluralTitle} option, you can activate the Sampling option.`
     },
     {
-      title: 'Filter Domains',
+      title: `Filter ${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
       inputValue: '0'
     }
   ]

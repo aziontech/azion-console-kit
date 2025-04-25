@@ -46,6 +46,7 @@ import { disabledBackButton } from './browser-back-button'
 import { buildSummary } from './build-summary'
 import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
+import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
 
 export {
   InviteSession,
@@ -95,5 +96,6 @@ export {
   buildSummary,
   INFORMATION_TEXTS,
   convertValueToDateByUserTimezone,
-  getCurrentTimezone
+  getCurrentTimezone,
+  TEXT_DOMAIN_WORKLOAD
 }

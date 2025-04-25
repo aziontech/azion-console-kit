@@ -23,7 +23,7 @@
           v-model="selectedDomainIds"
           @change="setDomainsSelectedOptions"
           class="w-full sm:max-w-xs"
-          placeholder="Select domain"
+          :placeholder="`Select a ${TEXT_DOMAIN_WORKLOAD.singularLabel}`"
           filter
           display="chip"
           scrollHeight="250px"
@@ -112,8 +112,8 @@
 
   <EmptyResultsBlock
     v-if="!showListTable"
-    title="Select a domain to query data"
-    description="To use this feature, a domain must be associated with the edge firewall that has a behavior running this WAF rule set."
+    :title="`Select a ${TEXT_DOMAIN_WORKLOAD.singularLabel} to query data`"
+    :description="`To use this feature, a ${TEXT_DOMAIN_WORKLOAD.singularLabel} must be associated with the edge firewall that has a behavior running this WAF rule set.`"
     :documentationService="props.documentationServiceTuning"
     noShowBorderTop
     class="!mt-0"
@@ -123,7 +123,7 @@
         class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"
-        label="Domain"
+        :label="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
         @click="goToDomain"
       />
     </template>
@@ -184,6 +184,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -484,7 +485,7 @@
   }
 
   const goToDomain = () => {
-    router.push({ name: 'list-domains' })
+    router.push({ name: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}` })
   }
 
   const handleSubmitAllowRules = async (nameAttack) => {

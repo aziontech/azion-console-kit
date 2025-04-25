@@ -1,3 +1,5 @@
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+
 function createHomeItem() {
   return {
     label: 'Home',
@@ -18,9 +20,9 @@ function createMarketplaceItem() {
 
 function createDomainsItem() {
   return {
-    label: 'Domains',
+    label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
     icon: 'ai ai-domains',
-    to: '/domains',
+    to: `${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
     id: 'domains'
   }
 }

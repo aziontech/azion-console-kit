@@ -239,7 +239,7 @@
 
 <template>
   <form-horizontal
-    description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
+    description="Create a workload with Azion to launch an edge application and set up security with digital certificates."
     :isDrawer="isDrawer"
     :noBorder="noBorder"
   >
@@ -250,10 +250,10 @@
           label="Name"
           required
           name="name"
-          placeholder="My domain"
+          placeholder="My workload"
           data-testid="domains-form__name-field"
           :value="name"
-          description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
+          description="This is an identification name for the workload. Once you save the configuration, the URL will be automatically generated."
         />
       </div>
     </template>
@@ -262,7 +262,7 @@
     :isDrawer="isDrawer"
     :noBorder="noBorder"
     title="Environment Type"
-    description="Select Global Edge Network to set this as a production domain or select Staging Network for a testing domain that won’t affect your production environment"
+    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment"
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
@@ -470,7 +470,7 @@
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"
-    description="Determine the edge application of the domain and its digital certificate. To link an existing domain to an application, add it to the CNAME field and block access to the application via the Azion domain."
+    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
   >
     <template #title> Settings </template>
     <template #inputs>
@@ -567,7 +567,7 @@
         auto
         :isCard="false"
         title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
@@ -577,7 +577,7 @@
           data-testid="domains-form__cnames-field"
           rows="2"
           :value="cnames"
-          description="List of CNAMEs to associate to the Azion domain. Separate each entry in a new line."
+          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

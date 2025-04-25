@@ -6,7 +6,8 @@
           <span class="text-color text-3xl font-medium">Edge Application Created!</span>
           <p class="font-normal text-base text-color-secondary mt-4">
             Start customizing the application with a quick setup. Once completed, advanced settings
-            will become available and can be edited anytime on the Edge Application or Domain page.
+            will become available and can be edited anytime on the Edge Application or
+            {{ TEXT_DOMAIN_WORKLOAD.singularTitle }} page.
           </p>
         </div>
         <Accordion
@@ -58,15 +59,15 @@
           class="mt-4"
           expandIcon="pi pi-chevron-down"
           collapseIcon="pi pi-chevron-up"
-          v-model:activeIndex="tabDomain"
+          v-model:activeIndex="tabWorkload"
         >
           <AccordionTab
-            :disabled="hasBindDomain"
+            :disabled="hasBindWorkload"
             :pt="{
               content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               header: { class: ' rounded-md' },
               headerAction: { class: hideDomainBorder },
-              headerIcon: { class: `${hasBindDomain ? 'hidden' : ''}` }
+              headerIcon: { class: `${hasBindWorkload ? 'hidden' : ''}` }
             }"
           >
             <template #header>
@@ -75,26 +76,26 @@
                 data-testid="create-domain-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span class="text-lg">{{ textInfoDomain.title }}</span>
+                  <span class="text-lg">{{ textInfoWorkload.title }}</span>
                   <span class="text-sm text-color-secondary font-normal"
-                    >{{ textInfoDomain.description }}
+                    >{{ textInfoWorkload.description }}
                   </span>
                 </div>
                 <PrimeButton
-                  v-if="hasBindDomain"
+                  v-if="hasBindWorkload"
                   icon="pi pi-check"
                 ></PrimeButton>
               </div>
             </template>
-            <DomainEdgeApplication
-              :listEdgeFirewallService="props.domainsService.listEdgeFirewallService"
-              :loadEdgeFirewallService="props.domainsService.loadEdgeFirewallService"
-              :listDigitalCertificatesService="props.domainsService.listDigitalCertificatesService"
-              :loadDigitalCertificatesService="props.domainsService.loadDigitalCertificateService"
-              :loadEdgeApplicationsService="props.domainsService.loadEdgeApplicationsService"
-              :listEdgeApplicationsService="props.domainsService.listEdgeApplicationsService"
-              :createDomainService="props.domainsService.createDomainService"
-              @createdDomain="handleResponse('domain')"
+            <WorkloadEdgeApplication
+              :listEdgeFirewallService="props.workloadService.listEdgeFirewallService"
+              :loadEdgeFirewallService="props.workloadService.loadEdgeFirewallService"
+              :listDigitalCertificatesService="props.workloadService.listDigitalCertificatesService"
+              :loadDigitalCertificatesService="props.workloadService.loadDigitalCertificateService"
+              :loadEdgeApplicationsService="props.workloadService.loadEdgeApplicationsService"
+              :listEdgeApplicationsService="props.workloadService.listEdgeApplicationsService"
+              :createDomainService="props.workloadService.createDomainService"
+              @createdDomain="handleResponse('worklodas')"
             />
           </AccordionTab>
         </Accordion>
@@ -150,28 +151,28 @@
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import OriginEdgeApplcation from './OriginEdgeApplcation.vue'
-  import DomainEdgeApplication from './DomainEdgeApplication.vue'
+  import WorkloadEdgeApplication from './WorkloadEdgeApplication.vue'
   import CacheEdgeApplication from './CacheEdgeApplication.vue'
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
-
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { ref, computed, onMounted } from 'vue'
   const props = defineProps({
-    domainsService: { type: Object, required: true },
+    workloadService: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true }
   })
 
   const activeAccordionTab = ref([])
-  const hasBindDomain = ref(false)
+  const hasBindWorkload = ref(false)
   const hasCreateOrigin = ref(false)
   const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
   const tabOrigin = ref([])
-  const tabDomain = ref([])
+  const tabWorkload = ref([])
   const tabCache = ref([])
   const originId = ref(0)
   const cacheSettingId = ref(0)
@@ -207,17 +208,17 @@
     }
   })
 
-  const textInfoDomain = computed(() => {
-    if (hasBindDomain.value) {
+  const textInfoWorkload = computed(() => {
+    if (hasBindWorkload.value) {
       return {
         description:
-          'The selected domain is now associated with this application. To edit these settings, go to the Domains page and select the domain > Deployment.',
-        title: 'Domain associed!'
+          'The selected workload is now associated with this application. To edit these settings, go to the Workloads page and select the workload > Deployment.',
+        title: 'Workload associed!'
       }
     }
     return {
-      description: 'Create the domain to associate with the edge application.',
-      title: 'Associate a domain'
+      description: 'Create the workload to associate with the edge application.',
+      title: 'Associate a workload'
     }
   })
 
@@ -237,7 +238,7 @@
   })
 
   const finishedConfiguration = computed(
-    () => hasBindDomain.value && hasCreateCache.value && hasCreateOrigin.value
+    () => hasBindWorkload.value && hasCreateCache.value && hasCreateOrigin.value
   )
   const primaryActionLabel = computed(() =>
     finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
@@ -290,9 +291,9 @@
       hasCreateCache.value = true
       closeAccordionTab(tabCache)
     }
-    if (tab === 'domain') {
-      hasBindDomain.value = true
-      closeAccordionTab(tabDomain)
+    if (tab === 'workload') {
+      hasBindWorkload.value = true
+      closeAccordionTab(tabWorkload)
     }
   }
 

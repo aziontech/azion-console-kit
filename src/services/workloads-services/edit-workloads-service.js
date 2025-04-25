@@ -1,11 +1,11 @@
-import { AxiosHttpClientAdapter } from '../../axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const editDomainService = async (payload) => {
+export const editWorkloadService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}/${payload.id}`,
+    url: `${makeWorkloadsBaseUrl()}/${payload.id}`,
     method: 'PATCH',
     body: adapt(payload)
   })
