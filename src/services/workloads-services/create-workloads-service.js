@@ -81,7 +81,7 @@ const parseHttpResponse = (httpResponse) => {
     case 202:
       return {
         feedback: 'Your domain has been created',
-        urlToEditView: `/domains/edit/${httpResponse.body.data.id}`,
+        urlToEditView: `/workloads/edit/${httpResponse.body.data.id}`,
         domainName: httpResponse.body.data.domains[0].domain,
         id: parseInt(httpResponse.body.data.id)
       }

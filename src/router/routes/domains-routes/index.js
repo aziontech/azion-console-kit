@@ -14,7 +14,7 @@ export const domainsRoutes = {
     {
       path: '',
       name: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
-      component: () => import('@views/Domains/ListView.vue'),
+      component: () => import('@views/Workload/ListView.vue'),
       props: {
         listDomainsService: WorkloadServices.listWorkloadsService,
         deleteDomainService: WorkloadServices.deleteWorkloadService,
@@ -33,7 +33,7 @@ export const domainsRoutes = {
     {
       path: 'create',
       name: 'create-domain',
-      component: () => import('@views/Domains/CreateView.vue'),
+      component: () => import('@views/Workload/CreateView.vue'),
       props: {
         createDomainService: WorkloadServices.createWorkloadService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
@@ -61,7 +61,7 @@ export const domainsRoutes = {
     {
       path: 'edit/:id/:tab?',
       name: `edit-${TEXT_DOMAIN_WORKLOAD.singularLabel}`,
-      component: () => import('@views/Domains/TabsView.vue'),
+      component: () => import('@views/Workload/TabsView.vue'),
       props: {
         domainServices: {
           editDomainService: WorkloadServices.editWorkloadService,
