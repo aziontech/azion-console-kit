@@ -6,6 +6,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -25,8 +26,8 @@
 
   const RESOURCES = [
     {
-      label: 'Domains',
-      to: '/domains/create?origin=create',
+      label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
+      to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create?origin=create`,
       description: 'Launch an edge application and set up security with digital certificates.'
     },
     {

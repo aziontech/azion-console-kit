@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, FILTERS_RULES } from '@/helpers'
+import { capitalizeFirstLetter, FILTERS_RULES, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
 
 const buildOperatorQuery = (dataset) => `
@@ -15,7 +15,7 @@ const buildOperatorQuery = (dataset) => `
   }
 `
 const ALIAS_MAPPING_OPERATOR = {
-  configurationIdIn: 'domain'
+  configurationIdIn: TEXT_DOMAIN_WORKLOAD.singularLabel
 }
 
 const buildFieldsQuery = () => `

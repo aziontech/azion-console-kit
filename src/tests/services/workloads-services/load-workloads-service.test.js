@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadDomainService } from '@/services/domains-services/v4'
+import { loadWorkloadService } from '@/services/workloads-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 
 const fixtures = {
@@ -56,7 +56,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadDomainService
+  const sut = loadWorkloadService
   return {
     sut
   }

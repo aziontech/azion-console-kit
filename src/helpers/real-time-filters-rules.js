@@ -1,3 +1,5 @@
+import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
+
 const FILTER_BLACK_LIST = [
   'clientId',
   'clientIdNe',
@@ -37,7 +39,7 @@ const FIELDS_LIKE = [
 ]
 
 const ALIAS_MAPPING = {
-  configurationId: 'domain'
+  configurationId: TEXT_DOMAIN_WORKLOAD.singularLabel
 }
 
 const FILTER_WHITELIST = {
@@ -46,8 +48,20 @@ const FILTER_WHITELIST = {
 }
 
 const MOST_RELEVANT_FIELDS = {
-  httpMetrics: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
-  httpEvents: ['Domain', 'Status', 'Upstream Status', 'Upstream Cache Status', 'Request Time'],
+  httpMetrics: [
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
+    'Status',
+    'Upstream Status',
+    'Upstream Cache Status',
+    'Request Time'
+  ],
+  httpEvents: [
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
+    'Status',
+    'Upstream Status',
+    'Upstream Cache Status',
+    'Request Time'
+  ],
   l2CacheMetrics: [
     'Upstream Bytes Received',
     'Status',
@@ -63,28 +77,28 @@ const MOST_RELEVANT_FIELDS = {
     'Request Time'
   ],
   edgeFunctionsMetrics: [
-    'Domain',
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
     'Edge Function Id',
     'Compute Time',
     'Invocations',
     'Edge Functions Instance Id List'
   ],
   edgeFunctionsEvents: [
-    'Domain',
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
     'Edge Function Id',
     'Compute Time',
     'Invocations',
     'Edge Functions Instance Id List'
   ],
   imagesProcessedMetrics: [
-    'Domain',
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
     'Status',
     'Upstream Status',
     'Upstream Cache Status',
     'Request Time'
   ],
   imagesProcessedEvents: [
-    'Domain',
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
     'Status',
     'Upstream Status',
     'Upstream Cache Status',
@@ -92,8 +106,20 @@ const MOST_RELEVANT_FIELDS = {
   ],
   idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
   idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
-  dataStreamedEvents: ['Domain', 'Data Streamed', 'Endpoint Type', 'Requests', 'Configuration Id'],
-  dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
+  dataStreamedEvents: [
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
+    'Data Streamed',
+    'Endpoint Type',
+    'Requests',
+    'Configuration Id'
+  ],
+  dataStreamedMetrics: [
+    TEXT_DOMAIN_WORKLOAD.singularTitle,
+    'Status',
+    'Data Streamed',
+    'Endpoint Type',
+    'Requests'
+  ]
 }
 
 const FILTER_LIKE_TYPE = {
@@ -109,7 +135,7 @@ const FILTER_LIKE_TYPE = {
 }
 
 const FILTER_LIKE_ALIAS = {
-  configurationIdIn: 'Domain',
+  configurationIdIn: TEXT_DOMAIN_WORKLOAD.singularTitle,
   classifiedEq: 'Classified',
   classifiedNe: 'Classified'
 }

@@ -67,7 +67,7 @@
   import InlineMessage from 'primevue/inlinemessage'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { listWorkloadsService } from '@/services/workloads-services'
+  import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
 
   defineOptions({ name: 'data-stream-view' })
@@ -97,7 +97,7 @@
   const loadWorkloads = async () => {
     try {
       domainsLoading.value = true
-      const response = await listWorkloadsService({
+      const response = await listWorkloadsDynamicFieldsService({
         fields: 'id',
         ordering: 'id',
         page: 1,

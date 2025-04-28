@@ -1,6 +1,6 @@
 import { loadRealTimeMetricsData } from '@/services/real-time-metrics-services'
 import { capitalizeFirstLetter } from '@/helpers'
-
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 let abortController = null
 
 /**
@@ -11,7 +11,7 @@ let abortController = null
  */
 const isAlias = (name) => {
   const aliasMapping = {
-    configurationId: 'domain'
+    configurationId: TEXT_DOMAIN_WORKLOAD.singularLabel
   }
 
   return aliasMapping[name]

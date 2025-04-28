@@ -1,29 +1,29 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Domains"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="`${TEXT_DOMAIN_WORKLOAD.pluralTitle}`"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Domain"
+        :addButtonLabel="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
         :createPagePath="createDomainPath"
-        editPagePath="domains/edit"
+        :editPagePath="`${TEXT_DOMAIN_WORKLOAD.pluralLabel}/edit`"
         :listService="listDomainsService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No domains found."
+        :emptyListMessage="`No ${TEXT_DOMAIN_WORKLOAD.singularLabel} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock
         v-else
-        title="No domains have been created"
-        description="Click the button below to create your first domain."
-        createButtonLabel="Domain"
+        title="No workload have been created"
+        description="Click the button below to create your first workload."
+        :createButtonLabel="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
@@ -43,7 +43,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
-  import { INFORMATION_TEXTS } from '@/helpers'
+  import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -70,7 +70,7 @@
     }
   })
 
-  const createDomainPath = 'domains/create?origin=list'
+  const createDomainPath = `${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create?origin=list`
   const toast = useToast()
   const DOMAINS_API_FIELDS = [
     'id',

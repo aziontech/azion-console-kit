@@ -23,7 +23,7 @@
               class="p-0"
               @click="navigateToDomains"
             >
-              Domains
+              {{ TEXT_DOMAIN_WORKLOAD.pluralTitle }}
             </PrimeButton>
           </InlineMessage>
           <FormFieldsCreateDigitalCertificates
@@ -55,6 +55,7 @@
   import { useRouter } from 'vue-router'
   import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -157,7 +158,7 @@
   })
 
   const navigateToDomains = () => {
-    router.push({ name: 'list-domains' })
+    router.push({ name: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}` })
   }
 
   const handleTrackSuccessCreated = () => {

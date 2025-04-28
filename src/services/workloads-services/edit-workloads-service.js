@@ -1,12 +1,12 @@
-import { AxiosHttpClientAdapter } from '../../axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-export const createDomainService = async (payload) => {
+export const editWorkloadService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}`,
-    method: 'POST',
+    url: `${makeWorkloadsBaseUrl()}/${payload.id}`,
+    method: 'PATCH',
     body: adapt(payload)
   })
 
@@ -26,15 +26,16 @@ const convertPortToInt = (ports) => {
 }
 
 const adapt = (payload) => {
+  payload.domains[0].allow_access = !payload.cnameAccessOnly
+  const domains = payload.domains
+
   const dataRequest = {
     name: payload.name,
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
-    edge_application: payload.edgeApplication,
-    edge_firewall: payload.edgeFirewall,
     active: payload.active,
-    mtls: {
-      verification: payload.mtlsVerification,
-      certificate: payload.mtlsTrustedCertificate
+    tls: {
+      minimum_version: null,
+      ciphers: null
     },
     protocols: {
       http: {
@@ -44,11 +45,12 @@ const adapt = (payload) => {
         quic_ports: payload.useHttp3 ? convertPortToInt(payload.quicPort) : null
       }
     },
-    domains: [{ allow_access: !payload.cnameAccessOnly }],
-    network_map: payload.environment,
-    tls: {
-      minimum_version: null
-    }
+    mtls: {
+      verification: payload.mtlsVerification,
+      certificate: payload.mtlsTrustedCertificate
+    },
+    domains,
+    network_map: payload.environment
   }
 
   if (!payload.mtlsIsEnabled) {
@@ -79,12 +81,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return {
-        feedback: 'Your domain has been created',
-        urlToEditView: `/domains/edit/${httpResponse.body.data.id}`,
-        domainName: httpResponse.body.data.domains[0].domain,
-        id: parseInt(httpResponse.body.data.id)
-      }
+      return 'Your domain has been edited'
     case 500:
       throw new Errors.InternalServerError().message
     default:

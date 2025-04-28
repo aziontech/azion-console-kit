@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FILTERS_RULES } from '@/helpers'
+import { FILTERS_RULES, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
 describe('RealTimeMetricsModule', () => {
   describe('Filter rules constants', () => {
@@ -56,14 +56,14 @@ describe('RealTimeMetricsModule', () => {
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
             'Request Time'
           ],
           httpEvents: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
@@ -84,28 +84,28 @@ describe('RealTimeMetricsModule', () => {
             'Request Time'
           ],
           edgeFunctionsMetrics: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Edge Function Id',
             'Compute Time',
             'Invocations',
             'Edge Functions Instance Id List'
           ],
           edgeFunctionsEvents: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Edge Function Id',
             'Compute Time',
             'Invocations',
             'Edge Functions Instance Id List'
           ],
           imagesProcessedMetrics: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
             'Request Time'
           ],
           imagesProcessedEvents: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
@@ -114,13 +114,19 @@ describe('RealTimeMetricsModule', () => {
           idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           dataStreamedEvents: [
-            'Domain',
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
             'Data Streamed',
             'Endpoint Type',
             'Requests',
             'Configuration Id'
           ],
-          dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
+          dataStreamedMetrics: [
+            TEXT_DOMAIN_WORKLOAD.singularTitle,
+            'Status',
+            'Data Streamed',
+            'Endpoint Type',
+            'Requests'
+          ]
         },
         FILTER_LIKE_TYPE: {
           configurationIdIn: 'ArrayObjectDomain',
@@ -134,11 +140,11 @@ describe('RealTimeMetricsModule', () => {
           actionNe: 'StringObject'
         },
         FILTER_LIKE_ALIAS: {
-          configurationIdIn: 'Domain',
+          configurationIdIn: TEXT_DOMAIN_WORKLOAD.singularTitle,
           classifiedEq: 'Classified',
           classifiedNe: 'Classified'
         },
-        ALIAS_MAPPING: { configurationId: 'domain' }
+        ALIAS_MAPPING: { configurationId: TEXT_DOMAIN_WORKLOAD.singularLabel }
       }
 
       expect(JSON.stringify(FILTERS_RULES)).toEqual(JSON.stringify(filterRules))
@@ -151,7 +157,7 @@ describe('RealTimeMetricsModule', () => {
     })
 
     it('should return true if the field is not blacklisted', () => {
-      const notBlacklistedField = { name: 'Domain' }
+      const notBlacklistedField = { name: TEXT_DOMAIN_WORKLOAD.singularTitle }
       const result = FILTERS_RULES.verifyBlackListFields(notBlacklistedField)
       expect(result).toBeTruthy()
     })

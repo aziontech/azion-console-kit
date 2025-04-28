@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { deleteDomainService } from '@/services/domains-services/v4'
+import { deleteWorkloadService } from '@/services/workloads-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -8,7 +8,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = deleteDomainService
+  const sut = deleteWorkloadService
 
   return { sut }
 }
