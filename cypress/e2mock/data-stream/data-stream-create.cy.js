@@ -8,22 +8,17 @@ describe('Data Stream Creation - Filter Domains Flow', { tags: ['@dev4'] }, () =
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
 
-    cy.clearAllSessionStorage()
-    cy.clearAllLocalStorage()
-  })
-
-  it('should successfully create a data stream with domain filters', () => {
-    // Arrange - Set up API intercepts and log in
     cy.intercept('GET', '/api/account/info', {
       fixture: '/account/info/with_data_streaming_sampling_flag.json'
     }).as('accountInfo')
     
     cy.login()
     cy.wait('@accountInfo', { timeout: 30000 })
+    
+  })
 
-    cy.intercept('GET', '/api/v4/data_stream/data_sets*', {
-      fixture: '/data-streaming/data_stream_templates.json'
-    }).as('getTemplates')
+  it('should successfully create a data stream with domain filters', () => {
+    // Arrange - Set up API intercepts and log in
 
     cy.intercept('GET', '/api/v4/workspace/workloads?ordering=id&page=1&page_size=1&fields=id&search=')
       .as('getOneWorkload')
