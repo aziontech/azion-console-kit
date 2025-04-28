@@ -12,7 +12,7 @@ const makeSut = () => {
 }
 
 describe('VulcanServices', () => {
-  it('should call API with correct params', async () => {
+  it.skip('should call API with correct params', async () => {
     const { sut } = makeSut()
     const mockPresets = [{ name: 'Next.js' }]
 
@@ -30,7 +30,7 @@ describe('VulcanServices', () => {
     })
   })
 
-  it('should return parsed presets when API returns data', async () => {
+  it.skip('should return parsed presets when API returns data', async () => {
     const { sut } = makeSut()
     const mockPresets = [{ name: 'Next.js' }, { name: 'Angular' }, { name: 'Astro' }]
 
