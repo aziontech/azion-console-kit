@@ -102,19 +102,17 @@
   })
 
   let scrollElement = null
-  // Manage variables related to the loading state of the request
+  
   const PAGE_SIZE = 100
   const page = ref(1)
   const PAGE_INCREMENT = 1
   const notRequest = ref(false)
 
-  // variables related to search request
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
 
-  // variables related to filter itens
   const searchSource = ref('')
   const searchTarget = ref('')
   const originalSource = ref([])

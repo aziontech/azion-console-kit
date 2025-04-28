@@ -1041,7 +1041,6 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
-  // import PickList from 'primevue/picklist'
   import fieldPickList from '@/templates/form-fields-inputs/fieldPickList.vue'
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
