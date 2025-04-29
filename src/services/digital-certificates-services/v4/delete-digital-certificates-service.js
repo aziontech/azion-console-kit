@@ -3,7 +3,6 @@ import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
 
-
 export const deleteDigitalCertificatesService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDigitalCertificatesBaseUrl()}/${id}`,
