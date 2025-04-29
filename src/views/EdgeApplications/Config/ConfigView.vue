@@ -156,6 +156,8 @@
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
+  import { disabledBackButton } from '@/helpers'
+
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { ref, computed, onMounted } from 'vue'
   const props = defineProps({
@@ -298,6 +300,7 @@
   }
 
   onMounted(async () => {
+    disabledBackButton()
     rulesEngine.value = await props.rulesEngineServices.listRulesEngineService({
       id: edgeApplicationId.value
     })

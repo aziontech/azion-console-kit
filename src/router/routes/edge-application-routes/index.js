@@ -1,6 +1,6 @@
 import * as Helpers from '@/helpers'
-import * as EdgeApplicationsService from '@/services/edge-application-services'
-import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
+// import * as EdgeApplicationsService from '@/services/edge-application-services'
+// import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
@@ -13,6 +13,12 @@ import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
+import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
+// import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
+// const flag = hasFlagBlockApiV4()
+// console.log(flag)
+const EdgeApplicationServices = useEdgeApplicationServices()
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -24,8 +30,8 @@ export const edgeApplicationRoutes = {
       name: 'list-edge-applications',
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
-        listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
+        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        deleteEdgeApplicationService: EdgeApplicationServices.deleteEdgeApplicationService,
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
@@ -42,7 +48,7 @@ export const edgeApplicationRoutes = {
       name: 'create-edge-application',
       component: () => import('@views/EdgeApplications/CreateView.vue'),
       props: {
-        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService
+        createEdgeApplicationService: EdgeApplicationServices.createEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -62,13 +68,12 @@ export const edgeApplicationRoutes = {
       name: 'config-edge-application',
       component: () => import('@views/EdgeApplications/Config/ConfigView.vue'),
       props: {
-        createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
+        createEdgeApplicationService: EdgeApplicationServices.createEdgeApplicationService,
         workloadService: {
-          listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
+          listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
           createDomainService: WorkloadServices.createDomainService,
 
-          loadEdgeApplicationsService:
-            EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService,
+          loadEdgeApplicationsService: EdgeApplicationServices.loadEdgeApplicationsDropdownService,
           listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
           listDigitalCertificatesService:
@@ -107,12 +112,12 @@ export const edgeApplicationRoutes = {
       props: {
         edgeApplicationServices: {
           checkgeApplicationsLockedService:
-            EdgeApplicationsServiceV4.checkgeApplicationsLockedService,
-          editEdgeApplication: EdgeApplicationsServiceV4.editEdgeApplicationsService,
-          loadEdgeApplication: EdgeApplicationsServiceV4.loadEdgeApplicationsService,
+            EdgeApplicationServices.checkgeApplicationsLockedService,
+          editEdgeApplication: EdgeApplicationServices.editEdgeApplicationsService,
+          loadEdgeApplication: EdgeApplicationServices.loadEdgeApplicationsService,
           updatedRedirect: 'list-edge-applications',
           contactSalesEdgeApplicationService:
-            EdgeApplicationsService.contactSalesEdgeApplicationService
+            EdgeApplicationServices.contactSalesEdgeApplicationService
         },
         originsServices: {
           listOriginsService: OriginsService.listOriginsService,

@@ -7,13 +7,13 @@ import * as WorkloadServices from '@/services/workloads-services'
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const domainsRoutes = {
-  path: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
-  name: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+export const workloadRoutes = {
+  path: `/workloads`,
+  name: `/workloads`,
   children: [
     {
       path: '',
-      name: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+      name: `list-workloads`,
       component: () => import('@views/Workload/ListView.vue'),
       props: {
         listDomainsService: WorkloadServices.listWorkloadsService,
@@ -24,15 +24,15 @@ export const domainsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
-            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
+            label: `Workloads`,
+            to: `/workloads`
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-domain',
+      name: 'create-workload',
       component: () => import('@views/Workload/CreateView.vue'),
       props: {
         createDomainService: WorkloadServices.createWorkloadService,
@@ -48,25 +48,25 @@ export const domainsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
-            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
+            label: `Workloads`,
+            to: `/workloads`
           },
           {
             label: `Create ${TEXT_DOMAIN_WORKLOAD.singularTitle}`,
-            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create`
+            to: `/workloads/create`
           }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
-      name: `edit-${TEXT_DOMAIN_WORKLOAD.singularLabel}`,
+      name: `edit-workload`,
       component: () => import('@views/Workload/TabsView.vue'),
       props: {
         domainServices: {
           editDomainService: WorkloadServices.editWorkloadService,
           loadDomainService: WorkloadServices.loadWorkloadService,
-          updatedRedirect: `list-${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+          updatedRedirect: `list-workloads`,
           clipboardWrite: Helpers.clipboardWrite,
           listDigitalCertificatesService:
             DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
@@ -87,8 +87,8 @@ export const domainsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
-            to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`
+            label: `Workloads`,
+            to: `/workloads`
           },
           {
             label: `Edit ${TEXT_DOMAIN_WORKLOAD.singularTitle}`
