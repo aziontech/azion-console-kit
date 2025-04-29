@@ -10,7 +10,7 @@
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  const props = defineProps({
+  defineProps({
     listEdgeConnectorsService: {
       type: Function,
       required: true
