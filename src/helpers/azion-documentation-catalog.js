@@ -28,7 +28,8 @@ export const documentationCatalog = {
   records: () => openSearchResult('records'),
   waf: () => openSearchResult('waf'),
   wafAllowed: () => openSearchResult('Allowed Rules'),
-  wafTuning: () => openSearchResult('Tune')
+  wafTuning: () => openSearchResult('Tune'),
+  mfaManagement: () => openSearchResult('MFA Management')
 }
 
 export const documentationGuideProducts = {

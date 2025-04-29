@@ -170,6 +170,7 @@
   const SEARCH_MAX_WAIT = 1000
   const NUMBER_OF_CHARACTERS_MIN_FOR_SEARCH = 3
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
+  const PERMISSION_DENIED = 'You do not have permission to do this action.'
 
   const name = toRef(props, 'name')
   const slots = useSlots()
@@ -265,7 +266,7 @@
       })
 
       if (currentPage === INITIAL_PAGE) {
-        data.value = results
+        data.value = results ? results : []
       } else {
         const uniqueResults = results.filter(
           (newItem) =>
@@ -276,7 +277,20 @@
 
         data.value = [...data.value, ...uniqueResults]
       }
+
+      if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
+        await checkValueInList(props.value)
+      }
     } catch (error) {
+      //Here we check if the error was caused by a lack of permission. If that's not the case, we add the ID to avoid blocking the user's experience.
+      if (error === PERMISSION_DENIED) {
+        data.value = [
+          {
+            id: props.value,
+            name: props.value
+          }
+        ]
+      }
       emit('onAccessDenied')
     } finally {
       loading.value = false
@@ -354,10 +368,7 @@
   watch(
     () => props.value,
     (newValue) => {
-      const existitemInList = data.value?.some((item) => item[props.optionValue] === newValue)
-      if (!existitemInList) {
-        loadSelectedValue(newValue)
-      }
+      checkValueInList(newValue)
     }
   )
 
@@ -386,5 +397,13 @@
     itemSize: 38,
     showLoader: true,
     loading
+  }
+
+  const checkValueInList = (value) => {
+    const existitemInList = data.value?.some((item) => item[props.optionValue] === value)
+
+    if (!existitemInList) {
+      loadSelectedValue(value)
+    }
   }
 </script>
