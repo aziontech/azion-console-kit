@@ -131,9 +131,9 @@
 
   const edgeConnectorsList = ref([])
 
-  const getEdgeConnectors = async () => {
-    edgeConnectorsList.value = await props.listEdgeConnectorsService()
-  }
+  // const getEdgeConnectors = async () => {
+  //   edgeConnectorsList.value = await props.listEdgeConnectorsService()
+  // }
 
   onMounted(async () => {
     // await getEdgeConnectors()
@@ -159,6 +159,7 @@
           label="Name"
           placeholder="Custom Page name"
           data-testid="custom-page-form__name"
+          required
           description="Name of the custom page."
           name="name"
           :value="name"
@@ -271,6 +272,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <FieldNumber
                 label="Custom Response TTL"
+                :data-testid="`custom-page-form__page__${index}__ttl`"
                 required
                 :value="pages[index].value.ttl"
                 :name="`pages[${index}].ttl`"
@@ -280,17 +282,23 @@
               />
             </div>
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <div
+            class="flex flex-col sm:max-w-lg w-full gap-2"
+            v-if="!isDefaultPage(index)"
+          >
             <FieldText
               label="Page Path (URI)"
-              placeholder="https://app.domain.com/"
+              placeholder="/example/path/another_path~file@name"
               :data-testid="`custom-page-form__page__${index}__path`"
               :name="`pages[${index}].uri`"
               :value="pages[index].value.uri"
               description="Select an origin to customize the error page path."
             />
           </div>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <div
+            class="flex flex-col w-full sm:max-w-xs gap-2"
+            v-if="!isDefaultPage(index)"
+          >
             <FieldNumber
               label="Response Custom Status Code"
               :data-testid="`custom-page-form__page__${index}__custom-status`"

@@ -40,18 +40,25 @@
     pages: []
   })
 
+  const isUriValidRegex = /^\/[/a-zA-Z0-9\-_.~@:]*$/
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     isActive: yup.boolean().required().label('Active'),
     isDefault: yup.boolean().required().label('Default'),
-    edgeConnectorId: yup.string().nullable().required().label('Edge Connector'),
+    edgeConnectorId: yup.string().nullable().label('Edge Connector'),
     pages: yup
       .array()
       .of(
         yup.object().shape({
           code: yup.string().required().label('Code'),
-          ttl: yup.number().label('TTL'),
-          uri: yup.string().url().label('URI'),
+          ttl: yup.number().min(1).required().label('TTL'),
+          uri: yup
+            .string()
+            .transform((value) => (value === '' ? null : value))
+            .nullable()
+            .matches(isUriValidRegex, 'Invalid URI')
+            .label('URI'),
           custom_status_code: yup.number().label('Custom Status Code')
         })
       )

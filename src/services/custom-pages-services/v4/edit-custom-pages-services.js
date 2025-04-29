@@ -1,17 +1,28 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeCustomPagesBaseUrl } from './make-custom-pages-base-url'
 import * as Errors from '@/services/axios/errors'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { makeCustomPagesBaseUrl } from './make-custom-pages-base-url'
 
-export const createCustomPagesService = async (payload) => {
-  const parsedBody = adapt(payload)
+export const editCustomPagesService = async (payload) => {
+  const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeCustomPagesBaseUrl()}`,
-    method: 'POST',
-    body: parsedBody
+    url: `${makeCustomPagesBaseUrl()}/${payload.id}`,
+    method: 'PATCH',
+    body: parsedPayload
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+const parseHttpResponse = (httpResponse) => {
+  switch (httpResponse.statusCode) {
+    case 202:
+      return 'Your Custom Page has been updated!'
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Error(extractApiError(httpResponse)).message
+  }
 }
 
 const nullable = (value) => {
@@ -21,7 +32,7 @@ const nullable = (value) => {
 const adapt = (payload) => {
   const pages = payload.pages.map((page) => {
     return {
-      code: page.code.toLowerCase(),
+      code: page.code === 'Default' ? 'default' : page.code,
       ttl: page.ttl,
       uri: nullable(page.uri),
       custom_status_code: nullable(page.customStatusCode)
@@ -35,21 +46,5 @@ const adapt = (payload) => {
       edge_connector: nullable(payload.edgeConnectorId),
       pages // code, ttl, uri, custom_status_code
     }
-  }
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The formatted error message.
- */
-const parseHttpResponse = (httpResponse) => {
-  switch (httpResponse.statusCode) {
-    case 202:
-      return { feedback: 'Custom Page successfully created' }
-    case 500:
-      throw new Errors.InternalServerError().message
-    default:
-      throw new Error(extractApiError(httpResponse)).message
   }
 }

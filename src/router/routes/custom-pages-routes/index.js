@@ -14,6 +14,8 @@ export const customPagesRoutes = {
         listCustomPagesService: CustomPagesServiceV4.listCustomPagesService,
         deleteCustomPagesService: CustomPagesServiceV4.deleteCustomPagesService,
         createCustomPagesService: CustomPagesServiceV4.createCustomPagesService,
+        loadCustomPagesService: CustomPagesServiceV4.loadCustomPagesService,
+        editCustomPagesService: CustomPagesServiceV4.editCustomPagesService,
         documentationService: Helpers.documentationCatalog.customPages
       },
       meta: {
