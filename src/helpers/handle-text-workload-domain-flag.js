@@ -1,4 +1,4 @@
-// import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 const TEXT_FOR_DOMAIN = {
   singularTitle: 'Domain',
@@ -15,7 +15,7 @@ const TEXT_FOR_WORKLOAD = {
 }
 
 //TODO handle flags next task
-const IS_DOMAIN_CONTEXT = true
+const IS_DOMAIN_CONTEXT = hasFlagBlockApiV4()
 
 const SELECTED_TEXT = IS_DOMAIN_CONTEXT ? TEXT_FOR_DOMAIN : TEXT_FOR_WORKLOAD
 

@@ -14,10 +14,8 @@ import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
-// import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
-// const flag = hasFlagBlockApiV4()
-// console.log(flag)
 const EdgeApplicationServices = useEdgeApplicationServices()
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -43,10 +41,15 @@ export const edgeApplicationRoutes = {
         ]
       }
     },
+
+    
     {
       path: 'create',
       name: 'create-edge-application',
-      component: () => import('@views/EdgeApplications/CreateView.vue'),
+      component: () =>
+        hasFlagBlockApiV4()
+          ? import('@views/EdgeApplications/V3/CreateView.vue') 
+          : import('@views/EdgeApplications/CreateView.vue'),
       props: {
         createEdgeApplicationService: EdgeApplicationServices.createEdgeApplicationService
       },

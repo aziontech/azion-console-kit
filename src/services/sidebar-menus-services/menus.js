@@ -20,9 +20,9 @@ function createMarketplaceItem() {
 
 function createDomainsItem() {
   return {
-    label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
+    label: TEXT_DOMAIN_WORKLOAD.pluralTitle,
     icon: 'ai ai-domains',
-    to: `${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+    to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
     id: 'domains'
   }
 }
