@@ -13,6 +13,7 @@ export const customPagesRoutes = {
       props: {
         listCustomPagesService: CustomPagesServiceV4.listCustomPagesService,
         deleteCustomPagesService: CustomPagesServiceV4.deleteCustomPagesService,
+        createCustomPagesService: CustomPagesServiceV4.createCustomPagesService,
         documentationService: Helpers.documentationCatalog.customPages
       },
       meta: {
