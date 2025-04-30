@@ -14,7 +14,7 @@ export const deleteCustomPagesService = async (id) => {
 
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Custom Page successfully deleted!'
     case 500:
       throw new Errors.InternalServerError().message

@@ -29,7 +29,7 @@ export const documentationCatalog = {
   waf: () => openSearchResult('waf'),
   wafAllowed: () => openSearchResult('Allowed Rules'),
   wafTuning: () => openSearchResult('Tune'),
-  customPages: () => openSearchResult('Error Responses'),
+  customPages: () => openSearchResult('Error Responses')
 }
 
 export const documentationGuideProducts = {

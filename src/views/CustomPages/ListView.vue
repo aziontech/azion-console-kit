@@ -51,7 +51,7 @@
       label: 'Delete',
       title: 'edge application',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeApplicationService
+      service: props.deleteCustomPagesService
     }
   ]
 
