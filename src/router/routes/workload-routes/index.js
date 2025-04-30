@@ -4,7 +4,6 @@ import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
 import * as WorkloadServices from '@/services/workloads-services'
-import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const workloadRoutes = {
@@ -52,7 +51,7 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Create ${TEXT_DOMAIN_WORKLOAD.singularTitle}`,
+            label: `Create Workload`,
             to: `/workloads/create`
           }
         ]
@@ -91,7 +90,7 @@ export const workloadRoutes = {
             to: `/workloads`
           },
           {
-            label: `Edit ${TEXT_DOMAIN_WORKLOAD.singularTitle}`
+            label: `Edit Workload`
           }
         ]
       }

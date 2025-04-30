@@ -64,7 +64,8 @@ describe('EdgeApplicationServicesV4', () => {
       imageProcessorEnabled: fixtures.edgeApplicationsMock.modules.image_processor_enabled,
       tieredCacheEnabled: fixtures.edgeApplicationsMock.modules.tiered_cache_enabled,
       isActive: fixtures.edgeApplicationsMock.active,
-      debug: fixtures.edgeApplicationsMock.debug
+      debug: fixtures.edgeApplicationsMock.debug,
+      productVersion: fixtures.edgeApplicationsMock.product_version,
     })
   })
 })

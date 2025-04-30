@@ -13,6 +13,7 @@
   import { useToast } from 'primevue/usetoast'
   import PrimeButton from 'primevue/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   defineOptions({
     name: 'more-details'
@@ -359,7 +360,9 @@
             </div>
             <Divider></Divider>
             <div class="flex gap-2">
-              <span class="text-color font-medium">{{ TEXT_DOMAIN_WORKLOAD.singularTitle }}:</span>
+              <span class="text-color font-medium"
+                >{{ handleTextDomainWorkload.singularTitle }}:</span
+              >
               <span class="text-color-secondary">{{ props.domainNames }}</span>
             </div>
           </div>

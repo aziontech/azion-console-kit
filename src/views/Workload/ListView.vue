@@ -1,20 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="`${TEXT_DOMAIN_WORKLOAD.pluralTitle}`"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="`${handleTextDomainWorkload.pluralTitle}`"></PageHeadingBlock>
     </template>
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :addButtonLabel="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
+        :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
-        :editPagePath="`${TEXT_DOMAIN_WORKLOAD.pluralLabel}/edit`"
+        :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
         :listService="listDomainsService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        :emptyListMessage="`No ${TEXT_DOMAIN_WORKLOAD.singularLabel} found.`"
+        :emptyListMessage="`No ${handleTextDomainWorkload.singularLabel} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
@@ -23,7 +23,7 @@
         v-else
         title="No workload have been created"
         description="Click the button below to create your first workload."
-        :createButtonLabel="`${TEXT_DOMAIN_WORKLOAD.singularTitle}`"
+        :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
@@ -44,6 +44,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -70,7 +71,7 @@
     }
   })
 
-  const createDomainPath = `${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create?origin=list`
+  const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
   const DOMAINS_API_FIELDS = [
     'id',

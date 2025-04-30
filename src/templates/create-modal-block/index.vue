@@ -7,6 +7,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -26,8 +27,8 @@
 
   const RESOURCES = [
     {
-      label: `${TEXT_DOMAIN_WORKLOAD.pluralTitle}`,
-      to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}/create?origin=create`,
+      label: `${handleTextDomainWorkload.pluralTitle}`,
+      to: `/${handleTextDomainWorkload.pluralLabel}/create?origin=create`,
       description: 'Launch an edge application and set up security with digital certificates.'
     },
     {

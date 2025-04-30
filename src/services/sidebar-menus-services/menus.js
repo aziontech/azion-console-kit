@@ -19,10 +19,12 @@ function createMarketplaceItem() {
 }
 
 function createDomainsItem() {
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+
   return {
-    label: TEXT_DOMAIN_WORKLOAD.pluralTitle,
+    label: handleTextDomainWorkload.pluralTitle,
     icon: 'ai ai-domains',
-    to: `/${TEXT_DOMAIN_WORKLOAD.pluralLabel}`,
+    to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains'
   }
 }

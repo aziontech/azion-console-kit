@@ -68,9 +68,11 @@
   }
 
   const checkIsLocked = async () => {
-    isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
-      id: edgeApplicationId.value
-    })
+    if (hasFlagBlockApiV4()) {
+      isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
+        id: edgeApplicationId.value
+      })
+    }
   }
 
   const handleLoadEdgeApplication = async () => {
