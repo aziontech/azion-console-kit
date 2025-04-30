@@ -45,6 +45,7 @@ export const domainsRoutes = {
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
+        flag: 'checkout_access',
         breadCrumbs: [
           {
             label: 'Domains',
@@ -75,6 +76,7 @@ export const domainsRoutes = {
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
+        flag: 'checkout_access',
         breadCrumbs: [
           {
             label: 'Domains',
