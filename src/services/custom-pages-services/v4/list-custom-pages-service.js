@@ -34,6 +34,19 @@ const parseStatusData = (status) => {
 
   return parsedStatus
 }
+const parseDefaultData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Yes',
+        severity: 'success'
+      }
+    : {
+        content: 'No',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
 
 const adapt = (httpResponse) => {
   const parsedBody =
@@ -42,9 +55,11 @@ const adapt = (httpResponse) => {
         id: customPage.id,
         name: customPage.name,
         lastEditor: customPage.last_editor,
-        lastModified: customPage.last_modified,
+        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          new Date(customPage.last_modified)
+        ),
         active: parseStatusData(customPage.active),
-        productVersion: customPage.product_version
+        default: parseDefaultData(customPage.default)
       }
     }) ?? []
 

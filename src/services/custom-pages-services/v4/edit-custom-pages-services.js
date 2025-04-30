@@ -32,7 +32,7 @@ const nullable = (value) => {
 const adapt = (payload) => {
   const pages = payload.pages.map((page) => {
     return {
-      code: page.code === 'Default' ? 'default' : page.code,
+      code: page.code.toLowerCase(),
       ttl: page.ttl,
       uri: nullable(page.uri),
       custom_status_code: nullable(page.customStatusCode)
@@ -44,7 +44,7 @@ const adapt = (payload) => {
     default: payload.isDefault,
     connector_custom_pages: {
       edge_connector: nullable(payload.edgeConnectorId),
-      pages // code, ttl, uri, custom_status_code
+      pages
     }
   }
 }
