@@ -1,6 +1,4 @@
 import * as Helpers from '@/helpers'
-// import * as EdgeApplicationsService from '@/services/edge-application-services'
-// import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services/v4'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
