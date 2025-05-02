@@ -53,7 +53,7 @@ export const customPagesRoutes = {
       props: {
         loadCustomPagesService: CustomPagesServiceV4.loadCustomPagesService,
         editCustomPagesService: CustomPagesServiceV4.editCustomPagesService,
-        updatedRedirect: 'list-custom-pages',
+        updatedRedirect: 'list-custom-pages'
       },
       meta: {
         breadCrumbs: [
