@@ -154,7 +154,8 @@ function createEdgeLibrariesItems() {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'pi pi-globe',
-      id: 'custom-pages'
+      id: 'custom-pages',
+      isBlockedApiV4: true
     }
   ]
 }

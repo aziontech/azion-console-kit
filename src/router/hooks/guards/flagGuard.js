@@ -4,7 +4,7 @@ import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 export async function flagGuard({ to }) {
   const checkFlag = to.meta?.flag
 
-  if (checkFlag === 'checkout_access' && !hasFlagBlockApiV4()) {
+  if (checkFlag === 'checkout_access' && hasFlagBlockApiV4()) {
     return '/not-found'
   }
 

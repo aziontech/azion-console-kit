@@ -49,7 +49,7 @@
           @click.middle="windowOpen(item.to)"
           :href="item.to"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
-          v-if="item?.clientFlag ? checkFlag(item?.clientFlag) : true"
+          v-if="hasClientFlag(item) || isBlockedApiV4(item)"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
@@ -75,6 +75,7 @@
   import { listSidebarMenusService } from '@services/sidebar-menus-services'
   import { windowOpen } from '@/helpers/window-open'
   import { useMagicKeys } from '@vueuse/core'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   const { meta, control } = useMagicKeys()
   const menuButton = ref(null)
@@ -167,4 +168,12 @@
     const response = listSidebarMenusService(showMarketplaceProductsInMenu.value)
     return response.body.menus
   })
+
+  const hasClientFlag = (item) => {
+    return !item?.clientFlag ? checkFlag(item?.clientFlag) : true
+  }
+
+  const isBlockedApiV4 = (item) => {
+    return item?.isBlockedApiV4 ? !hasFlagBlockApiV4() : true
+  }
 </script>
