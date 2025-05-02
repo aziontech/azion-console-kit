@@ -55,6 +55,7 @@ export const customPagesRoutes = {
       props: {
         loadCustomPagesService: CustomPagesServiceV4.loadCustomPagesService,
         editCustomPagesService: CustomPagesServiceV4.editCustomPagesService,
+        listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService,
         updatedRedirect: 'list-custom-pages'
       },
       meta: {

@@ -138,10 +138,12 @@
     try {
       edgeConnectorsList.value = await props.listEdgeConnectorsService()
     } catch (error) {
+    console.log('error :', error);
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'Something went wrong',
+        detail: 'Is not possible to list Edge Connectors, try again later'
       })
     }
   }

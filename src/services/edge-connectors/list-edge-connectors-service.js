@@ -9,7 +9,7 @@ export const listEdgeConnectorsService = async ({
   pageSize = 100,
   fields = '',
   search = ''
-}) => {
+} = {}) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
