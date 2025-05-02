@@ -18,7 +18,7 @@ const makeSut = () => {
 describe('SidebarMenusServices', () => {
   vi.mock('@/composables/user-flag', () => {
     return {
-      hasFlagBlockApiV4: vi.fn(),
+      hasFlagBlockApiV4: vi.fn()
     }
   })
 
