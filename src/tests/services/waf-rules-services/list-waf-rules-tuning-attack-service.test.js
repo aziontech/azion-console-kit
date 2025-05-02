@@ -95,6 +95,7 @@ describe('WafRulesService', () => {
         matchesOn: fixtures.wafRulesMock.matches_on,
         countryCount: fixtures.wafRulesMock.country_count,
         topPaths: ['/get (10 hits)'],
+        top10Paths: [{ path: '/get', hits: 10 }],
         matchValue: fixtures.wafRulesMock.match_value
       }
     ])

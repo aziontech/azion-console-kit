@@ -34,10 +34,16 @@ const adapt = (payload) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    return errorSchema[key]?.[0]
+  if (typeof errorSchema[key] === 'string') {
+    return `${key}: ${errorSchema[key]}`
   }
-  return errorSchema[key]
+
+  if (typeof errorSchema[key] === 'object') {
+    const [firstKey] = Object.keys(errorSchema[key])
+    return `${firstKey}: ${errorSchema[key][firstKey]}`
+  }
+
+  return `${key}: ${errorSchema[key][0]}`
 }
 
 /**
@@ -46,9 +52,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
+  return errorMessage
 }
 
 /**
