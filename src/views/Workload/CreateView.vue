@@ -143,7 +143,7 @@
       closable: true,
       severity: 'success',
       summary: 'Succesfully created!',
-      detail: 'The domain is now available in the Domain management section.'
+      detail: 'The domain is now available in the Workload management section.'
     }
     toast.add({ ...toastConfig })
   }

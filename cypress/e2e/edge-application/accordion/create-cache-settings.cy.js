@@ -39,14 +39,4 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.list.searchInput).type(`${fixtures.cacheName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheName)
   })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
-  })
 })

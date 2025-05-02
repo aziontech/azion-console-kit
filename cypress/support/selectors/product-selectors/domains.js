@@ -1,5 +1,5 @@
 export default {
-  createButton: '[data-testid="create_Domain_button"]',
+  createButton: '[data-testid="create_Workload_button"]',
   nameInput: '[data-testid="domains-form__name-field__input"]',
   portHttp: '[data-testid="form-horizontal-delivery-settings-http-ports-multi-select"]',
   portHttps: '[data-testid="form-horizontal-delivery-settings-https-ports-multi-select"]',
@@ -25,16 +25,16 @@ export default {
   createEdgeApplicationButton: '[data-testid="domains-form__create-edge-application-button"]',
   createEdgeFirewallButton: '[data-testid="domains-form__create-edge-firewall-button"]',
   edgeApplicationDrawer: '.p-sidebar-content',
-  dialogTitle: '[data-testid="domains-view__copy-domain-dialog__header-title"]',
-  domainField: '[data-testid="domains-dialog__domain-field__input"]',
+  dialogTitle: '[data-testid="workloads-view__copy-workload-dialog__header-title"]',
+  domainField: '[data-testid="workloads-dialog__workload-field__input"]',
   digitalCertificateDropdownFilter:
     '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
   createDigitalCertificateButton: '[data-testid="domains-form__create-digital-certificate-button"]',
   digitalCertificateActionBar: '[data-testid="digital-certificates-drawer__action-bar"]',
   edgeFirewallActionBar: '[data-testid="edge-firewall-drawer__action-bar"]',
   cnameAccessOnlyField: '[data-testid="domains-form__cname-access-only-field"]',
-  copyDomainButton: '[data-testid="domains-dialog__copy-domain__button"]',
-  confirmButton: '[data-testid="domains-dialog__confirm__button"]',
+  copyDomainButton: '[data-testid="workloads-dialog__copy-workload__button"]',
+  confirmButton: '[data-testid="workloads-dialog__confirm__button"]',
   pageTitle: (entityName) => `[data-testid="page_title_${entityName}"]`,
   digitalCertificateFieldSelectedValue:
     ':nth-child(4) > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
@@ -48,7 +48,7 @@ export default {
     '[data-testid="domains-form__digital-certificates-field__dropdown"] > .p-dropdown-label',
   letsEncryptDropdownOption: '#edgeCertificate_1',
   editPageTitle:
-    '[data-testid="page-heading-block__breadcrumb__Edit Domain"] > .p-menuitem-link > .p-menuitem-text',
+    '[data-testid="page-heading-block__breadcrumb__Edit Workload"] > .p-menuitem-link > .p-menuitem-text',
   enableMtlsSwitch:
     '[data-testid="domains-form__mtls-is-enabled-field__switch"] > .p-inputswitch-slider',
   dropdownTrustedCA:
@@ -58,8 +58,8 @@ export default {
     ':nth-child(5) > .max-w-3xl > .sm\\:max-w-xs > [data-testid="field-dropdown__dropdown"] > .p-dropdown-label',
   fieldTextInput: '[data-testid="field-text__input"]',
   domainUri: '[data-testid="edit-domains-form__domain-field__input"]',
-  editFormCopyDomainButton: '[data-testid="edit-domains-form__domain-field__copy-button"]',
-  activeSwitchEditForm: '[data-testid="edit-domains-form__active-field__switch"]',
+  editFormCopyDomainButton: '[data-testid="workloads-dialog__workload-field__input"]',
+  activeSwitchEditForm: '[data-testid="edit-workloads-form__active-field__switch"]',
   formActionsSubmitButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
   dataTableSearchInput: '[data-testid="data-table-search-input"]',
   listTableBlockColumnNameRow: '[data-testid="list-table-block__column__name__row"]',

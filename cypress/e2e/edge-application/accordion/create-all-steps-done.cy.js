@@ -25,7 +25,7 @@ const createOrigin = () => {
     cy.verifyToast('success', 'Your origin has been created')
 }
 
-const createDomain = () => {
+const createWorkload = () => {
     cy.intercept('GET', `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`).as('getEdgeFirewallList')
     cy.intercept('GET', '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*').as('searchDigitalCertificatesApi')
     cy.get(selectors.edgeApplication.accordionStepDomain.createDomain).click()
@@ -51,15 +51,15 @@ const createDomain = () => {
     cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('POST', '/api/v4/workspace/workloads').as('createDomain')
+    cy.intercept('POST', '/api/v4/workspace/workloads').as('createWorkload')
 
     cy.get(selectors.domains.cnameAccessOnlyField).click()
     
     
     // Act
     cy.get(selectors.form.createButtonAccordtion).eq(1).click()
-    cy.wait('@createDomain')
-    cy.verifyToast('success', 'Your domain has been created')
+    cy.wait('@createWorkload')
+    cy.verifyToast('success', 'Your workload has been created')
 }
 
 describe('Edge Application', { tags: ['@dev4'] }, () => {
@@ -85,7 +85,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.verifyToast('success', 'Your edge application has been created')
 
     createOrigin()
-    createDomain()
+    createWorkload()
     createCacheSettings()
     
     cy.get(selectors.form.actionsFinishButton).click()
@@ -102,21 +102,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-        entityName: fixtures.domainName,
-        productName: 'Domains'
-      }).then(() => {
-        cy.verifyToast('Domain successfully deleted')
-      })
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

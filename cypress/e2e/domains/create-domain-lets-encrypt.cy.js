@@ -78,11 +78,11 @@ describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
+    cy.get(selectors.domains.dialogTitle).should('have.text', 'Workload has been created')
     cy.get(selectors.domains.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
-    cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
+    cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Workload')
 
     cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()

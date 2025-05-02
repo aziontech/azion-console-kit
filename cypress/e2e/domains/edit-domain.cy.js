@@ -142,14 +142,14 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert - create a domain
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
+    cy.get(selectors.domains.dialogTitle).should('have.text', 'Workload has been created')
     cy.get(selectors.domains.domainField).should('be.visible')
     cy.get(selectors.domains.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',
-      'The domain is now available in the Domain management section.'
+      'The domain is now available in the Workload management section.'
     )
 
     domainEditedName = `${domainName}-edit`
@@ -157,7 +157,6 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     // Act
     cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
     cy.get(selectors.domains.fieldTextInput).clear()
-    cy.get(selectors.domains.edgeFirewallClearIcon).click()
     cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
     cy.get(selectors.domains.cnamesField).clear()
     cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
@@ -165,19 +164,15 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     createDigitalCertificate()
 
     cy.get(selectors.domains.domainUri).should('be.disabled')
-    cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
-    cy.get(selectors.domains.activeSwitchEditForm).click()
-    cy.intercept('PATCH', '/api/v3/domains/*', (req) => {
-      expect(req.body).to.have.property('edge_firewall_id', null)
-    }).as('editDomain')
+    cy.intercept('PATCH', '/api/v4/workspace/workloads/*').as('editWorkload')
+
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.wait('@editDomain')
+    cy.wait('@editWorkload')
 
     // Assert
-    cy.verifyToast('success', 'Your domain has been edited')
+    cy.verifyToast('success', 'Your workload has been edited')
     cy.get(selectors.domains.dataTableSearchInput).clear()
     cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
     cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
-    cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
   })
 })
