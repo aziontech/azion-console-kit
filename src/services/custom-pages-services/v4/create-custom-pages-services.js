@@ -33,7 +33,7 @@ const adapt = (payload) => {
     default: payload.isDefault,
     connector_custom_pages: {
       edge_connector: nullable(payload.edgeConnectorId),
-      pages // code, ttl, uri, custom_status_code
+      pages
     }
   }
 }
@@ -46,7 +46,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return { feedback: 'Custom Page successfully created' }
+      return {
+        feedback: 'Custom Page successfully created',
+        urlToEditView: `/custom-pages/edit/${httpResponse.body.data.id}`
+      }
     case 500:
       throw new Errors.InternalServerError().message
     default:

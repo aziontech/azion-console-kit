@@ -150,8 +150,7 @@
 <template>
   <FormHorizontal
     title="Custom Page"
-    description="Customize error pages and cache TTL based on the HTTP status code received from the origin."
-    :isDrawer="true"
+    description="Create custom pages to handle errors and cache TTL based on the HTTP status code received from the edge connectors."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -200,7 +199,7 @@
           name="isDefault"
           :value="isDefault"
           :isCard="false"
-          description="Enable or disable to the default page."
+          description="Enable or disable the Custom Page as default."
           auto
           data-testid="custom-page__isDefault-field"
         />
@@ -210,8 +209,7 @@
 
   <FormHorizontal
     title="Pages"
-    description="Select an origin to customize the error page path."
-    :isDrawer="true"
+    description="Customize error pages and cache TTL based on the HTTP status code received from the edge connectors."
   >
     <template #inputs>
       <div

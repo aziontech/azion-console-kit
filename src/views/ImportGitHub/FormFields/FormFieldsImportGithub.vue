@@ -188,6 +188,10 @@
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
+
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
+  }
 </script>
 
 <template>
@@ -343,6 +347,10 @@
                 v-if="slotProps.value"
                 class="flex items-center"
               >
+                <i
+                  :class="getPresetIconClass(slotProps.value)"
+                  class="mr-2"
+                ></i>
                 <div>
                   {{
                     getOptionNameByValue({
@@ -359,6 +367,10 @@
             </template>
             <template #option="slotProps">
               <div class="flex items-center">
+                <i
+                  :class="getPresetIconClass(slotProps.option.value)"
+                  class="mr-2"
+                ></i>
                 <div>{{ slotProps.option.label }}</div>
               </div>
             </template>

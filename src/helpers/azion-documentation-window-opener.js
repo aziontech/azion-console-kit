@@ -7,6 +7,7 @@ export const AZION_CONTACT_SUPPORT =
 export const GOOGLE_AUTHENTICATOR_DOCUMENTATION =
   'https://support.google.com/accounts/answer/1066447'
 export const AZION_SITE = 'https://www.azion.com/'
+export const AZION_LAUNCH_WEEK = 'https://www.azion.com/en/launch-week/'
 export const AZION_BLOG = 'https://www.azion.com/en/blog/'
 export const AZION_DISCORD = 'https://discord.com/invite/Yp9N7RMVZy'
 export const AZION_GITHUB = 'https://github.com/aziontech/azion-console-kit'
@@ -65,4 +66,8 @@ export const openShowMorePlan = () => {
 
 export const openMarketplaceIntegrationsDocumentation = () => {
   window.open(AZION_INTEGRATIONS, '_blank')
+}
+
+export const openLaunchWeek = () => {
+  window.open(AZION_LAUNCH_WEEK, '_blank')
 }

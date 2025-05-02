@@ -37,7 +37,7 @@ const adapt = (httpResponse) => {
     isDefault: customPage.default,
     productVersion: customPage.product_version,
     edgeConnectorId: customPage.connector_custom_pages.edge_connector,
-    pages // code, ttl, uri, custom_status_code
+    pages
   }
 
   return {
