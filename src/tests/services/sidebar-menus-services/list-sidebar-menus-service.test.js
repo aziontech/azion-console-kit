@@ -1,6 +1,6 @@
 import { listSidebarMenusService } from '@/services/sidebar-menus-services'
 import { getMenuItens } from '@/services/sidebar-menus-services/menus'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   menusMock: getMenuItens(),
@@ -16,6 +16,12 @@ const makeSut = () => {
 }
 
 describe('SidebarMenusServices', () => {
+  vi.mock('@/composables/user-flag', () => {
+    return {
+      hasFlagBlockApiV4: vi.fn(),
+    }
+  })
+
   it('should return correct menus', async () => {
     const { sut } = makeSut()
 

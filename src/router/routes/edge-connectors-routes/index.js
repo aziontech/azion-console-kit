@@ -25,6 +25,27 @@ export const edgeConnectorsRoutes = {
         ],
         flag: 'checkout_access'
       }
+    },
+    {
+      path: 'create',
+      name: 'create-edge-connectors',
+      component: () => import('@views/EdgeConnectors/CreateView.vue'),
+      props: {
+        createEdgeConnectorsService: EdgeConnectorsService.createEdgeConnectorsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Connectors',
+            to: '/edge-connectors'
+          },
+          {
+            label: 'Create Edge Connectors',
+            to: '/edge-connectors/create'
+          }
+        ],
+        flag: 'checkout_access'
+      }
     }
   ]
 }
