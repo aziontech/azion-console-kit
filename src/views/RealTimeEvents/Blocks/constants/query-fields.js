@@ -90,9 +90,11 @@ const formatOperatorData = (operator, fieldName, field) => ({
 })
 
 const extractOperatorFormat = (operators, fieldFormat) => {
+  const { verifyWhiteListFields, verifyBlackListFields } = FILTERS_RULES()
+  
   return operators
-    .filter(FILTERS_RULES().verifyWhiteListFields)
-    .filter(FILTERS_RULES().verifyBlackListFields)
+    .filter(verifyWhiteListFields)
+    .filter(verifyBlackListFields)
     .filter(({ deprecated }) => !deprecated.includes('DEPRECATED'))
     .map((operator) => {
       const fieldOperator = splitFieldNameAndOperator(operator.name)
