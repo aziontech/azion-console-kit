@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as CustomPagesServiceV4 from '@/services/custom-pages-services/v4'
+import * as EdgeConnectorsService from '@/services/edge-connectors'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const customPagesRoutes = {
@@ -30,7 +31,8 @@ export const customPagesRoutes = {
       name: 'create-custom-pages',
       component: () => import('@views/CustomPages/CreateView.vue'),
       props: {
-        createCustomPagesService: CustomPagesServiceV4.createCustomPagesService
+        createCustomPagesService: CustomPagesServiceV4.createCustomPagesService,
+        listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService
       },
       meta: {
         breadCrumbs: [

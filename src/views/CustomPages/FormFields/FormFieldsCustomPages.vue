@@ -7,10 +7,11 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import { useField, useFieldArray } from 'vee-validate'
   import { onMounted, ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  defineProps({
+  const props = defineProps({
     listEdgeConnectorsService: {
       type: Function,
       required: true
@@ -118,6 +119,8 @@
   const { value: isDefault } = useField('isDefault')
   const { push: pushPage, remove: removePage, fields: pages } = useFieldArray('pages')
 
+  const toast = useToast()
+
   const pageInitialState = {
     code: 400,
     ttl: 0,
@@ -131,13 +134,21 @@
 
   const edgeConnectorsList = ref([])
 
-  // const getEdgeConnectors = async () => {
-  //   edgeConnectorsList.value = await props.listEdgeConnectorsService()
-  // }
+  const getEdgeConnectors = async () => {
+    try {
+      edgeConnectorsList.value = await props.listEdgeConnectorsService()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
 
   onMounted(async () => {
-    // await getEdgeConnectors()
     addNewPage()
+    await getEdgeConnectors()
   })
 
   const removePageFromList = async (index) => {
