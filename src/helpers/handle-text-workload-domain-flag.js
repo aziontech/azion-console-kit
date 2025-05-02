@@ -1,3 +1,5 @@
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 const TEXT_FOR_DOMAIN = {
   singularTitle: 'Domain',
   singularLabel: 'domain',
@@ -12,9 +14,6 @@ const TEXT_FOR_WORKLOAD = {
   pluralLabel: 'workloads'
 }
 
-//TODO handle flags next task
-const IS_DOMAIN_CONTEXT = false
+const TEXT_DOMAIN_WORKLOAD = () => (hasFlagBlockApiV4() ? TEXT_FOR_DOMAIN : TEXT_FOR_WORKLOAD)
 
-const SELECTED_TEXT = IS_DOMAIN_CONTEXT ? TEXT_FOR_DOMAIN : TEXT_FOR_WORKLOAD
-
-export default SELECTED_TEXT
+export default TEXT_DOMAIN_WORKLOAD

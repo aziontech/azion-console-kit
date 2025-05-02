@@ -5,6 +5,7 @@ import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 export default class Aql {
   constructor() {
     this.operators = ['<=', '>=', '=', '<>', '<', '>', 'like', 'ilike', 'between', 'in']
+    this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
   parse(query, suggestions, domains) {
@@ -63,7 +64,7 @@ export default class Aql {
           parsedValue = Number(value)
         } else if (
           operator.toUpperCase() === 'IN' &&
-          field.toLowerCase() === TEXT_DOMAIN_WORKLOAD.singularLabel
+          field.toLowerCase() === this.handleTextDomainWorkload.singularLabel
         ) {
           parsedValue = this.formatDomainValues(query, domains)
         } else {
@@ -88,7 +89,7 @@ export default class Aql {
 
     const normalizedField = field.trim()
 
-    if (normalizedField.toLowerCase() === TEXT_DOMAIN_WORKLOAD.singularLabel)
+    if (normalizedField.toLowerCase() === this.handleTextDomainWorkload.singularLabel)
       return 'configurationId'
 
     const words = normalizedField.split(/\s+/)
@@ -104,7 +105,7 @@ export default class Aql {
 
   formatDomainValues(query, domains) {
     const extractDomainClauseContent = (query) => {
-      const indicator = `${TEXT_DOMAIN_WORKLOAD.singularLabel} in (`
+      const indicator = `${this.handleTextDomainWorkload.singularLabel} in (`
       const lowerQuery = query.toLowerCase()
       const pos = lowerQuery.indexOf(indicator)
       if (pos === -1) return null
@@ -228,7 +229,7 @@ export default class Aql {
         return { query: newQuery, nextStep: 'value', label: fieldName }
       }
       case 'value': {
-        if (fieldName === TEXT_DOMAIN_WORKLOAD.singularLabel) {
+        if (fieldName === this.handleTextDomainWorkload.singularLabel) {
           const suggestion = suggestionLabel.trim()
 
           let newQuery = ''
@@ -292,7 +293,7 @@ export default class Aql {
       }
       return {
         operator: 'value',
-        selectedField: operatorFound === 'in' ? TEXT_DOMAIN_WORKLOAD.singularLabel : ''
+        selectedField: operatorFound === 'in' ? this.handleTextDomainWorkload.singularLabel : ''
       }
     } else if (tokenForMatch && hasValueAfterOperator && query.endsWith(' ')) {
       return { operator: 'logicOperator', selectedField: '' }
@@ -733,7 +734,7 @@ export default class Aql {
   }
 
   getValueSuggestions(domains, selectedFieldName) {
-    if (selectedFieldName === TEXT_DOMAIN_WORKLOAD.singularLabel) {
+    if (selectedFieldName === this.handleTextDomainWorkload.singularLabel) {
       return domains
     }
     return []

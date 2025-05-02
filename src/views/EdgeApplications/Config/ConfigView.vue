@@ -6,8 +6,8 @@
           <span class="text-color text-3xl font-medium">Edge Application Created!</span>
           <p class="font-normal text-base text-color-secondary mt-4">
             Start customizing the application with a quick setup. Once completed, advanced settings
-            will become available and can be edited anytime on the Edge Application or
-            {{ TEXT_DOMAIN_WORKLOAD.singularTitle }} page.
+            will become available and can be edited anytime on the Edge Application or Workload
+            page.
           </p>
         </div>
         <Accordion
@@ -95,7 +95,7 @@
               :loadEdgeApplicationsService="props.workloadService.loadEdgeApplicationsService"
               :listEdgeApplicationsService="props.workloadService.listEdgeApplicationsService"
               :createDomainService="props.workloadService.createDomainService"
-              @createdDomain="handleResponse('worklodas')"
+              @createdDomain="handleResponse('workloads')"
             />
           </AccordionTab>
         </Accordion>
@@ -141,6 +141,7 @@
       </div>
     </section>
     <actionBarSkitConfig
+      :loading="loadingFinishedConfig"
       :finishedConfiguration="finishedConfiguration"
       :primaryActionLabel="primaryActionLabel"
       @onSubmit="onSubmit"
@@ -156,8 +157,10 @@
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { disabledBackButton } from '@/helpers'
+
   import { ref, computed, onMounted } from 'vue'
+
   const props = defineProps({
     workloadService: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
@@ -178,6 +181,7 @@
   const cacheSettingId = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const rulesEngine = ref(null)
+  const loadingFinishedConfig = ref(false)
 
   const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
   const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
@@ -246,6 +250,7 @@
 
   const onSubmit = async () => {
     if (hasCreateCache.value && hasCreateOrigin.value) {
+      loadingFinishedConfig.value = true
       const payload = {
         ...rulesEngine.value.body[0],
         phase: 'default',
@@ -260,10 +265,14 @@
           }
         ]
       }
-      await props.rulesEngineServices.editRulesEngineService({
-        id: edgeApplicationId.value,
-        payload
-      })
+      try {
+        await props.rulesEngineServices.editRulesEngineService({
+          id: edgeApplicationId.value,
+          payload
+        })
+      } finally {
+        loadingFinishedConfig.value = false
+      }
     }
     router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
   }
@@ -291,13 +300,14 @@
       hasCreateCache.value = true
       closeAccordionTab(tabCache)
     }
-    if (tab === 'workload') {
+    if (tab === 'workloads') {
       hasBindWorkload.value = true
       closeAccordionTab(tabWorkload)
     }
   }
 
   onMounted(async () => {
+    disabledBackButton()
     rulesEngine.value = await props.rulesEngineServices.listRulesEngineService({
       id: edgeApplicationId.value
     })

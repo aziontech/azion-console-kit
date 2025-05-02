@@ -8,7 +8,8 @@ import { createNewRoutes } from '@routes/create-new-routes'
 import { compareWithAzionRoutes } from '@routes/compare-with-azion'
 import { dataStreamRoutes } from '@/router/routes/data-stream-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
-import { domainsRoutes } from '@routes/domains-routes'
+import { workloadRoutes } from '@/router/routes/workload-routes'
+import { domainsRoutes } from '@/router/routes/domains'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
@@ -53,8 +54,9 @@ const router = createRouter({
   routes: [
     cliCallbackRoutes,
     dataStreamRoutes,
-    digitalCertificatesRoutes,
     domainsRoutes,
+    digitalCertificatesRoutes,
+    workloadRoutes,
     edgeApplicationRoutes,
     edgeFirewallRoutes,
     identityProvidersRoutes,

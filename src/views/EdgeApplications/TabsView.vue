@@ -14,7 +14,9 @@
   import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -66,9 +68,11 @@
   }
 
   const checkIsLocked = async () => {
-    isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
-      id: edgeApplicationId.value
-    })
+    if (hasFlagBlockApiV4()) {
+      isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
+        id: edgeApplicationId.value
+      })
+    }
   }
 
   const handleLoadEdgeApplication = async () => {
@@ -193,7 +197,7 @@
   const tabs = ref([
     {
       header: 'Main Settings',
-      component: EditView,
+      component: hasFlagBlockApiV4() ? EditViewV3 : EditView,
       condition: true,
       show: showTabs.mainSettings,
       props: () => ({

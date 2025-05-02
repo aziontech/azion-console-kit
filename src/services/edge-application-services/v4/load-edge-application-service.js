@@ -29,7 +29,8 @@ const adapt = (httpResponse) => {
     imageProcessorEnabled: edgeApplication.modules.image_processor_enabled,
     tieredCacheEnabled: edgeApplication.modules.tiered_cache_enabled,
     isActive: edgeApplication.active,
-    debug: edgeApplication.debug
+    debug: edgeApplication.debug,
+    productVersion: edgeApplication.product_version
   }
 
   return {
