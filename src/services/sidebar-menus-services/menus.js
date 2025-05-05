@@ -157,7 +157,7 @@ function createEdgeLibrariesItems() {
       to: '/edge-connectors',
       icon: 'ai ai-waf-rules',
       id: 'edge-connectors',
-      visible: hasFlagBlockApiV4()
+      visible: !hasFlagBlockApiV4()
     }
   ]
 }
