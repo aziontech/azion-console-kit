@@ -99,54 +99,54 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'GET',
       `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
     ).as('getEdgeApplicationListFilter')
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
+    cy.get(selectors.workload.createButton).click()
+    cy.get(selectors.workload.nameInput).type(domainName)
 
     // protocol section
-    cy.get(selectors.domains.portHttp).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
-    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.workload.portHttp).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.workload.portHttp).click()
 
-    cy.get(selectors.domains.useHttpsField).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.tlsVersion).click()
-    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
-    cy.get(selectors.domains.cipherSuite).click()
-    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+    cy.get(selectors.workload.useHttpsField).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.tlsVersion).click()
+    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.workload.cipherSuite).click()
+    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.wait('@getEdgeFirewalls')
     cy.wait('@getEdgeApplicationList')
 
-    cy.get(selectors.domains.edgeFirewallField).click()
-    cy.get(selectors.domains.edgeFirewallDropdownSearch).clear()
+    cy.get(selectors.workload.edgeFirewallField).click()
+    cy.get(selectors.workload.edgeFirewallDropdownSearch).clear()
     cy.intercept(
       'GET',
       `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
-    cy.get(selectors.domains.edgeFirewallDropdownSearch).type(firewallName)
+    cy.get(selectors.workload.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')
-    cy.get(selectors.domains.edgeFirewallOption).click()
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
+    cy.get(selectors.workload.edgeFirewallOption).click()
+    cy.get(selectors.workload.edgeApplicationField).click()
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).type(edgeAppName)
 
     cy.wait('@getEdgeApplicationListFilter')
-    cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
+    cy.get(selectors.workload.edgeApplicationOption).click()
+    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert - create a domain
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Workload has been created')
-    cy.get(selectors.domains.domainField).should('be.visible')
-    cy.get(selectors.domains.copyDomainButton).click()
+    cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
+    cy.get(selectors.workload.domainField).should('be.visible')
+    cy.get(selectors.workload.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
-    cy.get(selectors.domains.confirmButton).click()
+    cy.get(selectors.workload.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',
       'The domain is now available in the Workload management section.'
@@ -155,15 +155,15 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     domainEditedName = `${domainName}-edit`
 
     // Act
-    cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
-    cy.get(selectors.domains.fieldTextInput).clear()
-    cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
-    cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
+    cy.get(selectors.workload.fieldTextInput).should('have.value', domainName)
+    cy.get(selectors.workload.fieldTextInput).clear()
+    cy.get(selectors.workload.fieldTextInput).type(domainEditedName)
+    cy.get(selectors.workload.cnamesField).clear()
+    cy.get(selectors.workload.cnamesField).type(`${domainName}-edit.net`)
 
     createDigitalCertificate()
 
-    cy.get(selectors.domains.domainUri).should('be.disabled')
+    cy.get(selectors.workload.domainUri).should('be.disabled')
     cy.intercept('PATCH', '/api/v4/workspace/workloads/*').as('editWorkload')
 
     cy.get(selectors.form.actionsSubmitButton).click()
@@ -171,8 +171,8 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Assert
     cy.verifyToast('success', 'Your workload has been edited')
-    cy.get(selectors.domains.dataTableSearchInput).clear()
-    cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
-    cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
+    cy.get(selectors.workload.dataTableSearchInput).clear()
+    cy.get(selectors.workload.dataTableSearchInput).type(`${domainEditedName}{enter}`)
+    cy.get(selectors.workload.listTableBlockColumnNameRow).should('have.text', domainEditedName)
   })
 })

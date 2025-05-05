@@ -14,7 +14,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
   })
 
-  it('should add an chace settings', () => {
+  it('should add an workload', () => {
     //edge application creation
     cy.openProduct('Edge Application')
     
@@ -31,28 +31,28 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     // create domain
 
-    cy.get(selectors.domains.nameInput).type(fixtures.domainName)
+    cy.get(selectors.workload.nameInput).type(fixtures.domainName)
 
     // protocol section
-    cy.get(selectors.domains.portHttp).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
-    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.workload.portHttp).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.workload.portHttp).click()
 
-    cy.get(selectors.domains.useHttpsField).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.tlsVersion).click()
-    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
-    cy.get(selectors.domains.cipherSuite).click()
-    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+    cy.get(selectors.workload.useHttpsField).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.tlsVersion).click()
+    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.workload.cipherSuite).click()
+    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept('POST', '/api/v4/workspace/workloads').as('createWorkload')
 
-    cy.get(selectors.domains.cnameAccessOnlyField).click()
+    cy.get(selectors.workload.cnameAccessOnlyField).click()
     
     
     // Act

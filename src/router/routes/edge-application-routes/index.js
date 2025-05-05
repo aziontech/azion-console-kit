@@ -104,6 +104,7 @@ export const edgeApplicationRoutes = {
         }
       },
       meta: {
+        flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {
             label: 'Edge Applications',

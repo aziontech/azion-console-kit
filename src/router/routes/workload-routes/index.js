@@ -45,6 +45,8 @@ export const workloadRoutes = {
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
+        flag: 'checkout_access_without_flag',
+
         breadCrumbs: [
           {
             label: `Workloads`,
@@ -84,6 +86,7 @@ export const workloadRoutes = {
         }
       },
       meta: {
+        flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {
             label: `Workloads`,
