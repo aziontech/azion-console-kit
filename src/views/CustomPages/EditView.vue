@@ -11,7 +11,7 @@
         :updatedRedirect="updatedRedirect"
       >
         <template #form>
-          <FormFieldsCustomPages />
+          <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
@@ -44,6 +44,10 @@
     },
     updatedRedirect: {
       type: String,
+      required: true
+    },
+    listEdgeConnectorsService: {
+      type: Function,
       required: true
     }
   })

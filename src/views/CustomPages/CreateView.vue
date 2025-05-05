@@ -10,7 +10,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCustomPages />
+          <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -36,6 +36,10 @@
 
   defineProps({
     createCustomPagesService: {
+      type: Function,
+      required: true
+    },
+    listEdgeConnectorsService: {
       type: Function,
       required: true
     }
