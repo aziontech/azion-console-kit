@@ -293,7 +293,7 @@
         isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite,
-        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAcceleratorEnabled
+        hideApplicationAcceleratorInDescription: edgeApplication.value[applicationAcceleratorEnabled.value]
       })
     }
   ])
