@@ -4,4 +4,10 @@ import { createEdgeConnectorsService } from './create-edge-connectors-service'
 import { loadEdgeConnectorsService } from './load-edge-connectors-service'
 import { editEdgeConnectorsService } from './edit-edge-connectors-service'
 
-export { listEdgeConnectorsService, deleteEdgeConnectorsService, createEdgeConnectorsService, loadEdgeConnectorsService, editEdgeConnectorsService }
+export {
+  listEdgeConnectorsService,
+  deleteEdgeConnectorsService,
+  createEdgeConnectorsService,
+  loadEdgeConnectorsService,
+  editEdgeConnectorsService
+}

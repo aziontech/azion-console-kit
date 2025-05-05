@@ -62,7 +62,7 @@ export const edgeConnectorsRoutes = {
             to: '/edge-connectors'
           },
           {
-            label: 'Edit Edge Connectors',
+            label: 'Edit Edge Connectors'
           }
         ],
         flag: 'checkout_access'
