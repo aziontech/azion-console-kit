@@ -5,18 +5,14 @@ let domainName
 let edgeAppName
 let digitalCertificateName
 let firewallName
-
-const cnames = 'trabalho_local.lucas.com.br\n-trabalho-local.lucas.com.br'
-
 const createEdgeApplicationCase = () => {
   edgeAppName = generateUniqueName('EdgeApp')
   firewallName = generateUniqueName('EdgeFirewall')
   // Arrange
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
 
   // Act
-  cy.get(selectors.domains.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
+  cy.get(selectors.workload.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
 
   // Assert
   cy.verifyToast('success', 'Your edge application has been created')
@@ -26,7 +22,7 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).clear()
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
 
-  cy.get(selectors.domains.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
+  cy.get(selectors.workload.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
 
   cy.verifyToast('success', 'Your Edge Firewall has been created')
 }
@@ -52,7 +48,7 @@ const createDigitalCertificateCase = () => {
   )
 
   // Act
-  cy.get(selectors.domains.digitalCertificateActionBar)
+  cy.get(selectors.workload.digitalCertificateActionBar)
     .find(selectors.form.actionsSubmitButton)
     .click()
 
@@ -63,11 +59,7 @@ const createDigitalCertificateCase = () => {
 
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
-    }).as('accountInfo')
     cy.login()
-    
   })
 
   it('should create and delete a domain using a edge application', () => {
@@ -75,89 +67,77 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
-
     cy.intercept(
       'GET',
       '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
-
     cy.intercept(
       'GET',
       `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
-
     cy.intercept(
       'GET',
       '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
     ).as('searchDigitalCertificatesApi')
 
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
+    cy.get(selectors.workload.createButton).click()
+    cy.get(selectors.workload.nameInput).type(domainName)
+
+    // protocol section
+    cy.get(selectors.workload.portHttp).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.workload.portHttp).click()
+
+    cy.get(selectors.workload.useHttpsField).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.tlsVersion).click()
+    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.workload.cipherSuite).click()
+    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
+
+
+    cy.get(selectors.workload.useHttp3Field).click()
 
     cy.wait('@getEdgeApplicationList')
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.createEdgeApplicationButton).click()
+    cy.get(selectors.workload.edgeApplicationField).click()
+    cy.get(selectors.workload.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
     cy.wait('@getEdgeFirewallList')
-    cy.get(selectors.domains.edgeFirewallField).click()
-    cy.get(selectors.domains.createEdgeFirewallButton).click()
+    cy.get(selectors.workload.edgeFirewallField).click()
+    cy.get(selectors.workload.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
 
-    cy.get(selectors.domains.cnameAccessOnlyField).click()
-    cy.get(selectors.domains.digitalCertificateDropdown).click()
-    cy.get(selectors.domains.createDigitalCertificateButton).click()
+    cy.get(selectors.workload.cnameAccessOnlyField).click()
+    cy.get(selectors.workload.digitalCertificateDropdown).click()
+    cy.get(selectors.workload.createDigitalCertificateButton).click()
     createDigitalCertificateCase()
-
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
+    cy.verifyToast('error', 'certificate: Invalid certificate status, CANNOT use pending certificate.')
 
-    cy.get(selectors.domains.digitalCertificateDropdown).click()
+    cy.get(selectors.workload.digitalCertificateDropdown).click()
 
-    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).clear()
-    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).type('azion')
+    cy.get(selectors.workload.digitalCertificateDropdownFilterSearch).clear()
+    cy.get(selectors.workload.digitalCertificateDropdownFilterSearch).type('azion')
 
     cy.wait('@searchDigitalCertificatesApi')
-    cy.get(selectors.domains.edgeCertificateOption).click()
+    cy.get(selectors.workload.edgeCertificateOption).click()
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
-    cy.get(selectors.domains.domainField).should('be.visible')
-    cy.get(selectors.domains.copyDomainButton).click()
+    cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
+    cy.get(selectors.workload.domainField).should('be.visible')
+    cy.get(selectors.workload.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
-    cy.get(selectors.domains.confirmButton).click()
+    cy.get(selectors.workload.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',
-      'The domain is now available in the Domain management section.'
-    )
-  })
-
-  it('should error when cname is invalid on domain creation', () => {
-    domainName = generateUniqueName('domain')
-
-    // Arrange
-    cy.openProduct('Domains')
-
-    cy.intercept(
-      'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
-    ).as('getEdgeApplicationList')
-
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
-
-    cy.wait('@getEdgeApplicationList')
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.createEdgeApplicationButton).click()
-    createEdgeApplicationCase()
-
-    cy.get(selectors.domains.cnamesField).type(cnames)
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast(
-      'error',
-      'cname_invalid_format: trabalho_local.lucas.com.br, -trabalho-local.lucas.com.br'
+      'The domain is now available in the Workload management section.'
     )
   })
 })

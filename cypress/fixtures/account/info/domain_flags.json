@@ -1,0 +1,18 @@
+{
+  "id": 22692,
+  "name": "Vinicius",
+  "company_name": "Azion",
+  "full_name": "Paulo Ferreira",
+  "city": "Porto Alegre",
+  "region": "Rio Grande do Sul",
+  "country": "Brazil",
+  "kind": "client",
+  "client_flags": ["allow_console", "enable_ipv6", "federated_auth", "waf_mode", "block_apiv4_uncompatible_endpoints"],
+  "address": "Santa Terezinha 609",
+  "complement": "",
+  "postal_code": "90040-180",
+  "first_login": false,
+  "is_client_only": true,
+  "disclaimer": "Welcome to your trial period. You have USD 300.00 to use in 312 days. To use Azion with no service interruptions at the end of your trial, add a payment method <a href='/billing-subscriptions/payment-methods/add' target='_top'>right here</a>.",
+  "status": "ONLINE"
+}

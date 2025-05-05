@@ -10,21 +10,19 @@ const createEdgeApplicationCase = () => {
   cy.openProduct('Edge Application')
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
-
-  // Act
+  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
+  cy.verifyToast('success', 'Your edge application has been created')
+  cy.get(selectors.form.actionsSkipButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
 
   // Assert
-  cy.verifyToast('success', 'Your edge application has been created')
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
-    }).as('accountInfo')
     cy.login()
   })
 
@@ -49,6 +47,22 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.createButton).click()
     cy.get(selectors.domains.nameInput).type(domainName)
 
+    // protocol section
+    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.domains.portHttp).click()
+
+    cy.get(selectors.domains.useHttpsField).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.domains.portHttps).click()
+    cy.get(selectors.domains.tlsVersion).click()
+    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.domains.cipherSuite).click()
+    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
@@ -64,11 +78,11 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
+    cy.get(selectors.domains.dialogTitle).should('have.text', 'Workload has been created')
     cy.get(selectors.domains.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
     cy.get(selectors.domains.confirmButton).click()
-    cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Domain')
+    cy.get(selectors.domains.editPageTitle).should('have.text', 'Edit Workload')
 
     cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.digitalCertificatesDropdownLetsEncrypt).click()

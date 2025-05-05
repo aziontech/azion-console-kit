@@ -25,7 +25,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
 
     // Assert - create a edge application
-    cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
+    cy.get(selectors.workload.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 
     // Arrange
     cy.openProduct('Domains')
@@ -33,52 +33,52 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
       'GET',
       '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
+    cy.get(selectors.workload.createButton).click()
+    cy.get(selectors.workload.nameInput).type(domainName)
 
     // protocol section
-    cy.get(selectors.domains.portHttp).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(3).click()
-    cy.get(selectors.domains.portHttp).click()
+    cy.get(selectors.workload.portHttp).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.workload.portHttp).click()
 
-    cy.get(selectors.domains.useHttpsField).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.domains.dropdownSelectPort).find('li').eq(4).click()
-    cy.get(selectors.domains.portHttps).click()
-    cy.get(selectors.domains.tlsVersion).click()
-    cy.get(selectors.domains.dropdownSelectTls).find('li').eq(2).click()
-    cy.get(selectors.domains.cipherSuite).click()
-    cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
+    cy.get(selectors.workload.useHttpsField).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.tlsVersion).click()
+    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.workload.cipherSuite).click()
+    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.wait('@getEdgeApplicationList')
-    cy.get(selectors.domains.edgeApplicationField).click()
+    cy.get(selectors.workload.edgeApplicationField).click()
 
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
-    cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).type(edgeAppName)
+    cy.get(selectors.workload.edgeApplicationOption).click()
+    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert - create a domain
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
-    cy.get(selectors.domains.domainField)
+    cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
+    cy.get(selectors.workload.domainField)
       .then(($el) => {
         generatedDomainUrl = $el.val()
       })
       .then(() => {
-        cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getDomain')
-        cy.get(selectors.domains.copyDomainButton).click()
+        cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getWorkload')
+        cy.get(selectors.workload.copyDomainButton).click()
         cy.verifyToast('Successfully copied!')
-        cy.get(selectors.domains.confirmButton).click()
+        cy.get(selectors.workload.confirmButton).click()
         cy.verifyToast(
           'Succesfully created!',
-          'The domain is now available in the Domain management section.'
+          'The domain is now available in the Workload management section.'
         )        
-        cy.wait('@getDomain')
+        cy.wait('@getWorkload')
 
         // Act
         cy.openProduct('Real-Time Purge')

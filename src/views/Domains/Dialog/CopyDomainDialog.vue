@@ -7,7 +7,7 @@
     header="Domain has been created"
     :pt="{
       headerTitle: {
-        'data-testid': 'workloads-view__copy-workload-dialog__header-title'
+        'data-testid': 'domains-view__copy-domain-dialog__header-title'
       }
     }"
   >

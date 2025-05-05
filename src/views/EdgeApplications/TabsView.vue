@@ -96,8 +96,8 @@
       return acc
     }, {})
   }
-  const verifyTab = ({ edgeFunctionsEnabled }) => {
-    if (!edgeFunctionsEnabled) {
+  const verifyTab = (edgeApplication) => {
+    if (!edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()
       return
@@ -184,6 +184,22 @@
     return null
   })
 
+  const edgeFunctionsEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+  })
+
+  const applicationAcceleratorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'applicationAccelerator' : 'applicationAcceleratorEnabled'
+  })
+
+  const tieredCacheEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'l2Caching' : 'tieredCacheEnabled'
+  })
+
+  const imageProcessorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
+  })
+
   watch(activeTab, (newValue, oldValue) => {
     if (visibleOnSaved.value) {
       return
@@ -249,15 +265,15 @@
       show: showTabs.cacheSettings,
       props: () => ({
         ...props.cacheSettingsServices,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAcceleratorEnabled').value,
-        isTieredCacheEnabled: isModuleEnabled('tieredCacheEnabled').value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value
       })
     },
     {
       header: 'Functions Instances',
       component: EdgeApplicationsFunctionsListView,
-      condition: isModuleEnabled('edgeFunctionsEnabled'),
+      condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
       props: () => ({
         ...props.functionsServices,
@@ -272,9 +288,9 @@
       show: showTabs.rulesEngine,
       props: () => ({
         ...props.rulesEngineServices,
-        isImageOptimizationEnabled: isModuleEnabled('imageProcessorEnabled').value,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAcceleratorEnabled').value,
-        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctionsEnabled').value,
+        isImageOptimizationEnabled: isModuleEnabled(imageProcessorEnabled.value).value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAcceleratorEnabled
