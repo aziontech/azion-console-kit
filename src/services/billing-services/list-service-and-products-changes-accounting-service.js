@@ -4,6 +4,787 @@ import { makeAccountingBaseUrl } from './make-accounting-base-url'
 const BOT_MANAGER_SLUG = 'bot_manager'
 const EDGE_STORAGE_SLUG = 'edge_storage'
 
+const MOCK = {
+  data: {
+    accountingDetail: [
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 1641.663001253,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 147.468297129,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 2.270529331,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 8639.353615335,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 16582.565985289,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'application_accelerator',
+        metricSlug: 'application_accelerator_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'bot_manager',
+        metricSlug: 'bot_manager_invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 375837912.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 2297062888.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 464190.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 6527561.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 41982225.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'edge_application',
+        metricSlug: 'requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 87033.98553042,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 3004.518263532,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 496.751899988,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 8.653209557,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 24741.037817552,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'edge_application',
+        metricSlug: 'data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'data_stream',
+        metricSlug: 'data_stream_data_streamed'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'data_stream',
+        metricSlug: 'data_stream_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'ddos_protection_20gbps',
+        metricSlug: 'ddos_protection_20gbps'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'ddos_protection_50gbps',
+        metricSlug: 'ddos_protection_50gbps'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'ddos_protection_data_transferred',
+        metricSlug: 'ddos_protection_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'ddos_protection_unlimited',
+        metricSlug: 'ddos_protection_unlimited'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 29603366.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 4707073.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 398841.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 1729071225.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 264076617.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'network_layer_protection',
+        metricSlug: 'network_layer_protection_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'edge_functions',
+        metricSlug: 'compute_time'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'edge_functions',
+        metricSlug: 'invocations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_storage',
+        metricSlug: 'edge_storage_class_a_operations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_storage',
+        metricSlug: 'edge_storage_class_b_operations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_storage',
+        metricSlug: 'edge_storage_class_c_operations'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_storage',
+        metricSlug: 'edge_storage_data_stored'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 529124.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'image_processor',
+        metricSlug: 'images_processed'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 10501529.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'image_processor',
+        metricSlug: 'images_processed'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_dns',
+        metricSlug: 'hosted_zones'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'edge_dns',
+        metricSlug: 'edge_dns_queries'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 586.986710944,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 7154.039689017,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'tiered_cache',
+        metricSlug: 'tiered_cache_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'live_ingest',
+        metricSlug: 'data_ingested'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'live_ingest',
+        metricSlug: 'data_ingested'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'load_balancer',
+        metricSlug: 'load_balancer_data_transferred'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 31.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'plan_business',
+        metricSlug: 'plan_business'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'plan_enterprise',
+        metricSlug: 'plan_enterprise'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'plan_missioncritical',
+        metricSlug: 'plan_missioncritical'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'support_enterprise',
+        metricSlug: 'support_enterprise'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'No Region',
+        productSlug: 'support_mission_critical',
+        metricSlug: 'support_mission_critical'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Latam',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Europe',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'All Other Regions',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Brazil',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'Canada',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      },
+      {
+        billId: 11907625,
+        periodTo: '2025-01-31',
+        accounted: 0.0,
+        invoiceNumber: '*--*-9028l012025',
+        regionName: 'United States',
+        productSlug: 'waf',
+        metricSlug: 'waf_requests'
+      }
+    ]
+  }
+}
+
 export const listServiceAndProductsChangesAccountingService = async (billID) => {
   const BILL_DETAIL_QUERY = `
     query details {
@@ -35,7 +816,7 @@ export const listServiceAndProductsChangesAccountingService = async (billID) => 
     body: graphQLPayload
   })
 
-  httpResponse = adapt(httpResponse)
+  httpResponse = adapt({ body: {}, ...httpResponse })
 
   return parseHttpResponse(httpResponse)
 }
