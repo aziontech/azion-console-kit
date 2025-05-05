@@ -13,6 +13,8 @@
         emptyListMessage="No edge connectors found."
         :actions="actions"
         :enableEditClick="false"
+        addButtonLabel="Edge Connectors"
+        createPagePath="/edge-connectors/create"
       />
       <EmptyResultsBlock
         v-else
