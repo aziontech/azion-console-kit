@@ -46,6 +46,27 @@ export const edgeConnectorsRoutes = {
         ],
         flag: 'checkout_access'
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-edge-connectors',
+      component: () => import('@views/EdgeConnectors/EditView.vue'),
+      props: {
+        editEdgeConnectorsService: EdgeConnectorsService.editEdgeConnectorsService,
+        loadEdgeConnectorsService: EdgeConnectorsService.loadEdgeConnectorsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Connectors',
+            to: '/edge-connectors'
+          },
+          {
+            label: 'Edit Edge Connectors'
+          }
+        ],
+        flag: 'checkout_access'
+      }
     }
   ]
 }

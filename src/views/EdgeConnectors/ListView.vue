@@ -12,9 +12,9 @@
         @on-load-data="handleLoadData"
         emptyListMessage="No edge connectors found."
         :actions="actions"
-        :enableEditClick="false"
         addButtonLabel="Edge Connectors"
         createPagePath="/edge-connectors/create"
+        editPagePath="/edge-connectors/edit"
       />
       <EmptyResultsBlock
         v-else
