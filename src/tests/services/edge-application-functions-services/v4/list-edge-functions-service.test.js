@@ -21,7 +21,7 @@ const fixtures = {
     id: 123,
     initiator_type: 'teste',
     last_editor: 'az editor instance',
-    last_modified: new Date(2023, 10, 10),
+    last_modified: new Date(2023, 10, 10)
   }
 }
 

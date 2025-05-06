@@ -10,7 +10,7 @@ const fixtures = {
     edgeFunctionId: 123,
     edge_function_id: 123,
     last_editor: 'az editor instance',
-    last_modified: new Date(2023, 10, 10),
+    last_modified: new Date(2023, 10, 10)
   },
   edgeFunctionMock: {
     active: true,
