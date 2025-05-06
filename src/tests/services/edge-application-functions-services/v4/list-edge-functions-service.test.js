@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listFunctionsService } from '@/services/edge-application-functions-services/v4'
 import { describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 // Constantes para reutilização
 const API_VERSION = 'v4'
@@ -18,7 +19,9 @@ const fixtures = {
     json_args: {},
     edge_function: 321,
     id: 123,
-    initiator_type: 'teste'
+    initiator_type: 'teste',
+    last_editor: 'az editor instance',
+    last_modified: new Date(2023, 10, 10),
   }
 }
 
@@ -63,6 +66,8 @@ describe('EdgeApplicationFunctionsServices', () => {
   })
 
   it('should correctly parse all returned edge firewall function instances', async () => {
+    localeMock()
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.functionsInstance] },
@@ -77,6 +82,8 @@ describe('EdgeApplicationFunctionsServices', () => {
         args: fixtures.functionsInstance.json_args,
         edgeFunctionId: fixtures.functionsInstance.edge_function,
         id: fixtures.functionsInstance.id.toString(),
+        lastEditor: fixtures.functionsInstance.last_editor,
+        lastModified: 'Friday, November 10, 2023 at 12:00:00 AM',
         name: {
           tagProps: {},
           text: fixtures.functionsInstance.name
