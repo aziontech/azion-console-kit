@@ -53,11 +53,6 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
 
-    //add loadbalancer module
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('loadBalancer')).click()
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been updated')
-
     //add origin
     cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()

@@ -96,6 +96,7 @@ export default {
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',
     origin: '[data-testid="error-responses-form__origin__dropdown"]',
+    statusCodeDropdown: '#errorResponses[1].code_list',
     statusCodes: (optionIdx) =>
       `[data-testid="error-responses-form__error-response__${optionIdx}__status-code__dropdown"]`,
     customStatus: (optionIdx) =>

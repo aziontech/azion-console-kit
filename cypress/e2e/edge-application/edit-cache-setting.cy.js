@@ -24,7 +24,7 @@ const createEdgeApplicationCase = () => {
     'have.text',
     fixtures.edgeApplicationName
   )
-  cy.intercept('GET', '/api/v3/edge_applications/*').as('loadMainSettings')
+  cy.intercept('GET', '/api/v4/edge_application/applications*').as('loadMainSettings')
   // Act - Navigate to the created edge application
   cy.get(selectors.list.filteredRow.column('name')).click()
   cy.wait('@loadMainSettings')
