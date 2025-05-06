@@ -28,6 +28,9 @@ const createEdgeApplicationCase = () => {
 
 describe('Edge Application Device Groups Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     cy.login()
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     fixtures.deviceGroupName = generateUniqueName('DeviceGroup')

@@ -23,6 +23,9 @@ const createEdgeApplicationCase = () => {
 
 describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 

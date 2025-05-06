@@ -8,7 +8,9 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     fixtures.domainName = generateUniqueName('domain')
     fixtures.digitalCertificateName = generateUniqueName('CertificateName')
-
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
