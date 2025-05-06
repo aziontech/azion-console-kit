@@ -39,36 +39,49 @@ export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, 
       .trim()
   }
 
+  const createPayload = (attack, hasMatchValue, path) => {
+    const REQUEST_BODY_EXCEPTION_RULE_ID = 11
+    let matchZones = {
+      zone:
+        attack.ruleId === REQUEST_BODY_EXCEPTION_RULE_ID
+          ? 'request_body'
+          : checkAndReturnDefault(attack.matchZone, hasMatchValue),
+      matches_on: attack.matchesOn
+    }
+
+    if (hasMatchValue) {
+      const isCookieZone = attack.matchZone === 'cookie'
+      const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
+      matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
+    }
+
+    return {
+      rule_id: attack.ruleId,
+      match_zones: [matchZones],
+      ...(path && { path }),
+      name: removeEmptyLinesAndSpaces(name)
+    }
+  }
+
+  const createRequest = (payload) => {
+    return AxiosHttpClientAdapter.request({
+      url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
+      method: 'POST',
+      body: payload
+    }).then(parseHttpResponse)
+  }
+
   const requestsAllowedRules = attackEvents.flatMap((attack) => {
-    return attack?.top10Paths.map(({ path }) => {
-      const hasMatchValue = !!attack.matchValue
-      const REQUEST_BODY_EXCEPTION_RULE_ID = 11
-      let matchZones = {
-        zone:
-          attack.ruleId === REQUEST_BODY_EXCEPTION_RULE_ID
-            ? 'request_body'
-            : checkAndReturnDefault(attack.matchZone, hasMatchValue),
-        matches_on: attack.matchesOn
-      }
-      if (hasMatchValue) {
-        const isCookieZone = attack.matchZone === 'cookie'
-        const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
+    const hasMatchValue = !!attack.matchValue
 
-        matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
-      }
+    if (!attack?.top10Paths) {
+      const payload = createPayload(attack, hasMatchValue)
+      return [createRequest(payload)]
+    }
 
-      const payload = {
-        rule_id: attack.ruleId,
-        match_zones: [matchZones],
-        path,
-        name: removeEmptyLinesAndSpaces(name)
-      }
-
-      return AxiosHttpClientAdapter.request({
-        url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/exceptions`,
-        method: 'POST',
-        body: payload
-      }).then(parseHttpResponse)
+    return attack.top10Paths.map(({ path }) => {
+      const payload = createPayload(attack, hasMatchValue, path)
+      return createRequest(payload)
     })
   })
 
