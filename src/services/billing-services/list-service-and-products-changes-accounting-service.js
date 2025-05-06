@@ -244,9 +244,17 @@ const joinEdgeApplicationWithTieredCache = (services) => {
     }
   })
 
-  services.splice(tieredCacheServiceIndex, 1)
-  services.splice(edgeStorageServiceIndex, 1)
-  services.splice(botManagerServiceIndex, 1)
+  const indicesToRemove = [
+    tieredCacheServiceIndex,
+    edgeStorageServiceIndex,
+    botManagerServiceIndex
+  ].sort((first, second) => second - first)
+
+  indicesToRemove.forEach((index) => {
+    if (index !== -1) {
+      services.splice(index, 1)
+    }
+  })
 
   return services
 }
