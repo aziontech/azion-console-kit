@@ -17,7 +17,7 @@ describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
     cy.wait('@wafMainSettings', { timeout: 30000 })
   })
 
-  it.skip('should allow to create correct rule with ruleId 11 in more details', () => {
+  it('should allow to create correct rule with ruleId 11 in more details', () => {
     cy.intercept('GET', '/api/v3/waf/*/domains?page_size=200', {
       fixture: '/waf-rules/tuning/available-domains.json'
     }).as('wafDomains')
