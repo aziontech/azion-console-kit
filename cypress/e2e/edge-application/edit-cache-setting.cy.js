@@ -24,11 +24,11 @@ const createEdgeApplicationCase = () => {
     'have.text',
     fixtures.edgeApplicationName
   )
-  cy.intercept('GET', '/api/v4/edge_application/applications*').as('loadMainSettings')
+  cy.intercept('GET', 'api/v4/edge_application/applications/*').as('loadMainSettings')
   // Act - Navigate to the created edge application
   cy.get(selectors.list.filteredRow.column('name')).click()
   cy.wait('@loadMainSettings')
-  cy.get(selectors.edgeApplication.mainSettings.l2CachingSwitch).click()
+  cy.get(selectors.edgeApplication.mainSettings.tieredCacheEnabled).click()
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.verifyToast('success', 'Your edge application has been updated')
 }

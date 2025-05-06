@@ -8,7 +8,9 @@ export default {
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
     l2CachingSwitch:
-      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider'
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
+    tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
+
   },
   accordionStepOrigin: {
     createOrigin: '[data-testid="create-origion-accordion"]',
