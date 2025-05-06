@@ -21,6 +21,7 @@ export const workloadRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {
             label: `Workloads`,
