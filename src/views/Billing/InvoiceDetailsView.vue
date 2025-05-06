@@ -218,7 +218,7 @@
   const listServiceAndProductsChanges = async () => {
     try {
       listServiceProducts.value = accountIsNotRegular.value
-      ? await props.listServiceAndProductsChangesService(route.params.billId)
+        ? await props.listServiceAndProductsChangesService(route.params.billId)
         : await listServiceAndProductsChangesAccountingService(route.params.billId)
     } catch {
       listServiceProducts.value = []
