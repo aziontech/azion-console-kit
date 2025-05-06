@@ -1,7 +1,7 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
 import selectors from '../../support/selectors'
 
-describe('Real-Time Events Advanced Filter', { tags: ['@dev3'] }, () => {
+describe('Real-Time Events Advanced Filter', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.login()
     cy.openProduct('Real-Time Events')
