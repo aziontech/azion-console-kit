@@ -72,10 +72,6 @@
       name: '416: Range Not Satisfiable'
     },
     {
-      code: '425',
-      name: '425: Too Early'
-    },
-    {
       code: '426',
       name: '426: Upgrade Required'
     },
