@@ -1,6 +1,6 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
-import generateUniqueName from '../../../support/utils'
-import selectors from '../../../support/selectors'
+import generateUniqueName from '../../../../support/utils'
+import selectors from '../../../../support/selectors'
 
 let fixtures = {}
 
@@ -11,12 +11,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -46,7 +44,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
-      fixture: '/account/info/without_flags.json'
+        fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     // Login
     cy.login()
@@ -65,7 +63,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()

@@ -91,7 +91,7 @@ const formatOperatorData = (operator, fieldName, field) => ({
 
 const extractOperatorFormat = (operators, fieldFormat) => {
   const { verifyWhiteListFields, verifyBlackListFields } = FILTERS_RULES()
-  
+
   return operators
     .filter(verifyWhiteListFields)
     .filter(verifyBlackListFields)

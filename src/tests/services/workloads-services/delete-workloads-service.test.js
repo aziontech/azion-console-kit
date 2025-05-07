@@ -36,7 +36,7 @@ describe('DomainsServicesV4', () => {
     const { sut } = makeSut()
     const feedback = await sut(fixtures.id)
 
-    expect(feedback).toBe('Domain successfully deleted')
+    expect(feedback).toBe('Workload successfully deleted')
   })
 
   it('should throw parsing api error when request fails', async () => {

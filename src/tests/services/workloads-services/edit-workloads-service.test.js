@@ -207,7 +207,7 @@ describe('DomainsServicesV4', () => {
 
     const data = await sut(fixtures.domainMock)
 
-    expect(data).toBe('Your domain has been edited')
+    expect(data).toBe('Your workload has been edited')
   })
 
   it('Should return an API error for an 400 response status', async () => {

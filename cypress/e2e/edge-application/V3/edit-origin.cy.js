@@ -1,9 +1,7 @@
-import generateUniqueName from '../../support/utils'
-import selectors from '../../support/selectors'
+import generateUniqueName from '../../../support/utils'
+import selectors from '../../../support/selectors'
 
-let fixtures = {
-  originName: 'Default Origin'
-}
+let fixtures = {}
 
 /**
  * Creates a new edge application with basic settings.
@@ -12,12 +10,9 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -34,6 +29,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -47,11 +45,17 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     }
   })
 
-  it('should add an origin', () => {
+  it('should edit an origin', () => {
     //edge application creation
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
 
+    //add loadbalancer module
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('loadBalancer')).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your edge application has been updated')
+
+    //add origin
     cy.get(selectors.edgeApplication.tabs('Origins')).click()
     cy.get(selectors.edgeApplication.origins.createButton).click()
 
@@ -60,11 +64,14 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.origins.originType).click()
     cy.get(selectors.edgeApplication.origins.originType)
       .find('li')
-      .eq(0)
-      .should('have.text', 'Single Origin')
+      .eq(1)
+      .should('have.text', 'Load Balancer')
       .click()
 
-    cy.get(selectors.edgeApplication.origins.addressInput).type('teste.com')
+    cy.get(selectors.edgeApplication.origins.addressesInput(0)).clear()
+    cy.get(selectors.edgeApplication.origins.addressesInput(0)).type('test.com')
+    cy.get(selectors.edgeApplication.origins.addressesInput(1)).clear()
+    cy.get(selectors.edgeApplication.origins.addressesInput(1)).type('test2.com')
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should(
       'have.text',
@@ -76,6 +83,31 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
 
     //Assert
+    cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
+
+    //edit origin
+    //arrange
+    cy.intercept('GET', '/api/v3/edge_applications/*/origins/*').as('loadOrigins')
+    cy.get(selectors.list.filteredRow.column('name')).click()
+
+    //act
+    cy.wait('@loadOrigins')
+    cy.get(selectors.edgeApplication.origins.originType).click()
+    cy.get(selectors.edgeApplication.origins.originType)
+      .find('li')
+      .eq(0)
+      .should('have.text', 'Single Origin')
+      .click()
+    cy.get(selectors.edgeApplication.origins.originType).should('have.text', 'Single Origin')
+    cy.get(selectors.edgeApplication.origins.addressInput).clear()
+    cy.get(selectors.edgeApplication.origins.addressInput).type('test2.com')
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Your Origin has been edited')
+    cy.get(selectors.form.goBackButton).click()
+
+    //assert
+    cy.get(selectors.list.searchInput).clear()
     cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
   })

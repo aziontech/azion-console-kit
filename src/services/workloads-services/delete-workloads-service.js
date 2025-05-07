@@ -25,7 +25,7 @@ export const deleteWorkloadService = async (id) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Domain successfully deleted'
+      return 'Workload successfully deleted'
     case 500:
       throw new Errors.InternalServerError().message
     default:

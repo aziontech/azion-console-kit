@@ -13,13 +13,14 @@ const createEdgeApplicationCase = () => {
   cy.openProduct('Edge Application')
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
-
-  // Act
+  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
+  cy.verifyToast('success', 'Your edge application has been created')
+  cy.get(selectors.form.actionsSkipButton).click()
+  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
 
   // Assert
-  cy.verifyToast('success', 'Your edge application has been created')
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
@@ -80,7 +81,7 @@ const createDigitalCertificate = () => {
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
+      fixture: '/account/info/without_flags.json'
     }).as('accountInfo')
     cy.login()
   })
@@ -101,124 +102,80 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'GET',
       `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
     ).as('getEdgeApplicationListFilter')
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
+    cy.get(selectors.workload.createButton).click()
+    cy.get(selectors.workload.nameInput).type(domainName)
+
+    // protocol section
+    cy.get(selectors.workload.portHttp).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
+    cy.get(selectors.workload.portHttp).click()
+
+    cy.get(selectors.workload.useHttpsField).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
+    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
+    cy.get(selectors.workload.portHttps).click()
+    cy.get(selectors.workload.tlsVersion).click()
+    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
+    cy.get(selectors.workload.cipherSuite).click()
+    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
+
     cy.wait('@getEdgeFirewalls')
     cy.wait('@getEdgeApplicationList')
 
-    cy.get(selectors.domains.edgeFirewallField).click()
-    cy.get(selectors.domains.edgeFirewallDropdownSearch).clear()
+    cy.get(selectors.workload.edgeFirewallField).click()
+    cy.get(selectors.workload.edgeFirewallDropdownSearch).clear()
     cy.intercept(
       'GET',
       `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
-    cy.get(selectors.domains.edgeFirewallDropdownSearch).type(firewallName)
+    cy.get(selectors.workload.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')
-    cy.get(selectors.domains.edgeFirewallOption).click()
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
+    cy.get(selectors.workload.edgeFirewallOption).click()
+    cy.get(selectors.workload.edgeApplicationField).click()
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.workload.edgeApplicationDropdownSearch).type(edgeAppName)
 
     cy.wait('@getEdgeApplicationListFilter')
-    cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
+    cy.get(selectors.workload.edgeApplicationOption).click()
+    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert - create a domain
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
-    cy.get(selectors.domains.domainField).should('be.visible')
-    cy.get(selectors.domains.copyDomainButton).click()
+    cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
+    cy.get(selectors.workload.domainField).should('be.visible')
+    cy.get(selectors.workload.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
-    cy.get(selectors.domains.confirmButton).click()
+    cy.get(selectors.workload.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',
-      'The domain is now available in the Domain management section.'
+      'The domain is now available in the Workload management section.'
     )
 
     domainEditedName = `${domainName}-edit`
 
     // Act
-    cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
-    cy.get(selectors.domains.fieldTextInput).clear()
-    cy.get(selectors.domains.edgeFirewallClearIcon).click()
-    cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
-    cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}-edit.net`)
+    cy.get(selectors.workload.fieldTextInput).should('have.value', domainName)
+    cy.get(selectors.workload.fieldTextInput).clear()
+    cy.get(selectors.workload.fieldTextInput).type(domainEditedName)
+    cy.get(selectors.workload.cnamesField).clear()
+    cy.get(selectors.workload.cnamesField).type(`${domainName}-edit.net`)
 
     createDigitalCertificate()
 
-    cy.get(selectors.domains.domainUri).should('be.disabled')
-    cy.get(selectors.domains.editFormCopyDomainButton).should('be.visible')
-    cy.get(selectors.domains.activeSwitchEditForm).click()
-    cy.intercept('PATCH', '/api/v3/domains/*', (req) => {
-      expect(req.body).to.have.property('edge_firewall_id', null)
-    }).as('editDomain')
+    cy.get(selectors.workload.domainUri).should('be.disabled')
+    cy.intercept('PATCH', '/api/v4/workspace/workloads/*').as('editWorkload')
+
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.wait('@editDomain')
+    cy.wait('@editWorkload')
 
     // Assert
-    cy.verifyToast('success', 'Your domain has been edited')
-    cy.get(selectors.domains.dataTableSearchInput).clear()
-    cy.get(selectors.domains.dataTableSearchInput).type(`${domainEditedName}{enter}`)
-    cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
-    cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
-  })
-
-  it('should edit a domain with invalid cname', () => {
-    const cnames = generateUniqueName('cnames-domains')
-    createEdgeApplicationCase()
-    domainName = generateUniqueName('domain')
-
-    // Arrange
-    cy.openProduct('Domains')
-    cy.intercept(
-      'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
-    ).as('getEdgeApplicationList')
-    cy.intercept(
-      'GET',
-      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
-    ).as('getEdgeApplicationListFilter')
-    cy.get(selectors.domains.createButton).click()
-    cy.get(selectors.domains.nameInput).type(domainName)
-    cy.wait('@getEdgeApplicationList')
-
-    cy.get(selectors.domains.edgeApplicationField).click()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
-    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
-
-    cy.wait('@getEdgeApplicationListFilter')
-    cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${cnames}.com.br`)
-
-    // Act
-    cy.get(selectors.form.actionsSubmitButton).click()
-
-    // Assert - create a domain
-    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
-    cy.get(selectors.domains.domainField).should('be.visible')
-    cy.get(selectors.domains.copyDomainButton).click()
-    cy.verifyToast('Successfully copied!')
-    cy.get(selectors.domains.confirmButton).click()
-    cy.verifyToast(
-      'Succesfully created!',
-      'The domain is now available in the Domain management section.'
-    )
-
-    domainEditedName = `${domainName}-edit`
-
-    // Act
-    cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
-    cy.get(selectors.domains.fieldTextInput).clear()
-    cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
-    cy.get(selectors.domains.cnamesField).clear()
-    cy.get(selectors.domains.cnamesField).type(`**${cnames}-edit.com.br`)
-
-    cy.get(selectors.form.actionsSubmitButton).click()
-
-    // Assert
-    cy.verifyToast('error', `cname_invalid_format: **${cnames}-edit.com.br`)
+    cy.verifyToast('success', 'Your workload has been edited')
+    cy.get(selectors.workload.dataTableSearchInput).clear()
+    cy.get(selectors.workload.dataTableSearchInput).type(`${domainEditedName}{enter}`)
+    cy.get(selectors.workload.listTableBlockColumnNameRow).should('have.text', domainEditedName)
   })
 })

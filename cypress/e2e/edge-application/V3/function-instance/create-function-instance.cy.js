@@ -1,5 +1,5 @@
-import generateUniqueName from '../../../support/utils'
-import selectors from '../../../support/selectors'
+import generateUniqueName from '../../../../support/utils'
+import selectors from '../../../../support/selectors'
 
 let fixtures = {}
 
@@ -25,12 +25,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -39,6 +37,7 @@ const createEdgeApplicationCase = () => {
     'have.text',
     fixtures.edgeApplicationName
   )
+
   // Act - Navigate to the created edge application
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
@@ -47,7 +46,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
-      fixture: '/account/info/without_flags.json'
+        fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     // Login
     cy.login()
@@ -69,7 +68,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     createEdgeApplicationCase()
 
     // Act - create a function instance
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
