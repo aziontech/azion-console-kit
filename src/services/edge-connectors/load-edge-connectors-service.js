@@ -12,42 +12,74 @@ export const loadEdgeConnectorsService = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
+const extractAddresses = (addresses) => {
+  return addresses.map((el) => {
+    return {
+      address: el.address,
+      port: el.port,
+      serverRole: el.server_role,
+      weight: el.weight,
+      active: el.active,
+      maxConns: el.max_conns,
+      maxFails: el.max_fails,
+      failTimeout: el.fail_timeout
+    }
+  })
+}
+
 const adapt = (httpResponse) => {
   const data = httpResponse.body?.data
+  const typeBuilders = {
+    live_ingest: () => ({
+      liveIngestEndpoint: data.type_properties.liveIngestEndpoint
+    }),
+    s3: () => ({
+      addresses: extractAddresses(data.addresses),
+      s3: {
+        host: data.type_properties.host,
+        bucket: data.type_properties.bucket,
+        path: data.type_properties.path,
+        region: data.type_properties.region,
+        accessKey: data.type_properties.access_key,
+        secretKey: data.type_properties.secret_key
+      }
+    }),
+    edge_storage: () => ({
+      edgeStorage: {
+        bucket: data.type_properties.bucket,
+        prefix: data.type_properties.prefix
+      }
+    }),
+    http: () => ({
+      addresses: extractAddresses(data.addresses),
+      http: {
+        versions: data.type_properties.versions,
+        host: data.type_properties.host,
+        path: data.type_properties.path,
+        followingRedirect: data.type_properties.following_redirect,
+        realIpHeader: data.type_properties.real_ip_header,
+        realPortHeader: data.type_properties.real_port_header
+      }
+    })
+  }
+
+  const buildProperties = typeBuilders[data.type] || (() => ({}))
+
   const parsedEdgeConnectors = {
     id: data.id,
     type: data.type,
     name: data.name,
     loadBalancerEnabled: data.modules.load_balancer_enabled,
     originShieldEnabled: data.modules.origin_shield_enabled,
-    addresses: data.addresses.map((el) => {
-      return {
-        address: el.address,
-        plainPort: el.plain_port,
-        tlsPort: el.tls_port,
-        serverRole: el.server_role,
-        weight: el.weight,
-        active: el.active,
-        maxConns: el.max_conns,
-        maxFails: el.max_fails,
-        failTimeout: el.fail_timeout
-      }
-    }),
     tlsPolicy: data.tls.policy,
     loadBalanceMethod: data.load_balance_method,
     connectionPreference: data.connection_preference,
     connectionTimeout: data.connection_timeout,
     readWriteTimeout: data.read_write_timeout,
     maxRetries: data.max_retries,
-    active: data.active,
-    typeProperties: {
-      versions: data.type_properties.versions,
-      host: data.type_properties.host,
-      path: data.type_properties.path,
-      followingRedirect: data.type_properties.following_redirect,
-      realIpHeader: data.type_properties.real_ip_header,
-      realPortHeader: data.type_properties.real_port_header
-    }
+    status: data.active,
+    productVersion: data.product_version,
+    ...buildProperties()
   }
 
   return {
