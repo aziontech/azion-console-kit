@@ -1,5 +1,5 @@
-import generateUniqueName from '../../../support/utils'
-import selectors from '../../../support/selectors'
+import generateUniqueName from '../../../../support/utils'
+import selectors from '../../../../support/selectors'
 
 let fixtures = {}
 
@@ -10,12 +10,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -33,7 +31,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
-      fixture: '/account/info/without_flags.json'
+        fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     // Login
     cy.login()
@@ -48,7 +46,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     }
   })
 
-  it('should create a rule engine', () => {
+  it('should create a rule engine set cache policy', () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
@@ -63,7 +61,25 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Deliver')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Set Cache Policy')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
+
+    cy.intercept('GET', 'api/v3/edge_applications/*/cache_settings?page_size=200').as(
+      'getCachePolicy'
+    )
+    cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
+      .find(selectors.form.actionsSubmitButton)
+      .click()
+    cy.verifyToast('success', 'Cache Settings successfully created')
+
+    cy.wait('@getCachePolicy', { timeout: 10000 })
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
+      .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))
+      .click()
+
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Rule successfully created')
 

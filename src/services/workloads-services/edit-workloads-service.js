@@ -81,7 +81,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Your domain has been edited'
+      return 'Your workload has been edited'
     case 500:
       throw new Errors.InternalServerError().message
     default:

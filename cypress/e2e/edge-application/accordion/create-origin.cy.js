@@ -9,6 +9,9 @@ let fixtures = {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -38,15 +41,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
-  })
-
-  afterEach(() => {
-    // Delete the edge application
-    cy.deleteEntityFromList({
-      entityName: fixtures.edgeApplicationName,
-      productName: 'Edge Application'
-    }).then(() => {
-      cy.verifyToast('Resource successfully deleted')
-    })
   })
 })

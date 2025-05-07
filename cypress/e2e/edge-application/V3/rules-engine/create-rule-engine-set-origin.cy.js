@@ -1,6 +1,5 @@
-/* eslint-disable cypress/no-unnecessary-waiting */
-import generateUniqueName from '../../../support/utils'
-import selectors from '../../../support/selectors'
+import generateUniqueName from '../../../../support/utils'
+import selectors from '../../../../support/selectors'
 
 let fixtures = {}
 
@@ -11,12 +10,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
-  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -30,23 +27,11 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
 
-const createFunctionCase = () => {
-  // Act
-  cy.get(selectors.functions.nameInput).clear()
-  cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions2')
-  cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
-    .find(selectors.functions.saveButton)
-    .click()
-  cy.verifyToast('success', 'Your edge function has been created')
-  cy.wait('@getFunctions2')
-}
-
 describe('Edge Application', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
-      fixture: '/account/info/without_flags.json'
+        fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     // Login
     cy.login()
@@ -65,9 +50,6 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
-    cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Rules Engine')).click()
 
     // Act
@@ -79,34 +61,35 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).clear()
     cy.get(selectors.edgeApplication.rulesEngine.criteriaInputValue(0, 0)).type('/')
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Run Function')).click()
-    cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
-    cy.intercept('GET', 'api/v4/edge_functions/functions*').as('getFunctions')
-    cy.get(selectors.edgeApplication.rulesEngine.createFunctionInstanceButton).click()
-    cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
-    cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
-      fixtures.functionInstanceName
-    )
-    cy.wait('@getFunctions')
-    cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
-    cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
-    createFunctionCase()
-    cy.intercept('POST', 'api/v3/edge_applications/*/functions_instances*').as('postFunction')
-    cy.get(selectors.edgeApplication.rulesEngine.functionInstanceActionBar)
+    cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Set Origin')).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.createOriginButton).click()
+    cy.get(selectors.edgeApplication.origins.nameInput).type(fixtures.originName)
+    cy.get(selectors.edgeApplication.origins.originType).click()
+    cy.get(selectors.edgeApplication.origins.originType)
+      .find('li')
+      .eq(0)
+      .should('have.text', 'Single Origin')
+      .click()
+
+    cy.get(selectors.edgeApplication.origins.addressInput).type('test.com')
+
+    cy.intercept('GET', 'api/v3/edge_applications/*/origin*').as('getOrigin')
+    cy.get(selectors.edgeApplication.rulesEngine.originActionBar)
       .find(selectors.form.actionsSubmitButton)
       .click()
-    cy.intercept(
-      'GET',
-      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
-    ).as('getFunctionInstance')
-    cy.wait('@postFunction')
-    cy.wait('@getFunctionInstance')
-    cy.wait(1000)
-    cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0))
-      .find(
-        selectors.edgeApplication.rulesEngine.functionInstanceOption(fixtures.functionInstanceName)
-      )
+    cy.get('.p-component-overlay > .p-dialog > .p-dialog-header').should(
+      'have.text',
+      'Origin Key has been created'
+    )
+    cy.get(selectors.edgeApplication.origins.dialogCopyButton).click()
+    cy.verifyToast('success', 'Your origin has been created')
+    cy.verifyToast('Successfully copied!')
+    cy.get(selectors.edgeApplication.origins.dialogCloseButton).click()
+    cy.wait('@getOrigin')
+    cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0)).click()
+    cy.get(selectors.edgeApplication.rulesEngine.setOriginSelect(0))
+      .find(selectors.edgeApplication.rulesEngine.originOption(fixtures.originName))
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()

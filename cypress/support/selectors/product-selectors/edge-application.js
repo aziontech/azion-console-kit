@@ -8,7 +8,9 @@ export default {
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
     l2CachingSwitch:
-      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider'
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
+    tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
+
   },
   accordionStepOrigin: {
     createOrigin: '[data-testid="create-origion-accordion"]',
@@ -96,6 +98,7 @@ export default {
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',
     origin: '[data-testid="error-responses-form__origin__dropdown"]',
+    statusCodeDropdown: '#errorResponses[1].code_list',
     statusCodes: (optionIdx) =>
       `[data-testid="error-responses-form__error-response__${optionIdx}__status-code__dropdown"]`,
     customStatus: (optionIdx) =>
