@@ -23,7 +23,7 @@
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { value: customPage } = useField('customPage')
-  console.log('customPage :', customPage.value);
+  console.log('customPage :', customPage.value)
   const drawerEdgeFirewallRef = ref('')
 
   const openDrawerEdgeFirewall = () => {
