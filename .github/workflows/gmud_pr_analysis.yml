@@ -1,0 +1,85 @@
+name: GMUD PR Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+jobs:
+  analyze:
+    if: github.event.pull_request.base.ref == 'main' && (github.event.pull_request.head.ref == 'dev' || github.event.pull_request.head.ref == 'qa-2590-script-avaliable-in-checks')
+    name: Analyze GMUD PR
+    runs-on: ubuntu-latest
+    container: python:3.9-alpine
+    steps:
+      - name: Checkout repositories
+        uses: actions/checkout@v4
+        with:
+          repository: aziontech/azion-quality-index
+          ref: main
+          path: azion-quality-index
+          token: ${{ secrets.GLOBAL_TOKEN }}
+      
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          path: target-repo
+        
+      - name: Set up environment
+        run: |
+          apk add --no-cache git
+          cd azion-quality-index
+          pip install -r requirements.txt || echo "No requirements.txt found"
+          pip install PyGithub jira
+          echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
+      
+      - name: Run PR analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GLOBAL_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_URL: https://aziontech.atlassian.net
+        working-directory: azion-quality-index
+        run: |
+          mkdir -p pr_analysis_results
+          git config --global url."https://x-access-token:${{ secrets.GLOBAL_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          
+          python scripts/gmud_test_report/analyze_pr.py \
+            "$PR_URL" \
+            --output pr_analysis_results/output.md \
+            --e2e-repo "aziontech/qa-e2e-tests" \
+            --days-before 7 \
+            --days-after 7
+            
+      - name: Post analysis results
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GLOBAL_TOKEN }}
+          PR_URL: "${{ env.PR_URL }}"
+        working-directory: azion-quality-index
+        run: |
+          PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+          REPO_FULL_NAME=$(echo "$PR_URL" | grep -oE 'github.com/[^/]+/[^/]+' | sed 's#github.com/##')
+          
+          cat > post_comment.py << 'EOF'
+          import os, sys
+          from github import Github
+          
+          github_token = os.environ.get("GITHUB_TOKEN")
+          repo_name = sys.argv[1]
+          pr_number = int(sys.argv[2])
+          
+          file_path = 'pr_analysis_results/output_summary.md' if os.path.exists('pr_analysis_results/output_summary.md') else 'pr_analysis_results/output.md'
+          
+          with open(file_path, 'r') as result_file:
+              analysis_results = result_file.read()
+          
+          gh_client = Github(github_token)
+          repo = gh_client.get_repo(repo_name)
+          pr = repo.get_pull(pr_number)
+          
+          result_comment = f"## GMUD Analysis Results\n\n{analysis_results}\n\n*Generated automatically by GMUD PR Analysis workflow*"      
+          pr.create_issue_comment(result_comment)
+          EOF
+          
+          python post_comment.py "$REPO_FULL_NAME" "$PR_NUMBER"
