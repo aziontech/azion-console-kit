@@ -23,6 +23,7 @@
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { value: customPage } = useField('customPage')
+  console.log('customPage :', customPage.value);
   const drawerEdgeFirewallRef = ref('')
 
   const openDrawerEdgeFirewall = () => {
@@ -157,7 +158,7 @@
           :loadService="loadCustomPagesService"
           optionLabel="name"
           optionValue="value"
-          :value="customPages"
+          :value="customPage"
           appendTo="self"
           placeholder="Select an custom page"
         />
