@@ -2,6 +2,7 @@ import * as Helpers from '@/helpers'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
+import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
 import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
 import * as WorkloadServices from '@/services/workloads-services'
 
@@ -81,6 +82,10 @@ export const workloadRoutes = {
             EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
           listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService
+        },
+        customPagesServices: {
+          listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
+          loadCustomPagesService: CustomPagesServicesV4.loadCustomPagesService
         }
       },
       meta: {
