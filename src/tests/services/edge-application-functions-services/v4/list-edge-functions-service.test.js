@@ -3,7 +3,6 @@ import { listFunctionsService } from '@/services/edge-application-functions-serv
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 
-// Constantes para reutilização
 const API_VERSION = 'v4'
 const EDGE_APPLICATION_ID = 123
 
