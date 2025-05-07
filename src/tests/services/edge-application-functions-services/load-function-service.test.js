@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadFunctionService } from '@/services/edge-application-functions-services/loader-function-service'
 import { describe, expect, it, vi } from 'vitest'
 
-// Constantes para reutilização
 const EDGE_APPLICATION_ID = '123'
 const FUNCTION_ID = '456'
 
