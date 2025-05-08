@@ -7,7 +7,7 @@ on:
 
 jobs:
   analyze:
-    if: github.event.pull_request.base.ref == 'main' && (github.event.pull_request.head.ref == 'dev' || github.event.pull_request.head.ref == 'qa-2590-script-avaliable-in-checks')
+    if: github.event.pull_request.base.ref == 'main' && (github.event.pull_request.head.ref == 'dev')
     name: Analyze GMUD PR
     runs-on: ubuntu-latest
     container: python:3.9-alpine
