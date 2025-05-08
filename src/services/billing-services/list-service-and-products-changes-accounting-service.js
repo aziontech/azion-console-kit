@@ -195,7 +195,7 @@ const mapRegionMetrics = (metric, productsGroupedByRegion, currency, unit) => {
   }, [])
 }
 
-const joinEdgeApplicationWithTieredCache = (services) => {
+export const joinEdgeApplicationWithTieredCache = (services) => {
   const edgeApplicationService = services.find((service) => service.slug === 'edge_application')
   const tieredCacheServiceIndex = services.findIndex((service) => service.slug === 'tiered_cache')
   const edgeStorageServiceIndex = services.findIndex((service) => service.slug === 'edge_storage')
