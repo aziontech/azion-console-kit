@@ -13,17 +13,17 @@ export const loadEdgeConnectorsService = async ({ id }) => {
 }
 
 const extractAddresses = (addresses) => {
-  return addresses.map((el) => {
+  return addresses.map((address) => {
     return {
-      address: el.address,
-      plainPort: el.plain_port,
-      tlsPort: el.tls_port,
-      serverRole: el.server_role,
-      weight: el.weight,
-      active: el.active,
-      maxConns: el.max_conns,
-      maxFails: el.max_fails,
-      failTimeout: el.fail_timeout
+      address: address.address,
+      plainPort: address.plain_port,
+      tlsPort: address.tls_port,
+      serverRole: address.server_role,
+      weight: address.weight,
+      active: address.active,
+      maxConns: address.max_conns,
+      maxFails: address.max_fails,
+      failTimeout: address.fail_timeout
     }
   })
 }

@@ -13,17 +13,17 @@ export const createEdgeConnectorsService = async (payload) => {
 }
 
 const extractAddresses = (addresses) => {
-  return addresses.map((el) => {
+  return addresses.map((address) => {
     return {
-      address: el.address,
-      plain_port: el.plainPort,
-      tls_port: el.tlsPort,
-      server_role: el.serverRole,
-      weight: el.weight,
-      active: el.active,
-      max_conns: el.maxConns,
-      max_fails: el.maxFails,
-      fail_timeout: el.failTimeout
+      address: address.address,
+      plain_port: address.plainPort,
+      tls_port: address.tlsPort,
+      server_role: address.serverRole,
+      weight: address.weight,
+      active: address.active,
+      max_conns: address.maxConns,
+      max_fails: address.maxFails,
+      fail_timeout: address.failTimeout
     }
   })
 }
