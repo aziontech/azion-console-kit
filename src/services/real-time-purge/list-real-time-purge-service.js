@@ -54,10 +54,19 @@ const adapt = (httpResponse) => {
   const requestData = httpResponse.body.data?.activityHistoryEvents.map((item, index) => {
     const id = `${item.ts}-${index}`
     const [, type] = item.resourceType.split(':')
-    const data =
-      item?.requestData && item?.requestData !== DEFAULT_VALUE
-        ? JSON.parse(JSON.parse(item.requestData))
-        : null
+
+    const data = (() => {
+      if (item?.requestData && item?.requestData !== DEFAULT_VALUE) {
+        try {
+          const unescapedRequestData = item.requestData.replace(/\\"/g, '"')
+          return JSON.parse(unescapedRequestData)
+        } catch (error) {
+          console.log('error :', error)
+          return null
+        }
+      }
+      return null
+    })()
 
     return {
       id,
