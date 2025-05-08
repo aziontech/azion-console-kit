@@ -61,7 +61,6 @@ const adapt = (httpResponse) => {
           const unescapedRequestData = item.requestData.replace(/\\"/g, '"')
           return JSON.parse(unescapedRequestData)
         } catch (error) {
-          console.log('error :', error)
           return null
         }
       }
