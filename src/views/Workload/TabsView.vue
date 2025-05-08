@@ -13,7 +13,8 @@
 
   const props = defineProps({
     domainServices: { type: Object, required: true },
-    workloadDeploymentServices: { type: Object, required: true }
+    workloadDeploymentServices: { type: Object, required: true },
+    customPagesServices: { type: Object, required: true }
   })
 
   const mapTabs = ref({
@@ -156,6 +157,8 @@
               props.workloadDeploymentServices.loadEdgeApplicationsService
             "
             :listEdgeFirewallService="props.workloadDeploymentServices.listEdgeFirewallService"
+            :loadCustomPagesService="props.customPagesServices.loadCustomPagesService"
+            :listCustomPagesService="props.customPagesServices.listCustomPagesService"
             :loadEdgeFirewallService="props.workloadDeploymentServices.loadEdgeFirewallService"
             :editWorkloadDeploymentService="
               props.workloadDeploymentServices.editWorkloadDeploymentService

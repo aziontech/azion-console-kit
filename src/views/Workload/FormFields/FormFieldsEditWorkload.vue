@@ -22,6 +22,8 @@
 
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
+  const { value: customPage } = useField('customPage')
+
   const drawerEdgeFirewallRef = ref('')
 
   const openDrawerEdgeFirewall = () => {
@@ -47,6 +49,14 @@
       required: true
     },
     loadEdgeFirewallService: {
+      type: Function,
+      required: true
+    },
+    listCustomPagesService: {
+      type: Function,
+      required: true
+    },
+    loadCustomPagesService: {
       type: Function,
       required: true
     }
@@ -136,6 +146,22 @@
             </ul>
           </template>
         </FieldDropdownLazyLoader>
+      </div>
+
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <FieldDropdownLazyLoader
+          label="Custom Page"
+          enableClearOption
+          data-testid="domains-form__custom-page-field"
+          name="customPage"
+          :service="listCustomPagesService"
+          :loadService="loadCustomPagesService"
+          optionLabel="name"
+          optionValue="value"
+          :value="customPage"
+          appendTo="self"
+          placeholder="Select an custom page"
+        />
       </div>
     </template>
   </FormHorizontal>

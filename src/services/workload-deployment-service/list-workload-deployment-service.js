@@ -30,7 +30,8 @@ const adapt = async (httpResponse) => {
         tag: workload.tag,
         current: workload.current,
         edgeApplication: workload.binds.edge_application,
-        edgeFirewall: workload.binds.edge_firewall
+        edgeFirewall: workload.binds.edge_firewall,
+        customPage: workload.binds.custom_page
       }))
     : []
 

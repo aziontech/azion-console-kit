@@ -15,6 +15,8 @@
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeFirewallService="listEdgeFirewallService"
         :loadEdgeFirewallService="loadEdgeFirewallService"
+        :listCustomPagesService="listCustomPagesService"
+        :loadCustomPagesService="loadCustomPagesService"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -59,6 +61,14 @@
       type: Function,
       required: true
     },
+    listCustomPagesService: {
+      type: Function,
+      required: true
+    },
+    loadCustomPagesService: {
+      type: Function,
+      required: true
+    },
     updatedRedirect: {
       type: String,
       required: true
@@ -70,7 +80,8 @@
   const validationSchema = yup.object({
     id: yup.string().required(),
     edgeApplication: yup.number().required().label('Edge Application'),
-    edgeFirewall: yup.mixed().oneOf[(yup.number(), null)]
+    edgeFirewall: yup.mixed().oneOf[(yup.number(), null)],
+    customPage: yup.mixed().oneOf[(yup.number(), null)]
   })
 
   const editWorkLoadDeployment = async (payload) => {
