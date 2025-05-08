@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadFunctionService } from '@/services/edge-firewall-functions-services/v4'
 import { describe, expect, it, vi } from 'vitest'
 
-// Constantes para reutilização
 const EDGE_FIREWALL_ID = '123'
 const FUNCTION_ID = '456'
 
