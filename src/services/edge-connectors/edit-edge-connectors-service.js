@@ -18,7 +18,8 @@ const extractAddresses = (addresses) => {
   return addresses.map((el) => {
     return {
       address: el.address,
-      port: el.port,
+      plain_port: el.plainPort,
+      tls_port: el.tlsPort,
       server_role: el.serverRole,
       weight: el.weight,
       active: el.active,

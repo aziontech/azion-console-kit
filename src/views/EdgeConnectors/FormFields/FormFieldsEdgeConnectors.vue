@@ -347,13 +347,25 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
-            label="Port"
+            label="Plain Port"
             required
             description=""
-            :value="addresses[index].value.port"
-            :name="`addresses[${index}].port`"
+            :value="addresses[index].value.plainPort"
+            :name="`addresses[${index}].plainPort`"
             placeholder=""
-            data-testid="edge-connectors-form__addresses__port-field"
+            data-testid="edge-connectors-form__addresses__plain-port-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldNumber
+            label="TLS Port"
+            required
+            description=""
+            :value="addresses[index].value.tlsPort"
+            :name="`addresses[${index}].tlsPort`"
+            placeholder=""
+            data-testid="edge-connectors-form__addresses__tls-port-field"
           />
         </div>
 
@@ -624,7 +636,8 @@
   const addNewAddresses = () => {
     pushAddresses({
       address: '',
-      port: 80,
+      plainPort: 80,
+      tlsPort: 443,
       serverRole: 'primary',
       weight: 1,
       active: true,

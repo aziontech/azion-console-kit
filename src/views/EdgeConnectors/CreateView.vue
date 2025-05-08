@@ -168,13 +168,21 @@
               .min(1, 'Address must be at least 1 character')
               .max(255, 'Address must be at most 255 characters'),
 
-            port: yup
+            plainPort: yup
               .number()
-              .label('Port')
-              .integer('Port must be an integer')
-              .min(1, 'Port must be ≥ 1')
-              .max(65535, 'Port must be ≤ 65535')
-              .required('Port is required'),
+              .label('Plain Port')
+              .integer('Plain Port must be an integer')
+              .min(1, 'Plain Port must be ≥ 1')
+              .max(65535, 'Plain Port must be ≤ 65535')
+              .required('Plain Port is required'),
+
+            tlsPort: yup
+              .number()
+              .label('TLS Port')
+              .integer('TLS Port must be an integer')
+              .min(1, 'TLS Port must be ≥ 1')
+              .max(65535, 'TLS Port must be ≤ 65535')
+              .required('TLS Port is required'),
 
             serverRole: yup
               .string()
