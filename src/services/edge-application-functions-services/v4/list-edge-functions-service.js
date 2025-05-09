@@ -29,7 +29,14 @@ const adapt = (httpResponse) => {
       id: edgeApplicationFunction.id.toString(),
       edgeFunctionId: edgeApplicationFunction.edge_function,
       name: parseName(edgeApplicationFunction),
-      args: edgeApplicationFunction.json_args
+      args: edgeApplicationFunction.json_args,
+      lastEditor: edgeApplicationFunction.last_editor,
+      lastModified: edgeApplicationFunction.last_modified
+        ? new Intl.DateTimeFormat('us', {
+            dateStyle: 'full',
+            timeStyle: 'medium'
+          }).format(new Date(edgeApplicationFunction.last_modified))
+        : null
     }
   })
 

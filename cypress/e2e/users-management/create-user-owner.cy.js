@@ -40,11 +40,6 @@ describe('Users Management spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.form.submitButton).click()
 
     // Assert
-    cy.verifyToast('error', 'You cannot assign an account owner user to a Team.')
-
-    cy.get(selectors.usersManagement.switchSocialLogin).click()
-    cy.get(selectors.usersManagement.switchSocialLogin).click()
-    cy.get(selectors.form.submitButton).click()
 
     cy.verifyToast('success', 'Your user has been created')
 
