@@ -46,6 +46,8 @@
   const initialValues = {
     type: 'http',
     name: '',
+    productVersion: '1.0',
+
     loadBalancerEnabled: true,
     originShieldEnabled: true,
     addresses: [],
@@ -55,15 +57,28 @@
     connectionTimeout: 60,
     readWriteTimeout: 120,
     maxRetries: 0,
-    active: true,
-    typeProperties: {
+    status: true,
+    http: {
       versions: ['http1'],
       host: '',
       path: '',
       followingRedirect: true,
       realIpHeader: '',
       realPortHeader: ''
-    }
+    },
+    s3: {
+      host: '',
+      bucket: '',
+      path: '',
+      region: '',
+      accessKey: '',
+      secretKey: ''
+    },
+    edgeStorage: {
+      bucket: '',
+      prefix: ''
+    },
+    liveIngestEndpoint: ''
   }
 
   const validationSchema = yup.object({
@@ -71,6 +86,59 @@
       .string()
       .oneOf(['http', 's3', 'edge_storage', 'live_ingest'], 'Type is invalid')
       .required(),
+
+    // http
+    http: yup.object().when('type', {
+      is: 'http',
+      then: () =>
+        yup.object({
+          versions: yup.array().of(yup.string()),
+          host: yup.string().required('Host is a required field'),
+          path: yup.string().required('Path is a required field'),
+          followingRedirect: yup.boolean().required('Following Redirect is a required field'),
+          realIpHeader: yup.string().required('Real Ip Header is a required field'),
+          realPortHeader: yup.string().required('Real Port Header is a required field')
+        }),
+      otherwise: () => yup.object().notRequired()
+    }),
+
+    // s3
+    s3: yup.object().when('type', {
+      is: 's3',
+      then: () =>
+        yup.object({
+          host: yup.string().required('Host is a required field'),
+          bucket: yup.string().required('Bucket is a required field'),
+          path: yup.string().required('Path is a required field'),
+          region: yup.string().required('Region is a required field'),
+          accessKey: yup
+            .string()
+            .matches(/^\$\{env\.[A-Z0-9_]+\}$|^.{1,256}$/, 'Deve ser literal ou ENV var')
+            .required('Access Key is a required field'),
+          secretKey: yup
+            .string()
+            .matches(/^\$\{env\.[A-Z0-9_]+\}$|^.{1,256}$/, 'Deve ser literal ou ENV var')
+            .required('Secret Key is a required field')
+        }),
+      otherwise: () => yup.object().notRequired()
+    }),
+
+    // edge_storage
+    edgeStorage: yup.object().when('type', {
+      is: 'edge_storage',
+      then: () =>
+        yup.object({
+          bucket: yup.string().required('Bucket is a required field'),
+          prefix: yup.string().required('Prefix is a required field')
+        }),
+      otherwise: () => yup.object().notRequired()
+    }),
+
+    // live_ingest
+    liveIngestEndpoint: yup.string().when('type', {
+      is: 'live_ingest',
+      then: (schema) => schema.required('Endpoint is a required field')
+    }),
 
     name: yup
       .string()
@@ -82,78 +150,81 @@
         (value) => /^[\x20-\x21\x23-\x7E]+$/.test(value)
       ),
 
+    productVersion: yup.string().required(),
+
     loadBalancerEnabled: yup.boolean().required(),
     originShieldEnabled: yup.boolean().required(),
 
-    addresses: yup
-      .array()
-      .of(
-        yup.object({
-          address: yup
-            .string()
-            .label('Address')
-            .required('Address is required')
-            .min(1, 'Address must be at least 1 character')
-            .max(255, 'Address must be at most 255 characters'),
+    addresses: yup.array().when('type', {
+      is: (val) => ['live_ingest', 'edge_storage'].includes(val),
+      then: () => yup.array().notRequired(),
+      otherwise: () =>
+        yup.array().of(
+          yup.object({
+            address: yup
+              .string()
+              .label('Address')
+              .required('Address is required')
+              .min(1, 'Address must be at least 1 character')
+              .max(255, 'Address must be at most 255 characters'),
 
-          plainPort: yup
-            .number()
-            .label('Plain Port')
-            .integer('Plain Port must be an integer')
-            .min(1, 'Plain Port must be ≥ 1')
-            .max(65535, 'Plain Port must be ≤ 65535')
-            .required('Plain Port is required'),
+            plainPort: yup
+              .number()
+              .label('Plain Port')
+              .integer('Plain Port must be an integer')
+              .min(1, 'Plain Port must be ≥ 1')
+              .max(65535, 'Plain Port must be ≤ 65535')
+              .required('Plain Port is required'),
 
-          tlsPort: yup
-            .number()
-            .label('TLS Port')
-            .integer('TLS Port must be an integer')
-            .min(1, 'TLS Port must be ≥ 1')
-            .max(65535, 'TLS Port must be ≤ 65535')
-            .required('TLS Port is required'),
+            tlsPort: yup
+              .number()
+              .label('TLS Port')
+              .integer('TLS Port must be an integer')
+              .min(1, 'TLS Port must be ≥ 1')
+              .max(65535, 'TLS Port must be ≤ 65535')
+              .required('TLS Port is required'),
 
-          serverRole: yup
-            .string()
-            .label('Server Role')
-            .oneOf(['primary', 'backup'], 'Server Role must be primary or backup')
-            .required('Server Role is required'),
+            serverRole: yup
+              .string()
+              .label('Server Role')
+              .oneOf(['primary', 'backup'], 'Server Role must be primary or backup')
+              .required('Server Role is required'),
 
-          weight: yup
-            .number()
-            .label('Weight')
-            .integer('Weight must be an integer')
-            .min(0, 'Weight must be ≥ 0')
-            .max(100, 'Weight must be ≤ 100')
-            .required('Weight is required'),
+            weight: yup
+              .number()
+              .label('Weight')
+              .integer('Weight must be an integer')
+              .min(0, 'Weight must be ≥ 0')
+              .max(100, 'Weight must be ≤ 100')
+              .required('Weight is required'),
 
-          isActive: yup.boolean().label('isActive').required(),
+            active: yup.boolean().label('active'),
 
-          maxConns: yup
-            .number()
-            .label('Max Connections')
-            .integer('Max Connections must be an integer')
-            .min(0, 'Max Connections must be ≥ 0')
-            .max(1000, 'Max Connections must be ≤ 1000')
-            .required('Max Connections is required'),
+            maxConns: yup
+              .number()
+              .label('Max Connections')
+              .integer('Max Connections must be an integer')
+              .min(0, 'Max Connections must be ≥ 0')
+              .max(1000, 'Max Connections must be ≤ 1000')
+              .required('Max Connections is required'),
 
-          maxFails: yup
-            .number()
-            .label('Max Fails')
-            .integer('Max Fails must be an integer')
-            .min(1, 'Max Fails must be ≥ 1')
-            .max(10, 'Max Fails must be ≤ 10')
-            .required('Max Fails is required'),
+            maxFails: yup
+              .number()
+              .label('Max Fails')
+              .integer('Max Fails must be an integer')
+              .min(1, 'Max Fails must be ≥ 1')
+              .max(10, 'Max Fails must be ≤ 10')
+              .required('Max Fails is required'),
 
-          failTimeout: yup
-            .number()
-            .label('Fail Timeout')
-            .integer('Fail Timeout must be an integer')
-            .min(0, 'Fail Timeout must be ≥ 0')
-            .required('Fail Timeout is required')
-        })
-      )
-      .min(1, 'At least one address entry is required')
-      .required('Addresses is required'),
+            failTimeout: yup
+              .number()
+              .label('Fail Timeout')
+              .integer('Fail Timeout must be an integer')
+              .min(0, 'Fail Timeout must be ≥ 0')
+              .required('Fail Timeout is required')
+          })
+        )
+    }),
 
     tlsPolicy: yup.string().oneOf(['preserve', 'off', 'on'], 'TLS Policy is invalid'),
 
@@ -175,15 +246,6 @@
     readWriteTimeout: yup.number().integer().min(0).required(),
     maxRetries: yup.number().integer().min(0).required(),
 
-    active: yup.boolean().required(),
-
-    typeProperties: yup.object({
-      versions: yup.array().of(yup.string()).required(),
-      host: yup.string().required(),
-      path: yup.string().required(),
-      followingRedirect: yup.boolean().required().default(true),
-      realIpHeader: yup.string().required('Real Ip Header is a required field'),
-      realPortHeader: yup.string().required('Real Port Header is a required field')
-    })
+    status: yup.boolean().required()
   })
 </script>

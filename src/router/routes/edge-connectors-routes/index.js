@@ -23,7 +23,7 @@ export const edgeConnectorsRoutes = {
             to: '/edge-connectors'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     },
     {
@@ -44,7 +44,7 @@ export const edgeConnectorsRoutes = {
             to: '/edge-connectors/create'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     },
     {
@@ -65,7 +65,7 @@ export const edgeConnectorsRoutes = {
             label: 'Edit Edge Connectors'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     }
   ]
