@@ -1,3 +1,5 @@
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 function createHomeItem() {
   return {
     label: 'Home',
@@ -155,7 +157,7 @@ function createEdgeLibrariesItems() {
       to: '/custom-pages',
       icon: 'pi pi-globe',
       id: 'custom-pages',
-      isBlockedApiV4: true
+      visible: !hasFlagBlockApiV4()
     }
   ]
 }
