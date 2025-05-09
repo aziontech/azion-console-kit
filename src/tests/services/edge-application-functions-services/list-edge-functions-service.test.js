@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctionsService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
-// Constantes para reutilização
 const API_VERSION = 'v3'
 const EDGE_FIREWALL_ID = 123
 

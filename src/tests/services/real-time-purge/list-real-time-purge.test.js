@@ -3,13 +3,7 @@ import * as Errors from '@services/axios/errors'
 import { listRealTimePurgeService } from '@/services/real-time-purge'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '@/services/axios/makeEventsApi'
-
-const localeMock = (locale = 'en') => {
-  const DateTimeFormat = Intl.DateTimeFormat
-  vi.spyOn(window.global.Intl, 'DateTimeFormat').mockImplementation((__, options) =>
-    DateTimeFormat(locale, { ...options })
-  )
-}
+import { localeMock } from '@/tests/utils/localeMock'
 
 const purge = [
   {
@@ -18,9 +12,9 @@ const purge = [
     title: 'Purge:url  was created',
     comment: '-',
     type: 'created',
-    requestData: '"{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}"',
+    requestData: '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}',
     authorName: 'Paulo Sobrinho Ferreira',
-    authorEmail: 'paulo.ferreira+teste1@azion.com',
+    authorEmail: 'azion+teste1@azion.com',
     accountId: '2515'
   }
 ]
@@ -32,7 +26,7 @@ const fixtures = {
     layer: 'edge_cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
-    user: 'paulo.ferreira+teste1@azion.com'
+    user: 'azion+teste1@azion.com'
   }
 }
 
@@ -112,6 +106,49 @@ describe('ListRealTimePurgeService', () => {
         time: fixtures.realTimePurgeMock.time
       }
     ])
+  })
+
+  it('should correctly parse double-escaped requestData', async () => {
+    localeMock()
+    const doubleEscapedRequestData =
+      '{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}'
+    const mockResponse = {
+      statusCode: 200,
+      body: {
+        data: {
+          activityHistoryEvents: [
+            {
+              resourceType: 'Purge:url',
+              ts: '2023-12-13T18:02:49Z',
+              title: 'Purge:url was created',
+              comment: '-',
+              type: 'created',
+              requestData: doubleEscapedRequestData,
+              authorName: 'Paulo Sobrinho Ferreira',
+              authorEmail: 'azion+teste1@azion.com',
+              accountId: '2515'
+            }
+          ]
+        }
+      }
+    }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(mockResponse)
+
+    const apiClient = graphQLApi('token')
+    const result = await listRealTimePurgeService(apiClient)
+
+    const expectedParsedData = {
+      id: '2023-12-13T18:02:49Z-0',
+      type: 'URL',
+      arguments: ['www.vicva.com'],
+      layer: 'Edge Cache',
+      user: 'azion+teste1@azion.com',
+      disabled: false,
+      time: 'Wednesday, December 13, 2023 at 6:02 PM'
+    }
+
+    expect(result).toEqual([expectedParsedData])
   })
 
   it.each([

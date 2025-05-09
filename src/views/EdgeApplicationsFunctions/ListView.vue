@@ -71,7 +71,14 @@
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
   const hasContentToList = ref(true)
-  const FUNCTIONS_API_FIELDS = ['id', 'name', 'edge_function', 'json_args']
+  const FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'edge_function',
+    'json_args',
+    'last_modified',
+    'last_editor'
+  ]
 
   const props = defineProps({
     edgeApplicationId: {

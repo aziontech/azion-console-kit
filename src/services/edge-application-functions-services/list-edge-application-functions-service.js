@@ -44,8 +44,8 @@ const mapFunctionData = (edgeApplicationFunction, functionData) => {
     id: edgeApplicationFunction.id,
     name: edgeApplicationFunction.name,
     functionInstanced: functionData.name,
-    lastEditor: functionData.lastEditor,
-    modified: functionData.modified,
+    lastEditor: edgeApplicationFunction.lastEditor,
+    modified: edgeApplicationFunction.lastModified,
     version: functionData.version
   }
 }

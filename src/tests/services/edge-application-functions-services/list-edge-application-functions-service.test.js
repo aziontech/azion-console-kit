@@ -8,7 +8,9 @@ const fixtures = {
     id: 1,
     name: 'function instance',
     edgeFunctionId: 123,
-    edge_function_id: 123
+    edge_function_id: 123,
+    last_editor: 'az editor instance',
+    last_modified: new Date(2023, 10, 10)
   },
   edgeFunctionMock: {
     active: true,
@@ -63,8 +65,8 @@ describe('EdgeApplicationFunctionsServices', () => {
         id: '1',
         name: { text: 'function instance', tagProps: {} },
         functionInstanced: 'AZ firewall',
-        lastEditor: 'az editor',
-        modified: 'Friday, November 10, 2023',
+        lastEditor: 'az editor instance',
+        modified: 'Friday, November 10, 2023 at 12:00:00 AM',
         version: '1.0.0'
       }
     ])
