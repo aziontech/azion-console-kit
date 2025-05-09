@@ -51,26 +51,29 @@ const MAPTYPE = {
 const parseEscapedJSON = (escapedString) => {
   let unescapedString = escapedString
   let parsedData = null
-  const whileTrue = true
+  let hasChanged
 
-  while (whileTrue) {
+  do {
+    hasChanged = false
     try {
       parsedData = JSON.parse(unescapedString)
 
       if (typeof parsedData === 'string') {
         unescapedString = parsedData
-      } else {
-        break
+        hasChanged = true
       }
     } catch (error) {
-      unescapedString = unescapedString.replace(/\\"/g, '"')
+      const newUnescapedString = unescapedString.replace(/\\"/g, '"')
 
-      if (unescapedString === escapedString) {
+      if (newUnescapedString !== unescapedString) {
+        unescapedString = newUnescapedString
+        hasChanged = true
+      } else {
+        console.error('Não foi possível desescapar completamente a string.')
         return null
       }
-      escapedString = unescapedString
     }
-  }
+  } while (hasChanged)
 
   return parsedData
 }
