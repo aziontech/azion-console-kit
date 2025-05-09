@@ -48,6 +48,33 @@ const MAPTYPE = {
   url: 'URL'
 }
 
+const parseEscapedJSON = (escapedString) => {
+  let unescapedString = escapedString
+  let parsedData = null
+  const whileTrue = true
+
+  while (whileTrue) {
+    try {
+      parsedData = JSON.parse(unescapedString)
+
+      if (typeof parsedData === 'string') {
+        unescapedString = parsedData
+      } else {
+        break
+      }
+    } catch (error) {
+      unescapedString = unescapedString.replace(/\\"/g, '"')
+
+      if (unescapedString === escapedString) {
+        return null
+      }
+      escapedString = unescapedString
+    }
+  }
+
+  return parsedData
+}
+
 const adapt = (httpResponse) => {
   const DEFAULT_VALUE = '-'
 
@@ -57,12 +84,7 @@ const adapt = (httpResponse) => {
 
     const data = (() => {
       if (item?.requestData && item?.requestData !== DEFAULT_VALUE) {
-        try {
-          const unescapedRequestData = item.requestData.replace(/\\"/g, '"')
-          return JSON.parse(unescapedRequestData)
-        } catch (error) {
-          return null
-        }
+        return parseEscapedJSON(item.requestData)
       }
       return null
     })()
