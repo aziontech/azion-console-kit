@@ -1,10 +1,13 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Connectors" />
+      <PageHeadingBlock
+        pageTitle="Edge Connectors"
+        data-testid="edge-connectors-heading"
+      />
     </template>
     <template #content>
-      <ListTableBlock
+      <FetchListTableBlock
         v-if="hasContentToList"
         :listService="listEdgeConnectorsService"
         :columns="getColumns"
@@ -15,6 +18,7 @@
         addButtonLabel="Edge Connectors"
         createPagePath="/edge-connectors/create"
         editPagePath="/edge-connectors/edit"
+        data-testid="edge-connectors-list-table-block"
       />
       <EmptyResultsBlock
         v-else
@@ -22,7 +26,6 @@
         description="Click the button below to create your first edge connectors."
         createButtonLabel="Edge Connectors"
         createPagePath="edge-connectors/create"
-        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -37,8 +40,9 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import ListTableBlock from '@/templates/list-table-block'
+  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'edge-connectors-view' })
@@ -91,6 +95,25 @@
       {
         field: 'address',
         header: 'Address'
+      },
+      {
+        field: 'active',
+        header: 'Status',
+        type: 'component',
+        sortField: 'active',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })

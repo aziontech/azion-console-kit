@@ -40,6 +40,194 @@
         />
       </div>
 
+      <div
+        class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+        v-if="type === 'http'"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Host"
+            required
+            description=""
+            :value="host"
+            name="http.host"
+            placeholder="Host"
+            data-testid="edge-connectors-form__host-settings__http-host-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Path"
+            required
+            description=""
+            :value="path"
+            name="http.path"
+            placeholder="Path"
+            data-testid="edge-connectors-form__host-settings__http-path-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Real Ip Header"
+            required
+            description=""
+            :value="realIpHeader"
+            name="http.realIpHeader"
+            placeholder="Real Ip Header"
+            data-testid="edge-connectors-form__host-settings__http-real-ip-header-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Real Port Header"
+            required
+            description=""
+            :value="realPortHeader"
+            name="http.realPortHeader"
+            placeholder="Real Port Header"
+            data-testid="edge-connectors-form__host-settings__http-real-port-header-field"
+          />
+        </div>
+
+        <div class="flex flex-col w-full gap-2">
+          <FieldSwitchBlock
+            nameField="http.followingRedirect"
+            name="http.followingRedirect"
+            auto
+            :isCard="false"
+            title="Following Redirect"
+            :value="followingRedirect"
+            data-testid="edge-connectors-form__host-settings__http-following-redirect-field"
+          />
+        </div>
+      </div>
+
+      <div
+        class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+        v-if="type === 's3'"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Host"
+            required
+            description=""
+            :value="s3Host"
+            name="s3.host"
+            placeholder="Host"
+            data-testid="edge-connectors-form__host-settings__s3-host-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Bucket"
+            required
+            description=""
+            :value="s3Bucket"
+            name="s3.bucket"
+            placeholder="Bucket"
+            data-testid="edge-connectors-form__host-settings__s3-bucket-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Path"
+            required
+            description=""
+            :value="s3Path"
+            name="s3.path"
+            placeholder="Path"
+            data-testid="edge-connectors-form__host-settings__s3-path-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Region"
+            required
+            description=""
+            :value="s3Region"
+            name="s3.region"
+            placeholder="Region"
+            data-testid="edge-connectors-form__host-settings__s3-region-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Access Key"
+            required
+            description=""
+            :value="s3AccessKey"
+            name="s3.accessKey"
+            placeholder="Access Key"
+            data-testid="edge-connectors-form__host-settings__s3-access-key-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Secret Key"
+            required
+            description=""
+            :value="s3SecretKey"
+            name="s3.secretKey"
+            placeholder="Secret Key"
+            data-testid="edge-connectors-form__host-settings__s3-secret-key-field"
+          />
+        </div>
+      </div>
+
+      <div
+        class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+        v-if="type === 'edge_storage'"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Bucket"
+            required
+            description=""
+            :value="edgeStorageBucket"
+            name="edgeStorage.bucket"
+            placeholder="Bucket"
+            data-testid="edge-connectors-form__host-settings__edge-storage-bucket-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Prefix"
+            required
+            description=""
+            :value="edgeStoragePrefix"
+            name="edgeStorage.prefix"
+            placeholder="Prefix"
+            data-testid="edge-connectors-form__host-settings__edge-storage-prefix-field"
+          />
+        </div>
+      </div>
+
+      <div
+        class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+        v-if="type === 'live_ingest'"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Endpoint"
+            required
+            description=""
+            :value="liveIngestEndpoint"
+            name="liveIngestEndpoint"
+            placeholder="Endpoint"
+            data-testid="edge-connectors-form__host-settings__liveIngestEndpoint-field"
+          />
+        </div>
+      </div>
+
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldGroupRadio
           label="TLS"
@@ -94,61 +282,13 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Host"
+          label="Product Version"
           required
           description=""
-          :value="host"
-          name="typeProperties.host"
-          placeholder="Host"
-          data-testid="edge-connectors-form__host-settings__host-field"
-        />
-      </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Path"
-          required
-          description=""
-          :value="path"
-          name="typeProperties.path"
-          placeholder="Path"
-          data-testid="edge-connectors-form__host-settings__path-field"
-        />
-      </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Real Ip Header"
-          required
-          description=""
-          :value="realIpHeader"
-          name="typeProperties.realIpHeader"
-          placeholder="Real Ip Header"
-          data-testid="edge-connectors-form__host-settings__real-ip-header-field"
-        />
-      </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Real Port Header"
-          required
-          description=""
-          :value="realPortHeader"
-          name="typeProperties.realPortHeader"
-          placeholder="Real Port Header"
-          data-testid="edge-connectors-form__host-settings__real-port-header-field"
-        />
-      </div>
-
-      <div class="flex flex-col w-full gap-2">
-        <FieldSwitchBlock
-          nameField="typeProperties.followingRedirect"
-          name="typeProperties.followingRedirect"
-          auto
-          :isCard="false"
-          title="Following Redirect"
-          :value="followingRedirect"
-          data-testid="edge-connectors-form__host-settings__following-redirect-field"
+          :value="productVersion"
+          name="productVersion"
+          placeholder="Product Version"
+          data-testid="edge-connectors-form__host-settings__product-version-field"
         />
       </div>
     </template>
@@ -185,7 +325,7 @@
     title="Addresses"
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
-    v-if="type !== 'live_ingest'"
+    v-if="type !== 'live_ingest' && type !== 'edge_storage'"
   >
     <template #inputs>
       <div
@@ -200,7 +340,7 @@
             description="IPv4/IPv6 address or CNAME to resolve"
             :value="addresses[index].value.address"
             :name="`addresses[${index}].address`"
-            placeholder="My Edge Connector"
+            placeholder=""
             data-testid="edge-connectors-form__addresses__address-field"
           />
         </div>
@@ -208,6 +348,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Plain Port"
+            required
             description=""
             :value="addresses[index].value.plainPort"
             :name="`addresses[${index}].plainPort`"
@@ -219,6 +360,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="TLS Port"
+            required
             description=""
             :value="addresses[index].value.tlsPort"
             :name="`addresses[${index}].tlsPort`"
@@ -245,6 +387,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Weight"
+            required
             description="Weight used in load balancing strategy"
             :value="addresses[index].value.weight"
             :name="`addresses[${index}].weight`"
@@ -256,6 +399,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Max Conns"
+            required
             description="Maximum number of open connections per Edge Application instance"
             :value="addresses[index].value.maxConns"
             :name="`addresses[${index}].maxConns`"
@@ -267,6 +411,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Max Fails"
+            required
             description="Maximum number of communication attempts before marking as unavailable"
             :value="addresses[index].value.maxFails"
             :name="`addresses[${index}].maxFails`"
@@ -278,6 +423,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldNumber
             label="Fail Timeout"
+            required
             description="Timeout for communication attempts"
             :value="addresses[index].value.failTimeout"
             :name="`addresses[${index}].failTimeout`"
@@ -288,12 +434,12 @@
 
         <div class="flex flex-col w-full gap-2">
           <FieldSwitchBlock
-            nameField="isActive"
-            :name="`addresses[${index}].isActive`"
+            :nameField="`addresses[${index}].active`"
+            :name="`addresses[${index}].active`"
             auto
             :isCard="false"
             title="Active"
-            :value="`addresses[${index}].value.isActive`"
+            :value="`addresses[${index}].value.active`"
             data-testid="edge-connectors-form__addresses__active-field"
           />
         </div>
@@ -380,11 +526,11 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="active"
-          name="active"
+          nameField="status"
+          name="status"
           auto
           :isCard="false"
-          :value="active"
+          :value="status"
           title="Active"
           data-testid="edge-connectors-form__status__status-field"
         />
@@ -445,14 +591,32 @@
     remove: removeAddressesArray,
     fields: addresses
   } = useFieldArray('addresses')
-  const { value: active } = useField('active')
+  const { value: status } = useField('status')
   const { value: loadBalancerEnabled } = useField('loadBalancerEnabled')
   const { value: originShieldEnabled } = useField('originShieldEnabled')
-  const { value: host } = useField('typeProperties.host')
-  const { value: path } = useField('typeProperties.path')
-  const { value: followingRedirect } = useField('typeProperties.followingRedirect')
-  const { value: realIpHeader } = useField('typeProperties.realIpHeader')
-  const { value: realPortHeader } = useField('typeProperties.realPortHeader')
+  const { value: productVersion } = useField('productVersion')
+
+  // http
+  const { value: host } = useField('http.host')
+  const { value: path } = useField('http.path')
+  const { value: followingRedirect } = useField('http.followingRedirect')
+  const { value: realIpHeader } = useField('http.realIpHeader')
+  const { value: realPortHeader } = useField('http.realPortHeader')
+
+  // s3
+  const { value: s3Host } = useField('s3.host')
+  const { value: s3Bucket } = useField('s3.bucket')
+  const { value: s3Path } = useField('s3.path')
+  const { value: s3Region } = useField('s3.region')
+  const { value: s3AccessKey } = useField('s3.accessKey')
+  const { value: s3SecretKey } = useField('s3.secretKey')
+
+  // edge_storage
+  const { value: edgeStorageBucket } = useField('edgeStorage.bucket')
+  const { value: edgeStoragePrefix } = useField('edgeStorage.prefix')
+
+  // live_ingest
+  const { value: liveIngestEndpoint } = useField('liveIngestEndpoint')
 
   const serversRoles = computed(() => {
     if (loadBalanceMethod.value === 'ip_hash') {
@@ -476,7 +640,7 @@
       tlsPort: 443,
       serverRole: 'primary',
       weight: 1,
-      isActive: true,
+      active: true,
       maxConns: 0,
       maxFails: 1,
       failTimeout: 10
