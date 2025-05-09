@@ -1,0 +1,15 @@
+{
+  "data": {
+    "id": "123",
+    "name": "edgeConnectorsMock",
+    "type": "edge_storage",
+    "type_properties": {
+      "bucket": "advanced-filter-graphql",
+      "prefix": "20241010173031"
+    },
+    "load_balance_method": "off",
+    "modules": { "load_balancer_enabled": true, "origin_shield_enabled": true },
+    "tls": { "policy": "preserve" },
+    "addresses": []
+  }
+}

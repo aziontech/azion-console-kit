@@ -63,25 +63,6 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast('success', 'Edge Connector successfully created')
   })
 
-  it('should create a new Edge Connector type edge storange', () => {
-    cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
-
-    cy.get(edgeConnectors.createButton).click()
-    cy.get(edgeConnectors.name).clear()
-    cy.get(edgeConnectors.name).type(edgeConnectorName)
-    cy.get(edgeConnectors.typeDropdown).click()
-    cy.get('#type_2').click()
-    cy.get(edgeConnectors.edgeStorage.bucket).clear()
-    cy.get(edgeConnectors.edgeStorage.bucket).type('advanced-filter-graphql')
-    cy.get(edgeConnectors.edgeStorage.prefix).clear()
-    cy.get(edgeConnectors.edgeStorage.prefix).type('20241010173031')
-    cy.get(edgeConnectors.saveButton).click()
-
-    cy.wait('@createEdgeConnector')
-
-    cy.verifyToast('success', 'Edge Connector successfully created')
-  })
-
   it('should create a new Edge Connector type live ingest', () => {
     cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
 
