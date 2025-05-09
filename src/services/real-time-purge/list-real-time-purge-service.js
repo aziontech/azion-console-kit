@@ -69,7 +69,6 @@ const parseEscapedJSON = (escapedString) => {
         unescapedString = newUnescapedString
         hasChanged = true
       } else {
-        console.error('Não foi possível desescapar completamente a string.')
         return null
       }
     }
