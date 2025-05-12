@@ -5,6 +5,15 @@ let customPageName = ''
 
 describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', (req) => {
+      req.reply((res) => {
+        res.send({
+          ...res.body,
+          client_flags: ['allow_console', 'enable_ipv6', 'federated_auth', 'waf_mode']
+        })
+      })
+    }).as('accountInfo')
+
     cy.login()
     customPageName = generateUniqueName('Custom Page')
     cy.openProduct('Custom Pages')
@@ -19,8 +28,7 @@ describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
     // Assert
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Custom Page successfully created')
-
-    cy.get(selectors.list.searchInput).type(`${customPageName}{enter}`)
-    cy.get(selectors.customPages.list.columnName('name')).should('have.text', customPageName)
+    cy.get(selectors.customPages.editPageTitle).should('have.text', 'Edit Custom Page')
+    cy.get(selectors.customPages.nameInput).should('have.value', customPageName)
   })
 })

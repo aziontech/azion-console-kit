@@ -23,7 +23,7 @@ export const customPagesRoutes = {
             to: '/custom-pages'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     },
     {
@@ -45,7 +45,7 @@ export const customPagesRoutes = {
             to: '/custom-pages/create'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     },
     {
@@ -69,7 +69,7 @@ export const customPagesRoutes = {
             to: '/custom-pages/edit'
           }
         ],
-        flag: 'checkout_access'
+        flag: 'checkout_access_without_flag'
       }
     }
   ]
