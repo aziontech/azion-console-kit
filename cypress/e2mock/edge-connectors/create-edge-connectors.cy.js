@@ -117,7 +117,6 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
       .type('20241010173031')
     cy.get(edgeConnectors.saveButton).click()
 
-    // // 3. Verifica o alias e validações UI sem backend
     cy.wait('@createEdgeConnector')
       .its('response.body.data')
       .then((data) => {
