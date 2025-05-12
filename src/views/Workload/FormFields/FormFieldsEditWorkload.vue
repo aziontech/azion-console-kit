@@ -7,35 +7,8 @@
 
   import { useField } from 'vee-validate'
   import { ref } from 'vue'
-  const drawerRef = ref('')
 
-  const openDrawer = () => {
-    drawerRef.value.openCreateDrawer()
-  }
-
-  const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
-  }
-
-  defineOptions({ name: 'form-fields-variables' })
-  const emit = defineEmits(['edgeFirewallCreated'])
-
-  const { value: edgeApplication } = useField('edgeApplication')
-  const { value: edgeFirewall } = useField('edgeFirewall')
-  const { value: customPage } = useField('customPage')
-
-  const drawerEdgeFirewallRef = ref('')
-
-  const openDrawerEdgeFirewall = () => {
-    drawerEdgeFirewallRef.value.openCreateDrawer()
-  }
-
-  const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
-    emit('edgeFirewallCreated')
-  }
-
-  defineProps({
+  const props = defineProps({
     listEdgeApplicationsService: {
       type: Function,
       required: true
@@ -61,6 +34,38 @@
       required: true
     }
   })
+
+  const drawerRef = ref('')
+
+  const openDrawer = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
+  }
+
+  const handleListCustomPages = async () => {
+    return await props.listCustomPagesService({ fields: ['id', 'name'] })
+  }
+
+  defineOptions({ name: 'form-fields-variables' })
+  const emit = defineEmits(['edgeFirewallCreated'])
+
+  const { value: edgeApplication } = useField('edgeApplication')
+  const { value: edgeFirewall } = useField('edgeFirewall')
+  const { value: customPage } = useField('customPage')
+
+  const drawerEdgeFirewallRef = ref('')
+
+  const openDrawerEdgeFirewall = () => {
+    drawerEdgeFirewallRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallCreated = (id) => {
+    edgeFirewall.value = id
+    emit('edgeFirewallCreated')
+  }
 </script>
 
 <template>
@@ -154,7 +159,7 @@
           enableClearOption
           data-testid="domains-form__custom-page-field"
           name="customPage"
-          :service="listCustomPagesService"
+          :service="handleListCustomPages"
           :loadService="loadCustomPagesService"
           optionLabel="name"
           optionValue="value"
