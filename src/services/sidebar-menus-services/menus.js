@@ -1,4 +1,5 @@
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 function createHomeItem() {
   return {
@@ -149,10 +150,17 @@ function createEdgeLibrariesItems() {
       id: 'network-lists'
     },
     {
-      label: 'WAF Rules',
+      label: `WAF Rules ${!hasFlagBlockApiV4()}`,
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
+    },
+    {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'pi pi-globe',
+      id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
     }
   ]
 }
