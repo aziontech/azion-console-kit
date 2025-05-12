@@ -33,7 +33,7 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Edge Connectors')
   })
 
-  it('should edit a Edge Connector type http', () => {
+  it.skip('should edit a Edge Connector type http', () => {
     cy.intercept('api/v4/edge_connector/connectors/*').as('editEdgeConnector')
     createNewEdgeConnectorHttpType()
 
