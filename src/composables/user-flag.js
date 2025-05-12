@@ -11,6 +11,6 @@ export function useFlag(flagName) {
 }
 
 export function hasFlagBlockApiV4() {
-  const FLAG = 'block_apiv4_uncompatible_endpoints'
+  const FLAG = 'block_apiv4_incompatible_endpoints'
   return useFlag(FLAG).value
 }
