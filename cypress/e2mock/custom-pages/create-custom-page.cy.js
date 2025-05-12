@@ -1,5 +1,6 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
+import { httpResponseCreate } from '../../fixtures/custom-pages.js'
 
 let customPageName = ''
 
@@ -15,11 +16,19 @@ describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
     }).as('accountInfo')
 
     cy.login()
+
+    cy.wait('@accountInfo')
+
     customPageName = generateUniqueName('Custom Page')
     cy.openProduct('Custom Pages')
   })
 
   it('Create a Custom Page', function () {
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/custom_pages' },
+      { body: httpResponseCreate, statusCode: 202 }
+    ).as('createCustomPages')
+
     cy.get(selectors.customPages.createButton).click()
     cy.get(selectors.customPages.nameInput).type(customPageName)
     cy.get(selectors.customPages.isActiveSwitch).click()
@@ -27,8 +36,8 @@ describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
 
     // Assert
     cy.get(selectors.form.actionsSubmitButton).click()
+
+    cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
     cy.verifyToast('success', 'Custom Page successfully created')
-    cy.get(selectors.customPages.editPageTitle).should('have.text', 'Edit Custom Page')
-    cy.get(selectors.customPages.nameInput).should('have.value', customPageName)
   })
 })

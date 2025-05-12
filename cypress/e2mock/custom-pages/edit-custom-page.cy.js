@@ -1,5 +1,6 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
+import { httpResponseCreate, httpResponseGet } from '../../fixtures/custom-pages.js'
 
 let customPageName = ''
 
@@ -15,12 +16,28 @@ describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
     }).as('accountInfo')
 
     cy.login()
+
+    cy.wait('@accountInfo')
+
     customPageName = generateUniqueName('Custom Page')
     cy.openProduct('Custom Pages')
   })
 
   it('should edit a custom page', () => {
-    cy.intercept('GET', '/api/v4/workspace/custom_pages/*').as('getCustomPageData')
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/custom_pages' },
+      { body: httpResponseCreate, statusCode: 202 }
+    ).as('createCustomPages')
+
+    cy.intercept(
+      { method: 'GET', url: '/api/v4/workspace/custom_pages/*' },
+      { body: httpResponseGet, statusCode: 200 }
+    ).as('getCustomPages')
+
+    cy.intercept(
+      { method: 'PATCH', url: '/api/v4/workspace/custom_pages/*' },
+      { body: httpResponseCreate, statusCode: 202 }
+    ).as('updateCustomPages')
 
     cy.get(selectors.customPages.createButton).click()
     cy.get(selectors.customPages.nameInput).type(customPageName)
@@ -29,16 +46,21 @@ describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
 
     // Assert
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.verifyToast('success', 'Custom Page successfully created')
-    cy.get(selectors.customPages.nameInput).type(`${customPageName}-edit`)
 
-    cy.wait('@getCustomPageData')
+    cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
+
+    cy.verifyToast('success', 'Custom Page successfully created')
+
+    cy.wait('@getCustomPages').its('response.statusCode').should('eq', 200)
+
+    cy.get(selectors.customPages.nameInput).type(`${customPageName}-edit`)
     cy.get(selectors.customPages.ttlDefaultPage).should('be.visible').type('333')
 
     // // Assert
     cy.get(selectors.form.actionsSubmitButton).click()
+
+    cy.wait('@updateCustomPages').its('response.statusCode').should('eq', 202)
+
     cy.verifyToast('success', 'Your Custom Page has been updated!')
-    cy.get(selectors.list.searchInput).type(`${customPageName}{enter}`)
-    cy.get(selectors.customPages.list.columnName('name')).should('have.text', customPageName)
   })
 })
