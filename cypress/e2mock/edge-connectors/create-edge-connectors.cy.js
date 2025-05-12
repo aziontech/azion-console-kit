@@ -7,22 +7,21 @@ import accountInfoJSON from '../../fixtures/edge-connectors/account-info.json'
 
 let edgeConnectorName
 
-const mockRequestAccountInfo = () => {
-  edgeConnectorName = generateUniqueName('EdgeConnector')
-
-  cy.intercept(
-    { method: 'GET', url: '/api/account/info' },
-    {
-      statusCode: 200,
-      body: accountInfoJSON
-    }
-  ).as('getAccountInfo')
-}
-
 describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    edgeConnectorName = generateUniqueName('EdgeConnector')
+
+    cy.intercept(
+      { method: 'GET', url: '/api/account/info' },
+      {
+        statusCode: 200,
+        body: accountInfoJSON
+      }
+    ).as('getAccountInfo')
+
     cy.login()
-    mockRequestAccountInfo()
+
+    cy.wait('@getAccountInfo')
 
     cy.openProduct('Edge Connectors')
     cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
