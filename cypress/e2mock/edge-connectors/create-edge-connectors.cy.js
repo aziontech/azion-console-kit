@@ -2,7 +2,7 @@
 import edgeConnectors from '../../support/selectors/product-selectors/edge-connectors'
 import generateUniqueName from '../../support/utils'
 
-import edgeConnectorsJSON from '../../fixtures/edge-connectors/create-edge-connectors.json'
+import { edgeStorageResponse, liveIngestResponse, s3Response, httpResponse } from '../../fixtures/edge-connectors/create-edge-connectors.js'
 import accountInfoJSON from '../../fixtures/edge-connectors/account-info.json'
 
 let edgeConnectorName
@@ -28,7 +28,10 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
   })
 
   it('should create a new Edge Connector type http', () => {
-    cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/edge_connector/connectors' },
+      { body: httpResponse, statusCode: 202 }
+    ).as('createEdgeConnector')
 
     cy.get(edgeConnectors.createButton).click()
     cy.get(edgeConnectors.name).clear()
@@ -51,7 +54,10 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
   })
 
   it('should create a new Edge Connector type s3', () => {
-    cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/edge_connector/connectors' },
+      { body: s3Response, statusCode: 202 }
+    ).as('createEdgeConnector')
 
     cy.get(edgeConnectors.createButton).click()
     cy.get(edgeConnectors.name).clear()
@@ -75,13 +81,16 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
     cy.get(edgeConnectors.address).type('www.google.com')
     cy.get(edgeConnectors.saveButton).click()
 
-    cy.wait('@createEdgeConnector').its('response.statusCode').should('eq', 202)
+    cy.wait('@createEdgeConnector')
 
     cy.verifyToast('success', 'Edge Connector successfully created')
   })
 
-  it.only('should create a new Edge Connector type live ingest', () => {
-    cy.intercept('api/v4/edge_connector/connectors').as('createEdgeConnector')
+  it('should create a new Edge Connector type live ingest', () => {
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/edge_connector/connectors' },
+      { body: liveIngestResponse, statusCode: 202 }
+    ).as('createEdgeConnector')
 
     cy.get(edgeConnectors.createButton).click()
     cy.get(edgeConnectors.name).clear()
@@ -92,7 +101,7 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
     cy.get(edgeConnectors.liveIngest.endpoint).type('us-east-1.azioningest.net')
     cy.get(edgeConnectors.saveButton).click()
 
-    cy.wait('@createEdgeConnector').its('response.statusCode').should('eq', 202)
+    cy.wait('@createEdgeConnector')
 
     cy.verifyToast('success', 'Edge Connector successfully created')
   })
@@ -100,7 +109,7 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
   it('should create a new Edge Connector type edge storage (mocked)', () => {
     cy.intercept(
       { method: 'POST', url: '/api/v4/edge_connector/connectors' },
-      { body: edgeConnectorsJSON, statusCode: 202 }
+      { body: edgeStorageResponse, statusCode: 202 }
     ).as('createEdgeConnector')
 
 
