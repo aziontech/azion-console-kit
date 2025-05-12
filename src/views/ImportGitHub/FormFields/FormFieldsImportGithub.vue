@@ -32,9 +32,6 @@
     listVulcanPresetsService: {
       type: Function
     },
-    getModesByPresetService: {
-      type: Function
-    },
     frameworkDetectorService: {
       type: Function
     }
@@ -46,7 +43,6 @@
   const { value: repository } = useField('repository')
   const { value: applicationName } = useField('applicationName')
   const { value: rootDirectory } = useField('rootDirectory')
-  const { value: mode } = useField('mode')
   const { value: installCommand } = useField('installCommand')
   const { value: newVariables } = useField('newVariables')
 
@@ -66,6 +62,7 @@
 
   const callbackUrl = ref('')
   const isGithubConnectLoading = ref(false)
+  const presetsList = ref([])
 
   const setCallbackUrl = (uri) => {
     callbackUrl.value = uri
@@ -119,10 +116,6 @@
     return false
   })
 
-  const presetsList = computed(() => {
-    return props.listVulcanPresetsService()
-  })
-
   const repositoriesList = ref([])
   const loadingRepositories = ref(false)
   const setListRepositories = async () => {
@@ -142,30 +135,11 @@
       loadingRepositories.value = false
     }
   }
-  const modeList = ref([
-    { label: 'Deliver - Static', value: 'deliver', disabled: false },
-    { label: 'Compute - Edge processing (SSR or Back-End)', value: 'compute', disabled: false }
-  ])
-
-  const setModeByPreset = () => {
-    const availableModes = props.getModesByPresetService(preset.value)
-
-    mode.value = availableModes[0]
-
-    disableUnavailableModes(availableModes)
-  }
-  const disableUnavailableModes = (availableModes) => {
-    modeList.value = modeList.value.map((modeOption) => ({
-      ...modeOption,
-      disabled: !availableModes.includes(modeOption.value)
-    }))
-  }
 
   const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
       const framework = await props.frameworkDetectorService({ accountName, repositoryName })
       preset.value = framework
-      setModeByPreset()
     } catch (error) {
       toast.add({
         closable: true,
@@ -200,10 +174,6 @@
     return selectedOption ? selectedOption.label : ''
   }
 
-  const getPresetIconClass = (preset) => {
-    return `ai ai-${preset}`
-  }
-
   const goToVariablesPage = () => {
     const route = router.resolve({ name: 'variables' })
     windowOpen(route.href, '_blank')
@@ -216,7 +186,12 @@
   onMounted(async () => {
     await listIntegrations()
     listenerOnMessage()
+    presetsList.value = await props.listVulcanPresetsService()
   })
+
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
+  }
 </script>
 
 <template>
@@ -349,8 +324,8 @@
         />
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="flex flex-col sm:w-2/5 gap-2">
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col gap-2">
           <LabelBlock
             for="preset"
             label="Preset"
@@ -366,7 +341,6 @@
             autoFilterFocus
             placeholder="Select a framework preset"
             class="w-full md:w-14rem"
-            @change="setModeByPreset"
           >
             <template #value="slotProps">
               <div
@@ -404,21 +378,6 @@
           <small class="text-xs text-color-secondary font-normal leading-5">
             Defines the initial settings to work with web frameworks.
           </small>
-        </div>
-        <div class="flex flex-col sm:w-2/5 gap-2">
-          <FieldDropdown
-            :options="modeList"
-            optionLabel="label"
-            optionValue="value"
-            optionDisabled="disabled"
-            placeholder="Select the mode"
-            :disabled="!preset"
-            label="Mode"
-            required
-            name="mode"
-            :value="mode"
-            description="Defines the operational mode of application within the framework."
-          />
         </div>
       </div>
 

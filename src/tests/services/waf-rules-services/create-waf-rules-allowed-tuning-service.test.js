@@ -20,6 +20,7 @@ attack`,
       pathCount: 1,
       topCountries: ['Brazil'],
       matchesOn: 'value',
+      top10Paths: [{ path: '/get', hits: 10 }],
       countryCount: 1,
       topPaths: ['/get'],
       matchValue: 'arg'
@@ -33,6 +34,7 @@ attack`,
       matchZone: 'path',
       pathCount: 1,
       topCountries: ['Brazil'],
+      top10Paths: [{ path: '/get', hits: 10 }],
       matchesOn: 'value',
       countryCount: 1,
       topPaths: ['/get']
@@ -48,6 +50,7 @@ attack`,
       topCountries: ['Brazil'],
       matchesOn: 'value',
       countryCount: 1,
+      top10Paths: [{ path: '/get', hits: 10 }],
       topPaths: ['/get'],
       matchValue: 'arg'
     },
@@ -62,6 +65,7 @@ attack`,
       topCountries: ['Brazil'],
       matchesOn: 'value',
       countryCount: 1,
+      top10Paths: [{ path: '/get', hits: 10 }],
       topPaths: ['/get'],
       matchValue: 'arg'
     }
@@ -92,6 +96,7 @@ describe('WafRulesServices', () => {
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,
         name: fixtures.expectName,
+        path: fixtures.wafRulesMock[0].top10Paths[0].path,
         match_zones: [
           {
             matches_on: 'value',
@@ -118,6 +123,7 @@ describe('WafRulesServices', () => {
       body: {
         rule_id: fixtures.wafRulesMock[1].ruleId,
         name: fixtures.expectName,
+        path: fixtures.wafRulesMock[1].top10Paths[0].path,
         match_zones: [
           {
             matches_on: 'value',
@@ -143,6 +149,7 @@ describe('WafRulesServices', () => {
       body: {
         rule_id: fixtures.wafRulesMock[3].ruleId,
         name: fixtures.expectName,
+        path: fixtures.wafRulesMock[3].top10Paths[0].path,
         match_zones: [
           {
             matches_on: 'value',
