@@ -30,7 +30,6 @@ jobs:
           apk add --no-cache git
           cd azion-quality-index
           pip install -r requirements.txt || echo "No requirements.txt found"
-          pip install PyGithub jira
           echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
       
       - name: Run PR analysis
@@ -61,25 +60,4 @@ jobs:
           PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
           REPO_FULL_NAME=$(echo "$PR_URL" | grep -oE 'github.com/[^/]+/[^/]+' | sed 's#github.com/##')
           
-          cat > post_comment.py << 'EOF'
-          import os, sys
-          from github import Github
-          
-          github_token = os.environ.get("GITHUB_TOKEN")
-          repo_name = sys.argv[1]
-          pr_number = int(sys.argv[2])
-          
-          file_path = 'pr_analysis_results/output_summary.md' if os.path.exists('pr_analysis_results/output_summary.md') else 'pr_analysis_results/output.md'
-          
-          with open(file_path, 'r') as result_file:
-              analysis_results = result_file.read()
-          
-          gh_client = Github(github_token)
-          repo = gh_client.get_repo(repo_name)
-          pr = repo.get_pull(pr_number)
-          
-          result_comment = f"## GMUD Analysis Results\n\n{analysis_results}\n\n*Generated automatically by GMUD PR Analysis workflow*"      
-          pr.create_issue_comment(result_comment)
-          EOF
-          
-          python post_comment.py "$REPO_FULL_NAME" "$PR_NUMBER"
+          python scripts/gmud_test_report/post_pr_comment.py "$REPO_FULL_NAME" "$PR_NUMBER"
