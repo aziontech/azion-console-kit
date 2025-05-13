@@ -1,33 +1,40 @@
 <script setup>
+  import { ref } from 'vue'
+  import { useField } from 'vee-validate'
+  import PrimeButton from 'primevue/button'
+
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import Drawer from '@/views/EdgeApplications/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
-  import PrimeButton from 'primevue/button'
+  import DrawerCustomPages from '@/views/CustomPages/Drawer'
 
-  import { useField } from 'vee-validate'
-  import { ref } from 'vue'
-  const drawerRef = ref('')
-
-  const openDrawer = () => {
-    drawerRef.value.openCreateDrawer()
-  }
-
-  const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
-  }
+  defineProps({
+    listEdgeApplicationsService: { type: Function, required: true },
+    loadEdgeApplicationsService: { type: Function, required: true },
+    listEdgeFirewallService: { type: Function, required: true },
+    loadEdgeFirewallService: { type: Function, required: true },
+    listCustomPagesService: { type: Function, required: true },
+    loadCustomPagesService: { type: Function, required: true }
+  })
 
   defineOptions({ name: 'form-fields-variables' })
   const emit = defineEmits(['edgeFirewallCreated'])
+
+  const drawerRef = ref(null)
+  const drawerEdgeFirewallRef = ref(null)
+  const drawerCustomPagesRef = ref(null)
 
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { value: customPage } = useField('customPage')
 
-  const drawerEdgeFirewallRef = ref('')
+  const openDrawer = () => drawerRef.value?.openCreateDrawer()
+  const openDrawerEdgeFirewall = () => drawerEdgeFirewallRef.value?.openCreateDrawer()
+  const openDrawerCustomPages = () => drawerCustomPagesRef.value?.openCreateDrawer()
 
-  const openDrawerEdgeFirewall = () => {
-    drawerEdgeFirewallRef.value.openCreateDrawer()
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
   }
 
   const handleEdgeFirewallCreated = (id) => {
@@ -35,32 +42,10 @@
     emit('edgeFirewallCreated')
   }
 
-  defineProps({
-    listEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listCustomPagesService: {
-      type: Function,
-      required: true
-    },
-    loadCustomPagesService: {
-      type: Function,
-      required: true
-    }
-  })
+  const handleCustomPagesCreated = (id) => {
+    customPage.value = id
+    emit('customPageCreated')
+  }
 </script>
 
 <template>
@@ -149,6 +134,10 @@
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerCustomPages
+          ref="drawerCustomPagesRef"
+          @onSuccess="handleCustomPagesCreated"
+        />
         <FieldDropdownLazyLoader
           label="Custom Page"
           enableClearOption
@@ -161,7 +150,27 @@
           :value="customPage"
           appendTo="self"
           placeholder="Select an custom page"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerCustomPages"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-custom-pages-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Custom Page"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </FormHorizontal>

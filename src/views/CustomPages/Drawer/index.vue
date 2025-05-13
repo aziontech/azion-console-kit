@@ -5,6 +5,7 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
+  import { createCustomPagesService } from '@/services/custom-pages/v4'
 
   defineOptions({
     name: 'custom-pages-drawer'
@@ -13,14 +14,13 @@
   const emit = defineEmits(['onSuccess'])
 
   defineProps({
-    createService: {
-      type: Function
-    },
     loadService: {
-      type: Function
+      type: Function,
+      required: false
     },
     editService: {
-      type: Function
+      type: Function,
+      required: false
     }
   })
 
@@ -98,7 +98,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateCustomPagesDrawer"
-    :createService="createService"
+    :createService="createCustomPagesService"
     id="create-custom-page-drawer"
     drawerId="create-custom-page-drawer"
     :schema="validationSchema"
