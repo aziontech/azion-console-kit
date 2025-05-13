@@ -279,18 +279,6 @@
           data-testid="edge-connectors-form__host-settings__loader-balance-method-field"
         />
       </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Product Version"
-          required
-          description=""
-          :value="productVersion"
-          name="productVersion"
-          placeholder="Product Version"
-          data-testid="edge-connectors-form__host-settings__product-version-field"
-        />
-      </div>
     </template>
   </FormHorizontal>
 
@@ -594,7 +582,6 @@
   const { value: status } = useField('status')
   const { value: loadBalancerEnabled } = useField('loadBalancerEnabled')
   const { value: originShieldEnabled } = useField('originShieldEnabled')
-  const { value: productVersion } = useField('productVersion')
 
   // http
   const { value: host } = useField('http.host')

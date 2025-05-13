@@ -46,7 +46,6 @@
   const initialValues = {
     type: 'http',
     name: '',
-    productVersion: '1.0',
 
     loadBalancerEnabled: true,
     originShieldEnabled: true,
@@ -149,8 +148,6 @@
         'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
         (value) => /^[\x20-\x21\x23-\x7E]+$/.test(value)
       ),
-
-    productVersion: yup.string().required(),
 
     loadBalancerEnabled: yup.boolean().required(),
     originShieldEnabled: yup.boolean().required(),
