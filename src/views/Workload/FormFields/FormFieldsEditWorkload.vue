@@ -165,7 +165,7 @@
           optionValue="value"
           :value="customPage"
           appendTo="self"
-          placeholder="Select an custom page"
+          placeholder="Select a custom page"
         />
       </div>
     </template>
