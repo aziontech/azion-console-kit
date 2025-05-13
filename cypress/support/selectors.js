@@ -32,6 +32,7 @@ import BILLING_SELECTORS from './selectors/product-selectors/billing.js'
 import WAF_TUNING_PRODUCT_SELECTORS from './selectors/product-selectors/waf-tuning.js'
 import REAL_TIME_EVENTS_SELECTORS from './selectors/product-selectors/real-time-events.js'
 import WORKLOAD_SELECTORS from './selectors/product-selectors/workload.js'
+import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.js'
 
 const selectors = {
   billing: BILLING_SELECTORS,
@@ -62,7 +63,8 @@ const selectors = {
   usersManagement: USERS_MANAGEMENT_VIEW_SELECTORS,
   teams: TEAMS_BLOCK_SELECTORS,
   realTimeEvents: REAL_TIME_EVENTS_SELECTORS,
-  workload: WORKLOAD_SELECTORS
+  workload: WORKLOAD_SELECTORS,
+  customPages: CUSTOM_PAGES_SELECTORS
 }
 
 export default selectors

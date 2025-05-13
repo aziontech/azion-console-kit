@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 
 const _flags = ref([])
-const BLOCK_INCOMPATIBLE_ENDPOINT_V4 = 'block_apiv4_uncompatible_endpoints'
+const BLOCK_INCOMPATIBLE_ENDPOINT_V4 = 'block_apiv4_incompatible_endpoints'
 
 const setFeatureFlags = (flagsArray = []) => {
   _flags.value = flagsArray
