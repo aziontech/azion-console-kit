@@ -48,7 +48,8 @@ const parseHttpResponse = (httpResponse) => {
     case 202:
       return {
         feedback: 'Custom Page successfully created',
-        urlToEditView: `/custom-pages/edit/${httpResponse.body.data.id}`
+        urlToEditView: `/custom-pages/edit/${httpResponse.body.data.id}`,
+        id: httpResponse.body.data.id
       }
     case 500:
       throw new Errors.InternalServerError().message

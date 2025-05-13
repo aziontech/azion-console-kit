@@ -149,7 +149,7 @@
           optionValue="value"
           :value="customPage"
           appendTo="self"
-          placeholder="Select an custom page"
+          placeholder="Select a custom page"
         >
           <template #footer>
             <ul class="p-2">

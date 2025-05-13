@@ -2,10 +2,11 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
+  import { createCustomPagesService } from '@/services/custom-pages-services/v4'
+  import { listEdgeConnectorsService } from '@/services/edge-connectors'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { createCustomPagesService } from '@/services/custom-pages/v4'
 
   defineOptions({
     name: 'custom-pages-drawer'
@@ -77,8 +78,8 @@
     showEditCustomPagesDrawer.value = true
   }
 
-  const handleCreateCustomPages = () => {
-    emit('onSuccess')
+  const handleCreateCustomPages = (response) => {
+    emit('onSuccess', response.id)
     closeCreateDrawer()
   }
 
@@ -107,7 +108,7 @@
     title="Create Custom Page"
   >
     <template #formFields>
-      <FormFieldsCustomPages />
+      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
     </template>
   </CreateDrawerBlock>
 
@@ -122,7 +123,7 @@
     title="Edit Custom Page"
   >
     <template #formFields>
-      <FormFieldsCustomPages />
+      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
     </template>
   </EditDrawerBlock>
 </template>
