@@ -1,26 +1,53 @@
 export function errorHandler(error) {
-  console.log('🚀 ~ errorHandler ~ error:', error) // eslint-disable-line no-console
+  // Log error for debugging
+  console.error('API Error:', error)
 
+  if (!error?.response) {
+    return {
+      status: 500,
+      errors: [{
+        code: 'NETWORK_ERROR',
+        title: 'Connection Error',
+        detail: 'Unable to connect to the server. Please check your internet connection.'
+      }]
+    }
+  }
+
+  // Handle API errors with response data
   if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
     return {
       status: error.response.status,
       errors: error.response.data.errors.map((error) => ({
-        code: error.code,
-        title: error.title,
-        detail: error.detail,
-        status: error.status
+        code: error.code || 'API_ERROR',
+        title: error.title || 'Error',
+        detail: error.detail || 'An unexpected error occurred',
+        status: error.status || error.response.status
       }))
     }
   }
 
+  // Handle unexpected errors
   return {
-    status: error.response.status,
-    errors: [
-      {
-        code: 'UNKNOWN_ERROR',
-        title: 'Error unknown',
-        detail: error.message || 'An unknown error occurred.'
-      }
-    ]
+    status: error.response?.status || 500,
+    errors: [{
+      code: 'UNKNOWN_ERROR',
+      title: 'Unexpected Error',
+      detail: error.message || 'An unexpected error occurred. Please try again.'
+    }]
   }
+}
+
+/**
+ * Formats error messages for toast display
+ * @param {Object} errorResponse - The error response from errorHandler
+ * @returns {string[]} Array of formatted error messages
+ */
+export function formatErrorsForToast(errorResponse) {
+  if (!errorResponse?.errors) return ['An unexpected error occurred']
+
+  return errorResponse.errors.map(error => {
+    if (error.detail) return error.detail
+    if (error.title) return error.title
+    return 'An unexpected error occurred'
+  })
 }

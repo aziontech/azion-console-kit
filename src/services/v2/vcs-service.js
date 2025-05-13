@@ -1,33 +1,34 @@
 export class VcsService {
-  constructor(http, adapter) {
+  constructor(http, adapter, requestParams) {
     this.http = http
     this.adapter = adapter
+    this.requestParams = requestParams
     this.apiVersion = 'v4'
   }
 
-  async getPlatforms() {
-    const res = await this.http.request({ method: 'get', url: `${this.apiVersion}/vcs/providers` })
+  async getPlatforms(params) {
+    const searchParams = this.requestParams(params)
+    const res = await this.http.request({ 
+      method: 'get',
+      url: `${this.apiVersion}/vcs/providers?${searchParams}`,
+    })
     return this.adapter?.transformGetPlatforms?.(res) ?? res
   }
 
   async getIntegrations() {
+    const searchParams = this.requestParams(params)
     const res = await this.http.request({
       method: 'get',
-      url: `${this.apiVersion}/vcs/integrations`,
-      params: { page_size: 200 }
+      url: `${this.apiVersion}/vcs/integrations?${searchParams}`,
     })
     return this.adapter?.transformGetIntegrations?.(res) ?? res
   }
 
-  async getIntegrationRepositories(id, { pageSize = 200, ordering = 'name' } = {}) {
-    const params = new URLSearchParams()
-    params.set('page_size', pageSize)
-    params.set('ordering', ordering)
-
+  async getIntegrationRepositories(id, params) {
+    const searchParams = this.requestParams(params)
     const res = await this.http.request({
       method: 'get',
-      url: `${this.apiVersion}/vcs/integrations/${id}/repositories`,
-      params: params.toString()
+      url: `${this.apiVersion}/vcs/integrations/${id}/repositories?${searchParams}`,
     })
     return this.adapter?.transformGetIntegrationRepositories?.(res) ?? res
   }
@@ -41,7 +42,11 @@ export class VcsService {
     return this.adapter?.transformPostCallbackUrl?.(res) ?? res
   }
 
-  abortGetRepositories(params) {
-    this.http.abort('get', '/vcs/repositories', params)
+  abortGetRepositories(id) {
+    this.http.abort(`getRepositories-${id}`)
+  }
+
+  abortAll() {
+    this.http.abortAll()
   }
 }

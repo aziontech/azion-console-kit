@@ -1,31 +1,42 @@
 export class AbortManager {
-  constructor(keyBuilder) {
-    this.keyBuilder = keyBuilder
+  constructor() {
     this.controllers = new Map()
     this.groups = new Map()
   }
 
-  getSignal(method, url, identifier, group) {
-    const key = this.keyBuilder.build(method, url, identifier)
+  getSignal(identifier, group) {
     const controller = new AbortController()
-    this.controllers.set(key, controller)
+    this.controllers.set(identifier, controller)
 
     if (group) {
       if (!this.groups.has(group)) {
         this.groups.set(group, new Set())
       }
-      this.groups.get(group).add(key)
+      this.groups.get(group).add(identifier)
     }
+
+    // Remove controller when request completes
+    controller.signal.addEventListener('abort', () => {
+      this.controllers.delete(identifier)
+      if (group) {
+        const groupSet = this.groups.get(group)
+        if (groupSet) {
+          groupSet.delete(identifier)
+          if (groupSet.size === 0) {
+            this.groups.delete(group)
+          }
+        }
+      }
+    })
 
     return controller.signal
   }
 
-  abort(method, url, identifier) {
-    const key = this.keyBuilder.build(method, url, identifier)
-    const controller = this.controllers.get(key)
+  abort(identifier) {
+    const controller = this.controllers.get(identifier)
     if (controller) {
       controller.abort()
-      this.controllers.delete(key)
+      this.controllers.delete(identifier)
     }
   }
 
@@ -42,4 +53,9 @@ export class AbortManager {
       this.groups.delete(group)
     }
   }
+
+  abortAll() {
+    this.controllers.forEach(controller => controller.abort())
+  }
 }
+

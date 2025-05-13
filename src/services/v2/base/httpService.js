@@ -5,8 +5,8 @@ export class HttpService {
     this.errorHandler = errorHandler
   }
 
-  async request({ method, url, data = {}, params = {}, config = {}, abortGroup }) {
-    const signal = this.abortManager.getSignal(method, url, params, abortGroup)
+  async request({ method, url, data = {}, params = {}, config = {}, abortIdentifier, abortGroup }) {
+    const signal = this.abortManager.getSignal(abortIdentifier, abortGroup)
     try {
       const response = await this.httpClient.send({ method, url, data, params, signal, ...config })
       return response.data
@@ -16,8 +16,8 @@ export class HttpService {
     }
   }
 
-  abort(method, url, params) {
-    this.abortManager.abort(method, url, params)
+  abort(abortIdentifier) {
+    this.abortManager.abort(abortIdentifier)
   }
 
   abortGroup(groupName) {
