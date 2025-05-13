@@ -4,6 +4,7 @@
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -19,7 +20,9 @@
     listEdgeFunctionsDropdownService,
     loadEdgeFunctionService
   } from '@/services/edge-functions-services/v4'
+  import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
@@ -243,6 +246,14 @@
     return props.isLoadingRequests
   })
 
+  const getBehaviorsOriginOrEdgeConnectors = () => {
+    if (!hasFlagBlockApiV4()) {
+      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+    } else {
+      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+    }
+  }
+
   const behaviorsRequestOptions = ref([
     {
       label: 'Add Request Cookie' + behaviorsLabelsTags.value.applicationAccelerator,
@@ -298,7 +309,7 @@
       requires: !props.isEdgeFunctionEnabled
     },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false }
+    ...getBehaviorsOriginOrEdgeConnectors()
   ])
 
   const behaviorsResponseOptions = ref([
@@ -829,6 +840,19 @@
                   </ul>
                 </template>
               </FieldDropdown>
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
+              <FieldDropdownLazyLoader
+                :service="listEdgeConnectorsService"
+                :loadService="loadEdgeConnectorsService"
+                :loading="loadingOrigins"
+                :name="`behaviors[${behaviorIndex}].edgeConnectorId`"
+                optionLabel="name"
+                optionValue="id"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.edgeConnectorId"
+                :data-testid="`edge-application-rule-form__edge-connector-item[${behaviorIndex}]`"
+              />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
