@@ -153,6 +153,13 @@ function createEdgeLibrariesItems() {
       id: 'waf-rules'
     },
     {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'pi pi-globe',
+      id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
+    },
+    {
       label: 'Edge Connectors',
       to: '/edge-connectors',
       icon: 'ai ai-waf-rules',

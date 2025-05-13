@@ -66,10 +66,10 @@
     set: (value) => {
       if (formHasChanges.value) {
         formDrawerHasUpdated.value = !formDrawerHasUpdated.value
-        changeVisisbleDrawer(!value, false)
+        changeVisibleDrawer(!value, false)
         return
       }
-      changeVisisbleDrawer(value, true)
+      changeVisibleDrawer(value, true)
     }
   })
 
@@ -78,7 +78,7 @@
     return blockViewRedirection.value && isDirty.value
   })
 
-  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+  const changeVisibleDrawer = (isVisible, isResetForm) => {
     emit('update:visible', isVisible)
     if (isResetForm) resetForm()
   }
@@ -133,7 +133,7 @@
   }
 
   provide('drawerUnsaved', {
-    changeVisisbleDrawer,
+    changeVisibleDrawer,
     formDrawerHasUpdated
   })
 </script>

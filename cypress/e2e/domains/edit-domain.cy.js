@@ -162,4 +162,60 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.listTableBlockColumnNameRow).should('have.text', domainEditedName)
     cy.get(selectors.domains.listTableBlockColumnActiveRow).should('have.text', 'Inactive')
   })
+
+  it('should edit a domain with invalid cname', () => {
+    const cnames = generateUniqueName('cnames-domains')
+    createEdgeApplicationCase()
+    domainName = generateUniqueName('domain')
+
+    // Arrange
+    cy.openProduct('Domains')
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+    cy.intercept(
+      'GET',
+      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+    ).as('getEdgeApplicationListFilter')
+    cy.get(selectors.domains.createButton).click()
+    cy.get(selectors.domains.nameInput).type(domainName)
+    cy.wait('@getEdgeApplicationList')
+
+    cy.get(selectors.domains.edgeApplicationField).click()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
+    cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
+
+    cy.wait('@getEdgeApplicationListFilter')
+    cy.get(selectors.domains.edgeApplicationOption).click()
+    cy.get(selectors.domains.cnamesField).type(`${cnames}.com.br`)
+
+    // Act
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert - create a domain
+    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
+    cy.get(selectors.domains.domainField).should('be.visible')
+    cy.get(selectors.domains.copyDomainButton).click()
+    cy.verifyToast('Successfully copied!')
+    cy.get(selectors.domains.confirmButton).click()
+    cy.verifyToast(
+      'Succesfully created!',
+      'The domain is now available in the Domain management section.'
+    )
+
+    domainEditedName = `${domainName}-edit`
+
+    // Act
+    cy.get(selectors.domains.fieldTextInput).should('have.value', domainName)
+    cy.get(selectors.domains.fieldTextInput).clear()
+    cy.get(selectors.domains.fieldTextInput).type(domainEditedName)
+    cy.get(selectors.domains.cnamesField).clear()
+    cy.get(selectors.domains.cnamesField).type(`**${cnames}-edit.com.br`)
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('error', `cname_invalid_format: **${cnames}-edit.com.br`)
+  })
 })

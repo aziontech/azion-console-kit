@@ -6,10 +6,10 @@ import { getCurrentTimezone } from '@/helpers'
 export const listEdgeConnectorsService = async ({
   ordering = 'name',
   page = 1,
-  pageSize = 10,
+  pageSize = 100,
   fields = '',
   search = ''
-}) => {
+} = {}) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({

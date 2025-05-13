@@ -1,28 +1,30 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-
 export const listVulcanPresetsService = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    baseURL: '/',
-    url: '/v4/utils/project_samples',
-    method: 'GET'
-  })
+  const mockPresets = [
+    {
+      label: 'Next.js',
+      value: 'next'
+    },
+    {
+      label: 'Angular',
+      value: 'angular'
+    },
+    {
+      label: 'Astro',
+      value: 'astro'
+    },
+    {
+      label: 'Hexo',
+      value: 'hexo'
+    },
+    {
+      label: 'React',
+      value: 'react'
+    },
+    {
+      label: 'Vue',
+      value: 'vue'
+    }
+  ]
 
-  httpResponse = adapt(httpResponse)
-
-  return parseHttpResponse(httpResponse)
-}
-
-const adapt = (httpResponse) => {
-  const parsedIntegrations =
-    httpResponse?.body?.map(({ name }) => {
-      return {
-        label: name,
-        value: name.toLowerCase()
-      }
-    }) || []
-
-  return {
-    body: parsedIntegrations,
-    statusCode: httpResponse.statusCode
-  }
+  return Promise.resolve(mockPresets)
 }

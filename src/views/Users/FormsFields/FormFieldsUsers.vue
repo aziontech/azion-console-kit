@@ -167,7 +167,7 @@
   ])
 
   watch(isAccountOwner, (newValue) => {
-    if (!newValue && !isInitializing.value) {
+    if (newValue && !isInitializing.value) {
       teamsIds.value = []
     }
   })
