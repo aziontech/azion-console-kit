@@ -10,7 +10,10 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
+          <FormFieldsCustomPages
+            :listEdgeConnectorsService="listEdgeConnectorsService"
+            :loadEdgeConnectorsService="loadEdgeConnectorsService"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -40,6 +43,10 @@
       required: true
     },
     listEdgeConnectorsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeConnectorsService: {
       type: Function,
       required: true
     }

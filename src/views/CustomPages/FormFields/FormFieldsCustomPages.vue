@@ -5,14 +5,18 @@
   import Divider from 'primevue/divider'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import { useField, useFieldArray } from 'vee-validate'
-  import { onMounted, ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import { onMounted } from 'vue'
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  const props = defineProps({
+  defineProps({
     listEdgeConnectorsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeConnectorsService: {
       type: Function,
       required: true
     }
@@ -115,8 +119,6 @@
   const { value: isDefault } = useField('isDefault')
   const { push: pushPage, remove: removePage, fields: pages } = useFieldArray('pages')
 
-  const toast = useToast()
-
   const pageInitialState = {
     code: 400,
     ttl: 0,
@@ -128,24 +130,8 @@
     pushPage(pageInitialState)
   }
 
-  const edgeConnectorsList = ref([])
-
-  const getEdgeConnectors = async () => {
-    try {
-      edgeConnectorsList.value = await props.listEdgeConnectorsService()
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Something went wrong',
-        detail: 'Is not possible to list Edge Connectors, try again later'
-      })
-    }
-  }
-
   onMounted(async () => {
     addNewPage()
-    await getEdgeConnectors()
   })
 
   const removePageFromList = async (index) => {
@@ -173,12 +159,23 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <FieldDropdownLazyLoader
+          label="Edge Connector"
+          data-testid="custom-page-form__edge-connector"
+          name="edgeConnectorId"
+          :service="listEdgeConnectorsService"
+          :loadService="loadEdgeConnectorsService"
+          optionLabel="name"
+          optionValue="id"
+          :value="edgeConnectorId"
+          appendTo="self"
+          placeholder="Select an Edge Connector to link to the Custom Page."
+        />
         <FieldDropdown
           label="Edge Connector"
           :required="false"
           :options="edgeConnectorsList"
           optionLabel="name"
-          data-testid="custom-page-form__origin"
           optionValue="id"
           class="h-fit"
           name="edgeConnectorId"
@@ -298,7 +295,7 @@
               :data-testid="`custom-page-form__page__${index}__path`"
               :name="`pages[${index}].uri`"
               :value="pages[index].value.uri"
-              description="Select an origin to customize the error page path."
+              description="Customize the status code page path."
             />
           </div>
           <div
