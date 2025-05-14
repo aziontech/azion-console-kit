@@ -1,4 +1,5 @@
 export function errorHandler(error) {
+  //https://github.com/aziontech/azion-api-errors/blob/dev/src/azion_api_errors/definitions/vcs_api.json
   console.error('API Error:', error) // eslint-disable-line no-console
 
   if (!error?.response) {
