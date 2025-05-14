@@ -47,6 +47,7 @@ import { loadContractServicePlan } from '@/services/contract-services'
 import { resellerManagementRoutes } from '@routes/reseller-management-routes'
 import { groupsManagementRoutes } from '@routes/groups-management-routes'
 import { clientManagementRoutes } from '@routes/clients-management-routes'
+import { customPagesRoutes } from '@routes/custom-pages-routes'
 import { mfaManagementRoutes } from '@routes/mfa-management-routes'
 
 const router = createRouter({
@@ -93,6 +94,7 @@ const router = createRouter({
     resellerManagementRoutes,
     groupsManagementRoutes,
     clientManagementRoutes,
+    customPagesRoutes,
     mfaManagementRoutes
   ].concat(errorRoutes)
 })
