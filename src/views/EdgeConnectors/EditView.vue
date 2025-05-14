@@ -115,8 +115,6 @@
         (value) => /^[\x20-\x21\x23-\x7E]+$/.test(value)
       ),
 
-    productVersion: yup.string().required(),
-
     loadBalancerEnabled: yup.boolean().required(),
     originShieldEnabled: yup.boolean().required(),
 

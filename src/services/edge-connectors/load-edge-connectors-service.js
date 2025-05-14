@@ -79,7 +79,6 @@ const adapt = (httpResponse) => {
     readWriteTimeout: data.read_write_timeout,
     maxRetries: data.max_retries,
     status: data.active,
-    productVersion: data.product_version,
     ...buildProperties()
   }
 
