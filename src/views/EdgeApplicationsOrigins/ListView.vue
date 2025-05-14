@@ -5,8 +5,12 @@
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import edgeConnectorsGif from '@/assets/images/connectors.gif'
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
   defineOptions({ name: 'list-edge-applications-origins-tab' })
 
   const props = defineProps({
@@ -141,56 +145,74 @@
 </script>
 
 <template>
-  <DrawerOrigin
-    ref="drawerOriginsRef"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createOriginService="props.createOriginService"
-    :editOriginService="props.editOriginService"
-    :loadOriginService="props.loadOriginService"
-    :documentationService="props.documentationService"
-    :clipboardWrite="props.clipboardWrite"
-    :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
-    @onSuccess="reloadList"
-  />
-  <div v-if="hasContentToList">
-    <ListTableBlock
-      ref="listOriginsEdgeApplicationsRef"
-      :listService="listOriginsWithDecorator"
-      :columns="getColumns"
-      pageTitleDelete="origin"
-      :editInDrawer="openEditOriginDrawer"
-      @on-load-data="handleLoadData"
-      emptyListMessage="No origins found."
-      :actions="actions"
-      isTabs
+  <div v-if="hasFlagBlockApiV4()">
+    <DrawerOrigin
+      ref="drawerOriginsRef"
+      :edgeApplicationId="props.edgeApplicationId"
+      :createOriginService="props.createOriginService"
+      :editOriginService="props.editOriginService"
+      :loadOriginService="props.loadOriginService"
+      :documentationService="props.documentationService"
+      :clipboardWrite="props.clipboardWrite"
+      :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
+      @onSuccess="reloadList"
+    />
+    <div v-if="hasContentToList">
+      <ListTableBlock
+        ref="listOriginsEdgeApplicationsRef"
+        :listService="listOriginsWithDecorator"
+        :columns="getColumns"
+        pageTitleDelete="origin"
+        :editInDrawer="openEditOriginDrawer"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No origins found."
+        :actions="actions"
+        isTabs
+      >
+        <template #addButton>
+          <PrimeButton
+            icon="pi pi-plus"
+            label="Origin"
+            data-testid="origins__add-button"
+            @click="openCreateOriginDrawer"
+            class="w-full sm:w-auto"
+          />
+        </template>
+      </ListTableBlock>
+    </div>
+    <EmptyResultsBlock
+      v-else
+      title="No origins have been created"
+      description="Click the button below to create your first origin."
+      createButtonLabel="Origin"
+      :documentationService="props.documentationService"
+      :inTabs="true"
     >
-      <template #addButton>
+      <template #default>
         <PrimeButton
+          class="max-md:w-full w-fit"
+          severity="secondary"
           icon="pi pi-plus"
           label="Origin"
-          data-testid="origins__add-button"
           @click="openCreateOriginDrawer"
-          class="w-full sm:w-auto"
         />
       </template>
-    </ListTableBlock>
+    </EmptyResultsBlock>
   </div>
-  <EmptyResultsBlock
+  <div
     v-else
-    title="No origins have been created"
-    description="Click the button below to create your first origin."
-    createButtonLabel="Origin"
-    :documentationService="props.documentationService"
-    :inTabs="true"
+    class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex flex-col xl:flex-row items-center xl:items-start justify-center lg:px-8 lg:py-16 max-w-screen-2xl-test mx-auto w-full"
   >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Origin"
-        @click="openCreateOriginDrawer"
-      />
-    </template>
-  </EmptyResultsBlock>
+    <div class="flex-col gap-4 items-center justify-center">
+      <div class="text-xl font-medium">Origins is now Edge Connectors!</div>
+      <div class="text-sm text-color-secondary">
+        All settings that were previously made in Origins will now be made in the new Edge
+        Connectors menu.
+      </div>
+    </div>
+    <img
+      :src="edgeConnectorsGif"
+      alt="Origins to Edge Connectors"
+    />
+  </div>
 </template>

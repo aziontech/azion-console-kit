@@ -22,6 +22,20 @@ export const listEdgeConnectorsService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
+
 const adapt = (httpResponse) => {
   const parsedEdgeConnectors = httpResponse.body.results?.map((edgeConnectors) => {
     return {
@@ -34,12 +48,16 @@ const adapt = (httpResponse) => {
           return el.address
         })
         .join(','),
+      active: parseStatusData(edgeConnectors.active),
       lastEditor: edgeConnectors.last_editor,
       lastModified: getCurrentTimezone(edgeConnectors.last_modified)
     }
   })
 
+  const count = httpResponse.body?.count ?? 0
+
   return {
+    count,
     body: parsedEdgeConnectors,
     statusCode: httpResponse.statusCode
   }
