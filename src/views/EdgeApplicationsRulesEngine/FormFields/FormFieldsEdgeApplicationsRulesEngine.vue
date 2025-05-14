@@ -28,6 +28,14 @@
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
 
+  const getBehaviorsOriginOrEdgeConnectors = () => {
+    if (!hasFlagBlockApiV4()) {
+      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+    } else {
+      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+    }
+  }
+
   const CRITERIA_OPERATOR_OPTIONS = [
     { label: 'is equal', value: 'is_equal' },
     { label: 'is not equal', value: 'is_not_equal' },
@@ -43,7 +51,7 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false },
+    ...getBehaviorsOriginOrEdgeConnectors(),
     { label: 'Run Function', value: 'run_function', requires: false },
     { label: 'No Content (204)', value: 'no_content', requires: false }
   ]
@@ -245,14 +253,6 @@
   const isLoadingRequestsData = computed(() => {
     return props.isLoadingRequests
   })
-
-  const getBehaviorsOriginOrEdgeConnectors = () => {
-    if (!hasFlagBlockApiV4()) {
-      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
-    } else {
-      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
-    }
-  }
 
   const behaviorsRequestOptions = ref([
     {
