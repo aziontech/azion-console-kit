@@ -14,6 +14,7 @@ export const editDataStreamService = async (payload) => {
 
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
+
   let parsedPayload
 
   if (payload.template === 'CUSTOM_TEMPLATE') {
@@ -134,7 +135,7 @@ const getEndpoint = (payload) => {
 }
 
 const getDomains = (domains) => {
-  return domains.map((domain) => domain.domain_id)
+  return domains.map((domain) => domain.id)
 }
 
 const getHeaders = (listHeaders) => {

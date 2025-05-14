@@ -132,7 +132,7 @@ const parseByEndpointType = (payload) => {
 }
 
 const getDomains = (domains) => {
-  return domains.map((domain) => domain.domainID)
+  return domains.map((domain) => domain.id)
 }
 
 const getHeaders = (listHeaders) => {

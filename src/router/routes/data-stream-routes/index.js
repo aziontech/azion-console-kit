@@ -1,6 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as DataStreamService from '@/services/data-stream-services'
 import * as DataStreamServiceV4 from '@/services/data-stream-services/v4'
+import * as WorkloadsService from '@/services/workloads-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamRoutes = {
@@ -32,7 +33,8 @@ export const dataStreamRoutes = {
       props: {
         listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
         listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        createDataStreamService: DataStreamService.createDataStreamService
+        createDataStreamService: DataStreamService.createDataStreamService,
+        listWorkloadsService: WorkloadsService.listWorkloadsService
       },
       meta: {
         breadCrumbs: [
@@ -54,8 +56,9 @@ export const dataStreamRoutes = {
       props: {
         listDataStreamTemplateService: DataStreamService.listDataStreamTemplateService,
         listDataStreamDomainsService: DataStreamService.listDataStreamDomainsService,
-        loadDataStreamService: DataStreamService.loadDataStreamService,
+        loadDataStreamService: DataStreamServiceV4.loadDataStreamService,
         editDataStreamService: DataStreamService.editDataStreamService,
+        listWorkloadsService: WorkloadsService.listWorkloadsService,
         updatedRedirect: 'list-data-stream'
       },
       meta: {

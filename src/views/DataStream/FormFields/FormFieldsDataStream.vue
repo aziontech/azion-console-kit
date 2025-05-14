@@ -117,47 +117,13 @@
           data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
-        <PickList
-          v-model="domains"
+        <fieldPickList
+          :dataPick="domains"
           :disabled="hasNoPermissionToEditDataStream"
-          :pt="{
-            sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] },
-            sourceWrapper: { class: 'max-w-[340px]' },
-            targetWrapper: { class: 'max-w-[340px]' }
-          }"
-          dataKey="domainID"
-          breakpoint="1400px"
-          :showSourceControls="false"
-          :showTargetControls="false"
-          data-testid="data-stream-form__domains__domains-field"
-          :move-all-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-source-btn'
-          }"
-          :move-all-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-target-btn'
-          }"
-          :move-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-target-btn'
-          }"
-          :move-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
-          }"
-        >
-          <template #sourceheader>Available Domains</template>
-          <template #targetheader>Chosen Domains</template>
-          <template #item="slotProps">
-            <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
-              <div class="flex-1 flex flex-column gap-2">
-                <span
-                  class="font-normal"
-                  data-testid="data-stream-form__domains__domains-name"
-                  >{{ slotProps.item.name }}</span
-                >
-              </div>
-            </div>
-          </template>
-        </PickList>
+          :service="listWorkloadsService"
+          title="Domains"
+          dataKey="id"
+        ></fieldPickList>
 
         <small
           class="text-xs text-color-secondary font-normal leading-5"
@@ -1075,7 +1041,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
-  import PickList from 'primevue/picklist'
+  import fieldPickList from '@/templates/form-fields-inputs/fieldPickList.vue'
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -1092,6 +1058,10 @@
       required: true
     },
     listDataStreamDomainsService: {
+      type: Function,
+      required: true
+    },
+    listWorkloadsService: {
       type: Function,
       required: true
     },
@@ -1216,8 +1186,13 @@
   }
 
   const loaderDataStreamDomains = async () => {
-    const domainResponse = await props.listDataStreamDomainsService()
-    return [domainResponse, []]
+    if (!props.resetForm) return
+    const domainResponse = await props.listWorkloadsService({
+      page: 1,
+      pageSize: 100,
+      fields: 'id, name'
+    })
+    return [domainResponse.results, []]
   }
 
   const addHeader = () => {

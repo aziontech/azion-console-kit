@@ -22,6 +22,10 @@
     listDataStreamDomainsService: {
       type: Function,
       required: true
+    },
+    listWorkloadsService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -233,6 +237,7 @@
             :resetForm="resetForm"
             :listDataStreamTemplateService="props.listDataStreamTemplateService"
             :listDataStreamDomainsService="props.listDataStreamDomainsService"
+            :listWorkloadsService="props.listWorkloadsService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
