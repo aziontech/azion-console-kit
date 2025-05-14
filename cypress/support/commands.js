@@ -189,7 +189,8 @@ const sidebarProducts = [
   'Digital Certificates',
   'Network Lists',
   'WAF Rules',
-  'Custom Pages'
+  'Custom Pages',
+  'Edge Connectors'
 ]
 const accountProducts = [
   'Account Settings',
