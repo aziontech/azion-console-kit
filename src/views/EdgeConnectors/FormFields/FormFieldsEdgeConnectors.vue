@@ -3,6 +3,9 @@
     title="General"
     description="Create a edge connectors."
     data-testid="edge-connectors-form__section__general"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,6 +26,9 @@
     title="Host Settings"
     description="Customize settings related to origin servers and hosts."
     data-testid="edge-connectors-form__section__host-settings"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -260,7 +266,7 @@
             placeholder="Select an HTTP port"
             class="w-full"
             display="chip"
-            data-testid="form-horizontal-delivery-settings-http-ports-multi-select"
+            data-testid="form-horizontal-delivery-settings-http-ports-edge-connector-multi-select"
           />
         </span>
       </div>
@@ -286,6 +292,9 @@
     title="Modules"
     description="Modules a edge connectors."
     data-testid="edge-connectors-form__section__modules"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -314,6 +323,9 @@
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
     v-if="type !== 'live_ingest' && type !== 'edge_storage'"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div
@@ -470,6 +482,9 @@
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
     data-testid="edge-connectors-form__section__timeouts"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -510,6 +525,9 @@
   <FormHorizontal
     title="Status"
     data-testid="edge-connectors-form__section__status"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -540,6 +558,21 @@
   import MultiSelect from 'primevue/multiselect'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    hiddenTitle: {
+      type: Boolean,
+      default: false
+    },
+    noBorder: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const types = ref([
     { label: 'HTTP', value: 'http' },
