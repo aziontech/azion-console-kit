@@ -1,5 +1,6 @@
 <template>
   <FormHorizontal
+    isDrawer
     title="General"
     description="Create a edge connectors."
     data-testid="edge-connectors-form__section__general"
@@ -20,6 +21,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Host Settings"
     description="Customize settings related to origin servers and hosts."
     data-testid="edge-connectors-form__section__host-settings"
@@ -283,6 +285,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Modules"
     description="Modules a edge connectors."
     data-testid="edge-connectors-form__section__modules"
@@ -310,6 +313,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Addresses"
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
@@ -467,6 +471,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
     data-testid="edge-connectors-form__section__timeouts"
@@ -508,6 +513,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Status"
     data-testid="edge-connectors-form__section__status"
   >

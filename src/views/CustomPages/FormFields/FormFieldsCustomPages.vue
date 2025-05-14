@@ -6,8 +6,9 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import DrawerEdgeConnector from '@/views/EdgeConnectors/Drawer'
   import { useField, useFieldArray } from 'vee-validate'
-  import { onMounted } from 'vue'
+  import { onMounted, ref } from 'vue'
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
@@ -125,6 +126,7 @@
     uri: '',
     customStatusCode: 0
   }
+  const drawerEdgeConntectorRef = ref()
 
   const addNewPage = () => {
     pushPage(pageInitialState)
@@ -139,6 +141,14 @@
   }
 
   const isDefaultPage = (index) => index === 0
+
+  const openEdgeConnectorDrawer = () => {
+    drawerEdgeConntectorRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeConnectorSuccess = (data) => {
+    edgeConnectorId.value = data.id
+  }
 </script>
 
 <template>
@@ -159,6 +169,7 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeConnector ref="drawerEdgeConntectorRef" @onSuccess="handleEdgeConnectorSuccess" />
         <FieldDropdownLazyLoader
           label="Edge Connector"
           data-testid="custom-page-form__edge-connector"
@@ -170,19 +181,27 @@
           :value="edgeConnectorId"
           appendTo="self"
           placeholder="Select an Edge Connector to link to the Custom Page."
-        />
-        <FieldDropdown
-          label="Edge Connector"
-          :required="false"
-          :options="edgeConnectorsList"
-          optionLabel="name"
-          optionValue="id"
-          class="h-fit"
-          name="edgeConnectorId"
-          description="Select an Edge Connector to link to the Custom Page."
-          :value="edgeConnectorId"
-          scrollHeight="170px"
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openEdgeConnectorDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Connector"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="w-full flex flex-col gap-2">

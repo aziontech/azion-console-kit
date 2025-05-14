@@ -118,8 +118,9 @@
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true
-        emit('onError', error)
-        showToast('error', error)
+        const errorMessage = typeof error === 'string' ? error : error?.message
+        emit('onError', errorMessage)
+        showToast('error', errorMessage)
       }
     },
     ({ errors }) => {

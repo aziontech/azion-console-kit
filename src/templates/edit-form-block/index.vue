@@ -129,9 +129,11 @@
         }
         goBackToList()
       } catch (error) {
+        const errorMessage = typeof error === 'string' ? error : error?.message
+
         emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        showToast('error', error)
+        showToast('error', errorMessage)
       }
     },
     ({ errors }) => {
