@@ -33,17 +33,17 @@
   const openDrawerEdgeFirewall = () => drawerEdgeFirewallRef.value?.openCreateDrawer()
   const openDrawerCustomPages = () => drawerCustomPagesRef.value?.openCreateDrawer()
 
-  const handleEdgeApplicationCreated = (id) => {
-    edgeApplication.value = id
+  const handleEdgeApplicationCreated = (edgeApplicationId) => {
+    edgeApplication.value = edgeApplicationId
   }
 
-  const handleEdgeFirewallCreated = (id) => {
-    edgeFirewall.value = id
+  const handleEdgeFirewallCreated = (edgeFirewallId) => {
+    edgeFirewall.value = edgeFirewallId
     emit('edgeFirewallCreated')
   }
 
-  const handleCustomPagesCreated = (id) => {
-    customPage.value = id
+  const handleCustomPagesCreated = (customPageId) => {
+    customPage.value = customPageId
     emit('customPageCreated')
   }
 </script>
