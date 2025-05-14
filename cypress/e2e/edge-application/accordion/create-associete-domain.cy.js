@@ -1,5 +1,6 @@
 import generateUniqueName from '../../../support/utils'
 import selectors from '../../../support/selectors'
+import { payloadRequestWorkload } from '../../../fixtures/workload.js'
 
 let fixtures = {}
 
@@ -52,7 +53,10 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('POST', '/api/v4/workspace/workloads').as('createWorkload')
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
 
     cy.get(selectors.workload.cnameAccessOnlyField).click()
     

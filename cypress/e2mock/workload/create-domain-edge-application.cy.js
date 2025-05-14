@@ -1,7 +1,7 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
+import { payloadRequestWorkload } from '../../fixtures/workload.js'
 
-let domainName
 let edgeAppName
 let digitalCertificateName
 let firewallName
@@ -57,7 +57,7 @@ const createDigitalCertificateCase = () => {
   cy.wait('@getDigitalCertificatesApi')
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe('Workload spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
       fixture: '/account/info/without_flags.json'
@@ -66,7 +66,6 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
   })
 
   it('should create and delete a domain using a edge application', () => {
-    domainName = generateUniqueName('domain')
 
     // Arrange
     cy.openProduct('Domains')
@@ -84,7 +83,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.workload.createButton).click()
-    cy.get(selectors.workload.nameInput).type(domainName)
+    cy.get(selectors.workload.nameInput).type('domain140525103151708')
 
     // protocol section
     cy.get(selectors.workload.portHttp).click()
@@ -120,6 +119,16 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.createDigitalCertificateButton).click()
     createDigitalCertificateCase()
     // Act
+
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      {
+        statusCode: 400,
+        body: 
+          { certificate: ["Invalid certificate status, CANNOT use pending certificate."]  }
+      }
+    ).as('createWorkload');
+
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('error', 'certificate: Invalid certificate status, CANNOT use pending certificate.')
 
@@ -130,13 +139,22 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.workload.edgeCertificateOption).click()
+
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
+
     cy.get(selectors.form.actionsSubmitButton).click()
+
+    cy.wait('@createWorkload')
 
     // Assert
     cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
     cy.get(selectors.workload.domainField).should('be.visible')
     cy.get(selectors.workload.copyDomainButton).click()
     cy.verifyToast('Successfully copied!')
+   
     cy.get(selectors.workload.confirmButton).click()
     cy.verifyToast(
       'Succesfully created!',

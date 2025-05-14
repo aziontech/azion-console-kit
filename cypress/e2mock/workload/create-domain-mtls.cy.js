@@ -1,6 +1,7 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
 import fixtures from '../../fixtures/digital-certificates'
+import { payloadRequestWorkload } from '../../fixtures/workload.js'
 
 let domainName
 let edgeAppName
@@ -45,14 +46,13 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.workload.pageTitle(edgeAppName)).should('have.text', edgeAppName)
   cy.get(selectors.form.actionsCancelButton).click()
   // Assert
- 
 }
 
 describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', {
       fixture: '/account/info/without_flags.json'
-  }).as('accountInfo')
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -75,8 +75,10 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
       `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${digitalCertificateName}&type=*`
     ).as('getTrustedCACertificateByName')
 
-    cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getDomain')
-
+    cy.intercept(
+      { method: 'GET', url: '/api/v4/workspace/workloads/*' },
+      { body: payloadRequestWorkload, statusCode: 200 }
+    ).as('getDomain')
 
     cy.get(selectors.workload.createButton).click()
     cy.get(selectors.workload.nameInput).type(domainName)
@@ -105,7 +107,6 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
     cy.get(selectors.workload.enableMtlsSwitch).click()
 
-
     cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
     cy.wait('@getTrustedCACertificate')
     cy.get(selectors.workload.dropdownTrustedCA).click()
@@ -113,9 +114,14 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.workload.mtlsTrustedCADropdownFilter).type(digitalCertificateName)
     cy.wait('@getTrustedCACertificateByName')
     cy.get(selectors.workload.trustedCAFirstDropdownOption).click()
-
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
+
+    cy.wait('@createWorkload')
 
     // Assert
     cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')

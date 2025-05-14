@@ -150,7 +150,7 @@ function createEdgeLibrariesItems() {
       id: 'network-lists'
     },
     {
-      label: `WAF Rules ${!hasFlagBlockApiV4()}`,
+      label: 'WAF Rules',
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
