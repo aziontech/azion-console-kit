@@ -1,4 +1,4 @@
- const toSnakeCase = (str) => {
+const toSnakeCase = (str) => {
   if (!str) return ''
   return str
     .replace(/([A-Z])/g, '_$1')
@@ -6,19 +6,18 @@
     .toLowerCase()
 }
 
-
 export const buildQueryParams = ({ fields, ordering, page, pageSize, search }) => {
   const params = new URLSearchParams()
   const paramsMap = {
-    ordering: toSnakeCase(ordering),
-    page: page?.toString(),
-    page_size: pageSize?.toString(),
-    fields,
-    search
+    ...(ordering && { ordering: toSnakeCase(ordering) }),
+    ...(page && { page: page?.toString() }),
+    ...(pageSize && { page_size: pageSize?.toString() }),
+    ...(fields && { fields }),
+    ...(search && { search })
   }
 
   Object.entries(paramsMap)
-    .filter(([_, value]) => value != null)
+    .filter((entry) => entry[1] != null)
     .forEach(([key, value]) => params.set(key, value))
 
   return params.toString()

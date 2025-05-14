@@ -12,23 +12,12 @@
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
   import LabelBlock from '@/templates/label-block'
+  import { vcsService } from '@/services/v2'
 
   const toast = useToast()
   const router = useRouter()
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function
-    },
-    postCallbackUrlService: {
-      type: Function
-    },
-    listIntegrationsService: {
-      type: Function
-    },
-    listRepositoriesService: {
-      type: Function
-    },
     listVulcanPresetsService: {
       type: Function
     },
@@ -70,7 +59,7 @@
   const saveIntegration = async (integration) => {
     try {
       isGithubConnectLoading.value = true
-      await props.postCallbackUrlService(callbackUrl.value, integration.data)
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await listIntegrations()
     } catch (error) {
       toast.add({
@@ -96,8 +85,7 @@
   const listIntegrations = async () => {
     try {
       isGithubConnectLoading.value = true
-      const data = await props.listIntegrationsService()
-
+      const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
       toast.add({
@@ -122,7 +110,7 @@
     try {
       repositoriesList.value = []
       loadingRepositories.value = true
-      const data = await props.listRepositoriesService(gitScope.value)
+      const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
       toast.add({
@@ -211,7 +199,6 @@
       <div v-show="!hasIntegrations">
         <OAuthGithub
           ref="oauthGithubRef"
-          :listPlatformsService="listPlatformsService"
           @onCallbackUrl="
             (uri) => {
               setCallbackUrl(uri.value)

@@ -1,25 +1,7 @@
 export const VcsAdapter = {
-  transformGetRepositories(response) {
-    return response.filter((repo) => repo.isActive)
-  },
-
-  transformGetPlatforms(response) {
+  transformListIntegrations(response) {
     return (
-      response.results.map((platform) => {
-        const uri = platform.callback_url.split('vcs')[1]
-        return {
-          id: platform.id,
-          name: platform.name,
-          installationUrl: platform.installation_url,
-          callbackUrl: uri
-        }
-      }) || []
-    )
-  },
-
-  transformGetIntegrations(response) {
-    return (
-      response.results.map((integration) => {
+      response.body?.results?.map((integration) => {
         const uri = integration.provider.callback_url.split('vcs')[1]
         return {
           label: integration.scope,
@@ -29,15 +11,17 @@ export const VcsAdapter = {
       }) || []
     )
   },
-
-  transformGetIntegrationRepositories(response) {
-    return response.results || response
-  },
-
-  transformPostCallbackUrl(response) {
-    if (response.statusCode === 200) {
-      return { feedback: 'Git Hub Installation successfully completed' }
-    }
-    return response
+  transformListPlatforms(response) {
+    return (
+      response.body.results.map((platform) => {
+        const uri = platform.callback_url.split('vcs')[1]
+        return {
+          id: platform.id,
+          name: platform.name,
+          installationUrl: platform.installation_url,
+          callbackUrl: uri
+        }
+      }) || []
+    )
   }
 }

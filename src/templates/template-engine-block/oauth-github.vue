@@ -5,21 +5,17 @@
     outlined
     icon="pi pi-github"
     iconPos="left"
-    :loading="loading"
+    :loading="props.loading"
   />
 </template>
 
 <script setup>
   import { ref, watch } from 'vue'
   import PrimeButton from 'primevue/button'
-
+  import { vcsService } from '@/services/v2'
   const emit = defineEmits(['onCallbackUrl'])
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
     loading: {
       type: Boolean,
       required: true
@@ -30,7 +26,7 @@
   const callbackUrl = ref('')
 
   const connectWithGithub = async () => {
-    const response = await props.listPlatformsService()
+    const response = await vcsService.listPlatforms()
 
     response.forEach((platform) => {
       if (platform.id === 'github') {
