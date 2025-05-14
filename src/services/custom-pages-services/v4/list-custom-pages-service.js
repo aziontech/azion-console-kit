@@ -8,7 +8,7 @@ export const listCustomPagesService = async ({
   ordering = 'name',
   page = 1,
   pageSize = 10
-}) => {
+} = {}) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
