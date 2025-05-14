@@ -479,6 +479,7 @@
           :value="connectionTimeout"
           name="connectionTimeout"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__connection-timeout-field"
         />
       </div>
@@ -490,6 +491,7 @@
           :value="readWriteTimeout"
           name="readWriteTimeout"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__read-write-timeout-field"
         />
       </div>
@@ -501,6 +503,7 @@
           :value="maxRetries"
           name="maxRetries"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__max-retries-field"
         />
       </div>
