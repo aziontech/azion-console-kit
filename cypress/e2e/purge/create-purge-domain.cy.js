@@ -1,16 +1,67 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
-import { payloadRequestWorkload } from '../../fixtures/workload.js'
 
 let domainName
 let edgeAppName
 let generatedDomainUrl
+let digitalCertificateName
+let firewallName
+
+const createEdgeApplicationCase = () => {
+  edgeAppName = generateUniqueName('EdgeApp')
+  firewallName = generateUniqueName('EdgeFirewall')
+  // Arrange
+  cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
+  cy.get(selectors.edgeApplication.mainSettings.addressInput).type(`${edgeAppName}.edge.app`)
+
+  // Act
+  cy.get(selectors.domains.edgeApplicationDrawer).find(selectors.form.actionsSubmitButton).click()
+
+  // Assert
+  cy.verifyToast('success', 'Your edge application has been created')
+}
+
+const createEdgeFirewallCase = () => {
+  cy.get(selectors.edgeFirewall.nameInput).clear()
+  cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
+
+  cy.get(selectors.domains.edgeFirewallActionBar).find(selectors.form.actionsSubmitButton).click()
+
+  cy.verifyToast('success', 'Your Edge Firewall has been created')
+}
+
+const createDigitalCertificateCase = () => {
+  digitalCertificateName = generateUniqueName('digitalCertificate')
+  cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
+  cy.get(selectors.digitalCertificates.generateCSRRadioOption).click()
+  cy.get(selectors.digitalCertificates.subjectNameInput).type(
+    `${digitalCertificateName}.example.com`
+  )
+  cy.get(selectors.digitalCertificates.countryInput).type('BR')
+  cy.get(selectors.digitalCertificates.stateInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.cityInput).type('São Paulo')
+  cy.get(selectors.digitalCertificates.organizationInput).type(`${digitalCertificateName} S.A.`)
+  cy.get(selectors.digitalCertificates.organizationUnitInput).type('IT Department')
+  cy.get(selectors.digitalCertificates.emailInput).clear()
+  cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
+  cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
+
+  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+    'getDigitalCertificatesApi'
+  )
+
+  // Act
+  cy.get(selectors.domains.digitalCertificateActionBar)
+    .find(selectors.form.actionsSubmitButton)
+    .click()
+
+  // Assert
+  cy.verifyToast('success', 'Your digital certificate has been created!')
+  cy.wait('@getDigitalCertificatesApi')
+}
 
 describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/account/info', {
-      fixture: '/account/info/without_flags.json'
-    }).as('accountInfo')
     cy.login()
   })
 
@@ -21,15 +72,12 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.openProduct('Edge Application')
     cy.get(selectors.edgeApplication.mainSettings.createButton).click()
     cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-    cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
+    cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.wait('@createEdgeApp')
     cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsSkipButton).click()
-    cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
+    cy.get(selectors.form.actionsCancelButton).click()
 
-    // Assert - create a edge application
-    cy.get(selectors.workload.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 
     // Arrange
     cy.openProduct('Domains')
@@ -37,61 +85,62 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
       'GET',
       '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
-    cy.get(selectors.workload.createButton).click()
-    cy.get(selectors.workload.nameInput).type(domainName)
-
-    // protocol section
-    cy.get(selectors.workload.portHttp).click()
-    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
-    cy.get(selectors.workload.portHttp).click()
-
-    cy.get(selectors.workload.useHttpsField).click()
-    cy.get(selectors.workload.portHttps).click()
-    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
-    cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
-    cy.get(selectors.workload.portHttps).click()
-    cy.get(selectors.workload.tlsVersion).click()
-    cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
-    cy.get(selectors.workload.cipherSuite).click()
-    cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
-
-    cy.wait('@getEdgeApplicationList')
-    cy.get(selectors.workload.edgeApplicationField).click()
-
-    cy.get(selectors.workload.edgeApplicationDropdownSearch).clear()
-    cy.get(selectors.workload.edgeApplicationDropdownSearch).type(edgeAppName)
-    cy.get(selectors.workload.edgeApplicationOption).click()
-    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
     cy.intercept(
-      { method: 'POST', url: '/api/v4/workspace/workloads' },
-      { body: payloadRequestWorkload, statusCode: 202 }
-    ).as('createWorkload')
+      'GET',
+      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+    ).as('getEdgeFirewallList')
+
+    cy.intercept(
+      'GET',
+      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+    ).as('searchDigitalCertificatesApi')
+
+    cy.get(selectors.domains.createButton).click()
+    cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
+    cy.get(selectors.domains.edgeApplicationField).click()
+    cy.get(selectors.domains.createEdgeApplicationButton).click()
+    createEdgeApplicationCase()
+
+    cy.wait('@getEdgeFirewallList')
+    cy.get(selectors.domains.edgeFirewallField).click()
+    cy.get(selectors.domains.createEdgeFirewallButton).click()
+    createEdgeFirewallCase()
+
+    cy.get(selectors.domains.cnameAccessOnlyField).click()
+    cy.get(selectors.domains.digitalCertificateDropdown).click()
+    cy.get(selectors.domains.createDigitalCertificateButton).click()
+    createDigitalCertificateCase()
 
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
-    cy.wait('@createWorkload')
+    cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
+
+    cy.get(selectors.domains.digitalCertificateDropdown).click()
+
+    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).clear()
+    cy.get(selectors.domains.digitalCertificateDropdownFilterSearch).type('azion')
+
+    cy.wait('@searchDigitalCertificatesApi')
+    cy.get(selectors.domains.edgeCertificateOption).click()
+    cy.get(selectors.form.actionsSubmitButton).click()
 
     // Assert - create a domain
-    cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
-    cy.get(selectors.workload.domainField)
+    cy.get(selectors.domains.dialogTitle).should('have.text', 'Domain has been created')
+    cy.get(selectors.domains.domainField)
       .then(($el) => {
         generatedDomainUrl = $el.val()
       })
       .then(() => {
-        cy.intercept(
-          { method: 'GET', url: '/api/v4/workspace/workloads/*' },
-          { body: payloadRequestWorkload, statusCode: 200 }
-        ).as('getWorkload')
-        cy.get(selectors.workload.copyDomainButton).click()
+        cy.get(selectors.domains.copyDomainButton).click()
         cy.verifyToast('Successfully copied!')
-        cy.get(selectors.workload.confirmButton).click()
+        cy.get(selectors.domains.confirmButton).click()
         cy.verifyToast(
           'Succesfully created!',
-          'The domain is now available in the Workload management section.'
+          'The domain is now available in the Domain management section.'
         )        
-        cy.wait('@getWorkload')
 
         // Act
         cy.openProduct('Real-Time Purge')

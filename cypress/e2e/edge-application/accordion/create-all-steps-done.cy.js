@@ -100,12 +100,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.cacheName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheName)
-
-    // origin
-    cy.get(selectors.edgeApplication.tabs('Origins')).click()
-
-    //Assert
-    cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
-    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
   })
 })

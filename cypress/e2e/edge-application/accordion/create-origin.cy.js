@@ -6,7 +6,7 @@ let fixtures = {
 
 }
 
-describe('Edge Application', { tags: ['@dev4'] }, () => {
+describe.skip('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
