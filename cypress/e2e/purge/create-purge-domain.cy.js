@@ -1,5 +1,6 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
+import { payloadRequestWorkload } from '../../fixtures/workload.js'
 
 let domainName
 let edgeAppName
@@ -63,8 +64,14 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.workload.edgeApplicationOption).click()
     cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
+
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@createWorkload')
 
     // Assert - create a domain
     cy.get(selectors.workload.dialogTitle).should('have.text', 'Workload has been created')
@@ -73,7 +80,10 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
         generatedDomainUrl = $el.val()
       })
       .then(() => {
-        cy.intercept('GET', '/api/v4/workspace/workloads/*').as('getWorkload')
+        cy.intercept(
+          { method: 'GET', url: '/api/v4/workspace/workloads/*' },
+          { body: payloadRequestWorkload, statusCode: 200 }
+        ).as('getWorkload')
         cy.get(selectors.workload.copyDomainButton).click()
         cy.verifyToast('Successfully copied!')
         cy.get(selectors.workload.confirmButton).click()

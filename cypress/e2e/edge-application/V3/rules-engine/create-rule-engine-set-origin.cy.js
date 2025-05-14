@@ -1,5 +1,7 @@
 import generateUniqueName from '../../../../support/utils'
 import selectors from '../../../../support/selectors'
+import { accountInfoWithFlagBlockApiv4 } from '../../rules-engine/account-info-data.js'
+
 
 let fixtures = {}
 
@@ -30,9 +32,13 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
-    cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
-    }).as('accountInfo')
+    cy.intercept(
+      { method: 'GET', url: '/api/account/info' },
+      {
+        statusCode: 200,
+        body: accountInfoWithFlagBlockApiv4()
+      }
+    ).as('getAccountInfo')
     // Login
     cy.login()
 
