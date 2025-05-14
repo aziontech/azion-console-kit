@@ -6,7 +6,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-  import edgeConnectorsGif from '@/assets/images/connectors-gif.gif'
+  import edgeConnectorsGif from '@/assets/images/connectors.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
