@@ -84,7 +84,9 @@ export default {
       '#row-1 > :nth-child(1) > .gap-4 > [data-testid="data-table-input-position"] > .p-inputtext',
     reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
     reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
-    saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label'
+    saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label',
+    edgeConnectorsDropdown: '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
+    edgeConnectorsDropdownItem: '#behaviors\\[0\\]\\.edgeConnectorId_0'
   },
   origins: {
     createButton: '[data-testid="origins__add-button"]',

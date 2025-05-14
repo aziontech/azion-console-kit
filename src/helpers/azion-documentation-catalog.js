@@ -30,7 +30,8 @@ export const documentationCatalog = {
   wafAllowed: () => openSearchResult('Allowed Rules'),
   wafTuning: () => openSearchResult('Tune'),
   customPages: () => openSearchResult('Error Responses'),
-  mfaManagement: () => openSearchResult('MFA Management')
+  mfaManagement: () => openSearchResult('MFA Management'),
+  edgeConnectors: () => openSearchResult('Origins')
 }
 
 export const documentationGuideProducts = {
