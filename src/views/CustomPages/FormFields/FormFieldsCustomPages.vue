@@ -169,7 +169,10 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <DrawerEdgeConnector ref="drawerEdgeConntectorRef" @onSuccess="handleEdgeConnectorSuccess" />
+        <DrawerEdgeConnector
+          ref="drawerEdgeConntectorRef"
+          @onSuccess="handleEdgeConnectorSuccess"
+        />
         <FieldDropdownLazyLoader
           label="Edge Connector"
           data-testid="custom-page-form__edge-connector"
