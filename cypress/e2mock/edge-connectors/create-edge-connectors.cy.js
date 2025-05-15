@@ -97,8 +97,8 @@ describe('Create Edge Connectors spec', { tags: ['@dev3'] }, () => {
     cy.get(edgeConnectors.name).type(edgeConnectorName)
     cy.get(edgeConnectors.typeDropdown).click()
     cy.get('#type_3').click()
-    cy.get(edgeConnectors.liveIngest.endpoint).clear()
-    cy.get(edgeConnectors.liveIngest.endpoint).type('us-east-1.azioningest.net')
+    cy.get(edgeConnectors.liveIngest.endpoint).click()
+    cy.get(edgeConnectors.liveIngest.optionDropdown).click()
     cy.get(edgeConnectors.saveButton).click()
 
     cy.wait('@createEdgeConnector')

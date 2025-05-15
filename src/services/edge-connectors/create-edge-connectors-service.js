@@ -96,7 +96,7 @@ const parseHttpResponse = (httpResponse) => {
       return {
         feedback: 'Edge Connector successfully created',
         urlToEditView: '/edge-connectors',
-        id: httpResponse.body.data.id
+        id: parseInt(httpResponse.body.data.id)
       }
     case 500:
       throw new Errors.InternalServerError().message
