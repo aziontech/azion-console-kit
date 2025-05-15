@@ -4,7 +4,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Drawer from '@/views/EdgeApplications/Drawer'
+  import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'

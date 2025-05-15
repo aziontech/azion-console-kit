@@ -11,10 +11,7 @@ const fixtures = {
       results: [{ id: 1, name: 'Certificate 1' }]
     }
   },
-  defaultCertificates: [
-    { id: 0, name: 'Azion (SAN)' },
-    { id: 'lets_encrypt', name: "Let's Encrypt" }
-  ]
+  defaultCertificates: [{ id: 0, name: 'Azion (SAN)' }]
 }
 
 const makeSut = () => {
@@ -54,14 +51,13 @@ describe('DigitalCertificatesServices', () => {
 
     const result = await sut({ type: 'edge_certificate' })
 
-    expect(result.body).toHaveLength(3)
+    expect(result.body).toHaveLength(2)
     expect(result.body[0]).toEqual(fixtures.defaultCertificates[0])
-    expect(result.body[1]).toEqual(fixtures.defaultCertificates[1])
-    expect(result.body[2]).toEqual({
+    expect(result.body[1]).toEqual({
       id: 1,
       name: 'Certificate 1'
     })
-    expect(result.count).toBe(3)
+    expect(result.count).toBe(2)
   })
 
   it('should filter default certificates when search is provided with edge_certificate type', async () => {

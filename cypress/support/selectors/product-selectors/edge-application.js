@@ -4,10 +4,26 @@ export default {
     createButton: '[data-testid="create_Edge Application_button"]',
     nameInput: '[data-testid="form-horizontal-general-name__input"]',
     addressInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    unsaved: '[data-testid="dialog-unsaved__leave-page"]',
     modulesSwitch: (moduleName) =>
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
     l2CachingSwitch:
-      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider'
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
+    tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
+
+  },
+  accordionStepEdgeConnector: {
+    createEdgeConnector: '[data-testid="create-edge-connector-accordion"]',
+    addressOriginInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
+    hostOriginInput: '[data-testid="form-horizontal-default-origin-host-header-field-text__input"]'
+  },
+  accordionStepCache: {
+    createCache: '[data-testid="create-cache-accordion"]',
+    browserCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
+    cdnCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
+  },
+  accordionStepDomain: {
+    createDomain: '[data-testid="create-domain-accordion"]',
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',
@@ -84,6 +100,7 @@ export default {
   errorResponses: {
     createButton: '[data-testid="error-responses-form__add-button"]',
     origin: '[data-testid="error-responses-form__origin__dropdown"]',
+    statusCodeDropdown: '#errorResponses[1].code_list',
     statusCodes: (optionIdx) =>
       `[data-testid="error-responses-form__error-response__${optionIdx}__status-code__dropdown"]`,
     customStatus: (optionIdx) =>

@@ -45,10 +45,6 @@
     clipboardWrite: {
       type: Function,
       required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
     }
   })
 
