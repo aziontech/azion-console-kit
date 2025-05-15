@@ -23,12 +23,12 @@
           }"
         >
           <AccordionTab
-            :disabled="hasCreateOrigin"
+            :disabled="hasCreateEdgeConnector"
             :pt="{
               root: { class: 'rounded-md overflow-hidden border-none' },
               content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               headerAction: { class: hideOriginBorder },
-              headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
+              headerIcon: { class: `${hasCreateEdgeConnector ? 'hidden' : ''}` }
             }"
           >
             <template #header>
@@ -37,13 +37,13 @@
                 data-testid="create-edge-connector-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span class="text-lg">{{ textInfoOrigin.title }}</span>
+                  <span class="text-lg">{{ textInfoEdgeConnector.title }}</span>
                   <span class="text-sm text-color-secondary font-normal"
-                    >{{ textInfoOrigin.description }}
+                    >{{ textInfoEdgeConnector.description }}
                   </span>
                 </div>
                 <PrimeButton
-                  v-if="hasCreateOrigin"
+                  v-if="hasCreateEdgeConnector"
                   icon="pi pi-check"
                 ></PrimeButton>
               </div>
@@ -170,7 +170,7 @@
 
   const activeAccordionTab = ref([])
   const hasBindWorkload = ref(false)
-  const hasCreateOrigin = ref(false)
+  const hasCreateEdgeConnector = ref(false)
   const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
@@ -198,11 +198,11 @@
     activeAccordionTab.value.includes(2) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
   )
 
-  const textInfoOrigin = computed(() => {
-    if (hasCreateOrigin.value) {
+  const textInfoEdgeConnector = computed(() => {
+    if (hasCreateEdgeConnector.value) {
       return {
         description:
-          'The application will use the Edge Connector servers and hosts as configured. To edit these settings, go to the Edge Application page and select the application > Edge Connector.',
+          'The application will use the Edge Connector servers and hosts as configured. To edit these settings, go to the Edge Connector.',
         title: 'Default Edge Connector defined!'
       }
     }
@@ -242,14 +242,14 @@
   })
 
   const finishedConfiguration = computed(
-    () => hasBindWorkload.value && hasCreateCache.value && hasCreateOrigin.value
+    () => hasBindWorkload.value && hasCreateCache.value && hasCreateEdgeConnector.value
   )
   const primaryActionLabel = computed(() =>
     finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
   )
 
   const onSubmit = async () => {
-    if (hasCreateCache.value && hasCreateOrigin.value) {
+    if (hasCreateCache.value && hasCreateEdgeConnector.value) {
       loadingFinishedConfig.value = true
       const payload = {
         ...rulesEngine.value.body[0],
@@ -293,7 +293,7 @@
 
   const handleResponse = (tab) => {
     if (tab === 'edgeConnector') {
-      hasCreateOrigin.value = true
+      hasCreateEdgeConnector.value = true
       closeAccordionTab(tabOrigin)
     }
     if (tab === 'cache') {
