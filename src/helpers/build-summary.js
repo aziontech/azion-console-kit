@@ -1,12 +1,17 @@
 const formatEscapedJson = (value) => {
   try {
-    const cleaned = value.replace(/\\"/g, '"')
+    let cleaned = value
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+      cleaned = cleaned.slice(1, -1)
+    }
+    cleaned = cleaned.replace(/\\"/g, '"')
     const parsed = JSON.parse(cleaned)
     return JSON.stringify(parsed, null, 2)
   } catch (error) {
     return value
   }
 }
+
 export const buildSummary = (httpResponse) => {
   return Object.entries(httpResponse)
     .filter(([key]) => key !== 'ts')
