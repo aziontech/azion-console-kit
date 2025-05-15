@@ -4,7 +4,6 @@
     title="General"
     description="Create a edge connectors."
     data-testid="edge-connectors-form__section__general"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -28,7 +27,6 @@
     title="Host Settings"
     description="Customize settings related to origin servers and hosts."
     data-testid="edge-connectors-form__section__host-settings"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -297,7 +295,6 @@
     title="Modules"
     description="Modules a edge connectors."
     data-testid="edge-connectors-form__section__modules"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -329,7 +326,6 @@
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
     v-if="type !== 'live_ingest' && type !== 'edge_storage'"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -489,7 +485,6 @@
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
     data-testid="edge-connectors-form__section__timeouts"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -536,7 +531,6 @@
     isDrawer
     title="Status"
     data-testid="edge-connectors-form__section__status"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
