@@ -62,11 +62,13 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await loadListIntegrations()
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Save failed',
-        detail: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Save failed',
+          detail: message
+        })
       })
     } finally {
       isGithubConnectLoading.value = false
@@ -88,11 +90,13 @@
       const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Listing failed',
-        detail: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Listing failed',
+          detail: message
+        })
       })
     } finally {
       isGithubConnectLoading.value = false
@@ -113,11 +117,13 @@
       const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Loading failed',
-        detail: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Loading failed',
+          detail: message
+        })
       })
     } finally {
       loadingRepositories.value = false

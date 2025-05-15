@@ -26,7 +26,7 @@ export function errorHandler(error) {
   if (!error?.response) {
     return {
       status: 500,
-      errors: [ERROR_MESSAGES.CONNECTION_ERROR]
+      message: [ERROR_MESSAGES.CONNECTION_ERROR]
     }
   }
 
@@ -40,12 +40,12 @@ export function errorHandler(error) {
 
     return {
       status,
-      errors: formattedErrors
+      message: [...formattedErrors]
     }
   }
 
   return {
     status: status || 500,
-    errors: [error.message || ERROR_MESSAGES.UNEXPECTED_ERROR]
+    message: [error.message || ERROR_MESSAGES.UNEXPECTED_ERROR]
   }
 }

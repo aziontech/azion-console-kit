@@ -28,19 +28,11 @@ export class HttpService {
         ...(signal && { signal }),
         ...config
       })
-
-      return {
-        success: true,
-        body: response.data,
-        statusCode: response.status
-      }
+      const { data, status } = response
+      return { data, status }
     } catch (error) {
       const errors = this.errorHandler?.(error)
-      return {
-        success: false,
-        body: errors,
-        statusCode: errors.status
-      }
+      throw errors
     }
   }
 

@@ -1,7 +1,7 @@
 export const VcsAdapter = {
-  transformListIntegrations(response) {
+  transformListIntegrations(data) {
     return (
-      response.body?.results?.map((integration) => {
+      data?.map((integration) => {
         const uri = integration.provider.callback_url.split('vcs')[1]
         return {
           label: integration.scope,
@@ -11,9 +11,9 @@ export const VcsAdapter = {
       }) || []
     )
   },
-  transformListPlatforms(response) {
+  transformListPlatforms(data) {
     return (
-      response.body.results.map((platform) => {
+      data?.map((platform) => {
         const uri = platform.callback_url.split('vcs')[1]
         return {
           id: platform.id,

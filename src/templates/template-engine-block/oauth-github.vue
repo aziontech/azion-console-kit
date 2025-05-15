@@ -13,6 +13,10 @@
   import { ref, watch } from 'vue'
   import PrimeButton from 'primevue/button'
   import { vcsService } from '@/services/v2'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
+
   const emit = defineEmits(['onCallbackUrl'])
 
   const props = defineProps({
@@ -26,16 +30,26 @@
   const callbackUrl = ref('')
 
   const connectWithGithub = async () => {
-    const response = await vcsService.listPlatforms()
+    try {
+      const response = await vcsService.listPlatforms()
 
-    response.forEach((platform) => {
-      if (platform.id === 'github') {
-        githubInstallation.value = platform
-        callbackUrl.value = platform.callbackUrl
-      }
-    })
+      response.forEach((platform) => {
+        if (platform.id === 'github') {
+          githubInstallation.value = platform
+          callbackUrl.value = platform.callbackUrl
+        }
+      })
 
-    openPopupGithub()
+      openPopupGithub()
+    } catch (error) {
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: message
+        })
+      })
+    }
   }
 
   const openPopupGithub = () => {

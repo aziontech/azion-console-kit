@@ -303,10 +303,12 @@
 
       listOfIntegrations.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: message
+        })
       })
     } finally {
       isIntegrationsLoading.value = false
@@ -352,11 +354,13 @@
     try {
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: message
+        })
       })
     } finally {
       await listIntegrations()

@@ -6,41 +6,37 @@ export class VcsService {
   }
 
   async listIntegrations(params = { pageSize: 200 }) {
-    const res = await this.http.request({
+    const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/integrations`,
       params
     })
-    console.log('🚀 ~ VcsService ~ listIntegrations ~ res:', res);
-    return res.success ? this.adapter?.transformListIntegrations?.(res) : res
+    return this.adapter?.transformListIntegrations?.(data.results) ?? data.results
   }
 
   async listPlatforms() {
-    const res = await this.http.request({
+    const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/providers`
     })
-    console.log('🚀 ~ VcsService ~ listPlatforms ~ res:', res);
-    return res.success ? this.adapter?.transformListPlatforms?.(res) : res
+    return this.adapter?.transformListPlatforms?.(data.results) ?? data.results
   }
 
   async listRepositories(id, params = { pageSize: 200, ordering: 'name' }) {
-    const res = await this.http.request({
+    const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/integrations/${id}/repositories`,
       params
     })
-    console.log('🚀 ~ VcsService ~ listRepositories ~ res:', res);
-    return res.success ? this.adapter?.transformListRepositories?.(res) ?? res : res
+    return data.results
   }
 
   async postCallbackUrl(path, body) {
-    const res = await this.http.request({
+    const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}${path}`,
       body
     })
-    console.log('🚀 ~ VcsService ~ postCallbackUrl ~ res:', res);
-    return res
+    return data.results
   }
 }
