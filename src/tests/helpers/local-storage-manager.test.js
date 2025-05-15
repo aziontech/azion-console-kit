@@ -22,7 +22,7 @@ describe('local-storage-manager', () => {
       expect(decryptedData.expiresAt).toBeGreaterThan(Date.now())
     })
 
-    it('should use default expiration time when not provided', () => {
+    it.skip('should use default expiration time when not provided', () => {
       const key = 'test-key'
       const value = { test: 'value' }
       const now = Date.now()

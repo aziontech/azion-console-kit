@@ -38,9 +38,6 @@
     isApplicationAcceleratorEnabled: {
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      type: Boolean
-    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -64,10 +61,6 @@
     },
     clipboardWrite: {
       type: Function,
-      required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
       required: true
     }
   })
@@ -355,11 +348,9 @@
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
@@ -397,9 +388,7 @@
         @toggleDrawer="handleToggleDrawer"
         @refreshFunctions="handleRefreshFunctions"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"
