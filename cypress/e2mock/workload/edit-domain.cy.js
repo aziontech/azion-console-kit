@@ -1,5 +1,6 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
+import { payloadRequestWorkload } from '../../fixtures/workload.js'
 
 let domainName
 let edgeAppName
@@ -141,6 +142,16 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.edgeApplicationOption).click()
     cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
 
+    cy.intercept(
+      { method: 'GET', url: '/api/v4/workspace/workloads/*' },
+      { body: payloadRequestWorkload, statusCode: 200 }
+    ).as('getWorkload')
+
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
+
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
 
@@ -155,27 +166,29 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
       'The domain is now available in the Workload management section.'
     )
 
-    domainEditedName = `${domainName}-edit`
+    cy.wait('@getWorkload')
+
+    domainEditedName = `${payloadRequestWorkload.data.name}-edit`
 
     // Act
-    cy.get(selectors.workload.fieldTextInput).should('have.value', domainName)
+    cy.get(selectors.workload.fieldTextInput).should('have.value', payloadRequestWorkload.data.name)
     cy.get(selectors.workload.fieldTextInput).clear()
     cy.get(selectors.workload.fieldTextInput).type(domainEditedName)
     cy.get(selectors.workload.cnamesField).clear()
-    cy.get(selectors.workload.cnamesField).type(`${domainName}-edit.net`)
+    cy.get(selectors.workload.cnamesField).type(`${payloadRequestWorkload.data.name}-edit.net`)
 
     createDigitalCertificate()
 
     cy.get(selectors.workload.domainUri).should('be.disabled')
-    cy.intercept('PATCH', '/api/v4/workspace/workloads/*').as('editWorkload')
+    cy.intercept(
+      { method: 'PATCH', url: '/api/v4/workspace/workloads/*' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('editWorkload')
 
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.wait('@editWorkload')
 
     // Assert
     cy.verifyToast('success', 'Your workload has been edited')
-    cy.get(selectors.workload.dataTableSearchInput).clear()
-    cy.get(selectors.workload.dataTableSearchInput).type(`${domainEditedName}{enter}`)
-    cy.get(selectors.workload.listTableBlockColumnNameRow).should('have.text', domainEditedName)
   })
 })

@@ -9,7 +9,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import DrawerCustomPages from '@/views/CustomPages/Drawer'
 
-  defineProps({
+  const props = defineProps({
     listEdgeApplicationsService: { type: Function, required: true },
     loadEdgeApplicationsService: { type: Function, required: true },
     listEdgeFirewallService: { type: Function, required: true },
@@ -17,6 +17,10 @@
     listCustomPagesService: { type: Function, required: true },
     loadCustomPagesService: { type: Function, required: true }
   })
+
+  const handleListCustomPages = async () => {
+    return await props.listCustomPagesService({ fields: ['id', 'name'] })
+  }
 
   defineOptions({ name: 'form-fields-variables' })
   const emit = defineEmits(['edgeFirewallCreated'])
@@ -143,7 +147,7 @@
           enableClearOption
           data-testid="domains-form__custom-page-field"
           name="customPage"
-          :service="listCustomPagesService"
+          :service="handleListCustomPages"
           :loadService="loadCustomPagesService"
           optionLabel="name"
           optionValue="value"

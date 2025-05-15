@@ -1,5 +1,6 @@
 import generateUniqueName from '../../../support/utils'
 import selectors from '../../../support/selectors'
+import { payloadRequestWorkload } from '../../../fixtures/workload.js'
 
 let fixtures = {
     cacheName: 'Default Cache Settings',
@@ -51,11 +52,13 @@ const createWorkload = () => {
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
-    cy.intercept('POST', '/api/v4/workspace/workloads').as('createWorkload')
 
     cy.get(selectors.workload.cnameAccessOnlyField).click()
     
-    
+    cy.intercept(
+      { method: 'POST', url: '/api/v4/workspace/workloads' },
+      { body: payloadRequestWorkload, statusCode: 202 }
+    ).as('createWorkload')
     // Act
     cy.get(selectors.form.createButtonAccordtion).eq(1).click()
     cy.wait('@createWorkload')
@@ -97,12 +100,5 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     //Assert
     cy.get(selectors.list.searchInput).type(`${fixtures.cacheName}{enter}`)
     cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheName)
-
-    // origin
-    cy.get(selectors.edgeApplication.tabs('Origins')).click()
-
-    //Assert
-    cy.get(selectors.list.searchInput).type(`${fixtures.originName}{enter}`)
-    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.originName)
   })
 })

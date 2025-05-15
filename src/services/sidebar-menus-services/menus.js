@@ -150,7 +150,7 @@ function createEdgeLibrariesItems() {
       id: 'network-lists'
     },
     {
-      label: `WAF Rules ${!hasFlagBlockApiV4()}`,
+      label: 'WAF Rules',
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
@@ -160,6 +160,13 @@ function createEdgeLibrariesItems() {
       to: '/custom-pages',
       icon: 'pi pi-globe',
       id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
+    },
+    {
+      label: 'Edge Connectors',
+      to: '/edge-connectors',
+      icon: 'ai ai-waf-rules',
+      id: 'edge-connectors',
       visible: !hasFlagBlockApiV4()
     }
   ]
