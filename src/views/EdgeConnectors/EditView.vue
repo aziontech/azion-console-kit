@@ -205,9 +205,9 @@
       .of(yup.string().oneOf(['IPv6', 'IPv4'], 'Connection Preference is invalid'))
       .required(),
 
-    connectionTimeout: yup.number().integer().min(0).required(),
-    readWriteTimeout: yup.number().integer().min(0).required(),
-    maxRetries: yup.number().integer().min(0).required(),
+    connectionTimeout: yup.number().integer().min(1).required('Connection Timeout is required'),
+    readWriteTimeout: yup.number().integer().min(1).required('Read Write Timeout is required'),
+    maxRetries: yup.number().integer().min(1).required('Max Retries is required'),
 
     status: yup.boolean().required()
   })

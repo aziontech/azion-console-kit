@@ -22,7 +22,8 @@ export default {
     prefix: '[data-testid="edge-connectors-form__host-settings__edge-storage-prefix-field__input"]',
   },
   liveIngest: {
-    endpoint: '[data-testid="edge-connectors-form__host-settings__liveIngestEndpoint-field__input"]'
+    endpoint: '[data-testid="edge-connectors-form__host-settings__liveIngestEndpoint-field__dropdown"]',
+    optionDropdown: '#liveIngestEndpoint_1'
   },
   address: '[data-testid="edge-connectors-form__addresses__address-field__input"]',
   saveButton: '[data-testid="form-actions-submit-button"] > .p-button-label',
