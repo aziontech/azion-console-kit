@@ -55,7 +55,7 @@
     connectionPreference: ['IPv6', 'IPv4'],
     connectionTimeout: 60,
     readWriteTimeout: 120,
-    maxRetries: 0,
+    maxRetries: 1,
     status: true,
     http: {
       versions: ['http1'],
