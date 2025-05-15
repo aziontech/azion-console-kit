@@ -1,40 +1,38 @@
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Connectors" />
+  <FormAccordion
+    @on-response="handleResponse"
+    :schema="validationSchema"
+    :initialValues="initialValues"
+    :createService="createEdgeConnectorsService"
+    disabledCallback
+  >
+    <template #form>
+      <FormFieldsEdgeConnector
+        isDrawer
+        hiddenTitle
+        noBorder
+      />
     </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="createEdgeConnectorsService"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form="{ resetForm }">
-          <FormFieldsEdgeConnectors
-            :initialValues="initialValues"
-            :schema="validationSchema"
-            :resetForm="resetForm"
-          />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </CreateFormBlock>
+    <template #action-bar-accordion="{ onSubmit, loading }">
+      <ActionBarAccordion
+        @onSubmit="onSubmit"
+        :loading="loading"
+        data-testid="create-edge-application-action-bar"
+      />
     </template>
-  </ContentBlock>
+  </FormAccordion>
 </template>
-
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ActionBarAccordion from '@/templates/action-bar-block/action-bar-accordion.vue'
+  import FormAccordion from '@/templates/create-form-block/form-accordion.vue'
+  import FormFieldsEdgeConnector from '@/views/EdgeConnectors/FormFields/FormFieldsEdgeConnectors.vue'
   import * as yup from 'yup'
+
+  const emit = defineEmits(['createdEdgeConnector'])
+
+  const handleResponse = (value) => {
+    emit('createdEdgeConnector', value)
+  }
 
   defineProps({
     createEdgeConnectorsService: {
@@ -55,7 +53,7 @@
     connectionPreference: ['IPv6', 'IPv4'],
     connectionTimeout: 60,
     readWriteTimeout: 120,
-    maxRetries: 1,
+    maxRetries: 0,
     status: true,
     http: {
       versions: ['http1'],
@@ -239,9 +237,9 @@
       .of(yup.string().oneOf(['IPv6', 'IPv4'], 'Connection Preference is invalid'))
       .required(),
 
-    connectionTimeout: yup.number().integer().min(1).required('Connection Timeout is required'),
-    readWriteTimeout: yup.number().integer().min(1).required('Read Write Timeout is required'),
-    maxRetries: yup.number().integer().min(1).required('Max Retries is required'),
+    connectionTimeout: yup.number().integer().min(0).required(),
+    readWriteTimeout: yup.number().integer().min(0).required(),
+    maxRetries: yup.number().integer().min(0).required(),
 
     status: yup.boolean().required()
   })

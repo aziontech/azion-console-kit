@@ -9,11 +9,6 @@ on:
   push:
     branches:
       - dev
-      - redesigning-the-flow-of-the-user-journey-in-domain-and-edge-app
-      - UXE-6333-real-time-event-improvement-fork
-  push:
-    branches:
-      - dev
       - UXE-6333-real-time-event-improvement-fork
   workflow_dispatch:
 
@@ -34,6 +29,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn ci
-        
+
       - name: Run security-linter
         run: yarn security-check

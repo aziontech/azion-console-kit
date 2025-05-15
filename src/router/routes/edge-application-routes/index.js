@@ -11,6 +11,8 @@ import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
+import * as EdgeConnectorsService from '@/services/edge-connectors'
+
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
@@ -94,8 +96,8 @@ export const edgeApplicationRoutes = {
           cacheSettingsServices: {
             createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService
           },
-          originsServices: {
-            createOriginService: OriginsService.createOriginService
+          edgeConnectorServices: {
+            createEdgeConnectorsService: EdgeConnectorsService.createEdgeConnectorsService
           },
           rulesEngineServices: {
             editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,

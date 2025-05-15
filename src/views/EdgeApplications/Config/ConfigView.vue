@@ -23,34 +23,34 @@
           }"
         >
           <AccordionTab
-            :disabled="hasCreateOrigin"
+            :disabled="hasCreateEdgeConnector"
             :pt="{
               root: { class: 'rounded-md overflow-hidden border-none' },
               content: { class: 'p-0 pt-6 rounded-b-md overflow-hidden' },
               headerAction: { class: hideOriginBorder },
-              headerIcon: { class: `${hasCreateOrigin ? 'hidden' : ''}` }
+              headerIcon: { class: `${hasCreateEdgeConnector ? 'hidden' : ''}` }
             }"
           >
             <template #header>
               <div
                 class="flex w-full items-center"
-                data-testid="create-origion-accordion"
+                data-testid="create-edge-connector-accordion"
               >
                 <div class="w-full flex flex-col gap-2">
-                  <span class="text-lg">{{ textInfoOrigin.title }}</span>
+                  <span class="text-lg">{{ textInfoEdgeConnector.title }}</span>
                   <span class="text-sm text-color-secondary font-normal"
-                    >{{ textInfoOrigin.description }}
+                    >{{ textInfoEdgeConnector.description }}
                   </span>
                 </div>
                 <PrimeButton
-                  v-if="hasCreateOrigin"
+                  v-if="hasCreateEdgeConnector"
                   icon="pi pi-check"
                 ></PrimeButton>
               </div>
             </template>
-            <OriginEdgeApplcation
-              @createdOrigin="handleResponseOrigin"
-              :createOriginService="props.originsServices.createOriginService"
+            <EdgeConnectorApplication
+              @createdEdgeConnector="handleResponseEdgeConnector"
+              :createEdgeConnectorsService="props.edgeConnectorServices.createEdgeConnectorsService"
             />
           </AccordionTab>
         </Accordion>
@@ -151,7 +151,7 @@
 <script setup>
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import OriginEdgeApplcation from './OriginEdgeApplcation.vue'
+  import EdgeConnectorApplication from './EdgeConnectorApplication.vue'
   import WorkloadEdgeApplication from './WorkloadEdgeApplication.vue'
   import CacheEdgeApplication from './CacheEdgeApplication.vue'
   import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
@@ -164,20 +164,20 @@
   const props = defineProps({
     workloadService: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
-    originsServices: { type: Object, required: true },
+    edgeConnectorServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true }
   })
 
   const activeAccordionTab = ref([])
   const hasBindWorkload = ref(false)
-  const hasCreateOrigin = ref(false)
+  const hasCreateEdgeConnector = ref(false)
   const hasCreateCache = ref(false)
   const route = useRoute()
   const router = useRouter()
   const tabOrigin = ref([])
   const tabWorkload = ref([])
   const tabCache = ref([])
-  const originId = ref(0)
+  const edgeConnectorId = ref(0)
   const cacheSettingId = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const rulesEngine = ref(null)
@@ -198,17 +198,17 @@
     activeAccordionTab.value.includes(2) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
   )
 
-  const textInfoOrigin = computed(() => {
-    if (hasCreateOrigin.value) {
+  const textInfoEdgeConnector = computed(() => {
+    if (hasCreateEdgeConnector.value) {
       return {
         description:
-          'The application will use the origin servers and hosts as configured. To edit these settings, go to the Edge Application page and select the application > Origins.',
-        title: 'Default origin defined!'
+          'The application will use the Edge Connector servers and hosts as configured. To edit these settings, go to the Edge Connector.',
+        title: 'Default Edge Connector defined!'
       }
     }
     return {
-      description: 'Customize settings related to origin servers and hosts.',
-      title: 'Define a default origin'
+      description: 'Customize settings related to Edge Connector servers and hosts.',
+      title: 'Define a default Edge Connector'
     }
   })
 
@@ -242,22 +242,22 @@
   })
 
   const finishedConfiguration = computed(
-    () => hasBindWorkload.value && hasCreateCache.value && hasCreateOrigin.value
+    () => hasBindWorkload.value && hasCreateCache.value && hasCreateEdgeConnector.value
   )
   const primaryActionLabel = computed(() =>
     finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
   )
 
   const onSubmit = async () => {
-    if (hasCreateCache.value && hasCreateOrigin.value) {
+    if (hasCreateCache.value && hasCreateEdgeConnector.value) {
       loadingFinishedConfig.value = true
       const payload = {
         ...rulesEngine.value.body[0],
         phase: 'default',
         behaviors: [
           {
-            name: 'set_origin',
-            originId: originId.value
+            name: 'set_edge_connector',
+            edgeConnectorId: edgeConnectorId.value
           },
           {
             name: 'set_cache_policy',
@@ -281,9 +281,9 @@
     tab.value = tab.value.filter((item) => item !== 0)
   }
 
-  const handleResponseOrigin = (value) => {
-    originId.value = value.originId
-    handleResponse('origin')
+  const handleResponseEdgeConnector = (value) => {
+    edgeConnectorId.value = value.id
+    handleResponse('edgeConnector')
   }
 
   const handleResponseCache = (value) => {
@@ -292,8 +292,8 @@
   }
 
   const handleResponse = (tab) => {
-    if (tab === 'origin') {
-      hasCreateOrigin.value = true
+    if (tab === 'edgeConnector') {
+      hasCreateEdgeConnector.value = true
       closeAccordionTab(tabOrigin)
     }
     if (tab === 'cache') {

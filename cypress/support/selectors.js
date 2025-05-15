@@ -33,7 +33,7 @@ import WAF_TUNING_PRODUCT_SELECTORS from './selectors/product-selectors/waf-tuni
 import REAL_TIME_EVENTS_SELECTORS from './selectors/product-selectors/real-time-events.js'
 import WORKLOAD_SELECTORS from './selectors/product-selectors/workload.js'
 import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.js'
-
+import EDGE_CONNECTOR_SELECTORS from './selectors/product-selectors/edge-connectors.js'
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
@@ -64,7 +64,8 @@ const selectors = {
   teams: TEAMS_BLOCK_SELECTORS,
   realTimeEvents: REAL_TIME_EVENTS_SELECTORS,
   workload: WORKLOAD_SELECTORS,
-  customPages: CUSTOM_PAGES_SELECTORS
+  customPages: CUSTOM_PAGES_SELECTORS,
+  edgeConnector: EDGE_CONNECTOR_SELECTORS
 }
 
 export default selectors

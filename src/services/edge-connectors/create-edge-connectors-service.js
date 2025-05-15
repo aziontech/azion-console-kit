@@ -93,7 +93,11 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return { feedback: 'Edge Connector successfully created', urlToEditView: '/edge-connectors' }
+      return {
+        feedback: 'Edge Connector successfully created',
+        urlToEditView: '/edge-connectors',
+        id: parseInt(httpResponse.body.data.id)
+      }
     case 500:
       throw new Errors.InternalServerError().message
     default:
