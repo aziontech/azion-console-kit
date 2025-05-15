@@ -12,8 +12,8 @@ export default {
     tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
 
   },
-  accordionStepOrigin: {
-    createOrigin: '[data-testid="create-origion-accordion"]',
+  accordionStepEdgeConnector: {
+    createEdgeConnector: '[data-testid="create-edge-connector-accordion"]',
     addressOriginInput: '[data-testid="form-horizontal-default-origin-address-field-text__input"]',
     hostOriginInput: '[data-testid="form-horizontal-default-origin-host-header-field-text__input"]'
   },

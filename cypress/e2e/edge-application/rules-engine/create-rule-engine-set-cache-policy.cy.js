@@ -1,6 +1,7 @@
 import generateUniqueName from '../../../support/utils'
 import selectors from '../../../support/selectors'
 import { payloadRequestWorkload } from '../../../fixtures/workload.js'
+import { httpResponse } from '../../../fixtures/edge-connectors/create-edge-connectors.js'
 
 let fixtures = {}
 
@@ -13,13 +14,27 @@ const createCacheSettings = () => {
   cy.verifyToast('success', 'Cache Settings successfully created')
 }
 
-const createOrigin = () => {
-  cy.get(selectors.edgeApplication.accordionStepOrigin.createOrigin).click()
-  cy.get(selectors.edgeApplication.accordionStepOrigin.addressOriginInput).type(`${fixtures.edgeApplicationName}.app.azion`)
-  cy.intercept('POST', 'api/v3/edge_applications/*/origins').as('createOrigin')
+const createEdgeConnector = () => {
+  cy.get(selectors.edgeApplication.accordionStepEdgeConnector.createEdgeConnector).click()
+  cy.get(selectors.edgeConnector.name).clear()
+  cy.get(selectors.edgeConnector.name).type(fixtures.edgeConnectorName)
+  cy.get(selectors.edgeConnector.http.host).clear()
+  cy.get(selectors.edgeConnector.http.host).type('www.google.com')
+  cy.get(selectors.edgeConnector.http.path).clear()
+  cy.get(selectors.edgeConnector.http.path).type('/')
+  cy.get(selectors.edgeConnector.http.realIpHeader).clear()
+  cy.get(selectors.edgeConnector.http.realIpHeader).type('192.168.60.98')
+  cy.get(selectors.edgeConnector.http.realPortHeader).clear()
+  cy.get(selectors.edgeConnector.http.realPortHeader).type('1989')
+  cy.get(selectors.edgeConnector.address).clear()
+  cy.get(selectors.edgeConnector.address).type('www.google.com')
+  cy.intercept(
+    { method: 'POST', url: '/api/v4/edge_connector/connectors' },
+    { body: httpResponse, statusCode: 202 }
+  ).as('createEdgeConnector')
   cy.get(selectors.form.createButtonAccordtion).first().click()
-  cy.wait('@createOrigin')
-  cy.verifyToast('success', 'Your origin has been created')
+  cy.wait('@createEdgeConnector')
+  cy.verifyToast('success', 'Edge Connector successfully created')
 }
 
 const createWorkload = () => {
@@ -72,9 +87,15 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  createOrigin()
+  createEdgeConnector()
   createWorkload()
   createCacheSettings()
+
+  cy.intercept(
+    { method: 'PATCH', url: '/api/v4/edge_application/applications/*/rules/*' },
+    { body: {}, statusCode: 202 }
+  )
+
   cy.get(selectors.form.actionsFinishButton).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
@@ -105,7 +126,8 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       originName: generateUniqueName('origin'),
       rulesEngineName: generateUniqueName('RulesEng'),
       cacheSettingName: generateUniqueName('cacheSetting'),
-      domainName: generateUniqueName('domain')
+      domainName: generateUniqueName('domain'),
+      edgeConnectorName: generateUniqueName('EdgeConnector')
     }
   })
 
@@ -126,21 +148,8 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Set Cache Policy')).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
-    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
-
-    cy.intercept('GET', 'api/v3/edge_applications/*/cache_settings?page_size=200').as(
-      'getCachePolicy'
-    )
-    cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
-      .find(selectors.form.actionsSubmitButton)
-      .click()
-    cy.verifyToast('success', 'Cache Settings successfully created')
-
-    cy.wait('@getCachePolicy', { timeout: 10000 })
-    cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
-      .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))
+      .find(selectors.edgeApplication.rulesEngine.cachePolicyOption('Default Cache Settings'))
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
