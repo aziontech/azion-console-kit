@@ -3,6 +3,9 @@
     title="General"
     description="Create a edge connectors."
     data-testid="edge-connectors-form__section__general"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,6 +26,9 @@
     title="Host Settings"
     description="Customize settings related to origin servers and hosts."
     data-testid="edge-connectors-form__section__host-settings"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -216,13 +222,15 @@
         v-if="type === 'live_ingest'"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldText
+          <FieldDropdown
             label="Endpoint"
-            required
-            description=""
-            :value="liveIngestEndpoint"
             name="liveIngestEndpoint"
-            placeholder="Endpoint"
+            :options="liveIngestEndpoints"
+            optionLabel="label"
+            optionValue="value"
+            :value="liveIngestEndpoint"
+            appendTo="self"
+            description=""
             data-testid="edge-connectors-form__host-settings__liveIngestEndpoint-field"
           />
         </div>
@@ -260,7 +268,7 @@
             placeholder="Select an HTTP port"
             class="w-full"
             display="chip"
-            data-testid="form-horizontal-delivery-settings-http-ports-multi-select"
+            data-testid="form-horizontal-delivery-settings-http-ports-edge-connector-multi-select"
           />
         </span>
       </div>
@@ -286,6 +294,9 @@
     title="Modules"
     description="Modules a edge connectors."
     data-testid="edge-connectors-form__section__modules"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -314,6 +325,9 @@
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
     v-if="type !== 'live_ingest' && type !== 'edge_storage'"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div
@@ -470,6 +484,9 @@
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
     data-testid="edge-connectors-form__section__timeouts"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -479,6 +496,7 @@
           :value="connectionTimeout"
           name="connectionTimeout"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__connection-timeout-field"
         />
       </div>
@@ -490,6 +508,7 @@
           :value="readWriteTimeout"
           name="readWriteTimeout"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__read-write-timeout-field"
         />
       </div>
@@ -501,6 +520,7 @@
           :value="maxRetries"
           name="maxRetries"
           placeholder=""
+          required
           data-testid="edge-connectors-form__timeouts__max-retries-field"
         />
       </div>
@@ -510,6 +530,9 @@
   <FormHorizontal
     title="Status"
     data-testid="edge-connectors-form__section__status"
+    :isDrawer="isDrawer"
+    :hiddenTitle="hiddenTitle"
+    :noBorder="noBorder"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -541,6 +564,21 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
 
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    hiddenTitle: {
+      type: Boolean,
+      default: false
+    },
+    noBorder: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const types = ref([
     { label: 'HTTP', value: 'http' },
     { label: 'S3', value: 's3' },
@@ -564,6 +602,14 @@
   const connectionPreferences = ref([
     { label: 'IPv6', value: 'IPv6' },
     { label: 'IPv4', value: 'IPv4' }
+  ])
+
+  const liveIngestEndpoints = ref([
+    { label: 'us-east-1.azioningest.net', value: 'us-east-1.azioningest.net' },
+    { label: 'br-east-1.azioningest.net', value: 'br-east-1.azioningest.net' },
+    { label: 'br-east-2.azioningest.net', value: 'br-east-2.azioningest.net' },
+    { label: 'us-east-2.azioningest.net', value: 'us-east-2.azioningest.net' },
+    { label: 'br-east-3.azioningest.net', value: 'br-east-3.azioningest.net' }
   ])
 
   const { value: name } = useField('name')

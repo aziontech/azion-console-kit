@@ -1,3 +1,4 @@
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
 function createHomeItem() {
@@ -19,10 +20,12 @@ function createMarketplaceItem() {
 }
 
 function createDomainsItem() {
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+
   return {
-    label: 'Domains',
+    label: handleTextDomainWorkload.pluralTitle,
     icon: 'ai ai-domains',
-    to: '/domains',
+    to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains'
   }
 }

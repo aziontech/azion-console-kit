@@ -1,4 +1,4 @@
-import { listWorkloadsService } from '@/services/workloads-services'
+import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
 /** @type {import('vue-router').NavigationGuardWithThis} */
 
 export async function domainsLimitGuard({ to, accountStore }) {
@@ -10,7 +10,7 @@ export async function domainsLimitGuard({ to, accountStore }) {
   const isCreateOrEditDataStream =
     to.name === 'create-data-stream' || to.name === 'edit-data-stream'
   if (isCreateOrEditDataStream) {
-    const workloads = await listWorkloadsService({
+    const workloads = await listWorkloadsDynamicFieldsService({
       fields: 'id',
       ordering: 'id',
       page: 1,

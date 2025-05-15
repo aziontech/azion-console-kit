@@ -3,6 +3,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
@@ -35,7 +37,7 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Domain"
+    :title="`${handleTextDomainWorkload.singularTitle}`"
     description="Provide the domain name you want to host."
   >
     <template #inputs>
