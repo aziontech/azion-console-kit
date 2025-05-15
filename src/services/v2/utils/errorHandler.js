@@ -1,50 +1,51 @@
-export function errorHandler(error) {
-  //https://github.com/aziontech/azion-api-errors/blob/dev/src/azion_api_errors/definitions/vcs_api.json
-  console.error('API Error:', error) // eslint-disable-line no-console
+const ERROR_MESSAGES = {
+  CONNECTION_ERROR: 'Unable to connect to the server. Please check your internet connection.',
+  UNEXPECTED_ERROR: 'An unexpected error occurred. Please try again.'
+}
 
-  if (!error?.response) {
-    return {
-      status: 500,
-      errors: [
-        {
-          detail: 'Unable to connect to the server. Please check your internet connection.'
-        }
-      ]
-    }
-  }
+const formatPath = (path) => {
+  const prefix = '/data/'
 
-  // Handle API errors with response data
-  if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-    return {
-      status: error.response.status,
-      errors: error.response.data.errors.map((err) => ({
-        detail: err.detail
-      }))
-    }
-  }
+  if (!path.startsWith(prefix)) return null
 
-  // Handle unexpected errors
-  return {
-    status: error.response?.status || 500,
-    errors: [
-      {
-        detail: error.message || 'An unexpected error occurred. Please try again.'
-      }
-    ]
-  }
+  const rest = path.slice(prefix.length)
+  if (!rest) return null
+
+  return rest
+    .split('/')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' - ')
 }
 
 /**
- * Formats error messages for toast display
- * @param {Object} errorResponse - The error response from errorHandler
- * @returns {string[]} Array of formatted error messages
+ * Handles API errors and returns a standardized error response
+ * @param {Object} error - The error object from the API call
+ * @returns {Object} Standardized error response
  */
-export function formatErrorsForToast(errorResponse) {
-  if (!errorResponse?.errors) return ['An unexpected error occurred']
+export function errorHandler(error) {
+  if (!error?.response) {
+    return {
+      status: 500,
+      errors: [ERROR_MESSAGES.CONNECTION_ERROR]
+    }
+  }
 
-  return errorResponse.errors.map((error) => {
-    if (error.detail) return error.detail
-    if (error.title) return error.title
-    return 'An unexpected error occurred'
-  })
+  const { status, data } = error.response
+
+  if (data?.errors && Array.isArray(data.errors)) {
+    const formattedErrors = data.errors.map((err) => {
+      const fieldName = formatPath(err.source?.pointer)
+      return fieldName ? `${fieldName}: ${err.detail}` : err.detail
+    })
+
+    return {
+      status,
+      errors: formattedErrors
+    }
+  }
+
+  return {
+    status: status || 500,
+    errors: [error.message || ERROR_MESSAGES.UNEXPECTED_ERROR]
+  }
 }

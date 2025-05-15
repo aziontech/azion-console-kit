@@ -11,7 +11,8 @@ export class VcsService {
       url: `${this.baseURL}/integrations`,
       params
     })
-    return this.adapter?.transformListIntegrations?.(res) ?? res
+    console.log('🚀 ~ VcsService ~ listIntegrations ~ res:', res);
+    return res.success ? this.adapter?.transformListIntegrations?.(res) : res
   }
 
   async listPlatforms() {
@@ -19,7 +20,8 @@ export class VcsService {
       method: 'GET',
       url: `${this.baseURL}/providers`
     })
-    return this.adapter?.transformListPlatforms?.(res) ?? res
+    console.log('🚀 ~ VcsService ~ listPlatforms ~ res:', res);
+    return res.success ? this.adapter?.transformListPlatforms?.(res) : res
   }
 
   async listRepositories(id, params = { pageSize: 200, ordering: 'name' }) {
@@ -28,7 +30,8 @@ export class VcsService {
       url: `${this.baseURL}/integrations/${id}/repositories`,
       params
     })
-    return this.adapter?.transformListRepositories?.(res) ?? res
+    console.log('🚀 ~ VcsService ~ listRepositories ~ res:', res);
+    return res.success ? this.adapter?.transformListRepositories?.(res) ?? res : res
   }
 
   async postCallbackUrl(path, body) {
@@ -37,6 +40,7 @@ export class VcsService {
       url: `${this.baseURL}${path}`,
       body
     })
+    console.log('🚀 ~ VcsService ~ postCallbackUrl ~ res:', res);
     return res
   }
 }

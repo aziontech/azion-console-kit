@@ -7,23 +7,37 @@ export class HttpService {
   }
 
   async request({ method, url, body = {}, params = {}, config = {}, abortIdentifier, abortGroup }) {
-    const signal = this.abortManager.getSignal(abortIdentifier, abortGroup)
-    const paramsString = this.buildQueryParams(params)
+    let signal
+    if (abortIdentifier || abortGroup) {
+      signal = this.abortManager.getSignal(abortIdentifier, abortGroup)
+    }
+
+    let requestUrl = url
+    if (Object.keys(params).length > 0) {
+      const paramsString = this.buildQueryParams(params)
+      if (paramsString) {
+        requestUrl = `${url}?${paramsString}`
+      }
+    }
+
     try {
       const response = await this.httpClient.send({
         method,
         data: body,
-        url: `${url}${paramsString ? `?${paramsString}` : ''}`,
-        signal,
+        url: requestUrl,
+        ...(signal && { signal }),
         ...config
       })
+
       return {
+        success: true,
         body: response.data,
         statusCode: response.status
       }
     } catch (error) {
       const errors = this.errorHandler?.(error)
       return {
+        success: false,
         body: errors,
         statusCode: errors.status
       }

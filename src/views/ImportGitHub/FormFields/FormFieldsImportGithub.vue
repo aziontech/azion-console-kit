@@ -60,7 +60,7 @@
     try {
       isGithubConnectLoading.value = true
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
-      await listIntegrations()
+      await loadListIntegrations()
     } catch (error) {
       toast.add({
         closable: true,
@@ -82,7 +82,7 @@
   }
 
   const integrationsList = ref([])
-  const listIntegrations = async () => {
+  const loadListIntegrations = async () => {
     try {
       isGithubConnectLoading.value = true
       const data = await vcsService.listIntegrations()
@@ -172,7 +172,7 @@
   }
 
   onMounted(async () => {
-    await listIntegrations()
+    await loadListIntegrations()
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })

@@ -15,14 +15,13 @@ export class AbortManager {
       this.groups.get(group).add(identifier)
     }
 
-    // Remove controller when request completes
     controller.signal.addEventListener('abort', () => {
       this.controllers.delete(identifier)
       if (group) {
         const groupSet = this.groups.get(group)
         if (groupSet) {
           groupSet.delete(identifier)
-          if (groupSet.size === 0) {
+          if (groupSet.size) {
             this.groups.delete(group)
           }
         }
@@ -55,7 +54,6 @@ export class AbortManager {
   }
 
   abortAll() {
-    this.controllers.forEach(controller => controller.abort())
+    this.controllers.forEach((controller) => controller.abort())
   }
 }
-
