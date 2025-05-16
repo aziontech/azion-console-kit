@@ -157,6 +157,7 @@
 
 <template>
   <FormHorizontal
+    isDrawer
     title="Custom Page"
     description="Create custom pages to handle errors and cache TTL based on the HTTP status code received from the edge connectors."
   >
@@ -216,6 +217,7 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Pages"
     description="Customize error pages and cache TTL based on the HTTP status code received from the edge connectors."
   >

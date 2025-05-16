@@ -132,7 +132,7 @@
       <img
         class="mt-8"
         :src="customPagesGif"
-        alt="Origins to Custom Pages"
+        alt="Error Responses to Custom Pages"
       />
     </div>
   </div>
