@@ -104,7 +104,7 @@
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
-        const errorMessage = typeof error === 'string' ? error : error?.message
+        const errorMessage = error?.message || error
 
         showToast('error', errorMessage)
         emit('on-response-fail', errorMessage)
