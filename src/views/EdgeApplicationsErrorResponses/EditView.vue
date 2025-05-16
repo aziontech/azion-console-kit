@@ -123,16 +123,17 @@
     v-else
     class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex flex-col xl:flex-row items-center xl:items-start justify-center lg:px-8 lg:py-16 max-w-screen-2xl-test mx-auto w-full"
   >
-    <div class="flex-col gap-4 items-center justify-center">
+    <div class="flex-col gap-4 text-center items-center justify-center">
       <div class="text-xl font-medium">Error Responses is now Custom Pages!</div>
       <div class="text-sm text-color-secondary">
         All settings that were previously made in Error Responses will now be made in the new Custom
         Pages menu.
       </div>
+      <img
+        class="mt-8"
+        :src="customPagesGif"
+        alt="Error Responses to Custom Pages"
+      />
     </div>
-    <img
-      :src="customPagesGif"
-      alt="Origins to Custom Pages"
-    />
   </div>
 </template>
