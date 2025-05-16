@@ -7,6 +7,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -178,11 +179,17 @@
   }
 
   const loadRecommendedSolutions = async () => {
-    await loadSolutions({ group: 'recommended', type: accountStore.accountData.jobRole })
+    let type = accountStore.accountData.jobRole
+    if (!hasFlagBlockApiV4()) type = `${accountStore.accountData.jobRole}-v4`
+
+    await loadSolutions({ group: 'recommended', type })
   }
 
   const loadTemplates = async () => {
-    await loadSolutions({ group: 'templates', type: 'onboarding' })
+    let type = 'onboarding'
+    if (!hasFlagBlockApiV4()) type = 'onboarding-v4'
+
+    await loadSolutions({ group: 'templates', type })
   }
 
   const loadGithubImportSolution = async () => {
