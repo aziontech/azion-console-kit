@@ -6,7 +6,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, inject, ref } from 'vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
-  import edgeConnectorsGif from '@/assets/images/connectors.gif'
+  import edgeConnectorsGif from '@/assets/images/edgeConnectors.gif'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -199,16 +199,17 @@
     v-else
     class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex flex-col xl:flex-row items-center xl:items-start justify-center lg:px-8 lg:py-16 max-w-screen-2xl-test mx-auto w-full"
   >
-    <div class="flex-col gap-4 items-center justify-center">
+    <div class="flex-col gap-4 text-center items-center justify-center">
       <div class="text-xl font-medium">Origins is now Edge Connectors!</div>
       <div class="text-sm text-color-secondary">
         All settings that were previously made in Origins will now be made in the new Edge
         Connectors menu.
       </div>
+      <img
+        class="mt-8"
+        :src="edgeConnectorsGif"
+        alt="Origins to Edge Connectors"
+      />
     </div>
-    <img
-      :src="edgeConnectorsGif"
-      alt="Origins to Edge Connectors"
-    />
   </div>
 </template>
