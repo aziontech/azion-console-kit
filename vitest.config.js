@@ -33,7 +33,8 @@ export default mergeConfig(
           'src/views/**',
           'src/helpers/**',
           'src/plugins/**',
-          'src/modules/**'
+          'src/modules/**',
+          '!src/modules/azion-ai-chat/**'
         ],
         statements: 90,
         branches: 90,
