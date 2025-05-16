@@ -105,7 +105,6 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
   it('should add all step settings', () => {
     //edge application creation
     cy.openProduct('Edge Application')
-
     cy.get(selectors.edgeApplication.mainSettings.createButton).click()
     cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
     cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')

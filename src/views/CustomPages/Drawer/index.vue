@@ -2,6 +2,8 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
+  import { createCustomPagesService } from '@/services/custom-pages-services/v4'
+  import { listEdgeConnectorsService } from '@/services/edge-connectors'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
@@ -13,14 +15,13 @@
   const emit = defineEmits(['onSuccess'])
 
   defineProps({
-    createService: {
-      type: Function
-    },
     loadService: {
-      type: Function
+      type: Function,
+      required: false
     },
     editService: {
-      type: Function
+      type: Function,
+      required: false
     }
   })
 
@@ -77,8 +78,8 @@
     showEditCustomPagesDrawer.value = true
   }
 
-  const handleCreateCustomPages = () => {
-    emit('onSuccess')
+  const handleCreateCustomPages = (response) => {
+    emit('onSuccess', response.id)
     closeCreateDrawer()
   }
 
@@ -98,7 +99,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateCustomPagesDrawer"
-    :createService="createService"
+    :createService="createCustomPagesService"
     id="create-custom-page-drawer"
     drawerId="create-custom-page-drawer"
     :schema="validationSchema"
@@ -107,7 +108,7 @@
     title="Create Custom Page"
   >
     <template #formFields>
-      <FormFieldsCustomPages />
+      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
     </template>
   </CreateDrawerBlock>
 
@@ -122,7 +123,7 @@
     title="Edit Custom Page"
   >
     <template #formFields>
-      <FormFieldsCustomPages />
+      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
     </template>
   </EditDrawerBlock>
 </template>

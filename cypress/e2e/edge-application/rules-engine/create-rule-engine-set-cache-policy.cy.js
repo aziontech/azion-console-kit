@@ -69,8 +69,8 @@ const createWorkload = () => {
   ).as('createWorkload')
 
   cy.get(selectors.workload.cnameAccessOnlyField).click()
-  
-  
+
+
   // Act
   cy.get(selectors.form.createButtonAccordtion).eq(1).click()
   cy.wait('@createWorkload')

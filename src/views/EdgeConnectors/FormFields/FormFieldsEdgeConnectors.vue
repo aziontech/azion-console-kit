@@ -1,9 +1,9 @@
 <template>
   <FormHorizontal
+    isDrawer
     title="General"
     description="Create a edge connectors."
     data-testid="edge-connectors-form__section__general"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -23,10 +23,10 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Host Settings"
     description="Customize settings related to origin servers and hosts."
     data-testid="edge-connectors-form__section__host-settings"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -291,10 +291,10 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Modules"
     description="Modules a edge connectors."
     data-testid="edge-connectors-form__section__modules"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -321,11 +321,11 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Addresses"
     description="Addresses a edge connectors."
     data-testid="edge-connectors-form__section__addresses"
     v-if="type !== 'live_ingest' && type !== 'edge_storage'"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -481,10 +481,10 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
     data-testid="edge-connectors-form__section__timeouts"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -528,9 +528,9 @@
   </FormHorizontal>
 
   <FormHorizontal
+    isDrawer
     title="Status"
     data-testid="edge-connectors-form__section__status"
-    :isDrawer="isDrawer"
     :hiddenTitle="hiddenTitle"
     :noBorder="noBorder"
   >
@@ -565,10 +565,6 @@
   import Divider from 'primevue/divider'
 
   defineProps({
-    isDrawer: {
-      type: Boolean,
-      default: false
-    },
     hiddenTitle: {
       type: Boolean,
       default: false

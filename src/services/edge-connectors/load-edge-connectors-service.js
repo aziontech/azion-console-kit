@@ -32,7 +32,7 @@ const adapt = (httpResponse) => {
   const data = httpResponse.body?.data
   const typeBuilders = {
     live_ingest: () => ({
-      liveIngestEndpoint: data.type_properties.liveIngestEndpoint
+      liveIngestEndpoint: data.type_properties.endpoint
     }),
     s3: () => ({
       addresses: extractAddresses(data.addresses),
