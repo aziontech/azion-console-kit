@@ -8,6 +8,6 @@ import { FILTERS_RULES } from '@/helpers'
  * @return {number} The index of the relevant field, or -1 if not relevant.
  */
 export default function GetRelevantField(fieldName, dataset) {
-  const fieldsRelevant = FILTERS_RULES.MOST_RELEVANT_FIELDS[dataset] || []
+  const fieldsRelevant = FILTERS_RULES().MOST_RELEVANT_FIELDS[dataset] || []
   return fieldsRelevant.indexOf(fieldName)
 }

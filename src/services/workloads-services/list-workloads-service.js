@@ -1,14 +1,14 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
-import { convertArrayObjectsToCamelCase } from '@/helpers/convert-array-objects-to-camel-case'
+const LOCKED_VALUE = 'custom'
 
 export const listWorkloadsService = async ({
+  search = '',
   fields = '',
   ordering = 'name',
   page = 1,
-  pageSize = 200,
-  search = ''
+  pageSize = 10
 }) => {
   const searchParams = makeListServiceQueryParams({ fields, ordering, page, pageSize, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -16,45 +16,55 @@ export const listWorkloadsService = async ({
     method: 'GET'
   })
 
-  httpResponse = adapt(httpResponse)
+  httpResponse = await adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
-/**
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return `${errorSchema[key]}`
-}
+const parseName = (domain) => {
+  const nameProps = { text: domain.name, tagProps: {} }
 
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const apiKeyError = Object.keys(httpResponse.body)[0]
-  const apiValidationError = extractErrorKey(httpResponse.body, apiKeyError)
-
-  return `${apiValidationError}`
-}
-
-const adapt = (httpResponse) => {
-  if (httpResponse.statusCode === 200) {
-    const results = httpResponse.body.results || []
-
-    const parsedResults = convertArrayObjectsToCamelCase(results)
-
-    return {
-      body: { results: parsedResults, count: httpResponse.body.count },
-      statusCode: httpResponse.statusCode
+  if (domain?.product_version === LOCKED_VALUE) {
+    nameProps.tagProps = {
+      icon: 'pi pi-lock',
+      value: 'Locked',
+      outlined: true,
+      severity: 'warning'
     }
-  } else {
-    const errorMessage = extractApiError(httpResponse)
-    throw new Error(errorMessage).message
+  }
+
+  return nameProps
+}
+
+const adapt = async (httpResponse) => {
+  const parsedDomains = httpResponse.body.results?.map((domain) => {
+    return {
+      id: domain.id,
+      name: parseName(domain),
+      isLocked: domain.product_version === LOCKED_VALUE,
+      disableEditClick: domain.product_version === LOCKED_VALUE,
+      active: domain.active
+        ? {
+            content: 'Active',
+            severity: 'success'
+          }
+        : {
+            content: 'Inactive',
+            severity: 'danger'
+          },
+      activeSort: domain.active,
+      domainName: {
+        content: domain.domains ? domain.domains[0].domain : null
+      },
+      cnames: domain.alternate_domains
+    }
+  })
+
+  const count = httpResponse.body?.count ?? 0
+
+  return {
+    count,
+    body: parsedDomains,
+    statusCode: httpResponse.statusCode
   }
 }

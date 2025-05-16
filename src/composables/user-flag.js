@@ -1,16 +1,18 @@
-import { computed } from 'vue'
-import { useAccountStore } from '../stores/account'
+import { ref, computed } from 'vue'
 
-export function useFlag(flagName) {
-  const accountStore = useAccountStore()
-  const flags = computed(() => accountStore.clientFlags || [])
-  return computed(() => {
-    if (!flagName) return false
-    return flags.value.includes(flagName)
-  })
+const _flags = ref([])
+const BLOCK_INCOMPATIBLE_ENDPOINT_V4 = 'block_apiv4_incompatible_endpoints'
+
+const setFeatureFlags = (flagsArray = []) => {
+  _flags.value = flagsArray
 }
 
-export function hasFlagBlockApiV4() {
-  const FLAG = 'block_apiv4_uncompatible_endpoints'
-  return useFlag(FLAG).value
+const useFlag = (flagName) => {
+  return computed(() => _flags.value.includes(flagName))
 }
+
+const hasFlagBlockApiV4 = () => {
+  return useFlag(BLOCK_INCOMPATIBLE_ENDPOINT_V4).value
+}
+
+export { setFeatureFlags, useFlag, hasFlagBlockApiV4 }

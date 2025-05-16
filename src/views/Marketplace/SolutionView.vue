@@ -167,7 +167,8 @@
 
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error'
+    severity: 'error',
+    summary: 'Error'
   }
 
   const solution = ref()
@@ -239,7 +240,8 @@
         solution: route.params.solution
       })
     } catch (error) {
-      toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, detail: error })
+      loading.value = false
     }
   }
 
@@ -287,7 +289,8 @@
 
       reloadSolution(feedback)
     } catch (error) {
-      toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, detail: error })
+      loading.value = false
     }
   }
 
@@ -300,7 +303,7 @@
   const handleIntegrationFail = async (error) => {
     showIntegration.value = false
     loading.value = false
-    toast.add({ ...ERROR_PROPS, summary: error })
+    toast.add({ ...ERROR_PROPS, detail: error })
     await loadSolution()
   }
 

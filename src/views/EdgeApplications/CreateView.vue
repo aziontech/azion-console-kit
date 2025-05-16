@@ -59,47 +59,14 @@
   })
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
-    address: yup.string().required(),
-    hostHeader: yup.string().required(),
-    cdnCacheSettingsMaximumTtl: yup.string().required(),
-    httpPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('http'),
-      then: (schema) => schema.min(1).required()
-    }),
-    httpsPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('https'),
-      then: (schema) => schema.min(1).required()
-    })
+    name: yup.string().required()
   })
 
   const initialValues = ref({
-    name: '',
-    deliveryProtocol: 'http',
-    http3: false,
-    httpPort: [{ name: '80 (Default)', value: '80' }],
-    httpsPort: [{ name: '443 (Default)', value: '443' }],
-    minimumTlsVersion: 'none',
-    supportedCiphers: 'all',
-    originType: 'single_origin',
-
-    address: '',
-    originProtocolPolicy: 'preserve',
-    hostHeader: '${host}',
-    browserCacheSettings: 'override',
-    browserCacheSettingsMaximumTtl: 0,
-    cdnCacheSettings: 'override',
-    cdnCacheSettingsMaximumTtl: 60,
-    debugRules: false
+    name: ''
   })
 
-  const handleBlocks = [
-    'general',
-    'delivery-settings',
-    'default-origins',
-    'cache-expiration-policies',
-    'debug-rules'
-  ]
+  const handleBlocks = ['general']
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
