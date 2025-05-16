@@ -6,19 +6,21 @@ export class HttpService {
     this.buildQueryParams = buildQueryParams
   }
 
-  async request({ method, url, body = {}, params = {}, config = {}, abortIdentifier, abortGroup }) {
-    let signal
-    if (abortIdentifier || abortGroup) {
-      signal = this.abortManager.getSignal(abortIdentifier, abortGroup)
-    }
+  #buildRequestUrl(url, params) {
+    if (!Object.keys(params).length) return url
 
-    let requestUrl = url
-    if (Object.keys(params).length > 0) {
-      const paramsString = this.buildQueryParams(params)
-      if (paramsString) {
-        requestUrl = `${url}?${paramsString}`
-      }
-    }
+    const paramsString = this.buildQueryParams(params)
+    return paramsString ? `${url}?${paramsString}` : url
+  }
+
+  #getSignal(abortIdentifier, abortGroup) {
+    if (!abortIdentifier && !abortGroup) return null
+    return this.abortManager.getSignal(abortIdentifier, abortGroup)
+  }
+
+  async request({ method, url, body = {}, params = {}, config = {}, abortIdentifier, abortGroup }) {
+    const signal = this.#getSignal(abortIdentifier, abortGroup)
+    const requestUrl = this.#buildRequestUrl(url, params)
 
     try {
       const response = await this.httpClient.send({
@@ -28,11 +30,10 @@ export class HttpService {
         ...(signal && { signal }),
         ...config
       })
-      const { data, status } = response
-      return { data, status }
+
+      return response
     } catch (error) {
-      const errors = this.errorHandler?.(error)
-      throw errors
+      throw this.errorHandler?.(error)
     }
   }
 
