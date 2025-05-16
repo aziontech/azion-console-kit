@@ -225,7 +225,7 @@ export default class Aql {
         }
       }
       case 'operator': {
-        const newQuery = `${query} ${suggestionLabel} `
+        const newQuery = `${query.trimEnd()} ${suggestionLabel} `
         return { query: newQuery, nextStep: 'value', label: fieldName }
       }
       case 'value': {
