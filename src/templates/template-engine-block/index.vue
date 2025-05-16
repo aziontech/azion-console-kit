@@ -79,7 +79,6 @@
               <OAuthGithub
                 v-show="!hasIntegrations"
                 ref="oauthGithubRef"
-                :listPlatformsService="listPlatformsService"
                 @onCallbackUrl="
                   (uri) => {
                     setCallbackUrl(uri.value)
@@ -203,7 +202,7 @@
   import { useDeploy } from '@/stores/deploy'
   import { useScrollToError } from '@/composables/useScrollToError'
   import LabelBlock from '@/templates/label-block'
-
+  import { vcsService } from '@/services/v2'
   defineOptions({ name: 'templateEngineBlock' })
 
   const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])
@@ -214,16 +213,6 @@
       required: true
     },
     instantiateTemplateService: {
-      type: Function
-    },
-    postCallbackUrlService: {
-      type: Function,
-      required: true
-    },
-    listPlatformsService: {
-      type: Function
-    },
-    listIntegrationsService: {
       type: Function
     },
     templateId: {
@@ -305,7 +294,7 @@
   const listIntegrations = async () => {
     try {
       isIntegrationsLoading.value = true
-      const data = await props.listIntegrationsService()
+      const data = await vcsService.listIntegrations()
 
       if (data && data.length > 0) {
         formTools.value.setFieldValue(vcsIntegrationFieldName.value, data[0].value)
@@ -314,10 +303,12 @@
 
       listOfIntegrations.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: message
+        })
       })
     } finally {
       isIntegrationsLoading.value = false
@@ -361,13 +352,15 @@
   const saveIntegration = async (integration) => {
     isIntegrationsLoading.value = true
     try {
-      await props.postCallbackUrlService(callbackUrl.value, integration.data)
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
+      error.message?.forEach((message) => {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: message
+        })
       })
     } finally {
       await listIntegrations()
