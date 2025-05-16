@@ -565,10 +565,6 @@
   import Divider from 'primevue/divider'
 
   defineProps({
-    isDrawer: {
-      type: Boolean,
-      default: false
-    },
     hiddenTitle: {
       type: Boolean,
       default: false
