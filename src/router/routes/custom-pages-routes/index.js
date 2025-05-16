@@ -32,6 +32,7 @@ export const customPagesRoutes = {
       component: () => import('@views/CustomPages/CreateView.vue'),
       props: {
         createCustomPagesService: CustomPagesServiceV4.createCustomPagesService,
+        loadEdgeConnectorsService: EdgeConnectorsService.loadEdgeConnectorsService,
         listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService
       },
       meta: {
@@ -54,6 +55,7 @@ export const customPagesRoutes = {
       component: () => import('@views/CustomPages/EditView.vue'),
       props: {
         loadCustomPagesService: CustomPagesServiceV4.loadCustomPagesService,
+        loadEdgeConnectorsService: EdgeConnectorsService.loadEdgeConnectorsService,
         editCustomPagesService: CustomPagesServiceV4.editCustomPagesService,
         listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService,
         updatedRedirect: 'list-custom-pages'

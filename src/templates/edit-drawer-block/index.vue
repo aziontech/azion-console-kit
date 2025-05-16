@@ -140,9 +140,10 @@
         formContext.resetForm()
         toggleDrawerVisibility(false)
       } catch (error) {
+        const errorMessage = error?.message || error
         blockViewRedirection.value = true
-        emit('onError', error)
-        showToast('error', error)
+        emit('onError', errorMessage)
+        showToast('error', errorMessage)
       }
     },
     ({ errors }) => {

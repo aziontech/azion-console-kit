@@ -5,14 +5,19 @@
   import Divider from 'primevue/divider'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import DrawerEdgeConnector from '@/views/EdgeConnectors/Drawer'
   import { useField, useFieldArray } from 'vee-validate'
   import { onMounted, ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  const props = defineProps({
+  defineProps({
     listEdgeConnectorsService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeConnectorsService: {
       type: Function,
       required: true
     }
@@ -115,37 +120,20 @@
   const { value: isDefault } = useField('isDefault')
   const { push: pushPage, remove: removePage, fields: pages } = useFieldArray('pages')
 
-  const toast = useToast()
-
   const pageInitialState = {
     code: 400,
     ttl: 0,
     uri: '',
     customStatusCode: 0
   }
+  const drawerEdgeConntectorRef = ref()
 
   const addNewPage = () => {
     pushPage(pageInitialState)
   }
 
-  const edgeConnectorsList = ref([])
-
-  const getEdgeConnectors = async () => {
-    try {
-      edgeConnectorsList.value = await props.listEdgeConnectorsService()
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Something went wrong',
-        detail: 'Is not possible to list Edge Connectors, try again later'
-      })
-    }
-  }
-
   onMounted(async () => {
     addNewPage()
-    await getEdgeConnectors()
   })
 
   const removePageFromList = async (index) => {
@@ -153,6 +141,14 @@
   }
 
   const isDefaultPage = (index) => index === 0
+
+  const openEdgeConnectorDrawer = () => {
+    drawerEdgeConntectorRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeConnectorSuccess = (data) => {
+    edgeConnectorId.value = data.id
+  }
 </script>
 
 <template>
@@ -174,19 +170,42 @@
         />
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdown
-          label="Edge Connector"
-          :required="false"
-          :options="edgeConnectorsList"
-          optionLabel="name"
-          data-testid="custom-page-form__origin"
-          optionValue="id"
-          class="h-fit"
-          name="edgeConnectorId"
-          description="Select an Edge Connector to link to the Custom Page."
-          :value="edgeConnectorId"
-          scrollHeight="170px"
+        <DrawerEdgeConnector
+          ref="drawerEdgeConntectorRef"
+          @onSuccess="handleEdgeConnectorSuccess"
         />
+        <FieldDropdownLazyLoader
+          label="Edge Connector"
+          data-testid="custom-page-form__edge-connector"
+          name="edgeConnectorId"
+          :service="listEdgeConnectorsService"
+          :loadService="loadEdgeConnectorsService"
+          optionLabel="name"
+          optionValue="id"
+          :value="edgeConnectorId"
+          appendTo="self"
+          placeholder="Select an Edge Connector to link to the Custom Page."
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openEdgeConnectorDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Connector"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="w-full flex flex-col gap-2">
@@ -300,7 +319,7 @@
               :data-testid="`custom-page-form__page__${index}__path`"
               :name="`pages[${index}].uri`"
               :value="pages[index].value.uri"
-              description="Select an origin to customize the error page path."
+              description="Customize the status code page path."
             />
           </div>
           <div
