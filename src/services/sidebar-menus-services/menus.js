@@ -158,14 +158,14 @@ function createEdgeLibrariesItems() {
     {
       label: 'Custom Pages',
       to: '/custom-pages',
-      icon: 'pi pi-globe',
+      icon: 'ai ai-custom-pages',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
     },
     {
       label: 'Edge Connectors',
       to: '/edge-connectors',
-      icon: 'ai ai-waf-rules',
+      icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
       visible: !hasFlagBlockApiV4()
     }
