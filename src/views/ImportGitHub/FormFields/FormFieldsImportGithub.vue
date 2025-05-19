@@ -188,7 +188,6 @@
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
-
 </script>
 
 <template>
