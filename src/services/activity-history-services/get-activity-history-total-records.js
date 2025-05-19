@@ -1,19 +1,27 @@
 import { convertGQLTotalRecords } from '@/helpers/convert-gql'
-import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDecorator'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
+import graphQLApi from '../axios/makeEventsApi'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 
-export const getActivityHistoryTotalRecords = async ({ filter, dataset }) => {
+export const getActivityHistoryTotalRecords = async () => {
+  const dataset = 'activityHistoryEvents'
+  const filter = {
+    tsRange: {
+      tsRangeBegin: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString(),
+      tsRangeEnd: new Date().toISOString()
+    }
+  }
   const payload = adapt(filter, dataset)
+  const apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
 
-  const decorator = new AxiosHttpClientSignalDecorator()
-
-  const httpResponse = await decorator.request({
-    baseURL: '/',
-    url: makeEventsListBaseUrl(),
-    method: 'POST',
-    body: payload
-  })
-
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: `${makeEventsListBaseUrl()}`,
+      method: 'POST',
+      body: payload
+    },
+    apiClient
+  )
   return adaptResponse(httpResponse, dataset)
 }
 

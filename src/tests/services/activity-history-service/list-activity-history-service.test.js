@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@services/axios/errors'
-import { listEventsService } from '@/services/activity-history-services'
+import { listActivityHistoryEventsService } from '@/services/activity-history-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '../../../services/axios/makeEventsApi'
 
@@ -17,7 +17,7 @@ const records = [
 ]
 
 const makeSut = () => {
-  const sut = listEventsService
+  const sut = listActivityHistoryEventsService
 
   return { sut }
 }

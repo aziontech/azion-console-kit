@@ -11,7 +11,8 @@ export const activityHistoryRoutes = {
       name: 'list-activity-history',
       component: () => import('@views/ActivityHistory/ListView.vue'),
       props: {
-        listEventsService: ActivityHistoryService.listEventsService,
+        listActivityHistoryEventsService: ActivityHistoryService.listActivityHistoryEventsService,
+        getActivityHistoryTotalRecords: ActivityHistoryService.getActivityHistoryTotalRecords,
         documentationService: Helpers.documentationCatalog.activityHistory
       },
       meta: {

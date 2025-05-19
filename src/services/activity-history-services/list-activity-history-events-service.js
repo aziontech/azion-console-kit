@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import graphQLApi from '../axios/makeEventsApi'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
 
-export const listEventsService = async ({
+export const listActivityHistoryEventsService = async ({
   apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN),
   offset = 0,
   limit = 10
@@ -18,8 +18,6 @@ export const listEventsService = async ({
     activityHistoryEvents(
       offset: ${offset}
       limit: ${limit}
-      aggregate: { count: rows }
-      groupBy: [ts, title, comment, type, authorName, authorEmail, accountId]
       filter: {
         tsRange: {
           begin: "${offSetStart.toISOString()}"
@@ -35,7 +33,6 @@ export const listEventsService = async ({
       authorName
       authorEmail
       accountId
-      count
     }
   }
 `

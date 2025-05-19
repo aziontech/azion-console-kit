@@ -1,4 +1,4 @@
-import { listEventsService } from './list-events-service'
+import { listActivityHistoryEventsService } from './list-activity-history-events-service'
 import { getActivityHistoryTotalRecords } from './get-activity-history-total-records'
 
-export { listEventsService, getActivityHistoryTotalRecords }
+export { listActivityHistoryEventsService, getActivityHistoryTotalRecords }

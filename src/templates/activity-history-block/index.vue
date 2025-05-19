@@ -113,13 +113,13 @@
               </div>
             </template>
           </Timeline>
-          <Paginator
-            :rows="10"
-            :totalRecords="totalRecords"
-            :rowsPerPageOptions="[10, 25, 50]"
-            @page="handlePageChange"
-          />
         </div>
+        <Paginator
+          :rows="10"
+          :totalRecords="totalRecords"
+          :rowsPerPageOptions="[10, 25, 50]"
+          @page="handlePageChange"
+        />
       </template>
     </Card>
   </div>
@@ -159,7 +159,11 @@
   })
 
   const props = defineProps({
-    listEventsService: {
+    listActivityHistoryEventsService: {
+      type: Function,
+      required: true
+    },
+    getActivityHistoryTotalRecords: {
       type: Function,
       required: true
     }
@@ -176,10 +180,12 @@
   async function loadData() {
     try {
       isLoading.value = true
-      const data = await props.listEventsService({ limit: rowsPerPage.value, offset: offset.value })
-      console.log('data :', data)
+      const data = await props.listActivityHistoryEventsService({
+        limit: rowsPerPage.value,
+        offset: offset.value
+      })
+      totalRecords.value = await props.getActivityHistoryTotalRecords()
 
-      totalRecords.value = data.length
       events.value = data.map((historyEvent) => ({
         date: historyEvent.ts,
         icon: iconsMap.value[historyEvent.type],
@@ -203,9 +209,7 @@
     const rows = event.rows
 
     rowsPerPage.value = rows
-    console.log('rowsPerPage.value :', rowsPerPage.value);
     offset.value = page * rows
-    console.log('offset.value :', offset.value);
     await loadData()
   }
 
