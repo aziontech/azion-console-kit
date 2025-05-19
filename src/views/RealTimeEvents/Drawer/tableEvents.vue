@@ -49,6 +49,10 @@
               v-if="hasContent(data.value.content)"
             />
           </div>
+
+          <div v-else-if="keyToFormatJson.includes(data.key)">
+            <pre>{{ data.value }}</pre>
+          </div>
           <div
             v-else
             class="w-full"
@@ -77,6 +81,8 @@
       default: () => []
     }
   })
+
+  const keyToFormatJson = ['stacktrace', 'requestData']
 
   const toast = useToast()
 
