@@ -166,6 +166,8 @@
     edgeApplication: null,
     edgeFirewall: null,
     deliveryProtocol: 'https',
+    workloadHostnameAllowAccess: false,
+    domains: [],
     httpPort: [{ name: '80 (Default)', value: 80 }],
     httpsPort: [{ name: '443 (Default)', value: 443 }],
     quicPort: [{ name: '443 (Default)', value: 443 }],
@@ -193,6 +195,8 @@
         }
       ),
     edgeApplication: yup.number().label('Edge Application'),
+    customHostname: yup.string().label('Custom Hostname'),
+    workloadHostnameAllowAccess: yup.boolean().label('Allow Access'),
     cnames: yup
       .string()
       .label('CNAME')

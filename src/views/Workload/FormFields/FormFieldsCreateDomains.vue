@@ -10,6 +10,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import LabelBlock from '@/templates/label-block'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
@@ -464,6 +465,40 @@
           </span>
         </div>
       </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    :isDrawer="isDrawer"
+    title="Custom Hostname"
+    :noBorder="noBorder"
+    data-testid="form-horizontal-custom-hostname"
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldInputGroup
+          placeholder="Custom Hostname"
+          name="customHostname"
+          value="customHostname"
+          data-testid="workload-custom-hostname-field"
+        >
+          <template #button>
+            <PrimeButton
+              label=".azion.app"
+              size="small"
+              outlined
+            />
+          </template>
+        </FieldInputGroup>
+      </div>
+      <FieldSwitchBlock
+        data-testid="workaload-form__active_allow_access-field"
+        nameField="workloadHostnameAllowAccess"
+        name="workloadHostnameAllowAccess"
+        auto
+        :isCard="false"
+        title="Allow Access"
+      />
     </template>
   </FormHorizontal>
 

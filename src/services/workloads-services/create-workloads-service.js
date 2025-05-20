@@ -26,12 +26,20 @@ const convertPortToInt = (ports) => {
 }
 
 const adapt = (payload) => {
+  const domains = []
+
+  if (payload.customHostname) {
+    const sufix = '.azion.app'
+    domains.push(`${payload.customHostname}${sufix}`)
+  }
+
   const dataRequest = {
     name: payload.name,
     alternate_domains: payload.cnames.split('\n').filter((item) => item !== ''),
     edge_application: payload.edgeApplication,
     edge_firewall: payload.edgeFirewall,
     active: payload.active,
+    workload_hostname_allow_access: payload.workloadHostnameAllowAccess,
     mtls: {
       verification: payload.mtlsVerification,
       certificate: payload.mtlsTrustedCertificate
@@ -44,7 +52,7 @@ const adapt = (payload) => {
         quic_ports: payload.useHttp3 ? convertPortToInt(payload.quicPort) : null
       }
     },
-    domains: [{ allow_access: !payload.cnameAccessOnly }],
+    domains,
     network_map: payload.environment,
     tls: {
       minimum_version: null

@@ -46,7 +46,9 @@ const fixtures = {
     edgeCertificate: 0,
     mtlsTrustedCertificate: 72395,
     minimumTlsVersion: 'tls_1_3',
-    supportedCiphers: 'TLSv1.2_2021'
+    supportedCiphers: 'TLSv1.2_2021',
+    workloadHostnameAllowAccess: false,
+    customHostname: 'www.testtes'
   }
 }
 
@@ -82,6 +84,7 @@ describe('DomainsServicesV4', () => {
         edge_application: fixtures.domainMock.edgeApplication,
         edge_firewall: fixtures.domainMock.edgeFirewall,
         active: fixtures.domainMock.active,
+
         tls: {
           ciphers: fixtures.domainMock.supportedCiphers,
           minimum_version: fixtures.domainMock.minimumTlsVersion
@@ -98,7 +101,8 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
+        workload_hostname_allow_access: fixtures.domainMock.workloadHostnameAllowAccess,
+        domains: [`${fixtures.domainMock.customHostname}.azion.app`],
         network_map: fixtures.domainMock.environment
       }
     })
@@ -144,7 +148,8 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
+        workload_hostname_allow_access: fixtures.domainMock.workloadHostnameAllowAccess,
+        domains: [`${fixtures.domainMock.customHostname}.azion.app`],
         network_map: fixtures.domainMock.environment
       }
     })
@@ -192,7 +197,8 @@ describe('DomainsServicesV4', () => {
           verification: fixtures.domainMock.mtlsVerification,
           certificate: fixtures.domainMock.mtlsTrustedCertificate
         },
-        domains: [{ allow_access: !fixtures.domainMock.cnameAccessOnly }],
+        workload_hostname_allow_access: fixtures.domainMock.workloadHostnameAllowAccess,
+        domains: [`${fixtures.domainMock.customHostname}.azion.app`],
         network_map: fixtures.domainMock.environment
       }
     })
