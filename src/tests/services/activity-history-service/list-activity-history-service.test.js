@@ -43,7 +43,7 @@ describe('ListActivityHistoryService', () => {
     const { sut } = makeSut()
     const token = 'token'
     const apiClient = graphQLApi(token)
-    await sut(apiClient)
+    await sut({ apiClient })
     const offSetEnd = new Date()
     const offSetStart = new Date(
       Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
