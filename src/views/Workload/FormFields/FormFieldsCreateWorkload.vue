@@ -116,7 +116,6 @@
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
-  const { value: cnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
@@ -491,14 +490,6 @@
           </template>
         </FieldInputGroup>
       </div>
-      <FieldSwitchBlock
-        data-testid="workaload-form__active_allow_access-field"
-        nameField="workloadHostnameAllowAccess"
-        name="workloadHostnameAllowAccess"
-        auto
-        :isCard="false"
-        title="Allow Access"
-      />
     </template>
   </FormHorizontal>
 
@@ -595,19 +586,17 @@
           </template>
         </FieldDropdownLazyLoader>
       </div>
-      <FieldSwitchBlock
-        data-testid="domains-form__cname-access-only-field"
-        nameField="cnameAccessOnly"
-        name="cnameAccessOnly"
-        auto
-        :isCard="false"
-        title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
-      />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldSwitchBlock
+          data-testid="workaload-form__active_allow_access-field"
+          nameField="workloadHostnameAllowAccess"
+          name="workloadHostnameAllowAccess"
+          auto
+          :isCard="false"
+          title="Allow Access"
+        />
         <FieldTextArea
           label="CNAME"
-          :required="cnameAccessOnly"
           name="cnames"
           data-testid="domains-form__cnames-field"
           rows="2"

@@ -17,7 +17,7 @@
     loadDigitalCertificateService,
     listDigitalCertificatesServiceDropdown
   } from '@/services/digital-certificates-services/v4'
-  import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateWorkload.vue'
   import { useRoute } from 'vue-router'
 
   defineOptions({
