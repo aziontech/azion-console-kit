@@ -253,7 +253,7 @@
   })
 
   watch(browserCacheSettings, (cacheSettings) => {
-    if (cacheSettings === 'no-cache') browserCacheSettingsMaximumTtl.value = 0
+    if (cacheSettings !== 'override') browserCacheSettingsMaximumTtl.value = 0
   })
 </script>
 
