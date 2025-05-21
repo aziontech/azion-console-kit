@@ -5,7 +5,9 @@ import { extractApiError } from '@/helpers/extract-api-error'
 
 export const createDigitalCertificatesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDigitalCertificatesBaseUrl()}`,
+    url: certificateTypeIsLetsEncrypt(payload)
+      ? `${makeDigitalCertificatesBaseUrl()}/request`
+      : `${makeDigitalCertificatesBaseUrl()}`,
     method: 'POST',
     body: adapt(payload)
   })
@@ -52,7 +54,20 @@ const validateCertificateFields = ({ certificate, privateKey }) => {
   }
 }
 
+const certificateTypeIsLetsEncrypt = (payload) => {
+  return payload.certificateType === 'lets_encrypt'
+}
+
 const adapt = (payload) => {
+  if (certificateTypeIsLetsEncrypt(payload)) {
+    return {
+      name: payload.digitalCertificateName,
+      challenge: payload.challenge,
+      authority: payload.certificateType,
+      common_name: payload.commonName,
+      alternative_names: [payload.alternativeNames]
+    }
+  }
   return {
     name: payload.digitalCertificateName,
     type: payload.certificateType,

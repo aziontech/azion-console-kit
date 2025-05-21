@@ -4,8 +4,10 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   defineProps({
     certificateSelection: String,
@@ -13,13 +15,26 @@
       type: Boolean
     }
   })
+
   const emit = defineEmits(['update:certificateSelection'])
 
   const certificateTypesMap = {
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
     EDGE_CERTIFICATE_CSR: 'generateCSR',
-    TRUSTED: 'trusted_ca_certificate'
+    TRUSTED: 'trusted_ca_certificate',
+    LETS_ENCRYPT: 'lets_encrypt'
   }
+
+  const challenges = [
+    {
+      value: 'http',
+      label: 'HTTP-01'
+    },
+    {
+      value: 'dns',
+      label: 'DNS-01'
+    }
+  ]
 
   const { value: digitalCertificateName } = useField('digitalCertificateName')
   const { value: certificateType } = useField('certificateType', null, {
@@ -37,14 +52,31 @@
   const { value: email } = useField('email')
   const { value: privateKeyType } = useField('privateKeyType')
   const { value: subjectAlternativeNames } = useField('subjectAlternativeNames')
+  const { value: challenge } = useField('challenge')
+  const { value: commonName } = useField('commonName')
+  const { value: alternativeNames } = useField('alternativeNames')
 
   const isCertificateType = computed(() => {
     return {
       edgeCertificateCSR: certificateType.value === certificateTypesMap.EDGE_CERTIFICATE_CSR,
       trustedCertificate: certificateType.value === certificateTypesMap.TRUSTED,
-      uploadCertificate: certificateType.value === certificateTypesMap.EDGE_CERTIFICATE_UPLOAD
+      uploadCertificate: certificateType.value === certificateTypesMap.EDGE_CERTIFICATE_UPLOAD,
+      letsEncrypt: certificateType.value === certificateTypesMap.LETS_ENCRYPT
     }
   })
+
+  const hasOptionsLetsEncrypt = () => {
+    if (!hasFlagBlockApiV4()) {
+      return [
+        {
+          title: `Create a Let's Encrypt™ digital certificate`,
+          subtitle: `Leverage the managed automatic renewal for Let's Encrypt issued certificates for your applications.`,
+          inputValue: certificateTypesMap.LETS_ENCRYPT
+        }
+      ]
+    }
+    return []
+  }
 
   const certificateTypeRadioOptions = [
     {
@@ -63,7 +95,8 @@
       subtitle:
         'Upload a certificate in PEM format that can be used for mutual Transport Layer Security (mTLS).',
       inputValue: certificateTypesMap.TRUSTED
-    }
+    },
+    ...hasOptionsLetsEncrypt()
   ]
 
   watch(certificateType, () => {
@@ -260,6 +293,53 @@
           name="certificate"
           :value="certificate"
           description="Intermediate certificates are accepted."
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Challenge Mode"
+    description="Select the challenge type for you certificate."
+    v-if="isCertificateType.letsEncrypt"
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldDropdown
+          label="Challenge"
+          required
+          name="challenge"
+          :options="challenges"
+          optionLabel="label"
+          optionValue="value"
+          :value="challenge"
+          appendTo="self"
+          description="Select the validation mode for your certificate. Wildcards and apex domain certificates must be set on DNS-01 mode."
+          data-testid="lets-encrypt-form__challenge-field"
+        />
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          label="Common Name"
+          required
+          name="commonName"
+          description="Your common hostname (eg.: www.[your domain].com)."
+          placeholder=""
+          :value="commonName"
+          data-testid="lets-encrypt-form__common-name-field"
+        />
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          data-testid="lets-encrypt-form__alternative-names-field"
+          label="Alternative Names"
+          placeholder=""
+          required
+          name="alternativeNames"
+          :value="alternativeNames"
+          description="Add other hostnames associated with this certificate. (eg.: api.[your domain].com)"
         />
       </div>
     </template>

@@ -80,7 +80,8 @@
   const certificateTypes = {
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
     EDGE_CERTIFICATE_CSR: 'generateCSR',
-    TRUSTED: 'trusted_ca_certificate'
+    TRUSTED: 'trusted_ca_certificate',
+    LETS_ENCRYPT: 'lets_encrypt'
   }
   const CSRConditionalValidations = {
     is: certificateTypes.EDGE_CERTIFICATE_CSR,
@@ -106,7 +107,8 @@
     email: '',
     privateKeyType: 'RSA (2048)',
     subjectAlternativeNames: '',
-    certificateType: 'edge_certificate'
+    certificateType: 'edge_certificate',
+    challenge: 'dns'
   })
 
   const certificateRequiredField = (certificateType) => {
@@ -155,7 +157,19 @@
     subjectAlternativeNames: yup
       .string()
       .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)')
+      .label('subject alternative names (SAN)'),
+    challenge: yup.string().when('certificateType', {
+      is: certificateTypes.LETS_ENCRYPT,
+      then: (schema) => schema.required('Challenge is a required field.')
+    }),
+    commonName: yup.string().when('certificateType', {
+      is: certificateTypes.LETS_ENCRYPT,
+      then: (schema) => schema.required('Common Name is a required field.')
+    }),
+    alternativeNames: yup.string().when('certificateType', {
+      is: certificateTypes.LETS_ENCRYPT,
+      then: (schema) => schema.required('Alternative Names is a required field.')
+    })
   })
 
   const navigateToDomains = () => {
