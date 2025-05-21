@@ -164,6 +164,7 @@
     name: '',
     environment: '1',
     edgeApplication: null,
+    customHostname: '',
     edgeFirewall: null,
     deliveryProtocol: 'https',
     workloadHostnameAllowAccess: false,
@@ -175,7 +176,6 @@
     useHttps: false,
     useHttp3: false,
     cnames: '',
-    cnameAccessOnly: true,
     mtlsIsEnabled: false,
     mtlsVerification: MTLS_VERIFICATION_ENFORCE,
     active: true
@@ -200,10 +200,6 @@
     cnames: yup
       .string()
       .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
-        then: (schema) => schema.required()
-      })
       .test({
         name: 'no-whitespace',
         message: `Space characters aren't allowed.`,
@@ -225,7 +221,6 @@
       then: (schema) => schema.min(1, 'At least one port is required'),
       otherwise: (schema) => schema.notRequired()
     }),
-    cnameAccessOnly: yup.boolean(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),

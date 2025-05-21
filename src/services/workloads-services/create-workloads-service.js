@@ -90,7 +90,7 @@ const parseHttpResponse = (httpResponse) => {
       return {
         feedback: 'Your workload has been created',
         urlToEditView: `/workloads/edit/${httpResponse.body.data.id}`,
-        domainName: httpResponse.body.data.domains[0].domain,
+        domainName: httpResponse.body.data.workload_hostname,
         id: parseInt(httpResponse.body.data.id)
       }
     case 500:

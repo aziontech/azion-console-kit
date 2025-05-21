@@ -1,6 +1,6 @@
 import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
-import { payloadRequestWorkload } from '../../fixtures/workload.js'
+import { payloadResponseWorkload } from '../../fixtures/workload.js'
 
 let edgeAppName
 let digitalCertificateName
@@ -104,6 +104,10 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
 
     cy.get(selectors.workload.useHttp3Field).click()
 
+    cy.get(selectors.workload.customHostname).type('testcustom')
+    cy.get(selectors.workload.cnamesField).type('www.testcustom.com')
+    cy.get(selectors.workload.workloadAllowAccess).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.workload.edgeApplicationField).click()
     cy.get(selectors.workload.createEdgeApplicationButton).click()
@@ -114,7 +118,6 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
 
-    cy.get(selectors.workload.cnameAccessOnlyField).click()
     cy.get(selectors.workload.digitalCertificateDropdown).click()
     cy.get(selectors.workload.createDigitalCertificateButton).click()
     createDigitalCertificateCase()
@@ -142,7 +145,7 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
 
     cy.intercept(
       { method: 'POST', url: '/api/v4/workspace/workloads' },
-      { body: payloadRequestWorkload, statusCode: 202 }
+      { body: payloadResponseWorkload, statusCode: 202 }
     ).as('createWorkload')
 
     cy.get(selectors.form.actionsSubmitButton).click()

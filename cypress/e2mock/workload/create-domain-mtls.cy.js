@@ -99,12 +99,15 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.get(selectors.workload.cipherSuite).click()
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
+    cy.get(selectors.workload.customHostname).type('testcustom')
+    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
+    cy.get(selectors.workload.workloadAllowAccess).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.workload.edgeApplicationField).click()
     cy.get(selectors.workload.edgeApplicationDropdownSearch).clear()
     cy.get(selectors.workload.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.workload.edgeApplicationOption).click()
-    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
     cy.get(selectors.workload.enableMtlsSwitch).click()
 
     cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
