@@ -270,7 +270,6 @@
               align="left"
               type="dashed"
             >
-
             </Divider>
             <PrimeButton
               @click="removePageFromList(index)"
