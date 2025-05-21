@@ -168,7 +168,7 @@
     }),
     alternativeNames: yup.string().when('certificateType', {
       is: certificateTypes.LETS_ENCRYPT,
-      then: (schema) => schema.required('Alternative Names is a required field.')
+      then: (schema) => schema.notRequired('')
     })
   })
 

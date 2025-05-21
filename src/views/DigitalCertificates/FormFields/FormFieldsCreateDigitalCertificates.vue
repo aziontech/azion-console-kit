@@ -336,10 +336,9 @@
           data-testid="lets-encrypt-form__alternative-names-field"
           label="Alternative Names"
           placeholder=""
-          required
           name="alternativeNames"
           :value="alternativeNames"
-          description="Add other hostnames associated with this certificate. (eg.: api.[your domain].com)"
+          description="Add other hostnames associated with this certificate. (eg.: api.[your domain].com) separated by new-lines"
         />
       </div>
     </template>
