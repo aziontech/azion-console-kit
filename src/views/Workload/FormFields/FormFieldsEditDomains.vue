@@ -2,6 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import MultiSelect from 'primevue/multiselect'
   import LabelBlock from '@/templates/label-block'
@@ -42,11 +43,10 @@
 
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
-  const { value: cnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: environment } = useField('environment')
-  const { value: domainName } = useField('domainName')
+  const { value: workloadHostname } = useField('workloadHostname')
   const { value: deliveryProtocol } = useField('deliveryProtocol')
   const { value: useHttps } = useField('useHttps')
   const { value: useHttp3 } = useField('useHttp3')
@@ -244,6 +244,93 @@
   </form-horizontal>
 
   <FormHorizontal
+    :isDrawer="isDrawer"
+    title="Domain"
+    :noBorder="noBorder"
+    data-testid="form-horizontal-custom-hostname"
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldInputGroup
+          placeholder="my-custom-name"
+          label="Custom Hostname"
+          name="customHostname"
+          data-testid="workload-custom-hostname-field"
+        >
+          <template #button>
+            <PrimeButton
+              label=".azion.app"
+              size="small"
+              outlined
+            />
+          </template>
+        </FieldInputGroup>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          label="CNAME"
+          name="cnames"
+          data-testid="workload-form__cnames-field"
+          placeholder="example.com&#10;example.example.com"
+          rows="2"
+          :value="cnames"
+          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
+        />
+      </div>
+      <div class="flex flex-col w-full gap-2">
+        <label
+          for="domainName"
+          class="text-color text-base font-medium"
+        >
+          Domain
+        </label>
+        <div
+          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3 items-start"
+        >
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+              <i class="pi pi-lock" />
+              <InputText
+                id="workloadHostname"
+                data-testid="edit-domains-form__domain-field__input"
+                v-model="workloadHostname"
+                type="text"
+                class="flex flex-col w-full"
+                :feedback="false"
+                disabled
+              />
+            </span>
+            <small class="text-xs text-color-secondary font-normal leading-5">
+              The domain URL attributed by Azion.
+            </small>
+          </div>
+          <PrimeButton
+            icon="pi pi-clone"
+            outlined
+            data-testid="edit-domains-form__domain-field__copy-button"
+            type="button"
+            aria-label="Copy to Clipboard"
+            label="Copy to Clipboard"
+            :disabled="!props.hasDomainName"
+            @click="$emit('copyDomainName', { name: domainName })"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldSwitchBlock
+          data-testid="workaload-form__active_allow_access-field"
+          nameField="workloadHostnameAllowAccess"
+          name="workloadHostnameAllowAccess"
+          auto
+          description="Allow Access to host name URL attributed by Azion."
+          :isCard="false"
+          title="Allow Access to Hostname"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
     title="Delivery Settings"
     description="Choose the protocols used between the edge application and users."
     data-testid="form-horizontal-delivery-settings"
@@ -431,49 +518,6 @@
       </div>
     </template>
   </FormHorizontal>
-
-  <form-horizontal
-    title="Domain"
-    description="The domain URL attributed by Azion."
-  >
-    <template #inputs>
-      <div class="flex flex-col w-full gap-2">
-        <label
-          for="domainName"
-          class="text-color text-base font-medium"
-        >
-          Domain
-        </label>
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock" />
-            <InputText
-              id="domainName"
-              data-testid="edit-domains-form__domain-field__input"
-              v-model="domainName"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              disabled
-            />
-          </span>
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            aria-label="Copy to Clipboard"
-            label="Copy to Clipboard"
-            :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: domainName })"
-          />
-        </div>
-      </div>
-    </template>
-  </form-horizontal>
-
   <form-horizontal
     title="Settings"
     description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
@@ -483,27 +527,6 @@
         ref="digitalCertificateDrawerRef"
         @onSuccess="onDigitalCertificateSuccess"
       />
-      <FieldSwitchBlock
-        nameField="cnameAccessOnly"
-        name="cnameAccessOnly"
-        auto
-        :isCard="false"
-        title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
-      />
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="CNAME"
-          data-testid="domains-form__cnames-field"
-          :required="cnameAccessOnly"
-          name="cnames"
-          rows="2"
-          :value="cnames"
-          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
-        />
-      </div>
-
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
           label="Digital Certificate"

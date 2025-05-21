@@ -6,7 +6,9 @@ const fixtures = {
   domainMock: {
     id: 1234,
     name: 'Edge App X',
-    domains: [{ domain: 'www.test.com', allow_access: false }],
+    workload_hostname: 'xxx.map.azionedge.net',
+    domains: ['meudomain.azion.app', 'meudominio2.azion.app'],
+    workload_hostname_allow_access: false,
     alternate_domains: ['CName 1', 'CName 2'],
     tls: {
       certificate: 1,
@@ -31,7 +33,9 @@ const fixtures = {
   domainMockHttp3: {
     id: 1234,
     name: 'Edge App X',
-    domains: [{ domain: 'www.test.com', allow_access: false }],
+    workload_hostname: 'xxx.map.azionedge.net',
+    domains: ['meudomain.azion.app', 'meudominio2.azion.app'],
+    workload_hostname_allow_access: false,
     alternate_domains: ['CName 1', 'CName 2'],
     tls: {
       certificate: 1,
@@ -96,9 +100,10 @@ describe('DomainServices', () => {
     expect(result).toEqual({
       id: fixtures.domainMock.id,
       name: fixtures.domainMock.name,
-      domainName: fixtures.domainMock.domains[0].domain,
+      workloadHostname: fixtures.domainMock.workload_hostname,
       cnames: 'CName 1\nCName 2',
-      cnameAccessOnly: !fixtures.domainMock.domains[0].allow_access,
+      customHostname: 'meudomain',
+      workloadHostnameAllowAccess: fixtures.domainMock.workload_hostname_allow_access,
       mtlsIsEnabled: true,
       active: fixtures.domainMock.active,
       mtlsVerification: fixtures.domainMock.mtls.verification,
@@ -144,9 +149,10 @@ describe('DomainServices', () => {
     expect(result).toEqual({
       id: fixtures.domainMock.id,
       name: fixtures.domainMock.name,
-      domainName: fixtures.domainMock.domains[0].domain,
+      workloadHostname: fixtures.domainMock.workload_hostname,
+      customHostname: 'meudomain',
       cnames: 'CName 1\nCName 2',
-      cnameAccessOnly: !fixtures.domainMock.domains[0].allow_access,
+      workloadHostnameAllowAccess: fixtures.domainMock.workload_hostname_allow_access,
       mtlsIsEnabled: false,
       active: fixtures.domainMock.active,
       mtlsVerification: fixtures.domainMock.mtls.verification,
@@ -183,9 +189,10 @@ describe('DomainServices', () => {
     expect(result).toEqual({
       id: fixtures.domainMockHttp3.id,
       name: fixtures.domainMockHttp3.name,
-      domainName: fixtures.domainMockHttp3.domains[0].domain,
+      workloadHostname: fixtures.domainMock.workload_hostname,
+      customHostname: 'meudomain',
       cnames: 'CName 1\nCName 2',
-      cnameAccessOnly: !fixtures.domainMockHttp3.domains[0].allow_access,
+      workloadHostnameAllowAccess: fixtures.domainMock.workload_hostname_allow_access,
       mtlsIsEnabled: true,
       active: fixtures.domainMockHttp3.active,
       mtlsVerification: fixtures.domainMockHttp3.mtls.verification,

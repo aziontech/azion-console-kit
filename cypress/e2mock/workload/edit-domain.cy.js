@@ -122,6 +122,9 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.cipherSuite).click()
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
+    cy.get(selectors.workload.customHostname).type('testcustom')
+
+
     cy.wait('@getEdgeFirewalls')
     cy.wait('@getEdgeApplicationList')
 

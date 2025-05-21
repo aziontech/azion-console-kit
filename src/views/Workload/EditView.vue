@@ -128,7 +128,8 @@
           return nameRegex.test(value)
         }
       ),
-    domainName: yup.string().required(),
+    workloadHostname: yup.string(),
+    workloadHostnameAllowAccess: yup.boolean(),
     httpsPort: yup.array().when('useHttps', {
       is: true,
       then: (schema) => schema.min(1, 'At least one port is required'),
