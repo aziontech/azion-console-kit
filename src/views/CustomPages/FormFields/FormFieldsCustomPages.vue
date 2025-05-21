@@ -7,10 +7,12 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import DrawerEdgeConnector from '@/views/EdgeConnectors/Drawer'
-  import { useField, useFieldArray } from 'vee-validate'
-  import { onMounted, ref } from 'vue'
-
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import { useField, useFieldArray } from 'vee-validate'
+  import { onMounted, ref, computed } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
 
   defineProps({
     listEdgeConnectorsService: {
@@ -120,6 +122,14 @@
   const { value: isDefault } = useField('isDefault')
   const { push: pushPage, remove: removePage, fields: pages } = useFieldArray('pages')
 
+  const PAGE_LIMIT = 20
+  const pageLimitStatus = computed(() => {
+    return {
+      isReached: pages.value.length >= PAGE_LIMIT,
+      isAlmostReached: pages.value.length === PAGE_LIMIT - 1
+    }
+  })
+
   const pageInitialState = {
     code: 400,
     ttl: 0,
@@ -129,6 +139,15 @@
   const drawerEdgeConntectorRef = ref()
 
   const addNewPage = () => {
+    if (pageLimitStatus.value.isAlmostReached) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: `You cannot add more than ${PAGE_LIMIT} pages`,
+        life: 3000
+      })
+    }
+
     pushPage(pageInitialState)
   }
 
@@ -208,19 +227,8 @@
         </FieldDropdownLazyLoader>
       </div>
 
-      <div class="w-full flex flex-col gap-2">
-        <FieldSwitchBlock
-          title="Active"
-          nameField="isActive"
-          name="isActive"
-          data-testid="custom-page__isActive-field"
-          :value="isActive"
-          auto
-          description="Enable or disable the custom page."
-          :isCard="false"
-        />
-      </div>
-      <div class="w-full flex flex-col gap-2">
+      <!-- TODO: remove hidden and add flex when API is good -->
+      <div class="w-full flex-col gap-2 hidden">
         <FieldSwitchBlock
           title="Default"
           nameField="isDefault"
@@ -262,7 +270,7 @@
               align="left"
               type="dashed"
             >
-              Custom Page
+
             </Divider>
             <PrimeButton
               @click="removePageFromList(index)"
@@ -344,8 +352,29 @@
           @click="addNewPage"
           data-testid="custom-page-form__add-button"
           label="Add Page"
+          :disabled="pageLimitStatus.isReached"
           outlined
           icon="pi pi-plus-circle"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Status"
+    description="Set the status of the custom page."
+  >
+    <template #inputs>
+      <div class="w-full flex flex-col gap-2">
+        <FieldSwitchBlock
+          title="Active"
+          nameField="isActive"
+          name="isActive"
+          data-testid="custom-page__isActive-field"
+          :value="isActive"
+          auto
+          description="Enable or disable the custom page."
+          :isCard="false"
         />
       </div>
     </template>
