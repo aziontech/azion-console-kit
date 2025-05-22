@@ -194,11 +194,11 @@
 
   const environmentOptionsRadios = ref([
     {
-      title: 'Global Edge Network',
+      title: 'Production Infrastructure (All Edge Locations)',
       inputValue: '1'
     },
     {
-      title: 'Staging Network',
+      title: 'Staging Infrastructure',
       inputValue: '2'
     }
   ])
@@ -239,7 +239,7 @@
 
 <template>
   <form-horizontal
-    description="Create a workload with Azion to launch an edge application and set up security with digital certificates."
+    description="Create a workload with Azion to launch an Edge Application and set up security with digital certificates."
     :isDrawer="isDrawer"
     :noBorder="noBorder"
   >
@@ -261,8 +261,8 @@
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"
-    title="Environment Type"
-    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment"
+    title="Infrastructure"
+    description="Select the infrastructure where your Workload will be deployed. Each infrastructure option defines the regions, resources, and isolation level available for running your Workloads, allowing you to choose the most suitable environment for your specific use case."
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
@@ -278,9 +278,9 @@
 
   <FormHorizontal
     :isDrawer="isDrawer"
-    title="Delivery Settings"
+    title="Protocols Settings"
     :noBorder="noBorder"
-    description="Choose the protocols used between the edge application and users."
+    description="Choose the protocols used between the Edge Application and users."
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
@@ -464,65 +464,11 @@
           </span>
         </div>
       </div>
-    </template>
-  </FormHorizontal>
-
-  <form-horizontal
-    :isDrawer="isDrawer"
-    :noBorder="noBorder"
-    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
-  >
-    <template #title> Settings </template>
-    <template #inputs>
-      <DrawerEdgeFirewall
-        ref="drawerEdgeFirewallRef"
-        @onSuccess="handleEdgeFirewallCreated"
-      />
-      <Drawer
-        ref="drawerRef"
-        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
-      />
-      <DigitalCertificatesDrawer
-        ref="digitalCertificateDrawerRef"
-        @onSuccess="onDigitalCertificateSuccess"
-      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
-          label="Edge Application"
-          required
-          data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
-          :service="listEdgeApplicationsDecorator"
-          :loadService="loadEdgeApplicationsService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeApplication"
-          :disabled="disabledEdgeApplicationDropdown"
-          appendTo="self"
-          placeholder="Select an edge application"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  data-testid="domains-form__create-edge-application-button"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Application"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeFirewall
+          ref="drawerEdgeFirewallRef"
+          @onSuccess="handleEdgeFirewallCreated"
+        />
         <FieldDropdownLazyLoader
           label="Edge Firewall"
           enableClearOption
@@ -537,7 +483,7 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select an Edge Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -560,27 +506,11 @@
           </template>
         </FieldDropdownLazyLoader>
       </div>
-      <FieldSwitchBlock
-        data-testid="domains-form__cname-access-only-field"
-        nameField="cnameAccessOnly"
-        name="cnameAccessOnly"
-        auto
-        :isCard="false"
-        title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
-      />
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="CNAME"
-          :required="cnameAccessOnly"
-          name="cnames"
-          data-testid="domains-form__cnames-field"
-          rows="2"
-          :value="cnames"
-          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
-        />
-      </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DigitalCertificatesDrawer
+          ref="digitalCertificateDrawerRef"
+          @onSuccess="onDigitalCertificateSuccess"
+        />
         <FieldDropdownLazyLoader
           data-testid="domains-form__edge-certificate-field"
           label="Digital Certificate"
@@ -615,8 +545,78 @@
         </FieldDropdownLazyLoader>
       </div>
     </template>
-  </form-horizontal>
+  </FormHorizontal>
 
+  <form-horizontal
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    description="Determine the Edge Application of the Workload. To link an existing Workload to an application, add it to the CNAME field and block access to the application via the Azion Workload."
+  >
+    <template #title> Application Settings </template>
+    <template #inputs>
+      <Drawer
+        ref="drawerRef"
+        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+      />
+
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <FieldDropdownLazyLoader
+          label="Edge Application"
+          required
+          data-testid="domains-form__edge-application-field"
+          name="edgeApplication"
+          :service="listEdgeApplicationsDecorator"
+          :loadService="loadEdgeApplicationsService"
+          optionLabel="name"
+          optionValue="value"
+          :value="edgeApplication"
+          :disabled="disabledEdgeApplicationDropdown"
+          appendTo="self"
+          placeholder="Select an Edge Application"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+      <FieldSwitchBlock
+        data-testid="domains-form__cname-access-only-field"
+        nameField="cnameAccessOnly"
+        name="cnameAccessOnly"
+        auto
+        :isCard="false"
+        title="CNAME Access Only"
+        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
+      />
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          label="CNAME"
+          :required="cnameAccessOnly"
+          name="cnames"
+          data-testid="domains-form__cnames-field"
+          rows="2"
+          :value="cnames"
+          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
+        />
+      </div>
+    </template>
+  </form-horizontal>
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"

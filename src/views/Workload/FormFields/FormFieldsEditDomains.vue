@@ -114,17 +114,17 @@
 
   const environmentOptions = computed(() => {
     const tag = {
-      value: 'The environment type cannot be changed after the domain is created',
+      value: 'The infrastructure cannot be changed after the Workload is created',
       icon: 'pi pi-lock'
     }
     const environmentOptionsRadios = [
       {
-        title: 'Global Edge Network',
+        title: 'Production Infrastructure (All Edge Locations)',
         inputValue: '1',
         disabled: true
       },
       {
-        title: 'Staging Network',
+        title: 'Staging Infrastructure',
         inputValue: '2',
         disabled: true
       }
@@ -202,7 +202,7 @@
   </InlineMessage>
   <form-horizontal
     title="General"
-    description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
+    description="Check the details of the Azion Workload, including the domain address to access the application, and modify digital certificate options."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -210,17 +210,17 @@
           label="Name"
           required
           name="name"
-          placeholder="My domain"
+          placeholder="My workload"
           :value="name"
-          description="Give a unique and descriptive name to identify the domain."
+          description="Give a unique and descriptive name to identify the Workload."
         />
       </div>
     </template>
   </form-horizontal>
 
   <form-horizontal
-    title="Environment Type"
-    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment"
+    title="Infrastructure"
+    description="Select the infrastructure where your Workload will be deployed. Each infrastructure option defines the regions, resources, and isolation level available for running your Workloads, allowing you to choose the most suitable environment for your specific use case."
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
@@ -244,8 +244,8 @@
   </form-horizontal>
 
   <FormHorizontal
-    title="Delivery Settings"
-    description="Choose the protocols used between the edge application and users."
+    title="Protocols Settings"
+    description="Choose the protocols used between the Edge Application and users."
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
@@ -429,6 +429,44 @@
           </span>
         </div>
       </div>
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DigitalCertificatesDrawer
+          ref="digitalCertificateDrawerRef"
+          @onSuccess="onDigitalCertificateSuccess"
+        />
+        <FieldDropdownLazyLoader
+          label="Digital Certificate"
+          name="edgeCertificate"
+          data-testid="domains-form__digital-certificates-field"
+          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
+          optionLabel="name"
+          optionValue="value"
+          :value="edgeCertificate"
+          appendTo="self"
+          placeholder="Select a certificate"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
     </template>
   </FormHorizontal>
 
@@ -475,14 +513,10 @@
   </form-horizontal>
 
   <form-horizontal
-    title="Settings"
-    description="Determine the edge application of the workload and its digital certificate. To link an existing workload to an application, add it to the CNAME field and block access to the application via the Azion workload."
+    title="Application Settings"
+    description="To link an existing Workload to a CNAME, add it to the CNAME field and block access to the application via the Azion Workload."
   >
     <template #inputs>
-      <DigitalCertificatesDrawer
-        ref="digitalCertificateDrawerRef"
-        @onSuccess="onDigitalCertificateSuccess"
-      />
       <FieldSwitchBlock
         nameField="cnameAccessOnly"
         name="cnameAccessOnly"
@@ -502,41 +536,6 @@
           :value="cnames"
           description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
         />
-      </div>
-
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
-          label="Digital Certificate"
-          name="edgeCertificate"
-          data-testid="domains-form__digital-certificates-field"
-          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeCertificate"
-          appendTo="self"
-          placeholder="Select a certificate"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDigitalCertificateDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-digital-certificate-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Digital Certificate"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>
