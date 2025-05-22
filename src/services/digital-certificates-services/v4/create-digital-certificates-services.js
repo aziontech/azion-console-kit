@@ -65,7 +65,7 @@ const adapt = (payload) => {
       challenge: payload.challenge,
       authority: payload.certificateType,
       common_name: payload.commonName,
-      alternative_names: payload.alternativeNames.split(/\s+/) ?? []
+      alternative_names: payload.alternativeNames ? payload.alternativeNames.split(/\s+/) : []
     }
   }
   return {
