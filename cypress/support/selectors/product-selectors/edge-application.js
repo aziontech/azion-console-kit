@@ -9,8 +9,8 @@ export default {
       `[data-testid="form-horizontal-modules-default-switch__switch-${moduleName}__switch"] > .p-inputswitch-slider`,
     l2CachingSwitch:
       '[data-testid="form-horizontal-modules-subscription-switch__switch-l2Caching__switch"] > .p-inputswitch-slider',
-    tieredCacheEnabled: '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
-
+    tieredCacheEnabled:
+      '[data-testid="form-horizontal-modules-subscription-switch__switch-tieredCacheEnabled"]'
   },
   accordionStepEdgeConnector: {
     createEdgeConnector: '[data-testid="create-edge-connector-accordion"]',
@@ -19,11 +19,13 @@ export default {
   },
   accordionStepCache: {
     createCache: '[data-testid="create-cache-accordion"]',
-    browserCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
-    cdnCacheSettings: '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
+    browserCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings__radio__browserCacheSettings-radio-0"]',
+    cdnCacheSettings:
+      '[data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings__radio__cdnCacheSettings-radio-0"]'
   },
   accordionStepDomain: {
-    createDomain: '[data-testid="create-domain-accordion"]',
+    createDomain: '[data-testid="create-domain-accordion"]'
   },
   deviceGroups: {
     createButton: '[data-testid="create-device-group-button"]',
@@ -85,7 +87,8 @@ export default {
     reviewChanges: '[data-testid="rules-engine-save-order-button"] > .p-button-label',
     reviewChangesModal: '[data-testid="review-changes-dialog-warning-message-details"]',
     saveReorder: '[data-testid="review-changes-dialog-footer-delete-button"] > .p-button-label',
-    edgeConnectorsDropdown: '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
+    edgeConnectorsDropdown:
+      '[data-testid="edge-application-rule-form__edge-connector-item[0]__dropdown"]',
     edgeConnectorsDropdownItem: '#behaviors\\[0\\]\\.edgeConnectorId_0'
   },
   origins: {
@@ -111,6 +114,10 @@ export default {
   cacheSettings: {
     tieredCacheRegionDropdown:
       '[data-testid="edge-application-cache-settings-form__tiered-caching-region-field__dropdown"]',
+    overrideCacheSettings:
+      '[data-testid="edge-application-cache-settings-form__browser-cache-settings-field__radio__browserCacheSettings-radio-1"]',
+    honorCacheSettings:
+      '[data-testid="edge-application-cache-settings-form__browser-cache-settings-field__radio__browserCacheSettings-radio-0"]',
     largeFileOptimizationSwitch:
       '[data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field__switch"] > .p-inputswitch-slider',
     tieredCacheRegionOption: (option) => `#l2Region_${option}`,

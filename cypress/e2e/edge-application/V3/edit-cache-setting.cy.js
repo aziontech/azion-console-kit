@@ -35,7 +35,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
     cy.intercept('GET', '/api/account/info', {
-        fixture: '/account/info/domain_flags.json'
+      fixture: '/account/info/domain_flags.json'
     }).as('accountInfo')
     // Login
     cy.login()
@@ -128,6 +128,36 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       expect(req.body.slice_controls).to.have.property('slice_configuration_enabled', false)
       expect(req.body.slice_controls).to.have.property('slice_edge_caching_enabled', false)
       expect(req.body.slice_controls).to.have.property('slice_tiered_caching_enabled', false)
+    }).as('updateCacheSetting')
+    cy.get(selectors.form.actionsSubmitButton).click()
+
+    // Assert
+    cy.verifyToast('success', 'Cache Settings successfully edited')
+    cy.wait('@updateCacheSetting')
+  })
+  it('should be possible to edit override cache settings to honor', () => {
+    // Act
+    // Create a cache setting
+    cy.get(selectors.edgeApplication.tabs('Cache Settings')).click()
+    cy.get(selectors.edgeApplication.cacheSettings.createButton).click()
+
+    cy.get(selectors.edgeApplication.cacheSettings.overrideCacheSettings).click()
+    cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
+
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast('success', 'Cache Settings successfully created')
+
+    cy.get(selectors.list.searchInput).type(`${fixtures.cacheSettingName}{enter}`)
+
+    cy.get(selectors.list.filteredRow.column('name')).should('have.text', fixtures.cacheSettingName)
+
+    // Edit the cache setting
+    cy.get(selectors.list.filteredRow.column('name')).click()
+    cy.wait('@loadCacheSetting')
+
+    cy.get(selectors.edgeApplication.cacheSettings.honorCacheSettings).click()
+    cy.intercept('PUT', '/api/v4/edge_application/applications/*/cache_settings/*', (req) => {
+      expect(req.body.browser_cache).to.not.have.property('max_age')
     }).as('updateCacheSetting')
     cy.get(selectors.form.actionsSubmitButton).click()
 
