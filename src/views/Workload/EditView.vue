@@ -32,7 +32,7 @@
   import { ref, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
+  import FormFieldsEditDomains from './FormFields/FormFieldsEditWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
