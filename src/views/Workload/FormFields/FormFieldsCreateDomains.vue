@@ -280,7 +280,7 @@
     :isDrawer="isDrawer"
     title="Protocols Settings"
     :noBorder="noBorder"
-    description="Choose the protocols used between the Edge Application and users."
+    description="Choose the protocols used between Azion and it's users"
     data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
