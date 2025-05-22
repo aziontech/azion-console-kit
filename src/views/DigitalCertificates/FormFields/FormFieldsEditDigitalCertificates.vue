@@ -33,6 +33,7 @@
   const { value: managed } = useField('managed')
   const { value: privateKey } = useField('privateKey')
   const { value: challenge } = useField('challenge')
+  const { value: authority } = useField('authority')
 
   async function copyCSRToclipboard() {
     await props.clipboardWrite(csr.value)
@@ -46,7 +47,7 @@
     return {
       edgeCertificate: !csr.value && certificateType.value === certificateTypes.EDGE_CERTIFICATE,
       trustedCertificate: certificateType.value === certificateTypes.TRUSTED,
-      letsEncrypt: certificateType.value === certificateTypes.LETS_ENCRYPT
+      letsEncrypt: authority.value === certificateTypes.LETS_ENCRYPT
     }
   })
 
@@ -61,7 +62,10 @@
       <template #description>
         <p>This is a Let's Encrypt™ certificate automatically created and managed by Azion.</p>
 
-        <div v-if="isChallengeNotHttp()">
+        <div
+          v-if="isChallengeNotHttp()"
+          class="flex flex-col gap-4"
+        >
           <p>
             Azion's Certificate Manager is currently verifying if the Domain is correctly pointed by
             CNAME in the DNS.
@@ -89,7 +93,7 @@
           <FieldText
             label="Name *"
             name="name"
-            disabled
+            :disabled="!isCertificateType.letsEncrypt"
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
