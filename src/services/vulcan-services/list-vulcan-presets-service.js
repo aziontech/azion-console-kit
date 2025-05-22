@@ -1,10 +1,30 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeProjectSamplesBaseUrl } from './make-project-samples-base-url'
 export const listVulcanPresetsService = async () => {
-  const httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeProjectSamplesBaseUrl()}`,
-    method: 'GET'
-  })
+  const mockPresets = [
+    {
+      label: 'Next.js',
+      value: 'next'
+    },
+    {
+      label: 'Angular',
+      value: 'angular'
+    },
+    {
+      label: 'Astro',
+      value: 'astro'
+    },
+    {
+      label: 'Hexo',
+      value: 'hexo'
+    },
+    {
+      label: 'React',
+      value: 'react'
+    },
+    {
+      label: 'Vue',
+      value: 'vue'
+    }
+  ]
 
-  return parseHttpResponse(httpResponse)
+  return Promise.resolve(mockPresets)
 }
