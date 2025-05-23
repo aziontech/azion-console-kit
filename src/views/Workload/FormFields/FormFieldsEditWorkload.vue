@@ -18,8 +18,8 @@
     loadCustomPagesService: { type: Function, required: true }
   })
 
-  const handleListCustomPages = async () => {
-    return await props.listCustomPagesService({ fields: ['id', 'name'] })
+  const handleListCustomPages = async (query) => {
+    return await props.listCustomPagesService({ ...query, fields: ['id', 'name'] })
   }
 
   defineOptions({ name: 'form-fields-variables' })
