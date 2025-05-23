@@ -21,7 +21,8 @@
 
   const certificateTypes = {
     EDGE_CERTIFICATE: 'edge_certificate',
-    TRUSTED: 'trusted_ca_certificate'
+    TRUSTED: 'trusted_ca_certificate',
+    LETS_ENCRYPT: 'lets_encrypt'
   }
 
   const csrCopied = ref(false)
@@ -31,6 +32,8 @@
   const { value: certificateType } = useField('type')
   const { value: managed } = useField('managed')
   const { value: privateKey } = useField('privateKey')
+  const { value: challenge } = useField('challenge')
+  const { value: authority } = useField('authority')
 
   async function copyCSRToclipboard() {
     await props.clipboardWrite(csr.value)
@@ -43,36 +46,46 @@
   const isCertificateType = computed(() => {
     return {
       edgeCertificate: !csr.value && certificateType.value === certificateTypes.EDGE_CERTIFICATE,
-      trustedCertificate: certificateType.value === certificateTypes.TRUSTED
+      trustedCertificate: certificateType.value === certificateTypes.TRUSTED,
+      letsEncrypt: authority.value === certificateTypes.LETS_ENCRYPT
     }
   })
+
+  const isChallengeNotHttp = () => {
+    return challenge.value !== 'http'
+  }
 </script>
 
 <template>
-  <template v-if="managed">
+  <template v-if="managed || isCertificateType.letsEncrypt">
     <FormHorizontal title="Let's encrypt certificate">
       <template #description>
         <p>This is a Let's Encrypt™ certificate automatically created and managed by Azion.</p>
 
-        <p>
-          Azion's Certificate Manager is currently verifying if the Domain is correctly pointed by
-          CNAME in the DNS.
-        </p>
-
-        <Divider />
-
-        <div class="flex flex-wrap items-center">
+        <div
+          v-if="isChallengeNotHttp()"
+          class="flex flex-col gap-4"
+        >
           <p>
-            If you have not yet pointed a DNS zone, please check the
-            <PrimeButton
-              link
-              class="w-fit p-0 text-sm"
-              icon-pos="right"
-              icon="pi pi-external-link"
-              label="Documentation"
-              @click="openDocumentation"
-            />
+            Azion's Certificate Manager is currently verifying if the Domain is correctly pointed by
+            CNAME in the DNS.
           </p>
+
+          <Divider />
+
+          <div class="flex flex-wrap items-center">
+            <p>
+              If you have not yet pointed a DNS zone, please check the
+              <PrimeButton
+                link
+                class="w-fit p-0 text-sm"
+                icon-pos="right"
+                icon="pi pi-external-link"
+                label="Documentation"
+                @click="openDocumentation"
+              />
+            </p>
+          </div>
         </div>
       </template>
       <template #inputs>
@@ -80,7 +93,7 @@
           <FieldText
             label="Name *"
             name="name"
-            disabled
+            :disabled="!isCertificateType.letsEncrypt"
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
