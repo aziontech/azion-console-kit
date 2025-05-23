@@ -79,7 +79,7 @@
     'edge_application',
     'active',
     'alternate_domains',
-    'domains',
+    'workload_hostname',
     'product_version'
   ]
 
