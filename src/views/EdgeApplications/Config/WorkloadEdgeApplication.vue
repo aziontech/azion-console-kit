@@ -12,7 +12,6 @@
         noBorder
         :listEdgeFirewallService="listEdgeFirewallService"
         :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="listDigitalCertificatesService"
         :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
@@ -44,10 +43,6 @@
       required: true
     },
     loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
       type: Function,
       required: true
     },

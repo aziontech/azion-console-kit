@@ -10,6 +10,23 @@ const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
   const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
+  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'production' ? false : true
+
+  const createProxyConfig = ({ target, rewrite = null}) => ({
+    target,
+    changeOrigin: true,
+    rewrite,
+    configure: (proxy, options) => {
+      if (DEBUG_PROXY) {
+        proxy.on('proxyReq', (proxyReq, req) => {
+          const originalUrl = `https://${req.headers.host}${req.url}`
+          const targetUrl = options.target
+          const proxiedUrl = `${targetUrl}${req.url}`
+          console.log(`[Vite Proxy] ${req.method} ${originalUrl} => ${proxiedUrl}`)
+        })
+      }
+    }
+  })
 
   return {
     plugins: [
@@ -34,75 +51,62 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/marketplace': {
+        '^/api/marketplace': createProxyConfig({
           target: `${URLStartPrefix}marketplace.azion.com/`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '/marketplace/api')
-        },
-        '^/api/script-runner': {
+        }),
+        '^/api/script-runner': createProxyConfig({
           target: `${URLStartPrefix}script-runner.azion.com/`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '/script-runner/api')
-        },
-        '^/api/template-engine': {
+        }),
+        '^/api/template-engine': createProxyConfig({
           target: `${URLStartPrefix}template-engine.azion.com/`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/template-engine/, '/template-engine/api')
-        },
-        '^/api/iam': {
+        }),
+        '^/api/iam': createProxyConfig({
           target: `${URLStartPrefix}iam-api.azion.net/`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/iam/, '/iam/api')
-        },
-        '^/api/vcs': { 
+        }),
+        '^/api/vcs': createProxyConfig({
           target: `${URLStartPrefix}vcs-api.azion.net/`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
-        },
-        '/graphql/cities': {
+        }),
+        '/graphql/cities': createProxyConfig({
           target: `${URLStartPrefix}cities.azion.${DomainSuffix}`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
-        },
-        '/api/webhook/console_feedback': {
-          target: `https://automate.azion.net/`,
-          changeOrigin: true,
+        }),
+        '/api/webhook/console_feedback': createProxyConfig({
+          target: 'https://automate.azion.net/',
           rewrite: (path) => path.replace(/^\/api/, '')
-        },
-        '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
+        }),
+        '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': createProxyConfig({
           target: `${URLStartPrefix}sso.azion.com`,
-          changeOrigin: true,
           cookieDomainRewrite: { '*': '' }
-        },
-        '/api': {
+        }),
+        '/api': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
-        },
-        '/v4': {
+        }),
+        '/v4': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true
-        },
-        '/webpagetest': {
-          target: `https://www.azion.com/api/webpagetest`,
-          changeOrigin: true,
+        }),
+        '/webpagetest': createProxyConfig({
+          target: 'https://www.azion.com/api/webpagetest',
           rewrite: (path) => path.replace(/^\/webpagetest/, '')
-        },
-        '/webpagetest-external': {
-          target: `https://www.azion.com/api/webpagetest`,
-          changeOrigin: true,
+        }),
+        '/webpagetest-external': createProxyConfig({
+          target: 'https://www.azion.com/api/webpagetest',
           rewrite: (path) => path.replace(/^\/webpagetest-external/, '')
-        },
-        '/ai': {
+        }),
+        '/ai': createProxyConfig({
           target: `${URLStartPrefix}ai.azion.com/copilot/chat/completions`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ai/, '')
-        },
-        '/graphql/accounting': {
+        }),
+        '/graphql/accounting': createProxyConfig({
           target: `${URLStartPrefix}console.azion.com`,
-          changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/accounting/, '/accounting/graphql')
-        }
+        })
       }
     }
   }

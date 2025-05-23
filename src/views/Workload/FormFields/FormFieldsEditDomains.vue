@@ -16,6 +16,7 @@
   import { computed, ref, watch } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import { INFORMATION_TEXTS } from '@/helpers'
+  import { digitalCertificatesService } from '@/services/v2'
 
   const props = defineProps({
     digitalCertificates: {
@@ -26,10 +27,6 @@
       type: Boolean,
       required: false,
       default: false
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
     },
     loadDigitalCertificatesService: {
       type: Function,
@@ -175,20 +172,20 @@
     edgeCertificate.value = id
   }
 
-  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: EDGE_CERTIFICATE,
+  const listDigitalCertificatesByType = async (type, queryParams) => {
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
+      type,
       fields: ['id,name'],
       ...queryParams
     })
   }
 
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return await listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
+  }
+
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: TRUSTED_CA_CERTIFICATE,
-      fields: ['id,name'],
-      ...queryParams
-    })
+    return await listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
 </script>
 

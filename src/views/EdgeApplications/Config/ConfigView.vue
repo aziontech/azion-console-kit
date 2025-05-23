@@ -90,7 +90,6 @@
             <WorkloadEdgeApplication
               :listEdgeFirewallService="props.workloadService.listEdgeFirewallService"
               :loadEdgeFirewallService="props.workloadService.loadEdgeFirewallService"
-              :listDigitalCertificatesService="props.workloadService.listDigitalCertificatesService"
               :loadDigitalCertificatesService="props.workloadService.loadDigitalCertificateService"
               :loadEdgeApplicationsService="props.workloadService.loadEdgeApplicationsService"
               :listEdgeApplicationsService="props.workloadService.listEdgeApplicationsService"

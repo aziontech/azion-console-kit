@@ -6,7 +6,7 @@
   import {
     createDigitalCertificatesService,
     createDigitalCertificatesCSRService
-  } from '@/services/digital-certificates-services'
+  } from '@/services/digital-certificates-services/v4'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 

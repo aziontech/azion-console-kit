@@ -12,7 +12,6 @@ export const digitalCertificatesRoutes = {
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
       props: {
-        listDigitalCertificatesService: DigitalCertificatesServiceV4.listDigitalCertificatesService,
         deleteDigitalCertificatesService:
           DigitalCertificatesServiceV4.deleteDigitalCertificatesService,
         documentationService: Helpers.documentationCatalog.digitalCertificates
@@ -55,7 +54,6 @@ export const digitalCertificatesRoutes = {
       component: () => import('@views/DigitalCertificates/EditView.vue'),
       props: {
         editDigitalCertificateService: DigitalCertificatesServiceV4.editDigitalCertificateService,
-        loadDigitalCertificateService: DigitalCertificatesServiceV4.loadDigitalCertificateService,
         updatedRedirect: 'list-digital-certificates',
         clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate

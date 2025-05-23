@@ -88,8 +88,6 @@ export const edgeApplicationRoutes = {
               EdgeApplicationServices.loadEdgeApplicationsDropdownService,
             listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
             loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-            listDigitalCertificatesService:
-              DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
             loadDigitalCertificatesService:
               DigitalCertificatesServicesV4.loadDigitalCertificateService
           },

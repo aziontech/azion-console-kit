@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listDigitalCertificatesService"
+        :listServiceV2="digitalCertificatesService.listDigitalCertificates"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"
@@ -43,6 +43,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { digitalCertificatesService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -50,10 +51,6 @@
   defineOptions({ name: 'digital-certificates-view' })
 
   const props = defineProps({
-    listDigitalCertificatesService: {
-      required: true,
-      type: Function
-    },
     deleteDigitalCertificatesService: {
       required: true,
       type: Function

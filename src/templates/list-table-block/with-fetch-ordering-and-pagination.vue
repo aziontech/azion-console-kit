@@ -356,6 +356,9 @@
       required: true,
       type: Function
     },
+    listServiceV2: {
+      type: Function
+    },
     enableEditClick: {
       type: Boolean,
       default: true
@@ -585,6 +588,25 @@
           emit('on-load-data', !!hasData)
         }
         firstLoadData.value = false
+      }
+    }
+    if (props.listServiceV2) {
+      try {
+        isLoading.value = true
+        const { body, count } = await props.listServiceV2({ page, ...query })
+        data.value = body
+        totalRecords.value = count
+      } catch (error) {
+        error.message.forEach((error) => {
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'error',
+            detail: error.message || error
+          })
+        })
+      } finally {
+        isLoading.value = false
       }
     }
   }

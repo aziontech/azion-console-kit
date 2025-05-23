@@ -15,7 +15,6 @@
   } from '@/services/edge-firewall-services/v4'
   import {
     loadDigitalCertificateService,
-    listDigitalCertificatesServiceDropdown
   } from '@/services/digital-certificates-services/v4'
   import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateDomains.vue'
   import { useRoute } from 'vue-router'
@@ -162,7 +161,6 @@
       <FormFieldsCreateDomains
         :listEdgeFirewallService="listEdgeFirewallService"
         :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="listDigitalCertificatesServiceDropdown"
         :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"

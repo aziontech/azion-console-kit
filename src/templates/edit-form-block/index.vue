@@ -35,6 +35,10 @@
     disableAfterCreateToastFeedback: {
       type: Boolean,
       default: false
+    },
+    serviceV2: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -107,8 +111,9 @@
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
-      emit('on-load-fail', error)
-      showToast('error', error)
+      const messages = props.serviceV2 ? error.message : [error]
+      messages.forEach(message => showToast('error', message))
+      emit('on-load-fail', messages[0])
       goBackToList()
     }
   }
@@ -118,7 +123,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('success', feedback ?? 'edited successfully')
+          showToast('success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)

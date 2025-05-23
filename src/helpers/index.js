@@ -47,8 +47,10 @@ import { buildSummary } from './build-summary'
 import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
 import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
+const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
 
 export {
+  checkIfFieldExist,
   InviteSession,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,

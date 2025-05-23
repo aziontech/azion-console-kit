@@ -6,7 +6,7 @@
     <template #content>
       <EditFormBlock
         :editService="props.editDigitalCertificateService"
-        :loadService="props.loadDigitalCertificateService"
+        :loadService="digitalCertificatesService.loadDigitalCertificate"
         :schema="validationSchema"
         :updatedRedirect="props.updatedRedirect"
         @on-edit-success="handleTrackSuccessEdit"
@@ -40,15 +40,12 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-
+  import { digitalCertificatesService } from '@/services/v2'
+  
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    loadDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
     editDigitalCertificateService: {
       type: Function,
       required: true

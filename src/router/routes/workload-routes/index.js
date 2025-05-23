@@ -42,8 +42,6 @@ export const workloadRoutes = {
         listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
         loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService:
-          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
@@ -71,8 +69,6 @@ export const workloadRoutes = {
           loadDomainService: WorkloadServices.loadWorkloadService,
           updatedRedirect: `list-workloads`,
           clipboardWrite: Helpers.clipboardWrite,
-          listDigitalCertificatesService:
-            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
           loadDigitalCertificatesService:
             DigitalCertificatesServicesV4.loadDigitalCertificateService
         },
