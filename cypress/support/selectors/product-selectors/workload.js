@@ -30,6 +30,7 @@ export default {
     digitalCertificateDropdownFilter:
       '[data-testid="domains-form__edge-certificate-field__dropdown-filter-input"]',
     createDigitalCertificateButton: '[data-testid="domains-form__create-digital-certificate-button"]',
+    createDigitalCertificateTrustedButton: '[data-testid="domains-form__create-digital-certificate-trusted-button"]',
     digitalCertificateActionBar: '[data-testid="digital-certificates-drawer__action-bar"]',
     edgeFirewallActionBar: '[data-testid="edge-firewall-drawer__action-bar"]',
     cnameAccessOnlyField: '[data-testid="domains-form__cname-access-only-field"]',

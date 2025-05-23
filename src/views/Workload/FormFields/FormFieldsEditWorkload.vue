@@ -55,48 +55,14 @@
 <template>
   <FormHorizontal
     title="Deployment Settings"
-    description="Select the edge application and edge firewall to be associated with the domain."
+    description="Select the Edge Application and Edge Firewall to be associated with the Workload."
   >
     <template #inputs>
       <Drawer
         ref="drawerRef"
         @onEdgeApplicationCreated="handleEdgeApplicationCreated"
       />
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
-          label="Edge Application"
-          required
-          data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
-          :service="listEdgeApplicationsService"
-          :loadService="loadEdgeApplicationsService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeApplication"
-          appendTo="self"
-          placeholder="Select an edge application"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-application-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Application"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
+
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <DrawerEdgeFirewall
           ref="drawerEdgeFirewallRef"
@@ -113,7 +79,7 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          placeholder="Select an edge firewall"
+          placeholder="Select an Edge Firewall"
         >
           <template #footer>
             <ul class="p-2">
@@ -130,6 +96,41 @@
                     root: { class: 'p-2' }
                   }"
                   label="Create Edge Firewall"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <FieldDropdownLazyLoader
+          label="Edge Application"
+          required
+          data-testid="domains-form__edge-application-field"
+          name="edgeApplication"
+          :service="listEdgeApplicationsService"
+          :loadService="loadEdgeApplicationsService"
+          optionLabel="name"
+          optionValue="value"
+          :value="edgeApplication"
+          appendTo="self"
+          placeholder="Select an Edge Application"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-edge-application-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Edge Application"
                 />
               </li>
             </ul>

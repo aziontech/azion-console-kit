@@ -7,9 +7,12 @@
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
 
-  defineProps({
+  const props = defineProps({
     certificateSelection: String,
     isDrawer: {
+      type: Boolean
+    },
+    useOnlyTrustedCa: {
       type: Boolean
     }
   })
@@ -22,9 +25,7 @@
   }
 
   const { value: digitalCertificateName } = useField('digitalCertificateName')
-  const { value: certificateType } = useField('certificateType', null, {
-    initialValue: certificateTypesMap.EDGE_CERTIFICATE_UPLOAD
-  })
+  const { value: certificateType } = useField('certificateType')
   const { value: certificate } = useField('certificate')
   const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
 
@@ -50,13 +51,15 @@
     {
       title: 'Import a server certificate',
       subtitle: 'Upload a TLS X.509 certificate and private key in PEM format.',
-      inputValue: certificateTypesMap.EDGE_CERTIFICATE_UPLOAD
+      inputValue: certificateTypesMap.EDGE_CERTIFICATE_UPLOAD,
+      disabled: props.useOnlyTrustedCa
     },
     {
       title: 'Request a certificate',
       subtitle:
         'Generate a Certificate Signing Request (CSR) to purchase a TLS digital certificate from a CA.',
-      inputValue: certificateTypesMap.EDGE_CERTIFICATE_CSR
+      inputValue: certificateTypesMap.EDGE_CERTIFICATE_CSR,
+      disabled: props.useOnlyTrustedCa
     },
     {
       title: 'Import a Trusted CA certificate',
@@ -72,6 +75,13 @@
 
     if (!isEdgeCertificateCSR) setPrivateKeyValue(undefined)
   })
+
+  watch(
+    () => props.useOnlyTrustedCa,
+    (newValue) => {
+      if (newValue) certificateType.value = certificateTypesMap.TRUSTED
+    }
+  )
 
   watch(privateKey, (privateKeyValue) => {
     if (privateKeyValue === '') setPrivateKeyValue(undefined)
