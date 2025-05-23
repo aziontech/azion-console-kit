@@ -42,12 +42,12 @@
     visibleOnSaved = unsavedStatus.visibleOnSaved
   }
 
-  let changeVisisbleDrawer, formDrawerHasUpdated
+  let changeVisibleDrawer, formDrawerHasUpdated
 
   if (props.isDrawer) {
     const unsavedStatus = inject('drawerUnsaved')
 
-    changeVisisbleDrawer = unsavedStatus.changeVisisbleDrawer
+    changeVisibleDrawer = unsavedStatus.changeVisibleDrawer
     formDrawerHasUpdated = unsavedStatus.formDrawerHasUpdated
   }
 
@@ -71,7 +71,7 @@
     } else if (props.isDrawer) {
       const toKeepDisplayingDrawer = false
       const resetForm = true
-      changeVisisbleDrawer(toKeepDisplayingDrawer, resetForm)
+      changeVisibleDrawer(toKeepDisplayingDrawer, resetForm)
       openDialogUnsaved(false)
     } else {
       unsavedDisabled.value = true

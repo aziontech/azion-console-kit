@@ -6,6 +6,9 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
+  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -25,8 +28,8 @@
 
   const RESOURCES = [
     {
-      label: 'Domains',
-      to: '/domains/create?origin=create',
+      label: `${handleTextDomainWorkload.pluralTitle}`,
+      to: `/${handleTextDomainWorkload.pluralLabel}/create?origin=create`,
       description: 'Launch an edge application and set up security with digital certificates.'
     },
     {
@@ -176,11 +179,17 @@
   }
 
   const loadRecommendedSolutions = async () => {
-    await loadSolutions({ group: 'recommended', type: accountStore.accountData.jobRole })
+    let type = accountStore.accountData.jobRole
+    if (!hasFlagBlockApiV4()) type = `${accountStore.accountData.jobRole}-v4`
+
+    await loadSolutions({ group: 'recommended', type })
   }
 
   const loadTemplates = async () => {
-    await loadSolutions({ group: 'templates', type: 'onboarding' })
+    let type = 'onboarding'
+    if (!hasFlagBlockApiV4()) type = 'onboarding-v4'
+
+    await loadSolutions({ group: 'templates', type })
   }
 
   const loadGithubImportSolution = async () => {

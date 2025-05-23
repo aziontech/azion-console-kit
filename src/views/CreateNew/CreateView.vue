@@ -85,9 +85,6 @@
         v-else
       >
         <TemplateEngineBlock
-          :postCallbackUrlService="props.postCallbackUrlService"
-          :listIntegrationsService="props.listIntegrationsService"
-          :listPlatformsService="props.listPlatformsService"
           @cancel="handleCancel"
           @submitClick="handleSubmitClick"
           @instantiate="handleInstantiate"
@@ -282,18 +279,6 @@
 
   const props = defineProps({
     getTemplateService: {
-      type: Function,
-      required: true
-    },
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
-    postCallbackUrlService: {
-      type: Function,
-      required: true
-    },
-    listIntegrationsService: {
       type: Function,
       required: true
     },

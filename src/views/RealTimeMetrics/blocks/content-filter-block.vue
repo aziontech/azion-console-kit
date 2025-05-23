@@ -88,7 +88,7 @@
         }))
       }
     })
-    FILTERS_RULES.sortFields(newOptions)
+    FILTERS_RULES().sortFields(newOptions)
     return newOptions
   })
 

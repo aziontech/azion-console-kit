@@ -73,7 +73,7 @@
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
   import { onClickOutside } from '@vueuse/core'
-  import { listWorkloadsService } from '@/services/workloads-services/list-workloads-service.js'
+  import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services/list-workloads-dynamic-fields-service.js'
 
   const AzionQueryLanguage = new Aql()
 
@@ -168,7 +168,7 @@
 
   const loaderDomainWorkloads = async () => {
     try {
-      const response = await listWorkloadsService({ fields: 'id,name' })
+      const response = await listWorkloadsDynamicFieldsService({ fields: 'id,name' })
       domains.value = response.results.map((el) => {
         return {
           label: el.name,

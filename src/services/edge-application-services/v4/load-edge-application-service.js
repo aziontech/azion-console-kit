@@ -4,7 +4,7 @@ import { extractApiError } from '@/helpers/extract-api-error'
 
 export const loadEdgeApplicationsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${id}?fields=id,name`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${id}`,
     method: 'GET'
   })
 
@@ -14,14 +14,23 @@ export const loadEdgeApplicationsService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
+  const edgeApplication = httpResponse.body?.data
+
   if (httpResponse.statusCode !== 200) {
     throw new Error(extractApiError({ body: httpResponse.body })).message
   }
 
-  const data = httpResponse.body?.data
   const parsedEdgeApplications = {
-    id: data.id,
-    name: data.name
+    id: edgeApplication.id,
+    name: edgeApplication.name,
+    edgeCacheEnabled: edgeApplication.modules.edge_cache_enabled,
+    edgeFunctionsEnabled: edgeApplication.modules.edge_functions_enabled,
+    applicationAcceleratorEnabled: edgeApplication.modules.application_accelerator_enabled,
+    imageProcessorEnabled: edgeApplication.modules.image_processor_enabled,
+    tieredCacheEnabled: edgeApplication.modules.tiered_cache_enabled,
+    isActive: edgeApplication.active,
+    debug: edgeApplication.debug,
+    productVersion: edgeApplication.product_version
   }
 
   return {
