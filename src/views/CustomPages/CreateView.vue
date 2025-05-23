@@ -56,7 +56,7 @@
     name: '',
     isActive: false,
     isDefault: false,
-    edgeConnectorId: 0,
+    edgeConnectorId: null,
     pages: []
   })
 
