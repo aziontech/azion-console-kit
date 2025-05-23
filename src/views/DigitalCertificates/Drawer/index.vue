@@ -13,6 +13,11 @@
   defineOptions({
     name: 'digital-certificates-drawer'
   })
+  const props = defineProps({
+    useOnlyTrustedCa: {
+      type: Boolean
+    }
+  })
   const emit = defineEmits(['onSuccess', 'onEdgeApplicationCreated'])
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -49,7 +54,9 @@
     email: '',
     privateKeyType: 'RSA (2048)',
     subjectAlternativeNames: '',
-    certificateType: 'edge_certificate'
+    certificateType: props.useOnlyTrustedCa
+      ? certificateTypes.TRUSTED
+      : certificateTypes.EDGE_CERTIFICATE_CSR
   })
 
   const certificateRequiredField = (certificateType) => {
@@ -162,6 +169,7 @@
       <FormFieldsCreateDigitalCertificates
         isDrawer
         v-model:certificate-selection="certificateSelection"
+        :useOnlyTrustedCa="useOnlyTrustedCa"
       />
     </template>
   </CreateDrawerBlock>

@@ -112,6 +112,7 @@
   ]
 
   const digitalCertificateDrawerRef = ref('')
+  const digitalCertificateTrustedDrawerRef = ref('')
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
@@ -137,6 +138,10 @@
 
   const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
+  }
+
+  const openDigitalCertificateTrustedDrawer = () => {
+    digitalCertificateTrustedDrawerRef.value.openCreateDrawer()
   }
 
   const handleEdgeFirewallClear = () => {
@@ -216,6 +221,10 @@
 
   const onDigitalCertificateSuccess = (domainId) => {
     edgeCertificate.value = domainId
+  }
+
+  const onDigitalCertificateTrustedSuccess = (domainId) => {
+    mtlsTrustedCertificate.value = domainId
   }
 
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
@@ -647,6 +656,11 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
+        <DigitalCertificatesDrawer
+          ref="digitalCertificateTrustedDrawerRef"
+          useOnlyTrustedCa
+          @onSuccess="onDigitalCertificateTrustedSuccess"
+        />
         <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"
@@ -660,7 +674,27 @@
           :value="mtlsTrustedCertificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
-        />
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateTrustedDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-trusted-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Trusted CA certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>
