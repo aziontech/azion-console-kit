@@ -25,7 +25,7 @@ const adapt = (httpResponse, certificateType, search) => {
   let parsedDigitalCertificates = httpResponse.body.results?.map((item) => {
     return {
       id: item.id,
-      name: item.name
+      name: `${item.name}${item?.status ? ` (${item.status})` : ''}`
     }
   })
 

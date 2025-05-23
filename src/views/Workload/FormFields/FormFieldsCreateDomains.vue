@@ -221,9 +221,17 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await props.listDigitalCertificatesService({
       type: EDGE_CERTIFICATE,
-      fields: ['id,name'],
+      fields: ['id,name,status'],
       ...queryParams
     })
+  }
+
+  const loadDigitalCertificatesServiceDecorator = async ({ id }) => {
+    const data = await props.loadDigitalCertificatesService({ id })
+    return {
+      id: data.id,
+      name: `${data.name}${data.status ? ` (${data.status})` : ''}`
+    }
   }
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
@@ -586,12 +594,13 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="loadDigitalCertificatesServiceDecorator"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
           appendTo="self"
           placeholder="Select a certificate"
+          description="Azion SAN certificate will be used for pending certificates until the issuance is complete."
         >
           <template #footer>
             <ul class="p-2">
