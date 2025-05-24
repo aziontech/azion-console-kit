@@ -56,6 +56,10 @@
     filter: {
       type: Boolean,
       default: false
+    },
+    editable: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -131,6 +135,7 @@
     v-if="props.label"
   />
   <Dropdown
+    :editable="props.editable"
     appendTo="self"
     :id="name"
     :name="props.name"

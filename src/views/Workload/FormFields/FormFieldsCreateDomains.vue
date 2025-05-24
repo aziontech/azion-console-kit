@@ -16,7 +16,7 @@
   import { ref, watch, computed } from 'vue'
 
   const props = defineProps({
-    digitalCertificates: {
+    digitalCertificates: { 
       type: Array,
       required: true
     },
@@ -98,17 +98,20 @@
   ]
   const TLS_VERSIONS_OPTIONS = [
     { label: 'None', value: 'null' },
-    { label: 'TLS 1.0', value: 'tls_1_0' },
-    { label: 'TLS 1.1', value: 'tls_1_1' },
-    { label: 'TLS 1.2', value: 'tls_1_2' },
-    { label: 'TLS 1.3', value: 'tls_1_3' }
+    { label: 'TLS v1.3 (Default)', value: 'tls_1_3' },
+    { label: 'TLS v1.2', value: 'tls_1_2' },
+    { label: 'TLS v1.1 (Deprecated)', value: 'tls_1_1' },
+    { label: 'TLS v1.0 (Deprecated)', value: 'tls_1_0' }
   ]
   const SUPPORTED_CIPHERS_LIST_OPTIONS = [
-    { label: 'All', value: 'null' },
-    { label: 'TLSv1.2_2018', value: 'TLSv1.2_2018' },
-    { label: 'TLSv1.2_2019', value: 'TLSv1.2_2019' },
-    { label: 'TLSv1.2_2021', value: 'TLSv1.2_2021' },
-    { label: 'TLSv1.3_2022', value: 'TLSv1.3_2022' }
+    { label: 'Modern v2025Q1 (Recommended)', value: 'Modern_v2025Q1' },
+    { label: 'Compatible v2025Q1 (Balanced)', value: 'Compatible_v2025Q1' },
+    { label: 'Legacy v2025Q1 (Broad Support)', value: 'Legacy_v2025Q1' },
+    { label: 'Modern v2022Q1 - (migration TLS 1.3)', value: 'TLSv1.3_2022' },
+    { label: 'Modern v2022Q1 - TLS 1.2', value: 'TLSv1.2_2021' },
+    { label: 'Compatible v2018Q1 - TLS 1.2', value: 'TLSv1.2_2019' },
+    { label: 'Legacy v2018Q1 - TLS 1.2', value: 'TLSv1.2_2018' },
+    { label: 'Legacy v2017Q1 - All Ciphers', value: 'null' }
   ]
 
   const digitalCertificateDrawerRef = ref('')
@@ -254,6 +257,29 @@
           data-testid="domains-form__name-field"
           :value="name"
           description="This is an identification name for the workload. Once you save the configuration, the URL will be automatically generated."
+        />
+      </div>
+    </template>
+  </form-horizontal>
+  <form-horizontal
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    title="Domains"
+  >
+    <template #inputs>
+      <div class="flex sm:max-w-lg w-full gap-2">
+        <FieldText
+        name="domains"
+        placeholder="Add a domain"
+        :value="domains"
+        />
+        
+        <FieldDropdown
+          name="domainslist"
+          :options="domainsOptions"
+          editable
+          placeholder="Add a domain"
+          :value="domains"
         />
       </div>
     </template>
