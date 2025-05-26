@@ -305,9 +305,10 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
+  import DeleteDialog from './dialog/delete-dialog.vue'
+  import CloneDialog from './dialog/clone-dialog.vue'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
@@ -522,6 +523,7 @@
 
   const actionOptions = (rowData) => {
     const createActionOption = (action) => {
+    console.log('action :', action);
       return {
         ...action,
         disabled: action.disabled && action.disabled(rowData),
@@ -529,6 +531,23 @@
           switch (action.type) {
             case 'dialog':
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
+              break
+            case 'clone':
+              {
+                const bodyClone = {
+                  data: {
+                    title: action.title,
+                    selectedID: rowData.id,
+                    entityName: rowData?.name,
+                    entityNameField: action.entityNameField,
+                    cloneService: action.service,
+                    entityType: action.entityType,
+                    rerender: Math.random()
+                  },
+                  onClose: (opt) => opt.data.updated && reload() && updateDataTablePagination()
+                }
+                openDialog(CloneDialog, bodyClone)
+              }
               break
             case 'delete':
               {

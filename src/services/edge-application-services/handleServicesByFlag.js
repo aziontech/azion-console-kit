@@ -3,22 +3,8 @@ import * as EdgeApplicationsServiceV4 from '@/services/edge-application-services
 
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
-const useEdgeApplicationServices = () => {
-  if (hasFlagBlockApiV4()) {
-    return {
-      listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
-      deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
-      createEdgeApplicationService: EdgeApplicationsServiceV3.createEdgeApplicationService,
-      editEdgeApplicationService: EdgeApplicationsServiceV3.editEdgeApplicationService,
-      loadEdgeApplicationService: EdgeApplicationsServiceV3.loadEdgeApplicationService,
-      contactSalesEdgeApplicationService:
-        EdgeApplicationsServiceV3.contactSalesEdgeApplicationService,
-      checkgeApplicationsLockedService: EdgeApplicationsServiceV4.checkgeApplicationsLockedService,
-      loadEdgeApplicationsDropdownService:
-        EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService
-    }
-  }
-  return {
+const getEdgeApplicationServices = (useV3ForSomeServices) => {
+  const services = {
     listEdgeApplicationsService: EdgeApplicationsServiceV4.listEdgeApplicationsService,
     deleteEdgeApplicationService: EdgeApplicationsServiceV4.deleteEdgeApplicationService,
     createEdgeApplicationService: EdgeApplicationsServiceV4.createEdgeApplicationService,
@@ -29,6 +15,18 @@ const useEdgeApplicationServices = () => {
     loadEdgeApplicationsDropdownService:
       EdgeApplicationsServiceV4.loadEdgeApplicationsDropdownService
   }
+
+  if (useV3ForSomeServices) {
+    services.createEdgeApplicationService = EdgeApplicationsServiceV3.createEdgeApplicationService
+    services.editEdgeApplicationService = EdgeApplicationsServiceV3.editEdgeApplicationService
+    services.loadEdgeApplicationService = EdgeApplicationsServiceV3.loadEdgeApplicationService
+  }
+
+  return services
+}
+
+const useEdgeApplicationServices = () => {
+  return getEdgeApplicationServices(hasFlagBlockApiV4())
 }
 
 export default useEdgeApplicationServices

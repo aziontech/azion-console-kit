@@ -24,6 +24,10 @@
       required: true,
       type: Function
     },
+    cloneEdgeApplicationService: {
+      required: true,
+      type: Function
+    },
     documentationService: {
       required: true,
       type: Function
@@ -34,15 +38,10 @@
   const toast = useToast()
   const actions = [
     {
-      type: 'dialog',
+      type: 'clone',
       label: 'Clone',
       icon: 'pi pi-fw pi-clone',
-      dialog: {
-        component: CloneDialog,
-        body: (item) => ({
-          data: item
-        })
-      }
+      service: props.cloneEdgeApplicationService
     },
     {
       type: 'delete',
