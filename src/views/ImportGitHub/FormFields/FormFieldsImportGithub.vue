@@ -62,14 +62,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await loadListIntegrations()
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Save failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Save failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -90,14 +83,7 @@
       const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Listing failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Listing failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -117,14 +103,7 @@
       const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Loading failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Loading failed' })
     } finally {
       loadingRepositories.value = false
     }
@@ -132,7 +111,10 @@
 
   const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
-      const framework = await props.frameworkDetectorService({ accountName, repositoryName })
+      const framework = await props.frameworkDetectorService({
+        accountName,
+        repositoryName
+      })
       preset.value = framework
     } catch (error) {
       toast.add({
@@ -182,6 +164,10 @@
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
+
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
+  }
 </script>
 
 <template>
@@ -330,7 +316,40 @@
             autoFilterFocus
             placeholder="Select a framework preset"
             class="w-full md:w-14rem"
-          />
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center"
+              >
+                <i
+                  :class="getPresetIconClass(slotProps.value)"
+                  class="mr-2"
+                ></i>
+                <div>
+                  {{
+                    getOptionNameByValue({
+                      listOption: presetsList,
+                      optionValue: slotProps.value,
+                      key: 'value'
+                    })
+                  }}
+                </div>
+              </div>
+              <div v-else>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center">
+                <i
+                  :class="getPresetIconClass(slotProps.option.value)"
+                  class="mr-2"
+                ></i>
+                <div>{{ slotProps.option.label }}</div>
+              </div>
+            </template>
+          </Dropdown>
           <small class="text-xs text-color-secondary font-normal leading-5">
             Defines the initial settings to work with web frameworks.
           </small>

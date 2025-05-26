@@ -6,15 +6,10 @@ const fixtures = {
   domainMock: {
     product_version: 'custom',
     id: 1718802691,
+    workload_hostname: 'nvk8w1x3sa.map.azionedge.net',
     name: 'variable-deploy-azion-20240619134303',
     alternate_domains: ['CName 1', 'CName 2'],
-    active: true,
-    domains: [
-      {
-        domain: 'nvk8w1x3sa.map.azionedge.net',
-        allow_access: true
-      }
-    ]
+    active: true
   },
   disabledDomainMock: {
     product_version: '1.0',
@@ -22,12 +17,7 @@ const fixtures = {
     name: 'Edge App Y',
     alternate_domains: ['CName 3', 'CName 4'],
     active: false,
-    domains: [
-      {
-        domain: 'nvk8w1x3sa.map.azionedge.net',
-        allow_access: true
-      }
-    ]
+    workload_hostname: 'nvk8w1x3sa.map.azionedge.net'
   }
 }
 
@@ -81,7 +71,7 @@ describe('DomainsServices', () => {
         disableEditClick: true,
         isLocked: true,
         domainName: {
-          content: fixtures.domainMock.domains[0].domain
+          content: fixtures.domainMock.workload_hostname
         },
         cnames: fixtures.domainMock.alternate_domains,
         active: {
@@ -99,7 +89,7 @@ describe('DomainsServices', () => {
         disableEditClick: false,
         isLocked: false,
         domainName: {
-          content: fixtures.disabledDomainMock.domains[0].domain
+          content: fixtures.disabledDomainMock.workload_hostname
         },
         cnames: fixtures.disabledDomainMock.alternate_domains,
         active: {

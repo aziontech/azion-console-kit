@@ -126,7 +126,7 @@
     uri: '',
     customStatusCode: 0
   }
-  const drawerEdgeConntectorRef = ref()
+  const drawerEdgeConnectorRef = ref()
 
   const addNewPage = () => {
     pushPage(pageInitialState)
@@ -143,7 +143,7 @@
   const isDefaultPage = (index) => index === 0
 
   const openEdgeConnectorDrawer = () => {
-    drawerEdgeConntectorRef.value.openCreateDrawer()
+    drawerEdgeConnectorRef.value.openCreateDrawer()
   }
 
   const handleEdgeConnectorSuccess = (data) => {
@@ -171,13 +171,14 @@
       </div>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <DrawerEdgeConnector
-          ref="drawerEdgeConntectorRef"
+          ref="drawerEdgeConnectorRef"
           @onSuccess="handleEdgeConnectorSuccess"
         />
         <FieldDropdownLazyLoader
           label="Edge Connector"
           data-testid="custom-page-form__edge-connector"
           name="edgeConnectorId"
+          enableClearOption
           :service="listEdgeConnectorsService"
           :loadService="loadEdgeConnectorsService"
           optionLabel="name"
