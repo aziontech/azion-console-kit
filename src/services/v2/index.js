@@ -7,11 +7,11 @@ import { VcsService } from './vcs-service'
 import { VcsAdapter } from './adapters/vcs-adapter'
 
 // Edge Application Cache Settings
-import { CacheSettingAdapter } from './adapters/edge-app-cache-setting-adapter'
-import { CacheSettingService } from './edge-app-cache-setting-service'
+import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
+import { CacheSettingsService } from './edge-app-cache-settings-service'
 
 const httpService = createHttpService()
 const vcsService = new VcsService(httpService, VcsAdapter)
-const cacheSettinService = new CacheSettingService(httpService, CacheSettingAdapter)
+const cacheSettingsService = new CacheSettingsService(httpService, CacheSettingsAdapter)
 
-export { vcsService, cacheSettinService }
+export { vcsService, cacheSettingsService }

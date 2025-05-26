@@ -4,7 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
-  import { cacheSettinService } from '@/services/v2'
+  import { cacheSettingsService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -34,11 +34,11 @@
   const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
 
   const listCacheSettingsServiceWithDecorator = async (query) => {
-    return await cacheSettinService.listCacheSettingsService(props.edgeApplicationId, query)
+    return await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
   }
 
   const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await cacheSettinService.deleteCacheSettingService(
+    return await cacheSettingsService.deleteCacheSettingService(
       props.edgeApplicationId,
       cacheSettingsId
     )
@@ -112,9 +112,9 @@
     ref="drawerRef"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
-    :createService="cacheSettinService.createCacheSettingsService"
-    :loadService="cacheSettinService.loadCacheSettingsService"
-    :editService="cacheSettinService.editCacheSettingsService"
+    :createService="cacheSettingsService.createCacheSettingsService"
+    :loadService="cacheSettingsService.loadCacheSettingsService"
+    :editService="cacheSettingsService.editCacheSettingsService"
     :showTieredCache="isTieredCacheEnabled"
     @onSuccess="reloadList"
   />

@@ -25,7 +25,7 @@
   import * as yup from 'yup'
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
-  import { cacheSettinService } from '@/services/v2'
+  import { cacheSettingsService } from '@/services/v2'
 
   const emit = defineEmits(['createdCache'])
 
@@ -64,7 +64,7 @@
   })
 
   const createCacheSetting = async (payload) => {
-    return cacheSettinService.createCacheSettingsService(edgeApplicationId.value, payload)
+    return cacheSettingsService.createCacheSettingsService(edgeApplicationId.value, payload)
   }
 
   const handleResponse = (value) => {

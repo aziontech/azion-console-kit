@@ -1,4 +1,4 @@
-export class CacheSettingService {
+export class CacheSettingsService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter

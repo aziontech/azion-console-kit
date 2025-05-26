@@ -30,7 +30,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
 
     cy.get(selectors.edgeApplication.accordionStepCache.createCache).click()
     cy.get(selectors.edgeApplication.accordionStepCache.browserCacheSettings).click()
-    cy.intercept('POST', 'api/v4/edge_application/applications/*/cache_settings').as('createCache')
+    cy.intercept('POST', '/v4/edge_application/applications/*/cache_settings').as('createCache')
     cy.get(selectors.form.createButtonAccordtion).eq(2).click()
     cy.wait('@createCache')
     cy.verifyToast('success', 'Cache Settings successfully created')

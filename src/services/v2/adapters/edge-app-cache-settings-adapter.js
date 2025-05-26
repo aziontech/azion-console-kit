@@ -11,7 +11,7 @@ const parseTextToArray = (text) => text?.split('\n') ?? []
 const parseDeviceGroups = (ids) => ids?.map((id) => ({ id })) ?? []
 const parseDeviceGroup = (group) => group?.map(({ id }) => id) ?? []
 
-export const CacheSettingAdapter = {
+export const CacheSettingsAdapter = {
   requestPayload(payload) {
     return {
       name: payload.name,
