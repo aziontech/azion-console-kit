@@ -1,4 +1,4 @@
 import { buildQueryParams } from './buildQueryParams'
-import { errorHandler } from './errorHandler'
+import { ErrorHandler } from './errorHandler'
 
-export { buildQueryParams, errorHandler }
+export { buildQueryParams, ErrorHandler as errorHandler }

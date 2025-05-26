@@ -571,13 +571,19 @@
         data.value = body
         totalRecords.value = count
       } catch (error) {
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'error',
-          detail: errorMessage
-        })
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error.message || error
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage
+          })
+        }
       } finally {
         isLoading.value = false
         if (firstLoadData.value) {

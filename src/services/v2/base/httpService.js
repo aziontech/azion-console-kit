@@ -33,7 +33,7 @@ export class HttpService {
 
       return response
     } catch (error) {
-      throw this.errorHandler?.(error)
+      throw this.errorHandler.create(error)
     }
   }
 
