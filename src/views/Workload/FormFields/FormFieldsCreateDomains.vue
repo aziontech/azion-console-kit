@@ -16,7 +16,7 @@
   import { ref, watch, computed } from 'vue'
 
   const props = defineProps({
-    digitalCertificates: { 
+    digitalCertificates: {
       type: Array,
       required: true
     },
@@ -138,6 +138,17 @@
   const drawerEdgeFirewallRef = ref('')
   const hasEdgeFirewallAccess = ref(true)
 
+  // Multiple domains management
+  const domainsList = ref([{ id: 1, subdomain: '', domain: '' }])
+  const nextDomainId = ref(2)
+
+  // Mock domain options for dropdown
+  const domainsOptions = ref([
+    { label: '.azioncdn.net', value: 'azioncdn.net' },
+    { label: '.azionedge.net', value: 'azionedge.net' },
+    { label: '.azion.net', value: 'azion.net' }
+  ])
+
   const openDigitalCertificateDrawer = () => {
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
@@ -221,6 +232,36 @@
     edgeCertificate.value = domainId
   }
 
+  // Functions for managing multiple domains
+  const addNewDomain = () => {
+    domainsList.value.push({
+      id: nextDomainId.value,
+      subdomain: '',
+      domain: ''
+    })
+    nextDomainId.value++
+  }
+
+  const removeDomain = (domainId) => {
+    if (domainsList.value.length > 1) {
+      domainsList.value = domainsList.value.filter((domain) => domain.id !== domainId)
+    }
+  }
+
+  const updateDomainSubdomain = (domainId, value) => {
+    const domain = domainsList.value.find((domainItem) => domainItem.id === domainId)
+    if (domain) {
+      domain.subdomain = value
+    }
+  }
+
+  const updateDomainType = (domainId, value) => {
+    const domain = domainsList.value.find((domainItem) => domainItem.id === domainId)
+    if (domain) {
+      domain.domain = value
+    }
+  }
+
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await props.listDigitalCertificatesService({
       type: EDGE_CERTIFICATE,
@@ -265,22 +306,65 @@
     :isDrawer="isDrawer"
     :noBorder="noBorder"
     title="Domains"
+    description="Configure multiple domains for your workload. Each domain can have a subdomain and domain type."
   >
     <template #inputs>
-      <div class="flex sm:max-w-lg w-full gap-2">
-        <FieldText
-        name="domains"
-        placeholder="Add a domain"
-        :value="domains"
-        />
-        
-        <FieldDropdown
-          name="domainslist"
-          :options="domainsOptions"
-          editable
-          placeholder="Add a domain"
-          :value="domains"
-        />
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div
+          v-for="domain in domainsList"
+          :key="domain.id"
+          class="flex gap-3 w-full"
+        >
+          <FieldText
+            class="w-1/2"
+            :name="`subdomain-${domain.id}`"
+            placeholder="www"
+            :value="domain.subdomain"
+            @input="updateDomainSubdomain(domain.id, $event.target.value)"
+            data-testid="domains-form__subdomain-field"
+          />
+
+          <FieldDropdown
+            :name="`domain-${domain.id}`"
+            :options="domainsOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a domain"
+            :value="domain.domain"
+            @change="updateDomainType(domain.id, $event.value)"
+            data-testid="domains-form__domain-dropdown"
+          />
+
+          <div class="flex gap-2">
+            <PrimeButton
+              v-if="domainsList.length === 1"
+              @click="addNewDomain"
+              icon="pi pi-plus"
+              class="p-button-outlined p-button-sm"
+              data-testid="domains-form__add-domain-button"
+              title="Add new domain"
+            />
+
+            <template v-else>
+              <PrimeButton
+                v-if="domain.id === domainsList[domainsList.length - 1].id"
+                @click="addNewDomain"
+                icon="pi pi-plus"
+                class="p-button-outlined p-button-sm"
+                data-testid="domains-form__add-domain-button"
+                title="Add new domain"
+              />
+
+              <PrimeButton
+                @click="removeDomain(domain.id)"
+                icon="pi pi-trash"
+                class="p-button-outlined p-button-sm p-button-danger"
+                data-testid="domains-form__remove-domain-button"
+                title="Remove domain"
+              />
+            </template>
+          </div>
+        </div>
       </div>
     </template>
   </form-horizontal>
