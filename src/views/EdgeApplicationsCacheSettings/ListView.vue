@@ -4,6 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
   import Drawer from './Drawer'
+  import { cacheSettinService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -13,29 +14,9 @@
       required: true,
       type: String
     },
-    listCacheSettingsService: {
-      type: Function,
-      required: true
-    },
     isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
-    },
-    loadCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    editCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    deleteCacheSettingsService: {
-      type: Function,
-      required: true
-    },
-    createCacheSettingsService: {
-      type: Function,
-      required: true
     },
     documentationService: {
       type: Function,
@@ -53,14 +34,14 @@
   const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
 
   const listCacheSettingsServiceWithDecorator = async (query) => {
-    return await props.listCacheSettingsService({ id: props.edgeApplicationId, ...query })
+    return await cacheSettinService.listCacheSettingsService(props.edgeApplicationId, query)
   }
 
   const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await props.deleteCacheSettingsService({
-      edgeApplicationId: props.edgeApplicationId,
-      id: cacheSettingsId
-    })
+    return await cacheSettinService.deleteCacheSettingService(
+      props.edgeApplicationId,
+      cacheSettingsId
+    )
   }
 
   const actions = [
@@ -131,9 +112,9 @@
     ref="drawerRef"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
-    :createService="createCacheSettingsService"
-    :loadService="loadCacheSettingsService"
-    :editService="editCacheSettingsService"
+    :createService="cacheSettinService.createCacheSettingsService"
+    :loadService="cacheSettinService.loadCacheSettingsService"
+    :editService="cacheSettinService.editCacheSettingsService"
     :showTieredCache="isTieredCacheEnabled"
     @onSuccess="reloadList"
   />

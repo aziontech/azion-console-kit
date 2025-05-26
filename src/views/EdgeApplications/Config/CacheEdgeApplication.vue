@@ -25,13 +25,7 @@
   import * as yup from 'yup'
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
-
-  const props = defineProps({
-    createCacheSettingsService: {
-      type: Function,
-      required: true
-    }
-  })
+  import { cacheSettinService } from '@/services/v2'
 
   const emit = defineEmits(['createdCache'])
 
@@ -70,10 +64,7 @@
   })
 
   const createCacheSetting = async (payload) => {
-    return props.createCacheSettingsService({
-      edgeApplicationId: edgeApplicationId.value,
-      ...payload
-    })
+    return cacheSettinService.createCacheSettingsService(edgeApplicationId.value, payload)
   }
 
   const handleResponse = (value) => {
