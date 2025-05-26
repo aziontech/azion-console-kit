@@ -43,7 +43,6 @@
       openPopupGithub()
     } catch (error) {
       error.showErrors(toast)
-      
     }
   }
 
