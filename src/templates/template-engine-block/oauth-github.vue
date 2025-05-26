@@ -42,13 +42,8 @@
 
       openPopupGithub()
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: message
-        })
-      })
+      error.showErrors(toast)
+      
     }
   }
 

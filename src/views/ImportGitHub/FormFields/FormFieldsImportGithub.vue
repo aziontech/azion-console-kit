@@ -62,14 +62,7 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await loadListIntegrations()
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Save failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Save failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -90,14 +83,7 @@
       const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Listing failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Listing failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -117,14 +103,7 @@
       const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
-      error.message?.forEach((message) => {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Loading failed',
-          detail: message
-        })
-      })
+      error.showWithOptions(toast, { summary: 'Loading failed' })
     } finally {
       loadingRepositories.value = false
     }
@@ -132,7 +111,10 @@
 
   const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
-      const framework = await props.frameworkDetectorService({ accountName, repositoryName })
+      const framework = await props.frameworkDetectorService({
+        accountName,
+        repositoryName
+      })
       preset.value = framework
     } catch (error) {
       toast.add({
