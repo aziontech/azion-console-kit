@@ -76,18 +76,12 @@
   }
 
   const loadService = async (payload) => {
-    const deviceGroup = await props.loadDeviceGroupService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    const deviceGroup = await props.loadDeviceGroupService(props.edgeApplicationId, payload.id)
     return deviceGroup
   }
 
   const editService = async (payload) => {
-    return await props.editDeviceGroupService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    return await props.editDeviceGroupService(props.edgeApplicationId, payload)
   }
 
   const openDrawerCreate = () => {

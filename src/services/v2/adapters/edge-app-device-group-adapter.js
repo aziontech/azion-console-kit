@@ -19,7 +19,7 @@ export const DeviceGroupAdapter = {
       }) || []
     )
   },
-  transformLoadDeviceGroup(data) {
+  transformLoadDeviceGroup({ data }) {
     return {
       id: data.id,
       name: data.name,

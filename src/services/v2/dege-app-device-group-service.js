@@ -35,16 +35,20 @@ export class DeviceGroupService {
     return this.adapter?.transformLoadDeviceGroup?.(data) ?? data.data
   }
 
-  createDeviceGroupService = async (edgeApplicationId, payload) => {
+  createDeviceGroupService = async (payload) => {
+    const { edgeApplicationId } = payload
+
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'POST',
       url: this.getUrl(edgeApplicationId),
       body
     })
 
-    return data.results
+    return {
+      feedback: 'Device Group successfully created'
+    }
   }
 
   editDeviceGroupService = async (edgeApplicationId, payload) => {
