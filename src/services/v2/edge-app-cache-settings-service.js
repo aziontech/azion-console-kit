@@ -53,13 +53,13 @@ export class CacheSettingsService {
   editCacheSettingsService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.requestPayload?.(payload) ?? payload
 
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'PUT',
       url: this.getUrl(edgeApplicationId, `/${payload.id}`),
       body
     })
 
-    return data.results
+    return 'Cache Settings successfully edited'
   }
 
   deleteCacheSettingService = async (edgeApplicationId, cacheSettingId) => {

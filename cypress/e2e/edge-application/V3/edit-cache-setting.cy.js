@@ -49,7 +49,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       cacheSettingName: generateUniqueName('cacheSetting')
     }
     // Arrange
-    cy.intercept('GET', '/api/v4/edge_application/applications/*/cache_settings/*').as(
+    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings/*').as(
       'loadCacheSetting'
     )
     cy.openProduct('Edge Application')
