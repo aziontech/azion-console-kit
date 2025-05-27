@@ -130,9 +130,9 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       expect(req.body.slice_controls).to.have.property('slice_tiered_caching_enabled', false)
     }).as('updateCacheSetting')
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@updateCacheSetting')
 
     // Assert
     cy.verifyToast('success', 'Cache Settings successfully edited')
-    cy.wait('@updateCacheSetting')
   })
 })
