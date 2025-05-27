@@ -3,6 +3,7 @@
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
 
   import { useField } from 'vee-validate'
   import { ref, computed } from 'vue'
@@ -25,6 +26,17 @@
     LETS_ENCRYPT: 'lets_encrypt'
   }
 
+  const challenges = [
+    {
+      value: 'http',
+      label: 'HTTP-01'
+    },
+    {
+      value: 'dns',
+      label: 'DNS-01'
+    }
+  ]
+
   const csrCopied = ref(false)
   const { value: name } = useField('name')
   const { value: certificate } = useField('certificate')
@@ -34,6 +46,7 @@
   const { value: privateKey } = useField('privateKey')
   const { value: challenge } = useField('challenge')
   const { value: authority } = useField('authority')
+  const { value: status } = useField('status')
 
   async function copyCSRToclipboard() {
     await props.clipboardWrite(csr.value)
@@ -97,6 +110,42 @@
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Status"
+            name="status"
+            :disabled="true"
+            :value="status"
+            placeholder=""
+            description="The AZION SAN certificate will be used until the issuance is completed."
+            data-testid="digital-certificate__status-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Issuer"
+            name="authority"
+            :disabled="true"
+            :value="authority"
+            placeholder=""
+            description=""
+            data-testid="digital-certificate__authority-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldDropdown
+            label="Challenge"
+            name="challenge"
+            :options="challenges"
+            optionLabel="label"
+            optionValue="value"
+            :value="challenge"
+            appendTo="self"
+            :disabled="true"
+            description=""
+            data-testid="digital-certificate__challenge-field"
           />
         </div>
       </template>
