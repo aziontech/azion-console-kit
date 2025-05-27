@@ -12,5 +12,4 @@ const httpService = createHttpService()
 const vcsService = new VcsService(httpService, VcsAdapter)
 const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
 
-
 export { vcsService, deviceGroupService }
