@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
@@ -178,7 +177,6 @@ export const edgeApplicationRoutes = {
             reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService,
-            listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
             listEdgeApplicationFunctionsService: FunctionsServiceV4.listFunctionsServiceOptions
           },
           clipboardWrite: Helpers.clipboardWrite

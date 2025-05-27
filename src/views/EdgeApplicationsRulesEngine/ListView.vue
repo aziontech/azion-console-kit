@@ -63,10 +63,6 @@
       required: true,
       type: Function
     },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
-    },
     listOriginsService: {
       required: true,
       type: Function
@@ -263,7 +259,6 @@
     :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
     :listOriginsService="listOriginsService"
     :clipboardWrite="clipboardWrite"
-    :listCacheSettingsService="listCacheSettingsService"
     :edgeApplicationId="edgeApplicationId"
     :createRulesEngineService="createRulesEngineService"
     :editRulesEngineService="editRulesEngineService"
