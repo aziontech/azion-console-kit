@@ -66,15 +66,19 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.createCachePolicyButton).click()
     cy.get(selectors.edgeApplication.cacheSettings.nameInput).type(fixtures.cacheSettingName)
 
-    cy.intercept('GET', 'api/v3/edge_applications/*/cache_settings?page_size=200').as(
+    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings?page_size=100').as(
       'getCachePolicy'
     )
+
+    cy.intercept('POST', '/v4/edge_application/applications/*/cache_settings').as('createCache')
+
     cy.get(selectors.edgeApplication.rulesEngine.cachePolicyActionBar)
       .find(selectors.form.actionsSubmitButton)
       .click()
+    cy.wait('@createCache')
+    cy.wait('@getCachePolicy')
     cy.verifyToast('success', 'Cache Settings successfully created')
 
-    cy.wait('@getCachePolicy', { timeout: 10000 })
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setCachePolicySelect(0))
       .find(selectors.edgeApplication.rulesEngine.cachePolicyOption(fixtures.cacheSettingName))

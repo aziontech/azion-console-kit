@@ -27,7 +27,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     errorResponsesServices: { type: Object, required: true },
@@ -264,7 +263,6 @@
       condition: true,
       show: showTabs.cacheSettings,
       props: () => ({
-        ...props.cacheSettingsServices,
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value
