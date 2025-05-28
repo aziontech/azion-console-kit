@@ -4,7 +4,7 @@ export class WafService {
     this.adapter = adapter
     this.baseURL = 'v4/edge_firewall/wafs'
   }
-  // list, create, edit
+
   listWafRules = async (
     params = { search: '', fields: '', ordering: 'name', page: 1, pageSize: 10 }
   ) => {
@@ -22,7 +22,7 @@ export class WafService {
     const { data: response } = await this.http.request({
       method: 'POST',
       url: this.baseURL,
-      data: adaptedPayload
+      body: adaptedPayload
     })
 
     return {
@@ -32,11 +32,11 @@ export class WafService {
   }
 
   editWafRule = async (payload, wafId) => {
-    const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
+    const adaptedPayload = this.adapter.adaptWafRulePayload({ payload, isEdit: true })
     await this.http.request({
       method: 'PATCH',
       url: `${this.baseURL}/${wafId}`,
-      data: adaptedPayload
+      body: adaptedPayload
     })
 
     return 'Your WAF rule has been updated.'
@@ -65,7 +65,7 @@ export class WafService {
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/${payload.id}/clone`,
-      data: adaptedPayload
+      body: adaptedPayload
     })
 
     return {
