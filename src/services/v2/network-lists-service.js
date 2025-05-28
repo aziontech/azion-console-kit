@@ -8,10 +8,10 @@ export class NetworkListsService {
   listNetworkLists = async (
     params = { fields: '', search: '', ordering: '', page: 1, pageSize: 10 }
   ) => {
-    const searchParams = new URLSearchParams(params).toString()
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}?${searchParams}`
+      url: this.baseURL,
+      params
     })
 
     const { results, count } = data
@@ -28,7 +28,7 @@ export class NetworkListsService {
 
     const { data: response } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}`,
+      url: this.baseURL,
       body: bodyRequest
     })
 
