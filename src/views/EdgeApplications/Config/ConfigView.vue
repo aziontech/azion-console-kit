@@ -132,10 +132,7 @@
                 ></PrimeButton>
               </div>
             </template>
-            <CacheEdgeApplication
-              @createdCache="handleResponseCache"
-              :createCacheSettingsService="props.cacheSettingsServices.createCacheSettingsService"
-            />
+            <CacheEdgeApplication @createdCache="handleResponseCache" />
           </AccordionTab>
         </Accordion>
       </div>
@@ -163,7 +160,6 @@
 
   const props = defineProps({
     workloadService: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
     edgeConnectorServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true }
   })
