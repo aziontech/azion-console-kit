@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeNetworkListBaseUrl } from '../../network-lists-services/v4/make-network-list-service'
+import { makeNetworkListBaseUrl } from './make-network-list-service'
 import { makeListServiceQueryParams } from '@/helpers/make-list-service-query-params'
 
 export const listNetworkListService = async ({
