@@ -9,7 +9,7 @@ export class DeviceGroupService {
     return `${this.baseURL}/${edgeApplicationId}/device_groups${suffix}`
   }
 
-  listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 100 }) => {
+  listDeviceGroupService = async (edgeApplicationId, params = { pageSize: 10 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.getUrl(edgeApplicationId),

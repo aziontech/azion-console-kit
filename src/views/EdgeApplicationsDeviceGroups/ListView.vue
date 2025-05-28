@@ -86,8 +86,8 @@
     hasContentToList.value = event
   }
 
-  const listDeviceGroupsWithDecorator = async (query) => {
-    return await deviceGroupService.listDeviceGroupService(props.edgeApplicationId, query)
+  const listDeviceGroupsWithDecorator = async (params) => {
+    return await deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)
   }
 
   const deleteDeviceGroupsWithDecorator = async (id) => {
