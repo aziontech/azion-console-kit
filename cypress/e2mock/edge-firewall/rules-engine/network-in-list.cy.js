@@ -132,7 +132,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
   })
 
   it('should load a rule with network list criteria and verify the network list name is displayed', () => {
-    cy.intercept('GET', '/api/v4/workspace/network_lists*', {
+    cy.intercept('GET', '/v4/workspace/network_lists*', {
       statusCode: 200,
       body: {
         count: 0,
