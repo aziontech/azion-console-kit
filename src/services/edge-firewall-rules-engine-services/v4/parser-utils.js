@@ -65,3 +65,71 @@ export const parseBehaviors = (behaviors) => {
 
   return parsedBehaviors
 }
+
+/**
+ * Parse each criteria based on its type
+ * @param {Array} criteria
+ * @returns {Array}
+ */
+export const parseCriteriaLoad = (criteria) => {
+  const parsedCriteria = criteria.map((criterionGroup) => {
+    return criterionGroup.map((criterion) => {
+      switch (criterion.variable) {
+        case '${network}':
+          return {
+            ...criterion,
+            argument: criterion.argument.toString()
+          }
+        default:
+          return criterion
+      }
+    })
+  })
+
+  return parsedCriteria
+}
+
+/**
+ * Parse each behavior based on its type
+ * @param {Array} behaviors
+ * @returns {Array}
+ */
+export const parseBehaviorsLoad = (behaviors) => {
+  const parsedBehaviors = behaviors.map((behavior) => {
+    switch (behavior.name) {
+      case 'run_function':
+        return {
+          name: behavior.name,
+          functionId: parseInt(behavior.argument)
+        }
+
+      case 'set_waf_ruleset':
+        return {
+          name: behavior.name,
+          mode: behavior.argument.mode,
+          id: Number(behavior.argument.id)
+        }
+      case 'set_rate_limit':
+        return {
+          name: behavior.name,
+          type: behavior.argument.type,
+          limit_by: behavior.argument.limit_by,
+          average_rate_limit: behavior.argument.average_rate_limit,
+          maximum_burst_size: behavior.argument.maximum_burst_size
+        }
+      case 'set_custom_response':
+        return {
+          name: behavior.name,
+          status_code: behavior.argument.status_code,
+          content_type: behavior.argument.content_type,
+          content_body: behavior.argument.content_body
+        }
+      default:
+        return {
+          name: behavior.name
+        }
+    }
+  })
+
+  return parsedBehaviors
+}
