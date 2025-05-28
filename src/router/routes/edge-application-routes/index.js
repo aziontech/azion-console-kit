@@ -1,12 +1,10 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
-import * as CacheSettingsServicesV4 from '@/services/edge-application-cache-settings-services/v4'
 import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
@@ -93,9 +91,6 @@ export const edgeApplicationRoutes = {
             loadDigitalCertificatesService:
               DigitalCertificatesServicesV4.loadDigitalCertificateService
           },
-          cacheSettingsServices: {
-            createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService
-          },
           edgeConnectorServices: {
             createEdgeConnectorsService: EdgeConnectorsService.createEdgeConnectorsService
           },
@@ -146,11 +141,6 @@ export const edgeApplicationRoutes = {
             clipboardWrite: Helpers.clipboardWrite
           },
           cacheSettingsServices: {
-            listCacheSettingsService: CacheSettingsServicesV4.listCacheSettingsService,
-            deleteCacheSettingsService: CacheSettingsServicesV4.deleteCacheSettingsService,
-            createCacheSettingsService: CacheSettingsServicesV4.createCacheSettingsService,
-            loadCacheSettingsService: CacheSettingsServicesV4.loadCacheSettingsService,
-            editCacheSettingsService: CacheSettingsServicesV4.editCacheSettingsService,
             documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
           },
           functionsServices: {
@@ -187,7 +177,6 @@ export const edgeApplicationRoutes = {
             reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService,
-            listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
             listEdgeApplicationFunctionsService: FunctionsServiceV4.listFunctionsServiceOptions
           },
           clipboardWrite: Helpers.clipboardWrite
