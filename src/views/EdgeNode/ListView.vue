@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
-  import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
@@ -82,8 +82,6 @@
       }
     }
   ]
-
-  const EDGE_NODE_API_FIELDS = ['id', 'name', 'hash_id', 'status']
 </script>
 <template>
   <ContentBlock>
@@ -91,9 +89,8 @@
       <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
     </template>
     <template #content>
-      <FetchListTableBlock
+      <ListTableBlock
         v-if="hasContentToList"
-        :apiFields="EDGE_NODE_API_FIELDS"
         :listService="listEdgeNodeService"
         :columns="getColumns"
         editPagePath="edge-node/edit"
