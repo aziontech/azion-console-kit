@@ -10,7 +10,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+  import { cacheSettingsService } from '@/services/v2'
+
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import { createFunctionService } from '@/services/edge-application-functions-services'
@@ -532,7 +533,7 @@
         ref="drawerRef"
         @onSuccess="handleSuccess"
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
-        :createService="createCacheSettingsService"
+        :createService="cacheSettingsService.createCacheSettingsService"
         :edgeApplicationId="edgeApplicationId"
         :showTieredCache="isTieredCacheEnabled"
       />
