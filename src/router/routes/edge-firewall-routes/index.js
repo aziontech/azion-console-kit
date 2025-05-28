@@ -1,8 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
-
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
 import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-functions-services/v4'
 
@@ -22,8 +20,6 @@ export const edgeFirewallRoutes = {
       name: 'list-edge-firewall',
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        deleteEdgeFirewallService: EdgeFirewallServicesV4.deleteEdgeFirewallService,
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
       meta: {
@@ -40,8 +36,7 @@ export const edgeFirewallRoutes = {
       name: 'create-edge-firewall',
       component: () => import('@views/EdgeFirewall/CreateView.vue'),
       props: {
-        listDomainsService: DomainServices.listDomainsService,
-        createEdgeFirewallService: EdgeFirewallServicesV4.createEdgeFirewallService
+        listDomainsService: DomainServices.listDomainsService
       },
       meta: {
         breadCrumbs: [
@@ -65,8 +60,6 @@ export const edgeFirewallRoutes = {
         listNetworkListService: NetworkListsServiceV4.listNetworkListService,
         loadNetworkListService: NetworkListsServiceV4.loadNetworkListService,
         edgeFirewallServices: {
-          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-          editEdgeFirewallService: EdgeFirewallServicesV4.editEdgeFirewallService,
           listEdgeFirewallFunctionService:
             EdgeFirewallFunctionsServices.listEdgeFirewallFunctionsService,
           createFunctionService: EdgeFirewallFunctionsServicesV4.createFunctionService,

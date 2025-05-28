@@ -42,10 +42,13 @@ export class EdgeFirewallService {
     }
   }
 
-  cloneEdgeFirewallService = async (id) => {
+  cloneEdgeFirewallService = async (name, id) => {
+    const body = { name, id }
+
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${id}/clone`
+      url: `${this.baseURL}/${id}/clone`,
+      body
     })
 
     return {
@@ -67,7 +70,7 @@ export class EdgeFirewallService {
     return 'Your edge firewall has been updated'
   }
 
-  loadEdgeFirewallService = async (id) => {
+  loadEdgeFirewallService = async ({ id }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/${id}`

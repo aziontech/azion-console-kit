@@ -6,6 +6,7 @@
   import CloneEdgeFirewall from './Dialog/Clone.vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
+  import { edgeFirewallService } from '@/services/v2'
 
   defineOptions({ name: 'edge-firewall-view' })
 
@@ -23,14 +24,6 @@
   ]
 
   const props = defineProps({
-    listEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -55,7 +48,7 @@
       type: 'delete',
       title: 'edge firewall',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeFirewallService
+      service: edgeFirewallService.deleteCacheSettingService
     }
   ]
 
@@ -116,7 +109,7 @@
         addButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
-        :listService="listEdgeFirewallService"
+        :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"

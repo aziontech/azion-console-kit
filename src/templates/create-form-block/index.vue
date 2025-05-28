@@ -104,11 +104,15 @@
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
-        const errorMessage = error?.message || error
-
-        showToast('error', errorMessage)
-        emit('on-response-fail', errorMessage)
-        blockViewRedirection.value = true
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
