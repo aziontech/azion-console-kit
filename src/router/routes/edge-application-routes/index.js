@@ -1,7 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
-import * as DeviceGroupsServiceV4 from '@/services/edge-application-device-groups-services/v4'
 import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
@@ -157,12 +156,7 @@ export const edgeApplicationRoutes = {
             loadEdgeFunctionService: EdgeFunctionsServiceV4.loadEdgeFunctionService
           },
           deviceGroupsServices: {
-            listDeviceGroupsService: DeviceGroupsServiceV4.listDeviceGroupsService,
-            deleteDeviceGroupService: DeviceGroupsServiceV4.deleteDeviceGroupService,
-            documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
-            editDeviceGroupService: DeviceGroupsServiceV4.editDeviceGroupService,
-            loadDeviceGroupService: DeviceGroupsServiceV4.loadDeviceGroupService,
-            createDeviceGroupService: DeviceGroupsServiceV4.createDeviceGroupService
+            documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups
           },
           errorResponsesServices: {
             loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
