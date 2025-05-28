@@ -139,7 +139,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
         results: []
       }
     }).as('listNetworkLists')
-    cy.intercept('GET', `/api/v4/workspace/network_lists/${MOCK_NETWORK_LIST_ID}`, {
+    cy.intercept('GET', `/v4/workspace/network_lists/${MOCK_NETWORK_LIST_ID}`, {
       statusCode: 200,
       body: {
         data: {
