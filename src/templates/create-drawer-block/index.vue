@@ -118,9 +118,16 @@
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true
-        const errorMessage = error?.message || error
-        emit('onError', errorMessage)
-        showToast('error', errorMessage)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
