@@ -171,24 +171,15 @@
   }
 
   const createServiceWithEdgeApplicationIdDecorator = async (payload) => {
-    const result = await props.createService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    const result = await props.createService(props.edgeApplicationId, payload)
     return result
   }
 
   const loadCacheSettingsServiceWithDecorator = async (payload) => {
-    return props.loadService({
-      edgeApplicationId: props.edgeApplicationId,
-      id: payload.id
-    })
+    return props.loadService(props.edgeApplicationId, payload.id)
   }
   const editCacheSettingsServiceWithDecorator = async (payload) => {
-    return props.editService({
-      edgeApplicationId: props.edgeApplicationId,
-      ...payload
-    })
+    return props.editService(props.edgeApplicationId, payload)
   }
 
   const handleCreateCacheSettings = () => {
