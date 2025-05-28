@@ -10,6 +10,7 @@
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { wafService } from '@/services/v2'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -37,7 +38,7 @@
 
   const getWafDat = async () => {
     try {
-      return await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
+      return await wafService.loadWafRule({ id: wafRuleId.value })
     } catch (error) {
       toast.add({
         closable: true,
@@ -132,7 +133,6 @@
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
             :updatedRedirect="props.wafServices.updatedRedirect"
-            :editWafRulesService="props.wafServices.editWafRulesService"
             :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
             @handleWafRulesUpdated="updateWafRulesValue"

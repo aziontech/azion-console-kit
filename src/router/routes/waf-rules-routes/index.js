@@ -15,8 +15,6 @@ export const wafRulesRoutes = {
       name: 'list-waf-rules',
       component: () => import('@views/WafRules/ListView.vue'),
       props: {
-        listWafRulesService: WafRulesServiceV4.listWafRulesService,
-        deleteWafRulesService: WafRulesServiceV4.deleteWafRulesService,
         documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
@@ -32,9 +30,6 @@ export const wafRulesRoutes = {
       path: 'create',
       name: 'create-waf-rules',
       component: () => import('@views/WafRules/CreateView.vue'),
-      props: {
-        createWafRulesService: WafRulesServiceV4.createWafRulesService
-      },
       meta: {
         breadCrumbs: [
           {
@@ -64,8 +59,6 @@ export const wafRulesRoutes = {
         },
         wafServices: {
           updatedRedirect: 'list-waf-rules',
-          editWafRulesService: WafRulesServiceV4.editWafRulesService,
-          loadWafRulesService: WafRulesServiceV4.loadWafRulesService
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,

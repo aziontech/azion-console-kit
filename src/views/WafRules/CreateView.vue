@@ -1,30 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create WAF Rules" />
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createWafRulesService"
-        @on-response="handleTrackCreation"
-        @on-response-fail="handleTrackFailedCreation"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormFieldsWafRules />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
@@ -34,16 +7,10 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import * as yup from 'yup'
   import { inject } from 'vue'
+  import { wafService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createWafRulesService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
@@ -105,3 +72,31 @@
     active: true
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create WAF Rules" />
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="wafService.createWafRule"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+      >
+        <template #form>
+          <FormFieldsWafRules />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>

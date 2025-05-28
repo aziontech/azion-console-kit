@@ -49,10 +49,6 @@
       type: Function,
       required: true
     },
-    listWafRulesService: {
-      type: Function,
-      required: true
-    },
     edgeFirewallId: {
       type: String || Number,
       required: true
@@ -70,10 +66,6 @@
       required: true
     },
     reorderRulesEngine: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesService: {
       type: Function,
       required: true
     }
@@ -251,7 +243,6 @@
     :edgeFirewallModules="edgeFirewallModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
-    :listWafRulesService="listWafRulesService"
     :loadService="loadEdgeFirewallRulesEngineService"
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="listNetworkListService"
