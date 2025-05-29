@@ -7,7 +7,6 @@ let digitalCertificateName
 let firewallName
 const createEdgeApplicationCase = () => {
   edgeAppName = generateUniqueName('EdgeApp')
-  firewallName = generateUniqueName('EdgeFirewall')
   // Arrange
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
 
@@ -63,6 +62,8 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
       fixture: '/account/info/without_flags.json'
   }).as('accountInfo')
     cy.login()
+    firewallName = generateUniqueName('EdgeFirewall')
+
   })
 
   it('should create and delete a domain using a edge application', () => {
@@ -91,7 +92,6 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.dropdownSelectPort).find('li').eq(3).click()
     cy.get(selectors.workload.portHttp).click()
 
-    cy.get(selectors.workload.useHttpsField).click()
     cy.get(selectors.workload.portHttps).click()
     cy.get(selectors.workload.dropdownSelectPort).find('li').eq(2).click()
     cy.get(selectors.workload.dropdownSelectPort).find('li').eq(4).click()
@@ -100,24 +100,21 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.dropdownSelectTls).find('li').eq(2).click()
     cy.get(selectors.workload.cipherSuite).click()
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
-
-
-    cy.get(selectors.workload.useHttp3Field).click()
+    cy.wait('@getEdgeFirewallList')
+    cy.get(selectors.workload.edgeFirewallField).click()
+    cy.get(selectors.workload.createEdgeFirewallButton).click()
+    createEdgeFirewallCase()
+    cy.get(selectors.workload.digitalCertificateDropdown).click()
+    cy.get(selectors.workload.createDigitalCertificateButton).click()
+    createDigitalCertificateCase()
 
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.workload.edgeApplicationField).click()
     cy.get(selectors.workload.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
-    cy.get(selectors.workload.edgeFirewallField).click()
-    cy.get(selectors.workload.createEdgeFirewallButton).click()
-    createEdgeFirewallCase()
-
     cy.get(selectors.workload.cnameAccessOnlyField).click()
-    cy.get(selectors.workload.digitalCertificateDropdown).click()
-    cy.get(selectors.workload.createDigitalCertificateButton).click()
-    createDigitalCertificateCase()
+  
     // Act
 
     cy.intercept(

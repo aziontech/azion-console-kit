@@ -10,8 +10,6 @@ let digitalCertificateName
 const createTrustedCADigitalCertificateCase = () => {
   // Arrange
   digitalCertificateName = generateUniqueName('CertificateName')
-  cy.openProduct('Digital Certificates')
-  cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
   cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
   cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
   cy.get(selectors.digitalCertificates.importTrustedCARadioOption).click()
@@ -20,15 +18,16 @@ const createTrustedCADigitalCertificateCase = () => {
   })
 
   // Act
-  cy.get(selectors.form.submitButton).click()
+  cy.get(selectors.workload.digitalCertificateActionBar)
+    .find(selectors.form.actionsSubmitButton)
+    .click()
 
+  
   // Assert
   cy.verifyToast('success', 'Your digital certificate has been created!')
-  cy.get(selectors.digitalCertificates.editPageTitle).should(
-    'have.text',
-    'Edit Digital Certificate'
-  )
-  cy.get(selectors.digitalCertificates.trustedCATextArea).should('have.text', '')
+
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(3000)
 }
 
 const createEdgeApplicationCase = () => {
@@ -58,7 +57,6 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
 
   it('should create and delete a domain with a mTLS digital certificate', () => {
     // Arrange
-    createTrustedCADigitalCertificateCase()
     createEdgeApplicationCase()
     domainName = generateUniqueName('domain')
     cy.openProduct('Domains')
@@ -110,10 +108,8 @@ describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
     cy.wait('@getTrustedCACertificate').its('response.statusCode').should('eq', 200)
     cy.wait('@getTrustedCACertificate')
     cy.get(selectors.workload.dropdownTrustedCA).click()
-    cy.get(selectors.workload.mtlsTrustedCADropdownFilter).clear()
-    cy.get(selectors.workload.mtlsTrustedCADropdownFilter).type(digitalCertificateName)
-    cy.wait('@getTrustedCACertificateByName')
-    cy.get(selectors.workload.trustedCAFirstDropdownOption).click()
+    cy.get(selectors.workload.createDigitalCertificateTrustedButton).click()
+    createTrustedCADigitalCertificateCase()
     cy.intercept(
       { method: 'POST', url: '/api/v4/workspace/workloads' },
       { body: payloadRequestWorkload, statusCode: 202 }
