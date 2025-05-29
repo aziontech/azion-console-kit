@@ -9,9 +9,7 @@
     listEdgeApplicationsService,
     loadEdgeApplicationsService
   } from '@/services/edge-application-services/v4'
-  import {
-    edgeFirewallService
-  } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2'
   import {
     loadDigitalCertificateService,
     listDigitalCertificatesServiceDropdown

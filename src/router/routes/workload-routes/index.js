@@ -78,8 +78,7 @@ export const workloadRoutes = {
           editWorkloadDeploymentService: WorkloadDeploymentServices.editWorkloadDeploymentService,
           listEdgeApplicationsService:
             EdgeApplicationServicesV4.listEdgeApplicationsDropdownService,
-          loadEdgeApplicationsService:
-            EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService
+          loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService
         },
         customPagesServices: {
           listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
