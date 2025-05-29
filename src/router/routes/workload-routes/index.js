@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
 import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
@@ -39,8 +38,6 @@ export const workloadRoutes = {
         createDomainService: WorkloadServices.createWorkloadService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite,
         listDigitalCertificatesService:
           DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
@@ -82,9 +79,7 @@ export const workloadRoutes = {
           listEdgeApplicationsService:
             EdgeApplicationServicesV4.listEdgeApplicationsDropdownService,
           loadEdgeApplicationsService:
-            EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-          listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService
+            EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService
         },
         customPagesServices: {
           listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
