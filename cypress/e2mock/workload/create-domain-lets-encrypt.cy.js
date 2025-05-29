@@ -66,12 +66,15 @@ describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.cipherSuite).click()
     cy.get(selectors.domains.dropdownSelectCipher).find('li').eq(2).click()
 
+    cy.get(selectors.workload.customHostname).type('testcustom')
+    cy.get(selectors.workload.cnamesField).type(`${domainName}.net`)
+    cy.get(selectors.workload.workloadAllowAccess).click()
+
     cy.wait('@getEdgeApplicationList')
     cy.get(selectors.domains.edgeApplicationField).click()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).clear()
     cy.get(selectors.domains.edgeApplicationDropdownSearch).type(edgeAppName)
     cy.get(selectors.domains.edgeApplicationOption).click()
-    cy.get(selectors.domains.cnamesField).type(`${domainName}.net`)
 
     cy.wait('@searchDigitalCertificatesApi')
     cy.get(selectors.domains.digitalCertificateDropdown).click()

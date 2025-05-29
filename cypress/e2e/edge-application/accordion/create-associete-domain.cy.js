@@ -52,15 +52,16 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.workload.cipherSuite).click()
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
+    cy.get(selectors.workload.customHostname).type('testcustom')
+    cy.get(selectors.workload.cnamesField).type('www.test.net')
+    cy.get(selectors.workload.workloadAllowAccess).click()
+
     cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
     cy.intercept(
       { method: 'POST', url: '/api/v4/workspace/workloads' },
       { body: payloadRequestWorkload, statusCode: 202 }
     ).as('createWorkload')
-
-    cy.get(selectors.workload.cnameAccessOnlyField).click()
-    
-    
+        
     // Act
     cy.get(selectors.form.createButtonAccordtion).eq(1).click()
     cy.wait('@createWorkload')

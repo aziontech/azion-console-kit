@@ -10,6 +10,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import LabelBlock from '@/templates/label-block'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
@@ -115,7 +116,6 @@
   const edgeCertificate = ref(0)
   const { value: name } = useField('name')
   const { value: cnames } = useField('cnames')
-  const { value: cnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
@@ -467,6 +467,54 @@
     </template>
   </FormHorizontal>
 
+  <FormHorizontal
+    :isDrawer="isDrawer"
+    title="Domain"
+    :noBorder="noBorder"
+    data-testid="form-horizontal-custom-hostname"
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldInputGroup
+          placeholder="my-custom-name"
+          label="Custom Hostname"
+          name="customHostname"
+          data-testid="workload-custom-hostname-field"
+        >
+          <template #button>
+            <PrimeButton
+              label=".azion.app"
+              size="small"
+              outlined
+            />
+          </template>
+        </FieldInputGroup>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          label="CNAME"
+          name="cnames"
+          data-testid="workload-form__cnames-field"
+          placeholder="example.com&#10;example.example.com"
+          rows="2"
+          :value="cnames"
+          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
+        />
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldSwitchBlock
+          data-testid="workaload-form__active_allow_access-field"
+          nameField="workloadHostnameAllowAccess"
+          name="workloadHostnameAllowAccess"
+          auto
+          description="Allow Access to host name URL attributed by Azion."
+          :isCard="false"
+          title="Allow Access to Hostname"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
   <form-horizontal
     :isDrawer="isDrawer"
     :noBorder="noBorder"
@@ -560,26 +608,7 @@
           </template>
         </FieldDropdownLazyLoader>
       </div>
-      <FieldSwitchBlock
-        data-testid="domains-form__cname-access-only-field"
-        nameField="cnameAccessOnly"
-        name="cnameAccessOnly"
-        auto
-        :isCard="false"
-        title="CNAME Access Only"
-        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion workload will be blocked."
-      />
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="CNAME"
-          :required="cnameAccessOnly"
-          name="cnames"
-          data-testid="domains-form__cnames-field"
-          rows="2"
-          :value="cnames"
-          description="List of CNAMEs to associate to the Azion workload. Separate each entry in a new line."
-        />
-      </div>
+
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdownLazyLoader
           data-testid="domains-form__edge-certificate-field"

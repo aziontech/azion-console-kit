@@ -44,7 +44,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateDomains from './FormFields/FormFieldsCreateWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -164,8 +164,11 @@
     name: '',
     environment: '1',
     edgeApplication: null,
+    customHostname: '',
     edgeFirewall: null,
     deliveryProtocol: 'https',
+    workloadHostnameAllowAccess: false,
+    domains: [],
     httpPort: [{ name: '80 (Default)', value: 80 }],
     httpsPort: [{ name: '443 (Default)', value: 443 }],
     quicPort: [{ name: '443 (Default)', value: 443 }],
@@ -173,7 +176,6 @@
     useHttps: false,
     useHttp3: false,
     cnames: '',
-    cnameAccessOnly: true,
     mtlsIsEnabled: false,
     mtlsVerification: MTLS_VERIFICATION_ENFORCE,
     active: true
@@ -193,13 +195,11 @@
         }
       ),
     edgeApplication: yup.number().label('Edge Application'),
+    customHostname: yup.string().label('Custom Hostname'),
+    workloadHostnameAllowAccess: yup.boolean().label('Allow Access'),
     cnames: yup
       .string()
       .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
-        then: (schema) => schema.required()
-      })
       .test({
         name: 'no-whitespace',
         message: `Space characters aren't allowed.`,
@@ -221,7 +221,6 @@
       then: (schema) => schema.min(1, 'At least one port is required'),
       otherwise: (schema) => schema.notRequired()
     }),
-    cnameAccessOnly: yup.boolean(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),

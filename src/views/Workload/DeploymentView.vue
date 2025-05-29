@@ -31,7 +31,7 @@
 
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditWorkload from './FormFields/FormFieldsEditWorkload.vue'
+  import FormFieldsEditWorkload from './FormFields/FormFieldsEditWorkloadDeployment.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useRoute } from 'vue-router'
