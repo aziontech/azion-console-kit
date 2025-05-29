@@ -32,7 +32,7 @@ export const EdgeFirewallAdapter = {
       edgeFunctionsEnabled: data.modules.edge_functions_enabled,
       networkProtectionEnabled: data.modules.network_protection_enabled,
       wafEnabled: data.modules.waf_enabled,
-      debugRules: data.debug_rules,
+      debugRules: data.debug,
       domains: data.domains || [],
       ddosProtectionUnmetered: true
     }
@@ -47,7 +47,7 @@ export const EdgeFirewallAdapter = {
         network_protection_enabled: payload.networkProtectionEnabled,
         waf_enabled: payload.wafEnabled
       },
-      debug_rules: payload.debugRules
+      debug: payload.debugRules
     }
   }
 }
