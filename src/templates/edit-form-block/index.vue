@@ -107,8 +107,12 @@
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
-      emit('on-load-fail', error)
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        emit('on-load-fail', error)
+        showToast('error', error)
+      }
       goBackToList()
     }
   }

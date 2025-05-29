@@ -7,6 +7,8 @@
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { cacheSettingsService } from '@/services/v2'
+
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -41,10 +43,6 @@
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
     },
     listOriginsService: {
       required: true,
@@ -182,9 +180,8 @@
   const listCacheSettingsOptions = async () => {
     isLoadingRequests.value = true
     try {
-      cacheSettingsOptions.value = await props.listCacheSettingsService({
-        id: props.edgeApplicationId
-      })
+      const result = await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId)
+      cacheSettingsOptions.value = result.body
     } catch (error) {
       toast.add({
         closable: true,

@@ -108,7 +108,7 @@
         const response = await props.createService(values)
         blockViewRedirection.value = false
         emit('onSuccess', response)
-        showToast('success', response.feedback)
+        showToast('success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = true
