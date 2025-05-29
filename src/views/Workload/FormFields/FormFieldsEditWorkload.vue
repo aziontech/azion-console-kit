@@ -1,181 +1,192 @@
 <script setup>
-  import { ref } from 'vue'
-  import { useField } from 'vee-validate'
-  import PrimeButton from 'primevue/button'
-
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import Drawer from '@/views/EdgeApplications/Drawer'
-  import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
-  import DrawerCustomPages from '@/views/CustomPages/Drawer'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import InlineMessage from 'primevue/inlinemessage'
+  import { useField } from 'vee-validate'
+  import { INFORMATION_TEXTS } from '@/helpers'
+
+  // Blocks
+  import BlocksDomains from './blocks/domainsBlock.vue'
+  import BlocksDeploymentSettings from './blocks/deploymentSettingsBlock.vue'
+  import BlocksProtocolSettings from './blocks/protocolSettingsBlock.vue'
+  import BlocksInfrastructure from './blocks/infrastructureBlock.vue'
+  import BlocksMutualAuthenticationSettings from './blocks/mutualAuthenticationSettingsBlock.vue'
 
   const props = defineProps({
-    listEdgeApplicationsService: { type: Function, required: true },
-    loadEdgeApplicationsService: { type: Function, required: true },
-    listEdgeFirewallService: { type: Function, required: true },
-    loadEdgeFirewallService: { type: Function, required: true },
-    listCustomPagesService: { type: Function, required: true },
-    loadCustomPagesService: { type: Function, required: true }
+    digitalCertificates: { type: Array, required: true },
+    hasDomainName: { type: Boolean, required: false, default: false },
+    listDigitalCertificatesService: { type: Function, required: true },
+    loadDigitalCertificatesService: { type: Function, required: true }
   })
 
-  const handleListCustomPages = async () => {
-    return await props.listCustomPagesService({ fields: ['id', 'name'] })
-  }
+  const { value: name } = useField('name')
+  const { value: isLocked } = useField('isLocked')
 
-  defineOptions({ name: 'form-fields-variables' })
-  const emit = defineEmits(['edgeFirewallCreated'])
+  // const showTlsAndCipherDropdown = computed(() => useHttps.value || useHttp3.value)
 
-  const drawerRef = ref(null)
-  const drawerEdgeFirewallRef = ref(null)
-  const drawerCustomPagesRef = ref(null)
+  // const isLocked = computed(() => productVersion.value === 'custom')
 
-  const { value: edgeApplication } = useField('edgeApplication')
-  const { value: edgeFirewall } = useField('edgeFirewall')
-  const { value: customPage } = useField('customPage')
+  // watch(useHttp3, (newValue) => {
+  //   if (newValue) {
+  //     quicPort.value = HTTP3_PORT_LIST_OPTIONS
+  //   }
+  // })
 
-  const openDrawer = () => drawerRef.value?.openCreateDrawer()
-  const openDrawerEdgeFirewall = () => drawerEdgeFirewallRef.value?.openCreateDrawer()
-  const openDrawerCustomPages = () => drawerCustomPagesRef.value?.openCreateDrawer()
+  // watch(useHttps, (newValue) => {
+  //   if (newValue && !httpsPort.value) {
+  //     httpsPort.value = [HTTPS_PORT_LIST_OPTIONS[0]]
+  //   }
+  // })
 
-  const handleEdgeApplicationCreated = (edgeApplicationId) => {
-    edgeApplication.value = edgeApplicationId
-  }
+  // const digitalCertificateDrawerRef = ref('')
+  // const openDigitalCertificateDrawer = () => {
+  //   digitalCertificateDrawerRef.value.openCreateDrawer()
+  // }
 
-  const handleEdgeFirewallCreated = (edgeFirewallId) => {
-    edgeFirewall.value = edgeFirewallId
-    emit('edgeFirewallCreated')
-  }
+  // const onDigitalCertificateSuccess = (id) => {
+  //   edgeCertificate.value = id
+  // }
 
-  const handleCustomPagesCreated = (customPageId) => {
-    customPage.value = customPageId
-    emit('customPageCreated')
-  }
+  // const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+  //   return await props.listDigitalCertificatesService({
+  //     type: EDGE_CERTIFICATE,
+  //     fields: ['id,name'],
+  //     ...queryParams
+  //   })
+  // }
+
+  // const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
+  //   return await props.listDigitalCertificatesService({
+  //     type: TRUSTED_CA_CERTIFICATE,
+  //     fields: ['id,name'],
+  //     ...queryParams
+  //   })
+  // }
 </script>
 
 <template>
-  <FormHorizontal
-    title="Deployment Settings"
-    description="Select the edge application and edge firewall to be associated with the domain."
+  <InlineMessage
+    severity="warn"
+    v-if="isLocked"
+  >
+    <b>Warning</b>
+    {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
+  </InlineMessage>
+  <form-horizontal
+    title="General"
+    description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
   >
     <template #inputs>
-      <Drawer
-        ref="drawerRef"
-        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
-      />
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <FieldDropdownLazyLoader
-          label="Edge Application"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          label="Name"
           required
-          data-testid="domains-form__edge-application-field"
-          name="edgeApplication"
-          :service="listEdgeApplicationsService"
-          :loadService="loadEdgeApplicationsService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeApplication"
-          appendTo="self"
-          placeholder="Select an edge application"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-application-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Application"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <DrawerEdgeFirewall
-          ref="drawerEdgeFirewallRef"
-          @onSuccess="handleEdgeFirewallCreated"
+          name="name"
+          placeholder="My domain"
+          :value="name"
+          description="Give a unique and descriptive name to identify the domain."
         />
-        <FieldDropdownLazyLoader
-          label="Edge Firewall"
-          enableClearOption
-          data-testid="domains-form__edge-firewall-field"
-          name="edgeFirewall"
-          :service="listEdgeFirewallService"
-          :loadService="loadEdgeFirewallService"
-          optionLabel="name"
-          optionValue="value"
-          :value="edgeFirewall"
-          appendTo="self"
-          placeholder="Select an edge firewall"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawerEdgeFirewall"
-                  class="w-full whitespace-nowrap flex"
-                  data-testid="domains-form__create-edge-firewall-button"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Firewall"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
-      </div>
-
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <DrawerCustomPages
-          ref="drawerCustomPagesRef"
-          @onSuccess="handleCustomPagesCreated"
-        />
-        <FieldDropdownLazyLoader
-          label="Custom Page"
-          enableClearOption
-          data-testid="domains-form__custom-page-field"
-          name="customPage"
-          :service="handleListCustomPages"
-          :loadService="loadCustomPagesService"
-          optionLabel="name"
-          optionValue="value"
-          :value="customPage"
-          appendTo="self"
-          placeholder="Select a custom page"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openDrawerCustomPages"
-                  class="w-full whitespace-nowrap flex"
-                  data-testid="domains-form__create-custom-pages-button"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Custom Page"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
       </div>
     </template>
-  </FormHorizontal>
+  </form-horizontal>
+
+  <BlocksInfrastructure
+    isEdit
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+  />
+
+  <BlocksDomains
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    isEdit
+  />
+
+  <BlocksDeploymentSettings
+    isEdit
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    :disabledEdgeApplicationDropdown="props.disabledEdgeApplicationDropdown"
+    :listEdgeApplicationsService="props.listEdgeApplicationsService"
+    :loadEdgeApplicationsService="props.loadEdgeApplicationsService"
+    :listEdgeFirewallService="props.listEdgeFirewallService"
+    :loadEdgeFirewallService="loadEdgeFirewallService"
+  />
+
+  <BlocksProtocolSettings
+    isEdit
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    :listDigitalCertificatesService="props.listDigitalCertificatesService"
+    :loadDigitalCertificatesService="props.loadDigitalCertificatesService"
+  />
+
+  <BlocksMutualAuthenticationSettings
+    isEdit
+    :isDrawer="isDrawer"
+    :noBorder="noBorder"
+    :listDigitalCertificatesService="props.listDigitalCertificatesService"
+    :loadDigitalCertificatesService="props.loadDigitalCertificatesService"
+    :listDigitalCertificatesCRLDropDown="props.listDigitalCertificatesCRLDropDown"
+  />
+  <!-- 
+  <form-horizontal
+    title="Mutual Authentication Settings"
+    description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
+  >
+    <template #inputs>
+      <FieldSwitchBlock
+        nameField="mtlsIsEnabled"
+        name="mtlsIsEnabled"
+        auto
+        :isCard="false"
+        title="Mutual Authentication"
+      />
+
+      <div v-show="mtlsIsEnabled">
+        <div class="flex flex-col gap-3">
+          <FieldGroupRadio
+            nameField="mtlsVerification"
+            :isCard="true"
+            label="Mode"
+            :options="mtlsModeRadioOptions"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="mtlsIsEnabled"
+        class="flex flex-col w-full sm:max-w-xs gap-2"
+      >
+        <FieldDropdownLazyLoader
+          label="Trusted CA Certificate"
+          required
+          name="mtlsTrustedCertificate"
+          :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
+          :loadService="loadDigitalCertificatesService"
+          :disabled="!mtlsIsEnabled"
+          optionLabel="name"
+          optionValue="value"
+          :value="mtlsTrustedCertificate"
+          placeholder="Select a Trusted CA certificate"
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+        />
+      </div>
+    </template>
+  </form-horizontal> -->
+
+  <form-horizontal title="Status">
+    <template #inputs>
+      <FieldSwitchBlock
+        data-testid="edit-domains-form__active-field"
+        nameField="active"
+        name="active"
+        auto
+        :isCard="false"
+        title="Active"
+      />
+    </template>
+  </form-horizontal>
 </template>

@@ -59,7 +59,14 @@ const adapt = (httpResponse) => {
     id: body?.id,
     name: body?.name,
     workloadHostname: body?.workload_hostname,
-    cnames: body?.alternate_domains.join('\n'),
+    cnames: body?.alternate_domains?.map((domain, index) => {
+      const match = domain.match(/^(.+?)\.(.+)$/)
+      return {
+        id: index + 1,
+        subdomain: match ? match[1] : '',
+        domain: match ? match[2] : domain
+      }
+    }),
     workloadHostnameAllowAccess: body?.workload_hostname_allow_access,
     customHostname: body?.domains[0] ? stripAzionDomain(body?.domains[0]) : '',
     edgeCertificate: body?.tls.certificate ?? 0,

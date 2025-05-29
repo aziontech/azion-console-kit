@@ -85,7 +85,7 @@
     @keypress.enter.prevent
     :placeholder="props.placeholder"
     @input="handleChange"
-    :class="{ 'p-invalid': errorMessage }"
+    :class="[{ 'p-invalid': errorMessage }, $attrs.class]"
     @blur="handleBlur"
   />
   <small

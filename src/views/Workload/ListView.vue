@@ -80,6 +80,7 @@
     'active',
     'alternate_domains',
     'workload_hostname',
+    'infrastructure',
     'product_version'
   ]
 
@@ -100,14 +101,12 @@
   }
 
   const showLockedMessage = () => {
-    const options = {
+    toast.add({
       closable: true,
       severity: 'warn',
       summary: 'Warning',
       detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
-    }
-
-    toast.add(options)
+    })
   }
 
   const handleTrackEditEvent = (domain) => {

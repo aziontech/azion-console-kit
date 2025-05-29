@@ -47,8 +47,22 @@ import { buildSummary } from './build-summary'
 import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
 import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
+import {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS
+} from './workload-protocol-settings'
 
 export {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS,
   InviteSession,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,

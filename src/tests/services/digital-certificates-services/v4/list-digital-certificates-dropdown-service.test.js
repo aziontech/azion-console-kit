@@ -51,13 +51,13 @@ describe('DigitalCertificatesServices', () => {
 
     const result = await sut({ type: 'edge_certificate' })
 
-    expect(result.body).toHaveLength(2)
+    expect(result.body).toHaveLength(3)
     expect(result.body[0]).toEqual(fixtures.defaultCertificates[0])
     expect(result.body[1]).toEqual({
       id: 1,
-      name: 'Certificate 1'
+      name: `Let's Encrypt`
     })
-    expect(result.count).toBe(2)
+    expect(result.count).toBe(3)
   })
 
   it('should filter default certificates when search is provided with edge_certificate type', async () => {

@@ -1,7 +1,6 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeploymentView from './DeploymentView.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
@@ -9,6 +8,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import EditView from './EditView.vue'
+  import { workloadService } from '@/services/v2'
+
   defineOptions({ name: 'tabs-domains' })
 
   const props = defineProps({
@@ -18,30 +19,28 @@
   })
 
   const mapTabs = ref({
-    mainSettings: 0,
-    deployment: 1
+    mainSettings: 0
   })
 
   const route = useRoute()
   const toast = useToast()
   const router = useRouter()
   const activeTab = ref(0)
-  const domainId = ref(route.params.id)
-  const domain = ref()
+  const workloadId = ref(route.params.id)
+  const workload = ref()
 
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
-  const getDomain = async () => {
+  const getWorkload = async () => {
     try {
-      return await props.domainServices.loadDomainService({ id: domainId.value })
+      return await workloadService.loadWorkload({ id: workloadId.value })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
+      error.showWithOptions(toast, {
         summary: 'Processing failed',
         detail: error
       })
+      return {}
     }
   }
 
@@ -59,7 +58,7 @@
     const tab = getTabFromValue(index)
     activeTab.value = index
     const params = {
-      id: domainId.value,
+      id: workloadId.value,
       tab
     }
     const { query } = route
@@ -72,16 +71,10 @@
 
   const title = ref('')
 
-  const updateDomainValue = async (value) => {
-    title.value = value.name
-    domain.value = await getDomain()
-    formHasUpdated.value = false
-  }
-
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    domain.value = await getDomain()
-    title.value = domain.value.name
+    workload.value = await getWorkload()
+    title.value = workload.value.name
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
@@ -121,7 +114,7 @@
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
-        v-if="domain"
+        v-if="workload"
       >
         <TabPanel
           header="Main Settings"
@@ -132,38 +125,11 @@
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
             :updatedRedirect="props.domainServices.updatedRedirect"
-            :editDomainService="props.domainServices.editDomainService"
             :listDigitalCertificatesService="props.domainServices.listDigitalCertificatesService"
             :loadDigitalCertificatesService="props.domainServices.loadDigitalCertificatesService"
             :clipboardWrite="props.domainServices.clipboardWrite"
-            :domain="domain"
+            :workload="workload"
             :showActionBar="activeTab === mapTabs.mainSettings"
-            @handleDomainUpdated="updateDomainValue"
-          />
-        </TabPanel>
-        <TabPanel
-          header="Deployment"
-          :pt="{
-            root: { 'data-testid': 'domain-tabs__tab__deployment' }
-          }"
-        >
-          <DeploymentView
-            v-if="activeTab === mapTabs.deployment"
-            :updatedRedirect="props.domainServices.updatedRedirect"
-            :listEdgeApplicationsService="
-              props.workloadDeploymentServices.listEdgeApplicationsService
-            "
-            :loadEdgeApplicationsService="
-              props.workloadDeploymentServices.loadEdgeApplicationsService
-            "
-            :listEdgeFirewallService="props.workloadDeploymentServices.listEdgeFirewallService"
-            :loadCustomPagesService="props.customPagesServices.loadCustomPagesService"
-            :listCustomPagesService="props.customPagesServices.listCustomPagesService"
-            :loadEdgeFirewallService="props.workloadDeploymentServices.loadEdgeFirewallService"
-            :editWorkloadDeploymentService="
-              props.workloadDeploymentServices.editWorkloadDeploymentService
-            "
-            :listWorkloadDeployment="props.workloadDeploymentServices.listWorkloadDeploymentService"
           />
         </TabPanel>
       </TabView>

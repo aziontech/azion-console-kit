@@ -52,14 +52,16 @@ const adapt = (httpResponse) => {
   const parsedBody =
     httpResponse.body?.results?.map((customPage) => {
       return {
-        id: customPage.id,
-        name: customPage.name,
-        lastEditor: customPage.last_editor,
-        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          new Date(customPage.last_modified)
-        ),
-        active: parseStatusData(customPage.active),
-        default: parseDefaultData(customPage.default)
+        ...(customPage.id && { id: customPage.id }),
+        ...(customPage.name && { name: customPage.name }),
+        ...(customPage.last_editor && { lastEditor: customPage.last_editor }),
+        ...(customPage.last_modified && { 
+          lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+            new Date(customPage.last_modified)
+          )
+        }),
+        ...(customPage.active !== undefined && { active: parseStatusData(customPage.active) }),
+        ...(customPage.default !== undefined && { default: parseDefaultData(customPage.default) })
       }
     }) ?? []
 

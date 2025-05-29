@@ -60,6 +60,14 @@
     editable: {
       type: Boolean,
       default: false
+    },
+    emptyMessage: {
+      type: String,
+      default: 'No available options'
+    },
+    emptyFilterMessage: {
+      type: String,
+      default: 'No results found'
     }
   })
 
@@ -148,6 +156,8 @@
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
     :autoFilterFocus="props.filter"
+    :emptyMessage="props.emptyMessage"
+    :emptyFilterMessage="props.emptyFilterMessage"
     @change="emitChange"
     @blur="emitBlur"
     :class="{ 'p-invalid': errorMessage }"

@@ -7,7 +7,7 @@
     @on-response="handleResponse"
   >
     <template #form>
-      <FormFieldsCreateDomains
+      <FormFieldsCreateWorkload
         isDrawer
         noBorder
         :listEdgeFirewallService="listEdgeFirewallService"
@@ -31,7 +31,7 @@
 <script setup>
   import ActionBarAccordion from '@/templates/action-bar-block/action-bar-accordion.vue'
   import FormAccordion from '@/templates/create-form-block/form-accordion.vue'
-  import FormFieldsCreateDomains from '@/views/Workload/FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateWorkload from '@/views/Workload/FormFields/FormFieldsCreateWorkload.vue'
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import * as yup from 'yup'

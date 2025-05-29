@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="createDomainService"
+        :createService="workloadService.createWorkload"
         disabledCallback
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
@@ -14,15 +14,22 @@
         disableAfterCreateToastFeedback
       >
         <template #form>
-          <FormFieldsCreateDomains
-            :digitalCertificates="digitalCertificates"
+          <FormFieldsCreateWorkload
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="listEdgeFirewallService"
             :loadEdgeFirewallService="loadEdgeFirewallService"
             :listDigitalCertificatesService="listDigitalCertificatesService"
             :loadDigitalCertificatesService="loadDigitalCertificatesService"
-            :isLoadingRequests="isLoadingRequests"
+            :listDigitalCertificatesCRLDropDown="
+              digitalCertificateService.listDigitalCertificatesCRLDropDown
+            "
+            :loadDigitalCertificatesCRLDropDown="
+              digitalCertificateService.loadDigitalCertificatesCRLDropDown
+            "
+
+            :listCustomPagesService="listCustomPagesService"
+            :loadCustomPagesService="loadCustomPagesService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -44,32 +51,24 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateWorkload from './FormFields/FormFieldsCreateWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { workloadService, digitalCertificateService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
   const props = defineProps({
-    createDomainService: {
-      type: Function,
-      required: true
-    },
     listDigitalCertificatesService: {
       type: Function,
       required: true
     },
     loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
       type: Function,
       required: true
     },
@@ -88,6 +87,14 @@
     loadEdgeFirewallService: {
       type: Function,
       required: true
+    },
+    listCustomPagesService: {
+      type: Function,
+      required: true
+    },
+    loadCustomPagesService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -96,9 +103,7 @@
   const dialog = useDialog()
   const router = useRouter()
 
-  const digitalCertificates = ref([])
   const domainName = ref('')
-  const isLoadingRequests = ref(true)
 
   const handleResponse = (value) => {
     domainName.value = value?.domainName
@@ -120,32 +125,31 @@
   }
 
   const copyDomain = async () => {
-    const toastConfig = {
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    }
-
     try {
       props.clipboardWrite(domainName.value)
-      toast.add({ ...toastConfig })
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Successfully copied!'
+      })
     } catch (error) {
       toast.add({
-        ...toastConfig,
+        closable: true,
         severity: 'error',
+        summary: 'Error',
         detail: 'The domain was not copied to the clipboard. Try copying it again.'
       })
     }
   }
 
   const renderToastDomainCreateSuccesfully = () => {
-    const toastConfig = {
+    toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Succesfully created!',
+      summary: 'Success',
       detail: 'The domain is now available in the Workload management section.'
-    }
-    toast.add({ ...toastConfig })
+    })
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -162,21 +166,39 @@
 
   const initialValues = {
     name: '',
-    environment: '1',
     edgeApplication: null,
+    active: true,
+    networkMap: '1',
     edgeFirewall: null,
-    deliveryProtocol: 'https',
-    httpPort: [{ name: '80 (Default)', value: 80 }],
-    httpsPort: [{ name: '443 (Default)', value: 443 }],
-    quicPort: [{ name: '443 (Default)', value: 443 }],
-    minimumTlsVersion: 'tls_1_2',
-    useHttps: false,
-    useHttp3: false,
-    cnames: '',
-    cnameAccessOnly: true,
-    mtlsIsEnabled: false,
-    mtlsVerification: MTLS_VERIFICATION_ENFORCE,
-    active: true
+    tls: {
+      certificate: 0,
+      ciphers: 'Modern_v2025Q1',
+      minimumVersion: 'tls_1_2'
+    },
+    protocols: {
+      http: {
+        useHttps: true,
+        useHttp3: true,
+        httpPorts: [{ name: '80 (Default)', value: 80 }],
+        httpsPorts: [{ name: '443 (Default)', value: 443 }],
+        quicPorts: [{ name: '443 (Default)', value: 443 }]
+      }
+    },
+    mtls: {
+      isEnabled: false,
+      verification: 'enforce',
+      certificate: null,
+      crl: []
+    },
+    domains: [
+      {
+        subdomain: '',
+        domain: ''
+      }
+    ],
+    workloadHostnameAllowAccess: true,
+    useCustomDomain: false,
+    customDomain: ''
   }
 
   const validationSchema = yup.object({
@@ -192,47 +214,94 @@
           return nameRegex.test(value)
         }
       ),
-    edgeApplication: yup.number().label('Edge Application'),
-    cnames: yup
-      .string()
-      .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .test({
-        name: 'no-whitespace',
-        message: `Space characters aren't allowed.`,
-        test: (value) => value?.includes(' ') === false
-      }),
-    httpsPort: yup.array().when('useHttps', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    minimumTlsVersion: yup.string().when('useHttps', {
-      is: true,
-      then: (schema) => schema.required().label('TLS Version'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    httpPort: yup.array().min(1).required(),
-    quicPort: yup.array().when('useHtpp3', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    cnameAccessOnly: yup.boolean(),
-    edgeCertificate: yup.string().optional(),
-    mtlsIsEnabled: yup.boolean(),
-    mtlsVerification: yup.string(),
-    mtlsTrustedCertificate: yup
-      .string()
-      .when('mtlsIsEnabled', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .label('Trusted CA Certificate'),
+    edgeApplication: yup.number().required().label('Edge Application'),
     active: yup.boolean(),
-    environment: yup.string()
+    networkMap: yup.string(),
+    edgeFirewall: yup.number().label('Edge Firewall').nullable(),
+    tls: yup.object({
+      isEnabled: yup.boolean(),
+      certificate: yup.string(),
+      ciphers: yup.string(),
+      minimumVersion: yup.string()
+    }),
+    protocols: yup.object({
+      http: yup.object({
+        useHttps: yup.boolean(),
+        useHttp3: yup.boolean(),
+        versions: yup.array(),
+        httpPorts: yup.array().when('useHttp3', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        }),
+        httpsPorts: yup.array().when('useHttps', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        }),
+        quicPorts: yup.array().when('useHttp3', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        })
+      })
+    }),
+    mtls: yup.object({
+      verification: yup.string().label('Verification'),
+      certificate: yup
+        .string()
+        .when('isEnabled', {
+          is: true,
+          then: (schema) => schema.required()
+        })
+        .label('Trusted CA Certificate'),
+      crl: yup.array().label('Certificate Revocation List')
+    }),
+    domains: yup
+      .array()
+      .of(
+        yup.object({
+          id: yup.number(),
+          subdomain: yup
+            .string()
+            .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
+              if (!value) return true // Allow empty subdomain
+              return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            })
+            .label('Subdomain'),
+          domain: yup
+            .string()
+            .test('valid-domain', 'Invalid Domain format', function (value) {
+              if (!value) return true // Allow empty domain
+              // Regex para validar domínio: deve conter letras/números, ponto e TLD
+              return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/.test(value)
+            })
+            .label('Domain')
+        })
+      )
+      .when('workloadHostnameAllowAccess', {
+        is: false,
+        then: (schema) =>
+          schema.test(
+            'has-filled-domain',
+            'At least one domain with subdomain and domain is required',
+            (value) => value?.some((domain) => domain.subdomain && domain.domain)
+          )
+      }),
+    useCustomDomain: yup.boolean(),
+    customDomain: yup
+      .string()
+      .when('useCustomDomain', {
+        is: true,
+        then: (schema) =>
+          schema
+            .required()
+            .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
+              if (!value) return true // Allow empty hostname
+              return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            })
+      })
+      .label('Custom Domain'),
+    workloadHostnameAllowAccess: yup.boolean()
   })
 </script>

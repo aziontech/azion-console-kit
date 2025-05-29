@@ -44,11 +44,12 @@ export const workloadRoutes = {
         clipboardWrite: Helpers.clipboardWrite,
         listDigitalCertificatesService:
           DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService,
+        listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
+        loadCustomPagesService: CustomPagesServicesV4.loadCustomPagesService
       },
       meta: {
         flag: 'checkout_access_without_flag',
-
         breadCrumbs: [
           {
             label: `Workloads`,
