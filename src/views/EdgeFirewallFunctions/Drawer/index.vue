@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="props.createFunctionService"
+    :createService="edgeFirewallFunctionService.createEdgeFirewallService"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"

@@ -59,7 +59,7 @@ export class EdgeFirewallService {
   }
 
   editEdgeFirewallService = async (payload) => {
-    const body = this.adapter?.requestPayload?.(payload) ?? payload
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
 
     await this.http.request({
       method: 'PATCH',

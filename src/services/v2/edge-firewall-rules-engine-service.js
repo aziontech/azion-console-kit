@@ -5,15 +5,15 @@ export class EdgeFirewallRulesEngineService {
     this.baseURL = 'v4/edge_firewall/firewalls'
   }
 
-  #getUrl(edgeFirewallId, suffix = '') {
+  #getUrl = (edgeFirewallId, suffix = '') => {
     return `${this.baseURL}/${edgeFirewallId}/rules${suffix}`
   }
 
-  #getTransformed(method, data, fallback) {
+  #getTransformed = (method, data, fallback) => {
     return this.adapter?.[method]?.(data) ?? fallback
   }
 
-  async listEdgeFirewallRulesEngineService({ id, fields = '', search = '' }) {
+  listEdgeFirewallRulesEngineService = async ({ id, fields = '', search = '' }) => {
     const allData = []
     let page = 1
     let totalCount = 0
@@ -41,7 +41,7 @@ export class EdgeFirewallRulesEngineService {
     return { body, count: totalCount }
   }
 
-  async createEdgeFirewallRulesEngineService(edgeFirewallId, payload) {
+  createEdgeFirewallRulesEngineService = async (edgeFirewallId, payload) => {
     const body = this.#getTransformed('transformPayloadRulesEngine', payload, payload)
 
     await this.http.request({
@@ -53,7 +53,7 @@ export class EdgeFirewallRulesEngineService {
     return { feedback: 'Rule Engine successfully created' }
   }
 
-  async editEdgeFirewallRulesEngineService(edgeFirewallId, payload) {
+  editEdgeFirewallRulesEngineService = async (edgeFirewallId, payload) => {
     const body = this.#getTransformed('transformPayloadRulesEngine', payload, payload)
 
     await this.http.request({
@@ -65,7 +65,7 @@ export class EdgeFirewallRulesEngineService {
     return 'Rule Engine successfully updated'
   }
 
-  async loadEdgeFirewallRulesEngineService({ id, edgeFirewallId }) {
+  loadEdgeFirewallRulesEngineService = async ({ id, edgeFirewallId }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#getUrl(edgeFirewallId, `/${id}`)
@@ -74,7 +74,7 @@ export class EdgeFirewallRulesEngineService {
     return this.#getTransformed('transformLoadEdgeFirewallRulesEngine', data, data.data)
   }
 
-  async reorderEdgeFirewallRulesEngineService(payload, edgeFirewallId) {
+  reorderEdgeFirewallRulesEngineService = async (payload, edgeFirewallId) => {
     const body = this.#getTransformed('transformReorderEdgeFirewallRulesEngine', payload, payload)
 
     await this.http.request({
@@ -86,7 +86,7 @@ export class EdgeFirewallRulesEngineService {
     return 'Rules Engine successfully ordered'
   }
 
-  async deleteEdgeFirewallRulesEngineService(edgeFirewallId, ruleEngineId) {
+  deleteEdgeFirewallRulesEngineService = async (edgeFirewallId, ruleEngineId) => {
     await this.http.request({
       method: 'DELETE',
       url: this.#getUrl(edgeFirewallId, `/${ruleEngineId}`)

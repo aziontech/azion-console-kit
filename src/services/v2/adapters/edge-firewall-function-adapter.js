@@ -1,9 +1,10 @@
 export const EdgeFirewallFunctionAdapter = {
-  transformPayloadFunction(data, action) {
+  transformPayloadFunction(data) {
+    const [payloadRequest, action] = data
     const payload = {
-      name: data.name,
-      edge_function: data.edgeFunctionID,
-      json_args: JSON.parse(data.args)
+      name: payloadRequest.name,
+      edge_function: payloadRequest.edgeFunctionID,
+      json_args: JSON.parse(payloadRequest.args)
     }
 
     if (action === 'POST') {
