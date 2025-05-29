@@ -6,7 +6,8 @@ export class NetworkListsService {
   }
 
   listNetworkLists = async (
-    params = { fields: '', search: '', ordering: '', page: 1, pageSize: 10 }
+    params = { fields: '', search: '', ordering: '', page: 1, pageSize: 10 },
+    isDropdown = false
   ) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -15,7 +16,12 @@ export class NetworkListsService {
     })
 
     const { results, count } = data
-    const transformedData = this.adapter?.transformListNetworkLists?.(results) ?? results
+
+    let transformedData = isDropdown
+      ? this.adapter?.transformListNetworkListToDropdown?.(results)
+      : this.adapter?.transformListNetworkLists?.(results)
+
+    transformedData = transformedData ?? results
 
     return {
       count,
@@ -38,13 +44,21 @@ export class NetworkListsService {
     }
   }
 
-  loadNetworkList = async ({ id }) => {
+  loadNetworkList = async ({ id }, isDropdown = false) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/${id}`
     })
 
-    return this.adapter?.transformLoadNetworkList?.(data) ?? data
+    const { results } = data
+
+    let transformedData = isDropdown
+      ? this.adapter?.transformLoadNetworkListToDropdown?.(results)
+      : this.adapter?.transformLoadNetworkList?.(results)
+
+    transformedData = transformedData ?? results
+
+    return transformedData
   }
 
   editNetworkList = async (payload) => {

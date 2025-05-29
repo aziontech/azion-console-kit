@@ -1,5 +1,7 @@
 import { createHttpService } from './base/httpServiceFactory'
 
+// Services
+
 // Vcs Service
 import { VcsService } from './vcs-service'
 import { VcsAdapter } from './adapters/vcs-adapter'
@@ -26,13 +28,18 @@ import { WafAdapter } from './adapters/waf-adapter'
 
 const httpService = createHttpService()
 
-const services = {
-  vcsService: new VcsService(httpService, VcsAdapter),
-  wafService: new WafService(httpService, WafAdapter),
-  networkListsService: new NetworkListsService(httpService, NetworkListsAdapter),
-  deviceGroupService: new DeviceGroupService(httpService, DeviceGroupAdapter),
-  cacheSettingsService: new CacheSettingsService(httpService, CacheSettingsAdapter),
-  purgeService: new PurgeService(httpService, PurgeAdapter)
-}
+const vcsService = new VcsService(httpService, VcsAdapter)
+const wafService = new WafService(httpService, WafAdapter)
+const networkListsService = new NetworkListsService(httpService, NetworkListsAdapter)
+const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
+const cacheSettingsService = new CacheSettingsService(httpService, CacheSettingsAdapter)
+const purgeService = new PurgeService(httpService, PurgeAdapter)
 
-export default services
+export {
+  vcsService,
+  cacheSettingsService,
+  deviceGroupService,
+  purgeService,
+  wafService,
+  networkListsService
+}

@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
-import * as WafRulesServiceV4 from '@/services/waf-rules-services/v4'
 import * as DomainsService from '@/services/domains-services'
 
 import { listCountriesService } from '@/services/network-lists-services'
@@ -49,12 +48,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/TabsView.vue'),
       props: {
         wafRulesAllowed: {
-          deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-          createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
-          loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-          editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
           documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
           optionsRuleIds: WafRulesService.optionsRuleIds
         },
         wafServices: {
@@ -63,14 +57,11 @@ export const wafRulesRoutes = {
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,
           listWafRulesTuningService: WafRulesService.listWafRulesTuningService,
-          listNetworkListService: WafRulesServiceV4.listNetworkListService,
           listCountriesService: listCountriesService,
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
-          createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
           listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService,
           listDomainsService: WafRulesService.listWafRulesDomainsService,
-          loadDomainService: DomainsService.loadDomainService,
-          loadNetworkListService: WafRulesServiceV4.loadNetworkListService
+          loadDomainService: DomainsService.loadDomainService
         }
       },
       meta: {

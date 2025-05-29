@@ -73,4 +73,94 @@ export class WafService {
       urlToEditView: `/waf/edit/${response.data.id}`
     }
   }
+
+  createWafRuleAllowed = async ({ payload, id }) => {
+    const adaptedPayload = this.adapter.adaptCreateWafRuleAllowedPayload(payload)
+    await this.http.request({
+      url: `${this.baseURL}/${id}/exceptions`,
+      method: 'POST',
+      body: adaptedPayload
+    })
+
+    return {
+      feedback: 'Your waf rule allowed has been created'
+    }
+  }
+
+  async _createTuningRequest({ wafId, payload }) {
+    await this.http.request({
+      url: `${this.baseURL}/${wafId}/exceptions`,
+      method: 'POST',
+      body: payload
+    })
+
+    return { feedback: 'Your waf rule allowed has been created' }
+  }
+
+  createWafRulesAllowedTuning = async ({ attackEvents, wafId, name }) => {
+    const requests = attackEvents.flatMap((attack) => {
+      const hasMatchValue = !!attack.matchValue
+
+      if (!attack?.top10Paths) {
+        const payload = this.adapter.createPayload(attack, hasMatchValue, name)
+        return [this._createTuningRequest({ wafId, payload })]
+      }
+
+      return attack.top10Paths.map(({ path }) => {
+        const payload = this.adapter.createPayload(attack, hasMatchValue, name, path)
+        return this._createTuningRequest({ wafId, payload })
+      })
+    })
+
+    return Promise.allSettled(requests)
+  }
+
+  deleteWafRuleAllowed = async ({ wafId, allowedId }) => {
+    await this.http.request({
+      url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
+      method: 'DELETE'
+    })
+
+    return 'WAF allowed rule successfully deleted'
+  }
+
+  editWafRuleAllowed = async ({ payload, wafId, allowedId }) => {
+    const adaptedPayload = this.adapter.adaptCreateWafRuleAllowedPayload(payload)
+    await this.http.request({
+      url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
+      method: 'PUT',
+      body: adaptedPayload
+    })
+
+    return 'Your waf rule allowed has been updated'
+  }
+
+  listWafRulesAllowed = async ({
+    wafId,
+    fields = '',
+    search = '',
+    ordering = '',
+    page = 1,
+    pageSize = 10
+  }) => {
+    const params = { fields, ordering, page, pageSize, search }
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${wafId}/exceptions`,
+      method: 'GET',
+      params
+    })
+
+    return this.adapter?.transformListWafRulesAllowed?.(data) ?? data
+  }
+
+  loadWafRuleAllowed = async ({ wafId, allowedId }) => {
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
+      method: 'GET'
+    })
+
+    return this.adapter?.transformLoadWafRuleAllowed?.(data) ?? data
+  }
+
+
 }

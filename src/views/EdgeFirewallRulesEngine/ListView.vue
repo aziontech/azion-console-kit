@@ -240,7 +240,6 @@
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="networkListsService.listNetworkLists"
     :loadNetworkListService="networkListsService.loadNetworkList"
-    :loadWafRulesService="loadWafRulesService"
     @onSuccess="reloadList"
   />
 
