@@ -10,6 +10,7 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { networkListsService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -55,14 +56,6 @@
     },
     edgeFirewallModules: {
       type: Object,
-      required: true
-    },
-    listNetworkListService: {
-      type: Function,
-      required: true
-    },
-    loadNetworkListService: {
-      type: Function,
       required: true
     },
     reorderRulesEngine: {
@@ -245,8 +238,8 @@
     :listFunctionsService="listFunctionsService"
     :loadService="loadEdgeFirewallRulesEngineService"
     :editService="editEdgeFirewallRulesEngineService"
-    :listNetworkListService="listNetworkListService"
-    :loadNetworkListService="loadNetworkListService"
+    :listNetworkListService="networkListsService.listNetworkLists"
+    :loadNetworkListService="networkListsService.loadNetworkList"
     :loadWafRulesService="loadWafRulesService"
     @onSuccess="reloadList"
   />
