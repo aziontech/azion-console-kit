@@ -136,7 +136,11 @@
         data.onSuccess()
       }
     } catch (error) {
-      showToast('error', 'Error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     } finally {
       loading.value = false
     }
