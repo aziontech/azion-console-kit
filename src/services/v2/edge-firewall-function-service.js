@@ -7,58 +7,61 @@ export class EdgeFirewallFunctionService {
     this.countFunctions = 0
   }
 
-  getUrl(edgeFirewallId, suffix = '') {
+  #getUrl(edgeFirewallId, suffix = '') {
     return `${this.baseURL}/${edgeFirewallId}/functions${suffix}`
+  }
+
+  #getTransformed(method, data, fallback) {
+    return this.adapter?.[method]?.(data) ?? fallback
   }
 
   async listFunctionsService(edgeFirewallId, params = { pageSize: 10 }) {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.getUrl(edgeFirewallId),
+      url: this.#getUrl(edgeFirewallId),
       params
     })
 
-    const parsedResults = this.adapter?.transformListFunction?.(data.results) ?? data.results
-
     return {
       count: data.count,
-      body: parsedResults
+      body: this.#getTransformed('transformListFunction', data.results, data.results)
     }
   }
 
   async listEdgeFirewallFunctionsService(edgeFirewallId, query = { pageSize: 10 }) {
-    const { body: instances, count } = await this.listFunctionsService(edgeFirewallId, query)
+    const { body: functionInstances, count } = await this.listFunctionsService(
+      edgeFirewallId,
+      query
+    )
     this.countFunctions = count
 
-    const enrichedFunctions = await this.resolveNamesForFunctions(instances)
+    const enrichedFunctions = await this.#enrichFunctionsWithNames(functionInstances)
 
     return {
-      body: enrichedFunctions,
+      body: this.#getTransformed('transformFunction', enrichedFunctions, enrichedFunctions),
       count
     }
   }
 
-  async resolveNamesForFunctions(functionInstances) {
+  async #enrichFunctionsWithNames(functionInstances) {
+    const unresolvedIds = new Set(functionInstances.map((fn) => fn.id))
+    const enriched = []
+    const nameMap = new Map()
+
     let page = 1
     const pageSize = 100
-    const unresolvedIds = new Set(functionInstances.map((functions) => functions.id))
-    const enriched = []
-
-    let functionNameMap = new Map()
 
     while (unresolvedIds.size > 0) {
-      const { results } = await this.listFunctionNames(page, pageSize)
+      const { results } = await this.#listFunctionNames({ page, pageSize, fields: 'id,name' })
       if (!results?.length) break
 
-      for (const func of results) {
-        functionNameMap.set(func.id, func.name)
-      }
+      results.forEach((fn) => nameMap.set(fn.id, fn.name))
 
       for (const instance of functionInstances) {
-        if (unresolvedIds.has(instance.id) && functionNameMap.has(instance.edgeFunctionId)) {
+        if (unresolvedIds.has(instance.id) && nameMap.has(instance.edgeFunctionId)) {
           enriched.push({
             ...instance,
-            functionInstanced: functionNameMap.get(instance.edgeFunctionId)
+            functionInstanced: nameMap.get(instance.edgeFunctionId)
           })
           unresolvedIds.delete(instance.id)
         }
@@ -68,63 +71,58 @@ export class EdgeFirewallFunctionService {
       page++
     }
 
-    return this.adapter?.transformFunction?.(enriched) ?? []
+    return enriched
   }
 
-  async listFunctionNames(params = { page: 1, pageSize: 100, fields: 'id,name' }) {
+  async #listFunctionNames(params = { page: 1, pageSize: 100, fields: 'id,name' }) {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.functionListEndpoint,
       params
     })
 
-    return {
-      results: data.results,
-      count: data.count
-    }
+    return { results: data.results, count: data.count }
   }
 
-  createEdgeFirewallService = async (payload) => {
-    const body = this.adapter?.transformPayloadFunction?.(payload, 'POST') ?? payload
+  async createEdgeFirewallService(payload) {
+    const body = this.#getTransformed('transformPayloadFunction', [payload, 'POST'], payload)
 
     await this.http.request({
       method: 'POST',
-      url: this.getUrl(payload.id),
+      url: this.#getUrl(payload.id),
       body
     })
 
-    return {
-      feedback: 'Your Function has been created'
-    }
+    return { feedback: 'Function successfully created' }
   }
 
-  editEdgeFirewallFunctionService = async (payload) => {
-    const body = this.adapter?.transformPayloadFunction?.(payload, 'PATCH') ?? payload
+  async editEdgeFirewallFunctionService(payload) {
+    const body = this.#getTransformed('transformPayloadFunction', [payload, 'PATCH'], payload)
 
     await this.http.request({
       method: 'PATCH',
-      url: this.getUrl(payload.edgeFirewallID, `/${payload.id}`),
+      url: this.#getUrl(payload.edgeFirewallID, `/${payload.id}`),
       body
     })
 
-    return 'Your Function has been updated'
+    return { feedback: 'Function successfully updated' }
   }
 
-  async loadFunctionsService(edgeFirewallId, functionID) {
+  async loadFunctionsService(edgeFirewallId, functionId) {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.getUrl(edgeFirewallId, `/${functionID}`)
+      url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    return this.adapter?.transformLoadEdgeFirewallFunction?.(data) ?? data.data
+    return this.#getTransformed('transformLoadEdgeFirewallFunction', data, data.data)
   }
 
-  deleteEdgeFirewallFunctionService = async (functionId, edgeFirewallID) => {
+  async deleteEdgeFirewallFunctionService(functionId, edgeFirewallId) {
     await this.http.request({
       method: 'DELETE',
-      url: this.getUrl(edgeFirewallID, `/${functionId}`)
+      url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    return 'Function successfully deleted'
+    return { feedback: 'Function successfully deleted' }
   }
 }

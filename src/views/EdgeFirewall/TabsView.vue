@@ -179,7 +179,6 @@
         >
           <EditView
             v-if="showMainSettingsTab"
-            :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"

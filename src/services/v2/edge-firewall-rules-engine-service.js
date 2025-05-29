@@ -58,11 +58,11 @@ export class EdgeFirewallRulesEngineService {
 
     await this.http.request({
       method: 'PATCH',
-      url: this.#getUrl(edgeFirewallId),
+      url: this.#getUrl(edgeFirewallId, `/${payload.id}`),
       body
     })
 
-    return { feedback: 'Rule Engine successfully updated' }
+    return 'Rule Engine successfully updated'
   }
 
   async loadEdgeFirewallRulesEngineService({ id, edgeFirewallId }) {
@@ -83,7 +83,7 @@ export class EdgeFirewallRulesEngineService {
       body
     })
 
-    return { feedback: 'Rules Engine successfully ordered' }
+    return 'Rules Engine successfully ordered'
   }
 
   async deleteEdgeFirewallRulesEngineService(ruleEngineId, edgeFirewallId) {
@@ -92,6 +92,6 @@ export class EdgeFirewallRulesEngineService {
       url: this.#getUrl(edgeFirewallId, `/${ruleEngineId}`)
     })
 
-    return { feedback: 'Rules Engine successfully deleted' }
+    return 'Rules Engine successfully deleted'
   }
 }

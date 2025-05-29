@@ -72,10 +72,6 @@
       required: true,
       type: String
     },
-    listEdgeFirewallFunctionService: {
-      required: true,
-      type: Function
-    },
     loadFunctionService: {
       required: true,
       type: Function
