@@ -86,7 +86,7 @@ export class EdgeFirewallRulesEngineService {
     return 'Rules Engine successfully ordered'
   }
 
-  async deleteEdgeFirewallRulesEngineService(ruleEngineId, edgeFirewallId) {
+  async deleteEdgeFirewallRulesEngineService(edgeFirewallId, ruleEngineId) {
     await this.http.request({
       method: 'DELETE',
       url: this.#getUrl(edgeFirewallId, `/${ruleEngineId}`)

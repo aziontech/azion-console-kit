@@ -147,12 +147,16 @@
         detail: 'Reorder saved'
       })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: error
+        })
+      }
     } finally {
       isLoadingButtonOrder.value = false
       reload()

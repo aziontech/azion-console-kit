@@ -5,33 +5,27 @@ export class EdgeFirewallService {
     this.baseURL = 'v4/edge_firewall/firewalls'
   }
 
-  #getUrl(suffix = '') {
-    return suffix ? `${this.baseURL}/${suffix}` : this.baseURL
-  }
-
-  #getTransformed(method, data, fallback) {
-    return this.adapter?.[method]?.(data) ?? fallback
-  }
-
-  async listEdgeFirewallService(params = { pageSize: 10 }) {
+  listEdgeFirewallService = async (params = { pageSize: 10 }) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
       params
     })
 
-    const transformed = await Promise.all(
-      this.#getTransformed('transformListEdgeFirewall', data.results, data.results)
+    const { results, count } = data
+
+    const parsedEdgeFirewalls = await Promise.all(
+      this.adapter?.transformListEdgeFirewall?.(results) ?? results
     )
 
     return {
-      count: data.count,
-      body: transformed
+      count,
+      body: parsedEdgeFirewalls
     }
   }
 
-  async createEdgeFirewallService(payload) {
-    const body = this.#getTransformed('transformPayload', payload, payload)
+  createEdgeFirewallService = async (payload) => {
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
 
     const { data } = await this.http.request({
       method: 'POST',
@@ -39,7 +33,7 @@ export class EdgeFirewallService {
       body
     })
 
-    const id = data?.data?.id
+    const { id } = data.data
 
     return {
       feedback: 'Your Edge Firewall has been created',
@@ -48,51 +42,49 @@ export class EdgeFirewallService {
     }
   }
 
-  async cloneEdgeFirewallService(name, id) {
+  cloneEdgeFirewallService = async (name, id) => {
     const body = { name, id }
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(`${id}/clone`),
+      url: `${this.baseURL}/${id}/clone`,
       body
     })
-
-    const clonedId = data?.data?.id
 
     return {
       feedback: 'Your Edge Firewall has been cloned',
-      urlToEditView: `/edge-firewall/edit/${clonedId}`,
-      id: clonedId
+      urlToEditView: `/edge-firewall/edit/${data.data.id}`,
+      id: data.data.id
     }
   }
 
-  async editEdgeFirewallService(payload) {
-    const body = this.#getTransformed('requestPayload', payload, payload)
+  editEdgeFirewallService = async (payload) => {
+    const body = this.adapter?.requestPayload?.(payload) ?? payload
 
     await this.http.request({
       method: 'PATCH',
-      url: this.#getUrl(payload.id),
+      url: `${this.baseURL}/${payload.id}`,
       body
     })
 
-    return { feedback: 'Your Edge Firewall has been updated' }
+    return 'Your edge firewall has been updated'
   }
 
-  async loadEdgeFirewallService({ id }) {
+  loadEdgeFirewallService = async ({ id }) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#getUrl(id)
+      url: `${this.baseURL}/${id}`
     })
 
-    return this.#getTransformed('transformLoadEdgeFirewall', data, data.data)
+    return this.adapter?.transformLoadEdgeFirewall?.(data) ?? data.data
   }
 
-  async deleteEdgeFirewallService(id) {
+  deleteEdgeFirewallService = async (id) => {
     await this.http.request({
       method: 'DELETE',
-      url: this.#getUrl(id)
+      url: `${this.baseURL}/${id}`
     })
 
-    return { feedback: 'Edge Firewall successfully deleted' }
+    return 'Edge Firewall successfully deleted'
   }
 }

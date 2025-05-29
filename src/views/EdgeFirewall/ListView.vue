@@ -48,7 +48,7 @@
       type: 'delete',
       title: 'edge firewall',
       icon: 'pi pi-trash',
-      service: edgeFirewallService.deleteCacheSettingService
+      service: edgeFirewallService.deleteEdgeFirewallService
     }
   ]
 
