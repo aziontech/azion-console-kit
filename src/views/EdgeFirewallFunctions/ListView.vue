@@ -60,7 +60,7 @@
   import PrimeButton from 'primevue/button'
   import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-
+  import { edgeFirewallFunctionService } from '@/services/v2'
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -143,11 +143,17 @@
   })
 
   const listFunctionsInstance = async (query) => {
-    return await props.listEdgeFirewallFunctionService(props.edgeFirewallID, query)
+    return await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
+      props.edgeFirewallID,
+      query
+    )
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionService(functionId, props.edgeFirewallID)
+    return await edgeFirewallFunctionService.deleteEdgeFirewallFunctionService(
+      functionId,
+      props.edgeFirewallID
+    )
   }
 
   const handleLoadData = (event) => {

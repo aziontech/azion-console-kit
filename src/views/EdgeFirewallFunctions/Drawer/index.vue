@@ -52,6 +52,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallFunctionService } from '@/services/v2'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -63,14 +64,6 @@
       required: true
     },
     createFunctionService: {
-      type: Function,
-      required: true
-    },
-    editFunctionService: {
-      required: true,
-      type: Function
-    },
-    loadFunctionService: {
       type: Function,
       required: true
     },
@@ -169,18 +162,17 @@
   }
 
   const editService = async (payload) => {
-    return await props.editFunctionService({
+    return await edgeFirewallFunctionService.editEdgeFirewallFunctionService({
       ...payload,
       edgeFirewallID: props.edgeFirewallID
     })
   }
 
   const loadService = async () => {
-    const functions = await props.loadFunctionService({
-      edgeFirewallID: props.edgeFirewallID,
-      functionID: selectedFunctionToEdit.value
-    })
-    return functions
+    return await edgeFirewallFunctionService.loadFunctionsService(
+      props.edgeFirewallID,
+      selectedFunctionToEdit.value
+    )
   }
 
   const openDrawerCreate = () => {

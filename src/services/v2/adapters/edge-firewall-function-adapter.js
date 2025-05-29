@@ -1,12 +1,18 @@
 export const EdgeFirewallFunctionAdapter = {
-  transformPayloadFunction(payload) {
-    return {
-      name: payload.name,
-      edge_function: payload.edgeFunctionID,
-      json_args: JSON.parse(payload.args)
+  transformPayloadFunction(data, action) {
+    const payload = {
+      name: data.name,
+      edge_function: data.edgeFunctionID,
+      json_args: JSON.parse(data.args)
     }
+
+    if (action === 'POST') {
+      payload.active = true
+    }
+
+    return payload
   },
-  transformListEdgeFirewallFunction(data) {
+  transformListFunction(data) {
     return (
       data?.map((edgeFirewall) => {
         return {
@@ -27,5 +33,27 @@ export const EdgeFirewallFunctionAdapter = {
       name: data.name,
       args: JSON.stringify(data.json_args, null, '\t')
     }
+  },
+  transformLoadEdgeFunction({ data }) {
+    return {
+      id: data.id,
+      name: data.name,
+      version: data.version || '-'
+    }
+  },
+  transformFunction(data) {
+    return (
+      data?.map((edgeFirewallFunction) => {
+        return {
+          id: edgeFirewallFunction.id,
+          name: edgeFirewallFunction.name,
+          functionInstanced: edgeFirewallFunction.functionInstanced,
+          lastEditor: edgeFirewallFunction.lastEditor,
+          modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+            new Date(edgeFirewallFunction.lastModified)
+          )
+        }
+      }) || []
+    )
   }
 }

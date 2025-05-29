@@ -79,7 +79,7 @@ export class EdgeFirewallService {
     return this.adapter?.transformLoadEdgeFirewall?.(data) ?? data.data
   }
 
-  deleteCacheSettingService = async (id) => {
+  deleteEdgeFirewallService = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
