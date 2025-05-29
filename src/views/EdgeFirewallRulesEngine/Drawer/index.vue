@@ -6,6 +6,7 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallRulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -216,23 +217,23 @@
   }
 
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await props.createService({
-      edgeFirewallId: props.edgeFirewallId,
+    return await edgeFirewallRulesEngineService.createEdgeFirewallRulesEngineService(
+      props.edgeFirewallId,
       payload
-    })
+    )
   }
 
   const loadEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await props.loadService({
+    return await edgeFirewallRulesEngineService.loadEdgeFirewallRulesEngineService({
       edgeFirewallId: props.edgeFirewallId,
       id: payload.id
     })
   }
   const editEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await props.editService({
-      edgeFirewallId: props.edgeFirewallId,
+    return await edgeFirewallRulesEngineService.editEdgeFirewallRulesEngineService(
+      props.edgeFirewallId,
       payload
-    })
+    )
   }
   onMounted(async () => {
     await Promise.all([listEdgeFirewallFunctionsOptions()])

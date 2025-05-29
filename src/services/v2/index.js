@@ -10,6 +10,9 @@ import { EdgeFirewallAdapter } from './adapters/edge-firewall-adapter'
 // Edge Firewall - Functions Service
 import { EdgeFirewallFunctionAdapter } from './adapters/edge-firewall-function-adapter'
 import { EdgeFirewallFunctionService } from './edge-firewall-function-service'
+// Edge Firewall - Rules Engine Service
+import { EdgeFirewallRulesEngineAdapter } from './adapters/edge-firewall-rules-engine-adapter'
+import { EdgeFirewallRulesEngineService } from './edge-firewall-rules-engine-service'
 
 const httpService = createHttpService()
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -18,5 +21,14 @@ const edgeFirewallFunctionService = new EdgeFirewallFunctionService(
   httpService,
   EdgeFirewallFunctionAdapter
 )
+const edgeFirewallRulesEngineService = new EdgeFirewallRulesEngineService(
+  httpService,
+  EdgeFirewallRulesEngineAdapter
+)
 
-export { vcsService, edgeFirewallService, edgeFirewallFunctionService }
+export {
+  vcsService,
+  edgeFirewallService,
+  edgeFirewallFunctionService,
+  edgeFirewallRulesEngineService
+}

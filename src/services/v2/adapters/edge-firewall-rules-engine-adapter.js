@@ -3,8 +3,10 @@ import {
   parseBehaviors,
   parseBehaviorsLoad,
   parseCriteriaLoad
-} from '../../edge-firewall-rules-engine-services/v4/parser-utils'
+} from '../utils/adapter/rule-engine-utils'
+
 import { getCurrentTimezone } from '@/helpers'
+
 const STATUS_AS_TAG = {
   true: {
     content: 'Active',
@@ -15,8 +17,9 @@ const STATUS_AS_TAG = {
     severity: 'danger'
   }
 }
+
 export const EdgeFirewallRulesEngineAdapter = {
-  transformListEdgeFirewallRulesEngine(results, data) {
+  transformListEdgeFirewallRulesEngine(data) {
     return (
       data?.map((rules, index) => {
         return {
@@ -31,7 +34,7 @@ export const EdgeFirewallRulesEngineAdapter = {
             immutableValue: index,
             altered: false,
             min: 0,
-            max: results.length - 1
+            max: data.length - 1
           }
         }
       }) || []
@@ -57,5 +60,11 @@ export const EdgeFirewallRulesEngineAdapter = {
       criteria: parseCriteriaLoad(data.criteria),
       behaviors: parseBehaviorsLoad(data.behaviors)
     }
+  },
+
+  transformReorderEdgeFirewallRulesEngine(data) {
+    const listNewOrderDataIds = data.map((data) => data.id)
+
+    return { order: listNewOrderDataIds }
   }
 }
