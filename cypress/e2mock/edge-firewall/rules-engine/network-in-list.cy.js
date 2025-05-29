@@ -10,7 +10,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
   beforeEach(() => {
     cy.login()
 
-    cy.intercept('GET', '/api/v4/edge_firewall/firewalls*', {
+    cy.intercept('GET', '/v4/edge_firewall/firewalls*', {
       statusCode: 200,
       body: {
         count: 1,
@@ -38,7 +38,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
     cy.openProduct('Edge Firewall')
     cy.wait('@listEdgeFirewalls')
 
-    cy.intercept('GET', `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}`, {
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}`, {
       statusCode: 200,
       body: {
         data: {
@@ -72,7 +72,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
       }
     }).as('listEdgeFirewallFunctions')
 
-    cy.intercept('GET', `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules*`, {
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules*`, {
       statusCode: 200,
       body: {
         count: 1,
@@ -91,7 +91,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
 
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules/${MOCK_RULE_ID}`,
+      `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules/${MOCK_RULE_ID}`,
       {
         statusCode: 200,
         body: {

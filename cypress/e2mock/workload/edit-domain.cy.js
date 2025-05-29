@@ -33,7 +33,7 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
   cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
   cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
-  cy.intercept('GET', '/api/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
+  cy.intercept('GET', '/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
   cy.get(selectors.edgeFirewall.saveButton).click()
   cy.verifyToast('success', 'Your Edge Firewall has been created')
   cy.wait('@retrieveEdgeFirewall')
@@ -122,14 +122,13 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.cipherSuite).click()
     cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
-    cy.wait('@getEdgeFirewalls')
     cy.wait('@getEdgeApplicationList')
 
     cy.get(selectors.workload.edgeFirewallField).click()
     cy.get(selectors.workload.edgeFirewallDropdownSearch).clear()
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=${firewallName}`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
     cy.get(selectors.workload.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')

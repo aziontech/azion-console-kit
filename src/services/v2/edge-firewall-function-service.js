@@ -93,7 +93,7 @@ export class EdgeFirewallFunctionService {
       body
     })
 
-    return { feedback: 'Function successfully created' }
+    return { feedback: 'Your Function has been created' }
   }
 
   editEdgeFirewallFunctionService = async (payload) => {
@@ -123,6 +123,6 @@ export class EdgeFirewallFunctionService {
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    return { feedback: 'Function successfully deleted' }
+    return 'Function successfully deleted'
   }
 }
