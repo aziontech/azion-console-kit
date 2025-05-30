@@ -11,7 +11,7 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
@@ -97,7 +97,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .click()
     cy.intercept(
       'GET',
-      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
+      '/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
     ).as('getFunctionInstance')
     cy.wait('@postFunction')
     cy.wait('@getFunctionInstance')

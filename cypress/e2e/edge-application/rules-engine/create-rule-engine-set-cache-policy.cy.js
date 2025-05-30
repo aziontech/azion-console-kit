@@ -62,9 +62,9 @@ const createWorkload = () => {
   cy.get(selectors.workload.cipherSuite).click()
   cy.get(selectors.workload.dropdownSelectCipher).find('li').eq(2).click()
 
-  cy.intercept('GET', '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
+  cy.intercept('GET', '/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
   cy.intercept(
-    { method: 'POST', url: '/api/v4/workspace/workloads' },
+    { method: 'POST', url: '/v4/workspace/workloads' },
     { body: payloadRequestWorkload, statusCode: 202 }
   ).as('createWorkload')
 
@@ -83,7 +83,7 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
@@ -92,7 +92,7 @@ const createEdgeApplicationCase = () => {
   createCacheSettings()
 
   cy.intercept(
-    { method: 'PATCH', url: '/api/v4/edge_application/applications/*/rules/*' },
+    { method: 'PATCH', url: '/v4/edge_application/applications/*/rules/*' },
     { body: {}, statusCode: 202 }
   )
 

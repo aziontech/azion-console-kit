@@ -1,3 +1,168 @@
+<script setup>
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
+  import EdgeConnectorApplication from './EdgeConnectorApplication.vue'
+  import WorkloadEdgeApplication from './WorkloadEdgeApplication.vue'
+  import CacheEdgeApplication from './CacheEdgeApplication.vue'
+  import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
+  import PrimeButton from 'primevue/button'
+  import { useRoute, useRouter } from 'vue-router'
+  import { disabledBackButton } from '@/helpers'
+  import { rulesEngineService } from '@/services/v2'
+
+  import { ref, computed, onMounted } from 'vue'
+
+  const props = defineProps({
+    workloadService: { type: Object, required: true },
+    edgeConnectorServices: { type: Object, required: true }
+  })
+
+  const activeAccordionTab = ref([])
+  const hasBindWorkload = ref(false)
+  const hasCreateEdgeConnector = ref(false)
+  const hasCreateCache = ref(false)
+  const route = useRoute()
+  const router = useRouter()
+  const tabOrigin = ref([])
+  const tabWorkload = ref([])
+  const tabCache = ref([])
+  const edgeConnectorId = ref(0)
+  const cacheSettingId = ref(0)
+  const edgeApplicationId = ref(route.params.id)
+  const rulesEngine = ref(null)
+  const loadingFinishedConfig = ref(false)
+
+  const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
+  const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
+
+  const hideOriginBorder = computed(() =>
+    activeAccordionTab.value.includes(0) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const hideDomainBorder = computed(() =>
+    activeAccordionTab.value.includes(1) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const hideCacheBorder = computed(() =>
+    activeAccordionTab.value.includes(2) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
+  )
+
+  const textInfoEdgeConnector = computed(() => {
+    if (hasCreateEdgeConnector.value) {
+      return {
+        description:
+          'The application will use the Edge Connector servers and hosts as configured. To edit these settings, go to the Edge Connector.',
+        title: 'Default Edge Connector defined!'
+      }
+    }
+    return {
+      description: 'Customize settings related to Edge Connector servers and hosts.',
+      title: 'Define a default Edge Connector'
+    }
+  })
+
+  const textInfoWorkload = computed(() => {
+    if (hasBindWorkload.value) {
+      return {
+        description:
+          'The selected workload is now associated with this application. To edit these settings, go to the Workloads page and select the workload > Deployment.',
+        title: 'Workload associed!'
+      }
+    }
+    return {
+      description: 'Create the workload to associate with the edge application.',
+      title: 'Associate a workload'
+    }
+  })
+
+  const textInfoCache = computed(() => {
+    if (hasCreateCache.value) {
+      return {
+        description:
+          'The edge will handle TTL values sent by the origin and content cache as set. To edit these settings, go to the Edge Application page and select the application > Cache Settings.',
+        title: 'Cache expiration policies set!'
+      }
+    }
+    return {
+      description:
+        'Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge.',
+      title: 'Set cache expiration policies'
+    }
+  })
+
+  const finishedConfiguration = computed(
+    () => hasBindWorkload.value && hasCreateCache.value && hasCreateEdgeConnector.value
+  )
+  const primaryActionLabel = computed(() =>
+    finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
+  )
+
+  const onSubmit = async () => {
+    if (hasCreateCache.value && hasCreateEdgeConnector.value) {
+      loadingFinishedConfig.value = true
+      const payload = {
+        ...rulesEngine.value.body[0],
+        phase: 'default',
+        behaviors: [
+          {
+            name: 'set_edge_connector',
+            edgeConnectorId: edgeConnectorId.value
+          },
+          {
+            name: 'set_cache_policy',
+            cacheId: cacheSettingId.value
+          }
+        ]
+      }
+      try {
+        await rulesEngineService.editRulesEngine({
+          edgeApplicationId: edgeApplicationId.value,
+          payload
+        })
+      } finally {
+        loadingFinishedConfig.value = false
+      }
+    }
+    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
+  }
+
+  const closeAccordionTab = (tab) => {
+    tab.value = tab.value.filter((item) => item !== 0)
+  }
+
+  const handleResponseEdgeConnector = (value) => {
+    edgeConnectorId.value = value.id
+    handleResponse('edgeConnector')
+  }
+
+  const handleResponseCache = (value) => {
+    cacheSettingId.value = value.cacheId
+    handleResponse('cache')
+  }
+
+  const handleResponse = (tab) => {
+    if (tab === 'edgeConnector') {
+      hasCreateEdgeConnector.value = true
+      closeAccordionTab(tabOrigin)
+    }
+    if (tab === 'cache') {
+      hasCreateCache.value = true
+      closeAccordionTab(tabCache)
+    }
+    if (tab === 'workloads') {
+      hasBindWorkload.value = true
+      closeAccordionTab(tabWorkload)
+    }
+  }
+
+  onMounted(async () => {
+    disabledBackButton()
+    rulesEngine.value = await rulesEngineService.listRulesEngine({
+      edgeApplicationId: edgeApplicationId.value
+    })
+  })
+</script>
+
 <template>
   <div class="flex flex-col">
     <section class="flex my-10 m-auto h-full">
@@ -145,167 +310,3 @@
     />
   </div>
 </template>
-<script setup>
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
-  import EdgeConnectorApplication from './EdgeConnectorApplication.vue'
-  import WorkloadEdgeApplication from './WorkloadEdgeApplication.vue'
-  import CacheEdgeApplication from './CacheEdgeApplication.vue'
-  import actionBarSkitConfig from '@/templates/action-bar-block/action-bar-skit-config.vue'
-  import PrimeButton from 'primevue/button'
-  import { useRoute, useRouter } from 'vue-router'
-  import { disabledBackButton } from '@/helpers'
-
-  import { ref, computed, onMounted } from 'vue'
-
-  const props = defineProps({
-    workloadService: { type: Object, required: true },
-    edgeConnectorServices: { type: Object, required: true },
-    rulesEngineServices: { type: Object, required: true }
-  })
-
-  const activeAccordionTab = ref([])
-  const hasBindWorkload = ref(false)
-  const hasCreateEdgeConnector = ref(false)
-  const hasCreateCache = ref(false)
-  const route = useRoute()
-  const router = useRouter()
-  const tabOrigin = ref([])
-  const tabWorkload = ref([])
-  const tabCache = ref([])
-  const edgeConnectorId = ref(0)
-  const cacheSettingId = ref(0)
-  const edgeApplicationId = ref(route.params.id)
-  const rulesEngine = ref(null)
-  const loadingFinishedConfig = ref(false)
-
-  const STYLE_HEADER_ACCORDION = 'flex flex-row-reverse p-8 gap-2'
-  const STYLE_HEADER_HIDE_BORDER = `${STYLE_HEADER_ACCORDION} border-b-0`
-
-  const hideOriginBorder = computed(() =>
-    activeAccordionTab.value.includes(0) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
-  )
-
-  const hideDomainBorder = computed(() =>
-    activeAccordionTab.value.includes(1) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
-  )
-
-  const hideCacheBorder = computed(() =>
-    activeAccordionTab.value.includes(2) ? STYLE_HEADER_HIDE_BORDER : STYLE_HEADER_ACCORDION
-  )
-
-  const textInfoEdgeConnector = computed(() => {
-    if (hasCreateEdgeConnector.value) {
-      return {
-        description:
-          'The application will use the Edge Connector servers and hosts as configured. To edit these settings, go to the Edge Connector.',
-        title: 'Default Edge Connector defined!'
-      }
-    }
-    return {
-      description: 'Customize settings related to Edge Connector servers and hosts.',
-      title: 'Define a default Edge Connector'
-    }
-  })
-
-  const textInfoWorkload = computed(() => {
-    if (hasBindWorkload.value) {
-      return {
-        description:
-          'The selected workload is now associated with this application. To edit these settings, go to the Workloads page and select the workload > Deployment.',
-        title: 'Workload associed!'
-      }
-    }
-    return {
-      description: 'Create the workload to associate with the edge application.',
-      title: 'Associate a workload'
-    }
-  })
-
-  const textInfoCache = computed(() => {
-    if (hasCreateCache.value) {
-      return {
-        description:
-          'The edge will handle TTL values sent by the origin and content cache as set. To edit these settings, go to the Edge Application page and select the application > Cache Settings.',
-        title: 'Cache expiration policies set!'
-      }
-    }
-    return {
-      description:
-        'Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge.',
-      title: 'Set cache expiration policies'
-    }
-  })
-
-  const finishedConfiguration = computed(
-    () => hasBindWorkload.value && hasCreateCache.value && hasCreateEdgeConnector.value
-  )
-  const primaryActionLabel = computed(() =>
-    finishedConfiguration.value ? 'Finish Setup' : 'Skip Configuration'
-  )
-
-  const onSubmit = async () => {
-    if (hasCreateCache.value && hasCreateEdgeConnector.value) {
-      loadingFinishedConfig.value = true
-      const payload = {
-        ...rulesEngine.value.body[0],
-        phase: 'default',
-        behaviors: [
-          {
-            name: 'set_edge_connector',
-            edgeConnectorId: edgeConnectorId.value
-          },
-          {
-            name: 'set_cache_policy',
-            cacheId: cacheSettingId.value
-          }
-        ]
-      }
-      try {
-        await props.rulesEngineServices.editRulesEngineService({
-          id: edgeApplicationId.value,
-          payload
-        })
-      } finally {
-        loadingFinishedConfig.value = false
-      }
-    }
-    router.push({ name: 'edit-edge-application', params: { id: edgeApplicationId.value } })
-  }
-
-  const closeAccordionTab = (tab) => {
-    tab.value = tab.value.filter((item) => item !== 0)
-  }
-
-  const handleResponseEdgeConnector = (value) => {
-    edgeConnectorId.value = value.id
-    handleResponse('edgeConnector')
-  }
-
-  const handleResponseCache = (value) => {
-    cacheSettingId.value = value.cacheId
-    handleResponse('cache')
-  }
-
-  const handleResponse = (tab) => {
-    if (tab === 'edgeConnector') {
-      hasCreateEdgeConnector.value = true
-      closeAccordionTab(tabOrigin)
-    }
-    if (tab === 'cache') {
-      hasCreateCache.value = true
-      closeAccordionTab(tabCache)
-    }
-    if (tab === 'workloads') {
-      hasBindWorkload.value = true
-      closeAccordionTab(tabWorkload)
-    }
-  }
-
-  onMounted(async () => {
-    disabledBackButton()
-    rulesEngine.value = await props.rulesEngineServices.listRulesEngineService({
-      id: edgeApplicationId.value
-    })
-  })
-</script>

@@ -10,7 +10,7 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
