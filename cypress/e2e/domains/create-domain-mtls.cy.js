@@ -62,7 +62,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',

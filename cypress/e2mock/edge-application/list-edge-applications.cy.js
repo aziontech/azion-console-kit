@@ -3,7 +3,7 @@ import selectors from '../../support/selectors'
 describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
   beforeEach(() => {
     cy.login()
-    cy.intercept('GET', '/api/v4/edge_application/*', {
+    cy.intercept('GET', '/v4/edge_application/*', {
       fixture: '/edge-application/edge-applications.json'
     }).as('edgeApplicationsListApi')
 
@@ -13,7 +13,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
   })
 
     it('Should filter the list of edge applications.', function () {
-      cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      cy.intercept('GET', '/v4/edge_application/*', (req) => {
         if (req.url.includes('search=foo+1')) {
           req.reply({
             fixture: '/edge-application/edge-applications-filtered.json'
@@ -31,7 +31,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     })
 
     it('Should display empty state when filters result in no data', function () {
-      cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      cy.intercept('GET', '/v4/edge_application/*', (req) => {
         if (req.url.includes('search=no+data')) {
           req.reply({
             count: 0,
@@ -52,7 +52,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     it('should ordering edge applications list', function () {
       cy.get(selectors.list.pageNumber.option('5')).click()
 
-      cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      cy.intercept('GET', '/v4/edge_application/*', (req) => {
         if (req.url.includes('ordering=name')) {
           req.reply({
             fixture: '/edge-application/edge-applications-ordering-name.json'
@@ -71,7 +71,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     })
 
     it('should change page size of edge applications list', function () {
-      cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      cy.intercept('GET', '/v4/edge_application/*', (req) => {
         if (req.url.includes('page_size=100')) {
           req.reply({
             fixture: '/edge-application/edge-applications-page-size-100.json'
@@ -88,7 +88,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     })
 
     it('should paginate correctly list', function () {
-      cy.intercept('GET', '/api/v4/edge_application/*', (req) => {
+      cy.intercept('GET', '/v4/edge_application/*', (req) => {
         if (req.url.includes('page_size=10')) {
           req.reply({
             fixture: '/edge-application/edge-applications-paginated.json'
@@ -114,7 +114,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
       body: { state: 'pending', data: null }
     }).as('deleteEdgeApplicationApi')
 
-    cy.intercept('GET', '/api/v4/edge_application/*', {
+    cy.intercept('GET', '/v4/edge_application/*', {
       fixture: '/edge-application/edge-applications.json'
     }).as('filteredEdgeApplicationsListApi')
 
