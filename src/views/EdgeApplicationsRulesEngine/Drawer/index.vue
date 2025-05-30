@@ -2,6 +2,7 @@
   import { ref, inject, onMounted } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
@@ -161,11 +162,17 @@
 
     try {
       loadingFunctionsInstance.value = true
-      const responseFunctions = await props.listEdgeApplicationFunctionsService({
-        id: props.edgeApplicationId,
-        fields: ['id', 'name']
+      const params = { fields: ['id', 'name'] }
+      const responseFunctions = await edgeApplicationFunctionService.listFunctions(
+        props.edgeApplicationId,
+        params
+      )
+      functionsInstanceOptions.value = responseFunctions.map((el) => {
+        return {
+          id: el.id,
+          name: el.name.text
+        }
       })
-      functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
       toast.add({
         closable: true,
