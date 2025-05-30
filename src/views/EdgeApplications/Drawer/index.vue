@@ -5,7 +5,8 @@
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsCreateEdgeApplications'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeApplicationService } from '@/services/edge-application-services/v4'
+  import { edgeAppService } from '@/services/v2'
+
   import { useRoute } from 'vue-router'
 
   defineOptions({
@@ -74,7 +75,7 @@
     v-if="showCreateDrawer"
     data-testid="edge-application-drawer"
     v-model:visible="showCreateEdgeApplicationsDrawer"
-    :createService="createEdgeApplicationService"
+    :createService="edgeAppService.createEdgeApplicationService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"

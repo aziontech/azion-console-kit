@@ -62,6 +62,9 @@ const createDigitalCertificateCase = () => {
 
 describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 

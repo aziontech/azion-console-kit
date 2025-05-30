@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :editService="props.editEdgeApplicationService"
+    :editService="edgeAppService.editEdgeApplicationService"
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
@@ -39,15 +39,12 @@
   const emit = defineEmits(['updatedApplication'])
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeAppService } from '@/services/v2'
 
   const tracker = inject('tracker')
   const unsavedStatus = inject('unsaved')
 
   const props = defineProps({
-    editEdgeApplicationService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true

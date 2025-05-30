@@ -56,7 +56,7 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { useRouter } from 'vue-router'
-  import * as EdgeApplicationService from '@/services/edge-application-services/v4'
+  import { edgeAppService } from '@/services/v2'
   import * as yup from 'yup'
   import { useField, useForm } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
@@ -106,19 +106,23 @@
   const cloneEdgeApplication = handleSubmit(async () => {
     try {
       loading.value = true
-      const response = await EdgeApplicationService.cloneEdgeApplicationService({
-        edgeApplicationName: edgeApplicationName.value,
-        payload: edgeApplication
+      const response = await edgeAppService.cloneEdgeApplicationService({
+        ...edgeApplication,
+        edgeApplicationName: edgeApplicationName.value
       })
       feedbackEdgeAppCloned(response)
       emit('cloneCancel')
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: error
+        })
+      }
     } finally {
       loading.value = false
       closeDialog()

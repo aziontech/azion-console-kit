@@ -10,7 +10,7 @@
       <CreateFormBlock
         @on-response="handleTrackCreation"
         @on-response-fail="handleTrackFailedCreation"
-        :createService="props.createEdgeApplicationService"
+        :createService="edgeAppService.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
         data-testid="create-edge-application-form-block"
@@ -46,17 +46,11 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeAppService } from '@/services/v2'
 
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'
   const route = useRoute()
-
-  const props = defineProps({
-    createEdgeApplicationService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validationSchema = yup.object({
     name: yup.string().required()
