@@ -11,8 +11,8 @@ export class EdgeFirewallFunctionService {
     return `${this.baseURL}/${edgeFirewallId}/functions${suffix}`
   }
 
-  #getTransformed = (method, data, fallback) => {
-    return this.adapter?.[method]?.(data) ?? fallback
+  #getTransformed = (method, data) => {
+    return this.adapter?.[method]?.(data) ?? data
   }
 
   listFunctionsService = async (edgeFirewallId, params = { pageSize: 10 }) => {
@@ -24,7 +24,7 @@ export class EdgeFirewallFunctionService {
 
     return {
       count: data.count,
-      body: this.#getTransformed('transformListFunction', data.results, data.results)
+      body: this.#getTransformed('transformListFunction', data.results)
     }
   }
 
@@ -38,7 +38,7 @@ export class EdgeFirewallFunctionService {
     const enrichedFunctions = await this.#enrichFunctionsWithNames(functionInstances)
 
     return {
-      body: this.#getTransformed('transformFunction', enrichedFunctions, enrichedFunctions),
+      body: this.#getTransformed('transformFunction', enrichedFunctions),
       count
     }
   }
@@ -85,7 +85,7 @@ export class EdgeFirewallFunctionService {
   }
 
   createEdgeFirewallService = async (payload) => {
-    const body = this.#getTransformed('transformPayloadFunction', [payload, 'POST'], payload)
+    const body = this.#getTransformed('transformPayloadFunction', [payload, 'POST'])
 
     await this.http.request({
       method: 'POST',
@@ -97,7 +97,7 @@ export class EdgeFirewallFunctionService {
   }
 
   editEdgeFirewallFunctionService = async (payload) => {
-    const body = this.#getTransformed('transformPayloadFunction', [payload, 'PATCH'], payload)
+    const body = this.#getTransformed('transformPayloadFunction', [payload, 'PATCH'])
 
     await this.http.request({
       method: 'PATCH',
@@ -105,7 +105,7 @@ export class EdgeFirewallFunctionService {
       body
     })
 
-    return { feedback: 'Function successfully updated' }
+    return 'Function successfully updated'
   }
 
   loadFunctionsService = async (edgeFirewallId, functionId) => {
@@ -114,7 +114,7 @@ export class EdgeFirewallFunctionService {
       url: this.#getUrl(edgeFirewallId, `/${functionId}`)
     })
 
-    return this.#getTransformed('transformLoadEdgeFirewallFunction', data, data.data)
+    return this.#getTransformed('transformLoadEdgeFirewallFunction', data.data)
   }
 
   deleteEdgeFirewallFunctionService = async (functionId, edgeFirewallId) => {

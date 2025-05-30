@@ -1,17 +1,13 @@
 export const EdgeFirewallFunctionAdapter = {
   transformPayloadFunction(data) {
     const [payloadRequest, action] = data
-    const payload = {
+
+    return {
       name: payloadRequest.name,
       edge_function: payloadRequest.edgeFunctionID,
-      json_args: JSON.parse(payloadRequest.args)
+      json_args: JSON.parse(payloadRequest.args),
+      ...(action === 'POST' && { active: true })
     }
-
-    if (action === 'POST') {
-      payload.active = true
-    }
-
-    return payload
   },
   transformListFunction(data) {
     return (
@@ -27,7 +23,7 @@ export const EdgeFirewallFunctionAdapter = {
       }) || []
     )
   },
-  transformLoadEdgeFirewallFunction({ data }) {
+  transformLoadEdgeFirewallFunction(data) {
     return {
       id: data.id,
       edgeFunctionID: data.edge_function,

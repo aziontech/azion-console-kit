@@ -9,8 +9,8 @@ export class EdgeFirewallRulesEngineService {
     return `${this.baseURL}/${edgeFirewallId}/rules${suffix}`
   }
 
-  #getTransformed = (method, data, fallback) => {
-    return this.adapter?.[method]?.(data) ?? fallback
+  #getTransformed = (method, data) => {
+    return this.adapter?.[method]?.(data) ?? data
   }
 
   listEdgeFirewallRulesEngineService = async ({ id, fields = '', search = '' }) => {
@@ -36,13 +36,13 @@ export class EdgeFirewallRulesEngineService {
       page++
     } while (allData.length < totalCount)
 
-    const body = this.#getTransformed('transformListEdgeFirewallRulesEngine', allData, allData)
+    const body = this.#getTransformed('transformListEdgeFirewallRulesEngine', allData)
 
     return { body, count: totalCount }
   }
 
   createEdgeFirewallRulesEngineService = async (edgeFirewallId, payload) => {
-    const body = this.#getTransformed('transformPayloadRulesEngine', payload, payload)
+    const body = this.#getTransformed('transformPayloadRulesEngine', payload)
 
     await this.http.request({
       method: 'POST',
@@ -54,7 +54,7 @@ export class EdgeFirewallRulesEngineService {
   }
 
   editEdgeFirewallRulesEngineService = async (edgeFirewallId, payload) => {
-    const body = this.#getTransformed('transformPayloadRulesEngine', payload, payload)
+    const body = this.#getTransformed('transformPayloadRulesEngine', payload)
 
     await this.http.request({
       method: 'PATCH',
@@ -71,11 +71,11 @@ export class EdgeFirewallRulesEngineService {
       url: this.#getUrl(edgeFirewallId, `/${id}`)
     })
 
-    return this.#getTransformed('transformLoadEdgeFirewallRulesEngine', data, data.data)
+    return this.#getTransformed('transformLoadEdgeFirewallRulesEngine', data.data)
   }
 
   reorderEdgeFirewallRulesEngineService = async (payload, edgeFirewallId) => {
-    const body = this.#getTransformed('transformReorderEdgeFirewallRulesEngine', payload, payload)
+    const body = this.#getTransformed('transformReorderEdgeFirewallRulesEngine', payload)
 
     await this.http.request({
       method: 'PUT',

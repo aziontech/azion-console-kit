@@ -51,7 +51,7 @@ export const EdgeFirewallRulesEngineAdapter = {
     }
   },
 
-  transformLoadEdgeFirewallRulesEngine({ data }) {
+  transformLoadEdgeFirewallRulesEngine(data) {
     return {
       id: data.id,
       name: data.name,
