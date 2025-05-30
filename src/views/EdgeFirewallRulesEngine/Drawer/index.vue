@@ -6,7 +6,7 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallRulesEngineService } from '@/services/v2'
+  import { edgeFirewallRulesEngineService, edgeFirewallFunctionService } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -202,15 +202,16 @@
   }
 
   const listFunctionsServiceWithDecorator = async () => {
-    return await props.listFunctionsService({
-      edgeFirewallID: props.edgeFirewallId
+    return await edgeFirewallFunctionService.listFunctionsService(props.edgeFirewallId, {
+      pageSize: 100,
+      fields: 'id,name'
     })
   }
 
   const listEdgeFirewallFunctionsOptions = async () => {
     try {
       const result = await listFunctionsServiceWithDecorator()
-      edgeFirewallFunctionsOptions.value = result
+      edgeFirewallFunctionsOptions.value = result.body
     } catch {
       hasEdgeFunctionsProductAccess.value = false
     }
