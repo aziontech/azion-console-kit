@@ -59,10 +59,6 @@
       required: true,
       type: Boolean
     },
-    listEdgeApplicationFunctionsService: {
-      required: true,
-      type: Function
-    },
     listOriginsService: {
       required: true,
       type: Function
@@ -256,7 +252,6 @@
     ref="drawerRulesEngineRef"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :isImageOptimizationEnabled="isImageOptimizationEnabled"
-    :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
     :listOriginsService="listOriginsService"
     :clipboardWrite="clipboardWrite"
     :edgeApplicationId="edgeApplicationId"
