@@ -55,7 +55,7 @@ export const EdgeFunctionsAdapter = {
     }
   },
 
-  transformLoadEdgeFunction(data, fields) {
+  transformLoadEdgeFunction({ data }, fields) {
     const adapt = adaptServiceDataResponseToLoad(data, fields, transformMap)
 
     if (fields.includes('active') || fields.includes('language')) {
