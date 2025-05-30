@@ -50,13 +50,11 @@ export class NetworkListsService {
       url: `${this.baseURL}/${id}`
     })
 
-    const { results } = data
-
     let transformedData = isDropdown
-      ? this.adapter?.transformLoadNetworkListToDropdown?.(results)
-      : this.adapter?.transformLoadNetworkList?.(results)
+      ? this.adapter?.transformLoadNetworkListToDropdown?.(data)
+      : this.adapter?.transformLoadNetworkList?.(data)
 
-    transformedData = transformedData ?? results
+    transformedData = transformedData ?? data
 
     return transformedData
   }
