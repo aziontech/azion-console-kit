@@ -10,7 +10,7 @@
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
-  import { wafService, networkListsService } from '@/services/v2'
+  import { wafService } from '@/services/v2'
 
   defineOptions({ name: 'tabs-waf-rules' })
 

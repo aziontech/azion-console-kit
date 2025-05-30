@@ -28,7 +28,6 @@ export const NetworkListsAdapter = {
     }
   },
   transformLoadNetworkList(response) {
-  console.log('response :', response);
     const { name, id, last_editor, type, items, last_modified } = response.data
     const isCountriesType = type === 'countries'
 
