@@ -60,7 +60,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
 
   it('should create a rule engine set cache policy', () => {
     cy.intercept(
-      { method: 'GET', url: '/v4/edge_connector/connectors?**' },
+      { method: 'GET', url: '/api/v4/edge_connector/connectors?**' },
       {
         statusCode: 200,
         body: edgeConnectorsdata
