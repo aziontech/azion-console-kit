@@ -7,19 +7,9 @@
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import { computed, ref, watch } from 'vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
+  import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer'])
-
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFunctionService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -31,15 +21,23 @@
   }
 
   const changeArgs = async (target) => {
-    if (target?.args) {
-      args.value = target.args
+    if (target?.jsonArgs) {
+      args.value = target.jsonArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return props.listEdgeFunctionsService({
+    return edgeFunctionService.listEdgeFunctionsDropdown({
       initiatorType: 'edge_firewall',
+      fields: ['id', 'name', 'json_args', 'initiator_type'],
       ...queryParams
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = (queryParams) => {
+    return edgeFunctionService.loadEdgeFunction({
+      ...queryParams,
+      fields: ['id', 'name', 'json_args']
     })
   }
 
@@ -96,9 +94,9 @@
           name="edgeFunctionID"
           required
           :service="listEdgeFunctionsServiceDecorator"
-          :loadService="props.loadEdgeFunctionService"
+          :loadService="loadEdgeFunctionServiceDecorator"
           :value="edgeFunctionID"
-          :moreOptions="['args']"
+          :moreOptions="['jsonArgs']"
           disableEmitFirstRender
           @onSelectOption="changeArgs"
           optionLabel="label"

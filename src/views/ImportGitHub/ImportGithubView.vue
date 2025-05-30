@@ -18,22 +18,6 @@
   const route = useRoute()
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
-    postCallbackUrlService: {
-      type: Function,
-      required: true
-    },
-    listIntegrationsService: {
-      type: Function,
-      required: true
-    },
-    listRepositoriesService: {
-      type: Function,
-      required: true
-    },
     listVulcanPresetsService: {
       type: Function,
       required: true
@@ -175,10 +159,6 @@
       >
         <template #form>
           <FormFieldsImportGithub
-            :listPlatformsService="listPlatformsService"
-            :listIntegrationsService="listIntegrationsService"
-            :listRepositoriesService="listRepositoriesService"
-            :postCallbackUrlService="postCallbackUrlService"
             :listVulcanPresetsService="listVulcanPresetsService"
             :frameworkDetectorService="frameworkDetectorService"
           />

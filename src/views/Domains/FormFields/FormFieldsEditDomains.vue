@@ -8,7 +8,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import Drawer from '@/views/EdgeApplications/Drawer'
+  import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'

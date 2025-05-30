@@ -2,6 +2,7 @@ import { getAccountInfoService, getUserInfoService } from '@/services/account-se
 import { loadAccountJobRoleService } from '@/services/account-settings-services'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
+import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
@@ -33,4 +34,5 @@ export const loadUserAndAccountInfo = async () => {
   }
 
   accountStore.setAccountData(accountInfo)
+  setFeatureFlags(accountInfo.client_flags)
 }

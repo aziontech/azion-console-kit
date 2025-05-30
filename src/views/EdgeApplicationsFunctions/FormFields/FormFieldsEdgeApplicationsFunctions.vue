@@ -5,22 +5,12 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import PrimeButton from 'primevue/button'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
+  import { edgeFunctionService } from '@/services/v2'
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
   const emit = defineEmits(['toggleDrawer'])
-
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFunctionService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -32,15 +22,23 @@
   }
 
   const changeArgs = (target) => {
-    if (target?.args) {
-      args.value = target?.args
+    if (target?.jsonArgs) {
+      args.value = target?.jsonArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return props.listEdgeFunctionsService({
+    return edgeFunctionService.listEdgeFunctionsDropdown({
       initiatorType: 'edge_application',
+      fields: ['id', 'name', 'json_args', 'initiator_type'],
       ...queryParams
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = (queryParams) => {
+    return edgeFunctionService.loadEdgeFunction({
+      ...queryParams,
+      fields: ['id', 'name', 'json_args']
     })
   }
 
@@ -98,8 +96,8 @@
           required
           name="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
-          :loadService="loadEdgeFunctionService"
-          :moreOptions="['args']"
+          :loadService="loadEdgeFunctionServiceDecorator"
+          :moreOptions="['jsonArgs']"
           disableEmitFirstRender
           optionLabel="label"
           optionValue="value"

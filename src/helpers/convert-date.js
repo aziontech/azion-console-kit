@@ -166,6 +166,15 @@ const formatDateToMonthYear = (date) => {
   return []
 }
 
+const formatDateToDayMonthYearHour = (date) => {
+  if (!date) return null
+
+  return new Intl.DateTimeFormat('us', {
+    dateStyle: 'full',
+    timeStyle: 'medium'
+  }).format(new Date(date))
+}
+
 const convertValueToDateByUserTimezone = (value, timezone) => {
   const date = new Date(value)
   const options = {
@@ -190,5 +199,6 @@ export {
   getCurrentMonthStartEnd,
   formatExhibitionDate,
   formatDateToMonthYear,
-  convertValueToDateByUserTimezone
+  convertValueToDateByUserTimezone,
+  formatDateToDayMonthYearHour
 }

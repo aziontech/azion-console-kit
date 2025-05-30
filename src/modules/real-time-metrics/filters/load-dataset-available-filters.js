@@ -65,8 +65,8 @@ export default async function LoadDatasetAvailableFilters(dataset) {
 
   if (!data.inputFields) return []
   const availableFilters = data.inputFields
-    .filter(FILTERS_RULES.verifyWhiteListFields)
-    .filter(FILTERS_RULES.verifyBlackListFields)
+    .filter(FILTERS_RULES().verifyWhiteListFields)
+    .filter(FILTERS_RULES().verifyBlackListFields)
     .filter(({ description }) => !description.includes('DEPRECATED'))
     .map(ParserObjectField)
     .reduce(

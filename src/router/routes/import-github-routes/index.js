@@ -1,4 +1,3 @@
-import * as VersionControlSystemService from '@/services/version-control-system-integration-services'
 import * as VulcanService from '@/services/vulcan-services'
 import * as GitHubServices from '@/services/github-services'
 import * as VariablesService from '@/services/variables-services'
@@ -15,10 +14,6 @@ export const importGithubRoutes = {
       name: 'github-repository-import',
       component: () => import('@/views/ImportGitHub/ImportGithubView.vue'),
       props: {
-        listPlatformsService: VersionControlSystemService.listPlatformsService,
-        postCallbackUrlService: VersionControlSystemService.postCallbackUrlService,
-        listIntegrationsService: VersionControlSystemService.listIntegrationsService,
-        listRepositoriesService: VersionControlSystemService.listRepositoriesService,
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
         createVariablesService: VariablesService.createVariablesService,

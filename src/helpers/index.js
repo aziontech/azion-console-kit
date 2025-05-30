@@ -42,9 +42,12 @@ import FILTERS_RULES from './real-time-filters-rules'
 import { openGraphQlPlayground } from './open-graphql-playground.js'
 import { eventsPlaygroundOpener } from './events-playground-opener'
 import { setRedirectRoute, getRedirectRoute } from './login-redirect-manager'
+import { disabledBackButton } from './browser-back-button'
 import { buildSummary } from './build-summary'
 import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
+import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
+import { adaptServiceDataResponse } from '../services/v2/utils/adaptServiceDataResponse'
 
 export {
   InviteSession,
@@ -90,8 +93,11 @@ export {
   eventsPlaygroundOpener,
   setRedirectRoute,
   getRedirectRoute,
+  disabledBackButton,
   buildSummary,
   INFORMATION_TEXTS,
   convertValueToDateByUserTimezone,
-  getCurrentTimezone
+  getCurrentTimezone,
+  TEXT_DOMAIN_WORKLOAD,
+  adaptServiceDataResponse
 }

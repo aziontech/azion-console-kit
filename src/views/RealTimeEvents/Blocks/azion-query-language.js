@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index.js'
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
 export default class Aql {
   constructor() {
     this.operators = ['<=', '>=', '=', '<>', '<', '>', 'like', 'ilike', 'between', 'in']
+    this.handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   }
 
   parse(query, suggestions, domains) {
@@ -60,7 +62,10 @@ export default class Aql {
         let parsedValue
         if (suggestion && operatorInfo.type.toLowerCase() === 'int') {
           parsedValue = Number(value)
-        } else if (operator.toUpperCase() === 'IN' && field.toLowerCase() === 'domain') {
+        } else if (
+          operator.toUpperCase() === 'IN' &&
+          field.toLowerCase() === this.handleTextDomainWorkload.singularLabel
+        ) {
           parsedValue = this.formatDomainValues(query, domains)
         } else {
           parsedValue = value.replace(/^["']|["']$/g, '')
@@ -84,7 +89,8 @@ export default class Aql {
 
     const normalizedField = field.trim()
 
-    if (normalizedField.toLowerCase() === 'domain') return 'configurationId'
+    if (normalizedField.toLowerCase() === this.handleTextDomainWorkload.singularLabel)
+      return 'configurationId'
 
     const words = normalizedField.split(/\s+/)
 
@@ -99,7 +105,7 @@ export default class Aql {
 
   formatDomainValues(query, domains) {
     const extractDomainClauseContent = (query) => {
-      const indicator = 'domain in ('
+      const indicator = `${this.handleTextDomainWorkload.singularLabel} in (`
       const lowerQuery = query.toLowerCase()
       const pos = lowerQuery.indexOf(indicator)
       if (pos === -1) return null
@@ -219,11 +225,11 @@ export default class Aql {
         }
       }
       case 'operator': {
-        const newQuery = `${query} ${suggestionLabel} `
+        const newQuery = `${query.trimEnd()} ${suggestionLabel} `
         return { query: newQuery, nextStep: 'value', label: fieldName }
       }
       case 'value': {
-        if (fieldName === 'domain') {
+        if (fieldName === this.handleTextDomainWorkload.singularLabel) {
           const suggestion = suggestionLabel.trim()
 
           let newQuery = ''
@@ -285,7 +291,10 @@ export default class Aql {
       if (query.endsWith(') ')) {
         return { operator: 'logicOperator', selectedField: '' }
       }
-      return { operator: 'value', selectedField: operatorFound === 'in' ? 'domain' : '' }
+      return {
+        operator: 'value',
+        selectedField: operatorFound === 'in' ? this.handleTextDomainWorkload.singularLabel : ''
+      }
     } else if (tokenForMatch && hasValueAfterOperator && query.endsWith(' ')) {
       return { operator: 'logicOperator', selectedField: '' }
     }
@@ -725,7 +734,7 @@ export default class Aql {
   }
 
   getValueSuggestions(domains, selectedFieldName) {
-    if (selectedFieldName === 'domain') {
+    if (selectedFieldName === this.handleTextDomainWorkload.singularLabel) {
       return domains
     }
     return []

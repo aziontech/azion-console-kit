@@ -104,8 +104,13 @@
         const response = await props.createService(values)
         handleSuccess(response)
       } catch (error) {
-        showToast('error', error)
-        emit('on-response-fail', error)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          const errorMessage = error?.message || error
+          showToast('error', errorMessage)
+          emit('on-response-fail', errorMessage)
+        }
         blockViewRedirection.value = true
       }
     },

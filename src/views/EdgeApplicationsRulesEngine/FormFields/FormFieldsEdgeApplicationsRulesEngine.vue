@@ -4,26 +4,37 @@
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+  import { cacheSettingsService } from '@/services/v2'
+
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import { createFunctionService } from '@/services/edge-application-functions-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import {
     listEdgeFunctionsDropdownService,
     loadEdgeFunctionService
   } from '@/services/edge-functions-services/v4'
+  import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
+
+  const getBehaviorsOriginOrEdgeConnectors = () => {
+    if (!hasFlagBlockApiV4()) {
+      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+    } else {
+      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+    }
+  }
 
   const CRITERIA_OPERATOR_OPTIONS = [
     { label: 'is equal', value: 'is_equal' },
@@ -40,7 +51,7 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false },
+    ...getBehaviorsOriginOrEdgeConnectors(),
     { label: 'Run Function', value: 'run_function', requires: false },
     { label: 'No Content (204)', value: 'no_content', requires: false }
   ]
@@ -159,9 +170,6 @@
     isApplicationAcceleratorEnabled: {
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      type: Boolean
-    },
     isImageOptimizationEnabled: {
       type: Boolean
     },
@@ -189,10 +197,6 @@
       type: Function,
       required: true
     },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
-    },
     loadingOrigins: {
       type: Boolean,
       default: false
@@ -217,7 +221,7 @@
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
         ? ' - Requires Application Accelerator'
         : empty,
-      https: !props.isDeliveryProtocolHttps ? ' - Requires Delivery Protocol with HTTPS' : empty,
+      https: empty,
       imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
       edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
     }
@@ -283,7 +287,7 @@
     {
       label: 'Redirect HTTP to HTTPS' + behaviorsLabelsTags.value.https,
       value: 'redirect_http_to_https',
-      requires: !props.isDeliveryProtocolHttps
+      requires: false
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
@@ -298,7 +302,7 @@
       requires: !props.isEdgeFunctionEnabled
     },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false }
+    ...getBehaviorsOriginOrEdgeConnectors()
   ])
 
   const behaviorsResponseOptions = ref([
@@ -528,7 +532,7 @@
         ref="drawerRef"
         @onSuccess="handleSuccess"
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
-        :createService="createCacheSettingsService"
+        :createService="cacheSettingsService.createCacheSettingsService"
         :edgeApplicationId="edgeApplicationId"
         :showTieredCache="isTieredCacheEnabled"
       />
@@ -539,14 +543,12 @@
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
       />
       <DrawerFunction
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
         :loadEdgeFunctionService="loadEdgeFunctionService"
-        :createFunctionService="createFunctionService"
         :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -829,6 +831,19 @@
                   </ul>
                 </template>
               </FieldDropdown>
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
+              <FieldDropdownLazyLoader
+                :service="listEdgeConnectorsService"
+                :loadService="loadEdgeConnectorsService"
+                :loading="loadingOrigins"
+                :name="`behaviors[${behaviorIndex}].edgeConnectorId`"
+                optionLabel="name"
+                optionValue="id"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.edgeConnectorId"
+                :data-testid="`edge-application-rule-form__edge-connector-item[${behaviorIndex}]`"
+              />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
