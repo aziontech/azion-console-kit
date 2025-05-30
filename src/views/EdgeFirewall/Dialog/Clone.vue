@@ -56,7 +56,8 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
 
   import { useRouter } from 'vue-router'
-  import * as EdgeFirewallService from '@/services/edge-firewall-services/v4'
+  import { edgeFirewallService } from '@/services/v2'
+
   import * as yup from 'yup'
 
   defineOptions({ name: 'Clone-Dialog' })
@@ -106,18 +107,22 @@
   const cloneEdgeFirewall = handleSubmit(async () => {
     try {
       loading.value = true
-      const response = await EdgeFirewallService.cloneEdgeFirewallService({
-        edgeFirewallName: edgeFirewallName.value,
-        payload: edgeFirewall
-      })
+      const response = await edgeFirewallService.cloneEdgeFirewallService(
+        edgeFirewallName.value,
+        edgeFirewall.id
+      )
       feedbackEdgeFirewallCloned(response)
       emit('cloneCancel')
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: error
+        })
+      }
     } finally {
       loading.value = false
       closeDialog()

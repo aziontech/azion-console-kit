@@ -75,7 +75,7 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
     cy.intercept(
       'GET',
@@ -109,7 +109,6 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
     cy.get(selectors.workload.edgeFirewallField).click()
     cy.get(selectors.workload.createEdgeFirewallButton).click()
     createEdgeFirewallCase()

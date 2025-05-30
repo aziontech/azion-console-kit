@@ -7,7 +7,7 @@
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
-
+  import { edgeFirewallService } from '@/services/v2'
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
@@ -40,7 +40,7 @@
 
   const loaderEdgeFirewall = async () => {
     try {
-      return await props.edgeFirewallServices.loadEdgeFirewallService({
+      return await edgeFirewallService.loadEdgeFirewallService({
         id: edgeFirewallId.value
       })
     } catch (error) {
@@ -177,7 +177,6 @@
         >
           <EditView
             v-if="showMainSettingsTab"
-            :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"

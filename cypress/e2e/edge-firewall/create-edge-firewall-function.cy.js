@@ -37,6 +37,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
 
     // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
+    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/functions').as('createFunction')
     cy.intercept('GET', '/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
@@ -46,6 +47,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.createFunctionButton).click()
     createFunctionCase()
     cy.get(selectors.edgeFirewall.functionInstanceSubmit).click()
+    cy.wait('@createFunction')
     cy.verifyToast('success', 'Your Function has been created')
 
     // Assert - Find created function

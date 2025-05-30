@@ -5,6 +5,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
+  import { edgeFirewallService } from '@/services/v2'
   import { inject } from 'vue'
 
   defineOptions({ name: 'create-edge-firewall' })
@@ -13,13 +14,6 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createEdgeFirewallService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -65,7 +59,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeFirewallService"
+        :createService="edgeFirewallService.createEdgeFirewallService"
         :schema="validationSchema"
         :initialValues="initialValues"
         @on-response="handleCreateEdgeFirewall"

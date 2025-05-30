@@ -4,6 +4,7 @@
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall'
   import { ref, inject } from 'vue'
   import * as yup from 'yup'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -13,9 +14,7 @@
   defineOptions({ name: 'edit-edge-firewall' })
   const emit = defineEmits(['updatedFirewall'])
 
-  const props = defineProps({
-    editEdgeFirewallService: { type: Function, required: true },
-    edgeFirewall: { type: Object },
+  defineProps({
     loadDomains: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -31,10 +30,6 @@
     wafEnabled: yup.boolean().label('WAF Enabled'),
     isActive: yup.boolean().label('Active')
   })
-
-  const loadEdgeFirewall = async () => {
-    return props.edgeFirewall
-  }
 
   const formSubmit = async (onSubmit, values, formValid) => {
     if (!formValid) return
@@ -67,8 +62,8 @@
 <template>
   <div>
     <EditFormBlock
-      :editService="props.editEdgeFirewallService"
-      :loadService="loadEdgeFirewall"
+      :editService="edgeFirewallService.editEdgeFirewallService"
+      :loadService="edgeFirewallService.loadEdgeFirewallService"
       :schema="validationSchema"
       :updatedRedirect="updatedRedirect"
       disableRedirect

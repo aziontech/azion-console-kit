@@ -2,7 +2,6 @@ import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
 import * as EdgeConnectorsService from '@/services/edge-connectors'
@@ -80,8 +79,6 @@ export const edgeApplicationRoutes = {
 
             loadEdgeApplicationsService:
               EdgeApplicationServices.loadEdgeApplicationsDropdownService,
-            listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-            loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
             listDigitalCertificatesService:
               DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
             loadDigitalCertificatesService:

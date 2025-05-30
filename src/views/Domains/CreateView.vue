@@ -18,8 +18,8 @@
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             :listDigitalCertificatesService="listDigitalCertificatesService"
             :loadDigitalCertificatesService="loadDigitalCertificatesService"
             :isLoadingRequests="isLoadingRequests"
@@ -51,6 +51,7 @@
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

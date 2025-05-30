@@ -12,8 +12,8 @@
         noBorder
         :listEdgeFirewallService="listEdgeFirewallService"
         :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="listDigitalCertificatesService"
-        :loadDigitalCertificatesService="loadDigitalCertificateService"
+        :listDigitalCertificatesService="edgeFirewallService.listEdgeFirewallService"
+        :loadDigitalCertificatesService="edgeFirewallService.loadEdgeFirewallService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
         :disabledEdgeApplicationDropdown="true"
@@ -35,6 +35,7 @@
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import * as yup from 'yup'
+  import { edgeFirewallService } from '@/services/v2'
 
   const emit = defineEmits(['createdDomain'])
 

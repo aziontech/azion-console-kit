@@ -62,6 +62,9 @@ const createDigitalCertificateCase = () => {
 
 describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -88,7 +91,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
 
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
 
     cy.intercept(
@@ -104,7 +107,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
+    // cy.wait('@getEdgeFirewallList')
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.createEdgeFirewallButton).click()
     createEdgeFirewallCase()

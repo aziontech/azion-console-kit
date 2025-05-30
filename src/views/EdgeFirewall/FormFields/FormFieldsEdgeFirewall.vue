@@ -63,7 +63,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Modules"
-    description="Activate modules to extend configuration possibilities. Some modules require subscription."
+    description="Modules a edge connectors."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -96,7 +96,7 @@
           auto
           :isCard="false"
           title="Active"
-          subtitle="Rules that were successfully executed will be shown under the $traceback field in Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
+          subtitle="Rules that were successfully executed will be shown under the Straceback field in Data Streaming and Real-Time \nEvents or the stacktrace variable in GraphQL."
         />
       </div>
     </template>

@@ -9,10 +9,7 @@
     listEdgeApplicationsService,
     loadEdgeApplicationsService
   } from '@/services/edge-application-services/v4'
-  import {
-    listEdgeFirewallService,
-    loadEdgeFirewallService
-  } from '@/services/edge-firewall-services/v4'
+  import { edgeFirewallService } from '@/services/v2'
   import {
     loadDigitalCertificateService,
     listDigitalCertificatesServiceDropdown
@@ -160,8 +157,8 @@
   >
     <template #formFields>
       <FormFieldsCreateDomains
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
         :listDigitalCertificatesService="listDigitalCertificatesServiceDropdown"
         :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"

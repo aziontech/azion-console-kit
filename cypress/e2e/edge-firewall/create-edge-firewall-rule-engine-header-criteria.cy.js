@@ -38,7 +38,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.ruleBehaviorFirstOption).click()
 
-    cy.intercept('POST', '/api/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
+    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
 
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
 
