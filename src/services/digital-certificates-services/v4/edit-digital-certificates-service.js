@@ -14,6 +14,10 @@ export const editDigitalCertificateService = async (payload) => {
   return parseHttpResponse(httpResponse)
 }
 
+const isLetsEncrypt = (payload) => {
+  return payload.authority === 'lets_encrypt'
+}
+
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
@@ -26,6 +30,11 @@ const parseHttpResponse = (httpResponse) => {
 }
 
 const adapt = (payload) => {
+  if (isLetsEncrypt(payload)) {
+    return {
+      name: payload.name
+    }
+  }
   return {
     name: payload.name,
     certificate: payload.certificate === '' ? undefined : payload.certificate,
