@@ -14,7 +14,6 @@
 
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
-  import { createFunctionService } from '@/services/edge-application-functions-services'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import {
@@ -550,7 +549,6 @@
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
         :loadEdgeFunctionService="loadEdgeFunctionService"
-        :createFunctionService="createFunctionService"
         :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

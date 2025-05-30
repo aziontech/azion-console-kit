@@ -1,10 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as FunctionsService from '@/services/edge-application-functions-services'
-import * as FunctionsServiceV4 from '@/services/edge-application-functions-services/v4'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
-import * as EdgeFunctionsServiceV4 from '@/services/edge-functions-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
 import * as EdgeConnectorsService from '@/services/edge-connectors'
@@ -140,18 +137,9 @@ export const edgeApplicationRoutes = {
             documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
           },
           functionsServices: {
-            createFunctionService: FunctionsServiceV4.createFunctionService,
-            deleteFunctionService: FunctionsServiceV4.deleteFunctionService,
-            listEdgeApplicationFunctionsService:
-              FunctionsService.listEdgeApplicationFunctionsService,
-            loadFunctionService: FunctionsServiceV4.loadFunctionService,
-            editFunctionService: FunctionsServiceV4.editFunctionService,
             documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
           },
-          edgeFunctionsServices: {
-            listEdgeFunctionsService: EdgeFunctionsServiceV4.listEdgeFunctionsDropdownService,
-            loadEdgeFunctionService: EdgeFunctionsServiceV4.loadEdgeFunctionService
-          },
+          edgeFunctionsServices: {},
           deviceGroupsServices: {
             documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups
           },
@@ -167,8 +155,7 @@ export const edgeApplicationRoutes = {
             loadRulesEngineService: RulesEngineServiceV4.loadRulesEngineService,
             reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
-            listOriginsService: OriginsService.listOriginsService,
-            listEdgeApplicationFunctionsService: FunctionsServiceV4.listFunctionsServiceOptions
+            listOriginsService: OriginsService.listOriginsService
           },
           clipboardWrite: Helpers.clipboardWrite
         }

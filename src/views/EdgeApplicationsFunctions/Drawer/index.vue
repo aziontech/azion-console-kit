@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="props.createFunctionService"
+    :createService="edgeApplicationFunctionService.createEdgeApplicationFunction"
     drawerId="create-function-instance-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -12,11 +12,7 @@
     title="Create Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction
-        @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
-      />
+      <FormFieldsDrawerFunction @toggleDrawer="handleToggleDrawer" />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -32,11 +28,7 @@
     title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction
-        @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
-      />
+      <FormFieldsDrawerFunction @toggleDrawer="handleToggleDrawer" />
     </template>
   </EditDrawerBlock>
 </template>
@@ -51,6 +43,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeApplicationFunctionService } from '@/services/v2'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -59,26 +52,6 @@
   const props = defineProps({
     edgeApplicationId: {
       type: String,
-      required: true
-    },
-    createFunctionService: {
-      type: Function,
-      required: true
-    },
-    editFunctionService: {
-      required: true,
-      type: Function
-    },
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFunctionService: {
-      type: Function,
-      required: true
-    },
-    loadFunctionService: {
-      type: Function,
       required: true
     }
   })
@@ -178,14 +151,14 @@
   })
 
   const editService = async (payload) => {
-    return await props.editFunctionService({
+    return await edgeApplicationFunctionService.editEdgeApplicationFunction({
       ...payload,
       edgeApplicationID: props.edgeApplicationId
     })
   }
 
   const loadService = async () => {
-    const functions = await props.loadFunctionService({
+    const functions = await edgeApplicationFunctionService.loadEdgeApplicationFunction({
       edgeApplicationID: props.edgeApplicationId,
       functionID: selectedFunctionToEdit.value
     })
