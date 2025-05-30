@@ -153,14 +153,12 @@ export class WafService {
     return this.adapter?.transformListWafRulesAllowed?.(data) ?? data
   }
 
-  loadWafRuleAllowed = async ({ wafId, allowedId }) => {
+  loadWafRuleAllowed = async ({ id, allowedId }) => {
     const { data } = await this.http.request({
-      url: `${this.baseURL}/${wafId}/exceptions/${allowedId}`,
+      url: `${this.baseURL}/${id}/exceptions/${allowedId.id}`,
       method: 'GET'
     })
 
     return this.adapter?.transformLoadWafRuleAllowed?.(data) ?? data
   }
-
-
 }

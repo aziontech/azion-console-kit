@@ -9,8 +9,6 @@ import * as EdgeFirewallFunctionsServicesV4 from '@/services/edge-firewall-funct
 import * as EdgeFunctionServiceV4 from '@/services/edge-functions-services/v4'
 import * as EdgeFirewallRulesEngineServicesV4 from '@/services/edge-firewall-rules-engine-services/v4'
 
-import * as WafRulesServices from '@/services/waf-rules-services/v4'
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
   path: '/edge-firewall',
