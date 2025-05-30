@@ -70,7 +70,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     createEdgeApplicationCase()
     cy.intercept(
       'GET',
-      'api/v4/edge_functions/functions?ordering=name&page=1&page_size=100&fields=&search=*'
+      '/v4/edge_functions/functions?*'
     ).as('getEdgeFunctions')
 
     // Act - create a function instance

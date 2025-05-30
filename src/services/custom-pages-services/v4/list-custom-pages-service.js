@@ -48,18 +48,27 @@ const parseDefaultData = (status) => {
   return parsedStatus
 }
 
+const convertDate = (date) => {
+  let convertedDate
+  try {
+    convertedDate = new Date(date)
+    if (isNaN(convertedDate)) throw new Error('Invalid Date')
+  } catch (error) {
+    convertedDate = null
+  }
+  return convertedDate
+}
+
 const adapt = (httpResponse) => {
   const parsedBody =
     httpResponse.body?.results?.map((customPage) => {
       return {
-        id: customPage.id,
-        name: customPage.name,
-        lastEditor: customPage.last_editor,
-        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          new Date(customPage.last_modified)
-        ),
-        active: parseStatusData(customPage.active),
-        default: parseDefaultData(customPage.default)
+        id: customPage?.id,
+        name: customPage?.name,
+        lastEditor: customPage?.last_editor,
+        lastModified: convertDate(customPage?.last_modified),
+        active: parseStatusData(customPage?.active),
+        default: parseDefaultData(customPage?.default)
       }
     }) ?? []
 

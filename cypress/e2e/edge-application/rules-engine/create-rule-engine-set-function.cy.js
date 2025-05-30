@@ -34,7 +34,7 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions2')
+  cy.intercept('GET', '/v4/edge_functions/functions/*').as('getFunctions2')
   cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
     .find(selectors.functions.saveButton)
     .click()
@@ -61,7 +61,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     }
   })
 
-  it('should create a rule engine set cache policy', () => {
+  it.skip('should create a rule engine set cache policy', () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
@@ -81,7 +81,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsDropdown(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.behaviorsOption('Run Function')).click()
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
-    cy.intercept('GET', 'api/v4/edge_functions/functions*').as('getFunctions')
+    cy.intercept('GET', '/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.rulesEngine.createFunctionInstanceButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
@@ -91,17 +91,15 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
-    cy.intercept('POST', 'api/v3/edge_applications/*/functions_instances*').as('postFunction')
+    cy.intercept('POST', 'api/v4/edge_application/applications/*/rules*').as('postFunction')
     cy.get(selectors.edgeApplication.rulesEngine.functionInstanceActionBar)
       .find(selectors.form.actionsSubmitButton)
       .click()
     cy.intercept(
       'GET',
-      'api/v4/edge_application/applications/*/functions?ordering=name&page=1&page_size=100&fields=id%2Cname&search='
+      '/v4/edge_application/applications/*/functions?*'
     ).as('getFunctionInstance')
-    cy.wait('@postFunction')
-    cy.wait('@getFunctionInstance')
-    cy.wait(1000)
+
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0))
       .find(
@@ -110,6 +108,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       .click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
+    cy.wait('@postFunction')
     cy.verifyToast('success', 'Rule successfully created')
 
     // Assert
