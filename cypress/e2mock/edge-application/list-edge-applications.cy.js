@@ -109,7 +109,7 @@ describe('Edge Application List Spec', { tags: ['@dev2'] }, () => {
     })
 
   it('should reset pagination after delete edge application', function () {
-    cy.intercept('DELETE', '/api/v4/edge_application/applications/*', {
+    cy.intercept('DELETE', '/v4/edge_application/applications/*', {
       statusCode: 202,
       body: { state: 'pending', data: null }
     }).as('deleteEdgeApplicationApi')
