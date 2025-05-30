@@ -22,6 +22,14 @@ import { DeviceGroupService } from './edge-app-device-group-service'
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
 
+// Edge Functions
+import { EdgeApplicationFunctionService } from './edge-application-functions-service'
+import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-functions-adapter'
+
+// Edge Functions
+import { EdgeFunctionService } from './edge-function-service'
+import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -29,5 +37,18 @@ const networkListsService = new NetworkListsService(httpService, NetworkListsAda
 const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
 const cacheSettingsService = new CacheSettingsService(httpService, CacheSettingsAdapter)
 const purgeService = new PurgeService(httpService, PurgeAdapter)
+const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
+  httpService,
+  EdgeApplicationFunctionsAdapter
+)
+const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
 
-export { vcsService, cacheSettingsService, deviceGroupService, purgeService, networkListsService }
+export {
+  vcsService,
+  cacheSettingsService,
+  deviceGroupService,
+  purgeService,
+  networkListsService,
+  edgeApplicationFunctionService,
+  edgeFunctionService
+}

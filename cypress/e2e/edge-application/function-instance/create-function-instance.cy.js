@@ -10,7 +10,7 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions')
+  cy.intercept('GET', '/v4/edge_functions/functions/*').as('getFunctions')
   cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
     .find(selectors.functions.saveButton)
     .click()
@@ -73,7 +73,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
-    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
+    cy.intercept('GET', '/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(
