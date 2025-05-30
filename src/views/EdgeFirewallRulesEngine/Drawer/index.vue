@@ -6,6 +6,7 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { wafService } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -33,10 +34,6 @@
       type: Function,
       required: true
     },
-    listWafRulesService: {
-      type: Function,
-      required: true
-    },
     editService: {
       type: Function,
       required: true
@@ -50,10 +47,6 @@
       required: true
     },
     loadNetworkListService: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesService: {
       type: Function,
       required: true
     }
@@ -260,10 +253,10 @@
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :listWafRulesService="listWafRulesService"
+        :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
-        :loadWafRulesService="loadWafRulesService"
+        :loadWafRulesService="wafService.loadWafRule"
       />
     </template>
   </CreateDrawerBlock>
@@ -284,10 +277,10 @@
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :listWafRulesService="listWafRulesService"
+        :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
-        :loadWafRulesService="loadWafRulesService"
+        :loadWafRulesService="wafService.loadWafRule"
       />
     </template>
   </EditDrawerBlock>

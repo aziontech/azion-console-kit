@@ -53,5 +53,39 @@ export const NetworkListsAdapter = {
       type: networkListType,
       items: isCountriesType ? itemsValuesCountry : itemsValues.trim().split('\n')
     }
+  },
+  transformLoadNetworkListToDropdown(body) {
+    const element = body?.results
+
+    const disabledIP = element.type === 'ip_cidr'
+    const disabledCountries = element.type === 'countries'
+
+    return {
+      value: {
+        id: element.id,
+        disabledIP,
+        disabledCountries
+      },
+      name: element.name
+    }
+  },
+  transformListNetworkListToDropdown(data) {
+    const isArray = Array.isArray(data)
+
+    return isArray
+      ? data?.map((element) => {
+          const disabledIP = element.type === 'ip_cidr'
+          const disabledCountries = element.type === 'countries'
+          return {
+            value: {
+              id: element.id,
+              disabledIP,
+              disabledCountries
+            },
+            id: element.id,
+            name: element.name
+          }
+        })
+      : []
   }
 }
