@@ -10,7 +10,7 @@ let fixtures = {}
  */
 const createEdgeApplicationCase = () => {
   // Act
-  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
 
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
