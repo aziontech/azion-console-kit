@@ -57,18 +57,16 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
         }
       }
     }).as('loadEdgeFirewall')
-
-    cy.intercept('GET', `/api/v3/edge_firewall/${MOCK_EDGE_FIREWALL_ID}/functions_instances*`, {
+    
+    
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/functions?page_size=100&fields=id%2Cname`, {
       statusCode: 200,
       body: {
         count: 0,
-        total_pages: 1,
-        schema_version: 3,
-        links: {
-          previous: null,
-          next: null
-        },
-        results: []
+        results: [{
+          id: 11312,
+          name: 'Edge function'
+        }]
       }
     }).as('listEdgeFirewallFunctions')
 
