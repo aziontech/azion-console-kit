@@ -10,6 +10,7 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { rulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -22,30 +23,6 @@
     edgeApplicationId: {
       required: true,
       type: String
-    },
-    listRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    deleteRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    reorderRulesEngine: {
-      required: true,
-      type: Function
-    },
-    loadRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    editRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    createRulesEngineService: {
-      required: true,
-      type: Function
     },
     documentationService: {
       required: true,
@@ -152,8 +129,8 @@
   }
 
   const listRulesEngineWithDecorator = async (query) => {
-    const data = await props.listRulesEngineService({
-      id: props.edgeApplicationId,
+    const data = await rulesEngineService.listRulesEngine({
+      edgeApplicationId: props.edgeApplicationId,
       ...query
     })
     return data
@@ -163,7 +140,7 @@
     const phase =
       ruleData.phase.content == 'Default' ? 'request' : ruleData.phase.content.toLowerCase()
 
-    return await props.deleteRulesEngineService({
+    return await rulesEngineService.deleteRulesEngine({
       edgeApplicationId: props.edgeApplicationId,
       ruleId,
       phase
@@ -202,7 +179,7 @@
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true
     try {
-      await props.reorderRulesEngine(data, props.edgeApplicationId)
+      await rulesEngineService.reorderRulesEngine(data, props.edgeApplicationId)
       toast.add({
         closable: true,
         severity: 'success',
@@ -255,9 +232,6 @@
     :listOriginsService="listOriginsService"
     :clipboardWrite="clipboardWrite"
     :edgeApplicationId="edgeApplicationId"
-    :createRulesEngineService="createRulesEngineService"
-    :editRulesEngineService="editRulesEngineService"
-    :loadRulesEngineService="loadRulesEngineService"
     :documentationService="documentationService"
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="isEdgeFunctionEnabled"

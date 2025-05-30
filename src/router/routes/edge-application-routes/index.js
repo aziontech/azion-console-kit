@@ -1,7 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
-import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
@@ -37,7 +36,6 @@ export const edgeApplicationRoutes = {
         ]
       }
     },
-
     {
       path: 'create',
       name: 'create-edge-application',
@@ -89,10 +87,6 @@ export const edgeApplicationRoutes = {
           },
           edgeConnectorServices: {
             createEdgeConnectorsService: EdgeConnectorsService.createEdgeConnectorsService
-          },
-          rulesEngineServices: {
-            editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
-            listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll
           }
         }
       },
@@ -151,12 +145,6 @@ export const edgeApplicationRoutes = {
             editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
           },
           rulesEngineServices: {
-            listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
-            deleteRulesEngineService: RulesEngineServiceV4.deleteRuleService,
-            editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
-            createRulesEngineService: RulesEngineServiceV4.createRulesEngineService,
-            loadRulesEngineService: RulesEngineServiceV4.loadRulesEngineService,
-            reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService
           },
