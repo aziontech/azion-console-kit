@@ -18,27 +18,15 @@
       type: Boolean,
       default: false
     },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesCRLDropDown: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesCRLDropDown: {
-      type: Function,
+    digitalCertificatesServices: {
+      type: Object,
       required: true
     }
   })
 
   const digitalCertificateTrustedDrawerRef = ref('')
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
+    return await props.digitalCertificatesServices.listDigitalCertificatesService({
       type: 'trusted_ca_certificate',
       fields: ['id,name'],
       ...queryParams
@@ -113,7 +101,7 @@
           required
           name="mtls.certificate"
           :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesServices.loadDigitalCertificatesService"
           :disabled="!mtls.isEnabled"
           optionLabel="name"
           optionValue="value"

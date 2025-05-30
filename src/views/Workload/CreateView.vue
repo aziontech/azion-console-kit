@@ -14,22 +14,11 @@
         disableAfterCreateToastFeedback
       >
         <template #form>
-          <FormFieldsCreateWorkload
-            :listEdgeApplicationsService="listEdgeApplicationsService"
-            :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
-            :listDigitalCertificatesCRLDropDown="
-              digitalCertificateService.listDigitalCertificatesCRLDropDown
-            "
-            :loadDigitalCertificatesCRLDropDown="
-              digitalCertificateService.loadDigitalCertificatesCRLDropDown
-            "
-
-            :listCustomPagesService="listCustomPagesService"
-            :loadCustomPagesService="loadCustomPagesService"
+          <FormFieldsWorkload
+            :edgeApplication="propsService.edgeApplication"
+            :edgeFirewall="propsService.edgeFirewall"
+            :digitalCertificates="propsService.digitalCertificates"
+            :customPages="propsService.customPages"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -51,14 +40,14 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsCreateWorkload from './FormFields/FormFieldsCreateWorkload.vue'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { workloadService, digitalCertificateService } from '@/services/v2'
+  import { workloadService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -97,6 +86,25 @@
       required: true
     }
   })
+
+  const propsService = {
+    edgeApplication: {
+      listEdgeApplicationsService: props.listEdgeApplicationsService,
+      loadEdgeApplicationsService: props.loadEdgeApplicationsService
+    },
+    edgeFirewall: {
+      listEdgeFirewallService: props.listEdgeFirewallService,
+      loadEdgeFirewallService: props.loadEdgeFirewallService
+    },
+    digitalCertificates: {
+      listDigitalCertificatesService: props.listDigitalCertificatesService,
+      loadDigitalCertificatesService: props.loadDigitalCertificatesService
+    },
+    customPages: {
+      listCustomPagesService: props.listCustomPagesService,
+      loadCustomPagesService: props.loadCustomPagesService
+    }
+  }
 
   const toast = useToast()
   const route = useRoute()
@@ -172,7 +180,7 @@
     edgeFirewall: null,
     tls: {
       certificate: 0,
-      ciphers: 'Modern_v2025Q1',
+      ciphers: 7,
       minimumVersion: 'tls_1_2'
     },
     protocols: {

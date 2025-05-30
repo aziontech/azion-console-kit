@@ -15,10 +15,10 @@ const LOCKED_VALUE = 'custom'
 
 const isLocked = (version) => version === LOCKED_VALUE
 
-const parseName = ({ name, product_version }) => {
-  const nameProps = { text: name, tagProps: {} }
+const parseName = (domain) => {
+  const nameProps = { text: domain.name, tagProps: {} }
 
-  if (product_version === LOCKED_VALUE) {
+  if (domain?.product_version === LOCKED_VALUE) {
     nameProps.tagProps = {
       icon: 'pi pi-lock',
       value: 'Locked',
@@ -79,18 +79,17 @@ export const WorkloadAdapter = {
         name: parseName(workload),
         isLocked: locked,
         disableEditClick: locked,
-        lastModified: workload.last_modified
-          ? new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-              new Date(workload.last_modified)
-            )
-          : '-',
-        lastEditor: workload.last_editor,
-        productVersion: workload.product_version,
-        protocols: workload.protocols,
         infrastructure: workload.infrastructure === 1 ? 'Production' : 'Staging',
         active: workload.active
-          ? { content: 'Active', severity: 'success' }
-          : { content: 'Inactive', severity: 'danger' },
+          ? {
+              content: 'Active',
+              severity: 'success'
+            }
+          : {
+              content: 'Inactive',
+              severity: 'danger'
+            },
+        activeSort: workload.active,
         workloadHostname: {
           content: workload.workload_hostname
         },

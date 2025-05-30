@@ -10,17 +10,12 @@
     isTabs
   >
     <template #form>
-      <FormFieldsEditWorkload
-        :digitalCertificates="digitalCertificates"
-        :listDigitalCertificatesService="listDigitalCertificatesService"
-        :loadDigitalCertificatesService="loadDigitalCertificatesService"
-        :listEdgeApplicationsService="listEdgeApplicationsService"
-        :loadEdgeApplicationsService="loadEdgeApplicationsService"
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listCustomPagesService="listCustomPagesService"
-        :loadCustomPagesService="loadCustomPagesService"
-        hasDomainName
+      <FormFieldsWorkload
+        isEdit
+        :edgeApplicationServices="props.edgeApplicationServices"
+        :edgeFirewallServices="props.edgeFirewallServices"
+        :digitalCertificatesServices="props.digitalCertificatesServices"
+        :customPagesServices="props.customPagesServices"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -35,9 +30,8 @@
 
 <script setup>
   import { ref, inject } from 'vue'
-
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditWorkload from './FormFields/FormFieldsEditWorkload.vue'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -46,28 +40,24 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    editWorkloadService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
     },
-    clipboardWrite: {
-      type: Function,
+    edgeApplicationServices: {
+      type: Object,
       required: true
     },
-    updateDigitalCertificates: {
-      type: Function,
+    edgeFirewallServices: {
+      type: Object,
+      required: true
+    },
+    digitalCertificatesServices: {
+      type: Object,
+      required: true
+    },
+    customPagesServices: {
+      type: Object,
       required: true
     },
     workload: {
@@ -78,7 +68,7 @@
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
-      productName: 'Domain'
+      productName: 'Workload'
     })
   }
 
@@ -86,7 +76,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Domain',
+        productName: 'Workload',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -94,11 +84,10 @@
       .track()
   }
 
-  const digitalCertificates = ref([])
-  const domainName = ref()
+  const workloadName = ref()
 
   const setWorkloadName = async (workload) => {
-    domainName.value = workload.name
+    workloadName.value = workload.name
   }
 
   const loadWorkload = () => {

@@ -9,21 +9,13 @@
 
   import { ref } from 'vue'
 
-  const emit = defineEmits(['edgeApplicationCreated'])
-
   const props = defineProps({
     isEdit: { type: Boolean, default: false },
     isDrawer: { type: Boolean, default: false },
     noBorder: { type: Boolean, default: false },
-    listEdgeApplicationsService: { type: Function, required: true },
-    loadEdgeApplicationsService: { type: Function, required: true },
-
-    listEdgeFirewallService: { type: Function, required: true },
-    loadEdgeFirewallService: { type: Function, required: true },
-
-    listCustomPagesService: { type: Function, required: true },
-    loadCustomPagesService: { type: Function, required: true },
-
+    edgeApplicationServices: { type: Object, required: true },
+    edgeFirewallServices: { type: Object, required: true },
+    customPagesServices: { type: Object, required: true },
     disabledEdgeApplicationDropdown: { type: Boolean, default: false }
   })
 
@@ -70,19 +62,18 @@
   }
 
   const listEdgeApplicationsDecorator = async (queryParams) => {
-    return await props.listEdgeApplicationsService({
+    return await props.edgeApplicationServices.listEdgeApplicationsService({
       ...queryParams,
       isDropdown: true
     })
   }
 
   const handleListCustomPages = async () => {
-    return await props.listCustomPagesService({ fields: ['id', 'name'] })
+    return await props.customPagesServices.listCustomPagesService({ fields: ['id', 'name'] })
   }
 
   const handleEdgeFirewallCreated = (id) => {
     edgeFirewall.value = id
-    emit('edgeFirewallCreated')
   }
 </script>
 <template>
@@ -104,7 +95,7 @@
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
           :service="listEdgeApplicationsDecorator"
-          :loadService="loadEdgeApplicationsService"
+          :loadService="edgeApplicationServices.loadEdgeApplicationsService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
@@ -145,8 +136,8 @@
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           @onClear="handleEdgeFirewallClear"
-          :service="listEdgeFirewallService"
-          :loadService="loadEdgeFirewallService"
+          :service="edgeFirewallServices.listEdgeFirewallService"
+          :loadService="edgeFirewallServices.loadEdgeFirewallService"
           @onAccessDenied="handleEdgeFirewallAccessDenied"
           v-if="hasEdgeFirewallAccess"
           optionLabel="name"
@@ -189,7 +180,7 @@
           name="customPage"
           @onClear="handleCustomPageClear"
           :service="handleListCustomPages"
-          :loadService="loadCustomPagesService"
+          :loadService="customPagesServices.loadCustomPagesService"
           optionLabel="name"
           optionValue="value"
           :value="customPage"

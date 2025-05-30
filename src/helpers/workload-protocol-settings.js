@@ -29,7 +29,7 @@ export const HTTPS_PORT_LIST_OPTIONS = [
 ]
 
 export const TLS_VERSIONS_OPTIONS = [
-  { label: 'None', value: 'null' },
+  { label: 'None', value: '' },
   { label: 'TLS v1.3 (Default)', value: 'tls_1_3' },
   { label: 'TLS v1.2', value: 'tls_1_2' },
   { label: 'TLS v1.1 (Deprecated)', value: 'tls_1_1' },
@@ -37,12 +37,12 @@ export const TLS_VERSIONS_OPTIONS = [
 ]
 
 export const SUPPORTED_CIPHERS_LIST_OPTIONS = [
-  { label: 'Modern v2025Q1', value: 'Modern_v2025Q1' },
-  { label: 'Compatible v2025Q1', value: 'Compatible_v2025Q1' },
-  { label: 'Legacy v2025Q1', value: 'Legacy_v2025Q1' },
-  { label: 'Modern v2022Q1 - (migration TLS 1.3)', value: 'TLSv1.3_2022' },
-  { label: 'Modern v2022Q1 - TLS 1.2', value: 'TLSv1.2_2021' },
-  { label: 'Compatible v2018Q1 - TLS 1.2', value: 'TLSv1.2_2019' },
-  { label: 'Legacy v2018Q1 - TLS 1.2', value: 'TLSv1.2_2018' },
-  { label: 'Legacy v2017Q1 - All Ciphers', value: 'null' }
+  { label: 'Legacy v2018Q1 - TLS 1.2', value: 1 },
+  { label: 'Compatible v2018Q1 - TLS 1.2', value: 2 },
+  { label: 'Modern v2022Q1 - TLS 1.2', value: 3 },
+  { label: 'Modern v2022Q1 - (migration TLS 1.3)', value: 4 },
+  { label: 'Legacy v2025Q1', value: 5 },
+  { label: 'Compatible v2025Q1', value: 6 },
+  { label: 'Modern v2025Q1', value: 7 },
+  { label: 'Legacy v2017Q1 - All Ciphers', value: 8 }
 ]

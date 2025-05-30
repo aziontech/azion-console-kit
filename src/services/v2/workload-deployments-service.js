@@ -28,14 +28,7 @@ export class WorkloadService {
       params
     })
 
-    const { results, count } = data
-
-    const transformed = this.adapter?.transformListWorkloads?.(results) || results
-
-    return {
-      count,
-      body: transformed
-    }
+    return this.adapter?.transformListWorkloads?.(data.results) || data.results
   }
 
   loadWorkload = async ({ id }) => {
@@ -45,25 +38,5 @@ export class WorkloadService {
     })
 
     return this.adapter?.transformLoadWorkload?.(data) || data
-  }
-
-  editWorkload = async ({ id, payload }) => {
-    const body = this.adapter?.transformEditWorkload?.(payload)
-    await this.http.request({
-      method: 'PUT',
-      url: `${this.baseURL}/${id}`,
-      body
-    })
-
-    return 'Your workload has been updated'
-  }
-
-  deleteWorkload = async (id, { name }) => {
-    await this.http.request({
-      method: 'DELETE',
-      url: `${this.baseURL}/${id}`
-    })
-
-    return `Workload ${name} successfully deleted.`
   }
 }

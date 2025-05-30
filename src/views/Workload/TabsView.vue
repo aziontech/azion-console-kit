@@ -10,11 +10,13 @@
   import EditView from './EditView.vue'
   import { workloadService } from '@/services/v2'
 
-  defineOptions({ name: 'tabs-domains' })
+  defineOptions({ name: 'tabs-workloads' })
 
   const props = defineProps({
-    domainServices: { type: Object, required: true },
-    workloadDeploymentServices: { type: Object, required: true },
+    updatedRedirect: { type: String, required: true },
+    edgeApplicationServices: { type: Object, required: true },
+    edgeFirewallServices: { type: Object, required: true },
+    digitalCertificatesServices: { type: Object, required: true },
     customPagesServices: { type: Object, required: true }
   })
 
@@ -119,15 +121,16 @@
         <TabPanel
           header="Main Settings"
           :pt="{
-            root: { 'data-testid': 'domain-tabs__tab__main-settings' }
+            root: { 'data-testid': 'workload-tabs__tab__main-settings' }
           }"
         >
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
-            :updatedRedirect="props.domainServices.updatedRedirect"
-            :listDigitalCertificatesService="props.domainServices.listDigitalCertificatesService"
-            :loadDigitalCertificatesService="props.domainServices.loadDigitalCertificatesService"
-            :clipboardWrite="props.domainServices.clipboardWrite"
+            :updatedRedirect="props.updatedRedirect"
+            :edgeApplicationServices="props.edgeApplicationServices"
+            :edgeFirewallServices="props.edgeFirewallServices"
+            :digitalCertificatesServices="props.digitalCertificatesServices"
+            :customPagesServices="props.customPagesServices"
             :workload="workload"
             :showActionBar="activeTab === mapTabs.mainSettings"
           />

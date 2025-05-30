@@ -223,7 +223,7 @@
             :value="tls.minimumVersion"
             inputId="tls.minimumVersion"
             placeholder="Select a minimum TLS Version"
-            description="Select the minimum TLS version that the application supports."
+            description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
           />
         </div>
 

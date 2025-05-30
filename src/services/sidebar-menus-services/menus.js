@@ -24,8 +24,9 @@ function createDomainsItem() {
 
   return {
     label: handleTextDomainWorkload.pluralTitle,
-    icon: 'ai ai-domains',
+    icon: handleTextDomainWorkload.icon,
     to: `/${handleTextDomainWorkload.pluralLabel}`,
+    ...(handleTextDomainWorkload.tag && { tag: handleTextDomainWorkload.tag }),
     id: 'domains'
   }
 }
@@ -49,6 +50,14 @@ function createBuildItems() {
 
 function createSecureItems() {
   return [
+    {
+      label: 'Edge Connectors',
+      to: '/edge-connectors',
+      icon: 'ai ai-edge-connectors',
+      id: 'edge-connectors',
+      tag: 'Preview',
+      visible: !hasFlagBlockApiV4()
+    },
     {
       label: 'Edge Firewall',
       to: '/edge-firewall',
@@ -138,6 +147,14 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'ai ai-custom-pages',
+      id: 'custom-pages',
+      tag: 'Preview',
+      visible: !hasFlagBlockApiV4()
+    },
+    {
       label: 'Digital Certificates',
       to: '/digital-certificates',
       icon: 'ai ai-digital-certificates',
@@ -154,20 +171,6 @@ function createEdgeLibrariesItems() {
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
-    },
-    {
-      label: 'Custom Pages',
-      to: '/custom-pages',
-      icon: 'ai ai-custom-pages',
-      id: 'custom-pages',
-      visible: !hasFlagBlockApiV4()
-    },
-    {
-      label: 'Edge Connectors',
-      to: '/edge-connectors',
-      icon: 'ai ai-edge-connectors',
-      id: 'edge-connectors',
-      visible: !hasFlagBlockApiV4()
     }
   ]
 }
