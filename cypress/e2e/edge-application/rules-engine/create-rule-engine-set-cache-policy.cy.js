@@ -64,7 +64,7 @@ const createWorkload = () => {
 
   cy.intercept('GET', '/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=').as('getEdgeApplicationList')
   cy.intercept(
-    { method: 'POST', url: '/v4/workspace/workloads' },
+    { method: 'POST', url: 'api/v4/workspace/workloads' },
     { body: payloadRequestWorkload, statusCode: 202 }
   ).as('createWorkload')
 
