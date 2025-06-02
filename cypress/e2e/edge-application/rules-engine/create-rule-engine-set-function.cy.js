@@ -59,7 +59,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     }
   })
 
-  it.skip('should create a rule engine set cache policy', () => {
+  it('should create a rule engine set cache policy', () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
@@ -98,12 +98,9 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       '/v4/edge_application/applications/*/functions?*'
     ).as('getFunctionInstance')
 
+    cy.wait('@getFunctionInstance')
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0))
-      .find(
-        selectors.edgeApplication.rulesEngine.functionInstanceOption(fixtures.functionInstanceName)
-      )
-      .click()
+    cy.get(selectors.edgeApplication.rulesEngine.firstBehaviorValueOption).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.wait('@postFunction')
