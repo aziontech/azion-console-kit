@@ -54,7 +54,7 @@
 
   const hasContentToList = ref(true)
 
-  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed']
+  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id']
 
   const actions = [
     {
