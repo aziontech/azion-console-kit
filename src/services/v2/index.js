@@ -28,6 +28,9 @@ import { DeviceGroupService } from './edge-app-device-group-service'
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
 
+// Edge Application
+import { EdgeAppAdapter } from './adapters/edge-app-adapter'
+import { EdgeAppService } from './edge-app-service'
 // Edge Functions
 import { EdgeApplicationFunctionService } from './edge-application-functions-service'
 import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-functions-adapter'
@@ -52,6 +55,7 @@ const networkListsService = new NetworkListsService(httpService, NetworkListsAda
 const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
 const cacheSettingsService = new CacheSettingsService(httpService, CacheSettingsAdapter)
 const purgeService = new PurgeService(httpService, PurgeAdapter)
+const edgeAppService = new EdgeAppService(httpService, EdgeAppAdapter)
 const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   httpService,
   EdgeApplicationFunctionsAdapter
@@ -64,6 +68,7 @@ export {
   deviceGroupService,
   purgeService,
   networkListsService,
+  edgeAppService,
   edgeFirewallService,
   edgeFirewallFunctionService,
   edgeFirewallRulesEngineService,
