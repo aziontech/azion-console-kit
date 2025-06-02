@@ -48,6 +48,17 @@ const parseDefaultData = (status) => {
   return parsedStatus
 }
 
+const convertDate = (date) => {
+  let convertedDate
+  try {
+    convertedDate = new Date(date)
+    if (isNaN(convertedDate)) throw new Error('Invalid Date')
+  } catch (error) {
+    convertedDate = null
+  }
+  return convertedDate
+}
+
 const adapt = (httpResponse) => {
   const parsedBody =
     httpResponse.body?.results?.map((customPage) => {
@@ -55,11 +66,7 @@ const adapt = (httpResponse) => {
         ...(customPage.id && { id: customPage.id }),
         ...(customPage.name && { name: customPage.name }),
         ...(customPage.last_editor && { lastEditor: customPage.last_editor }),
-        ...(customPage.last_modified && { 
-          lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-            new Date(customPage.last_modified)
-          )
-        }),
+        ...(customPage.last_modified && { lastModified: convertDate(customPage?.last_modified) }),
         ...(customPage.active !== undefined && { active: parseStatusData(customPage.active) }),
         ...(customPage.default !== undefined && { default: parseDefaultData(customPage.default) })
       }

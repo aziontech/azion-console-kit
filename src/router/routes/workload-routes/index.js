@@ -1,5 +1,4 @@
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
 

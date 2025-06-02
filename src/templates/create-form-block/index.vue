@@ -108,11 +108,11 @@
           error.showErrors(toast)
           emit('on-response-fail', error.message[0] || error)
         } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
+          emit('onError', errorMessage)
           showToast('error', errorMessage)
-          emit('on-response-fail', errorMessage)
         }
-        blockViewRedirection.value = true
       }
     },
     ({ errors }) => {
