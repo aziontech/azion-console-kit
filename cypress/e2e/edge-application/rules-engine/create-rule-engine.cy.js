@@ -10,10 +10,11 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
+
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -30,6 +31,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 

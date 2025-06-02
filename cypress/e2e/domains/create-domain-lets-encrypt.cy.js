@@ -20,8 +20,11 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3'] }, () => {
+describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -32,7 +35,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',

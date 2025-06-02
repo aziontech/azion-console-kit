@@ -10,7 +10,7 @@
       <CreateFormBlock
         @on-response="handleTrackCreation"
         @on-response-fail="handleTrackFailedCreation"
-        :createService="props.createEdgeApplicationService"
+        :createService="edgeAppService.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
         data-testid="create-edge-application-form-block"
@@ -46,60 +46,21 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeAppService } from '@/services/v2'
 
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'
   const route = useRoute()
 
-  const props = defineProps({
-    createEdgeApplicationService: {
-      type: Function,
-      required: true
-    }
-  })
-
   const validationSchema = yup.object({
-    name: yup.string().required(),
-    address: yup.string().required(),
-    hostHeader: yup.string().required(),
-    cdnCacheSettingsMaximumTtl: yup.string().required(),
-    httpPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('http'),
-      then: (schema) => schema.min(1).required()
-    }),
-    httpsPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('https'),
-      then: (schema) => schema.min(1).required()
-    })
+    name: yup.string().required()
   })
 
   const initialValues = ref({
-    name: '',
-    deliveryProtocol: 'http',
-    http3: false,
-    httpPort: [{ name: '80 (Default)', value: '80' }],
-    httpsPort: [{ name: '443 (Default)', value: '443' }],
-    minimumTlsVersion: 'none',
-    supportedCiphers: 'all',
-    originType: 'single_origin',
-
-    address: '',
-    originProtocolPolicy: 'preserve',
-    hostHeader: '${host}',
-    browserCacheSettings: 'override',
-    browserCacheSettingsMaximumTtl: 0,
-    cdnCacheSettings: 'override',
-    cdnCacheSettingsMaximumTtl: 60,
-    debugRules: false
+    name: ''
   })
 
-  const handleBlocks = [
-    'general',
-    'delivery-settings',
-    'default-origins',
-    'cache-expiration-policies',
-    'debug-rules'
-  ]
+  const handleBlocks = ['general']
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({

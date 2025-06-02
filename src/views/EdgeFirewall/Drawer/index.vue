@@ -4,8 +4,8 @@
   import * as yup from 'yup'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeFirewallService } from '@/services/edge-firewall-services/v4'
   import FormCreateEdgeFirewall from '../FormFields/FormFieldsEdgeFirewall'
+  import { edgeFirewallService } from '@/services/v2'
 
   defineOptions({
     name: 'edge-firewall-drawer'
@@ -76,7 +76,7 @@
     v-if="showCreateDrawer"
     data-testid="edge-firewall-drawer"
     v-model:visible="showCreateEdgeFirewallDrawer"
-    :createService="createEdgeFirewallService"
+    :createService="edgeFirewallService.createEdgeFirewallService"
     :schema="validationSchema"
     :initialValues="initialValues"
     drawerId="edge-firewall-drawer"

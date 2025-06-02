@@ -2,11 +2,14 @@
   import { ref, inject, onMounted } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { cacheSettingsService } from '@/services/v2'
+
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -38,16 +41,9 @@
     isApplicationAcceleratorEnabled: {
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      type: Boolean
-    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
     },
     listOriginsService: {
       required: true,
@@ -64,10 +60,6 @@
     },
     clipboardWrite: {
       type: Function,
-      required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
       required: true
     }
   })
@@ -170,11 +162,17 @@
 
     try {
       loadingFunctionsInstance.value = true
-      const responseFunctions = await props.listEdgeApplicationFunctionsService({
-        id: props.edgeApplicationId,
-        fields: ['id', 'name']
+      const params = { fields: ['id', 'name'] }
+      const responseFunctions = await edgeApplicationFunctionService.listFunctions(
+        props.edgeApplicationId,
+        params
+      )
+      functionsInstanceOptions.value = responseFunctions.map((el) => {
+        return {
+          id: el.id,
+          name: el.name.text
+        }
       })
-      functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
       toast.add({
         closable: true,
@@ -189,9 +187,8 @@
   const listCacheSettingsOptions = async () => {
     isLoadingRequests.value = true
     try {
-      cacheSettingsOptions.value = await props.listCacheSettingsService({
-        id: props.edgeApplicationId
-      })
+      const result = await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId)
+      cacheSettingsOptions.value = result.body
     } catch (error) {
       toast.add({
         closable: true,
@@ -355,11 +352,9 @@
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
@@ -397,9 +392,7 @@
         @toggleDrawer="handleToggleDrawer"
         @refreshFunctions="handleRefreshFunctions"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"

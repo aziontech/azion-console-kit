@@ -55,21 +55,9 @@
       required: true,
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      required: true,
-      type: Boolean
-    },
     isImageOptimizationEnabled: {
       required: true,
       type: Boolean
-    },
-    listEdgeApplicationFunctionsService: {
-      required: true,
-      type: Function
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
     },
     listOriginsService: {
       required: true,
@@ -83,10 +71,6 @@
     },
     clipboardWrite: {
       type: Function,
-      required: true
-    },
-    isLoadBalancerEnabled: {
-      type: Boolean,
       required: true
     }
   })
@@ -267,13 +251,9 @@
   <DrawerRulesEngine
     ref="drawerRulesEngineRef"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
-    :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
     :isImageOptimizationEnabled="isImageOptimizationEnabled"
-    :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
     :listOriginsService="listOriginsService"
     :clipboardWrite="clipboardWrite"
-    :isLoadBalancerEnabled="isLoadBalancerEnabled"
-    :listCacheSettingsService="listCacheSettingsService"
     :edgeApplicationId="edgeApplicationId"
     :createRulesEngineService="createRulesEngineService"
     :editRulesEngineService="editRulesEngineService"

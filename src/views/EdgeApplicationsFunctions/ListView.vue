@@ -2,17 +2,12 @@
   <DrawerFunction
     ref="drawerFunctionRef"
     :edgeApplicationId="edgeApplicationId"
-    :createFunctionService="createFunctionService"
-    :listEdgeFunctionsService="listEdgeFunctionsService"
-    :loadEdgeFunctionService="loadEdgeFunctionService"
-    :loadFunctionService="loadFunctionService"
-    :editFunctionService="editFunctionService"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
     <FetchListTableBlock
       ref="listFunctionsEdgeApplicationsRef"
-      :listService="listFunctionsInstance"
+      :listService="listEdgeApplicationFunctions"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
       @on-load-data="handleLoadData"
@@ -61,6 +56,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
+  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import PrimeButton from 'primevue/button'
   import { computed, ref, inject } from 'vue'
@@ -71,42 +67,21 @@
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
   const hasContentToList = ref(true)
-  const FUNCTIONS_API_FIELDS = ['id', 'name', 'edge_function', 'json_args']
+  const FUNCTIONS_API_FIELDS = [
+    'id',
+    'name',
+    'edge_function',
+    'json_args',
+    'last_modified',
+    'last_editor'
+  ]
 
   const props = defineProps({
     edgeApplicationId: {
       required: true,
       type: String
     },
-    listEdgeApplicationFunctionsService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
-      required: true,
-      type: Function
-    },
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    loadEdgeFunctionService: {
-      required: true,
-      type: Function
-    },
-    loadFunctionService: {
-      required: true,
-      type: Function
-    },
-    createFunctionService: {
-      required: true,
-      type: Function
-    },
-    editFunctionService: {
-      required: true,
-      type: Function
-    },
-    deleteFunctionService: {
       required: true,
       type: Function
     }
@@ -147,12 +122,18 @@
     ]
   })
 
-  const listFunctionsInstance = async (query) => {
-    return await props.listEdgeApplicationFunctionsService(props.edgeApplicationId, query)
+  const listEdgeApplicationFunctions = async (query) => {
+    return await edgeApplicationFunctionService.listEdgeApplicationFunctions(
+      props.edgeApplicationId,
+      query
+    )
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionService(functionId, props.edgeApplicationId)
+    return await edgeApplicationFunctionService.deleteEdgeApplicationFunction(
+      functionId,
+      props.edgeApplicationId
+    )
   }
 
   const handleLoadData = (event) => {

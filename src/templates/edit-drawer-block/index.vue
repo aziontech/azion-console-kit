@@ -74,10 +74,10 @@
     set: (value) => {
       if (formHasChanges.value) {
         formDrawerHasUpdated.value = !formDrawerHasUpdated.value
-        changeVisisbleDrawer(!value, false)
+        changeVisibleDrawer(!value, false)
         return
       }
-      changeVisisbleDrawer(value, true)
+      changeVisibleDrawer(value, true)
     }
   })
 
@@ -86,7 +86,7 @@
     return blockViewRedirection.value && isDirty.value
   })
 
-  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+  const changeVisibleDrawer = (isVisible, isResetForm) => {
     emit('update:visible', isVisible)
     if (isResetForm) resetForm()
   }
@@ -141,8 +141,16 @@
         toggleDrawerVisibility(false)
       } catch (error) {
         blockViewRedirection.value = true
-        emit('onError', error)
-        showToast('error', error)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
@@ -160,7 +168,7 @@
   })
 
   provide('drawerUnsaved', {
-    changeVisisbleDrawer,
+    changeVisibleDrawer,
     formDrawerHasUpdated
   })
 </script>

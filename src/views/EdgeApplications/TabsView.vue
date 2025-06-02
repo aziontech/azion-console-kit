@@ -14,9 +14,12 @@
   import { computed, ref, reactive, provide, watch, inject, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { edgeAppService } from '@/services/v2'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -25,7 +28,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     errorResponsesServices: { type: Object, required: true },
@@ -66,16 +68,27 @@
   }
 
   const checkIsLocked = async () => {
-    isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
-      id: edgeApplicationId.value
-    })
+    if (hasFlagBlockApiV4()) {
+      const edgeApplication = await edgeAppService.loadEdgeApplicationService({
+        id: edgeApplicationId.value,
+        params: {
+          fields: 'product_version'
+        }
+      })
+
+      isLocked.value = edgeApplication.productVersion === 'custom'
+    }
   }
 
   const handleLoadEdgeApplication = async () => {
     try {
-      return await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const params = { id: edgeApplicationId.value }
+
+      if (hasFlagBlockApiV4()) {
+        return await props.edgeApplicationServices.loadEdgeApplication(params)
+      }
+
+      return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
       toast.add({
         closable: true,
@@ -92,8 +105,8 @@
       return acc
     }, {})
   }
-  const verifyTab = ({ edgeFunctions }) => {
-    if (!edgeFunctions) {
+  const verifyTab = (edgeApplication) => {
+    if (!edgeApplication[edgeFunctionsEnabled.value]) {
       delete mapTabs.value.functions
       reindexMapTabs()
       return
@@ -116,8 +129,6 @@
 
   const tabTitle = computed(() => edgeApplication.value?.name || '')
 
-  const isHttpsEnabled = () =>
-    computed(() => edgeApplication.value?.deliveryProtocol.includes('https'))
   const isModuleEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
 
   const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
@@ -182,6 +193,22 @@
     return null
   })
 
+  const edgeFunctionsEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'edgeFunctions' : 'edgeFunctionsEnabled'
+  })
+
+  const applicationAcceleratorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'applicationAccelerator' : 'applicationAcceleratorEnabled'
+  })
+
+  const tieredCacheEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'l2Caching' : 'tieredCacheEnabled'
+  })
+
+  const imageProcessorEnabled = computed(() => {
+    return hasFlagBlockApiV4() ? 'imageOptimization' : 'imageProcessorEnabled'
+  })
+
   watch(activeTab, (newValue, oldValue) => {
     if (visibleOnSaved.value) {
       return
@@ -195,7 +222,7 @@
   const tabs = ref([
     {
       header: 'Main Settings',
-      component: EditView,
+      component: hasFlagBlockApiV4() ? EditViewV3 : EditView,
       condition: true,
       show: showTabs.mainSettings,
       props: () => ({
@@ -214,7 +241,6 @@
       show: showTabs.origins,
       props: () => ({
         ...props.originsServices,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite
       })
@@ -247,16 +273,15 @@
       condition: true,
       show: showTabs.cacheSettings,
       props: () => ({
-        ...props.cacheSettingsServices,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isTieredCacheEnabled: isModuleEnabled('l2Caching').value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value
       })
     },
     {
       header: 'Functions Instances',
       component: EdgeApplicationsFunctionsListView,
-      condition: isModuleEnabled('edgeFunctions'),
+      condition: isModuleEnabled(edgeFunctionsEnabled.value),
       show: showTabs.functions,
       props: () => ({
         ...props.functionsServices,
@@ -271,14 +296,13 @@
       show: showTabs.rulesEngine,
       props: () => ({
         ...props.rulesEngineServices,
-        isImageOptimizationEnabled: isModuleEnabled('imageOptimization').value,
-        isDeliveryProtocolHttps: isHttpsEnabled().value,
-        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
-        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctions').value,
+        isImageOptimizationEnabled: isModuleEnabled(imageProcessorEnabled.value).value,
+        isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
+        isEdgeFunctionEnabled: isModuleEnabled(edgeFunctionsEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value,
-        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         clipboardWrite: props.clipboardWrite,
-        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
+        hideApplicationAcceleratorInDescription:
+          edgeApplication.value[applicationAcceleratorEnabled.value]
       })
     }
   ])

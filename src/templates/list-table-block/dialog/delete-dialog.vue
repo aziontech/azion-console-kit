@@ -136,7 +136,11 @@
         data.onSuccess()
       }
     } catch (error) {
-      showToast('error', 'Error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     } finally {
       loading.value = false
     }
@@ -167,7 +171,7 @@
   const deleteMessage = computed(() => {
     return (
       data.entityDeleteMessage ||
-      `This ${data.title} will be deleted along with any associated settings or instances. Check Help Center for more details.`
+      `The selected ${data.title} will be deleted, along with all associated settings or instances. Check the Help Center for more details.`
     )
   })
 

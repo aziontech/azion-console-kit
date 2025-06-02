@@ -18,27 +18,7 @@
   const route = useRoute()
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function,
-      required: true
-    },
-    postCallbackUrlService: {
-      type: Function,
-      required: true
-    },
-    listIntegrationsService: {
-      type: Function,
-      required: true
-    },
-    listRepositoriesService: {
-      type: Function,
-      required: true
-    },
     listVulcanPresetsService: {
-      type: Function,
-      required: true
-    },
-    getModesByPresetService: {
       type: Function,
       required: true
     },
@@ -70,7 +50,6 @@
       .matches(/^\S*$/, 'Root Directory cannot contain spaces')
       .label('Root Directory'),
     preset: yup.string().required().label('Preset'),
-    mode: yup.string().required().label('Mode'),
     repository: yup.string().required().label('Repository'),
     installCommand: yup.string().required().label('Install Command'),
     gitScope: yup.string().required().label('Git Scope'),
@@ -91,7 +70,6 @@
     rootDirectory: '/',
     preset: '',
     newVariables: [],
-    mode: '',
     repository: '',
     installCommand: '',
     gitScope: ''
@@ -125,11 +103,6 @@
         field: 'vulcan_preset',
         instantiation_data_path: 'envs.[2].value',
         value: formValues.preset
-      },
-      {
-        field: 'vulcan_mode',
-        instantiation_data_path: 'envs.[3].value',
-        value: formValues.mode
       },
       {
         field: 'az_command',
@@ -186,12 +159,7 @@
       >
         <template #form>
           <FormFieldsImportGithub
-            :listPlatformsService="listPlatformsService"
-            :listIntegrationsService="listIntegrationsService"
-            :listRepositoriesService="listRepositoriesService"
-            :postCallbackUrlService="postCallbackUrlService"
             :listVulcanPresetsService="listVulcanPresetsService"
-            :getModesByPresetService="getModesByPresetService"
             :frameworkDetectorService="frameworkDetectorService"
           />
         </template>

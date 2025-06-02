@@ -5,6 +5,9 @@ let domainName
 let edgeAppName
 let digitalCertificateName
 let firewallName
+
+const cnames = 'trabalho_local.lucas.com.br\n-trabalho-local.lucas.com.br'
+
 const createEdgeApplicationCase = () => {
   edgeAppName = generateUniqueName('EdgeApp')
   firewallName = generateUniqueName('EdgeFirewall')
@@ -60,7 +63,11 @@ const createDigitalCertificateCase = () => {
 
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
+    
   })
 
   it('should create and delete a domain using a edge application', () => {
@@ -68,14 +75,17 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     // Arrange
     cy.openProduct('Domains')
+
     cy.intercept(
       'GET',
       '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
+
     cy.intercept(
       'GET',
       `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
+
     cy.intercept(
       'GET',
       '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
@@ -89,7 +99,6 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
@@ -98,6 +107,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.digitalCertificateDropdown).click()
     cy.get(selectors.domains.createDigitalCertificateButton).click()
     createDigitalCertificateCase()
+
     // Act
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('error', 'digital_certificate_id: cannot set a pending certificate to a domain')
@@ -120,6 +130,33 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.verifyToast(
       'Succesfully created!',
       'The domain is now available in the Domain management section.'
+    )
+  })
+
+  it('should error when cname is invalid on domain creation', () => {
+    domainName = generateUniqueName('domain')
+
+    // Arrange
+    cy.openProduct('Domains')
+
+    cy.intercept(
+      'GET',
+      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+    ).as('getEdgeApplicationList')
+
+    cy.get(selectors.domains.createButton).click()
+    cy.get(selectors.domains.nameInput).type(domainName)
+
+    cy.wait('@getEdgeApplicationList')
+    cy.get(selectors.domains.edgeApplicationField).click()
+    cy.get(selectors.domains.createEdgeApplicationButton).click()
+    createEdgeApplicationCase()
+
+    cy.get(selectors.domains.cnamesField).type(cnames)
+    cy.get(selectors.form.actionsSubmitButton).click()
+    cy.verifyToast(
+      'error',
+      'cname_invalid_format: trabalho_local.lucas.com.br, -trabalho-local.lucas.com.br'
     )
   })
 })

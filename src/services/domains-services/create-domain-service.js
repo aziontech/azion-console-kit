@@ -45,6 +45,12 @@ const extractErrorKey = (errorSchema, key) => {
   if (typeof errorSchema[key] === 'string') {
     return `${key}: ${errorSchema[key]}`
   }
+
+  if (typeof errorSchema[key] === 'object') {
+    const [firstKey] = Object.keys(errorSchema[key])
+    return `${firstKey}: ${errorSchema[key][firstKey]}`
+  }
+
   return `${key}: ${errorSchema[key][0]}`
 }
 

@@ -188,7 +188,9 @@ const sidebarProducts = [
   'Edge Services',
   'Digital Certificates',
   'Network Lists',
-  'WAF Rules'
+  'WAF Rules',
+  'Custom Pages',
+  'Edge Connectors'
 ]
 const accountProducts = [
   'Account Settings',

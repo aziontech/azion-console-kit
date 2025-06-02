@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :editService="props.editEdgeApplicationService"
+    :editService="edgeAppService.editEdgeApplicationService"
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
@@ -11,7 +11,7 @@
     data-testid="edit-edge-application-form-block"
   >
     <template #form>
-      <FormFieldsCreateEdgeApplications
+      <FormFieldsEditEdgeApplications
         :handleBlock="handleBlocks"
         :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService"
         data-testid="edit-edge-application-form-fields"
@@ -32,22 +32,19 @@
   import EditFormBlock from '@/templates/edit-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
+  import FormFieldsEditEdgeApplications from './FormFields/FormFieldsEditEdgeApplications.vue'
   import { inject } from 'vue'
 
   defineOptions({ name: 'edit-edge-application' })
   const emit = defineEmits(['updatedApplication'])
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeAppService } from '@/services/v2'
 
   const tracker = inject('tracker')
   const unsavedStatus = inject('unsaved')
 
   const props = defineProps({
-    editEdgeApplicationService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
@@ -62,15 +59,7 @@
   const handleBlocks = ['general', 'delivery-settings', 'edge-application-modules', 'debug-rules']
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
-    httpPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('http'),
-      then: (schema) => schema.min(1).required()
-    }),
-    httpsPort: yup.array().when('deliveryProtocol', {
-      is: (deliveryProtocol) => deliveryProtocol?.includes('https'),
-      then: (schema) => schema.min(1).required()
-    })
+    name: yup.string().required()
   })
 
   const loadEdgeApplication = async () => {

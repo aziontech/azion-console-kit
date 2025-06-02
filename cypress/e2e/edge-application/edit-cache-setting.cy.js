@@ -10,11 +10,12 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
   cy.get(selectors.form.actionsCancelButton).click()
+
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
@@ -22,11 +23,11 @@ const createEdgeApplicationCase = () => {
     'have.text',
     fixtures.edgeApplicationName
   )
-  cy.intercept('GET', '/api/v3/edge_applications/*').as('loadMainSettings')
+  cy.intercept('GET', '/v4/edge_application/applications/*').as('loadMainSettings')
   // Act - Navigate to the created edge application
   cy.get(selectors.list.filteredRow.column('name')).click()
   cy.wait('@loadMainSettings')
-  cy.get(selectors.edgeApplication.mainSettings.l2CachingSwitch).click()
+  cy.get(selectors.edgeApplication.mainSettings.tieredCacheEnabled).click()
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.verifyToast('success', 'Your edge application has been updated')
 }
@@ -34,6 +35,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -46,7 +50,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
       cacheSettingName: generateUniqueName('cacheSetting')
     }
     // Arrange
-    cy.intercept('GET', '/api/v4/edge_application/applications/*/cache_settings/*').as(
+    cy.intercept('GET', '/v4/edge_application/applications/*/cache_settings/*').as(
       'loadCacheSetting'
     )
     cy.openProduct('Edge Application')
@@ -120,7 +124,7 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     cy.wait('@loadCacheSetting')
 
     cy.get(selectors.edgeApplication.cacheSettings.largeFileOptimizationSwitch).click()
-    cy.intercept('PUT', '/api/v4/edge_application/applications/*/cache_settings/*', (req) => {
+    cy.intercept('PUT', '/v4/edge_application/applications/*/cache_settings/*', (req) => {
       expect(req.body).to.have.property('slice_controls')
       expect(req.body.slice_controls).to.have.property('slice_configuration_enabled', false)
       expect(req.body.slice_controls).to.have.property('slice_edge_caching_enabled', false)

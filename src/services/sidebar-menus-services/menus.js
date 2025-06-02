@@ -1,3 +1,6 @@
+import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 function createHomeItem() {
   return {
     label: 'Home',
@@ -17,10 +20,12 @@ function createMarketplaceItem() {
 }
 
 function createDomainsItem() {
+  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+
   return {
-    label: 'Domains',
+    label: handleTextDomainWorkload.pluralTitle,
     icon: 'ai ai-domains',
-    to: '/domains',
+    to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains'
   }
 }
@@ -149,6 +154,20 @@ function createEdgeLibrariesItems() {
       to: '/waf',
       icon: 'ai ai-waf-rules',
       id: 'waf-rules'
+    },
+    {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'ai ai-custom-pages',
+      id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
+    },
+    {
+      label: 'Edge Connectors',
+      to: '/edge-connectors',
+      icon: 'ai ai-edge-connectors',
+      id: 'edge-connectors',
+      visible: !hasFlagBlockApiV4()
     }
   ]
 }

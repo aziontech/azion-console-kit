@@ -28,7 +28,10 @@ export const documentationCatalog = {
   records: () => openSearchResult('records'),
   waf: () => openSearchResult('waf'),
   wafAllowed: () => openSearchResult('Allowed Rules'),
-  wafTuning: () => openSearchResult('Tune')
+  wafTuning: () => openSearchResult('Tune'),
+  customPages: () => openSearchResult('Error Responses'),
+  mfaManagement: () => openSearchResult('MFA Management'),
+  edgeConnectors: () => openSearchResult('Origins')
 }
 
 export const documentationGuideProducts = {
@@ -54,5 +57,6 @@ export const documentationGuideProducts = {
   paymentMethods: () =>
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-methods'),
   paymentHistory: () =>
-    openDocumentationProducts('guides/billing-and-subscriptions/#payment-history')
+    openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
+  customPages: () => openDocumentationProducts('guides/customizing-error-response-page')
 }

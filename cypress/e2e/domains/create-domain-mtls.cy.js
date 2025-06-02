@@ -46,8 +46,11 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.domains.pageTitle(edgeAppName)).should('have.text', edgeAppName)
 }
 
-describe('Domains spec', { tags: ['@dev3', '@xfail'] }, () => {
+describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 

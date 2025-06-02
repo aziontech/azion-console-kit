@@ -1,32 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <EditFormBlock
-        :editService="props.editNetworkListsService"
-        :loadService="props.loadNetworkListsService"
-        @on-edit-success="handleTrackSuccessEdit"
-        @on-edit-fail="handleTrackFailEdit"
-        :updatedRedirect="props.updatedRedirect"
-        :schema="validationSchema"
-      >
-        <template #form>
-          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
-        </template>
-        <template #action-bar="{ onSubmit, onCancel, loading }">
-          <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-          />
-        </template>
-      </EditFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditNetworkLists from './FormFields/FormFieldsEditNetworkLists'
@@ -36,13 +7,12 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { networkListsService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    loadNetworkListsService: { type: Function, required: true },
-    editNetworkListsService: { type: Function, required: true },
     listCountriesService: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -90,3 +60,32 @@
       .track()
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <EditFormBlock
+        :editService="networkListsService.editNetworkList"
+        :loadService="networkListsService.loadNetworkList"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
+        :updatedRedirect="props.updatedRedirect"
+        :schema="validationSchema"
+      >
+        <template #form>
+          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
+</template>
