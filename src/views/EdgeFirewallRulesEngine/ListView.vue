@@ -9,6 +9,7 @@
   import { useDialog } from 'primevue/usedialog'
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
+  import { edgeFirewallRulesEngineService } from '@/services/v2'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
   import { networkListsService } from '@/services/v2'
 
@@ -34,14 +35,7 @@
       type: Function,
       required: true
     },
-    listEdgeFirewallRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeFirewallRulesEngineService: {
-      type: Function,
-      required: true
-    },
+
     loadEdgeFirewallRulesEngineService: {
       type: Function,
       required: true
@@ -87,16 +81,16 @@
   ]
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
-    return await props.listEdgeFirewallRulesEngineService({
+    return await edgeFirewallRulesEngineService.listEdgeFirewallRulesEngineService({
       id: props.edgeFirewallId,
       ...query
     })
   }
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
-    return await props.deleteEdgeFirewallRulesEngineService({
-      edgeFirewallId: props.edgeFirewallId,
+    return await edgeFirewallRulesEngineService.deleteEdgeFirewallRulesEngineService(
+      props.edgeFirewallId,
       ruleEngineId
-    })
+    )
   }
 
   const handleTrackEditEvent = () => {
@@ -135,7 +129,10 @@
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true
     try {
-      await props.reorderRulesEngine(data, props.edgeFirewallId)
+      await edgeFirewallRulesEngineService.reorderEdgeFirewallRulesEngineService(
+        data,
+        props.edgeFirewallId
+      )
       toast.add({
         closable: true,
         severity: 'success',
@@ -143,12 +140,16 @@
         detail: 'Reorder saved'
       })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: error
+        })
+      }
     } finally {
       isLoadingButtonOrder.value = false
       reload()

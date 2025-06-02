@@ -13,8 +13,8 @@
       <FormFieldsEditWorkload
         :listEdgeApplicationsService="listEdgeApplicationsService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
         :listCustomPagesService="listCustomPagesService"
         :loadCustomPagesService="loadCustomPagesService"
       />
@@ -35,6 +35,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useRoute } from 'vue-router'
+  import { edgeFirewallService } from '@/services/v2'
 
   const props = defineProps({
     editWorkloadDeploymentService: {

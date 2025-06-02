@@ -5,38 +5,28 @@ export class VcsService {
     this.baseURL = 'v4/vcs'
   }
 
-  listIntegrations = async (params = { pageSize: 200 }) => {
+  listEdgeFirewall = async (params = { pageSize: 100 }) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/integrations`,
+      url: this.baseURL,
       params
     })
     return this.adapter?.transformListIntegrations?.(data.results) ?? data.results
   }
 
-  listPlatforms = async () => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.baseURL}/providers`
-    })
-    return this.adapter?.transformListPlatforms?.(data.results) ?? data.results
-  }
-
-  listRepositories = async (id, params = { pageSize: 200, ordering: 'name' }) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.baseURL}/integrations/${id}/repositories`,
-      params
-    })
-    return data.results
-  }
-
-  postCallbackUrl = async (path, body) => {
+  createEdgeFirewall = async (body) => {
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}${path}`,
+      url: this.baseURL,
       body
     })
-    return data.results
+
+    const { id } = data.body
+
+    return {
+      feedback: 'Your Edge Firewall has been created',
+      urlToEditView: `/edge-firewall/edit/${id}`,
+      id
+    }
   }
 }
