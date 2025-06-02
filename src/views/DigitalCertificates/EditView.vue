@@ -20,7 +20,7 @@
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            v-if="!values.managed"
+            v-if="!values.managed || values.authority === 'lets_encrypt'"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
@@ -73,11 +73,17 @@
     csr: yup.string(),
     certificate: yup.string(),
     privateKey: yup.string(),
-    managed: yup
-      .boolean()
-      .isFalse(
-        `This is a Let's Encrypt™ certificate automatically created and managed by Azion and can't be edited.`
-      )
+    authority: yup.string(),
+    challenge: yup.string(),
+    managed: yup.string().when('authority', {
+      is: (value) => value !== 'lets_encrypt',
+      then: (schema) =>
+        schema.oneOf(
+          [false],
+          `This is a Let's Encrypt™ certificate automatically created and managed by Azion and can't be edited.`
+        ),
+      otherwise: (schema) => schema
+    })
   })
 
   const handleTrackSuccessEdit = () => {
