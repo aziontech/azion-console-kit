@@ -14,7 +14,7 @@ describe('Data Stream spec', { tags: ['@dev3'] }, () => {
 
   it('should create a data stream with the standard connector', () => {
     // Arrange
-    cy.intercept('api/v3/data_streaming/templates').as('getTemplates')
+    cy.intercept('/v4/data_stream/data_sets?page=1&page_size=100&fields=id%2Cname').as('getTemplates')
 
     cy.get(selectors.dataStream.createButton).click()
     cy.wait('@getTemplates')

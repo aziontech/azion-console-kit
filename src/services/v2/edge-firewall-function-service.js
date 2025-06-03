@@ -1,3 +1,5 @@
+import { enrichByMatchingReference } from './utils/enrichByMatchingReference'
+
 export class EdgeFirewallFunctionService {
   constructor(http, adapter) {
     this.http = http
@@ -35,7 +37,17 @@ export class EdgeFirewallFunctionService {
     )
     this.countFunctions = count
 
-    const enrichedFunctions = await this.#enrichFunctionsWithNames(functionInstances)
+    const enrichedFunctions = await enrichByMatchingReference(
+      functionInstances,
+      'id',
+      this.#listFunctionNames,
+      (item) => item.edgeFunctionId,
+      (item, matchedRef) => ({
+        ...item,
+        functionInstanced: matchedRef.name
+      }),
+      { pageSize: 100 }
+    )
 
     return {
       body: this.#getTransformed('transformFunction', enrichedFunctions),

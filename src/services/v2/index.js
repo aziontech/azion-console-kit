@@ -36,6 +36,10 @@ import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-fun
 import { EdgeFunctionService } from './edge-function-service'
 import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
 
+//Data Stream
+import { DataStreamService } from './data-stream-service'
+import { DataStreamAdapter } from './adapters/data-stream-adapter'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -57,6 +61,7 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
+const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 
 export {
   vcsService,
@@ -68,5 +73,6 @@ export {
   edgeFirewallFunctionService,
   edgeFirewallRulesEngineService,
   edgeApplicationFunctionService,
-  edgeFunctionService
+  edgeFunctionService,
+  dataStreamService
 }

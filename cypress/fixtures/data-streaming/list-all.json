@@ -1,9 +1,10 @@
 {
+  "count": 11,
   "results": [
     {
       "id": 12836,
       "name": "joijoi",
-      "template_id": 2,
+      "data_set_id": 4,
       "data_source": "http",
       "active": true,
       "endpoint": {
@@ -12,10 +13,157 @@
         "log_line_separator": "\n",
         "payload_format": "$dataset",
         "max_size": 1000000
-      },
-      "sampling_percentage": 90,
-      "all_domains": true
+      }
+    },
+    {
+      "id": 13388,
+      "name": "cli wwe",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13474,
+      "name": "domain etst",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 14206,
+      "name": "domains id",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13285,
+      "name": "Eleven",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13384,
+      "name": "kit01aw",
+      "data_source": "rtm_activity",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 4856,
+      "name": "kkkkk",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": false,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13385,
+      "name": "My New red",
+      "data_source": "http",
+      "data_set_id": 69,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13390,
+      "name": "qwas",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13797,
+      "name": "rules-engine red",
+      "data_source": "http",
+      "data_set_id": 4,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
+    },
+    {
+      "id": 13387,
+      "name": "stream sde",
+      "data_source": "waf",
+      "data_set_id": 5,
+      "active": true,
+      "endpoint": {
+        "url": "https://app.domain.com/",
+        "log_line_separator": "\\n",
+        "payload_format": "$dataset",
+        "max_size": 1000000,
+        "headers": {},
+        "endpoint_type": "standard"
+      }
     }
-  ],
-  "schema_version": 3
+  ]
 }

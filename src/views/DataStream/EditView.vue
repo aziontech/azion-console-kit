@@ -9,24 +9,9 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useAccountStore } from '@/stores/account'
+  import { dataStreamService } from '@/services/v2'
 
   const props = defineProps({
-    listDataStreamTemplateService: {
-      type: Function,
-      required: true
-    },
-    listDataStreamDomainsService: {
-      type: Function,
-      required: true
-    },
-    loadDataStreamService: {
-      type: Function,
-      required: true
-    },
-    editDataStreamService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
@@ -238,8 +223,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editDataStreamService"
-        :loadService="props.loadDataStreamService"
+        :editService="dataStreamService.editDataStreamService"
+        :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
       >
