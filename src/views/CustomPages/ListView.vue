@@ -13,27 +13,7 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    deleteCustomPagesService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
-      required: true,
-      type: Function
-    },
-    createCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    loadCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    editCustomPagesService: {
       required: true,
       type: Function
     }
@@ -47,7 +27,7 @@
       label: 'Delete',
       title: 'custom pages',
       icon: 'pi pi-trash',
-      service: props.deleteCustomPagesService
+      service: customPageService.deleteCustomPagesService
     }
   ]
 

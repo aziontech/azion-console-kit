@@ -38,14 +38,6 @@
   import { customPageService } from '@/services/v2'
 
   defineProps({
-    loadCustomPagesService: {
-      type: Function,
-      required: true
-    },
-    editCustomPagesService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true

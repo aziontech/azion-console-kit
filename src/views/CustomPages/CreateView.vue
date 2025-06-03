@@ -37,11 +37,8 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCustomPages from './FormFields/FormFieldsCustomPages'
   import { customPageService } from '@/services/v2'
+
   defineProps({
-    createCustomPagesService: {
-      type: Function,
-      required: true
-    },
     listEdgeConnectorsService: {
       type: Function,
       required: true

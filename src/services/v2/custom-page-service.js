@@ -58,7 +58,7 @@ export class CustomPageService {
     return this.adapter?.transformLoadCustomPage?.(data) ?? data.data
   }
 
-  async deleteCustomPagesService(id) {
+  deleteCustomPagesService = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.baseURL}/${id}`
