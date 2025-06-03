@@ -2,13 +2,41 @@ export class DigitalCertificatesService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/digital_certificates'
+    this.baseURL = 'v4/digital_certificates/certificates'
+  }
+
+  createDigitalCertificate = async (payload) => {
+    const body = this.adapter?.transformCreateDigitalCertificate?.(payload)
+
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: this.baseURL,
+      body
+    })
+
+    const {
+      data: { id }
+    } = data
+
+    return {
+      feedback: 'Your digital certificate has been created!',
+      urlToEditView: `/digital-certificates/edit/${id}`,
+      domainId: id
+    }
+  }
+
+  editDigitalCertificate = async (payload) => {
+    await this.http.request({
+      method: 'PUT',
+      url: `${this.baseURL}/${payload.id}`,
+      body: payload
+    })
   }
 
   listDigitalCertificates = async (params) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/certificates`,
+      url: this.baseURL,
       params: {
         search: '',
         fields: '',
@@ -19,17 +47,11 @@ export class DigitalCertificatesService {
       }
     })
 
-    return this.adapter?.transformListDigitalCertificates?.(data)
+    return this.adapter?.transformListDigitalCertificates?.(data, params)
   }
 
   listDigitalCertificatesDropdown = async (params) => {
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: `${this.baseURL}/certificates`,
-      params
-    })
-
-    return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
+    this.listDigitalCertificates(params)
   }
 
   loadDigitalCertificate = async ({ id }) => {
@@ -37,12 +59,21 @@ export class DigitalCertificatesService {
 
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/certificates/${id}`,
+      url: `${this.baseURL}/${id}`,
       params: {
         fields
       }
     })
 
     return this.adapter?.transformLoadDigitalCertificate?.(data)
+  }
+
+  deleteDigitalCertificate = async ({ id }) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/${id}`
+    })
+
+    return 'Digital certificate successfully deleted!'
   }
 }

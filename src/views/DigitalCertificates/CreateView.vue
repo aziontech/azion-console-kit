@@ -57,25 +57,14 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import { digitalCertificatesService, digitalCertificatesCSRService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    createDigitalCertificatesCSRService: {
-      type: Function,
-      required: true
-    }
-  })
-
   const router = useRouter()
 
-  const createDigitalCertificateService = props.createDigitalCertificatesService
-  const createCSRService = props.createDigitalCertificatesCSRService
+  const createDigitalCertificateService = digitalCertificatesService.createDigitalCertificate
+  const createCSRService = digitalCertificatesCSRService.createDigitalCertificateCSR
 
   const certificateTypes = {
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',

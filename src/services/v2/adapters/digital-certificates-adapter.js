@@ -26,6 +26,20 @@ const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
 export const DigitalCertificatesAdapter = {
+  transformCreateDigitalCertificate({
+    digitalCertificateName,
+    certificateType,
+    certificate,
+    privateKey
+  }) {
+    return {
+      name: digitalCertificateName,
+      type: certificateType,
+      ...(!!certificate?.trim() && { certificate }),
+      ...(!!privateKey?.trim() && { private_key: privateKey })
+    }
+  },
+
   transformListDigitalCertificates({ results, count }) {
     const formattedResults = results?.map((item) => {
       const subjectNames = checkIfFieldExist(
@@ -83,7 +97,9 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformLoadDigitalCertificate({ id, name, type, csr = undefined, managed }) {
+  transformLoadDigitalCertificate({ data }) {
+    const { id, name, type, csr = undefined, managed } = data
+
     return {
       id,
       name,

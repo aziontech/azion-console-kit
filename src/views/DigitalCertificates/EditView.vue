@@ -46,10 +46,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    editDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true

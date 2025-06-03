@@ -12,8 +12,6 @@ export const digitalCertificatesRoutes = {
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
       props: {
-        deleteDigitalCertificatesService:
-          DigitalCertificatesServiceV4.deleteDigitalCertificatesService,
         documentationService: Helpers.documentationCatalog.digitalCertificates
       },
       meta: {

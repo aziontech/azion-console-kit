@@ -6,6 +6,15 @@ import { createHttpService } from './base/httpServiceFactory'
 import { DigitalCertificatesAdapter } from './adapters/digital-certificates-adapter'
 import { DigitalCertificatesService } from './digital-certificates-service'
 
+// Digital Certificates CSR Service
+import { DigitalCertificatesCSRService } from './digital-certificates-csr-service'
+
+// Digital Certificates CRL Service
+import { DigitalCertificatesCRLService } from './digital-certificates-crl-service'
+
+// Digital Certificates CR Service
+import { DigitalCertificatesCRService } from './digital-certificates-cr-service'
+
 // Vcs Service
 import { VcsService } from './vcs-service'
 import { VcsAdapter } from './adapters/vcs-adapter'
@@ -79,6 +88,9 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
+const digitalCertificatesCSRService = new DigitalCertificatesCSRService(httpService)
+const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
+const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 
 export {
   vcsService,
@@ -94,5 +106,8 @@ export {
   rulesEngineService,
   edgeApplicationFunctionService,
   edgeFunctionService,
-  digitalCertificatesService
+  digitalCertificatesService,
+  digitalCertificatesCSRService,
+  digitalCertificatesCRLService,
+  digitalCertificatesCRService
 }

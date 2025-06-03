@@ -25,7 +25,7 @@
         description="Click the button below to add your first digital certificate."
         createButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -51,10 +51,6 @@
   defineOptions({ name: 'digital-certificates-view' })
 
   const props = defineProps({
-    deleteDigitalCertificatesService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -78,7 +74,7 @@
       type: 'delete',
       title: 'digital certificate',
       icon: 'pi pi-trash',
-      service: props.deleteDigitalCertificatesService
+      service: digitalCertificatesService.deleteDigitalCertificate
     }
   ]
 

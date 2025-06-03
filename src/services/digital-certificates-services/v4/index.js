@@ -2,12 +2,10 @@ import { createDigitalCertificatesCSRService } from './create-digital-certificat
 import { createDigitalCertificatesService } from './create-digital-certificates-services'
 import { loadDigitalCertificateService } from './load-digital-certificates-service'
 import { editDigitalCertificateService } from './edit-digital-certificates-service'
-import { deleteDigitalCertificatesService } from './delete-digital-certificates-service'
 
 export {
   createDigitalCertificatesCSRService,
   createDigitalCertificatesService,
   loadDigitalCertificateService,
   editDigitalCertificateService,
-  deleteDigitalCertificatesService
 }
