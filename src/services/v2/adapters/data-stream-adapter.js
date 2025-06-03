@@ -8,11 +8,11 @@ const mapDataSourceName = {
   waf: 'WAF Events'
 }
 
-const getDomains = (domains) => {
-  return domains.map((domain) => domain.id)
+const getWorkloadIds = (workloads) => {
+  return workloads.map((workload) => workload.id)
 }
 
-const getHeaders = (listHeaders) => {
+const getHeadersPostRequest = (listHeaders) => {
   const headers = {}
   if (listHeaders.length > 0) {
     listHeaders.forEach((element) => {
@@ -28,7 +28,7 @@ const getHeaders = (listHeaders) => {
   return headers
 }
 
-const getHeadersLoad = (payload) => {
+const getHeadersLoadRequest = (payload) => {
   const headers = []
   if (payload.endpoint && payload.endpoint?.headers) {
     Object.entries(payload.endpoint?.headers).forEach((element) => {
@@ -50,7 +50,7 @@ const parseByEndpointType = (payload) => {
         payload_format: payload.payloadFormat,
         log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
         max_size: payload.maxSize,
-        headers: getHeaders(payload.headers)
+        headers: getHeadersPostRequest(payload.headers)
       }
     case 'kafka':
       return {
@@ -140,7 +140,7 @@ const getInfoByEndpoint = (payload) => {
             ? '\\n'
             : payload.endpoint.log_line_separator,
         maxSize: payload.endpoint.max_size,
-        ...getHeadersLoad(payload)
+        ...getHeadersLoadRequest(payload)
       }
     case 'kafka':
       return {
@@ -246,7 +246,7 @@ export const DataStreamAdapter = {
         filters: {
           sampling_enable: allDomains,
           sampling_rate: 100,
-          workloads: getDomains(payload.domains[1])
+          workloads: getWorkloadIds(payload.domains[1])
         },
         endpoint: parseByEndpointType(payload)
       }
@@ -258,7 +258,7 @@ export const DataStreamAdapter = {
         filters: {
           sampling_enable: allDomains,
           sampling_rate: 100,
-          workloads: getDomains(payload.domains[1])
+          workloads: getWorkloadIds(payload.domains[1])
         },
         active: payload.status,
         endpoint: parseByEndpointType(payload)
