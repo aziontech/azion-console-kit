@@ -68,8 +68,8 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     // Act - Set WAF Behavior
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.behaviorsWafOption).click()
+    cy.wait('@wafDropdown')
     cy.get(selectors.edgeFirewall.rulesWafDropdown).click()
-    cy.wait('@wafDropdown', { timeout: 3000 })
     cy.get(selectors.edgeFirewall.scrollWafDropdown).scrollTo('bottom')
     cy.wait('@wafDropdownSecondPage', { timeout: 3000 });
     // eslint-disable-next-line cypress/unsafe-to-chain-command

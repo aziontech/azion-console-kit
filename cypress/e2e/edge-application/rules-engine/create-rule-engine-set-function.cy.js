@@ -11,12 +11,10 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -61,7 +59,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     }
   })
 
-  it.skip('should create a rule engine set cache policy', () => {
+  it('should create a rule engine set cache policy', () => {
     // Arrange
     cy.openProduct('Edge Application')
     createEdgeApplicationCase()
@@ -91,7 +89,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
     cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionsDropdown).click()
     cy.get(selectors.edgeApplication.functionsInstance.createFunctionButton).click()
     createFunctionCase()
-    cy.intercept('POST', 'api/v4/edge_application/applications/*/rules*').as('postFunction')
+    cy.intercept('POST', '/v4/edge_application/applications/*/rules*').as('postFunction')
     cy.get(selectors.edgeApplication.rulesEngine.functionInstanceActionBar)
       .find(selectors.form.actionsSubmitButton)
       .click()
@@ -100,12 +98,9 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
       '/v4/edge_application/applications/*/functions?*'
     ).as('getFunctionInstance')
 
+    cy.wait('@getFunctionInstance')
     cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0)).click()
-    cy.get(selectors.edgeApplication.rulesEngine.setFunctionInstanceSelect(0))
-      .find(
-        selectors.edgeApplication.rulesEngine.functionInstanceOption(fixtures.functionInstanceName)
-      )
-      .click()
+    cy.get(selectors.edgeApplication.rulesEngine.firstBehaviorValueOption).click()
 
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.wait('@postFunction')

@@ -8,7 +8,7 @@
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { cacheSettingsService } from '@/services/v2'
+  import { cacheSettingsService, rulesEngineService } from '@/services/v2'
 
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
@@ -20,18 +20,6 @@
   const props = defineProps({
     edgeApplicationId: {
       type: String,
-      required: true
-    },
-    createRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    editRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    loadRulesEngineService: {
-      type: Function,
       required: true
     },
     documentationService: {
@@ -141,16 +129,16 @@
   }
 
   const createService = async (payload) => {
-    return await props.createRulesEngineService({
+    return await rulesEngineService.createRulesEngine({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
   }
 
   const editService = async (payload) => {
-    return await props.editRulesEngineService({
+    return await rulesEngineService.editRulesEngine({
       payload,
-      id: props.edgeApplicationId
+      edgeApplicationId: props.edgeApplicationId
     })
   }
 
@@ -216,7 +204,7 @@
   }
 
   const loadService = async () => {
-    return await props.loadRulesEngineService({
+    return await rulesEngineService.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
       edgeApplicationId: props.edgeApplicationId
     })

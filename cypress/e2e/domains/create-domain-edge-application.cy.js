@@ -99,7 +99,6 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
