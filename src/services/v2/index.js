@@ -28,6 +28,10 @@ import { DeviceGroupService } from './edge-app-device-group-service'
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
 
+// Waf
+import { WafService } from './waf-service'
+import { WafAdapter } from './adapters/waf-adapter'
+
 // Edge Application Rules Engine
 import { RulesEngineAdapter } from './adapters/edge-app-rules-engine-adapter'
 import { RulesEngineService } from './edge-app-rules-engine-service'
@@ -46,6 +50,7 @@ import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
+const wafService = new WafService(httpService, WafAdapter)
 const edgeFirewallService = new EdgeFirewallService(httpService, EdgeFirewallAdapter)
 const edgeFirewallFunctionService = new EdgeFirewallFunctionService(
   httpService,
@@ -72,6 +77,7 @@ export {
   cacheSettingsService,
   deviceGroupService,
   purgeService,
+  wafService,
   networkListsService,
   edgeAppService,
   edgeFirewallService,
