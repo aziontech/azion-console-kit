@@ -19,6 +19,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { edgeAppService } from '@/services/v2'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -68,17 +69,26 @@
 
   const checkIsLocked = async () => {
     if (hasFlagBlockApiV4()) {
-      isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
-        id: edgeApplicationId.value
+      const edgeApplication = await edgeAppService.loadEdgeApplicationService({
+        id: edgeApplicationId.value,
+        params: {
+          fields: 'product_version'
+        }
       })
+
+      isLocked.value = edgeApplication.productVersion === 'custom'
     }
   }
 
   const handleLoadEdgeApplication = async () => {
     try {
-      return await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const params = { id: edgeApplicationId.value }
+
+      if (hasFlagBlockApiV4()) {
+        return await props.edgeApplicationServices.loadEdgeApplication(params)
+      }
+
+      return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
       toast.add({
         closable: true,
