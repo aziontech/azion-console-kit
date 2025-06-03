@@ -10,8 +10,8 @@
       <FormFieldsCreateDomains
         isDrawer
         noBorder
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
         :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
@@ -34,6 +34,7 @@
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import * as yup from 'yup'
+  import { edgeFirewallService } from '@/services/v2'
 
   const emit = defineEmits(['createdDomain'])
 

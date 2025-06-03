@@ -12,7 +12,7 @@ const getConfig = () => {
   const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'production' ? false : true
 
-  const createProxyConfig = ({ target, rewrite = null}) => ({
+  const createProxyConfig = ({ target, rewrite = null }) => ({
     target,
     changeOrigin: true,
     rewrite,
@@ -22,6 +22,8 @@ const getConfig = () => {
           const originalUrl = `https://${req.headers.host}${req.url}`
           const targetUrl = options.target
           const proxiedUrl = `${targetUrl}${req.url}`
+          
+          // eslint-disable-next-line no-console
           console.log(`[Vite Proxy] ${req.method} ${originalUrl} => ${proxiedUrl}`)
         })
       }

@@ -10,15 +10,13 @@ let fixtures = {}
  */
 const createEdgeApplicationCase = () => {
   // Act
-  cy.intercept('POST', 'api/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
 
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsSkipButton).click()
-  cy.get(selectors.edgeApplication.mainSettings.unsaved).click()
   cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
@@ -66,7 +64,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
         body: edgeConnectorsdata
       }
     ).as('listEdgeConnectors')
-    cy.intercept({ method: 'POST', url: '/api/v4/edge_application/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
+    cy.intercept({ method: 'POST', url: '/v4/edge_application/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
 
     // Arrange
     cy.openProduct('Edge Application')

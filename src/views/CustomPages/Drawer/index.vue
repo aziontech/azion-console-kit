@@ -3,7 +3,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
   import { createCustomPagesService } from '@/services/custom-pages-services/v4'
-  import { listEdgeConnectorsService } from '@/services/edge-connectors'
+  import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
@@ -37,7 +37,7 @@
     name: '',
     isActive: false,
     isDefault: false,
-    edgeConnectorId: 0,
+    edgeConnectorId: null,
     pages: []
   })
 
@@ -106,9 +106,13 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateCustomPages"
     title="Create Custom Page"
+    isOverlapped
   >
     <template #formFields>
-      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
+      <FormFieldsCustomPages
+        :loadEdgeConnectorsService="loadEdgeConnectorsService"
+        :listEdgeConnectorsService="listEdgeConnectorsService"
+      />
     </template>
   </CreateDrawerBlock>
 
@@ -121,9 +125,13 @@
     :schema="validationSchema"
     @onSuccess="handleEditedCustomPages"
     title="Edit Custom Page"
+    isOverlapped
   >
     <template #formFields>
-      <FormFieldsCustomPages :listEdgeConnectorsService="listEdgeConnectorsService" />
+      <FormFieldsCustomPages
+        :loadEdgeConnectorsService="loadEdgeConnectorsService"
+        :listEdgeConnectorsService="listEdgeConnectorsService"
+      />
     </template>
   </EditDrawerBlock>
 </template>

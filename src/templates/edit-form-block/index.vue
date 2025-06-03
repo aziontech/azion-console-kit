@@ -111,9 +111,12 @@
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
-      const messages = props.serviceV2 ? error.message : [error]
-      messages.forEach(message => showToast('error', message))
-      emit('on-load-fail', messages[0])
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        emit('on-load-fail', error)
+        showToast('error', error)
+      }
       goBackToList()
     }
   }
@@ -134,11 +137,18 @@
         }
         goBackToList()
       } catch (error) {
-        const errorMessage = error?.message || error
-
-        emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        showToast('error', errorMessage)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          emit('on-edit-fail', error)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {

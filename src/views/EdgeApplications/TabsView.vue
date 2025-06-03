@@ -19,6 +19,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { edgeAppService } from '@/services/v2'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -27,7 +28,6 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     errorResponsesServices: { type: Object, required: true },
@@ -69,17 +69,26 @@
 
   const checkIsLocked = async () => {
     if (hasFlagBlockApiV4()) {
-      isLocked.value = await props.edgeApplicationServices.checkgeApplicationsLockedService({
-        id: edgeApplicationId.value
+      const edgeApplication = await edgeAppService.loadEdgeApplicationService({
+        id: edgeApplicationId.value,
+        params: {
+          fields: 'product_version'
+        }
       })
+
+      isLocked.value = edgeApplication.productVersion === 'custom'
     }
   }
 
   const handleLoadEdgeApplication = async () => {
     try {
-      return await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const params = { id: edgeApplicationId.value }
+
+      if (hasFlagBlockApiV4()) {
+        return await props.edgeApplicationServices.loadEdgeApplication(params)
+      }
+
+      return await edgeAppService.loadEdgeApplicationService(params)
     } catch (error) {
       toast.add({
         closable: true,
@@ -264,7 +273,6 @@
       condition: true,
       show: showTabs.cacheSettings,
       props: () => ({
-        ...props.cacheSettingsServices,
         isApplicationAcceleratorEnabled: isModuleEnabled(applicationAcceleratorEnabled.value).value,
         isTieredCacheEnabled: isModuleEnabled(tieredCacheEnabled.value).value,
         edgeApplicationId: edgeApplicationId.value

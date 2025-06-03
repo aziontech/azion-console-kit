@@ -41,7 +41,7 @@
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { digitalCertificatesService } from '@/services/v2'
-  
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 

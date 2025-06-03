@@ -132,6 +132,8 @@
           id="countriesList"
           v-model="itemsValuesCountry"
           :options="countriesList"
+          :loading="!countriesList.length"
+          :disabled="!countriesList.length"
           name="itemsValuesCountry"
           filter
           autoFilterFocus

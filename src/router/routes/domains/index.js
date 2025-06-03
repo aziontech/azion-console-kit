@@ -1,7 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
 import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
 
@@ -37,8 +36,6 @@ export const domainsRoutes = {
         createDomainService: DomainServices.createDomainService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         clipboardWrite: Helpers.clipboardWrite,
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
@@ -65,8 +62,6 @@ export const domainsRoutes = {
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
         updatedRedirect: 'list-domains',
         clipboardWrite: Helpers.clipboardWrite,
         loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService

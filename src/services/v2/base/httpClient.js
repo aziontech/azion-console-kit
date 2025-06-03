@@ -10,16 +10,24 @@ export class HttpClient {
 
   async send(config) {
     const headers = config.headers || {}
-
     const baseURL = config.baseURL ?? '/'
 
+    // Set default headers
     headers['Accept'] = config.accept ?? 'application/json; version=3'
     headers['Content-Type'] = config.contentType ?? 'application/json; version=3'
     headers['withCredentials'] = config.withCredentials ?? true
 
+    // Add authentication if token is available
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`
     }
-    return this.api({ ...config, headers, baseURL })
+
+    const requestConfig = {
+      ...config,
+      headers,
+      baseURL
+    }
+
+    return this.api(requestConfig)
   }
 }
