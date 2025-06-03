@@ -52,7 +52,7 @@ export const wafRulesRoutes = {
           optionsRuleIds: WafRulesService.optionsRuleIds
         },
         wafServices: {
-          updatedRedirect: 'list-waf-rules',
+          updatedRedirect: 'list-waf-rules'
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning,

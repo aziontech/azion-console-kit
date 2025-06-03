@@ -6,7 +6,11 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallRulesEngineService, edgeFirewallFunctionService, wafService } from '@/services/v2'
+  import {
+    edgeFirewallRulesEngineService,
+    edgeFirewallFunctionService,
+    wafService
+  } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

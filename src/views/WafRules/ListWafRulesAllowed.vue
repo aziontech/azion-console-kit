@@ -35,7 +35,6 @@
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
   const props = defineProps({
-
     documentationServiceAllowed: {
       required: true,
       type: Function
