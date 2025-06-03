@@ -64,7 +64,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
         body: edgeConnectorsdata
       }
     ).as('listEdgeConnectors')
-    cy.intercept({ method: 'POST', url: '/api/v4/edge_application/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
+    cy.intercept({ method: 'POST', url: '/v4/edge_application/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
 
     // Arrange
     cy.openProduct('Edge Application')

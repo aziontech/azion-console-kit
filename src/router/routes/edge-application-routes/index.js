@@ -1,7 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
-import * as RulesEngineServiceV4 from '@/services/edge-application-rules-engine-services/v4'
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
 import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
@@ -94,12 +93,6 @@ export const edgeApplicationRoutes = {
             editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
           },
           rulesEngineServices: {
-            listRulesEngineService: RulesEngineServiceV4.listRulesEngineServiceAll,
-            deleteRulesEngineService: RulesEngineServiceV4.deleteRuleService,
-            editRulesEngineService: RulesEngineServiceV4.editRulesEngineService,
-            createRulesEngineService: RulesEngineServiceV4.createRulesEngineService,
-            loadRulesEngineService: RulesEngineServiceV4.loadRulesEngineService,
-            reorderRulesEngine: RulesEngineServiceV4.reorderRulesEngine,
             documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
             listOriginsService: OriginsService.listOriginsService
           },
