@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="createCustomPagesService"
+        :createService="customPageService.createCustomPagesService"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -36,7 +36,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCustomPages from './FormFields/FormFieldsCustomPages'
-
+  import { customPageService } from '@/services/v2'
   defineProps({
     createCustomPagesService: {
       type: Function,

@@ -25,17 +25,17 @@ describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
 
   it('should edit a custom page', () => {
     cy.intercept(
-      { method: 'POST', url: '/api/v4/workspace/custom_pages' },
+      { method: 'POST', url: '/v4/workspace/custom_pages' },
       { body: httpResponseCreate, statusCode: 202 }
     ).as('createCustomPages')
 
     cy.intercept(
-      { method: 'GET', url: '/api/v4/workspace/custom_pages/*' },
+      { method: 'GET', url: '/v4/workspace/custom_pages/*' },
       { body: httpResponseGet, statusCode: 200 }
     ).as('getCustomPages')
 
     cy.intercept(
-      { method: 'PATCH', url: '/api/v4/workspace/custom_pages/*' },
+      { method: 'PATCH', url: '/v4/workspace/custom_pages/*' },
       { body: httpResponseCreate, statusCode: 202 }
     ).as('updateCustomPages')
 

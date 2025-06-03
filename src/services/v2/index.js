@@ -47,6 +47,10 @@ import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-fun
 import { EdgeFunctionService } from './edge-function-service'
 import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
 
+// Custom Pages
+import { CustomPageAdapter } from './adapters/custom-page-adapter'
+import { CustomPageService } from './custom-page-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -71,6 +75,7 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
+const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 
 export {
   vcsService,
@@ -85,5 +90,6 @@ export {
   edgeFirewallRulesEngineService,
   rulesEngineService,
   edgeApplicationFunctionService,
-  edgeFunctionService
+  edgeFunctionService,
+  customPageService
 }

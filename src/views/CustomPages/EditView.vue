@@ -5,8 +5,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="editCustomPagesService"
-        :loadService="loadCustomPagesService"
+        :editService="customPageService.editCustomPagesService"
+        :loadService="customPageService.loadCustomPagesService"
         :schema="validationSchema"
         :updatedRedirect="updatedRedirect"
       >
@@ -35,6 +35,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCustomPages from './FormFields/FormFieldsCustomPages'
+  import { customPageService } from '@/services/v2'
 
   defineProps({
     loadCustomPagesService: {
