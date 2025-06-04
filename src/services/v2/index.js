@@ -28,6 +28,17 @@ import { DeviceGroupService } from './edge-app-device-group-service'
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
 
+// Waf
+import { WafService } from './waf-service'
+import { WafAdapter } from './adapters/waf-adapter'
+
+// Edge Application Rules Engine
+import { RulesEngineAdapter } from './adapters/edge-app-rules-engine-adapter'
+import { RulesEngineService } from './edge-app-rules-engine-service'
+
+// Edge Application
+import { EdgeAppAdapter } from './adapters/edge-app-adapter'
+import { EdgeAppService } from './edge-app-service'
 // Edge Functions
 import { EdgeApplicationFunctionService } from './edge-application-functions-service'
 import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-functions-adapter'
@@ -40,9 +51,14 @@ import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
 import { DataStreamService } from './data-stream-service'
 import { DataStreamAdapter } from './adapters/data-stream-adapter'
 
+// Custom Pages
+import { CustomPageAdapter } from './adapters/custom-page-adapter'
+import { CustomPageService } from './custom-page-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
+const wafService = new WafService(httpService, WafAdapter)
 const edgeFirewallService = new EdgeFirewallService(httpService, EdgeFirewallAdapter)
 const edgeFirewallFunctionService = new EdgeFirewallFunctionService(
   httpService,
@@ -52,27 +68,34 @@ const edgeFirewallRulesEngineService = new EdgeFirewallRulesEngineService(
   httpService,
   EdgeFirewallRulesEngineAdapter
 )
-const networkListsService = new NetworkListsService(httpService, NetworkListsAdapter)
-const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
 const cacheSettingsService = new CacheSettingsService(httpService, CacheSettingsAdapter)
+const deviceGroupService = new DeviceGroupService(httpService, DeviceGroupAdapter)
 const purgeService = new PurgeService(httpService, PurgeAdapter)
+const edgeAppService = new EdgeAppService(httpService, EdgeAppAdapter)
+const networkListsService = new NetworkListsService(httpService, NetworkListsAdapter)
+const rulesEngineService = new RulesEngineService(httpService, RulesEngineAdapter)
 const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   httpService,
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
 const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
+const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 
 export {
   vcsService,
   cacheSettingsService,
   deviceGroupService,
   purgeService,
+  wafService,
   networkListsService,
+  edgeAppService,
   edgeFirewallService,
   edgeFirewallFunctionService,
   edgeFirewallRulesEngineService,
+  rulesEngineService,
   edgeApplicationFunctionService,
   edgeFunctionService,
-  dataStreamService
+  dataStreamService,
+  customPageService
 }

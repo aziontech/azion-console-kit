@@ -2,11 +2,11 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
-  import { createCustomPagesService } from '@/services/custom-pages-services/v4'
   import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
+  import { customPageService } from '@/services/v2'
 
   defineOptions({
     name: 'custom-pages-drawer'
@@ -99,7 +99,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateCustomPagesDrawer"
-    :createService="createCustomPagesService"
+    :createService="customPageService.createCustomPagesService"
     id="create-custom-page-drawer"
     drawerId="create-custom-page-drawer"
     :schema="validationSchema"
@@ -120,8 +120,8 @@
     v-if="showEditDrawer"
     :id="selectedCustomPageToEdit"
     v-model:visible="showEditCustomPagesDrawer"
-    :loadService="loadService"
-    :editService="editService"
+    :loadService="customPageService.loadCustomPagesService"
+    :editService="customPageService.editCustomPagesService"
     :schema="validationSchema"
     @onSuccess="handleEditedCustomPages"
     title="Edit Custom Page"

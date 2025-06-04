@@ -1,170 +1,3 @@
-<template>
-  <div
-    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex flex-col gap-6 md:gap-4"
-  >
-    <div class="w-full flex md:flex-row flex-col gap-4 md:items-center">
-      <div class="flex gap-6 flex-col sm:flex-row w-full">
-        <Dropdown
-          appendTo="self"
-          optionValue="value"
-          optionLabel="name"
-          :options="timeOptions"
-          v-model="selectedFilter.hourRange"
-          @change="filterTuning"
-          class="w-full sm:max-w-xs"
-        />
-        <MultiSelect
-          data-testid="waf-tuning-list__domains-field"
-          appendTo="body"
-          optionLabel="name"
-          optionValue="id"
-          :options="domainsOptions.options"
-          :loading="!domainsOptions.done"
-          v-model="selectedDomainIds"
-          @change="setDomainsSelectedOptions"
-          class="w-full sm:max-w-xs"
-          :placeholder="`Select a ${handleTextDomainWorkload.singularLabel}`"
-          filter
-          display="chip"
-          scrollHeight="250px"
-          :maxSelectedLabels="3"
-          :virtualScrollerOptions="{ itemSize: 38 }"
-          :pt="{
-            panel: { class: 'surface-section shadow-2 border-none' },
-            item: {
-              class: 'hover:surface-hover',
-              'data-testid': 'waf-tuning-list__domains-field-item'
-            },
-            closeButton: { 'data-testid': 'waf-tuning-list__domains-field-close-button' },
-            wrapper: { class: 'w-full' },
-            list: { class: 'p-0 list-none' },
-            filterInput: { class: 'surface-ground' }
-          }"
-          style="--p-multiselect-overlay-width: 100%"
-        />
-
-        <FieldDropdownLazyLoader
-          data-testid="waf-tuning-list__network-list-field"
-          name="valueNetworkId"
-          :service="props.listNetworkListService"
-          :loadService="props.loadNetworkListService"
-          optionLabel="name"
-          optionValue="id"
-          :value="valueNetworkId"
-          :moreOptions="['value']"
-          appendTo="self"
-          placeholder="Select an network list"
-          @onClear="setNetworkListSelectedOption(null)"
-          @onSelectOption="setNetworkListSelectedOption"
-          class="w-full sm:max-w-xs"
-          enableClearOption
-        />
-      </div>
-      <div class="flex items-center justify-end">
-        <PrimeTag
-          class="no-wrap whitespace-nowrap ml-auto"
-          :value="recordsFoundLabel"
-          severity="info"
-        />
-      </div>
-    </div>
-    <div class="flex flex-col md:flex-row md:items-center gap-2">
-      <advancedFilter
-        ref="advancedFilterRef"
-        :hashUpdatable="false"
-        v-model:externalFilter="selectedFilter"
-        v-model:filterAdvanced="selectedFilterAdvanced"
-        :fieldsInFilter="listFields"
-        @applyFilter="filterSearch"
-      />
-      <PrimeButton
-        class="md:hidden"
-        outlined
-        size="small"
-        label="Export to CSV"
-        icon="pi pi-download"
-        @click="downloadCSV"
-      />
-      <PrimeButton
-        class="hidden md:flex"
-        outlined
-        size="small"
-        icon="pi pi-download"
-        v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
-        @click="downloadCSV"
-      />
-    </div>
-  </div>
-  <ListTableBlock
-    v-show="showListTable"
-    pageTitleDelete="WAF rules tuning"
-    :listService="listService"
-    ref="listServiceWafTunningRef"
-    :columns="wafRulesAllowedColumns"
-    :hasListService="true"
-    v-model:selectedItensData="selectedEvents"
-    :showSelectionMode="true"
-    :editInDrawer="openMoreDetails"
-    emptyListMessage="No requests found."
-    hiddenHeader
-    :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
-  />
-
-  <EmptyResultsBlock
-    v-if="!showListTable"
-    :title="`Select a ${handleTextDomainWorkload.singularLabel} to query data`"
-    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the edge firewall that has a behavior running this WAF rule set.`"
-    :documentationService="props.documentationServiceTuning"
-    noShowBorderTop
-    class="!mt-0"
-  >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        :label="`${handleTextDomainWorkload.singularTitle}`"
-        @click="goToDomain"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-  <ActionBarTemplate
-    v-if="showActionBar"
-    @onSubmit="openDialog"
-    @onCancel="cancelAllowed"
-    :submitDisabled="!selectedEvents.length"
-    primaryActionLabel="Allow Rules"
-  />
-
-  <MoreDetailsDrawer
-    v-if="showDetailsOfAttack"
-    :wafRuleId="wafRuleId"
-    :domainNames="parsedDomainsNames"
-    v-model:visible="showDetailsOfAttack"
-    :listService="props.listWafRulesTuningAttacksService"
-    :tuningObject="tuningSelected"
-    :domains="selectedFilter.domains"
-    :time="timeName"
-    :listNetworkListService="props.listNetworkListService"
-    :loadNetworkListService="props.loadNetworkListService"
-    :listCountriesService="props.listCountriesService"
-    :parentSelectedFilter="selectedFilter"
-    :parentSelectedFilterAdvanced="selectedFilterAdvanced"
-    @attack-on="createAllowedByAttack"
-  >
-  </MoreDetailsDrawer>
-
-  <DialogAllowRule
-    v-model:visible="showDialogAllowRule"
-    :isLoading="isLoadingAllowed"
-    @closeDialog="closeDialog"
-    @handleDescriptionOfAttack="handleSubmitAllowRules"
-  >
-  </DialogAllowRule>
-</template>
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
@@ -185,6 +18,8 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import PrimeTag from 'primevue/tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { networkListsService, wafService } from '@/services/v2'
+
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -203,20 +38,12 @@
       required: true,
       type: Function
     },
-    listNetworkListService: {
-      required: true,
-      type: Function
-    },
     listWafRulesDomainsService: {
       required: true,
       type: Function
     },
     showActionBar: {
       type: Boolean,
-      required: true
-    },
-    createWafRulesAllowedTuningService: {
-      type: Function,
       required: true
     },
     listWafRulesTuningAttacksService: {
@@ -228,10 +55,6 @@
       required: true
     },
     loadDomainService: {
-      type: Function,
-      required: true
-    },
-    loadNetworkListService: {
       type: Function,
       required: true
     }
@@ -498,7 +321,7 @@
     }
 
     try {
-      const [{ status, reason, value }] = await props.createWafRulesAllowedTuningService({
+      const [{ status, reason, value }] = await wafService.createWafRulesAllowedTuning({
         attackEvents,
         wafId: wafRuleId.value,
         name: nameAttack
@@ -571,7 +394,7 @@
 
   const setNetWorkListOptions = async () => {
     try {
-      const response = await props.listNetworkListService({ fields: '' })
+      const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
@@ -592,8 +415,184 @@
     }
   }
 
+  const handleListNetworkListDropdown = async ({ id }) => {
+    return await networkListsService.listNetworkLists({ id }, true)
+  }
+
+  const handleLoadNetworkListDropdown = async ({ id }) => {
+    return await networkListsService.loadNetworkList({ id }, true)
+  }
+
   onMounted(async () => {
     await setNetWorkListOptions()
     await listDomainsOptions()
   })
 </script>
+
+<template>
+  <div
+    class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md mt-5 rounded-b-none flex flex-col gap-6 md:gap-4"
+  >
+    <div class="w-full flex md:flex-row flex-col gap-4 md:items-center">
+      <div class="flex gap-6 flex-col sm:flex-row w-full">
+        <Dropdown
+          appendTo="self"
+          optionValue="value"
+          optionLabel="name"
+          :options="timeOptions"
+          v-model="selectedFilter.hourRange"
+          @change="filterTuning"
+          class="w-full sm:max-w-xs"
+        />
+        <MultiSelect
+          data-testid="waf-tuning-list__domains-field"
+          appendTo="body"
+          optionLabel="name"
+          optionValue="id"
+          :options="domainsOptions.options"
+          :loading="!domainsOptions.done"
+          v-model="selectedDomainIds"
+          @change="setDomainsSelectedOptions"
+          class="w-full sm:max-w-xs"
+          :placeholder="`Select a ${handleTextDomainWorkload.singularLabel}`"
+          filter
+          display="chip"
+          scrollHeight="250px"
+          :maxSelectedLabels="3"
+          :virtualScrollerOptions="{ itemSize: 38 }"
+          :pt="{
+            panel: { class: 'surface-section shadow-2 border-none' },
+            item: {
+              class: 'hover:surface-hover',
+              'data-testid': 'waf-tuning-list__domains-field-item'
+            },
+            closeButton: { 'data-testid': 'waf-tuning-list__domains-field-close-button' },
+            wrapper: { class: 'w-full' },
+            list: { class: 'p-0 list-none' },
+            filterInput: { class: 'surface-ground' }
+          }"
+          style="--p-multiselect-overlay-width: 100%"
+        />
+
+        <FieldDropdownLazyLoader
+          data-testid="waf-tuning-list__network-list-field"
+          name="valueNetworkId"
+          :service="handleListNetworkListDropdown"
+          :loadService="handleLoadNetworkListDropdown"
+          optionLabel="name"
+          optionValue="id"
+          :value="valueNetworkId"
+          :moreOptions="['value']"
+          appendTo="self"
+          placeholder="Select an network list"
+          @onClear="setNetworkListSelectedOption(null)"
+          @onSelectOption="setNetworkListSelectedOption"
+          class="w-full sm:max-w-xs"
+          enableClearOption
+        />
+      </div>
+      <div class="flex items-center justify-end">
+        <PrimeTag
+          class="no-wrap whitespace-nowrap ml-auto"
+          :value="recordsFoundLabel"
+          severity="info"
+        />
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center gap-2">
+      <advancedFilter
+        ref="advancedFilterRef"
+        :hashUpdatable="false"
+        v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
+        :fieldsInFilter="listFields"
+        @applyFilter="filterSearch"
+      />
+      <PrimeButton
+        class="md:hidden"
+        outlined
+        size="small"
+        label="Export to CSV"
+        icon="pi pi-download"
+        @click="downloadCSV"
+      />
+      <PrimeButton
+        class="hidden md:flex"
+        outlined
+        size="small"
+        icon="pi pi-download"
+        v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
+        @click="downloadCSV"
+      />
+    </div>
+  </div>
+  <ListTableBlock
+    v-show="showListTable"
+    pageTitleDelete="WAF rules tuning"
+    :listService="listService"
+    ref="listServiceWafTunningRef"
+    :columns="wafRulesAllowedColumns"
+    :hasListService="true"
+    v-model:selectedItensData="selectedEvents"
+    :showSelectionMode="true"
+    :editInDrawer="openMoreDetails"
+    emptyListMessage="No requests found."
+    hiddenHeader
+    :pt="{ root: { class: 'rounded-t-none p-datatable-hoverable-rows' } }"
+  />
+
+  <EmptyResultsBlock
+    v-if="!showListTable"
+    :title="`Select a ${handleTextDomainWorkload.singularLabel} to query data`"
+    :description="`To use this feature, a ${handleTextDomainWorkload.singularLabel} must be associated with the edge firewall that has a behavior running this WAF rule set.`"
+    :documentationService="props.documentationServiceTuning"
+    noShowBorderTop
+    class="!mt-0"
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        :label="`${handleTextDomainWorkload.singularTitle}`"
+        @click="goToDomain"
+      />
+    </template>
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
+  <ActionBarTemplate
+    v-if="showActionBar"
+    @onSubmit="openDialog"
+    @onCancel="cancelAllowed"
+    :submitDisabled="!selectedEvents.length"
+    primaryActionLabel="Allow Rules"
+  />
+
+  <MoreDetailsDrawer
+    v-if="showDetailsOfAttack"
+    :wafRuleId="wafRuleId"
+    :domainNames="parsedDomainsNames"
+    v-model:visible="showDetailsOfAttack"
+    :listService="props.listWafRulesTuningAttacksService"
+    :tuningObject="tuningSelected"
+    :domains="selectedFilter.domains"
+    :time="timeName"
+    :listNetworkListService="handleListNetworkListDropdown"
+    :loadNetworkListService="handleLoadNetworkListDropdown"
+    :listCountriesService="props.listCountriesService"
+    :parentSelectedFilter="selectedFilter"
+    :parentSelectedFilterAdvanced="selectedFilterAdvanced"
+    @attack-on="createAllowedByAttack"
+  >
+  </MoreDetailsDrawer>
+
+  <DialogAllowRule
+    v-model:visible="showDialogAllowRule"
+    :isLoading="isLoadingAllowed"
+    @closeDialog="closeDialog"
+    @handleDescriptionOfAttack="handleSubmitAllowRules"
+  >
+  </DialogAllowRule>
+</template>

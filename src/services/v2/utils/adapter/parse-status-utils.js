@@ -11,3 +11,17 @@ export const parseStatusData = (status) => {
 
   return parsedStatus
 }
+
+export const parseDefaultData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Yes',
+        severity: 'success'
+      }
+    : {
+        content: 'No',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}

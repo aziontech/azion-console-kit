@@ -32,6 +32,7 @@ export default {
   },
   rulesEngine: {
     createButton: '[data-testid="rules-engine-create-button"]',
+    
     ruleNameInput: '[data-testid="rule-form-general-name__input"]',
     createCachePolicyButton:
       '[data-testid="edge-applications-rules-engine-form__create-cache-policy-button"]',
@@ -109,6 +110,7 @@ export default {
       `[data-testid="error-responses-form__error-response__${optionIdx}__path__input"]`
   },
   cacheSettings: {
+    saveCacheSetting: '[data-testid="create-cache-settings-drawer__action-bar"]',
     tieredCacheRegionDropdown:
       '[data-testid="edge-application-cache-settings-form__tiered-caching-region-field__dropdown"]',
     largeFileOptimizationSwitch:
