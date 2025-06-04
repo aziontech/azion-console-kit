@@ -10,24 +10,25 @@ const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'production' ? 'https://' : 'https://stage-'
   const DomainSuffix = env.VITE_ENVIRONMENT === 'production' ? 'com' : 'net'
-  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'production' ? false : true
+  const DEBUG_PROXY = env.VITE_DEBUG_PROXY
 
-  const createProxyConfig = ({ target, rewrite = null }) => ({
+  const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
-    changeOrigin: true,
-    rewrite,
-    configure: (proxy, options) => {
-      if (DEBUG_PROXY) {
+    changeOrigin,
+    ...(rewrite && { rewrite }),
+    ...(cookieDomainRewrite && { cookieDomainRewrite }),
+    ...(DEBUG_PROXY && {
+      configure: (proxy, options) => {
         proxy.on('proxyReq', (proxyReq, req) => {
           const originalUrl = `https://${req.headers.host}${req.url}`
           const targetUrl = options.target
           const proxiedUrl = `${targetUrl}${req.url}`
-          
+
           // eslint-disable-next-line no-console
           console.log(`[Vite Proxy] ${req.method} ${originalUrl} => ${proxiedUrl}`)
         })
       }
-    }
+    })
   })
 
   return {
@@ -90,8 +91,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api/, '')
         }),
         '/v4': createProxyConfig({
-          target: `${URLStartPrefix}api.azion.com`,
-          changeOrigin: true
+          target: `${URLStartPrefix}api.azion.com`
         }),
         '/webpagetest': createProxyConfig({
           target: 'https://www.azion.com/api/webpagetest',

@@ -20,7 +20,9 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :loadDigitalCertificatesService="digitalCertificatesService.loadDigitalCertificatesService"
+            :loadDigitalCertificatesService="
+              digitalCertificatesService.loadDigitalCertificatesService
+            "
             :isLoadingRequests="isLoadingRequests"
           />
         </template>

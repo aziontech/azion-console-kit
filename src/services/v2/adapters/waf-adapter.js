@@ -1,40 +1,37 @@
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+
+const parseStatusData = (status) => ({
+  content: status ? 'Active' : 'Inactive',
+  severity: status ? 'success' : 'danger'
+})
+
+const parseThreatTypes = (threatsConfiguration) => {
+  const threatTypesMap = {
+    file_upload: 'File upload',
+    evading_tricks: 'Evading Tricks',
+    unwanted_access: 'Unwanted Access',
+    identified_attack: 'Identified Attack',
+    cross_site_scripting: 'Cross-Site Scripting (XSS)',
+    directory_traversal: 'Directory Traversal',
+    remote_file_inclusion: 'Remote File Inclusions (RFI)',
+    sql_injection: 'SQL Injection'
+  }
+
+  return Object.keys(threatTypesMap)
+    .filter((key) => threatsConfiguration[key])
+    .map((key) => threatTypesMap[key])
+}
+
+const transformMap = {
+  id: (value) => value.id,
+  active: (value) => parseStatusData(value.active),
+  name: (value) => value.name,
+  threatsConfiguration: (value) => parseThreatTypes(value.threats_configuration)
+}
+
 export const WafAdapter = {
-  transformListWafRules(data) {
-    const parseStatusData = (status) => ({
-      content: status ? 'Active' : 'Inactive',
-      severity: status ? 'success' : 'danger'
-    })
-
-    const parseThreatTypes = (threatsConfiguration) => {
-      const threatTypesMap = {
-        file_upload: 'File upload',
-        evading_tricks: 'Evading Tricks',
-        unwanted_access: 'Unwanted Access',
-        identified_attack: 'Identified Attack',
-        cross_site_scripting: 'Cross-Site Scripting (XSS)',
-        directory_traversal: 'Directory Traversal',
-        remote_file_inclusion: 'Remote File Inclusions (RFI)',
-        sql_injection: 'SQL Injection'
-      }
-
-      return Object.keys(threatTypesMap)
-        .filter((key) => threatsConfiguration[key])
-        .map((key) => threatTypesMap[key])
-    }
-
-    const mapWafRule = (waf) => ({
-      id: waf.id,
-      name: waf.name,
-      active: parseStatusData(waf.active),
-      threatsConfiguration: parseThreatTypes(waf.threats_configuration)
-    })
-
-    const parsedWafRules = Array.isArray(data.results) ? data.results.map(mapWafRule) : []
-
-    return {
-      count: data?.count ?? 0,
-      body: parsedWafRules
-    }
+  transformListWafRules(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
   adaptWafRulePayload({ payload, isEdit = false } = {}) {
     const threatsConfiguration = {

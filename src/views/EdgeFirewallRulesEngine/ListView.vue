@@ -9,9 +9,8 @@
   import { useDialog } from 'primevue/usedialog'
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
-  import { edgeFirewallRulesEngineService } from '@/services/v2'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-  import { networkListsService } from '@/services/v2'
+  import { networkListsService, edgeFirewallRulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

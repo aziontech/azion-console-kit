@@ -35,7 +35,7 @@ export const domainsRoutes = {
         createDomainService: DomainServices.createDomainService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
-        clipboardWrite: Helpers.clipboardWrite,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         flag: 'checkout_access',

@@ -25,7 +25,7 @@ describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
 
   it('Create a Custom Page', function () {
     cy.intercept(
-      { method: 'POST', url: '/api/v4/workspace/custom_pages' },
+      { method: 'POST', url: '/v4/workspace/custom_pages' },
       { body: httpResponseCreate, statusCode: 202 }
     ).as('createCustomPages')
 

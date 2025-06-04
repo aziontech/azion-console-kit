@@ -37,7 +37,7 @@ export const workloadRoutes = {
         createDomainService: WorkloadServices.createWorkloadService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-        clipboardWrite: Helpers.clipboardWrite,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         flag: 'checkout_access_without_flag',
@@ -63,7 +63,7 @@ export const workloadRoutes = {
           editDomainService: WorkloadServices.editWorkloadService,
           loadDomainService: WorkloadServices.loadWorkloadService,
           updatedRedirect: `list-workloads`,
-          clipboardWrite: Helpers.clipboardWrite,
+          clipboardWrite: Helpers.clipboardWrite
         },
         workloadDeploymentServices: {
           listWorkloadDeploymentService: WorkloadDeploymentServices.listWorkloadDeploymentsService,

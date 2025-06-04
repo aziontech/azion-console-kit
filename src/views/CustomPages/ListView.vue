@@ -6,33 +6,14 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { customPageService } from '@/services/v2'
 
   defineOptions({ name: 'list-custom-pages' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    deleteCustomPagesService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
-      required: true,
-      type: Function
-    },
-    createCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    loadCustomPagesService: {
-      required: true,
-      type: Function
-    },
-    editCustomPagesService: {
       required: true,
       type: Function
     }
@@ -46,7 +27,7 @@
       label: 'Delete',
       title: 'custom pages',
       icon: 'pi pi-trash',
-      service: props.deleteCustomPagesService
+      service: customPageService.deleteCustomPagesService
     }
   ]
 
@@ -137,7 +118,7 @@
         addButtonLabel="Custom Page"
         createPagePath="custom-pages/create"
         editPagePath="custom-pages/edit"
-        :listService="listCustomPagesService"
+        :listService="customPageService.listCustomPagesService"
         :columns="getColumns"
         :apiFields="CUSTOM_PAGES_API_FIELDS"
         @on-load-data="handleLoadData"

@@ -5,10 +5,7 @@
   import { ref, inject, defineExpose, watch } from 'vue'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import {
-    digitalCertificatesService,
-    digitalCertificatesCSRService
-  } from '@/services/v2'
+  import { digitalCertificatesService, digitalCertificatesCSRService } from '@/services/v2'
 
   defineOptions({
     name: 'digital-certificates-drawer'
@@ -30,7 +27,9 @@
     then: (schema) => schema.required('Field Required')
   }
 
-  const createServiceBySelectedType = ref(digitalCertificatesService.createDigitalCertificatesService)
+  const createServiceBySelectedType = ref(
+    digitalCertificatesService.createDigitalCertificatesService
+  )
 
   const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
@@ -57,7 +56,7 @@
 
     return isTrustedCA
   }
-  
+
   const validationSchema = yup.object({
     digitalCertificateName: yup.string().required('Name is a required field.'),
 

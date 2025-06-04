@@ -61,7 +61,7 @@
     hasContentToList.value = event
   }
 
-  const WAF_API_FIELDS = []
+  const WAF_API_FIELDS = ['id', 'name', 'threats_configuration', 'active']
 
   const getColumns = computed(() => {
     return [

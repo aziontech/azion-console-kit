@@ -1,3 +1,5 @@
+import { enrichByMatchingReference } from './utils/enrichByMatchingReference'
+
 export class EdgeFirewallFunctionService {
   constructor(http, adapter) {
     this.http = http
@@ -35,43 +37,21 @@ export class EdgeFirewallFunctionService {
     )
     this.countFunctions = count
 
-    const enrichedFunctions = await this.#enrichFunctionsWithNames(functionInstances)
+    const enrichedFunctions = await enrichByMatchingReference(
+      functionInstances,
+      this.#listFunctionNames,
+      (item) => item.edgeFunctionId,
+      (item, matchedRef) => ({
+        ...item,
+        functionInstanced: matchedRef.name
+      }),
+      { pageSize: 100 }
+    )
 
     return {
       body: this.#getTransformed('transformFunction', enrichedFunctions),
       count
     }
-  }
-
-  #enrichFunctionsWithNames = async (functionInstances) => {
-    const unresolvedIds = new Set(functionInstances.map((fn) => fn.id))
-    const enriched = []
-    const nameMap = new Map()
-
-    let page = 1
-    const pageSize = 100
-
-    while (unresolvedIds.size > 0) {
-      const { results } = await this.#listFunctionNames({ page, pageSize, fields: 'id,name' })
-      if (!results?.length) break
-
-      results.forEach((fn) => nameMap.set(fn.id, fn.name))
-
-      for (const instance of functionInstances) {
-        if (unresolvedIds.has(instance.id) && nameMap.has(instance.edgeFunctionId)) {
-          enriched.push({
-            ...instance,
-            functionInstanced: nameMap.get(instance.edgeFunctionId)
-          })
-          unresolvedIds.delete(instance.id)
-        }
-      }
-
-      if (results.length < pageSize) break
-      page++
-    }
-
-    return enriched
   }
 
   #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
