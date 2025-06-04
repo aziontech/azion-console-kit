@@ -1,7 +1,7 @@
 import { getCurrentTimezone } from '@/helpers'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
-const extractAddresses = (addresses) => {
+const extractAddressesPostRequest = (addresses) => {
   return addresses.map((address) => {
     return {
       address: address.address,
@@ -41,7 +41,7 @@ const typeBuilders = {
   }),
 
   s3: (payload) => ({
-    addresses: extractAddresses(payload.addresses),
+    addresses: extractAddressesPostRequest(payload.addresses),
     type_properties: {
       host: payload.s3.host,
       bucket: payload.s3.bucket,
@@ -60,7 +60,7 @@ const typeBuilders = {
   }),
 
   http: (payload) => ({
-    addresses: extractAddresses(payload.addresses),
+    addresses: extractAddressesPostRequest(payload.addresses),
     type_properties: {
       versions: payload.http.versions,
       host: payload.http.host,
