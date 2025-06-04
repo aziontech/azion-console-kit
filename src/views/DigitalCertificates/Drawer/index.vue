@@ -27,9 +27,7 @@
     then: (schema) => schema.required('Field Required')
   }
 
-  const createServiceBySelectedType = ref(
-    digitalCertificatesService.createDigitalCertificatesService
-  )
+  const createServiceBySelectedType = ref(digitalCertificatesService.createDigitalCertificates)
 
   const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
@@ -136,8 +134,8 @@
       certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
 
     createServiceBySelectedType.value = isEdgeCertificateCSR
-      ? digitalCertificatesCSRService.createDigitalCertificatesCSRService
-      : digitalCertificatesService.createDigitalCertificatesService
+      ? digitalCertificatesCSRService.createDigitalCertificateCSR
+      : digitalCertificatesService.createDigitalCertificates
   })
 
   defineExpose({
