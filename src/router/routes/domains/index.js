@@ -1,7 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as WorkloadServices from '@/services/workloads-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -37,7 +36,6 @@ export const domainsRoutes = {
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         clipboardWrite: Helpers.clipboardWrite,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
       },
       meta: {
         flag: 'checkout_access',
@@ -63,8 +61,7 @@ export const domainsRoutes = {
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsService,
         loadDomainService: DomainServices.loadDomainService,
         updatedRedirect: 'list-domains',
-        clipboardWrite: Helpers.clipboardWrite,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         flag: 'checkout_access',

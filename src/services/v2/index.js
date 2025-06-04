@@ -7,6 +7,7 @@ import { DigitalCertificatesAdapter } from './adapters/digital-certificates-adap
 import { DigitalCertificatesService } from './digital-certificates-service'
 
 // Digital Certificates CSR Service
+import { DigitalCertificatesCSRAdapter } from './adapters/digital-certificates-csr-adapter'
 import { DigitalCertificatesCSRService } from './digital-certificates-csr-service'
 
 // Digital Certificates CRL Service
@@ -88,7 +89,10 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
-const digitalCertificatesCSRService = new DigitalCertificatesCSRService(httpService)
+const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
+  httpService,
+  DigitalCertificatesCSRAdapter
+)
 const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
 const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 

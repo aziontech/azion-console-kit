@@ -1,5 +1,3 @@
-import * as DigitalCertificatesServiceV4 from '@/services/digital-certificates-services/v4'
-
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,9 +9,6 @@ export const digitalCertificatesRoutes = {
       path: '',
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
-      props: {
-        documentationService: Helpers.documentationCatalog.digitalCertificates
-      },
       meta: {
         breadCrumbs: [
           {
@@ -27,12 +22,6 @@ export const digitalCertificatesRoutes = {
       path: 'create',
       name: 'create-digital-certificates',
       component: () => import('@views/DigitalCertificates/CreateView.vue'),
-      props: {
-        createDigitalCertificatesCSRService:
-          DigitalCertificatesServiceV4.createDigitalCertificatesCSRService,
-        createDigitalCertificatesService:
-          DigitalCertificatesServiceV4.createDigitalCertificatesService
-      },
       meta: {
         breadCrumbs: [
           {
@@ -51,8 +40,6 @@ export const digitalCertificatesRoutes = {
       name: 'edit-digital-certificates',
       component: () => import('@views/DigitalCertificates/EditView.vue'),
       props: {
-        editDigitalCertificateService: DigitalCertificatesServiceV4.editDigitalCertificateService,
-        updatedRedirect: 'list-digital-certificates',
         clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
       },

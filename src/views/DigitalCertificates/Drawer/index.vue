@@ -3,12 +3,12 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import { ref, inject, defineExpose, watch } from 'vue'
-  import {
-    createDigitalCertificatesService,
-    createDigitalCertificatesCSRService
-  } from '@/services/digital-certificates-services/v4'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import {
+    digitalCertificatesService,
+    digitalCertificatesCSRService
+  } from '@/services/v2'
 
   defineOptions({
     name: 'digital-certificates-drawer'
@@ -30,7 +30,7 @@
     then: (schema) => schema.required('Field Required')
   }
 
-  const createServiceBySelectedType = ref(createDigitalCertificatesService)
+  const createServiceBySelectedType = ref(digitalCertificatesService.createDigitalCertificatesService)
 
   const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
@@ -57,6 +57,7 @@
 
     return isTrustedCA
   }
+  
   const validationSchema = yup.object({
     digitalCertificateName: yup.string().required('Name is a required field.'),
 
@@ -136,8 +137,8 @@
       certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
 
     createServiceBySelectedType.value = isEdgeCertificateCSR
-      ? createDigitalCertificatesCSRService
-      : createDigitalCertificatesService
+      ? digitalCertificatesCSRService.createDigitalCertificatesCSRService
+      : digitalCertificatesService.createDigitalCertificatesService
   })
 
   defineExpose({

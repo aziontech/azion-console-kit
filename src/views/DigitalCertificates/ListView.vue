@@ -25,7 +25,7 @@
         description="Click the button below to add your first digital certificate."
         createButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
-        :documentationService="props.documentationService"
+        :documentationService="documentationCatalog.digitalCertificates"
       >
         <template #illustration>
           <Illustration />
@@ -44,18 +44,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { digitalCertificatesService } from '@/services/v2'
+  import { documentationCatalog } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'digital-certificates-view' })
-
-  const props = defineProps({
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
 
   const hasContentToList = ref(true)
   const DIGITAL_CERTIFICATE_API_FIELDS = [
