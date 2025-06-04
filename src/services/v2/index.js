@@ -47,6 +47,10 @@ import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-fun
 import { EdgeFunctionService } from './edge-function-service'
 import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
 
+//Data Stream
+import { DataStreamService } from './data-stream-service'
+import { DataStreamAdapter } from './adapters/data-stream-adapter'
+
 // Custom Pages
 import { CustomPageAdapter } from './adapters/custom-page-adapter'
 import { CustomPageService } from './custom-page-service'
@@ -79,6 +83,7 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
   EdgeApplicationFunctionsAdapter
 )
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
+const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
 
@@ -97,5 +102,6 @@ export {
   edgeApplicationFunctionService,
   edgeFunctionService,
   customPageService,
-  edgeConnectorsService
+  edgeConnectorsService,
+  dataStreamService
 }

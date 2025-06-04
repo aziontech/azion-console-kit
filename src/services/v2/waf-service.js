@@ -14,7 +14,20 @@ export class WafService {
       params
     })
 
-    return this.adapter?.transformListWafRules?.(data) ?? data
+    const { results, count } = data
+    const fieldsSplits = Array.isArray(params.fields)
+      ? params.fields
+      : (params.fields || '')
+          .split(',')
+          .map((field) => field.trim())
+          .filter(Boolean)
+
+    const body = this.adapter?.transformListWafRules?.(results, fieldsSplits) ?? results
+
+    return {
+      body,
+      count
+    }
   }
 
   createWafRule = async (payload) => {

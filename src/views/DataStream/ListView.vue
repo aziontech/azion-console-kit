@@ -29,7 +29,7 @@
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
-            :listService="listDataStreamService"
+            :listService="dataStreamService.listDataStreamService"
             :columns="getColumns"
             @on-load-data="handleLoadData"
             emptyListMessage="No streams found."
@@ -69,18 +69,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
-
+  import { dataStreamService } from '@/services/v2'
   defineOptions({ name: 'data-stream-view' })
 
-  const props = defineProps({
-    listDataStreamService: {
-      required: true,
-      type: Function
-    },
-    deleteDataStreamService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -121,7 +113,7 @@
       type: 'delete',
       title: 'stream',
       icon: 'pi pi-trash',
-      service: props.deleteDataStreamService
+      service: dataStreamService.deleteDataStreamService
     }
   ]
 

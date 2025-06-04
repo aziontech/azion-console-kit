@@ -72,16 +72,7 @@
     hasContentToList.value = event
   }
 
-  const EDGE_CONNECTORS_API_FIELDS = [
-    // 'id',
-    // 'name',
-    // 'type',
-    // 'type_properties',
-    // 'addresses',
-    // 'active',
-    // 'last_editor',
-    // 'last_modified'
-  ]
+  const EDGE_CONNECTORS_API_FIELDS = []
 
   const getColumns = computed(() => {
     return [

@@ -56,8 +56,8 @@
             required
             name="template"
             :options="listTemplates"
-            optionLabel="label"
-            optionValue="value"
+            optionLabel="name"
+            optionValue="id"
             :value="template"
             appendTo="self"
             description="Represents a preset of variables for specific sources or an open template to choose variables."
@@ -117,47 +117,12 @@
           data-testid="data-stream-form__domains__domains-field__label"
           isRequired
         />
-        <PickList
-          v-model="domains"
-          :disabled="hasNoPermissionToEditDataStream"
-          :pt="{
-            sourceList: { class: ['h-80'] },
-            targetList: { class: ['h-80'] },
-            sourceWrapper: { class: 'max-w-[340px]' },
-            targetWrapper: { class: 'max-w-[340px]' }
-          }"
-          dataKey="domainID"
-          breakpoint="1400px"
-          :showSourceControls="false"
-          :showTargetControls="false"
-          data-testid="data-stream-form__domains__domains-field"
-          :move-all-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-source-btn'
-          }"
-          :move-all-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-all-to-target-btn'
-          }"
-          :move-to-target-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-target-btn'
-          }"
-          :move-to-source-props="{
-            'data-testid': 'data-stream-form__domains-field-picklist__move-to-source-btn'
-          }"
-        >
-          <template #sourceheader>Available {{ handleTextDomainWorkload.pluralTitle }}</template>
-          <template #targetheader>Chosen {{ handleTextDomainWorkload.pluralTitle }}</template>
-          <template #item="slotProps">
-            <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
-              <div class="flex-1 flex flex-column gap-2">
-                <span
-                  class="font-normal"
-                  data-testid="data-stream-form__domains__domains-name"
-                  >{{ slotProps.item.name }}</span
-                >
-              </div>
-            </div>
-          </template>
-        </PickList>
+        <fieldPickList
+          :dataPick="domains"
+          :service="dataStreamService.listWorkloadsService"
+          title="Domains"
+          dataKey="id"
+        ></fieldPickList>
 
         <small
           class="text-xs text-color-secondary font-normal leading-5"
@@ -1065,6 +1030,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import fieldPickList from '@/templates/form-fields-inputs/fieldPickList.vue'
 
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
@@ -1076,11 +1042,11 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
-  import PickList from 'primevue/picklist'
   import RadioButton from 'primevue/radiobutton'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+  import { dataStreamService } from '@/services/v2'
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
@@ -1091,14 +1057,6 @@
   import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
-    listDataStreamTemplateService: {
-      type: Function,
-      required: true
-    },
-    listDataStreamDomainsService: {
-      type: Function,
-      required: true
-    },
     resetForm: {
       type: Function,
       required: false
@@ -1213,15 +1171,22 @@
   const listTemplates = ref([])
 
   const loaderDataStreamTemplates = async () => {
-    const templates = await props.listDataStreamTemplateService()
-    listTemplates.value = templates
+    const templates = await dataStreamService.listTemplates({
+      fields: 'id,name,data_set'
+    })
+    listTemplates.value = templates.results
 
-    return listTemplates.value[0].value ?? ''
+    return listTemplates.value[0].id ?? ''
   }
 
   const loaderDataStreamDomains = async () => {
-    const domainResponse = await props.listDataStreamDomainsService()
-    return [domainResponse, []]
+    if (!props.resetForm) return
+    const domainResponse = await dataStreamService.listWorkloadsService({
+      page: 1,
+      pageSize: 100,
+      fields: 'id, name'
+    })
+    return [domainResponse.results, []]
   }
 
   const addHeader = () => {
@@ -1232,18 +1197,18 @@
     headers.value.splice(index, 1)
   }
 
-  const insertDataSet = (templateID, isFirstRender) => {
-    const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
+  const insertDataSet = async (templateID, isFirstRender) => {
+    const index = listTemplates.value.map((el) => el.id).indexOf(templateID)
     try {
       if (templateID === 'CUSTOM_TEMPLATE' && !isFirstRender) {
         dataSet.value = ''
       } else {
-        const dataSetJSON = JSON.parse(listTemplates.value[index].template)
+        const dataSetJSON = JSON.parse(listTemplates.value[index].dataSet)
         dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
       }
     } catch (exception) {
-      if (!dataSet.value || templateID !== 'CUSTOM_TEMPLATE') {
-        dataSet.value = listTemplates.value[index].template
+      if ((!dataSet.value || templateID !== 'CUSTOM_TEMPLATE') && index > 0) {
+        dataSet.value = listTemplates.value[index].dataSet
       }
     }
   }
@@ -1285,10 +1250,17 @@
     (newValue, oldValue) => {
       const templateID = newValue
       const isFirstRender = !oldValue
-      if (templateID) insertDataSet(templateID, isFirstRender)
+      if (templateID && listTemplates.value.length) insertDataSet(templateID, isFirstRender)
 
       const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
       dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
+    }
+  )
+
+  watch(
+    () => listTemplates.value,
+    (newValue) => {
+      if (newValue.length) insertDataSet(template.value, false)
     }
   )
 

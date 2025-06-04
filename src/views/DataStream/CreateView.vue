@@ -9,21 +9,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
-
-  const props = defineProps({
-    createDataStreamService: {
-      type: Function,
-      required: true
-    },
-    listDataStreamTemplateService: {
-      type: Function,
-      required: true
-    },
-    listDataStreamDomainsService: {
-      type: Function,
-      required: true
-    }
-  })
+  import { dataStreamService } from '@/services/v2'
 
   // Schema de Validação
   const validationSchema = yup.object({
@@ -225,15 +211,11 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createDataStreamService"
+        :createService="dataStreamService.createDataSteramService"
         :schema="validationSchema"
       >
         <template #form="{ resetForm }">
-          <FormFieldsDataStream
-            :resetForm="resetForm"
-            :listDataStreamTemplateService="props.listDataStreamTemplateService"
-            :listDataStreamDomainsService="props.listDataStreamDomainsService"
-          />
+          <FormFieldsDataStream :resetForm="resetForm" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
