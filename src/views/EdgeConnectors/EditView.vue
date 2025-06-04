@@ -5,8 +5,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="editEdgeConnectorsService"
-        :loadService="loadEdgeConnectorsService"
+        :editService="edgeConnectorsService.editEdgeConnectorsService"
+        :loadService="edgeConnectorsService.loadEdgeConnectorsService"
         :schema="validationSchema"
       >
         <template #form>
@@ -34,6 +34,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import * as yup from 'yup'
+  import { edgeConnectorsService } from '@/services/v2'
 
   defineProps({
     editEdgeConnectorsService: {
