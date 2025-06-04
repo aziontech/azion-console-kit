@@ -2,9 +2,9 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsEdgeConnectors from '../FormFields/FormFieldsEdgeConnectors'
   import * as yup from 'yup'
-  import { createEdgeConnectorsService } from '@/services/edge-connectors'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
+  import { edgeConnectorsService } from '@/services/v2'
 
   defineOptions({
     name: 'edge-connectors-drawer'
@@ -242,7 +242,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateEdgeConnectorsDrawer"
-    :createService="createEdgeConnectorsService"
+    :createService="edgeConnectorsService.createEdgeConnectorsService"
     id="create-edge-connectors-drawer"
     drawerId="create-edge-connectors-drawer"
     :schema="validationSchema"

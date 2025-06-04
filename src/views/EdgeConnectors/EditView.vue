@@ -35,18 +35,6 @@
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import * as yup from 'yup'
   import { edgeConnectorsService } from '@/services/v2'
-
-  defineProps({
-    editEdgeConnectorsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeConnectorsService: {
-      type: Function,
-      required: true
-    }
-  })
-
   const validationSchema = yup.object({
     type: yup
       .string()

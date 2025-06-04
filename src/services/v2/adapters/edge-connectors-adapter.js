@@ -118,16 +118,22 @@ export const EdgeConnectorsAdapter = {
         return {
           id: edgeConnectors.id,
           name: edgeConnectors.name,
-          type: edgeConnectors.type,
-          header: edgeConnectors.type_properties.real_port_header,
-          address: edgeConnectors.addresses
-            .map((el) => {
-              return el.address
-            })
-            .join(','),
-          active: parseStatusData(edgeConnectors.active),
-          lastEditor: edgeConnectors.last_editor,
-          lastModified: getCurrentTimezone(edgeConnectors.last_modified)
+          type: edgeConnectors?.type,
+          header: edgeConnectors?.type_properties?.real_port_header,
+          address: edgeConnectors?.addresses
+            ? edgeConnectors?.addresses
+                .map((el) => {
+                  return el.address
+                })
+                .join(',')
+            : [],
+          active: edgeConnectors?.active
+            ? parseStatusData(edgeConnectors.active)
+            : edgeConnectors?.active,
+          lastEditor: edgeConnectors?.last_editor,
+          lastModified: edgeConnectors?.last_modified
+            ? getCurrentTimezone(edgeConnectors.last_modified)
+            : edgeConnectors?.last_modified
         }
       }) || []
     )
