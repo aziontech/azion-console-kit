@@ -259,8 +259,8 @@
               <div class="flex flex-col gap-2">
                 <div class="text-lg sm:text-xl font-medium">Ask Azion Copilot</div>
                 <div class="text-xs sm:text-sm text-color-secondary">
-                  Ask your questions to Azion Copilot, an artificial intelligence with years
-                  of edge computing expertise.
+                  Ask your questions to Azion Copilot, an artificial intelligence with years of edge
+                  computing expertise.
                 </div>
               </div>
             </div>
