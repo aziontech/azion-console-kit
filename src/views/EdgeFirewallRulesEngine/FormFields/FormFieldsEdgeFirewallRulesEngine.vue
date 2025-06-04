@@ -70,7 +70,7 @@
   })
 
   const listWafRulesServiceOptions = async (query) => {
-    return await props.listWafRulesService({ ...query, fields: 'name, id' })
+    return await props.listWafRulesService({ ...query, fields: 'name,id' })
   }
 
   const listNetworkList = async () => {
