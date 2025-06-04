@@ -5,8 +5,7 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { customPageService } from '@/services/v2'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService, customPageService } from '@/services/v2'
 
   defineOptions({
     name: 'custom-pages-drawer'
