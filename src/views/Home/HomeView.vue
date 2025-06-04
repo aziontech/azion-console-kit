@@ -234,7 +234,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to use Real-Time Metrics"
+                label="How to use"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
