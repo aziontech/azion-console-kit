@@ -2,11 +2,10 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
-  import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
-  import { customPageService } from '@/services/v2'
+  import { edgeConnectorsService, customPageService } from '@/services/v2'
 
   defineOptions({
     name: 'custom-pages-drawer'
@@ -24,6 +23,13 @@
       required: false
     }
   })
+
+  const getEdgeConnectors = async (query) => {
+    return await edgeConnectorsService.listEdgeConnectorsService({
+      fields: 'id,name',
+      ...query
+    })
+  }
 
   const showCreateCustomPagesDrawer = ref(false)
   const showEditCustomPagesDrawer = ref(false)
@@ -110,8 +116,8 @@
   >
     <template #formFields>
       <FormFieldsCustomPages
-        :loadEdgeConnectorsService="loadEdgeConnectorsService"
-        :listEdgeConnectorsService="listEdgeConnectorsService"
+        :loadEdgeConnectorsService="edgeConnectorsService.loadEdgeConnectorsService"
+        :listEdgeConnectorsService="getEdgeConnectors"
       />
     </template>
   </CreateDrawerBlock>
@@ -129,8 +135,8 @@
   >
     <template #formFields>
       <FormFieldsCustomPages
-        :loadEdgeConnectorsService="loadEdgeConnectorsService"
-        :listEdgeConnectorsService="listEdgeConnectorsService"
+        :loadEdgeConnectorsService="edgeConnectorsService.loadEdgeConnectorsService"
+        :listEdgeConnectorsService="getEdgeConnectors"
       />
     </template>
   </EditDrawerBlock>
