@@ -5,17 +5,17 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editDigitalCertificateService"
+        :editService="digitalCertificatesService.editDigitalCertificate"
         :loadService="digitalCertificatesService.loadDigitalCertificate"
         :schema="validationSchema"
-        :updatedRedirect="props.updatedRedirect"
+        updatedRedirect="list-digital-certificates"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
           <FormFieldsEditDigitalCertificates
-            :clipboardWrite="clipboardWrite"
-            :documentationService="documentationService"
+            :clipboardWrite="props.clipboardWrite"
+            :documentationService="props.documentationService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -46,10 +46,6 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -80,6 +76,7 @@
       })
       .track()
   }
+
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product

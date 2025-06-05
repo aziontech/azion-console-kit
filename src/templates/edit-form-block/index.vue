@@ -35,10 +35,6 @@
     disableAfterCreateToastFeedback: {
       type: Boolean,
       default: false
-    },
-    serviceV2: {
-      type: Boolean,
-      default: false
     }
   })
 

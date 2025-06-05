@@ -26,11 +26,14 @@ export class DigitalCertificatesService {
   }
 
   editDigitalCertificate = async (payload) => {
+    console.log('payload', payload)
     await this.http.request({
       method: 'PUT',
       url: `${this.baseURL}/${payload.id}`,
       body: payload
     })
+
+    return 'Your digital certificate has been updated!'
   }
 
   listDigitalCertificates = async (params) => {
@@ -69,10 +72,13 @@ export class DigitalCertificatesService {
     return this.adapter?.transformLoadDigitalCertificate?.(data)
   }
 
-  deleteDigitalCertificate = async ({ id }) => {
+  deleteDigitalCertificate = async (payload) => {
+    const body = this.adapter?.transformDeleteDigitalCertificate?.(payload)
+
     await this.http.request({
       method: 'DELETE',
-      url: `${this.baseURL}/${id}`
+      url: `${this.baseURL}/${payload.id}`,
+      body
     })
 
     return 'Digital certificate successfully deleted!'

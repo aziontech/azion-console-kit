@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listServiceV2="digitalCertificatesService.listDigitalCertificates"
+        :listService="digitalCertificatesService.listDigitalCertificates"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"

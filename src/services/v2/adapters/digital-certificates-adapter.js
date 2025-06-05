@@ -98,14 +98,40 @@ export const DigitalCertificatesAdapter = {
   },
 
   transformLoadDigitalCertificate({ data }) {
-    const { id, name, type, csr = undefined, managed } = data
+    const {
+      id,
+      name,
+      type,
+      csr = undefined,
+      managed,
+      issuer,
+      subject_name,
+      validity,
+      status,
+      certificate_type,
+      certificate_content
+    } = data
 
     return {
       id,
       name,
       type,
       csr,
-      managed
+      managed,
+      issuer,
+      subjectName: subject_name,
+      validity,
+      status,
+      certificateType: certificate_type,
+      certificateContent: certificate_content
+    }
+  },
+
+  transformEditDigitalCertificate({ name, certificate, privateKey }) {
+    return {
+      name,
+      certificate: certificate || undefined,
+      private_key: privateKey || undefined
     }
   }
 }
