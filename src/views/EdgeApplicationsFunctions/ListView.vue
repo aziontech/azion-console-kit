@@ -115,7 +115,7 @@
         sortField: 'last_editor'
       },
       {
-        field: 'modified',
+        field: 'lastModified',
         sortField: 'last_modified',
         header: 'Last Modified'
       }

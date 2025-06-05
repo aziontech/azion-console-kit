@@ -71,5 +71,9 @@ export const EdgeFunctionsAdapter = {
 
   transformEdgeFunctionsDropdown(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
+  },
+
+  transformEdgeFunctions(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   }
 }
