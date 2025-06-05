@@ -19,7 +19,7 @@ export class DigitalCertificatesCSRService {
     } = data
 
     return {
-      feedback: 'Your CSR has been created!',
+      feedback: 'Your digital certificate has been created!',
       urlToEditView: `/digital-certificates/edit/${id}`,
       domainId: id
     }

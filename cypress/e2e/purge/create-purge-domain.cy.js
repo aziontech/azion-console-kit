@@ -46,9 +46,7 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
-    'getDigitalCertificatesApi'
-  )
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?').as('getDigitalCertificatesApi')
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -81,7 +79,6 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.verifyToast('success', 'Your edge application has been created')
     cy.get(selectors.form.actionsCancelButton).click()
 
-
     // Arrange
     cy.openProduct('Domains')
     cy.intercept(
@@ -96,7 +93,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
 
     cy.intercept(
       'GET',
-      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+      ' /v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
     ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()
@@ -143,7 +140,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
         cy.verifyToast(
           'Succesfully created!',
           'The domain is now available in the Domain management section.'
-        )        
+        )
 
         // Act
         cy.openProduct('Real-Time Purge')
