@@ -104,12 +104,12 @@ const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAd
 const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
+const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
+const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
   httpService,
   DigitalCertificatesCSRAdapter
 )
-const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
-const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 
 export {
   vcsService,
