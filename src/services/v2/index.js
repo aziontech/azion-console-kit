@@ -18,12 +18,15 @@ import { EdgeFirewallRulesEngineService } from './edge-firewall-rules-engine-ser
 // Purge
 import { PurgeService } from './purge-service'
 import { PurgeAdapter } from './adapters/purge-adapter'
+
 // Network Lists
 import { NetworkListsService } from './network-lists-service'
 import { NetworkListsAdapter } from './adapters/network-lists-adapter'
+
 // Edge Application Device Group
 import { DeviceGroupAdapter } from './adapters/edge-app-device-group-adapter'
 import { DeviceGroupService } from './edge-app-device-group-service'
+
 // Edge Application Cache Settings
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
@@ -39,6 +42,7 @@ import { RulesEngineService } from './edge-app-rules-engine-service'
 // Edge Application
 import { EdgeAppAdapter } from './adapters/edge-app-adapter'
 import { EdgeAppService } from './edge-app-service'
+
 // Edge Functions
 import { EdgeApplicationFunctionService } from './edge-application-functions-service'
 import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-functions-adapter'
