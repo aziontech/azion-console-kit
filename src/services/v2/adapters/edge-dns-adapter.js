@@ -2,6 +2,7 @@ import {
   adaptServiceDataResponse,
   adaptServiceDataResponseToLoad
 } from '@/services/v2/utils/adaptServiceDataResponse'
+import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const transformMap = {
   id: (value) => value.id,
@@ -27,20 +28,6 @@ const transformLoadingEdgeDNSSECMap = {
   enabled: (value) => value.enabled,
   status: (value) => value.status,
   delegationSigner: (value) => value.delegation_signer
-}
-
-const parseStatusData = (status) => {
-  const parsedStatus = status
-    ? {
-        content: 'Active',
-        severity: 'success'
-      }
-    : {
-        content: 'Inactive',
-        severity: 'danger'
-      }
-
-  return parsedStatus
 }
 
 export const EdgeDNSAdapter = {
