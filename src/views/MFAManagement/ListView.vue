@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listMfaUsersService"
+        :listService="mafService.listMfaService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No MFA users found."
@@ -36,16 +36,8 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref } from 'vue'
-
-  const props = defineProps({
-    listMfaUsersService: {
-      type: Function,
-      required: true
-    },
-    deleteMfaService: {
-      type: Function,
-      required: true
-    },
+  import { mafService } from '@/services/v2'
+  defineProps({
     documentationService: {
       type: Function,
       required: true
@@ -54,14 +46,14 @@
 
   const hasContentToList = ref(true)
 
-  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed']
+  const MFA_USERS_API_FIELDS = ['id', 'name', 'confirmed', 'user_id']
 
   const actions = [
     {
       type: 'delete',
       title: 'MFA',
       icon: 'pi pi-trash',
-      service: props.deleteMfaService
+      service: mafService.deleteMfaService
     }
   ]
 
