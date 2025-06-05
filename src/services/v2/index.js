@@ -58,6 +58,9 @@ import { CustomPageService } from './custom-page-service'
 // MFA
 import { MFAService } from './mfa-service'
 import { MFAAdapter } from './adapters/mfa-adapter'
+// Edge Connectors
+import { EdgeConnectorsAdapter } from './adapters/edge-connectors-adapter'
+import { EdgeConnectorsService } from './edge-connectors-service'
 
 const httpService = createHttpService()
 
@@ -86,6 +89,7 @@ const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAd
 const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const mafService = new MFAService(httpService, MFAAdapter)
+const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
 
 export {
   vcsService,
@@ -103,5 +107,6 @@ export {
   edgeFunctionService,
   dataStreamService,
   customPageService,
+  edgeConnectorsService,
   mafService
 }

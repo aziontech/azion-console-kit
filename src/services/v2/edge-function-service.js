@@ -62,4 +62,25 @@ export class EdgeFunctionService {
       body: transformed
     }
   }
+
+  listEdgeFunctions = async (params = { pageSize: 100, fields: [] }) => {
+    if (!params.initiatorType) return []
+
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#getUrl(),
+      params
+    })
+
+    const { results, count } = data
+    const dataFiltered = results?.filter((values) => values.initiator_type === params.initiatorType)
+
+    const transformed =
+      this.adapter?.transformEdgeFunctions?.(dataFiltered, params.fields) ?? results
+
+    return {
+      count,
+      body: transformed
+    }
+  }
 }

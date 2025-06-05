@@ -5,7 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="createEdgeConnectorsService"
+        :createService="edgeConnectorsService.createEdgeConnectorsService"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -35,13 +35,7 @@
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-
-  defineProps({
-    createEdgeConnectorsService: {
-      type: Function,
-      required: true
-    }
-  })
+  import { edgeConnectorsService } from '@/services/v2'
 
   const initialValues = {
     type: 'http',
