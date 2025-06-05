@@ -66,7 +66,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      '/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*'
+      '/v4/digital_certificates/certificates?ordering=name?*'
     ).as('getTrustedCACertificate')
     cy.intercept(
       'GET',
