@@ -55,6 +55,14 @@ import { DataStreamAdapter } from './adapters/data-stream-adapter'
 import { CustomPageAdapter } from './adapters/custom-page-adapter'
 import { CustomPageService } from './custom-page-service'
 
+// Edge DNS
+import { EdgeDNSAdapter } from './adapters/edge-dns-adapter'
+import { EdgeDNSService } from './edge-dns-service'
+
+// Edge DNS Records
+import { EdgeDNSRecordsAdapter } from './adapters/edge-dns-records-adapter'
+import { EdgeDNSRecordsService } from './edge-dns-records-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -81,6 +89,8 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
 const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
+const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
+const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 
 export {
   vcsService,
@@ -97,5 +107,7 @@ export {
   edgeApplicationFunctionService,
   edgeFunctionService,
   dataStreamService,
-  customPageService
+  customPageService,
+  edgeDNSService,
+  edgeDNSRecordsService
 }

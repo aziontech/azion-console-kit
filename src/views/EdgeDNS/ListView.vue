@@ -22,7 +22,7 @@
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
-        :listService="listEdgeDNSService"
+        :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
         :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -59,6 +59,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
+  import { edgeDNSService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -66,14 +67,6 @@
   defineOptions({ name: 'edge-dns-view' })
 
   const props = defineProps({
-    listEdgeDNSService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeDNSService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -92,7 +85,7 @@
       type: 'delete',
       title: 'zone',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeDNSService
+      service: edgeDNSService.deleteEdgeDNSService
     }
   ]
 

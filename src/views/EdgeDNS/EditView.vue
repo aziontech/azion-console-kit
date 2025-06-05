@@ -15,23 +15,18 @@
   import { computed, onBeforeMount, ref, watch, reactive, provide, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
-  import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
+  import FormFieldsEdgeDnsEdit from './FormFields/FormFieldsEditEdgeDns.vue'
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { TTL_MAX_VALUE_RECORDS, TTL_DEFAULT } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeDNSService, edgeDNSRecordsService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    loadEdgeDNSService: { type: Function, required: true },
-    editEdgeDNSService: { type: Function, required: true },
-
-    listRecordsService: { type: Function, required: true },
-    deleteRecordsService: { type: Function, required: true },
-    loadRecordsService: { type: Function, required: true },
     editRecordsService: { type: Function, required: true },
 
     clipboardWrite: { type: Function, required: true },
@@ -56,13 +51,11 @@
   const recordListColumns = ref([
     {
       field: 'name',
-      header: 'Name',
-      sortField: 'entry'
+      header: 'Name'
     },
     {
       field: 'type',
-      header: 'Type',
-      sortField: 'record_type'
+      header: 'Type'
     },
     {
       field: 'value',
@@ -150,9 +143,9 @@
 
   const EDGE_DNS_RECORDS_FIELDS = [
     'id',
-    'entry',
-    'record_type',
-    'answers_list',
+    'name',
+    'type',
+    'rdata',
     'ttl',
     'policy',
     'weight',
@@ -207,11 +200,12 @@
   }
 
   const listRecordsServiceEdgeDNSDecorator = async (query) => {
-    return await props.listRecordsService({ id: edgeDNSID.value, ...query })
+    const params = { ...query }
+    return await edgeDNSRecordsService.listRecords(edgeDNSID.value, params)
   }
 
   const deleteRecordsServiceEdgeDNSDecorator = async (recordID) => {
-    return await props.deleteRecordsService({
+    return await edgeDNSRecordsService.deleteRecord({
       recordID: recordID,
       edgeDNSID: edgeDNSID.value
     })
@@ -238,8 +232,8 @@
     changeTab(tabEvent.index)
   }
 
-  const handleCopyNameServers = () => {
-    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+  const handleCopy = (nameserver) => {
+    props.clipboardWrite(nameserver)
     toast.add({
       closable: true,
       severity: 'success',
@@ -260,14 +254,17 @@
   })
 
   const loadRecordServiceWithEDNSIdDecorator = async (payload) => {
-    return await props.loadRecordsService({
+    return await edgeDNSRecordsService.loadRecord({
       id: payload.id,
       edgeDNSId: edgeDNSID.value
     })
   }
 
   const editRecordServiceWithEDNSIdDecorator = async (payload) => {
-    return await props.editRecordsService({ edgeDNSId: edgeDNSID.value, ...payload })
+    return await edgeDNSRecordsService.editRecordsService({
+      edgeDNSId: edgeDNSID.value,
+      ...payload
+    })
   }
 
   watch(route, () => {
@@ -376,20 +373,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Edit Zone"
-        description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
-      >
-        <template #default>
-          <PrimeButton
-            outlined
-            icon="pi pi-copy"
-            class="max-md:w-full"
-            label="Copy Nameserver Values"
-            @click="handleCopyNameServers"
-          ></PrimeButton>
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Zone" />
     </template>
     <template #content>
       <TabView
@@ -406,8 +390,8 @@
           }"
         >
           <EditFormBlock
-            :editService="editEdgeDNSService"
-            :loadService="loadEdgeDNSService"
+            :editService="edgeDNSService.editEdgeDNSService"
+            :loadService="edgeDNSService.loadEdgeDNSService"
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
@@ -415,7 +399,7 @@
             @on-edit-fail="handleTrackFailEditEvent"
           >
             <template #form>
-              <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
+              <FormFieldsEdgeDnsEdit :handleCopy="handleCopy" />
             </template>
             <template #action-bar="{ onSubmit, onCancel, loading }">
               <ActionBarTemplate
@@ -488,7 +472,7 @@
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"
               v-model:visible="showCreateRecordDrawer"
-              :createService="createRecordsService"
+              :createService="edgeDNSRecordsService.createRecord"
               :schema="validationSchemaEDNSRecords"
               :initialValues="initialValuesCreateRecords"
               @onSuccess="handleCreatedSuccessfully"
