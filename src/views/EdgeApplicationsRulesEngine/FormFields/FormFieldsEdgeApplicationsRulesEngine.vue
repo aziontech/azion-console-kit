@@ -20,13 +20,13 @@
     listEdgeFunctionsDropdownService,
     loadEdgeFunctionService
   } from '@/services/edge-functions-services/v4'
-  import { listEdgeConnectorsService, loadEdgeConnectorsService } from '@/services/edge-connectors'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
+  import { edgeConnectorsService } from '@/services/v2'
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
@@ -34,6 +34,13 @@
     } else {
       return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
     }
+  }
+
+  const getEdgeConnectors = async (query) => {
+    return await edgeConnectorsService.listEdgeConnectorsService({
+      fields: 'id,name',
+      ...query
+    })
   }
 
   const CRITERIA_OPERATOR_OPTIONS = [
@@ -834,8 +841,8 @@
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
               <FieldDropdownLazyLoader
-                :service="listEdgeConnectorsService"
-                :loadService="loadEdgeConnectorsService"
+                :service="getEdgeConnectors"
+                :loadService="edgeConnectorsService.loadEdgeConnectorsService"
                 :loading="loadingOrigins"
                 :name="`behaviors[${behaviorIndex}].edgeConnectorId`"
                 optionLabel="name"

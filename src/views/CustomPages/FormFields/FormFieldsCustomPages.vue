@@ -9,19 +9,16 @@
   import DrawerEdgeConnector from '@/views/EdgeConnectors/Drawer'
   import { useField, useFieldArray } from 'vee-validate'
   import { onMounted, ref } from 'vue'
+  import { edgeConnectorsService } from '@/services/v2'
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  defineProps({
-    listEdgeConnectorsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeConnectorsService: {
-      type: Function,
-      required: true
-    }
-  })
+  const getEdgeConnectors = async (query) => {
+    return await edgeConnectorsService.listEdgeConnectorsService({
+      fields: 'id,name',
+      ...query
+    })
+  }
 
   const STATUS_CODE_OPTIONS = [
     {
@@ -179,8 +176,8 @@
           data-testid="custom-page-form__edge-connector"
           name="edgeConnectorId"
           enableClearOption
-          :service="listEdgeConnectorsService"
-          :loadService="loadEdgeConnectorsService"
+          :service="getEdgeConnectors"
+          :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="id"
           :value="edgeConnectorId"

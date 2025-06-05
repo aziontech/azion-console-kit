@@ -9,7 +9,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeConnectorsService"
+        :listService="edgeConnectorsService.listEdgeConnectorsService"
         :columns="getColumns"
         ref="refListTable"
         @on-load-data="handleLoadData"
@@ -19,6 +19,7 @@
         createPagePath="/edge-connectors/create"
         editPagePath="/edge-connectors/edit"
         data-testid="edge-connectors-list-table-block"
+        :apiFields="EDGE_CONNECTORS_API_FIELDS"
       />
       <EmptyResultsBlock
         v-else
@@ -44,19 +45,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
+  import { edgeConnectorsService } from '@/services/v2'
 
   defineOptions({ name: 'edge-connectors-view' })
 
-  const props = defineProps({
-    listEdgeConnectorsService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeConnectorsService: {
       required: true,
       type: Function
     }
@@ -70,13 +64,15 @@
       type: 'delete',
       title: 'Edge Connectors',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeConnectorsService
+      service: edgeConnectorsService.deleteEdgeConnectorsService
     }
   ]
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const EDGE_CONNECTORS_API_FIELDS = []
 
   const getColumns = computed(() => {
     return [
