@@ -14,16 +14,14 @@ export class DigitalCertificatesCSRService {
       body
     })
 
-    // return {
-    //   feedback: 'Your digital certificate has been created!',
-    //   urlToEditView: `/digital-certificates/edit/${httpResponse.body.data.id}`,
-    //   digitalCertificateId: httpResponse.body.data.id
-    // }
+    const {
+      data: { id }
+    } = data
 
     return {
       feedback: 'Your CSR has been created!',
-      urlToEditView: `/digital-certificates/edit/${data.id}`,
-      domainId: data.id
+      urlToEditView: `/digital-certificates/edit/${id}`,
+      domainId: id
     }
   }
 }
