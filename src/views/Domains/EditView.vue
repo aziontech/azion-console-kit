@@ -20,9 +20,6 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :loadDigitalCertificatesService="
-              digitalCertificatesService.loadDigitalCertificatesService
-            "
             hasDomainName
             @copyDomainName="copyDomainName"
           />
@@ -50,7 +47,7 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallService, digitalCertificatesService } from '@/services/v2'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

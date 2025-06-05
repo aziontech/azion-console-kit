@@ -70,8 +70,8 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
-    let parsedDigitalCertificates = results?.map((item) => {
+  transformListDigitalCertificatesDropdown({ body, count }, { type, search }) {
+    let parsedDigitalCertificates = body?.map((item) => {
       return {
         id: item.id,
         name: item.name

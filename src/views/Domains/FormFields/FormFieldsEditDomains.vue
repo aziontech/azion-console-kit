@@ -40,10 +40,6 @@
     loadEdgeFirewallService: {
       type: Function,
       required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -379,7 +375,7 @@
           name="edgeCertificate"
           data-testid="domains-form__digital-certificates-field"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
@@ -443,7 +439,7 @@
           required
           name="mtlsTrustedCertificate"
           :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"

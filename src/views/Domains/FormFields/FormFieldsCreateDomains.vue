@@ -45,10 +45,6 @@
     loadEdgeFirewallService: {
       type: Function,
       required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -142,17 +138,17 @@
   const listDigitalCertificatesByType = async (type, queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type,
-      fields: ['id,name'],
+      fields: ['id', 'name'],
       ...queryParams
     })
   }
 
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
+    return await listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
   }
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
+    return await listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
 
   const emit = defineEmits(['edgeApplicationCreated'])
@@ -309,7 +305,7 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
@@ -374,7 +370,7 @@
           required
           name="mtlsTrustedCertificate"
           :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"

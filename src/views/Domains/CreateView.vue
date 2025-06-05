@@ -20,9 +20,6 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :loadDigitalCertificatesService="
-              digitalCertificatesService.loadDigitalCertificatesService
-            "
             :isLoadingRequests="isLoadingRequests"
           />
         </template>
@@ -53,7 +50,6 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2'
-  import { digitalCertificatesService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
