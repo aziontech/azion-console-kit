@@ -8,7 +8,8 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { useRouter } from 'vue-router'
-  import { createEdgeFunctionsService } from '@/services/edge-functions-services/v4'
+  import { edgeFunctionService } from '@/services/v2'
+
   defineOptions({
     name: 'edge-functions-drawer'
   })
@@ -99,7 +100,7 @@
     v-if="showCreateDrawer"
     drawerId="create-edge-functions-drawer"
     v-model:visible="showCreateEdgeFunctionsDrawer"
-    :createService="createEdgeFunctionsService"
+    :createService="edgeFunctionService.createEdgeFunctionsService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"

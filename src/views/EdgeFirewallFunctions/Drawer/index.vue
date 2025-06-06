@@ -14,8 +14,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
+        :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
+        :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
       />
     </template>
   </CreateDrawerBlock>
@@ -35,8 +35,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
+        :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
+        :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
       />
     </template>
   </EditDrawerBlock>
@@ -52,7 +52,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallFunctionService } from '@/services/v2'
+  import { edgeFirewallFunctionService, edgeFunctionService } from '@/services/v2'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -66,14 +66,6 @@
     createFunctionService: {
       type: Function,
       required: true
-    },
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    loadEdgeFunctionService: {
-      required: true,
-      type: Function
     }
   })
 
