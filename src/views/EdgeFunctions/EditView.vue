@@ -13,14 +13,6 @@
   import { edgeFunctionService } from '@/services/v2'
 
   const props = defineProps({
-    loadEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    editEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
