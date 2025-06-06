@@ -16,10 +16,6 @@
   import AccordionTab from 'primevue/accordiontab'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import {
-    listEdgeFunctionsDropdownService,
-    loadEdgeFunctionService
-  } from '@/services/edge-functions-services/v4'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
@@ -555,8 +551,6 @@
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
-        :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
