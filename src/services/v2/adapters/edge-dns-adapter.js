@@ -51,5 +51,12 @@ export const EdgeDNSAdapter = {
       domain: payload.domain,
       active: payload.isActive
     }
+  },
+
+  transformPayloadEdit(payload) {
+    return {
+      name: payload.name,
+      active: payload.isActive
+    }
   }
 }

@@ -1,14 +1,12 @@
 <script setup>
   import { useEdgeDNSStore } from '@/stores/edge-dns'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
   import PrimeButton from 'primevue/button'
   import { edgeDNSService } from '@/services/v2'
-
-  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import LabelBlock from '@/templates/label-block'
 
   import { useField } from 'vee-validate'
   import { watch, ref } from 'vue'
@@ -47,6 +45,7 @@
         label: 'Key Tag',
         name: 'key-tag',
         value: data?.delegationSigner?.key_tag || 'Generating... visit here again soon.',
+        disabledCopyButton: !data?.delegationSigner?.key_tag,
         description:
           'Unique identifier for the DNSSEC key used to sign your zone. Use this value with your domain provider.'
       },
@@ -55,18 +54,21 @@
         name: 'algorithm',
         value:
           data?.delegationSigner?.algorithm_type.slug || 'Generating... visit here again soon.',
+        disabledCopyButton: !data?.delegationSigner?.algorithm_type.slug,
         description: 'Specifies the algorithm used to generate the DNSSEC key.'
       },
       {
         label: 'Digest Type',
         name: 'digestType',
         value: data?.delegationSigner?.digest_type.slug || 'Generating... visit here again soon.',
+        disabledCopyButton: !data?.delegationSigner?.digest_type.slug,
         description: 'Indicates the hash function used for the DNSSEC digest.'
       },
       {
         label: 'Digest',
         name: 'digest',
         value: data?.delegationSigner?.digest || 'Generating... visit here again soon.',
+        disabledCopyButton: !data?.delegationSigner?.digest,
         description:
           'Cryptographic hash of the public key for DNSSEC validation. Provide this to your provider.'
       }
@@ -101,24 +103,20 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    :title="`${handleTextDomainWorkload.singularTitle}`"
+    title="Domain"
     description="Provide the domain name you want to host."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          :label="`${handleTextDomainWorkload.singularTitle} Name`"
-          required
+        <FieldTextIcon
+          label="Domain Name"
           name="domain"
           placeholder="mydomain.com"
           data-testid="edge-dns-form__domain"
           disabled
-        >
-          <template #description>
-            Add the root {{ handleTextDomainWorkload.singularLabel }} name. Example:
-            <code>mydomain.com</code>.
-          </template>
-        </FieldText>
+          icon="pi pi-lock"
+          description="Add the root domain name. Example: mydomain.com."
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -127,37 +125,41 @@
     description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
   >
     <template #inputs>
-      <div
-        class="flex items-center sm:max-w-lg w-full gap-2"
-        v-for="(nameserver, index) in nameservers"
-        :key="index"
-      >
-        <FieldTextIcon
-          label=""
-          required
-          :name="`name-${index}`"
-          :value="nameserver"
-          data-testid="edge-dns-form__nameserver"
-          description=""
-          disabled
-          icon="pi pi-lock"
-        />
-        <div>
-          <PrimeButton
-            @click="handleCopy(nameserver)"
-            class="w-full whitespace-nowrap flex"
-            data-testid="edge-dns-form__nameserver-button"
-            size="small"
-            icon="pi pi-copy"
-            outlined
-            severity="primary"
-            :pt="{
-              label: { class: 'w-full text-left' },
-              root: { class: 'p-2' }
-            }"
-            label="Copy to Clipboard"
+      <div class="flex flex-col gap-2">
+        <LabelBlock label="Nameservers" />
+        <div
+          class="flex items-center sm:max-w-lg w-full gap-2"
+          v-for="(nameserver, index) in nameservers"
+          :key="index"
+        >
+          <FieldTextIcon
+            required
+            :name="`name-${index}`"
+            :value="nameserver"
+            data-testid="edge-dns-form__nameserver"
+            disabled
+            icon="pi pi-lock"
           />
+          <div>
+            <PrimeButton
+              @click="handleCopy(nameserver)"
+              class="w-full whitespace-nowrap flex"
+              data-testid="edge-dns-form__nameserver-button"
+              size="small"
+              icon="pi pi-copy"
+              outlined
+              severity="primary"
+              :pt="{
+                label: { class: 'w-full text-left' },
+                root: { class: 'p-2' }
+              }"
+              label="Copy to Clipboard"
+            />
+          </div>
         </div>
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Add the nameservers in your domain provider.
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -177,37 +179,43 @@
         />
       </div>
       <div
-        class="flex items-center sm:max-w-lg w-full gap-2"
-        v-for="(entry, index) in dnssecData"
-        :key="index"
+        v-if="dnssec"
+        class="flex flex-col gap-4"
       >
-        <div class="flex-1">
-          <FieldTextIcon
-            class="w-full"
-            :label="entry.label"
-            required
-            :name="entry.name"
-            v-model="entry.value"
-            :data-testid="`edge-dns-form__${entry.name}`"
-            :description="entry.description"
-            disabled
-            icon="pi pi-lock"
-          />
-        </div>
-        <div :class="entry.name === 'key-tag' || entry.name === 'digest' ? 'mb-6' : ''">
-          <PrimeButton
-            @click="handleCopy(entry.value)"
-            :data-testid="`edge-dns-form__${entry.name}-button`"
-            size="small"
-            icon="pi pi-copy"
-            outlined
-            severity="primary"
-            :pt="{
-              label: { class: 'w-full text-left' },
-              root: { class: 'p-2' }
-            }"
-            label="Copy to Clipboard"
-          />
+        <div
+          class="flex items-center sm:max-w-lg w-full gap-2"
+          v-for="(entry, index) in dnssecData"
+          :key="index"
+        >
+          <div class="flex-1">
+            <FieldTextIcon
+              class="w-full"
+              :label="entry.label"
+              required
+              :name="entry.name"
+              v-model="entry.value"
+              :data-testid="`edge-dns-form__${entry.name}`"
+              :description="entry.description"
+              disabled
+              icon="pi pi-lock"
+            />
+          </div>
+          <div :class="entry.name === 'key-tag' || entry.name === 'digest' ? 'mb-6' : ''">
+            <PrimeButton
+              @click="handleCopy(entry.value)"
+              :data-testid="`edge-dns-form__${entry.name}-button`"
+              size="small"
+              icon="pi pi-copy"
+              outlined
+              severity="primary"
+              :pt="{
+                label: { class: 'w-full text-left' },
+                root: { class: 'p-2' }
+              }"
+              label="Copy to Clipboard"
+              :disabled="entry.disabledCopyButton"
+            />
+          </div>
         </div>
       </div>
     </template>

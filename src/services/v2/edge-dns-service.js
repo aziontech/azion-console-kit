@@ -45,12 +45,12 @@ export class EdgeDNSService {
     return this.adapter?.transformLoadEdgeDNSSEC?.(data.data, params.fields)
   }
 
-  createEdgeDNSZoneDNSSEC = async (DNSZoneID) => {
+  createEdgeDNSZoneDNSSEC = async (DNSZoneID, enableDNSSEC = true) => {
     await this.http.request({
       method: 'PUT',
       url: this.getUrl(`/${DNSZoneID}/dnssec`),
       body: {
-        enabled: true
+        enabled: enableDNSSEC
       }
     })
   }
@@ -74,8 +74,10 @@ export class EdgeDNSService {
     await this.http.request({
       method: 'PATCH',
       url: this.getUrl(`/${payload.id}`),
-      body: this.adapter?.transformPayload?.(payload) ?? payload
+      body: this.adapter?.transformPayloadEdit?.(payload)
     })
+
+    this.createEdgeDNSZoneDNSSEC(payload.id, payload.dnssec)
 
     return 'Edge DNS has been updated'
   }
