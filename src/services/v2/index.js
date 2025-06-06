@@ -69,6 +69,9 @@ import { DataStreamAdapter } from './adapters/data-stream-adapter'
 import { CustomPageAdapter } from './adapters/custom-page-adapter'
 import { CustomPageService } from './custom-page-service'
 
+// MFA
+import { MFAService } from './mfa-service'
+import { MFAAdapter } from './adapters/mfa-adapter'
 // Edge Connectors
 import { EdgeConnectorsAdapter } from './adapters/edge-connectors-adapter'
 import { EdgeConnectorsService } from './edge-connectors-service'
@@ -103,6 +106,7 @@ const edgeApplicationFunctionService = new EdgeApplicationFunctionService(
 const edgeFunctionService = new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
 const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
+const mafService = new MFAService(httpService, MFAAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
 const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
 const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
@@ -125,9 +129,10 @@ export {
   rulesEngineService,
   edgeApplicationFunctionService,
   edgeFunctionService,
+  dataStreamService,
   customPageService,
   edgeConnectorsService,
-  dataStreamService,
+  mafService,
   digitalCertificatesService,
   digitalCertificatesCSRService,
   digitalCertificatesCRLService,
