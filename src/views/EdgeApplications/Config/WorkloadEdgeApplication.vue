@@ -10,10 +10,9 @@
       <FormFieldsCreateDomains
         isDrawer
         noBorder
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="edgeFirewallService.listEdgeFirewallService"
-        :loadDigitalCertificatesService="edgeFirewallService.loadEdgeFirewallService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
+        :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
         :disabledEdgeApplicationDropdown="true"
@@ -45,10 +44,6 @@
       required: true
     },
     loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
       type: Function,
       required: true
     },

@@ -20,7 +20,6 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
             :loadDigitalCertificatesService="loadDigitalCertificatesService"
             :isLoadingRequests="isLoadingRequests"
           />
@@ -59,10 +58,6 @@
 
   const props = defineProps({
     createDomainService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
       type: Function,
       required: true
     },

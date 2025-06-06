@@ -48,8 +48,10 @@ import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
 import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
 import { adaptServiceDataResponse } from '../services/v2/utils/adaptServiceDataResponse'
+const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
 
 export {
+  checkIfFieldExist,
   InviteSession,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,

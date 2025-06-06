@@ -47,7 +47,7 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?fields=*').as(
     'getDigitalCertificatesApi'
   )
 
@@ -88,7 +88,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.intercept(
       'GET',
-      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+      '/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
     ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()

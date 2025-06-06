@@ -122,7 +122,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('success', feedback ?? 'edited successfully')
+          showToast('success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)

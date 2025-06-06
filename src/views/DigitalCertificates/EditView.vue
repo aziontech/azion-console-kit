@@ -5,17 +5,17 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editDigitalCertificateService"
-        :loadService="props.loadDigitalCertificateService"
+        :editService="digitalCertificatesService.editDigitalCertificate"
+        :loadService="digitalCertificatesService.loadDigitalCertificate"
         :schema="validationSchema"
-        :updatedRedirect="props.updatedRedirect"
+        updatedRedirect="list-digital-certificates"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"
       >
         <template #form>
           <FormFieldsEditDigitalCertificates
-            :clipboardWrite="clipboardWrite"
-            :documentationService="documentationService"
+            :clipboardWrite="props.clipboardWrite"
+            :documentationService="props.documentationService"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
@@ -40,23 +40,12 @@
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { digitalCertificatesService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    loadDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
-    editDigitalCertificateService: {
-      type: Function,
-      required: true
-    },
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -87,6 +76,7 @@
       })
       .track()
   }
+
   const handleTrackFailEdit = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
