@@ -133,7 +133,6 @@
             v-if="activeTab === mapTabs.mainSettings"
             :updatedRedirect="props.domainServices.updatedRedirect"
             :editDomainService="props.domainServices.editDomainService"
-            :listDigitalCertificatesService="props.domainServices.listDigitalCertificatesService"
             :loadDigitalCertificatesService="props.domainServices.loadDigitalCertificatesService"
             :clipboardWrite="props.domainServices.clipboardWrite"
             :domain="domain"

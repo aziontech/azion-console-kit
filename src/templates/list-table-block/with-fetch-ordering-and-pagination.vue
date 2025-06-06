@@ -562,36 +562,34 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
-      try {
-        isLoading.value = true
-        const { count = 0, body = [] } = props.isGraphql
-          ? await props.listService()
-          : await props.listService({ page, ...query })
-        data.value = body
-        totalRecords.value = count
-      } catch (error) {
-        // Check if error is an ErrorHandler instance (from v2 services)
-        if (error && typeof error.showErrors === 'function') {
-          error.showErrors(toast)
-        } else {
-          // Fallback for legacy errors or non-ErrorHandler errors
-          const errorMessage = error.message || error
-          toast.add({
-            closable: true,
-            severity: 'error',
-            summary: 'Error',
-            detail: errorMessage
-          })
-        }
-      } finally {
-        isLoading.value = false
-        if (firstLoadData.value) {
-          const hasData = data.value?.length > 0
-          emit('on-load-data', !!hasData)
-        }
-        firstLoadData.value = false
+    try {
+      isLoading.value = true
+      const { count = 0, body = [] } = props.isGraphql
+        ? await props.listService()
+        : await props.listService({ page, ...query })
+      data.value = body
+      totalRecords.value = count
+    } catch (error) {
+      // Check if error is an ErrorHandler instance (from v2 services)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
+        const errorMessage = error.message || error
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage
+        })
       }
+    } finally {
+      isLoading.value = false
+      if (firstLoadData.value) {
+        const hasData = data.value?.length > 0
+        emit('on-load-data', !!hasData)
+      }
+      firstLoadData.value = false
     }
   }
 

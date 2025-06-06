@@ -39,11 +39,11 @@ describe.skip('Domains spec', { tags: ['@dev3'] }, () => {
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*'
+      '/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=&type=*'
     ).as('searchDigitalCertificatesApi')
     cy.intercept(
       'GET',
-      `/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${domainName}&type=*`
+      `/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=${domainName}&type=*`
     ).as('searchDigitalCertificatesApiByDomain')
 
     cy.get(selectors.domains.createButton).click()

@@ -41,7 +41,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.get(selectors.digitalCertificates.breadcrumbReturnToList).click()
     cy.get(selectors.list.searchInput).clear()
-    cy.intercept('GET', '/api/v4/digital_certificates/certificates*').as('getDigitalCertificates')
+    cy.intercept('GET', '/v4/digital_certificates/certificates*').as('getDigitalCertificates')
     cy.get(selectors.list.searchInput).type(`${certificateName}{enter}`)
     cy.wait('@getDigitalCertificates')
     cy.get(selectors.list.filteredRow.column('name')).find(selectors.list.showMore).click()

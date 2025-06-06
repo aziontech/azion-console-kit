@@ -2,6 +2,20 @@ import { createHttpService } from './base/httpServiceFactory'
 
 // Services
 
+// Digital Certificates9
+import { DigitalCertificatesAdapter } from './adapters/digital-certificates-adapter'
+import { DigitalCertificatesService } from './digital-certificates-service'
+
+// Digital Certificates CSR Service
+import { DigitalCertificatesCSRAdapter } from './adapters/digital-certificates-csr-adapter'
+import { DigitalCertificatesCSRService } from './digital-certificates-csr-service'
+
+// Digital Certificates CRL Service
+import { DigitalCertificatesCRLService } from './digital-certificates-crl-service'
+
+// Digital Certificates CR Service
+import { DigitalCertificatesCRService } from './digital-certificates-cr-service'
+
 // Vcs Service
 import { VcsService } from './vcs-service'
 import { VcsAdapter } from './adapters/vcs-adapter'
@@ -65,6 +79,10 @@ import { EdgeConnectorsService } from './edge-connectors-service'
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
+const digitalCertificatesService = new DigitalCertificatesService(
+  httpService,
+  DigitalCertificatesAdapter
+)
 const wafService = new WafService(httpService, WafAdapter)
 const edgeFirewallService = new EdgeFirewallService(httpService, EdgeFirewallAdapter)
 const edgeFirewallFunctionService = new EdgeFirewallFunctionService(
@@ -90,6 +108,12 @@ const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const mafService = new MFAService(httpService, MFAAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
+const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
+const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
+const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
+  httpService,
+  DigitalCertificatesCSRAdapter
+)
 
 export {
   vcsService,
@@ -108,5 +132,9 @@ export {
   dataStreamService,
   customPageService,
   edgeConnectorsService,
-  mafService
+  mafService,
+  digitalCertificatesService,
+  digitalCertificatesCSRService,
+  digitalCertificatesCRLService,
+  digitalCertificatesCRService
 }

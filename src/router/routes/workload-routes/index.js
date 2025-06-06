@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
 import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
 import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
 import * as WorkloadServices from '@/services/workloads-services'
@@ -38,10 +37,7 @@ export const workloadRoutes = {
         createDomainService: WorkloadServices.createWorkloadService,
         listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
         loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-        clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService:
-          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         flag: 'checkout_access_without_flag',
@@ -67,11 +63,7 @@ export const workloadRoutes = {
           editDomainService: WorkloadServices.editWorkloadService,
           loadDomainService: WorkloadServices.loadWorkloadService,
           updatedRedirect: `list-workloads`,
-          clipboardWrite: Helpers.clipboardWrite,
-          listDigitalCertificatesService:
-            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-          loadDigitalCertificatesService:
-            DigitalCertificatesServicesV4.loadDigitalCertificateService
+          clipboardWrite: Helpers.clipboardWrite
         },
         workloadDeploymentServices: {
           listWorkloadDeploymentService: WorkloadDeploymentServices.listWorkloadDeploymentsService,
