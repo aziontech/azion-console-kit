@@ -32,12 +32,15 @@ import { EdgeFirewallRulesEngineService } from './edge-firewall-rules-engine-ser
 // Purge
 import { PurgeService } from './purge-service'
 import { PurgeAdapter } from './adapters/purge-adapter'
+
 // Network Lists
 import { NetworkListsService } from './network-lists-service'
 import { NetworkListsAdapter } from './adapters/network-lists-adapter'
+
 // Edge Application Device Group
 import { DeviceGroupAdapter } from './adapters/edge-app-device-group-adapter'
 import { DeviceGroupService } from './edge-app-device-group-service'
+
 // Edge Application Cache Settings
 import { CacheSettingsAdapter } from './adapters/edge-app-cache-settings-adapter'
 import { CacheSettingsService } from './edge-app-cache-settings-service'
@@ -53,6 +56,7 @@ import { RulesEngineService } from './edge-app-rules-engine-service'
 // Edge Application
 import { EdgeAppAdapter } from './adapters/edge-app-adapter'
 import { EdgeAppService } from './edge-app-service'
+
 // Edge Functions
 import { EdgeApplicationFunctionService } from './edge-application-functions-service'
 import { EdgeApplicationFunctionsAdapter } from './adapters/edge-application-functions-adapter'
@@ -75,6 +79,14 @@ import { MFAAdapter } from './adapters/mfa-adapter'
 // Edge Connectors
 import { EdgeConnectorsAdapter } from './adapters/edge-connectors-adapter'
 import { EdgeConnectorsService } from './edge-connectors-service'
+
+// Edge DNS
+import { EdgeDNSAdapter } from './adapters/edge-dns-adapter'
+import { EdgeDNSService } from './edge-dns-service'
+
+// Edge DNS Records
+import { EdgeDNSRecordsAdapter } from './adapters/edge-dns-records-adapter'
+import { EdgeDNSRecordsService } from './edge-dns-records-service'
 
 const httpService = createHttpService()
 
@@ -114,6 +126,8 @@ const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
   httpService,
   DigitalCertificatesCSRAdapter
 )
+const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
+const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 
 export {
   vcsService,
@@ -136,5 +150,7 @@ export {
   digitalCertificatesService,
   digitalCertificatesCSRService,
   digitalCertificatesCRLService,
-  digitalCertificatesCRService
+  digitalCertificatesCRService,
+  edgeDNSService,
+  edgeDNSRecordsService
 }

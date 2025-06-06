@@ -125,8 +125,6 @@ export class EdgeApplicationFunctionService {
       url: this.#getUrl(edgeApplicationID, `/${functionID}`)
     })
 
-    return {
-      feedback: 'Your Function successfully deleted'
-    }
+    return 'Your Function successfully deleted'
   }
 }
