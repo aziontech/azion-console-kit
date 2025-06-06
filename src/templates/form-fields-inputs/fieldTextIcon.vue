@@ -60,6 +60,7 @@
 
 <template>
   <label
+    v-if="props.label"
     :for="props.name"
     class="text-color text-base font-medium leading-5"
   >
