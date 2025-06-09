@@ -86,9 +86,16 @@ const getConfig = () => {
           target: `${URLStartPrefix}sso.azion.com`,
           cookieDomainRewrite: { '*': '' }
         }),
+        '^/api/v4/edge_sql': createProxyConfig({
+          target: `${URLStartPrefix}api.azion.com`,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }),
         '/api': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`,
           rewrite: (path) => path.replace(/^\/api/, '')
+        }),
+        '^/v4/edge_sql': createProxyConfig({
+          target: `${URLStartPrefix}api.azion.com`
         }),
         '/v4': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`
