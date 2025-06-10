@@ -8,6 +8,8 @@
         :createService="customPageService.createCustomPagesService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleToast"
+        disableToast
       >
         <template #form>
           <FormFieldsCustomPages
@@ -86,4 +88,17 @@
       .required()
       .label('Pages')
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Custom Page successfully created',
+      actions: {
+        link: {
+          label: 'View Custom Page',
+          callback: () => response.redirectToUrl(`/custom-pages/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>

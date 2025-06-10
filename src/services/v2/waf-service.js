@@ -38,10 +38,7 @@ export class WafService {
       body: adaptedPayload
     })
 
-    return {
-      feedback: 'Your WAF Rule has been created',
-      urlToEditView: `/waf/edit/${response.data.id}`
-    }
+    return response.data
   }
 
   editWafRule = async (payload, wafId) => {

@@ -14,14 +14,6 @@ export class DigitalCertificatesCSRService {
       body
     })
 
-    const {
-      data: { id }
-    } = data
-
-    return {
-      feedback: 'Your digital certificate has been created!',
-      urlToEditView: `/digital-certificates/edit/${id}`,
-      domainId: id
-    }
+    return data
   }
 }

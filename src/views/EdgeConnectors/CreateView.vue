@@ -5,9 +5,11 @@
     </template>
     <template #content>
       <CreateFormBlock
+        @on-response="handleToast"
         :createService="edgeConnectorsService.createEdgeConnectorsService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form="{ resetForm }">
           <FormFieldsEdgeConnectors
@@ -239,4 +241,17 @@
 
     status: yup.boolean().required()
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Edge Connector successfully created',
+      actions: {
+        link: {
+          label: 'View Edge Connector',
+          callback: () => response.redirectToUrl(`/edge-connectors/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>

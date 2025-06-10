@@ -14,6 +14,7 @@
         :schema="validationSchema"
         :initialValues="initialValues"
         data-testid="create-edge-application-form-block"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeApplications
@@ -101,12 +102,14 @@
     'debug-rules'
   ]
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Application',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
+
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -119,5 +122,18 @@
         errorMessage: message
       })
       .track()
+  }
+
+  const handleToast = (data) => {
+    const toast = {
+      feedback: 'Your edge application has been created',
+      actions: {
+        link: {
+          label: 'View Edge Application',
+          callback: () => data.redirectToUrl(`/edge-applications/edit/${data.id}`)
+        }
+      }
+    }
+    data.showToastWithActions(toast)
   }
 </script>

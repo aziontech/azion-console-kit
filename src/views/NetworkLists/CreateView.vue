@@ -33,10 +33,11 @@
     { name: 'IP/CIDR', value: 'ip_cidr' }
   ])
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'Network List'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -67,6 +68,19 @@
       then: (schema) => schema.required('ASN is a required field')
     })
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your network list has been created',
+      actions: {
+        link: {
+          label: 'View Network List',
+          callback: () => response.redirectToUrl(`/network-lists/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -81,6 +95,7 @@
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateNetworkLists :listCountriesService="props.listCountriesService" />

@@ -12,10 +12,11 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'WAF Rules'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -71,6 +72,19 @@
     sqlInjection: true,
     active: true
   }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your waf rule has been created',
+      actions: {
+        link: {
+          label: 'View WAF Rule',
+          callback: () => response.redirectToUrl(`/waf/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -85,6 +99,7 @@
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form>
           <FormFieldsWafRules />

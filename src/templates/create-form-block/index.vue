@@ -37,6 +37,10 @@
     unSaved: {
       type: Boolean,
       default: true
+    },
+    disableToast: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -78,6 +82,19 @@
     toast.add(options)
   }
 
+  const showToastWithActions = (toastData) => {
+    const options = {
+      closable: true,
+      severity: 'success',
+      summary: 'success',
+      detail: toastData.feedback,
+      additionalDetails: toastData?.additionalFeedback,
+      action: toastData?.actions
+    }
+
+    toast.add(options)
+  }
+
   const showFeedback = (feedback = 'created successfully') => {
     const feedbackMessage = feedback
     if (props.disableAfterCreateToastFeedback) {
@@ -91,7 +108,11 @@
   }
 
   const handleSuccess = (response) => {
-    emit('on-response', response)
+    emit('on-response', { ...response, showToastWithActions, redirectToUrl })
+    if (props.disableToast) {
+      router.go(-1)
+      return
+    }
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
     redirectToUrl(response?.urlToEditView)
@@ -122,7 +143,10 @@
 
   defineExpose({
     resetForm,
-    values
+    values,
+    showToastWithActions,
+    showFeedback,
+    redirectToUrl
   })
 </script>
 

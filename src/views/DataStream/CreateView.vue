@@ -202,6 +202,19 @@
       displaySamplingDialog.value = true
     }
   }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your data stream has been created',
+      actions: {
+        link: {
+          label: 'View Data Stream ',
+          callback: () => response.redirectToUrl(`/data-stream/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -213,6 +226,8 @@
       <CreateFormBlock
         :createService="dataStreamService.createDataSteramService"
         :schema="validationSchema"
+        @on-response="handleToast"
+        disableToast
       >
         <template #form="{ resetForm }">
           <FormFieldsDataStream :resetForm="resetForm" />

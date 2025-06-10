@@ -115,7 +115,6 @@
           data-testid="edge-dns-form__domain"
           disabled
           icon="pi pi-lock"
-          description="Add the root domain name. Example: mydomain.com."
         />
       </div>
     </template>

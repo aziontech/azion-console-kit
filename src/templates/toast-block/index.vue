@@ -25,6 +25,12 @@
         >
           {{ parseText(message.detail, CHAR_LIMITS.DETAIL) }}
         </p>
+        <p
+          class="text-sm text-color-secondary font-normal mt-3"
+          v-if="message.additionalDetails"
+        >
+          {{ message.additionalDetails }}
+        </p>
         <div
           class="flex flex-row gap-2 align-self-end mt-5"
           v-if="showActions(message)"

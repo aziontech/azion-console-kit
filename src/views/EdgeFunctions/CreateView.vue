@@ -19,12 +19,13 @@
 
   const ARGS_INITIAL_STATE = '{}'
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Functions',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -73,6 +74,19 @@
     args: ARGS_INITIAL_STATE,
     initiatorType: 'edge_application'
   }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge function has been created',
+      actions: {
+        link: {
+          label: 'View Edge Function',
+          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -89,6 +103,7 @@
         @on-response="handleTrackCreation"
         @on-response-fail="handleTrackFailedCreation"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />

@@ -40,11 +40,7 @@ export class EdgeAppService {
       }
     })
 
-    return {
-      feedback: 'Your edge application has been created',
-      urlToEditView: `/edge-applications/edit/${data.data.id}`,
-      applicationId: data.data.id
-    }
+    return data
   }
 
   cloneEdgeApplicationService = async (payload) => {

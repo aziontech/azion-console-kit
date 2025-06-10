@@ -17,8 +17,8 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleDrawerSuccess = (response) => {
-    edgeFunctionID.value = response.functionId
+  const handleDrawerSuccess = (functionId) => {
+    edgeFunctionID.value = functionId
   }
 
   const changeArgs = (target) => {
