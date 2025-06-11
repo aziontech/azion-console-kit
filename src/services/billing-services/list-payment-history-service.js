@@ -54,8 +54,7 @@ const removeCurrentPayment = (payments) => {
 }
 
 const listPaymentHistoryForNotRegularAccounts = async () => {
-
-  const body= await paymentService.listPaymentsHistory({
+  const body = await paymentService.listPaymentsHistory({
     pageSize: PAGE_SIZE
   })
 

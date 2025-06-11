@@ -15,7 +15,7 @@
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
   import { paymentService } from '@/services/v2'
-  
+
   defineOptions({ name: 'add-payment-method-block' })
 
   const router = useRouter()
