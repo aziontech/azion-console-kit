@@ -49,7 +49,7 @@ describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
 
     cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
 
-    cy.verifyToast('success', 'Custom Page successfully created')
+    cy.verifyToastWithAction('success', 'Custom Page successfully created')
 
     cy.wait('@getCustomPages').its('response.statusCode').should('eq', 200)
 
