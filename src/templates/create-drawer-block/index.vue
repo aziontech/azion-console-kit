@@ -47,6 +47,10 @@
     showBarGoBack: {
       type: Boolean,
       default: false
+    },
+    disableToast: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -102,13 +106,26 @@
     toast.add(options)
   }
 
+  const showToastWithActions = (toastData) => {
+    const options = {
+      closable: true,
+      severity: 'success',
+      summary: 'success',
+      detail: toastData.feedback,
+      additionalDetails: toastData?.additionalFeedback,
+      action: toastData?.actions
+    }
+
+    toast.add(options)
+  }
+
   const onSubmit = handleSubmit(
     async (values, formContext) => {
       try {
         const response = await props.createService(values)
         blockViewRedirection.value = false
-        emit('onSuccess', response)
-        showToast('success', response?.feedback)
+        emit('onSuccess', { ...response, showToastWithActions })
+        if (!props.disableToast) showToast('success', response?.feedback)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = true

@@ -71,22 +71,6 @@ describe('EdgeApplicationServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        results: {
-          id: 1
-        }
-      }
-    })
-    const { sut } = makeSut()
-
-    const data = await sut(fixtures.edgeApplicationMock)
-
-    expect(data.feedback).toBe('Your edge application has been created')
-  })
-
   it.each([
     {
       statusCode: 400,

@@ -10,6 +10,7 @@
         :initialValues="initialValues"
         @on-response="handleTrackSuccessCreated"
         @on-response-fail="handleTrackFailCreated"
+        disableToast
       >
         <template #form>
           <InlineMessage
@@ -151,10 +152,24 @@
     router.push({ name: `list-${handleTextDomainWorkload.pluralLabel}` })
   }
 
-  const handleTrackSuccessCreated = () => {
+  const handleTrackSuccessCreated = (response) => {
     tracker.product.productCreated({
       productName: 'Digital Certificate'
     })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your digital certificate has been created!',
+      actions: {
+        link: {
+          label: 'View Edge Certificate',
+          callback: () => response.redirectToUrl(`/digital-certificates/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailCreated = (error) => {

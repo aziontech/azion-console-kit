@@ -8,7 +8,7 @@ export default {
   nameRow: '[data-testid="list-table-block__column__name__row"]',
   showMore: '[data-testid="table-column-expand-text-column__show-more__toggle"]',
   domainRow: '[data-testid="table-column-expand-text-column__value"]',
-  statusRow: '[data-testid="list-table-block__column__status__row"] > .p-tag-value',
+  statusRow: '[data-testid="list-table-block__column__active__row"] > .p-tag-value',
   list: {
     columnName: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`
   },

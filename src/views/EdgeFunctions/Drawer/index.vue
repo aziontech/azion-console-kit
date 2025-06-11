@@ -84,15 +84,24 @@
   const openCreateDrawer = () => {
     showCreateEdgeFunctionsDrawer.value = true
   }
-  const handleCreateWithSuccess = (id) => {
+  const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
-    emit('onSuccess', id)
+    handleToast(response)
+    emit('onSuccess', response.functionId)
     closeCreateDrawer()
   }
+
   defineExpose({
     showCreateDrawer,
     openCreateDrawer
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge function has been created'
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -106,6 +115,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Function"
+    disableToast
   >
     <template #formFields>
       <FormFieldsCreateEdgeFunctions

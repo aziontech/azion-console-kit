@@ -33,13 +33,7 @@ export class EdgeFirewallService {
       body
     })
 
-    const { id } = data.data
-
-    return {
-      feedback: 'Your Edge Firewall has been created',
-      urlToEditView: `/edge-firewall/edit/${id}`,
-      id
-    }
+    return data
   }
 
   cloneEdgeFirewallService = async (name, id) => {

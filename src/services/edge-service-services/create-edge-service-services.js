@@ -51,11 +51,8 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return {
-        feedback: 'Your Edge Service has been created',
-        urlToEditView: `/edge-services/edit/${httpResponse.body.id}`,
-        id: httpResponse.body.id
-      }
+      const data = httpResponse.body
+      return data
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

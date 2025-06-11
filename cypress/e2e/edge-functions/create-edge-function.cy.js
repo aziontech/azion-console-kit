@@ -17,7 +17,6 @@ describe('Edge Functions spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
     cy.get(selectors.functions.saveButton).click()
     cy.verifyToast('success', 'Your edge function has been created')
-    cy.get(selectors.functions.cancelButton).click()
 
     // Assert
     cy.get(selectors.functions.searchInput).clear()

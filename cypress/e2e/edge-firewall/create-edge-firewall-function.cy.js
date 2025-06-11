@@ -33,7 +33,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
     cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
     cy.get(selectors.edgeFirewall.saveButton).click()
-    cy.verifyToast('success', 'Your Edge Firewall has been created')
+    cy.verifyToastWithAction('success', 'Your Edge Firewall has been created')
 
     // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()

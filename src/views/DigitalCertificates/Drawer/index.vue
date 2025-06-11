@@ -125,7 +125,8 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
-    emit('onSuccess', response.domainId)
+    handleToast(response)
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
   }
 
@@ -137,6 +138,13 @@
       ? digitalCertificatesCSRService.createDigitalCertificateCSR
       : digitalCertificatesService.createDigitalCertificate
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your digital certificate has been created!'
+    }
+    response.showToastWithActions(toast)
+  }
 
   defineExpose({
     showCreateDrawer,
@@ -155,6 +163,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedToCreate"
     title="Create Digital Certificate"
+    disableToast
   >
     <template #formFields>
       <FormFieldsCreateDigitalCertificates

@@ -22,7 +22,6 @@ describe('Variables spec', { tags: ['@dev7'] }, () => {
     cy.get(selectors.variables.valueInput).type(variableValue)
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your variable has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
 
     // Assert
     cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)

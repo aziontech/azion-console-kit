@@ -64,10 +64,7 @@ export class EdgeDNSService {
 
     if (payload.dnssec) this.createEdgeDNSZoneDNSSEC(data.data.id)
 
-    return {
-      feedback: 'Your Edge DNS Zone has been created',
-      urlToEditView: `/edge-dns/edit/${data.data.id}`
-    }
+    return data
   }
 
   editEdgeDNSService = async (payload) => {
