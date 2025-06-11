@@ -94,8 +94,8 @@ const listPaymentHistoryForRegularAccounts = async () => {
   return adaptPaymentHistoryForRegularAccounts(httpResponse)
 }
 
-const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
-  const parseBilling = httpResponse.body.results?.map((card) => {
+const adaptPaymentHistoryForNotRegularAccounts = (results) => {
+  const parseBilling = results?.map((card) => {
     const typeCard = card.card_brand?.toLowerCase()
     return {
       amount: card.amount_with_currency,
@@ -116,7 +116,7 @@ const adaptPaymentHistoryForNotRegularAccounts = (httpResponse) => {
 
   return {
     body: parseBilling || [],
-    statusCode: httpResponse.statusCode
+    statusCode: 200
   }
 }
 
