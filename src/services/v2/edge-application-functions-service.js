@@ -27,7 +27,7 @@ export class EdgeApplicationFunctionService {
     const pageSize = 100
 
     while (unresolvedIds.size > 0) {
-      const { body: data } = await this.#getEdgeFunctionService().listEdgeFunctions({
+      const { body: data, count } = await this.#getEdgeFunctionService().listEdgeFunctions({
         page,
         pageSize,
         fields: ['id', 'name', 'version', 'initiator_type'],
@@ -48,7 +48,7 @@ export class EdgeApplicationFunctionService {
         }
       }
 
-      if (data.length < pageSize) break
+      if (count < pageSize) break
       page++
     }
 

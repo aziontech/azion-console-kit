@@ -77,7 +77,6 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
 
     // Arrange
     cy.openProduct('Domains')

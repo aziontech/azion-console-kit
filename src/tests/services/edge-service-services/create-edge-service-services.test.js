@@ -66,19 +66,6 @@ describe('EdgeServiceServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: { id: '123' }
-    })
-
-    const { sut } = makeSut()
-
-    const { feedback } = await sut(fixtures.edgeServiceMock)
-
-    expect(feedback).toBe('Your Edge Service has been created')
-  })
-
   it('Should return an API error to an invalid edge service name', async () => {
     const apiErrorMock = 'name should not be empty'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

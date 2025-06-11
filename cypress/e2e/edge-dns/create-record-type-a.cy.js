@@ -31,7 +31,6 @@ describe('Edge DNS spec', { tags: ['@dev4', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
     cy.verifyToast('success', 'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.')
-    // cy.get(selectors.edgeDns.cancelButton).click()
     cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)
       .should('contain', zoneName)
