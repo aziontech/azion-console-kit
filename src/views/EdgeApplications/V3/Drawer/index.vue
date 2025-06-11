@@ -92,9 +92,16 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
+    handleToast(response)
     emit('onSuccess')
-    emit('onEdgeApplicationCreated', response.applicationId)
+    emit('onEdgeApplicationCreated', response.id)
     closeCreateDrawer()
+  }
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge application has been created'
+    }
+    response.showToastWithActions(toast)
   }
   defineExpose({
     showCreateDrawer,
@@ -113,6 +120,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Application"
+    disableToast
   >
     <template #formFields>
       <FormFieldsCreateEdgeApplications
