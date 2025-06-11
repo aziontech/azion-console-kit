@@ -12,7 +12,6 @@ export const realTimePurgeRoutes = {
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
         listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
-        createRealTimePurgeService: RealTimePurgeService.createRealTimePurgeService,
         documentationService: Helpers.documentationCatalog.realTimePurge
       },
       meta: {
@@ -29,7 +28,6 @@ export const realTimePurgeRoutes = {
       name: 'create-real-time-purge',
       component: () => import('@views/RealTimePurge/CreateView.vue'),
       props: {
-        createRealTimePurgeService: RealTimePurgeService.createRealTimePurgeService,
         contactSalesRealTimePurgeService: RealTimePurgeService.contactSalesRealTimePurgeService
       },
       meta: {

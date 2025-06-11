@@ -29,10 +29,32 @@
     secret: yup.boolean().required().default(false)
   })
 
-  const handleResponse = () => {
+  const handleResponse = (response) => {
     tracker.product.productCreated({
       productName: 'Variable'
     })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your variable has been created',
+      actions: {}
+    }
+
+    if (response?.secret) {
+      response.showToastWithActions(toast)
+      response.redirectToUrl('/variables')
+      return
+    }
+
+    toast.actions = {
+      link: {
+        label: 'View Variables',
+        callback: () => response.redirectToUrl(`/variables/edit/${response.uuid}`)
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -59,6 +81,7 @@
         :schema="validationSchema"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
+        disableToast
       >
         <template #form>
           <FormFieldsVariables />

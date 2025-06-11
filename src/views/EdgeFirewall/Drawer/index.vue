@@ -62,8 +62,15 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
-    emit('onSuccess', response.id)
+    handleToast(response)
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
+  }
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Firewall has been created'
+    }
+    response.showToastWithActions(toast)
   }
   defineExpose({
     showCreateDrawer,
@@ -83,6 +90,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Firewall"
+    disableToast
   >
     <template #formFields>
       <FormCreateEdgeFirewall />

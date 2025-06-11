@@ -52,16 +52,13 @@ export class DataStreamService {
   createDataSteramService = async (payload) => {
     const body = this.#getTransformed('transformPayloadDataStream', payload)
 
-    await this.http.request({
+    const response = await this.http.request({
       method: 'POST',
       url: this.baseURL,
       body
     })
 
-    return {
-      feedback: 'Your data stream has been created',
-      urlToEditView: `/data-stream`
-    }
+    return response.data
   }
 
   editDataStreamService = async (payload) => {

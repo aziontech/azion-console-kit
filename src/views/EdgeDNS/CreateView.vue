@@ -9,6 +9,7 @@
         :createService="edgeDNSService.createEdgeDNSZonesService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
       >
@@ -61,10 +62,28 @@
     isActive: true
   }
 
-  const handleResponse = () => {
+  const handleResponse = (response) => {
     tracker.product.productCreated({
       productName: 'Edge DNS Zone'
     })
+
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback:
+        'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.',
+      additionalFeedback:
+        'For the DNSSEC, once the Key Tag and Digest are available in your zone, provide them to your provider to fully activate DNSSEC.',
+      actions: {
+        link: {
+          label: 'View Zone',
+          callback: () => response.redirectToUrl(`/edge-dns/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailedCreation = (error) => {

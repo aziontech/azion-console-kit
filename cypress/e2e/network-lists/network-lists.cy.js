@@ -25,7 +25,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -54,7 +53,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -84,7 +82,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -110,7 +107,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -159,7 +155,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -209,7 +204,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()

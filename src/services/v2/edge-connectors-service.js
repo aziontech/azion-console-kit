@@ -34,8 +34,7 @@ export class EdgeConnectorsService {
     const { id } = data.data
 
     return {
-      feedback: 'Edge Connector successfully created',
-      urlToEditView: '/edge-connectors',
+      ...data,
       id: parseInt(id)
     }
   }

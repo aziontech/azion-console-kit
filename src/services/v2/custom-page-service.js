@@ -30,11 +30,7 @@ export class CustomPageService {
       body
     })
 
-    return {
-      feedback: 'Custom Page successfully created',
-      urlToEditView: `/custom-pages/edit/${data.data.id}`,
-      id: data.data.id
-    }
+    return data
   }
 
   editCustomPagesService = async (payload) => {

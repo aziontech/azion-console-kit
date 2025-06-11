@@ -14,10 +14,6 @@
   const tracker = inject('tracker')
 
   defineProps({
-    createRealTimePurgeService: {
-      type: Function,
-      required: true
-    },
     contactSalesRealTimePurgeService: {
       type: Function,
       required: true

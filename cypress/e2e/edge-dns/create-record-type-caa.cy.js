@@ -22,15 +22,14 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
       value: '0 issue "letsencrypt.org"',
       policyType: 'simple',
       policyTypeOption: 0,
-      description: '-'
+      description: ''
     }
 
     cy.get(selectors.edgeDns.createButton).click()
     cy.get(selectors.edgeDns.nameInput).type(zoneName)
     cy.get(selectors.edgeDns.domainInput).type(`${zoneName}.com.az`)
     cy.get(selectors.edgeDns.saveButton).click()
-    cy.verifyToast('success', 'Your Edge DNS Zonehas been created')
-    cy.get(selectors.edgeDns.cancelButton).click()
+    cy.verifyToast('success', 'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.')
     cy.get(selectors.edgeDns.searchInput).type(`${zoneName}{enter}`)
     cy.get(selectors.edgeDns.nameRow)
       .should('contain', zoneName)
