@@ -14,7 +14,8 @@
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
-
+  import { paymentService } from '@/services/v2'
+  
   defineOptions({ name: 'add-payment-method-block' })
 
   const router = useRouter()
@@ -42,10 +43,6 @@
   }
   const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
-    createService: {
-      type: Function,
-      required: true
-    },
     stripeClientService: {
       type: Function,
       required: true
@@ -204,7 +201,7 @@
         card_expiration_month: token.card.exp_month,
         card_expiration_year: token.card.exp_year
       }
-      const response = await props.createService(payload)
+      const response = await paymentService.createCreditCard(payload)
       emit('onSuccess', response)
       showToast('success', response.feedback)
       toggleDrawerVisibility(false)

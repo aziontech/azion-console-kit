@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makePaymentBaseUrl } from './make-payment-base-url'
 import { makeAccountingBaseUrl } from './make-accounting-base-url'
 import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
 import { formatDateToMonthYear, formatDateToUS } from '@/helpers/convert-date'
+import { paymentService } from '@/services/v2'
 
 const PAGE_SIZE = 200
 const ACCOUNTING_LIST_LIMIT = 12
@@ -54,12 +54,12 @@ const removeCurrentPayment = (payments) => {
 }
 
 const listPaymentHistoryForNotRegularAccounts = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePaymentBaseUrl()}/history?page_size=${PAGE_SIZE}`,
-    method: 'GET'
+
+  const body= await paymentService.listPaymentsHistory({
+    pageSize: PAGE_SIZE
   })
 
-  return adaptPaymentHistoryForNotRegularAccounts(httpResponse)
+  return adaptPaymentHistoryForNotRegularAccounts(body)
 }
 
 const listPaymentHistoryForRegularAccounts = async () => {
