@@ -193,14 +193,6 @@
     </div>
   </div>
 
-  <NotificationPayment
-    v-if="user.disclaimer"
-    :clickAddCredit="drawersMethods.openDrawerAddCredit"
-    :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
-    :clickLinkPaymentMethod="goToPayment"
-    :disabledBtnAddCredit="!defaultCardStatus.hasData"
-  />
-
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
@@ -250,7 +242,6 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
-  import NotificationPayment from './components/notification-payment'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'

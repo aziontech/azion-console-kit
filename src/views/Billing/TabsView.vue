@@ -9,6 +9,7 @@
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
   import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
   import SkeletonBlock from '@/templates/skeleton-block'
+  import NotificationPayment from './components/notification-payment'
 
   import { ref, computed, provide, onMounted } from 'vue'
 
@@ -185,6 +186,10 @@
             }
           }"
         >
+          <NotificationPayment type="info" />
+          <NotificationPayment type="warning" />
+          <NotificationPayment type="success" />
+          <NotificationPayment type="error" />
           <BillsView
             v-if="isActiveTab.bills"
             ref="viewBillsRef"
@@ -202,6 +207,7 @@
             }
           }"
         >
+          <NotificationPayment />
           <PaymentListView
             v-if="isActiveTab.payment"
             ref="listPaymentMethodsRef"
