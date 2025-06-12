@@ -554,13 +554,17 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'error',
-          detail: errorMessage
-        })
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          const errorMessage = error.message || error
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'error',
+            detail: errorMessage
+          })
+        }
       } finally {
         isLoading.value = false
       }

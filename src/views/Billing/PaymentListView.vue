@@ -4,8 +4,10 @@
     v-if="hasContentToList"
     :enableEditClick="false"
     isTabs
+    :defaultOrderingFieldName="'is_default'"
+    :apiFields="API_FIELDS"
     :columns="paymentsColumns"
-    :listService="props.listPaymentMethodsService"
+    :listService="listCreditCards"
     @on-load-data="handleLoadData"
     :actions="actionsRow"
     emptyListMessage="No payment method found."
@@ -53,6 +55,7 @@
   import ListTableBlock from '@templates/list-table-block'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  import { paymentService } from '@/services/v2'
 
   import { ref, inject } from 'vue'
   const emit = defineEmits(['update-credit-event'])
@@ -60,27 +63,33 @@
   const toast = useToast()
 
   const props = defineProps({
-    listPaymentMethodsService: {
-      type: Function,
-      required: true
-    },
-    deletePaymentService: {
-      type: Function,
-      required: true
-    },
-    setAsDefaultPaymentService: {
-      type: Function,
-      required: true
-    },
     documentPaymentMethodService: {
       type: Function,
       required: true
     }
   })
 
+  const listCreditCards = async (params) => {
+    const { body } = await paymentService.listCreditCards({
+      ...params,
+      pageSize: 200
+    })
+    return body
+  }
+
   const listPaymentMethodsRef = ref('')
 
   const drawersMethods = inject('drawersMethods')
+
+  const API_FIELDS = [
+    'id',
+    'card_holder',
+    'card_brand',
+    'card_expiration_month',
+    'card_expiration_year',
+    'is_default',
+    'card_last_4_digits'
+  ]
 
   const paymentsColumns = ref([
     {
@@ -126,8 +135,10 @@
 
   const setPaymentAsDefault = async (payment) => {
     try {
-      const feedback = await props.setAsDefaultPaymentService(payment.id)
-      showToast('success', feedback)
+      await paymentService.editCreditCard(payment.id, {
+        is_default: true
+      })
+      showToast('success', 'Payment Method successfully set as default')
       emit('update-credit-event')
       reloadList()
     } catch (error) {
@@ -149,7 +160,7 @@
       type: 'delete',
       icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
-      service: props.deletePaymentService
+      service: paymentService.deleteCreditCard
     }
   ])
 
