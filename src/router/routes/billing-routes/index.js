@@ -46,6 +46,7 @@ export const billingRoutes = {
       props: {
         loadPaymentMethodDefaultService: BillingServices.loadPaymentMethodDefaultService,
         loadInvoiceDataService: BillingServices.loadInvoiceDataService,
+        loadCurrentInvoiceService: BillingServices.loadCurrentInvoiceService,
         listServiceAndProductsChangesService: BillingServices.listServiceAndProductsChangesService,
         clipboardWrite
       },

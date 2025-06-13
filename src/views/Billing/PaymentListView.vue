@@ -1,4 +1,16 @@
 <template>
+  <DrawerAddCredit
+    ref="drawerAddCreditRef"
+    v-if="props.cardDefault.cardData"
+    :cardDefault="props.cardDefault"
+    :createService="paymentService.addCredit"
+    @onSuccess="successAddCredit"
+  />
+  <DrawerPaymentMethod
+    ref="drawerPaymentMethodRef"
+    :getStripeClientService="props.getStripeClientService"
+    @onSuccess="successAddPaymentMethod"
+  />
   <ListTableBlock
     ref="listPaymentMethodsRef"
     v-if="hasContentToList"
@@ -18,7 +30,7 @@
           icon="pi pi-plus"
           label="Credit"
           size="small"
-          @click="drawersMethods.openDrawerAddCredit"
+          @click="openDrawerAddCredit"
           data-testid="payment-methods__add-credit__button"
           outlined
         />
@@ -27,7 +39,7 @@
           data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
           size="small"
-          @click="drawersMethods.openDrawerPaymentMethod"
+          @click="openDrawerPaymentMethod"
           label="Payment Method"
         />
       </div>
@@ -39,7 +51,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
-    @click-to-create="drawersMethods.openDrawerPaymentMethod"
+    @click-to-create="openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -56,14 +68,25 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2'
+  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
+  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
-  import { ref, inject } from 'vue'
+  import { ref } from 'vue'
   const emit = defineEmits(['update-credit-event'])
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const props = defineProps({
     documentPaymentMethodService: {
+      type: Function,
+      required: true
+    },
+    cardDefault: {
+      type: Object,
+      required: true
+    },
+    getStripeClientService: {
       type: Function,
       required: true
     }
@@ -79,7 +102,16 @@
 
   const listPaymentMethodsRef = ref('')
 
-  const drawersMethods = inject('drawersMethods')
+  const drawerAddCreditRef = ref(null)
+  const drawerPaymentMethodRef = ref(null)
+
+  const openDrawerAddCredit = () => {
+    if (props.cardDefault.cardData) drawerAddCreditRef.value.openDrawer()
+  }
+
+  const openDrawerPaymentMethod = () => {
+    drawerPaymentMethodRef.value.openDrawer()
+  }
 
   const API_FIELDS = [
     'id',
@@ -172,7 +204,29 @@
     hasContentToList.value = true
   }
 
+  const updateAccountStatus = async () => {
+    try {
+      await loadUserAndAccountInfo()
+    } catch (error) {
+      showToast(
+        'error',
+        'An error occurred while updating account status. Please refresh the page to see the latest changes.'
+      )
+    }
+  }
+
+  const successAddCredit = async () => {
+    await updateAccountStatus()
+  }
+
+  const successAddPaymentMethod = async () => {
+    await updateAccountStatus()
+    reloadList()
+  }
+
   defineExpose({
-    reloadList
+    reloadList,
+    openDrawerAddCredit,
+    openDrawerPaymentMethod
   })
 </script>

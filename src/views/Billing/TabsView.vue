@@ -6,13 +6,10 @@
   import Tag from 'primevue/tag'
   import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
-  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import { paymentService } from '@/services/v2' 
   import NotificationPayment from './components/notification-payment'
 
-  import { ref, computed, provide, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
@@ -22,23 +19,12 @@
   const router = useRouter()
   const accountStore = useAccountStore()
 
-  const { paymentReviewPending, accountIsNotRegular } = storeToRefs(accountStore)
+  const { accountIsNotRegular } = storeToRefs(accountStore)
 
   const activeTab = ref(0)
-  const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
-  const listPaymentMethodsRef = ref(null)
-  const viewBillsRef = ref(null)
-  const accountBlocked = paymentReviewPending
 
-  provide('drawersMethods', {
-    openDrawerPaymentMethod: () => {
-      drawerPaymentMethodRef.value.openDrawer()
-    },
-    openDrawerAddCredit: () => {
-      if (cardDefault.value.cardData) drawerAddCreditRef.value.openDrawer()
-    }
-  })
+  const viewBillsRef = ref(null)
+  const paymentListViewRef = ref(null)
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -94,14 +80,6 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
-  const loadListPaymentMethods = () => {
-    if (isActiveTab.value.payment) {
-      listPaymentMethodsRef.value?.reloadList()
-    }
-
-    loadCardDefault()
-  }
-
   const loadCardDefault = async () => {
     cardDefault.value.isLoader = false
     try {
@@ -125,8 +103,14 @@
     }
   }
 
-  const successAddCredit = async () => {
-    await viewBillsRef.value?.reloadList()
+  const goToPaymentCredit = () => {
+    if (activeTab.value !== TABS_MAP.payment) changeTab(TABS_MAP.payment)
+    paymentListViewRef.value.openDrawerAddCredit()
+  }
+
+  const goToPaymentMethod = () => {
+    if (activeTab.value !== TABS_MAP.payment) changeTab(TABS_MAP.payment)
+    paymentListViewRef.value.openDrawerPaymentMethod()
   }
 
   onMounted(() => {
@@ -158,18 +142,6 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <DrawerAddCredit
-        ref="drawerAddCreditRef"
-        v-if="cardDefault.cardData"
-        :cardDefault="cardDefault"
-        :createService="paymentService.addCredit"
-        @onSuccess="successAddCredit"
-      />
-      <DrawerPaymentMethod
-        ref="drawerPaymentMethodRef"
-        :getStripeClientService="props.getStripeClientService"
-        @onSuccess="loadListPaymentMethods"
-      />
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -177,17 +149,20 @@
       >
         <TabPanel
           header="Bills"
-          :disabled="accountBlocked"
           :pt="{
             headerAction: {
               'data-testid': 'billing__bills-tab__button'
             }
           }"
         >
-          <NotificationPayment type="info" />
-          <NotificationPayment type="warning" />
-          <NotificationPayment type="success" />
-          <NotificationPayment type="error" />
+          <NotificationPayment
+            class="mt-4"
+            :loadCurrentInvoice="props.billsServices.loadCurrentInvoiceService"
+            :disabledCredit="!cardDefault.cardData"
+            @clickAddCredit="goToPaymentCredit"
+            @clickAddPaymentMethod="goToPaymentMethod"
+            @clickLinkPaymentMethod="changeTab(TABS_MAP.payment)"
+          />
           <BillsView
             v-if="isActiveTab.bills"
             ref="viewBillsRef"
@@ -205,12 +180,21 @@
             }
           }"
         >
-          <NotificationPayment />
+          <NotificationPayment
+            class="mt-4"
+            :loadCurrentInvoice="props.billsServices.loadCurrentInvoiceService"
+            :disabledCredit="!cardDefault.cardData"
+            @clickAddCredit="goToPaymentCredit"
+            @clickAddPaymentMethod="goToPaymentMethod"
+            @clickLinkPaymentMethod="changeTab(TABS_MAP.payment)"
+          />
           <PaymentListView
+            ref="paymentListViewRef"
             v-if="isActiveTab.payment"
-            ref="listPaymentMethodsRef"
             @update-credit-event="loadCardDefault"
             v-bind="props.paymentServices"
+            :getStripeClientService="props.getStripeClientService"
+            :cardDefault="cardDefault"
           />
         </TabPanel>
       </TabView>

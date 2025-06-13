@@ -4,6 +4,15 @@
       <PageHeadingBlock pageTitle="Invoice Details" />
     </template>
     <template #content>
+      <div class="mb-4">
+        <NotificationPayment
+          :loadCurrentInvoice="props.loadCurrentInvoiceService"
+          :disabledCredit="!cardDefault.cardData"
+          @clickAddCredit="goToPaymentMethod"
+          @clickAddPaymentMethod="goToPaymentMethod"
+          @clickLinkPaymentMethod="goToPaymentMethod"
+        />
+      </div>
       <div class="w-full flex flex-col-reverse sm:flex-row gap-6">
         <TableServicesProducts :listProduct="listServiceProducts" />
         <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
@@ -154,7 +163,7 @@
 
 <script setup>
   import { onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -166,6 +175,7 @@
   import TableServicesProducts from './components/table-services-products'
   import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'
   import { windowOpen } from '@/helpers/window-open'
+  import NotificationPayment from './components/notification-payment'
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -180,6 +190,10 @@
       type: Function,
       required: true
     },
+    loadCurrentInvoiceService: {
+      type: Function,
+      required: true
+    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -187,6 +201,7 @@
   })
 
   const route = useRoute()
+  const router = useRouter()
   const toast = useToast()
   const accountStore = useAccountStore()
 
@@ -213,6 +228,10 @@
     } finally {
       isInvoiceDataLoaded.value = true
     }
+  }
+
+  const goToPaymentMethod = () => {
+    router.push('/billing/payment')
   }
 
   const listServiceAndProductsChanges = async () => {
