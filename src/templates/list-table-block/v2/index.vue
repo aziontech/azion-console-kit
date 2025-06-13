@@ -550,6 +550,7 @@
   const onRowReorder = async (event) => {
     const { dragIndex, dropIndex } = event
     const row = data.value[dragIndex]
+    if (data.value[dropIndex].name === 'Default Rule') return
     if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
       onPositionChange(row, dropIndex)
       emit('on-reorder', { event, data })
