@@ -119,7 +119,7 @@
         #groupheader="slotProps"
         v-if="props.groupColumn"
       >
-        <div 
+        <div
           class="vertical-align-middle font-bold line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
           @click="toggleGroup(slotProps.data)"
         >
@@ -718,7 +718,7 @@
   const toggleGroup = (groupData) => {
     const groupValue = getObjectPath(groupData, props.groupColumn)
     const index = expandedGroups.value.indexOf(groupValue)
-    
+
     if (index === -1) {
       expandedGroups.value.push(groupValue)
     } else {
