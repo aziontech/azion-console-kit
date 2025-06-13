@@ -26,9 +26,11 @@
       :sortField="props.groupColumn"
       sortMode="single"
       :rowClass="stateClassRules"
+      rowHover
       :pt="{
         bodyrow: (rowData) => ({
-          id: `row-${rowData.context.index}`
+          id: `row-${rowData.context.index}`,
+          class: 'cursor-pointer'
         })
       }"
     >
@@ -117,9 +119,12 @@
         #groupheader="slotProps"
         v-if="props.groupColumn"
       >
-        <span class="vertical-align-middle font-bold line-height-3 absolute left-16 top-4">
+        <div 
+          class="vertical-align-middle font-bold line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
+          @click="toggleGroup(slotProps.data)"
+        >
           {{ getObjectPath(slotProps.data, props.groupColumn) }}
-        </span>
+        </div>
       </template>
 
       <Column
@@ -709,6 +714,17 @@
   })
 
   const optionsColumns = ref([])
+
+  const toggleGroup = (groupData) => {
+    const groupValue = getObjectPath(groupData, props.groupColumn)
+    const index = expandedGroups.value.indexOf(groupValue)
+    
+    if (index === -1) {
+      expandedGroups.value.push(groupValue)
+    } else {
+      expandedGroups.value.splice(index, 1)
+    }
+  }
 
   onMounted(() => {
     loadData({
