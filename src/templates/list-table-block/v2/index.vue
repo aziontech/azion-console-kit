@@ -120,7 +120,7 @@
         v-if="props.groupColumn"
       >
         <div
-          class="vertical-align-middle font-bold line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
+          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
           @click="toggleGroup(slotProps.data)"
         >
           {{ getObjectPath(slotProps.data, props.groupColumn) }}
@@ -550,7 +550,6 @@
   const onRowReorder = async (event) => {
     const { dragIndex, dropIndex } = event
     const row = data.value[dragIndex]
-    if (data.value[dropIndex].name === 'Default Rule') return
     if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
       onPositionChange(row, dropIndex)
       emit('on-reorder', { event, data })
