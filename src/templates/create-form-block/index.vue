@@ -153,6 +153,7 @@
 <template>
   <div :class="classForm">
     <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
+      {{ values }}
       <slot
         name="form"
         :resetForm="resetForm"

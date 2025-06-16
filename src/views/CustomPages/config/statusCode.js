@@ -1,90 +1,186 @@
 export const STATUS_CODE_OPTIONS = [
   {
+    id: 0,
+    code: 'default',
+    name: 'default',
+    type: 'Custom',
+    customStatus: '-',
+    responseTTL: '0'
+  },
+  {
+    id: 400,
     code: '400',
-    name: '400: Bad Request'
+    name: 'Bad Request',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 401,
     code: '401',
-    name: '401: Unauthorized'
+    name: 'Unauthorized',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 403,
     code: '403',
-    name: '403: Forbidden'
+    name: 'Forbidden',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 404,
     code: '404',
-    name: '404: Not Found'
+    name: 'Not Found',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 405,
     code: '405',
-    name: '405: Method Not Allowed'
+    name: 'Method Not Allowed',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 406,
     code: '406',
-    name: '406: Not Acceptable'
+    name: 'Not Acceptable',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 408,
     code: '408',
-    name: '408: Request Timeout'
+    name: 'Request Timeout',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 409,
     code: '409',
-    name: '409: Conflict'
+    name: 'Conflict',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 410,
     code: '410',
-    name: '410: Gone'
+    name: 'Gone',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 411,
     code: '411',
-    name: '411: Length Required'
+    name: 'Length Required',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 414,
     code: '414',
-    name: '414: URI Too Long'
+    name: 'URI Too Long',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 415,
     code: '415',
-    name: '415: Unsupported Media Type'
+    name: 'Unsupported Media Type',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 416,
     code: '416',
-    name: '416: Range Not Satisfiable'
+    name: 'Range Not Satisfiable',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 426,
     code: '426',
-    name: '426: Upgrade Required'
+    name: 'Upgrade Required',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 429,
     code: '429',
-    name: '429: Too Many Requests'
+    name: 'Too Many Requests',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 431,
     code: '431',
-    name: '431: Request Header Fields Too Large'
+    name: 'Request Header Fields Too Large',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 500,
     code: '500',
-    name: '500: Internal Server Error'
+    name: 'Internal Server Error',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 501,
     code: '501',
-    name: '501: Not Implemented'
+    name: 'Not Implemented',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 502,
     code: '502',
-    name: '502: Bad Gateway'
+    name: 'Bad Gateway',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 503,
     code: '503',
-    name: '503: Service Unavailable'
+    name: 'Service Unavailable',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 504,
     code: '504',
-    name: '504: Gateway Timeout'
+    name: 'Gateway Timeout',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   },
   {
+    id: 505,
     code: '505',
-    name: '505: HTTP Version Not Supported'
+    name: 'HTTP Version Not Supported',
+    type: 'Default',
+    customStatus: '-',
+    responseTTL: '0'
   }
 ]
