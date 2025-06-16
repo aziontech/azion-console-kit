@@ -590,9 +590,10 @@
     if (!result.rows || !result.columns) return []
     
     return result.rows.map((row, rowIndex) => {
-      const obj = { _rowId: rowIndex }
+      const obj = { _rowId: rowIndex, _originalRow: row } // Manter dados originais
       result.columns.forEach((col, index) => {
-        obj[col] = row[index]
+        const value = row[index]
+        obj[col] = value // Sempre manter o valor original para edição
       })
       return obj
     })
@@ -646,6 +647,61 @@
     }, { duration: 0, rowsRead: 0, rowsWritten: 0, totalRows: 0 })
     
     return stats
+  }
+
+
+  // Função para formatar valores de células para visualização
+  const formatCellValue = (value) => {
+    if (value === null) return 'NULL'
+    if (value === undefined) return 'UNDEFINED'
+    if (value === '') return '(empty)'
+    
+    // Para objetos complexos, mostrar conteúdo real quando possível
+    if (value !== null && value !== undefined && typeof value === 'object') {
+      // Se tem propriedades específicas de BLOB/Vector
+      if (value.type && value.data) {
+        return `${value.type}(${value.data.length || 'unknown size'})`
+      } else if (Array.isArray(value)) {
+        // Para arrays pequenos, mostrar conteúdo; para grandes, mostrar resumo
+        if (value.length <= 5) {
+          return `[${value.join(', ')}]`
+        } else {
+          return `Array[${value.length}] [${value.slice(0, 3).join(', ')}, ...]`
+        }
+      } else if (value.constructor === Uint8Array || value.constructor === ArrayBuffer) {
+        return `BLOB(${value.byteLength || value.length} bytes)`
+      } else {
+        // Para objetos simples, mostrar conteúdo real
+        const keys = Object.keys(value)
+        if (keys.length === 1) {
+          const firstKey = keys[0]
+          const firstValue = value[firstKey]
+          
+          // Se é um valor simples, mostrar ele
+          if (typeof firstValue === 'string' || typeof firstValue === 'number') {
+            if (typeof firstValue === 'string' && firstValue.length > 50) {
+              return `"${firstValue.substring(0, 47)}..."`
+            } else {
+              return String(firstValue)
+            }
+          }
+        }
+        
+        // Fallback para objetos complexos
+        try {
+          const jsonStr = JSON.stringify(value)
+          if (jsonStr.length <= 100) {
+            return jsonStr
+          } else {
+            return `${jsonStr.substring(0, 97)}...`
+          }
+        } catch {
+          return `Object{${keys.length} keys}`
+        }
+      }
+    }
+    
+    return value
   }
 
 
@@ -905,18 +961,41 @@
   const clickTimeout = ref(null)
 
   // Função para copiar valor da célula (só no clique simples)
-  const copyToClipboard = async (value, fieldName) => {
+  const copyToClipboard = async (rowData, fieldName) => {
     try {
-      const textToCopy = value !== null && value !== undefined ? String(value) : ''
+      // Usar o valor original da linha em vez do valor formatado
+      const originalRow = rowData._originalRow
+      const result = queryResults.value[0]
       
-      await navigator.clipboard.writeText(textToCopy)
-      
-      toast.add({
-        severity: 'success',
-        summary: 'Copied',
-        detail: `${fieldName}: "${textToCopy}" copied to clipboard`,
-        life: 2000
-      })
+      if (originalRow && result?.columns) {
+        const fieldIndex = result.columns.indexOf(fieldName)
+        const originalValue = fieldIndex >= 0 ? originalRow[fieldIndex] : rowData[fieldName]
+        
+        // Para objetos complexos, tentar JSON.stringify
+        let textToCopy = ''
+        if (originalValue === null || originalValue === undefined) {
+          textToCopy = 'NULL'
+        } else if (typeof originalValue === 'object') {
+          try {
+            textToCopy = JSON.stringify(originalValue, null, 2)
+          } catch {
+            textToCopy = String(originalValue)
+          }
+        } else {
+          textToCopy = String(originalValue)
+        }
+        
+        await navigator.clipboard.writeText(textToCopy)
+        
+        toast.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: `${fieldName}: value copied to clipboard`,
+          life: 2000
+        })
+      } else {
+        throw new Error('Could not access original data')
+      }
     } catch (error) {
       toast.add({
         severity: 'warn',
@@ -928,7 +1007,7 @@
   }
 
   // Gerenciar clique simples vs double-click
-  const handleCellClick = (value, fieldName) => {
+  const handleCellClick = (rowData, fieldName) => {
     // Cancelar timeout anterior se existir
     if (clickTimeout.value) {
       clearTimeout(clickTimeout.value)
@@ -936,7 +1015,7 @@
     
     // Definir timeout para clique simples
     clickTimeout.value = setTimeout(() => {
-      copyToClipboard(value, fieldName)
+      copyToClipboard(rowData, fieldName)
       clickTimeout.value = null
     }, 250) // 250ms para detectar double-click
   }
@@ -1390,12 +1469,17 @@
                                 <template #body="{ data, field, index }">
                                   <div 
                                     class="table-cell-content cursor-pointer" 
-                                    @click="handleCellClick(data[field], field); $event.stopPropagation()"
+                                    @click="handleCellClick(data, field); $event.stopPropagation()"
                                     @dblclick="handleCellDoubleClick(data, index, field); $event.stopPropagation()"
                                     :title="`Click to copy • Double-click to edit`"
                                   >
-                                    <span class="cell-value">
-                                      {{ data[field] }}
+                                    <span 
+                                      class="cell-value"
+                                      :class="{
+                                        'text-color-secondary italic': data[field] === null || data[field] === undefined
+                                      }"
+                                    >
+                                      {{ formatCellValue(data[field]) }}
                                     </span>
                                   </div>
                                 </template>

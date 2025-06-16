@@ -7,6 +7,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Tag from 'primevue/tag'
+  import InputText from 'primevue/inputtext'
 
   import * as EdgeSQLService from '@/services/edge-sql-services'
   import { useRoute } from 'vue-router'
@@ -53,22 +54,28 @@
   const route = useRoute()
   const databaseId = computed(() => route.params.id)
 
-  // Criar schema de validação dinâmico baseado nas colunas
+  // Criar schema de validação dinâmico baseado nas colunas (excluindo campos BLOB)
   const validationSchema = computed(() => {
     const schema = {}
     props.columns.forEach(column => {
-      schema[column] = yup.string().label(column)
+      // Campos BLOB não precisam de validação
+      if (!isFieldBlobType(column)) {
+        schema[column] = yup.string().label(column)
+      }
     })
     return yup.object(schema)
   })
 
-  // Valores iniciais baseados nas colunas
+  // Valores iniciais baseados nas colunas (excluindo campos BLOB)
   const initialValues = computed(() => {
     const values = {}
     props.columns.forEach(column => {
-      // Usar cópia do valor para evitar referências compartilhadas
-      const value = props.initialData[column]
-      values[column] = value !== undefined && value !== null ? String(value) : ''
+      // Campos BLOB não participam da validação/formulário
+      if (!isFieldBlobType(column)) {
+        // Usar cópia do valor para evitar referências compartilhadas
+        const value = props.initialData[column]
+        values[column] = value !== undefined && value !== null ? String(value) : ''
+      }
     })
     return values
   })
@@ -179,10 +186,11 @@
         throw new Error('Table name is required')
       }
       
-      // Filtrar campos vazios se necessário
+      // Filtrar campos vazios e campos BLOB (não editáveis)
       const cleanFormData = {}
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== undefined && formData[key] !== null && formData[key] !== '') {
+        // Não incluir campos BLOB no INSERT
+        if (!isFieldBlobType(key) && formData[key] !== undefined && formData[key] !== null && formData[key] !== '') {
           cleanFormData[key] = formData[key]
         }
       })
@@ -217,15 +225,18 @@
       const originalData = props.initialData
       const whereCondition = buildWhereCondition(originalData, props.columnInfo)
       
-      // Identificar apenas os campos que mudaram
+      // Identificar apenas os campos que mudaram (excluindo campos BLOB)
       const changedData = {}
       props.columns.forEach(column => {
-        const originalValue = originalData[column] || ''
-        const newValue = formData[column] || ''
-        
-        // Só incluir no UPDATE se o valor realmente mudou
-        if (originalValue !== newValue) {
-          changedData[column] = newValue
+        // Não incluir campos BLOB no UPDATE
+        if (!isFieldBlobType(column)) {
+          const originalValue = originalData[column] || ''
+          const newValue = formData[column] || ''
+          
+          // Só incluir no UPDATE se o valor realmente mudou
+          if (originalValue !== newValue) {
+            changedData[column] = newValue
+          }
         }
       })
       
@@ -320,6 +331,53 @@
     return description
   }
 
+  // Funções para detectar e tratar tipos especiais (BLOB, etc.)
+  const isSpecialType = (value) => {
+    if (value !== null && value !== undefined && typeof value === 'object') {
+      return true
+    }
+    return false
+  }
+
+  const formatSpecialTypeValue = (value) => {
+    if (value === null) return 'NULL'
+    if (value === undefined) return 'UNDEFINED'
+    if (value === '') return '(empty)'
+    
+    if (value !== null && value !== undefined && typeof value === 'object') {
+      // Se tem propriedades específicas de BLOB/Vector
+      if (value.type && value.data) {
+        return `${value.type}(${value.data.length || 'unknown size'})`
+      } else if (Array.isArray(value)) {
+        return `Array[${value.length}]`
+      } else if (value.constructor === Uint8Array || value.constructor === ArrayBuffer) {
+        return `BLOB(${value.byteLength || value.length} bytes)`
+      } else {
+        // Para outros objetos
+        const keys = Object.keys(value)
+        const firstKey = keys[0]
+        if (keys.length === 1 && typeof value[firstKey] === 'string') {
+          const data = value[firstKey]
+          // Se parece com base64 ou dados binários
+          if (data.length > 16 && /^[A-Za-z0-9+/=]+$/.test(data.substring(0, 20))) {
+            return `BLOB(${Math.round(data.length * 0.75)} bytes, base64)`
+          } else {
+            return `Object{"${data.substring(0, 20)}${data.length > 20 ? '...' : ''}"}`
+          }
+        } else {
+          return `Object{${keys.length} keys}`
+        }
+      }
+    }
+    
+    return value
+  }
+
+  const isFieldBlobType = (columnName) => {
+    const value = props.initialData[columnName]
+    return isSpecialType(value)
+  }
+
 
 
   // Focus no campo específico ou primeiro campo quando o drawer abrir
@@ -392,16 +450,36 @@
               :key="column"
               class="flex flex-col gap-2"
             >
-              <!-- Input Field with enhanced label -->
-              <FieldText
-                :label="getEnhancedLabel(column)"
-                :name="column"
-                :placeholder="`Enter ${column} value`"
-                :disabled="disabledFields"
-                :description="getFieldDescription(column)"
-                :data-testid="`row-form__field-${index}`"
-                :data-field="column"
-              />
+              <!-- Campo BLOB/Special Type - Readonly -->
+              <div v-if="isFieldBlobType(column)" class="field">
+                <label class="text-sm font-medium text-color mb-2 block">
+                  {{ getEnhancedLabel(column) }}
+                </label>
+                <InputText
+                  :value="formatSpecialTypeValue(initialData[column])"
+                  disabled
+                  class="w-full font-mono text-sm"
+                />
+                <small class="text-color-secondary mt-2 block">
+                  {{ getFieldDescription(column) }}
+                </small>
+                <div class="flex gap-1 flex-wrap mt-2">
+                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
+                </div>
+              </div>
+
+              <!-- Campo Normal - Editável -->
+              <template v-else>
+                <FieldText
+                  :label="getEnhancedLabel(column)"
+                  :name="column"
+                  :placeholder="`Enter ${column} value`"
+                  :disabled="disabledFields"
+                  :description="getFieldDescription(column)"
+                  :data-testid="`row-form__field-${index}`"
+                  :data-field="column"
+                />
+              </template>
               
               <!-- Column Constraints -->
               <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
@@ -450,16 +528,36 @@
               :key="column"
               class="flex flex-col gap-2"
             >
-              <!-- Input Field with enhanced label -->
-              <FieldText
-                :label="getEnhancedLabel(column)"
-                :name="column"
-                :placeholder="`Enter ${column} value`"
-                :disabled="disabledFields"
-                :description="getFieldDescription(column)"
-                :data-testid="`row-form__field-${index}`"
-                :data-field="column"
-              />
+              <!-- Campo BLOB/Special Type - Readonly (mesmo em modo Create, se há dados iniciais) -->
+              <div v-if="isFieldBlobType(column)" class="field">
+                <label class="text-sm font-medium text-color mb-2 block">
+                  {{ getEnhancedLabel(column) }}
+                </label>
+                <InputText
+                  :value="formatSpecialTypeValue(initialData[column])"
+                  disabled
+                  class="w-full font-mono text-sm"
+                />
+                <small class="text-color-secondary mt-2 block">
+                  {{ getFieldDescription(column) }}
+                </small>
+                <div class="flex gap-1 flex-wrap mt-2">
+                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
+                </div>
+              </div>
+
+              <!-- Campo Normal - Editável -->
+              <template v-else>
+                <FieldText
+                  :label="getEnhancedLabel(column)"
+                  :name="column"
+                  :placeholder="`Enter ${column} value`"
+                  :disabled="disabledFields"
+                  :description="getFieldDescription(column)"
+                  :data-testid="`row-form__field-${index}`"
+                  :data-field="column"
+                />
+              </template>
               
               <!-- Column Constraints -->
               <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
