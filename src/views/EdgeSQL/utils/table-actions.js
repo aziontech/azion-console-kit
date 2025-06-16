@@ -21,7 +21,15 @@ export const TABLE_QUERIES = {
   // Queries de limpeza
   VACUUM_ANALYZE: () => `VACUUM; ANALYZE;`,
   DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
-  TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`
+  TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
+  
+  // Tamanho do banco de dados
+  DATABASE_SIZE: () => `SELECT 
+    (page_count * page_size) AS size_bytes,
+    ROUND((page_count * page_size) / 1024.0, 2) AS size_kb,
+    ROUND((page_count * page_size) / 1048576.0, 2) AS size_mb
+  FROM 
+    pragma_page_count(), pragma_page_size();`
 }
 
 // Ações disponíveis para o menu contextual da tabela
@@ -72,6 +80,13 @@ export const TABLE_MENU_ACTIONS = [
     type: 'query',
     query: TABLE_QUERIES.FOREIGN_KEYS,
     description: 'Show foreign key relationships'
+  },
+  {
+    label: 'Database Size',
+    icon: 'pi pi-database',
+    type: 'query',
+    query: TABLE_QUERIES.DATABASE_SIZE,
+    description: 'Show database disk space usage'
   },
   {
     separator: true

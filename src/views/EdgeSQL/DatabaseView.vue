@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, onMounted, watch, nextTick } from 'vue'
+  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   
@@ -961,9 +961,28 @@
 
 
 
+  // Função para lidar com atalhos de teclado
+  const handleKeyDown = (event) => {
+    // Ctrl+Enter para executar query
+    if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault()
+      if (!isExecutingQuery.value && sqlQuery.value.trim()) {
+        executeQuery()
+      }
+    }
+  }
+
   onMounted(async () => {
     await loadDatabaseInfo()
     await loadTables()
+    
+    // Adicionar listener para atalhos de teclado
+    document.addEventListener('keydown', handleKeyDown)
+  })
+
+  onBeforeUnmount(() => {
+    // Remover listener quando componente for desmontado
+    document.removeEventListener('keydown', handleKeyDown)
   })
 
   watch(databaseId, async (newId) => {
@@ -1152,6 +1171,7 @@
                         @click="executeQuery"
                         :disabled="!sqlQuery.trim() || isExecutingQuery"
                         class="font-medium"
+                        v-tooltip.top="'Execute Query (Ctrl+Enter)'"
                       />
                       <Button
                         label="Clear"
