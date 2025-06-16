@@ -70,6 +70,16 @@
   const selectedTable = ref(null)
   const selectedRows = ref([])
 
+  // Paginação dos resultados
+  const rowsPerPage = ref(20)
+  const currentPage = ref(0)
+
+  // Função para lidar com mudanças de paginação
+  const onPageChange = (event) => {
+    currentPage.value = event.page
+    rowsPerPage.value = event.rows
+  }
+
   // Carregar informações do banco de dados
   const loadDatabaseInfo = async () => {
     try {
@@ -204,6 +214,9 @@
         isEditingRow.value = false
         editingRowData.value = {}
         editingRowIndex.value = -1
+        
+        // Resetar paginação para primeira página
+        currentPage.value = 0
         
         // Adicionar ao histórico
         sqlStore.addQueryResult({
@@ -1322,15 +1335,19 @@
 
                         <!-- Mostrar tabela quando há colunas (com ou sem dados) -->
                         <div v-else-if="result.columns?.length > 0" class="border-round-lg shadow-sm border-1 surface-border overflow-hidden">
-                          <DataTable
-                            :value="formatResultData(result)"
+                                                  <DataTable
+                          :value="formatResultData(result)"
                             v-model:selection="selectedRows"
                             dataKey="_rowId"
                             scrollable
-                            scrollHeight="300px"
+                            :scrollHeight="formatResultData(result).length > 20 ? '400px' : '300px'"
                             class="w-full"
                             selectionMode="checkbox"
                             :metaKeySelection="false"
+                            :paginator="formatResultData(result).length > 20"
+                            :rows="rowsPerPage"
+                            :rowsPerPageOptions="[10, 20, 50, 100]"
+                            @page="onPageChange"
                             :pt="{
                                 bodyRow: { 
                                   class: ({ instance }) => {
@@ -1345,7 +1362,7 @@
                                 headerStyle="width: 2rem" 
                                 bodyStyle="width: 2rem"
                                 :exportable="false"
-                                frozen
+                                :frozen="true"
                                 alignFrozen="left"
                               ></Column>
                               
@@ -1864,21 +1881,16 @@
   text-shadow: 0 0 2px rgba(245, 158, 11, 0.3);
 }
 
-/* Coluna de seleção fixa durante scroll */
-:deep(.p-datatable .p-datatable-thead > tr > th.p-selection-column),
-:deep(.p-datatable .p-datatable-tbody > tr > td.p-selection-column) {
+/* Coluna de checkbox fixa - solução limpa */
+:deep(.p-datatable .p-datatable-thead > tr > th[data-p-frozen-column="true"]),
+:deep(.p-datatable .p-datatable-tbody > tr > td[data-p-frozen-column="true"]) {
   position: sticky !important;
   left: 0 !important;
+  z-index: 1 !important;
+}
+
+:deep(.p-datatable .p-datatable-thead > tr > th[data-p-frozen-column="true"]) {
   z-index: 2 !important;
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th.p-selection-column) {
-  z-index: 3 !important;
-}
-
-/* Fundo da coluna de seleção em linhas selecionadas */
-:deep(.p-datatable .p-datatable-tbody > tr.p-highlight > td.p-selection-column) {
-  background: var(--primary-50) !important;
 }
 
 
