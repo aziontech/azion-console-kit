@@ -281,11 +281,17 @@
       'Create Table': 'pi pi-plus',
       'Insert Data': 'pi pi-pencil',
       'Select All': 'pi pi-search',
+      'Count Records': 'pi pi-calculator',
       'Update Record': 'pi pi-sync',
       'Delete Record': 'pi pi-trash',
       'Create Index': 'pi pi-bookmark',
       'Drop Table': 'pi pi-times',
-      'Alter Table': 'pi pi-wrench'
+      'Alter Table': 'pi pi-wrench',
+      'Vector Table': 'pi pi-sitemap',
+      'Insert Vectors': 'pi pi-share-alt',
+      'Vector Search': 'pi pi-compass',
+      'Create Vector Index': 'pi pi-objects-column',
+      'Vector Top K Query': 'pi pi-chart-line'
     }
     return icons[templateName] || 'pi pi-code'
   }
@@ -1207,7 +1213,7 @@
                   />
                 </div>
                 <div v-show="!isTemplatesCollapsed" class="templates-content">
-                  <div class="flex flex-column gap-1 overflow-y-auto" style="max-height: 200px;">
+                  <div class="flex flex-column gap-1 overflow-y-auto" style="max-height: 350px;">
                     <div
                     v-for="template in quickTemplates"
                     :key="template.name"
@@ -1959,23 +1965,6 @@
 
 
 
-/* Destacar colunas Primary Key no header */
-:deep(.p-datatable .p-datatable-thead > tr > th .pi-key) {
-  color: #f59e0b !important;
-  text-shadow: 0 0 2px rgba(245, 158, 11, 0.3);
-}
-
-/* Coluna de checkbox fixa - solução limpa */
-:deep(.p-datatable .p-datatable-thead > tr > th[data-p-frozen-column="true"]),
-:deep(.p-datatable .p-datatable-tbody > tr > td[data-p-frozen-column="true"]) {
-  position: sticky !important;
-  left: 0 !important;
-  z-index: 1 !important;
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th[data-p-frozen-column="true"]) {
-  z-index: 2 !important;
-}
 
 
 </style> 

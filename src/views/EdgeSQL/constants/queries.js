@@ -22,6 +22,47 @@ export const QUICK_TEMPLATES = [
   {
     name: 'Count Records',
     query: 'SELECT COUNT(*) as total FROM users;'
+  },
+  {
+    name: 'Vector Table',
+    query: `CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT,
+  embedding F32_BLOB(1536)
+);`
+  },
+  {
+    name: 'Insert Vectors',
+    query: `INSERT INTO products (name, description, embedding) VALUES 
+('Laptop', 'Gaming laptop with RTX graphics', vector('[0.1, 0.2, 0.3, 0.4, 0.5]')),
+('Mouse', 'Wireless ergonomic mouse', vector('[0.2, 0.3, 0.1, 0.6, 0.4]')),
+('Keyboard', 'Mechanical RGB keyboard', vector('[0.3, 0.1, 0.4, 0.2, 0.7]'));`
+  },
+  {
+    name: 'Vector Search',
+    query: `SELECT 
+  name,
+  description,
+  vector_distance_cos(embedding, vector('[0.25, 0.25, 0.25, 0.25, 0.25]')) AS similarity
+FROM products
+ORDER BY similarity ASC
+LIMIT 5;`
+  },
+  {
+    name: 'Create Vector Index',
+    query: `CREATE INDEX products_vector_idx 
+ON products (libsql_vector_idx(embedding));`
+  },
+  {
+    name: 'Vector Top K Query',
+    query: `SELECT
+  name,
+  description,
+  vector_distance_cos(embedding, vector('[0.1, 0.3, 0.2, 0.4, 0.5]')) AS distance
+FROM products
+ORDER BY distance ASC
+LIMIT 3;`
   }
 ]
 
