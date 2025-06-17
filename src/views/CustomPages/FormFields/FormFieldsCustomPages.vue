@@ -1,8 +1,6 @@
 <template>
-  <block-custom-page />
-  <block-status-code />
-  <block-status-configuration />
-  <block-response-details />
+  <block-custom-page-block />
+  <block-status-code-block />
   <form-horizontal title="Status">
     <template #inputs>
       <FieldSwitchBlock
@@ -19,9 +17,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
-  import blockCustomPage from '@/views/CustomPages/Blocks/customPage'
-  import blockStatusCode from '@/views/CustomPages/Blocks/statusCode'
-  import blockStatusConfiguration from '@/views/CustomPages/Blocks/statusConfiguration'
+  import blockCustomPageBlock from '@/views/CustomPages/Blocks/customPageBlock'
+  import blockStatusCodeBlock from '@/views/CustomPages/Blocks/statusCodeBlock'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import blockResponseDetails from '@/views/CustomPages/Blocks/responseDetails'
 </script>

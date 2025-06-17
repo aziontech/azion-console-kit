@@ -1,6 +1,6 @@
 <template>
   <FormHorizontal
-    isDrawer
+    :isDrawer="props.isDrawer"
     title="Custom Page"
     description="Create custom pages to handle errors and cache TTL based on the HTTP status code received from the edge connectors."
   >
@@ -23,4 +23,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+
+  const props = defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 </script>

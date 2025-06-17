@@ -1,6 +1,10 @@
 <template>
+  <DrawerBlock
+    ref="drawerRef"
+    @onSuccess="reloadList"
+  />
   <FormHorizontal
-    isDrawer
+    :isDrawer="props.isDrawer"
     title="Status Codes"
     description="Use the Status Codes table to configure error pages by editing HTTP status codes. Click a row to open the settings panel and customize values like Response TTL, Custom Status Code, and Page Path (URI)."
     :pt="classesPt"
@@ -14,8 +18,6 @@
         :columns="loaderStatusCodeColumns"
         :editInDrawer="openEditStatusCodeDrawer"
         :listService="listStatusCodeService"
-        @on-load-data="handleLoadData"
-        @on-before-go-to-edit="goToEnvoiceDetails"
         :actions="actionsRow"
         emptyListMessage="No status codes found."
       />
@@ -24,18 +26,25 @@
 </template>
 
 <script setup>
+  import DrawerBlock from '@views/CustomPages/Drawer/drawerStatusCode.vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@templates/list-table-block'
-  import { ref, computed } from 'vue'
+  import { ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/statusCode'
+  import { useField } from 'vee-validate'
 
   const listStatusCodeRef = ref(null)
   const hasContentToList = ref(true)
+  const drawerRef = ref(null)
 
-  const openEditStatusCodeDrawer = (item) => {
-    console.log('openEditStatusCodeDrawer', item)
-  }
+  const { value: pagesValue } = useField('pages')
+
+  const props = defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const classesPt = {
     root: 'flex-col',
@@ -79,29 +88,23 @@
       }
     },
     {
-      field: 'customStatus',
+      field: 'customStatusCode',
       header: 'Custom Status'
     },
     {
-      field: 'responseTTL',
+      field: 'ttl',
       header: 'Response TTL'
     }
   ]
 
-  const handleLoadData = () => {
-    console.log('handleLoadData')
-  }
-
-  const goToEnvoiceDetails = () => {
-    console.log('goToEnvoiceDetails')
-  }
-
+  //
   const actionsRow = ref([
     {
       label: 'Set as default',
       icon: 'pi pi-download',
       type: 'action',
       commandAction: async (item) => {
+        // eslint-disable-next-line no-console
         console.log('item', item)
       }
     },
@@ -110,12 +113,21 @@
       icon: 'pi pi-download',
       type: 'action',
       commandAction: async (item) => {
+        // eslint-disable-next-line no-console
         console.log('item', item)
       }
     }
   ])
 
   const listStatusCodeService = () => {
-    return STATUS_CODE_OPTIONS
+    return pagesValue.value
+  }
+
+  const reloadList = () => {
+    listStatusCodeRef.value.reloadList()
+  }
+
+  const openEditStatusCodeDrawer = (item) => {
+    drawerRef.value.openEditDrawer(item)
   }
 </script>

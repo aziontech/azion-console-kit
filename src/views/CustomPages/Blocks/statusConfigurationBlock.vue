@@ -1,8 +1,8 @@
 <template>
   <FormHorizontal
-    isDrawer
     title="Status Configuration"
     description="Configure the settings for the selected HTTP status code. Define how the custom page will behave, including its type, associated Edge Connector, and response details."
+    :isDrawer="props.isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -13,7 +13,6 @@
           :options="listTypes"
           optionLabel="label"
           optionValue="value"
-          :value="type"
           appendTo="self"
         />
       </div>
@@ -26,7 +25,14 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
 
   const listTypes = [
-    { label: 'Default', value: 'pageDefault' },
-    { label: 'Custom', value: 'pageCustom' }
+    { label: 'Default', value: 'Default' },
+    { label: 'Connector', value: 'Connector' }
   ]
+
+  const props = defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 </script>

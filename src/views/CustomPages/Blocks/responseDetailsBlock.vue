@@ -1,11 +1,14 @@
 <template>
   <FormHorizontal
-    isDrawer
     title="Response Details"
     description="Customize the response for this status code. Specify the URI, status code, TTL, content type, and the response body to be returned to the client."
+    :isDrawer="props.isDrawer"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isConnector"
+      >
         <FieldDropdownLazyLoader
           label="Edge Connector"
           required
@@ -14,7 +17,6 @@
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="value"
-          :value="connector"
           placeholder="Select a Edge Connector"
         >
           <template #footer>
@@ -37,51 +39,60 @@
             </ul>
           </template>
         </FieldDropdownLazyLoader>
-        <!-- Response -->
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isConnector"
+      >
         <FieldText
           label="Page Path (URI)"
           placeholder="/path/error_page.html"
-          :name="uri"
-          :value="uri"
+          name="uri"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldNumber
           label="Response Custom Status Code"
           required
-          :value="customStatusCode"
           name="customStatusCode"
           :min="100"
           :max="599"
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isConnector"
+      >
         <FieldNumber
           label="Response TTL"
           required
-          :value="ttl"
           name="ttl"
+          :value="ttl"
           :min="0"
           :max="31536000"
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isConnector"
+      >
+        <FieldTextIcon
+          icon="pi pi-lock"
           label="Content Type"
           placeholder="text/html"
-          :name="contentType"
-          :value="contentType"
+          name="contentType"
           disabled
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isConnector"
+      >
         <FieldTextarea
           label="Response"
+          icon="pi pi-lock"
           placeholder="Response body"
-          :name="response"
-          :value="response"
+          name="response"
         />
       </div>
     </template>
@@ -92,8 +103,23 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
+  import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
   import { edgeConnectorsService } from '@/services/v2'
+  import { useField } from 'vee-validate'
+  import { computed } from 'vue'
 
+  const { value: typeValue } = useField('type')
+  const { value: ttl } = useField('ttl')
+
+  const isConnector = computed(() => {
+    return typeValue.value === 'Connector'
+  })
+
+  const props = defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 </script>

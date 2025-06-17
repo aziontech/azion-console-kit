@@ -1,20 +1,17 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Custom Page" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
-      <CreateFormBlock
-        :createService="customPageService.createCustomPagesService"
-        :schema="validationSchema"
-        :initialValues="initialValues"
+      <component
+        :is="componentForm.component"
+        v-bind="componentForm.props"
         @on-response="handleToast"
-        disableToast
       >
         <template #form>
           <FormFieldsCustomPages />
         </template>
-
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
@@ -22,14 +19,15 @@
             :loading="loading"
           />
         </template>
-      </CreateFormBlock>
+      </component>
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
@@ -40,7 +38,7 @@
   const initialValues = ref(defaultValues)
 
   defineOptions({
-    name: 'create-custom-pages'
+    name: 'custom-pages-view'
   })
 
   const handleToast = (response) => {
@@ -55,4 +53,42 @@
     }
     response.showToastWithActions(toast)
   }
+
+  const props = defineProps({
+    mode: {
+      type: String,
+      default: 'create'
+    },
+    updatedRedirect: {
+      type: String,
+      default: 'list-custom-pages'
+    }
+  })
+
+  const title = computed(() => {
+    return props.mode === 'create' ? 'Create Custom Page' : 'Edit Custom Page'
+  })
+
+  const componentForm = computed(() => {
+    return {
+      create: {
+        component: CreateFormBlock,
+        props: {
+          createService: customPageService.createCustomPagesService,
+          schema: validationSchema,
+          initialValues: initialValues,
+          disableToast: true
+        }
+      },
+      edit: {
+        component: EditFormBlock,
+        props: {
+          editService: customPageService.editCustomPagesService,
+          loadService: customPageService.loadCustomPagesService,
+          schema: validationSchema,
+          updatedRedirect: props.updatedRedirect
+        }
+      }
+    }[props.mode]
+  })
 </script>
