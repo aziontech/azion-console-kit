@@ -1,7 +1,7 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FormFieldsCustomPages from '../FormFields/FormFieldsCustomPages'
+  import FormFieldsCustomPages from '@/views/CustomPages/FormFields/FormFieldsCustomPages'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'

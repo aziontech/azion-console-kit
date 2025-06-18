@@ -3,7 +3,7 @@
   import FormFieldsStatusCode from '../FormFields/FormFieldsStatusCode'
   import { refDebounced } from '@vueuse/core'
   import { ref, computed } from 'vue'
-  import { pageSchema } from '@/views/CustomPages/Config/validationSchema'
+  import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
 
   defineOptions({
@@ -114,3 +114,4 @@
     </template>
   </EditDrawerBlock>
 </template>
+@/views/CustomPages/ConfigDefault/validationSchema

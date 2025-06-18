@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/statusCode'
+import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
 
 const isUriValidRegex = /^\/[/a-zA-Z0-9\-_.~@:]*$/
 

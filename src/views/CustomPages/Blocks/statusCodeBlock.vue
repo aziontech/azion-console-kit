@@ -32,7 +32,7 @@
   import { ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
-  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/statusCode'
+  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
   const listStatusCodeRef = ref(null)
   const hasContentToList = ref(true)
   const drawerRef = ref(null)
