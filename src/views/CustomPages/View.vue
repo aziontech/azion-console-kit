@@ -33,7 +33,7 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCustomPages from '@/views/CustomPages/FormFields/FormFieldsCustomPages'
   import { customPageService } from '@/services/v2'
-  import { validationSchema, defaultValues } from '@/views/CustomPages/Config/validation'
+  import { validationSchema, defaultValues } from '@/views/CustomPages/Config/validation.js'
 
   const initialValues = ref(defaultValues)
 
