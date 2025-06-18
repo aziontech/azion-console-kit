@@ -65,7 +65,7 @@ export class DigitalCertificatesService {
     return this.adapter?.transformLoadDigitalCertificate?.(data)
   }
 
-  deleteDigitalCertificate = async ({ id }) => {
+  deleteDigitalCertificate = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.baseURL}/${id}`

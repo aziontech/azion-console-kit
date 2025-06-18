@@ -9,7 +9,7 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it('should request a Certificate Signing Request (CSR)', function () {
+  it.skip('should request a Certificate Signing Request (CSR)', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
     cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)

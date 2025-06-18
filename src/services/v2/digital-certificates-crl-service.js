@@ -5,43 +5,57 @@ export class DigitalCertificatesCRLService {
     this.baseURL = 'v4/digital_certificates/crls'
   }
 
-  listDigitalCertificatesCRL = async (payload) => {
-    await this.http.request({
-      method: 'POST',
-      url: this.baseURL,
-      body: payload
+  listDigitalCertificatesCRL = async () => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL
     })
+
+    const adapter = this.adapter?.transformListDigitalCertificatesCRL(data.results)
+
+    return { count: data.count, body: adapter }
   }
 
   createDigitalCertificateCRL = async (payload) => {
-    await this.http.request({
+    const body = this.adapter?.transformCreateDigitalCertificateCRL(payload)
+
+    const { data } = await this.http.request({
       method: 'POST',
       url: this.baseURL,
-      body: payload
+      body
     })
+
+    return data
   }
 
   loadDigitalCertificateCRL = async (payload) => {
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'GET',
       url: `${this.baseURL}/${payload.id}`,
       body: payload
     })
+
+    return this.adapter?.transformLoadDigitalCertificateCRL(data)
   }
 
   editDigitalCertificateCRL = async (payload) => {
+    const body = this.adapter?.transformEditDigitalCertificateCRL(payload)
+
     await this.http.request({
       method: 'PUT',
       url: `${this.baseURL}/${payload.id}`,
-      body: payload
+      body
     })
+
+    return 'Your CRL has been updated!'
   }
 
-  deleteDigitalCertificateCRL = async (payload) => {
+  deleteDigitalCertificateCRL = async (id) => {
     await this.http.request({
       method: 'DELETE',
-      url: `${this.baseURL}/${payload.id}`,
-      body: payload
+      url: `${this.baseURL}/${id}`
     })
+
+    return 'CRL successfully deleted!'
   }
 }

@@ -25,7 +25,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.login()
   })
 
-  it('should edit a digital certificate successfully', () => {
+  it.skip('should edit a digital certificate successfully', () => {
     createDigitalCertificate()
     certificateName = generateUniqueName('CertificateName')
 

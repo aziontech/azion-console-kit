@@ -21,7 +21,8 @@
 
   const certificateTypes = {
     EDGE_CERTIFICATE: 'edge_certificate',
-    TRUSTED: 'trusted_ca_certificate'
+    TRUSTED: 'trusted_ca_certificate',
+    CRL: 'CRL'
   }
 
   const csrCopied = ref(false)
@@ -43,7 +44,8 @@
   const isCertificateType = computed(() => {
     return {
       edgeCertificate: !csr.value && certificateType.value === certificateTypes.EDGE_CERTIFICATE,
-      trustedCertificate: certificateType.value === certificateTypes.TRUSTED
+      trustedCertificate: certificateType.value === certificateTypes.TRUSTED,
+      crl: certificateType.value === certificateTypes.CRL
     }
   })
 </script>
@@ -172,6 +174,34 @@
             label="Private Key"
             name="privateKey"
             :value="privateKey"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+
+    <!-- CRL case -->
+    <FormHorizontal
+      v-if="isCertificateType.crl"
+      title="Update a CRL"
+      description="Paste the PEM-encoded CRL in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            :value="name"
+            placeholder="My digital certificate"
+            data-testid="digital-certificate__name-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            data-testid="digital-certificate__certificate-field"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           />
         </div>

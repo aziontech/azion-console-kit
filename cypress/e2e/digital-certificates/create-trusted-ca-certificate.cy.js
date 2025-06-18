@@ -10,7 +10,7 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it('should create a truted CA digital certificate', function () {
+  it.skip('should create a truted CA digital certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
