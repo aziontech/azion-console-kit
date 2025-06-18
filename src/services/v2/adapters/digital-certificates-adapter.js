@@ -109,7 +109,8 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificate_type,
-      certificate_content
+      certificate_content,
+      certificate
     } = data
 
     return {
@@ -123,7 +124,8 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificateType: certificate_type,
-      certificateContent: certificate_content
+      certificateContent: certificate_content,
+      certificate
     }
   },
 

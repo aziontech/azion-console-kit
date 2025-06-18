@@ -24,7 +24,7 @@
           data-testid="import-server-certificate-form__private-key-field"
           label="Private Key"
           required
-          placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
+          placeholder="-----BEGIN PRIVATE KEY----&#10;-----END PRIVATE KEY-----"
           name="privateKey"
           :value="privateKey"
         />

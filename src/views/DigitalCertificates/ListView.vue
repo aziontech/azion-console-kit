@@ -101,7 +101,7 @@
       label: 'Server Certificate',
       items: [
         {
-          label: 'Create Server Certificate',
+          label: 'Import Server Certificate',
           icon: 'pi pi-plus',
           command: () => {
             certificateType.value = CERTIFICATE_TYPES.EDGE_CERTIFICATE

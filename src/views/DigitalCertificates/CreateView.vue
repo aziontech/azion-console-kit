@@ -50,7 +50,8 @@
     isEdgeCertificate,
     isEdgeCertificateCSR,
     PRIVATE_KEY_TYPES,
-    CERTIFICATE_TYPES
+    CERTIFICATE_TYPES,
+    certificateTypeList
   } = useDigitalCertificate()
 
   const initialValues = ref({
@@ -93,11 +94,14 @@
   }
 
   const handleToast = (response) => {
+    const label =
+      certificateTypeList.value === 'Certificates' ? 'View Edge Certificate' : 'View CRL'
+
     const toast = {
       feedback: 'Your digital certificate has been created!',
       actions: {
         link: {
-          label: 'View Edge Certificate',
+          label,
           callback: () => response.redirectToUrl(`/digital-certificates/edit/${response.data.id}`)
         }
       }
