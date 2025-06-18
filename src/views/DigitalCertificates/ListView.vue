@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="digitalCertificatesService.listDigitalCertificates"
+        :listService="handleService()"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, inject, watch, onMounted } from 'vue'
+  import { ref, computed, inject, watch } from 'vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
@@ -157,10 +157,13 @@
     }
   ])
 
-  onMounted(() => {
-    digitalCertificateTypeSelected.value = 'Certificates'
-    certificateTypeList.value = 'Certificates'
-  })
+  const handleService = () => {
+    if (certificateTypeList.value === 'CRL') {
+      return digitalCertificatesCRLService.listDigitalCertificatesCRL
+    } else {
+      return digitalCertificatesService.listDigitalCertificates
+    }
+  }
 
   const handleCreateDigitalCertificate = () => {
     router.push('/digital-certificates/create')
