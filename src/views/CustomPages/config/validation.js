@@ -3,7 +3,7 @@ import { STATUS_CODE_OPTIONS } from './statusCode'
 
 const isUriValidRegex = /^\/[/a-zA-Z0-9\-_.~@:]*$/
 
-const pageSchema = yup.object().shape({
+export const pageSchema = yup.object().shape({
   code: yup.string().required().label('Code'),
   type: yup.string().required().label('Type'),
   connector: yup.number().when('$type', {

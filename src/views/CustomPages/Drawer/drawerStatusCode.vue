@@ -3,7 +3,7 @@
   import FormFieldsStatusCode from '../FormFields/FormFieldsStatusCode'
   import { refDebounced } from '@vueuse/core'
   import { ref, computed } from 'vue'
-  import { customPageService } from '@/services/v2'
+  import { pageSchema } from '../config/validation'
   import ActionBarBlock from '@templates/action-bar-block'
 
   defineOptions({
@@ -12,7 +12,6 @@
 
   const emit = defineEmits(['onSuccess'])
   const itemStatusCode = ref({})
-  const showCreateCustomPagesDrawer = ref(false)
   const showEditCustomPagesDrawer = ref(false)
   const selectedCustomPageToEdit = ref('')
   const debouncedDrawerAnimate = 300
@@ -22,20 +21,10 @@
   const loadService = () => {
     return Promise.resolve(itemStatusCode.value)
   }
-  const validationSchema = {}
-
-  const closeCreateDrawer = () => {
-    showCreateCustomPagesDrawer.value = false
-  }
 
   const openEditDrawer = (statusCodeItem) => {
     itemStatusCode.value = statusCodeItem
     showEditCustomPagesDrawer.value = true
-  }
-
-  const handleEditedCustomPages = () => {
-    emit('onSuccess')
-    closeCreateDrawer()
   }
 
   const title = computed(() => {
@@ -45,6 +34,19 @@
     const code = item.name !== 'Default' ? `${item.code}:` : ''
     return `${code} ${item.name}`.trim()
   })
+
+  const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {
+    const submit = await handleSubmit(
+      (values) => {
+        emit('onSuccess', values)
+        onCancel()
+      },
+      ({ errors }) => {
+        scrollToErrorInDrawer(errors)
+      }
+    )
+    await submit()
+  }
 
   defineExpose({
     openEditDrawer
@@ -57,23 +59,18 @@
     :id="selectedCustomPageToEdit"
     v-model:visible="showEditCustomPagesDrawer"
     :loadService="loadService"
-    :editService="customPageService.editCustomPagesService"
-    :schema="validationSchema"
-    @onSuccess="handleEditedCustomPages"
+    :schema="pageSchema"
     :title="title"
   >
     <template #formFields>
-      {{ itemStatusCode }}
-      <FormFieldsStatusCode
-        :itemStatusCode="itemStatusCode"
-        @onSuccess="handleEditedCustomPages"
-      />
+      <FormFieldsStatusCode :itemStatusCode="itemStatusCode" />
     </template>
-    <template #action-bar="{ onSubmit, onCancel }">
+    <template #action-bar="{ handleSubmit, onCancel, formValid, scrollToErrorInDrawer }">
       <ActionBarBlock
         primaryActionLabel="Apply"
-        @onSubmit="onSubmit"
+        @onSubmit="applyStatusCodes(handleSubmit, onCancel, scrollToErrorInDrawer)"
         @onCancel="onCancel"
+        :disabled="!formValid"
       />
     </template>
   </EditDrawerBlock>

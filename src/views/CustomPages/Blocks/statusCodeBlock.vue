@@ -1,7 +1,7 @@
 <template>
   <DrawerBlock
     ref="drawerRef"
-    @onSuccess="reloadList"
+    @onSuccess="updateList"
   />
   <FormHorizontal
     :isDrawer="props.isDrawer"
@@ -31,12 +31,13 @@
   import ListTableBlock from '@templates/list-table-block'
   import { ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useField } from 'vee-validate'
+  import { useField, useFieldArray } from 'vee-validate'
 
   const listStatusCodeRef = ref(null)
   const hasContentToList = ref(true)
   const drawerRef = ref(null)
 
+  const { fields: pages } = useFieldArray('pages')
   const { value: pagesValue } = useField('pages')
 
   const props = defineProps({
@@ -97,7 +98,6 @@
     }
   ]
 
-  //
   const actionsRow = ref([
     {
       label: 'Set as default',
@@ -123,8 +123,14 @@
     return pagesValue.value
   }
 
-  const reloadList = () => {
-    listStatusCodeRef.value.reloadList()
+  const updateList = (item) => {
+    const idx = pages.value.findIndex((page) => page.value.code === item.code)
+    if (idx !== -1) {
+      pages.value[idx].value = { ...pages.value[idx].value, ...item }
+    }
+    if (listStatusCodeRef.value && listStatusCodeRef.value.reloadList) {
+      listStatusCodeRef.value.reloadList()
+    }
   }
 
   const openEditStatusCodeDrawer = (item) => {

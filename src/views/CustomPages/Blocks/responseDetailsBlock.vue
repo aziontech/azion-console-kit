@@ -13,7 +13,7 @@
           label="Edge Connector"
           required
           name="connector"
-          :service="listEdgeConnectorsService"
+          :service="edgeConnectorsService.listEdgeConnectorsService"
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="value"
@@ -23,17 +23,17 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateTrustedDrawer"
+                  @click="openCreateEdgeConnectorDrawer"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
                   icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-digital-certificate-trusted-button"
+                  data-testid="domains-form__create-edge-connector-button"
                   :pt="{
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Digital Trusted CA certificate"
+                  label="Create Edge Connector"
                 />
               </li>
             </ul>
@@ -67,7 +67,6 @@
           label="Response TTL"
           required
           name="ttl"
-          :value="ttl"
           :min="0"
           :max="31536000"
         />
@@ -93,6 +92,7 @@
           icon="pi pi-lock"
           placeholder="Response body"
           name="response"
+          disabled
         />
       </div>
     </template>
@@ -105,12 +105,12 @@
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
+  import PrimeButton from 'primevue/button'
   import { edgeConnectorsService } from '@/services/v2'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
   const { value: typeValue } = useField('type')
-  const { value: ttl } = useField('ttl')
 
   const isConnector = computed(() => {
     return typeValue.value === 'Connector'

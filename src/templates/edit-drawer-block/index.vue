@@ -33,7 +33,7 @@
     },
     editService: {
       type: Function,
-      required: true
+      default: () => {}
     },
     title: {
       type: String,
@@ -214,6 +214,8 @@
           :loading="isSubmitting"
           :values="values"
           :onCancel="closeDrawer"
+          :handleSubmit="handleSubmit"
+          :scrollToErrorInDrawer="scrollToErrorInDrawer"
         >
           <GoBack
             :goBack="handleGoBack"
