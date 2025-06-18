@@ -2,7 +2,7 @@ export const STATUS_CODE_OPTIONS = [
   {
     id: 0,
     code: '-',
-    type: 'Connector',
+    type: 'Default',
     name: 'Default',
     customStatusCode: '-',
     ttl: '0',

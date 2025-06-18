@@ -3,7 +3,7 @@
   import FormFieldsStatusCode from '../FormFields/FormFieldsStatusCode'
   import { refDebounced } from '@vueuse/core'
   import { ref, computed } from 'vue'
-  import { pageSchema } from '../config/validation'
+  import { pageSchema } from '@/views/CustomPages/Config/validation'
   import ActionBarBlock from '@templates/action-bar-block'
 
   defineOptions({
@@ -38,7 +38,8 @@
   const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {
     const submit = await handleSubmit(
       (values) => {
-        emit('onSuccess', values)
+        const transformedValues = transformValuesByType(values)
+        emit('onSuccess', transformedValues)
         onCancel()
       },
       ({ errors }) => {
@@ -46,6 +47,44 @@
       }
     )
     await submit()
+  }
+
+  const transformValuesByType = (values) => {
+    switch (values.type) {
+      case 'Default':
+        return {
+          id: values.id,
+          code: values.code,
+          type: 'Default',
+          contentType: values.contentType || 'text/html',
+          response: values.response || '<html>...</html>',
+          customStatusCode: values.customStatusCode || '-',
+          ttl: 0
+        }
+      case 'Custom':
+        return {
+          id: values.id,
+          code: values.code,
+          type: 'Custom',
+          contentType: values.contentType || 'text/html',
+          response: values.response || '<html>...</html>',
+          ttl: 0,
+          customStatusCode: values.customStatusCode || '-'
+        }
+      case 'Connector':
+        return {
+          id: values.id,
+          code: values.code,
+          type: 'Connector',
+          connector: values.connector,
+          ttl: values.ttl,
+          uri: values.uri,
+          customStatusCode: values.customStatusCode || '-'
+        }
+
+      default:
+        return values
+    }
   }
 
   defineExpose({

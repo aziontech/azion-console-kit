@@ -32,7 +32,7 @@
   import { ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
-
+  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/statusCode'
   const listStatusCodeRef = ref(null)
   const hasContentToList = ref(true)
   const drawerRef = ref(null)
@@ -98,31 +98,6 @@
     }
   ]
 
-  const actionsRow = ref([
-    {
-      label: 'Set as default',
-      icon: 'pi pi-download',
-      type: 'action',
-      commandAction: async (item) => {
-        // eslint-disable-next-line no-console
-        console.log('item', item)
-      }
-    },
-    {
-      label: 'Set as default',
-      icon: 'pi pi-download',
-      type: 'action',
-      commandAction: async (item) => {
-        // eslint-disable-next-line no-console
-        console.log('item', item)
-      }
-    }
-  ])
-
-  const listStatusCodeService = () => {
-    return pagesValue.value
-  }
-
   const updateList = (item) => {
     const idx = pages.value.findIndex((page) => page.value.code === item.code)
     if (idx !== -1) {
@@ -131,6 +106,30 @@
     if (listStatusCodeRef.value && listStatusCodeRef.value.reloadList) {
       listStatusCodeRef.value.reloadList()
     }
+  }
+
+  const actionsRow = ref([
+    {
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      type: 'action',
+      commandAction: async (item) => {
+        openEditStatusCodeDrawer(item)
+      }
+    },
+    {
+      label: 'Reset to default',
+      icon: 'pi pi-undo',
+      type: 'action',
+      commandAction: async (item) => {
+        const defaultItem = STATUS_CODE_OPTIONS.find((option) => option.code === item.code)
+        updateList(defaultItem)
+      }
+    }
+  ])
+
+  const listStatusCodeService = () => {
+    return pagesValue.value
   }
 
   const openEditStatusCodeDrawer = (item) => {
