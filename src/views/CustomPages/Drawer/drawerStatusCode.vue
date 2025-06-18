@@ -114,4 +114,3 @@
     </template>
   </EditDrawerBlock>
 </template>
-@/views/CustomPages/ConfigDefault/validationSchema
