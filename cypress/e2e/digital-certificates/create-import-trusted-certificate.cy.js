@@ -1,6 +1,6 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
-import fixtures from '../../fixtures/digital-certificates'
+import { certificate } from '../../fixtures/digital-certificates'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
@@ -10,15 +10,16 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it.skip('should create a truted CA digital certificate', function () {
+  it('should create a truted CA digital certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
+    cy.get(selectors.digitalCertificates.clickImportTrustedCertificate).click()
+
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
     cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
-    cy.get(selectors.digitalCertificates.importTrustedCARadioOption).click()
-    cy.get(selectors.digitalCertificates.trustedCATextArea).type(fixtures.templateCertificate, {
-      delay: 0
-    })
+
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).clear()
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).type(certificate)
 
     // Act
     cy.get(selectors.form.submitButton).click()
@@ -29,6 +30,5 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
       'have.text',
       'Edit Digital Certificate'
     )
-    cy.get(selectors.digitalCertificates.trustedCATextArea).should('have.text', '')
   })
 })

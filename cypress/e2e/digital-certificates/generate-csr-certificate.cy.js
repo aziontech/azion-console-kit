@@ -9,13 +9,15 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it.skip('should request a Certificate Signing Request (CSR)', function () {
+  it('should request a Certificate Signing Request (CSR)', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
+    cy.get(selectors.digitalCertificates.clickGenerateCSR).click()
+
     cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
-    cy.get(selectors.digitalCertificates.generateCSRRadioOption).click()
+
     cy.get(selectors.digitalCertificates.subjectNameInput).type(
-      `${digitalCertificateName}.example.com`
+      `${digitalCertificateName}.com`
     )
     cy.get(selectors.digitalCertificates.countryInput).type('BR')
     cy.get(selectors.digitalCertificates.stateInput).type('São Paulo')
@@ -24,6 +26,8 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.digitalCertificates.organizationUnitInput).type('IT Department')
     cy.get(selectors.digitalCertificates.emailInput).clear()
     cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
+    cy.get(selectors.digitalCertificates.clickDropdown).click()
+    cy.get(selectors.digitalCertificates.clickDropdownOption).click()
     cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
     // Act
     cy.get(selectors.form.submitButton).click()

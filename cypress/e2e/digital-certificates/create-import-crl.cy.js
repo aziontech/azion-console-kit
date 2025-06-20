@@ -1,6 +1,6 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
-import fixtures from '../../fixtures/digital-certificates'
+import { CRL } from '../../fixtures/digital-certificates'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
@@ -10,15 +10,16 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.openProduct('Digital Certificates')
   })
 
-  it.skip('should import a server certificate', function () {
+  it('should import a CRL', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
+    cy.get(selectors.digitalCertificates.clickImportCRL).click()
+
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
     cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
-    cy.get(selectors.digitalCertificates.serverCertificateTextArea).type(
-      fixtures.templateCertificate,
-      { delay: 0 }
-    )
+
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).clear()
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).type(CRL)
 
     // Act
     cy.get(selectors.form.submitButton).click()
