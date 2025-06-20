@@ -35,10 +35,18 @@ export const EdgeFirewallAdapter = {
       name: payload.name,
       active: payload.isActive,
       modules: {
-        ddos_protection_enabled: true,
-        edge_functions_enabled: payload.edgeFunctionsEnabled,
-        network_protection_enabled: payload.networkProtectionEnabled,
-        waf_enabled: payload.wafEnabled
+        ddos_protection: {
+          enabled: payload.ddosProtectionUnmetered
+        },
+        edge_functions: {
+          enabled: payload.edgeFunctionsEnabled
+        },
+        network_protection: {
+          enabled: payload.networkProtectionEnabled
+        },
+        waf: {
+          enabled: payload.wafEnabled
+        }
       },
       debug: payload.debugRules
     }
