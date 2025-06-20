@@ -8,7 +8,7 @@
       scrollable
       removableSort
       :lazy="props.lazy"
-      rowHover
+      :rowHover="!disabledList"
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       dataKey="id"
@@ -79,6 +79,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -110,7 +111,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        :class="col.disableSort ? '' : 'hover:cursor-pointer'"
+        :class="{ 'hover:cursor-pointer': !col.disableSort || !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -238,6 +239,7 @@
     </DataTable>
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -272,6 +274,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                :disabled="disabledAddButton"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -332,6 +335,12 @@
       default: () => [{ field: 'name', header: 'Name' }]
     },
     loadDisabled: {
+      type: Boolean
+    },
+    disabledAddButton: {
+      type: Boolean
+    },
+    disabledList: {
       type: Boolean
     },
     isGraphql: {
