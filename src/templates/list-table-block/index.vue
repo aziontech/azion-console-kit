@@ -70,7 +70,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
-                :disabled="disabledList"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -178,6 +178,7 @@
               size="small"
               outlined
               v-bind="optionsOneAction(rowData)"
+              v-tooltip.top="getTooltipConfig(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
               data-testid="data-table-actions-column-body-action-button"
@@ -265,7 +266,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
-                :disabled="disabledList"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
@@ -321,6 +322,9 @@
 
   const props = defineProps({
     disabledList: {
+      type: Boolean
+    },
+    disabledAddButton: {
       type: Boolean
     },
     hiddenHeader: {
@@ -605,8 +609,14 @@
     const [firstAction] = actionOptions(rowData)
     return {
       icon: firstAction?.icon,
+      tooltip: firstAction?.tooltip,
       disabled: firstAction?.disabled
     }
+  }
+
+  const getTooltipConfig = (rowData) => {
+    const actionOptions = optionsOneAction(rowData)
+    return actionOptions.tooltip ? { value: actionOptions.tooltip, showDelay: 200 } : null
   }
 
   const reload = (query = {}) => {
