@@ -27,7 +27,7 @@
     name: '',
     isActive: true,
     debugRules: false,
-    edgeFunctionsEnabled: false,
+    edgeFunctionsEnabled: true,
     networkProtectionEnabled: true,
     wafEnabled: false,
     ddosProtectionUnmetered: true

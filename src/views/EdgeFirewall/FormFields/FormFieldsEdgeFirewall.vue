@@ -63,7 +63,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Modules"
-    description="Modules a edge connectors."
+    description="Activate modules to extend configuration possibilities. Some modules require subscription."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">

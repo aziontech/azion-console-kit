@@ -200,8 +200,7 @@
   const listFunctionsServiceWithDecorator = async () => {
     return await edgeFirewallFunctionService.listFunctionsService(props.edgeFirewallId, {
       pageSize: 100,
-      fields: 'id,name',
-      ordering: 'active'
+      fields: 'id,name'
     })
   }
 
