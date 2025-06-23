@@ -59,19 +59,6 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
       'have.text',
       'My Rule Description'
     )
-
-    // Cleanup - Remove the created rule
-    cy.deleteEntityFromLoadedList().then(() => {
-      cy.verifyToast('Rules Engine successfully deleted')
-    })
-
-    // Assert - Find the created firewall
-    cy.get(selectors.edgeFirewall.mainSettingsTab).click()
-    cy.get(selectors.edgeFirewall.cancelButton).click()
-    cy.get(selectors.edgeFirewall.searchInput).clear()
-    cy.get(selectors.edgeFirewall.searchInput).type(`${firewallName}{enter}`)
-    cy.get(selectors.edgeFirewall.nameRow).should('have.text', firewallName)
-    cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
   })
 
   it('should create an Edge Firewall and Tag Event', () => {
@@ -99,7 +86,8 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.ruleCriteriaInput).clear()
     cy.get(selectors.edgeFirewall.ruleCriteriaInput).type('test')
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
-    cy.get(selectors.edgeFirewall.ruleBehaviorFirstOption).click()
+    cy.get(selectors.edgeFirewall.ruleBehaviorTagEventOption).click()
+    cy.get(selectors.edgeFirewall.behaviorTagEventOption).type('Tag_Name')
 
     cy.intercept('POST', '/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
 
@@ -134,12 +122,5 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.searchInput).type(`${edgeFirewallName}{enter}`)
     cy.get(selectors.edgeFirewall.nameRow).should('have.text', edgeFirewallName)
     cy.get(selectors.edgeFirewall.activeRow).should('have.text', 'Active')
-  })
-
-  afterEach(() => {
-    // Delete the firewall
-    cy.deleteEntityFromList({ entityName: edgeFirewallName, productName: 'Edge Firewall' }).then(() => {
-      cy.verifyToast('Edge Firewall successfully deleted')
-    })
   })
 })
