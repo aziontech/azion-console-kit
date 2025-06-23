@@ -11,6 +11,7 @@ import { DigitalCertificatesCSRAdapter } from './adapters/digital-certificates-c
 import { DigitalCertificatesCSRService } from './digital-certificates-csr-service'
 
 // Digital Certificates CRL Service
+import { DigitalCertificatesCRLAdapter } from './adapters/digital-certificates-crl-adapter'
 import { DigitalCertificatesCRLService } from './digital-certificates-crl-service'
 
 // Digital Certificates CR Service
@@ -124,7 +125,10 @@ const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const mafService = new MFAService(httpService, MFAAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
-const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
+const digitalCertificatesCRLService = new DigitalCertificatesCRLService(
+  httpService,
+  DigitalCertificatesCRLAdapter
+)
 const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
   httpService,

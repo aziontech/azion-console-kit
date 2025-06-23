@@ -30,9 +30,7 @@
       title: 'Edge Cache',
       inputValue: 'edge_cache',
       subtitle: `Purge content from Azion's edge cache layer.`
-    }
-  ]
-  const subscriptionLayerRadioOptions = [
+    },
     {
       title: 'Tiered Cache',
       inputValue: 'tiered_cache',
@@ -81,17 +79,9 @@
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Default Layer"
         nameField="layer"
         isCard
         :options="layerRadioOptions"
-      />
-
-      <FieldGroupRadio
-        label="Subscription Layer"
-        nameField="layer"
-        isCard
-        :options="subscriptionLayerRadioOptions"
       />
     </template>
   </FormHorizontal>
@@ -132,9 +122,16 @@
           name="argumentsPurge"
           rows="2"
           :placeholder="computedPurgeArgumentsPlaceHolder"
-          description="Separate each argument using a new line."
           autoResize
-        />
+        >
+          <template #description>
+            <span v-if="purgeType === 'cachekey'">
+              Use this specific format ”httpswww.example.com/images/image.jpg”.
+            </span>
+            <br />
+            Separate each argument using a new line.
+          </template>
+        </FieldTextArea>
       </div>
     </template>
   </FormHorizontal>
