@@ -2,8 +2,6 @@
   import { ref, watch, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
-  import Message from 'primevue/message'
-  import Avatar from 'primevue/avatar'
 
   defineOptions({ name: 'dialog-real-time-purge' })
 
@@ -52,24 +50,6 @@
         <h5 class="text-lg not-italic font-bold leading-5">Confirm Repurge</h5>
       </template>
       <div class="flex flex-col gap-3.5">
-        <Message
-          severity="warn"
-          :closable="false"
-          :pt="{
-            root: { class: 'w-full' },
-            wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
-          }"
-        >
-          <template #messageicon>
-            <Avatar
-              icon="pi pi-exclamation-triangle"
-              class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2 min-w-[2rem]"
-            />
-          </template>
-          <p class="text-color-secondary">
-            This action may temporarily impact some URLs, causing a minor disruption.
-          </p>
-        </Message>
         <div class="text-color font-normal text-sm mb-2 text-color-secondary">
           This happens because the purge is queued for execution, and the results may take some time
           to propagate to all edge nodes.

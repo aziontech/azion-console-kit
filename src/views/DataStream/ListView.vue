@@ -25,6 +25,7 @@
         <div class="w-full">
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
+            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"

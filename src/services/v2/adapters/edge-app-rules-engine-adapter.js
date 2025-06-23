@@ -26,7 +26,9 @@ export const RulesEngineAdapter = {
         position: {
           value: index,
           immutableValue: index,
-          altered: false
+          altered: false,
+          min: 0,
+          max: data.length - 1
         },
         description: rule.description || '-'
       })) || []
