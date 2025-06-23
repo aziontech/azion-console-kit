@@ -61,6 +61,7 @@
     'name',
     'active',
     'language',
+    'vendor',
     'initiator_type',
     'reference_count',
     'last_editor'
@@ -106,6 +107,20 @@
     {
       field: 'referenceCount',
       header: 'Ref. Count'
+    },
+    {
+      field: 'vendor',
+      header: 'Vendor',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: {
+            text: columnData,
+            ...(columnData === 'Azion' && { leftIcon: 'pi pi-shopping-cart text-xl' })
+          },
+          columnAppearance: 'text-with-icon'
+        })
+      }
     },
     {
       field: 'language',
