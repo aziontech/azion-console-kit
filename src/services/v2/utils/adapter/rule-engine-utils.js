@@ -18,7 +18,7 @@ export const parseCriteria = (criteria) => {
 export const parseBehaviors = (behaviors) => {
   const parsedBehaviors = behaviors.map((behavior) => {
     switch (behavior.name) {
-      case 'tag_event': 
+      case 'tag_event':
         return {
           name: behavior.name,
           argument: behavior.content_type
@@ -108,7 +108,7 @@ export const parseBehaviorsLoad = (behaviors) => {
           functionId: parseInt(behavior.argument)
         }
 
-      case 'tag_event': 
+      case 'tag_event':
         return {
           name: behavior.name,
           content_type: behavior.argument
