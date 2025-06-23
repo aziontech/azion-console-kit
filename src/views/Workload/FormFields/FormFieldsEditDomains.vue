@@ -507,7 +507,7 @@
           name="edgeCertificate"
           data-testid="domains-form__digital-certificates-field"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
