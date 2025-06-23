@@ -61,6 +61,8 @@
   import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -110,7 +112,8 @@
     'last_editor',
     'last_modified',
     'version',
-    'edge_function'
+    'edge_function',
+    'active'
   ]
 
   const getColumns = computed(() => {
@@ -134,6 +137,17 @@
         field: 'modified',
         header: 'Last Modified',
         sortField: 'last_modified'
+      },
+      {
+        field: 'active',
+        header: 'Active',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
     ]
   })
