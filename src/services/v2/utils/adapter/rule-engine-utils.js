@@ -114,7 +114,7 @@ export const parseBehaviorsLoad = (behaviors) => {
           tag_event: behavior.argument
         }
 
-      case 'set_waf':
+      case 'set_waf_ruleset':
         return {
           name: behavior.name,
           mode: behavior.argument.mode,
