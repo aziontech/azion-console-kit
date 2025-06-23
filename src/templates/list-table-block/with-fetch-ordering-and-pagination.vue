@@ -59,6 +59,9 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
+              <div class="ml-3">
+                <slot name="select-buttons" />
+              </div>
             </span>
 
             <PrimeButton
@@ -308,7 +311,7 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog.vue'
   import { useDialog } from 'primevue/usedialog'
@@ -570,14 +573,24 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }) => {
+  const loadData = async ({ page, ...query }, service) => {
     try {
       isLoading.value = true
-      const { count = 0, body = [] } = props.isGraphql
-        ? await props.listService()
-        : await props.listService({ page, ...query })
-      data.value = body
-      totalRecords.value = count
+      if (service) {
+        const { count = 0, body = [] } = props.isGraphql
+          ? await service()
+          : await service({ page, ...query })
+
+        data.value = body
+        totalRecords.value = count
+      } else {
+        const { count = 0, body = [] } = props.isGraphql
+          ? await props.listService()
+          : await props.listService({ page, ...query })
+
+        data.value = body
+        totalRecords.value = count
+      }
     } catch (error) {
       // Check if error is an ErrorHandler instance (from v2 services)
       if (error && typeof error.showErrors === 'function') {
@@ -637,7 +650,7 @@
     }
   }
 
-  const reload = async (query = {}) => {
+  const reload = async (query = {}, listService = props.listService) => {
     if (!savedOrdering.value) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
@@ -654,7 +667,7 @@
       commonParams.search = savedSearch.value
     }
 
-    loadData(commonParams)
+    loadData(commonParams, listService)
   }
 
   const extractFieldValue = (rowData, field) => {
@@ -725,6 +738,14 @@
     }
     selectedColumns.value = props.columns
   })
+
+  watch(
+    () => props.columns,
+    (newColumns) => {
+      selectedColumns.value = newColumns
+    },
+    { deep: true }
+  )
 
   defineExpose({ reload, handleExportTableDataToCSV })
 </script>

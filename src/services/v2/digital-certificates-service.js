@@ -52,7 +52,7 @@ export class DigitalCertificatesService {
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'csr', 'managed']
+    const fields = ['id', 'name', 'type', 'csr', 'managed', 'certificate']
 
     const { data } = await this.http.request({
       method: 'GET',
@@ -65,7 +65,7 @@ export class DigitalCertificatesService {
     return this.adapter?.transformLoadDigitalCertificate?.(data)
   }
 
-  deleteDigitalCertificate = async ({ id }) => {
+  deleteDigitalCertificate = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.baseURL}/${id}`

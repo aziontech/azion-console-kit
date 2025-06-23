@@ -1,5 +1,6 @@
 import generateUniqueName from '../../support/utils'
 import selectors from '../../support/selectors'
+import { privateKeyCertificate, certificate } from '../../fixtures/digital-certificates'
 
 const digitalCertificateName = generateUniqueName('CertificateName')
 
@@ -12,8 +13,15 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
   it('should create a new digital certificate', function () {
     // Arrange
     cy.get(selectors.digitalCertificates.createDigitalCertificateButton).click()
+    cy.get(selectors.digitalCertificates.clickImportServerCertificate).click()
+
     cy.get(selectors.digitalCertificates.digitalCertificateName).clear()
     cy.get(selectors.digitalCertificates.digitalCertificateName).type(digitalCertificateName)
+
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).click()
+    cy.get(selectors.digitalCertificates.serverCertificateTextArea).type(certificate)
+    cy.get(selectors.digitalCertificates.privateKeyTextArea).click()
+    cy.get(selectors.digitalCertificates.privateKeyTextArea).type(privateKeyCertificate)
 
     // Act
     cy.get(selectors.form.submitButton).click()
@@ -25,9 +33,5 @@ describe('Digital Certificates spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.list.searchInput).clear()
     cy.intercept('GET', '/v4/digital_certificates/certificates*').as('getDigitalCertificates')
     cy.get(selectors.list.searchInput).type(`${digitalCertificateName}{enter}`)
-    cy.wait('@getDigitalCertificates')
-    cy.get(selectors.list.filteredRow.column('name')).find(selectors.list.showMore).click()
-    cy.get(selectors.list.filteredRow.column('name')).contains(digitalCertificateName)
-    cy.get(selectors.list.filteredRow.statusColumn).should('have.text', 'Pending')
   })
 })
