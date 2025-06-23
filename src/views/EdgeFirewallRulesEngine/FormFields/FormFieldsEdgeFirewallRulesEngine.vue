@@ -380,15 +380,16 @@
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
+    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
 
     return [
       { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
+      { value: 'tag_event', label: 'Tag Event' },
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
-        value: 'set_waf_ruleset',
+        value: 'set_waf',
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Set WAF Rule Set'
@@ -464,8 +465,13 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
   }
+
+  const isTagEvent = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
+  }
+
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
   }
@@ -490,7 +496,7 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
@@ -787,6 +793,19 @@
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
               />
+            </template>
+
+            <template v-if="isTagEvent(behaviorItemIndex)">
+              <div class="w-full">
+                <FieldText
+                  id="`behaviors[${behaviorItemIndex}].content_type`"
+                  :key="`${behaviorItem.key}-content_type`"
+                  placeholder="Tag Event"
+                  class="w-full mb-3"
+                  :value="behaviors[behaviorItemIndex].value.content_type"
+                  :name="`behaviors[${behaviorItemIndex}].content_type`"
+                />
+              </div>
             </template>
 
             <template v-if="isWafBehavior(behaviorItemIndex)">
