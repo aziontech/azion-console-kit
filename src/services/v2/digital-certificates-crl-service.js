@@ -11,9 +11,9 @@ export class DigitalCertificatesCRLService {
       url: this.baseURL
     })
 
-    const adapter = this.adapter?.transformListDigitalCertificatesCRL(data.results)
+    const body = this.adapter?.transformListDigitalCertificatesCRL(data.results)
 
-    return { count: data.count, body: adapter }
+    return { count: data.count, body }
   }
 
   createDigitalCertificateCRL = async (payload) => {

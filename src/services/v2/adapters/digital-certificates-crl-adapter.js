@@ -1,26 +1,5 @@
-import { capitalizeFirstLetter, getCurrentTimezone, checkIfFieldExist } from '@/helpers'
-
-const parseStatusData = (status) => {
-  if (!status) {
-    return {
-      content: '-',
-      severity: 'info'
-    }
-  }
-
-  const isActive = status.toUpperCase() === 'ACTIVE'
-  const parsedStatus = isActive
-    ? {
-        content: capitalizeFirstLetter(status),
-        severity: 'success'
-      }
-    : {
-        content: capitalizeFirstLetter(status),
-        severity: 'danger'
-      }
-
-  return parsedStatus
-}
+import { getCurrentTimezone, checkIfFieldExist } from '@/helpers'
+import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 export const DigitalCertificatesCRLAdapter = {
   transformCreateDigitalCertificateCRL(payload) {
@@ -52,7 +31,7 @@ export const DigitalCertificatesCRLAdapter = {
     return {
       id: data?.id,
       name: data?.name,
-      certificate: data?.crl || undefined,
+      certificate: data?.crl,
       type: 'CRL'
     }
   },
