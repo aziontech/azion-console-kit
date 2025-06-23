@@ -7,9 +7,9 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           data-testid="import-server-certificate-form__certificate-field"
-          label="Certificate"
+          :label="getTitleByCertificateType"
           required
-          placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
+          :placeholder="getPlaceholderByCertificateType"
           name="certificate"
           :value="certificate"
           description="Intermediate certificates are accepted."
@@ -63,9 +63,25 @@
       case CERTIFICATE_TYPES.TRUSTED:
         return 'Paste the PEM-encoded public Trusted CA certificate in the respective field.'
       case CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST:
-        return 'Paste the PEM-encoded TLS X.509 certificate.'
+        return 'Paste the PEM-encoded Certificate Revogation List (CRL) in the respective field.'
       default:
         return 'Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields.'
     }
+  })
+
+  const getTitleByCertificateType = computed(() => {
+    if (certificateType.value === CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST) {
+      return 'CRL'
+    }
+
+    return 'Certificate'
+  })
+
+  const getPlaceholderByCertificateType = computed(() => {
+    if (certificateType.value === CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST) {
+      return `-----BEGIN CRL-----\n-----END CRL-----`
+    }
+
+    return `-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----`
   })
 </script>

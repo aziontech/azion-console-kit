@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Digital Certificate"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="pageTitleByCertificateType"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
@@ -51,7 +51,8 @@
     isEdgeCertificateCSR,
     PRIVATE_KEY_TYPES,
     CERTIFICATE_TYPES,
-    certificateTypeList
+    certificateTypeList,
+    pageTitleByCertificateType
   } = useDigitalCertificate()
 
   const initialValues = ref({

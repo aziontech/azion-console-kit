@@ -20,7 +20,7 @@ export const DigitalCertificatesCSRAdapter = {
       email,
       organization_unity: organizationUnity,
       private_key_type: 'rsa_2048',
-      alternative_names: subjectAlternativeNames?.split('\n')
+      alternative_names: subjectAlternativeNames ? subjectAlternativeNames?.split('\n') : []
     }
   }
 }

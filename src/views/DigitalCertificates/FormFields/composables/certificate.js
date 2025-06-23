@@ -62,6 +62,18 @@ export function useDigitalCertificate() {
     () => certificateType.value === CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST
   )
 
+  const pageTitleByCertificateType = computed(() => {
+    if (certificateType.value === CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST) {
+      return 'Importing a Certificate Revogation List'
+    }
+
+    if (certificateType.value === CERTIFICATE_TYPES.TRUSTED) {
+      return 'Importing a Trusted Certificate'
+    }
+
+    return 'Create Digital Certificate'
+  })
+
   return {
     certificateType,
     createService,
@@ -72,6 +84,7 @@ export function useDigitalCertificate() {
     isCertificateRevocationList,
     CERTIFICATE_TYPES,
     PRIVATE_KEY_TYPES,
-    certificateTypeList
+    certificateTypeList,
+    pageTitleByCertificateType
   }
 }
