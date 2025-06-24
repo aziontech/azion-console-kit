@@ -47,9 +47,10 @@ export default {
   ruleCriteriaNetworkListFilter:
     '[data-testid="edge-firewall-rules-form__network-list[0]__dropdown-search"]',
   ruleBehaviorDropdown: '[data-testid="edge-firewall-rules-form__behaviors[0]-dropdown__dropdown"]',
-  ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_4',
-  ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_2',
+  ruleBehaviorRunFunction: '#behaviors\\[0\\]\\.name_5',
+  ruleBehaviorSetRateLimit: '#behaviors\\[0\\]\\.name_3',
   ruleBehaviorFirstOption: '#behaviors\\[0\\]\\.name_0',
+  ruleBehaviorTagEventOption: '#behaviors\\[0\\]\\.name_1',
   scrollWafDropdown: '.p-dropdown-items-wrapper .p-virtualscroller',
   selectTheLastWaf: '.p-dropdown-items-wrapper .p-virtualscroller ul li',
   rulesWafDropdown:
@@ -58,7 +59,7 @@ export default {
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf__dropdown-filter-input"]',
   rulesWafFirstOption: '#behaviors\\[0\\]\\.id_0',
   rulesWafFirstModeOption: '#behaviors\\[0\\]\\.mode_0',
-  behaviorsWafOption: '#behaviors\\[0\\]\\.name_3',
+  behaviorsWafOption: '#behaviors\\[0\\]\\.name_4',
   rulesWafModeDropdown:
     '[data-testid="edge-firewall-rule-form__behaviors[0]__waf-mode__dropdown"] > .p-dropdown-label',
   ruleBehaviorFunctionToRunDropdown:
@@ -80,6 +81,7 @@ export default {
   behaviorAverageRateLimitInput: '[data-testid="field-number__input"] > .p-inputtext',
   behaviorLimitBy: '#behaviors\\[0\\]\\.limit_by > .p-dropdown-label',
   behaviorLimitByFirstOption: '#behaviors\\[0\\]\\.limit_by_0',
+  behaviorTagEventOption: '#behaviors\\[0\\]\\.tag_event',
 
   createRulesEngine: '[data-testid="rules-engine-create-button"] > .p-button-label',
   inputNumberFirstPosition:

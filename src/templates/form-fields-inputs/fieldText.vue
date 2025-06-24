@@ -9,6 +9,9 @@
       type: String,
       default: ''
     },
+    class: {
+      type: String
+    },
     name: {
       type: String,
       required: true
@@ -85,7 +88,7 @@
     @keypress.enter.prevent
     :placeholder="props.placeholder"
     @input="handleChange"
-    :class="{ 'p-invalid': errorMessage }"
+    :class="[{ 'p-invalid': errorMessage }, props.class]"
     @blur="handleBlur"
   />
   <small
