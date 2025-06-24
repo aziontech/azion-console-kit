@@ -15,6 +15,7 @@ import CreditCardColumn from './credit-card-column.vue'
 import CountryFlagColumn from './country-flag-column.vue'
 import TagWithTooltip from './tag-with-tooltip'
 import LogBody from './log-body.vue'
+import TextWithIcon from './text-with-icon.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
@@ -116,6 +117,12 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
     case 'log-body':
       return h(LogBody, {
         value: data
+      })
+    case 'text-with-icon':
+      return h(TextWithIcon, {
+        text: data.text,
+        leftIcon: data.leftIcon,
+        rightIcon: data.rightIcon
       })
     default:
       throw new Error('Invalid column appearance')

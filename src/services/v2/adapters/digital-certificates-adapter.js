@@ -1,26 +1,5 @@
-import { capitalizeFirstLetter, getCurrentTimezone, checkIfFieldExist } from '@/helpers'
-
-const parseStatusData = (status) => {
-  if (!status) {
-    return {
-      content: '-',
-      severity: 'info'
-    }
-  }
-
-  const isActive = status.toUpperCase() === 'ACTIVE'
-  const parsedStatus = isActive
-    ? {
-        content: capitalizeFirstLetter(status),
-        severity: 'success'
-      }
-    : {
-        content: capitalizeFirstLetter(status),
-        severity: 'danger'
-      }
-
-  return parsedStatus
-}
+import { getCurrentTimezone, checkIfFieldExist } from '@/helpers'
+import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
@@ -109,7 +88,8 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificate_type,
-      certificate_content
+      certificate_content,
+      certificate
     } = data
 
     return {
@@ -123,7 +103,8 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificateType: certificate_type,
-      certificateContent: certificate_content
+      certificateContent: certificate_content,
+      certificate
     }
   },
 

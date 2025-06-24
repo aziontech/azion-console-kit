@@ -9,6 +9,7 @@ export default {
   editPageTitle: '[data-testid="page_title_Edit Custom Page"]',
   clickItemTable: (columnPosition) => `[data-pc-section="bodyrow"]:nth-child(${columnPosition})`,
   drawer: {
+    sidebar: '[data-pc-name="sidebar"]',
     customStatusCode: '[data-testid="field-number__input"] > .p-inputtext',
     buttonSave: 'button[aria-label="Apply"]'
   }

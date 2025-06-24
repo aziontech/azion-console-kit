@@ -7,11 +7,13 @@
       <InlineMessage
         class="w-fit mb-8"
         severity="info"
-        >When creating a new purge, it's queued for execution and will appear in the history once
+      >
+        When creating a new purge, it's queued for execution and will appear in the table below once
         completed.
       </InlineMessage>
       <ListTableBlock
         v-if="hasContentToList"
+        disabledList
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
         addButtonLabel="Purge"
@@ -52,16 +54,12 @@
   import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
-
+  import { purgeService } from '@/services/v2'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
-    createRealTimePurgeService: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       required: true,
       type: Function
@@ -111,7 +109,7 @@
       layer: purgeToRepurge.layer
     }
     try {
-      const { feedback } = await props.createRealTimePurgeService(dataPurge)
+      const { feedback } = await purgeService.createPurge(dataPurge)
       showToast('success', feedback)
       handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
@@ -127,6 +125,7 @@
       type: 'dialog',
       label: 'Repurge',
       icon: 'pi pi-refresh',
+      tooltip: 'Revalidate',
       disabled: (rowData) => rowData.disabled,
       dialog: {
         component: DialogPurge,
@@ -145,7 +144,8 @@
     return [
       {
         field: 'time',
-        header: 'Date'
+        header: 'Date',
+        sortField: 'ts'
       },
       {
         field: 'user',

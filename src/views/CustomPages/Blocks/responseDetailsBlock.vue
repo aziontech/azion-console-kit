@@ -13,6 +13,7 @@
           label="Edge Connector"
           required
           name="connector"
+          :value="connector"
           :service="edgeConnectorsService.listEdgeConnectorsService"
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
@@ -67,6 +68,7 @@
           label="Response TTL"
           required
           name="ttl"
+          :value="ttl"
           :min="0"
           :max="31536000"
         />
@@ -92,6 +94,7 @@
           icon="pi pi-lock"
           placeholder="Response body"
           name="response"
+          rows="4"
           disabled
         />
       </div>
@@ -104,6 +107,7 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
   import { edgeConnectorsService } from '@/services/v2'
@@ -111,6 +115,8 @@
   import { computed } from 'vue'
 
   const { value: typeValue } = useField('type')
+  const { value: ttl } = useField('ttl')
+  const { value: connector } = useField('connector')
 
   const isConnector = computed(() => {
     return typeValue.value === 'Connector'

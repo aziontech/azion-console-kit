@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-  import DrawerBlock from '@views/CustomPages/Drawer/drawerStatusCode.vue'
+  import DrawerBlock from '@/views/CustomPages/Drawer/DrawerSelectStatusCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@templates/list-table-block'
   import { ref } from 'vue'

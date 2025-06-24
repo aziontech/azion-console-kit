@@ -74,7 +74,8 @@ const adapt = (httpResponse) => {
       layer: data?.layer ? MAPLAYER[data.layer] : DEFAULT_VALUE,
       user: item.authorEmail,
       disabled: !data,
-      time: formatExhibitionDate(item.ts, 'full', 'short')
+      time: formatExhibitionDate(item.ts, 'full', 'short'),
+      ts: item.ts
     }
   })
   return {

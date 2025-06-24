@@ -33,13 +33,14 @@ describe('Custom Pages spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.customPages.nameInput).type(customPageName)
 
     cy.get(selectors.customPages.clickItemTable(1)).click()
+    cy.get(selectors.customPages.drawer.customStatusCode).clear()
     cy.get(selectors.customPages.drawer.customStatusCode).type('123')
-    // cy.get(selectors.customPages.drawer.buttonSave).click()
+    cy.get(selectors.customPages.drawer.buttonSave).click()
 
-    // // // Assert
-    // // cy.get(selectors.form.actionsSubmitButton).click()
+    cy.get(selectors.customPages.drawer.sidebar).should('not.exist')
+    cy.get(selectors.form.actionsSubmitButton).click()
 
-    // cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
-    // cy.verifyToast('success', 'Custom Page successfully created')
+    cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
+    cy.verifyToast('success', 'Custom Page successfully created')
   })
 })
