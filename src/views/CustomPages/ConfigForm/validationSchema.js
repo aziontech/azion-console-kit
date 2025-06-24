@@ -6,17 +6,17 @@ const isUriValidRegex = /^\/[/a-zA-Z0-9\-_.~@:]*$/
 export const pageSchema = yup.object().shape({
   code: yup.string().required().label('Code'),
   type: yup.string().required().label('Type'),
-  connector: yup.number().when('$type', {
+  connector: yup.number().when('type', {
     is: 'Connector',
     then: (schema) => schema.required().label('Connector'),
     otherwise: (schema) => schema.nullable()
   }),
-  ttl: yup.number().when('$type', {
+  ttl: yup.number().when('type', {
     is: 'Connector',
     then: (schema) => schema.required().label('TTL'),
     otherwise: (schema) => schema.nullable()
   }),
-  uri: yup.string().when('$type', {
+  uri: yup.string().when('type', {
     is: 'Connector',
     then: (schema) =>
       schema
@@ -27,12 +27,12 @@ export const pageSchema = yup.object().shape({
         .label('URI'),
     otherwise: (schema) => schema.nullable()
   }),
-  contentType: yup.string().when('$type', {
+  contentType: yup.string().when('type', {
     is: 'PageDefault',
     then: (schema) => schema.default('text/html').label('Content Type'),
     otherwise: (schema) => schema.nullable()
   }),
-  response: yup.string().when('$type', {
+  response: yup.string().when('type', {
     is: 'PageDefault',
     then: (schema) => schema.required().label('Response'),
     otherwise: (schema) => schema.nullable()

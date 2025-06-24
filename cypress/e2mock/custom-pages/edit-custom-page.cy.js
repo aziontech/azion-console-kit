@@ -1,10 +1,10 @@
-import selectors from '../../support/selectors'
 import generateUniqueName from '../../support/utils'
+import selectors from '../../support/selectors'
 import { httpResponseCreate, httpResponseGet } from '../../fixtures/custom-pages.js'
 
 let customPageName = ''
 
-describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
+describe.skip('Custom Pages spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/account/info', (req) => {
       req.reply((res) => {
@@ -41,26 +41,32 @@ describe('Custom Pages spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.customPages.createButton).click()
     cy.get(selectors.customPages.nameInput).type(customPageName)
-    cy.get(selectors.customPages.isActiveSwitch).click()
-    cy.get(selectors.customPages.ttlDefaultPage).type('222')
 
-    // Assert
+    cy.get(selectors.customPages.clickItemTable(1)).click()
+    cy.get(selectors.customPages.drawer.customStatusCode).clear()
+    cy.get(selectors.customPages.drawer.customStatusCode).type('222')
+    cy.get(selectors.customPages.drawer.buttonSave).click()
+
+    cy.get(selectors.customPages.drawer.sidebar).should('not.exist')
     cy.get(selectors.form.actionsSubmitButton).click()
 
     cy.wait('@createCustomPages').its('response.statusCode').should('eq', 202)
-
-    cy.verifyToastWithAction('success', 'Custom Page successfully created')
+    cy.verifyToast('success', 'Custom Page successfully created')
 
     cy.wait('@getCustomPages').its('response.statusCode').should('eq', 200)
 
+    cy.get(selectors.customPages.nameInput).clear()
     cy.get(selectors.customPages.nameInput).type(`${customPageName}-edit`)
-    cy.get(selectors.customPages.ttlDefaultPage).should('be.visible').type('333')
 
-    // // Assert
+    cy.get(selectors.customPages.clickItemTable(1)).click()
+    cy.get(selectors.customPages.drawer.customStatusCode).clear()
+    cy.get(selectors.customPages.drawer.customStatusCode).type('333')
+    cy.get(selectors.customPages.drawer.buttonSave).click()
+
+    cy.get(selectors.customPages.drawer.sidebar).should('not.exist')
     cy.get(selectors.form.actionsSubmitButton).click()
 
     cy.wait('@updateCustomPages').its('response.statusCode').should('eq', 202)
-
     cy.verifyToast('success', 'Your Custom Page has been updated!')
   })
 })

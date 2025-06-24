@@ -16,6 +16,31 @@ const convertDate = (date) => {
   return convertedDate
 }
 
+const typesPage = {
+  default: 'PageDefault',
+  connector: 'PageConnector',
+  custom: 'PageCustom'
+}
+
+const getPageAttributes = (type, page) => {
+  const typeAttributes = {
+    connector: {
+      connector: page.connector,
+      ttl: page.ttl,
+      uri: page.uri
+    },
+    default: {
+      content_type: page.contentType,
+      response: page.response
+    }
+  }
+
+  return {
+    ...(typeAttributes[type] || {}),
+    custom_status_code: page.custom_status_code
+  }
+}
+
 export const CustomPageAdapter = {
   transformListCustomPage(data) {
     return (
@@ -70,6 +95,23 @@ export const CustomPageAdapter = {
       productVersion: data.product_version,
       edgeConnectorId: data.connector_custom_pages.edge_connector,
       pages
+    }
+  },
+  transformLoadCustomPageStatusCode({ data }) {
+    return {
+      id: data.id,
+      name: data.name,
+      last_editor: data.last_editor,
+      last_modified: data.last_modified,
+      active: data.active,
+      product_version: data.product_version,
+      pages: data.pages.map(({ type, ...page }) => ({
+        code: page.code,
+        page: {
+          type: typesPage[type],
+          attributes: getPageAttributes(type, page)
+        }
+      }))
     }
   }
 }

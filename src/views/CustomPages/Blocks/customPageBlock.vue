@@ -23,6 +23,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import { useField } from 'vee-validate'
+
+  const { value: name } = useField('name')
 
   const props = defineProps({
     isDrawer: {
