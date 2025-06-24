@@ -39,8 +39,8 @@ export const CustomPageAdapter = {
           id: customPage?.id,
           name: customPage?.name,
           lastEditor: customPage?.last_editor,
-          lastModified: formatExhibitionDate(customPage.last_modified, 'full', undefined),
-          lastModifyDate: customPage.last_modified,
+          lastModified: formatExhibitionDate(customPage?.last_modified, 'full', undefined),
+          lastModifyDate: customPage?.last_modified,
           active: parseStatusData(customPage?.active),
           default: parseDefaultData(customPage?.default)
         }
