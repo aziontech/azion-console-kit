@@ -51,10 +51,7 @@
         <h5 class="text-lg not-italic font-medium leading-5">Confirm Repurge</h5>
       </template>
       <div class="flex flex-col gap-3.5">
-        <InlineMessage
-          class=""
-          severity="warn"
-        >
+        <InlineMessage severity="warn">
           When creating a new purge, it's queued for execution and will appear in the table below
           once completed.
         </InlineMessage>

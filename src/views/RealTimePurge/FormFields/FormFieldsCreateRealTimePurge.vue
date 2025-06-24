@@ -41,7 +41,7 @@
 
   const isLayerTieredCache = computed(() => layer.value === 'tiered_cache')
 
-  const showHelperText = computed(() => {
+  const showHelperTextArguments = computed(() => {
     const helpText = {
       cacheKey: '',
       default: 'Separate each argument using a new line.'
@@ -137,8 +137,8 @@
           autoResize
         >
           <template #description>
-            <p>{{ showHelperText.cacheKey }}</p>
-            {{ showHelperText.default }}
+            <p v-if="showHelperTextArguments.cacheKey">{{ showHelperTextArguments.cacheKey }}</p>
+            {{ showHelperTextArguments.default }}
           </template>
         </FieldTextArea>
       </div>
