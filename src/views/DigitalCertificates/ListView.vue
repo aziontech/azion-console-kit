@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="handleService()"
+        :listService="listService"
         :columns="getColumns"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificate"
@@ -66,21 +66,25 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
-  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
   import { documentationCatalog } from '@/helpers'
   import SelectButton from 'primevue/selectbutton'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import CreateMenuBlock from './CreateMenuBlock.vue'
-  import { useRouter } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const router = useRouter()
   const listTableBlock = ref(null)
 
   defineOptions({ name: 'digital-certificates-view' })
 
-  const { certificateTypeList, certificateType, CERTIFICATE_TYPES } = useDigitalCertificate()
+  const {
+    certificateTypeList,
+    certificateType,
+    CERTIFICATE_TYPES,
+    handleClickToCreate,
+    listService,
+    deleteService
+  } = useDigitalCertificate()
 
   const hasContentToList = ref(true)
   const DIGITAL_CERTIFICATE_API_FIELDS = [
@@ -98,50 +102,25 @@
 
   const items = [
     {
-      label: 'Server Certificate',
-      items: [
-        {
-          label: 'Import Server Certificate',
-          icon: 'pi pi-plus',
-          command: () => {
-            certificateType.value = CERTIFICATE_TYPES.EDGE_CERTIFICATE
-            certificateTypeList.value = 'Certificates'
-            handleCreateDigitalCertificate()
-          }
-        },
-        {
-          label: 'Generate CSR',
-          icon: 'pi pi-plus',
-          command: () => {
-            certificateType.value = CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR
-            certificateTypeList.value = 'Certificates'
-            handleCreateDigitalCertificate()
-          }
-        }
-      ]
+      label: 'Create a Server Certificate',
+      icon: 'pi pi-plus',
+      command: () => {
+        handleClickToCreate(CERTIFICATE_TYPES.EDGE_CERTIFICATE)
+      }
     },
     {
-      label: 'mTLS',
-      items: [
-        {
-          label: 'Import a Trusted Certificate',
-          icon: 'pi pi-plus',
-          command: () => {
-            certificateType.value = CERTIFICATE_TYPES.TRUSTED
-            certificateTypeList.value = 'Certificates'
-            handleCreateDigitalCertificate()
-          }
-        },
-        {
-          label: 'Import a CRL',
-          icon: 'pi pi-plus',
-          command: () => {
-            certificateType.value = CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST
-            certificateTypeList.value = 'CRL'
-            handleCreateDigitalCertificate()
-          }
-        }
-      ]
+      label: 'Import a Trusted Certificate',
+      icon: 'pi pi-plus',
+      command: () => {
+        handleClickToCreate(CERTIFICATE_TYPES.TRUSTED)
+      }
+    },
+    {
+      label: 'Import a CRL',
+      icon: 'pi pi-plus',
+      command: () => {
+        handleClickToCreate(CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST)
+      }
     }
   ]
 
@@ -150,24 +129,9 @@
       type: 'delete',
       title: certificateTypeList.value === 'CRL' ? 'CRL' : 'digital certificate',
       icon: 'pi pi-trash',
-      service:
-        certificateTypeList.value === 'CRL'
-          ? digitalCertificatesCRLService.deleteDigitalCertificateCRL
-          : digitalCertificatesService.deleteDigitalCertificate
+      service: deleteService.value
     }
   ])
-
-  const handleService = () => {
-    if (certificateTypeList.value === 'CRL') {
-      return digitalCertificatesCRLService.listDigitalCertificatesCRL
-    } else {
-      return digitalCertificatesService.listDigitalCertificates
-    }
-  }
-
-  const handleCreateDigitalCertificate = () => {
-    router.push('/digital-certificates/create')
-  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -260,15 +224,8 @@
     ]
   })
 
-  const changeListServiceByCertificateType = (value) => {
-    switch (value) {
-      case 'Certificates':
-        listTableBlock.value?.reload({}, digitalCertificatesService.listDigitalCertificates)
-        break
-      case 'CRL':
-        listTableBlock.value?.reload({}, digitalCertificatesCRLService.listDigitalCertificatesCRL)
-        break
-    }
+  const changeListServiceByCertificateType = () => {
+    listTableBlock.value?.reload({}, listService.value)
   }
 
   watch(
@@ -300,9 +257,6 @@
     (value) => {
       switch (value) {
         case CERTIFICATE_TYPES.EDGE_CERTIFICATE:
-          digitalCertificateTypeSelected.value = 'Certificates'
-          break
-        case CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR:
           digitalCertificateTypeSelected.value = 'Certificates'
           break
         case CERTIFICATE_TYPES.TRUSTED:

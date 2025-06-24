@@ -41,9 +41,12 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { validationSchema } from './FormFields/composables/validation'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
+  import { useRoute } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const route = useRoute()
 
   const {
     createService,
@@ -53,7 +56,7 @@
     CERTIFICATE_TYPES,
     certificateTypeList,
     pageTitleByCertificateType
-  } = useDigitalCertificate()
+  } = useDigitalCertificate(route.query.certificate)
 
   const initialValues = ref({
     digitalCertificateName: '',

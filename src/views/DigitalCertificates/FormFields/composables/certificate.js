@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   digitalCertificatesService,
   digitalCertificatesCSRService,
@@ -22,9 +23,41 @@ export const PRIVATE_KEY_TYPES = {
 const sharedCertificateType = ref(CERTIFICATE_TYPES.EDGE_CERTIFICATE)
 const sharedCertificateTypeList = ref('Certificates')
 
-export function useDigitalCertificate() {
+export function useDigitalCertificate(initialType = null) {
+  const route = useRoute()
+  const router = useRouter()
+
+  if (initialType && sharedCertificateType.value !== initialType) {
+    sharedCertificateType.value = initialType
+  }
+
+  if (route.query.certificate && sharedCertificateType.value !== route.query.certificate) {
+    sharedCertificateType.value = route.query.certificate
+  }
+
   const certificateType = sharedCertificateType
   const certificateTypeList = sharedCertificateTypeList
+
+  const handleClickToCreate = (certificate) => {
+    if (certificate === CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST) {
+      certificateType.value = CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST
+      certificateTypeList.value = 'CRL'
+      navigateToCreate()
+    }
+
+    certificateType.value = certificate
+    certificateTypeList.value = 'Certificates'
+    navigateToCreate()
+  }
+
+  const navigateToCreate = () => {
+    router.push({
+      path: '/digital-certificates/create',
+      query: {
+        certificate: certificateType.value
+      }
+    })
+  }
 
   const createService = computed(() => {
     switch (certificateType.value) {
@@ -39,12 +72,19 @@ export function useDigitalCertificate() {
 
   const listService = computed(() => {
     switch (certificateTypeList.value) {
-      case 'Certificates':
-        return digitalCertificatesService.listDigitalCertificates
       case 'CRL':
         return digitalCertificatesCRLService.listDigitalCertificatesCRL
       default:
         return digitalCertificatesService.listDigitalCertificates
+    }
+  })
+
+  const deleteService = computed(() => {
+    switch (certificateTypeList.value) {
+      case 'CRL':
+        return digitalCertificatesCRLService.deleteDigitalCertificateCRL
+      default:
+        return digitalCertificatesService.deleteDigitalCertificate
     }
   })
 
@@ -71,7 +111,7 @@ export function useDigitalCertificate() {
       return 'Importing a Trusted Certificate'
     }
 
-    return 'Create Digital Certificate'
+    return 'Create Server Certificate'
   })
 
   return {
@@ -85,6 +125,8 @@ export function useDigitalCertificate() {
     CERTIFICATE_TYPES,
     PRIVATE_KEY_TYPES,
     certificateTypeList,
-    pageTitleByCertificateType
+    pageTitleByCertificateType,
+    handleClickToCreate,
+    deleteService
   }
 }

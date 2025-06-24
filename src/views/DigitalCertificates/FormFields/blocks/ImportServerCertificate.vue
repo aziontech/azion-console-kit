@@ -42,7 +42,7 @@
 
   defineOptions({ name: 'ImportServerCertificate' })
 
-  const { certificateType, isEdgeCertificate, CERTIFICATE_TYPES } = useDigitalCertificate()
+  const { isEdgeCertificate, CERTIFICATE_TYPES, certificateType } = useDigitalCertificate()
 
   const { value: certificate } = useField('certificate')
   const { value: privateKey } = useField('privateKey')
