@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Digital Certificate"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="pageTitleByCertificateType"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
@@ -41,9 +41,12 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { validationSchema } from './FormFields/composables/validation'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
+  import { useRoute } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const route = useRoute()
 
   const {
     createService,
@@ -51,8 +54,9 @@
     isEdgeCertificateCSR,
     PRIVATE_KEY_TYPES,
     CERTIFICATE_TYPES,
-    certificateTypeList
-  } = useDigitalCertificate()
+    certificateTypeList,
+    pageTitleByCertificateType
+  } = useDigitalCertificate(route.query.certificate)
 
   const initialValues = ref({
     digitalCertificateName: '',

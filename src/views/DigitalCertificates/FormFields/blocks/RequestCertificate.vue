@@ -77,20 +77,22 @@
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <Dropdown
-          v-model="privateKeyType"
+        <FieldDropdown
+          name="privateKeyType"
+          :value="privateKeyType"
           :options="PRIVATE_KEY_TYPES"
           optionLabel="name"
           optionValue="value"
           placeholder="Select a Private Key Type"
           class="w-full md:w-14rem"
+          label="Key Algorithm"
+          appendTo="self"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           data-testid="digital-certificate__san"
           label="Subject Alternative Names (SAN)"
-          required
           placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"
           name="subjectAlternativeNames"
           :value="subjectAlternativeNames"
@@ -105,9 +107,9 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import { useField } from 'vee-validate'
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
 
   defineOptions({ name: 'RequestCertificate' })
 
@@ -116,6 +118,10 @@
       type: Boolean,
       default: false
     }
+  })
+
+  onMounted(() => {
+    privateKeyType.value = 'BIT_RSA_2048'
   })
 
   const PRIVATE_KEY_TYPES = ref([

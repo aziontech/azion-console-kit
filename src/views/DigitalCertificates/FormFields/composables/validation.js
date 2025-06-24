@@ -7,10 +7,10 @@ const CERTIFICATE_TYPES = {
   CERTIFICATE_REVOCATION_LIST: 'certificateRevogationList'
 }
 
-const CSRConditionalValidations = {
+const CSRConditionalValidations = (fieldName) => ({
   is: CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR,
-  then: (schema) => schema.required('Field Required')
-}
+  then: (schema) => schema.required(`${fieldName} is a required field.`)
+})
 
 const certificateRequiredField = (certificateType) => {
   return certificateType === CERTIFICATE_TYPES.TRUSTED
@@ -24,7 +24,7 @@ const validationSchema = yup.object({
     then: (schema) => schema.required('Certificate is a required field.')
   }),
   privateKey: yup.string(),
-  common: yup.string().when('certificateType', CSRConditionalValidations),
+  common: yup.string().when('certificateType', CSRConditionalValidations('Subject Name')),
   country: yup.string().when('certificateType', {
     is: CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR,
     then: (schema) =>
@@ -33,25 +33,22 @@ const validationSchema = yup.object({
         .max(2, 'Country/Region must be a 2-character country code.')
         .min(2, 'Country/Region must be a 2-character country code.')
   }),
-  state: yup.string().when('certificateType', CSRConditionalValidations),
-  city: yup.string().when('certificateType', CSRConditionalValidations),
+  state: yup.string().when('certificateType', CSRConditionalValidations('State/Province')),
+  city: yup.string().when('certificateType', CSRConditionalValidations('City/Locality')),
   organizationUnity: yup
     .string()
-    .when('certificateType', CSRConditionalValidations)
+    .when('certificateType', CSRConditionalValidations('Organization Unity'))
     .label('organization unity'),
-  organization: yup.string().when('certificateType', CSRConditionalValidations),
+  organization: yup.string().when('certificateType', CSRConditionalValidations('Organization')),
   privateKeyType: yup
     .string()
-    .when('certificateType', CSRConditionalValidations)
+    .when('certificateType', CSRConditionalValidations('Private Key Type'))
     .label('private key type'),
   email: yup.string().when('certificateType', {
     is: CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR,
     then: (schema) => schema.required('Email is a required field.').email()
   }),
-  subjectAlternativeNames: yup
-    .string()
-    .when('certificateType', CSRConditionalValidations)
-    .label('subject alternative names (SAN)')
+  subjectAlternativeNames: yup.string().label('subject alternative names (SAN)')
 })
 
 export { validationSchema }
