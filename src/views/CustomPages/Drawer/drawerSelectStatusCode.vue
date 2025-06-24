@@ -1,6 +1,6 @@
 <script setup>
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FormFieldsStatusCode from '../FormFields/FormFieldsStatusCode'
+  import FormFieldsStatusCode from '../FormFields/DrawerStatusCode'
   import { refDebounced } from '@vueuse/core'
   import { ref, computed } from 'vue'
   import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
@@ -18,9 +18,7 @@
 
   const showEditDrawer = refDebounced(showEditCustomPagesDrawer, debouncedDrawerAnimate)
 
-  const loadService = () => {
-    return Promise.resolve(itemStatusCode.value)
-  }
+  const loadService = () => itemStatusCode.value
 
   const openEditDrawer = (statusCodeItem) => {
     itemStatusCode.value = statusCodeItem
@@ -114,4 +112,3 @@
     </template>
   </EditDrawerBlock>
 </template>
-@/views/CustomPages/ConfigDefault/validationSchema

@@ -1,19 +1,34 @@
 import { capitalizeFirstLetter } from '@/helpers'
 import { parseStatusData, parseDefaultData } from '../utils/adapter/parse-status-utils'
+import { formatExhibitionDate } from '@/helpers/convert-date'
 
 const nullable = (value) => {
   return value ? value : null
 }
 
-const convertDate = (date) => {
-  let convertedDate
-  try {
-    convertedDate = new Date(date)
-    if (isNaN(convertedDate)) throw new Error('Invalid Date')
-  } catch (error) {
-    convertedDate = null
+const typesPage = {
+  default: 'PageDefault',
+  connector: 'PageConnector',
+  custom: 'PageCustom'
+}
+
+const getPageAttributes = (type, page) => {
+  const typeAttributes = {
+    connector: {
+      connector: page.connector,
+      ttl: page.ttl,
+      uri: page.uri
+    },
+    default: {
+      content_type: page.contentType,
+      response: page.response
+    }
   }
-  return convertedDate
+
+  return {
+    ...(typeAttributes[type] || {}),
+    custom_status_code: page.custom_status_code
+  }
 }
 
 export const CustomPageAdapter = {
@@ -24,7 +39,8 @@ export const CustomPageAdapter = {
           id: customPage?.id,
           name: customPage?.name,
           lastEditor: customPage?.last_editor,
-          lastModified: convertDate(customPage?.last_modified),
+          lastModified: formatExhibitionDate(customPage?.last_modified, 'full', undefined),
+          lastModifyDate: customPage?.last_modified,
           active: parseStatusData(customPage?.active),
           default: parseDefaultData(customPage?.default)
         }
@@ -70,6 +86,23 @@ export const CustomPageAdapter = {
       productVersion: data.product_version,
       edgeConnectorId: data.connector_custom_pages.edge_connector,
       pages
+    }
+  },
+  transformLoadCustomPageStatusCode({ data }) {
+    return {
+      id: data.id,
+      name: data.name,
+      last_editor: data.last_editor,
+      last_modified: data.last_modified,
+      active: data.active,
+      product_version: data.product_version,
+      pages: data.pages.map(({ type, ...page }) => ({
+        code: page.code,
+        page: {
+          type: typesPage[type],
+          attributes: getPageAttributes(type, page)
+        }
+      }))
     }
   }
 }
