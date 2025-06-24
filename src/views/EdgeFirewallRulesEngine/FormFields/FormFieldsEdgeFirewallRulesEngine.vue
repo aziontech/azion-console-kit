@@ -380,7 +380,7 @@
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
+    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
 
     return [
@@ -389,7 +389,7 @@
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
-        value: 'set_waf_ruleset',
+        value: 'set_waf',
         label: `${
           hasWebApplicationFirewallModuleEnabled
             ? 'Set WAF Rule Set'
@@ -465,7 +465,7 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
   }
 
   const isTagEvent = (behaviorItemIndex) => {
@@ -496,7 +496,7 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
@@ -827,7 +827,7 @@
                 :options="[
                   {
                     label: 'Learning',
-                    value: 'learning'
+                    value: 'logging'
                   },
                   {
                     label: 'Blocking',

@@ -28,12 +28,12 @@ export const parseBehaviors = (behaviors) => {
           name: behavior.name,
           argument: behavior.functionId
         }
-      case 'set_waf_ruleset':
+      case 'set_waf':
         return {
           name: behavior.name,
           argument: {
             mode: behavior.mode,
-            id: behavior.id
+            waf_id: behavior.id
           }
         }
       case 'set_rate_limit':
@@ -114,11 +114,11 @@ export const parseBehaviorsLoad = (behaviors) => {
           tag_event: behavior.argument
         }
 
-      case 'set_waf_ruleset':
+      case 'set_waf':
         return {
           name: behavior.name,
           mode: behavior.argument.mode,
-          id: Number(behavior.argument.id)
+          id: Number(behavior.argument.waf_id)
         }
       case 'set_rate_limit':
         return {
