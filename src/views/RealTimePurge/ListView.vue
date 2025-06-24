@@ -144,7 +144,8 @@
     return [
       {
         field: 'time',
-        header: 'Date'
+        header: 'Date',
+        sortField: 'ts'
       },
       {
         field: 'user',

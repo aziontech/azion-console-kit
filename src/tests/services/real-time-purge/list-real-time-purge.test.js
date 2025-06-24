@@ -26,7 +26,8 @@ const fixtures = {
     layer: 'edge_cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
-    user: 'azion+teste1@azion.com'
+    user: 'azion+teste1@azion.com',
+    ts: '2023-12-13T18:02:49Z'
   }
 }
 
@@ -103,7 +104,8 @@ describe('ListRealTimePurgeService', () => {
         disabled: false,
         layer: 'Edge Cache',
         user: fixtures.realTimePurgeMock.user,
-        time: fixtures.realTimePurgeMock.time
+        time: fixtures.realTimePurgeMock.time,
+        ts: fixtures.realTimePurgeMock.ts
       }
     ])
   })
@@ -145,7 +147,8 @@ describe('ListRealTimePurgeService', () => {
       layer: 'Edge Cache',
       user: 'azion+teste1@azion.com',
       disabled: false,
-      time: 'Wednesday, December 13, 2023 at 6:02 PM'
+      time: 'Wednesday, December 13, 2023 at 6:02 PM',
+      ts: '2023-12-13T18:02:49Z'
     }
 
     expect(result).toEqual([expectedParsedData])
