@@ -115,8 +115,8 @@
       component: (columnData) => {
         return columnBuilder({
           data: {
-            text: columnData,
-            ...(columnData === 'Azion' && { leftIcon: 'pi pi-shopping-cart text-xl' })
+            text: columnData || '-',
+            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
           },
           columnAppearance: 'text-with-icon'
         })

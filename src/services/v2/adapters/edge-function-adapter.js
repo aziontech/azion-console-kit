@@ -98,7 +98,7 @@ export const EdgeFunctionsAdapter = {
           id: edgeFunction.id,
           lastEditor: parseLastEditor(edgeFunction),
           name: parseName(edgeFunction),
-          vendor: edgeFunction.vendor || '-',
+          vendor: edgeFunction.vendor,
           referenceCount: edgeFunction.reference_count
         }
       }) || []
