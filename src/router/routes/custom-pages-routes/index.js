@@ -25,7 +25,7 @@ export const customPagesRoutes = {
     {
       path: 'create',
       name: 'create-custom-pages',
-      component: () => import('@views/CustomPages/View.vue'),
+      component: () => import('@views/CustomPages/CreateView.vue'),
       meta: {
         breadCrumbs: [
           {
@@ -43,10 +43,9 @@ export const customPagesRoutes = {
     {
       path: 'edit/:id',
       name: 'edit-custom-pages',
-      component: () => import('@views/CustomPages/View.vue'),
+      component: () => import('@views/CustomPages/EditView.vue'),
       props: {
-        updatedRedirect: 'list-custom-pages',
-        mode: 'edit'
+        updatedRedirect: 'list-custom-pages'
       },
       meta: {
         breadCrumbs: [

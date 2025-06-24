@@ -38,14 +38,6 @@
     },
     disabled: {
       type: Boolean
-    },
-    icon: {
-      type: String,
-      default: ''
-    },
-    iconPosition: {
-      type: String,
-      default: 'right'
     }
   })
 
@@ -73,10 +65,6 @@
       error: `${id}__error-message`
     }
   })
-
-  const iconPositionClass = computed(() => {
-    return props.icon ? `p-input-icon-${props.iconPosition}` : ''
-  })
 </script>
 
 <template>
@@ -86,33 +74,21 @@
     :label="props.label"
     :isRequired="attrs.required"
   />
-  <span
-    class="w-full"
-    :class="iconPositionClass"
-  >
-    <i
-      v-if="props.icon"
-      :class="props.icon"
-      class="text-color-secondary top-5"
-    />
-    <TextArea
-      :data-testid="customTestId.textarea"
-      :id="name"
-      v-model="inputValue"
-      :name="props.name"
-      :disabled="props.disabled"
-      type="text"
-      class="w-full min-h-[2.75rem]"
-      :autoResize="props.autoResize"
-      :rows="props.rows"
-      :cols="props.cols"
-      :placeholder="props.placeholder"
-      @input="handleChange"
-      @blur="handleBlur"
-      :class="{ 'p-invalid': errorMessage }"
-    />
-  </span>
-
+  <TextArea
+    :data-testid="customTestId.textarea"
+    :id="name"
+    v-model="inputValue"
+    :name="props.name"
+    :disabled="props.disabled"
+    type="text"
+    :autoResize="props.autoResize"
+    :rows="props.rows"
+    :cols="props.cols"
+    :placeholder="props.placeholder"
+    @input="handleChange"
+    @blur="handleBlur"
+    :class="{ 'p-invalid': errorMessage }"
+  />
   <small
     v-if="errorMessage"
     :data-testid="customTestId.error"
