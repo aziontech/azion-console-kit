@@ -4,6 +4,6 @@
 </template>
 
 <script setup>
-  import blockStatusConfigurationBlock from '@/views/CustomPages/Blocks/StatusConfigurationBlock'
-  import blockResponseDetailsBlock from '@/views/CustomPages/Blocks/ResponseDetailsBlock'
+  import blockStatusConfigurationBlock from '@/views/CustomPages/Blocks/statusConfigurationBlock'
+  import blockResponseDetailsBlock from '@/views/CustomPages/Blocks/responseDetailsBlock'
 </script>
