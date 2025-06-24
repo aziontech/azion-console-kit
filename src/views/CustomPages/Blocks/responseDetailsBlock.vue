@@ -49,6 +49,7 @@
           label="Page Path (URI)"
           placeholder="/path/error_page.html"
           name="uri"
+          :value="uri"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -117,6 +118,7 @@
   const { value: typeValue } = useField('type')
   const { value: ttl } = useField('ttl')
   const { value: connector } = useField('connector')
+  const { value: uri } = useField('uri')
 
   const isConnector = computed(() => {
     return typeValue.value === 'Connector'

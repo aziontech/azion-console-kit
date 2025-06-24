@@ -9,7 +9,7 @@ const defaultValue = {
 
 export const STATUS_CODE_OPTIONS = [
   {
-    id: 0,
+    id: 1,
     code: '-',
     name: 'Default',
     ...defaultValue
