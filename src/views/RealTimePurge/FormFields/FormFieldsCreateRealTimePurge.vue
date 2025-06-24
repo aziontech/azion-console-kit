@@ -41,6 +41,18 @@
 
   const isLayerTieredCache = computed(() => layer.value === 'tiered_cache')
 
+  const showHelperTextArguments = computed(() => {
+    const helpText = {
+      cacheKey: '',
+      default: 'Separate each argument using a new line.'
+    }
+    if (purgeType.value === 'cachekey') {
+      helpText.cacheKey = `Use this specific format ”httpswww.example.com/images/image.jpg”`
+    }
+
+    return helpText
+  })
+
   const purgeTypeRadioOptions = computed(() => {
     return [
       {
@@ -59,7 +71,7 @@
         inputValue: 'url',
         name: 'url-purge-type',
         hide: isLayerTieredCache.value,
-        subtitle: `Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.`
+        subtitle: `Enter a list of content URLs to be purged.`
       },
       {
         title: 'Wildcard',
@@ -125,11 +137,8 @@
           autoResize
         >
           <template #description>
-            <span v-if="purgeType === 'cachekey'">
-              Use this specific format ”httpswww.example.com/images/image.jpg”.
-            </span>
-            <br />
-            Separate each argument using a new line.
+            <p v-if="showHelperTextArguments.cacheKey">{{ showHelperTextArguments.cacheKey }}</p>
+            {{ showHelperTextArguments.default }}
           </template>
         </FieldTextArea>
       </div>

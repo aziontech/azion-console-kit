@@ -2,6 +2,7 @@
   import { ref, watch, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
+  import InlineMessage from 'primevue/inlinemessage'
 
   defineOptions({ name: 'dialog-real-time-purge' })
 
@@ -47,12 +48,20 @@
       }"
     >
       <template #header>
-        <h5 class="text-lg not-italic font-bold leading-5">Confirm Repurge</h5>
+        <h5 class="text-lg not-italic font-medium leading-5">Confirm Repurge</h5>
       </template>
       <div class="flex flex-col gap-3.5">
+        <InlineMessage severity="warn">
+          When creating a new purge, it's queued for execution and will appear in the table below
+          once completed.
+        </InlineMessage>
         <div class="text-color font-normal text-sm mb-2 text-color-secondary">
-          This happens because the purge is queued for execution, and the results may take some time
-          to propagate to all edge nodes.
+          Confirm repurge for the URL "{{ dialogRef.data.item.arguments[0] }}", clearing its cached
+          content to ensure users receive the most up-to-date version.
+        </div>
+        <div class="text-color font-normal text-sm mb-2 text-color-secondary">
+          The process will be queued for execution, and changes may take some time to propagate
+          across all edge nodes, which could cause brief disruptions.
         </div>
       </div>
       <template #closeicon>
