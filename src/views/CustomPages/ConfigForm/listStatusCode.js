@@ -9,12 +9,6 @@ const defaultValue = {
 
 export const STATUS_CODE_OPTIONS = [
   {
-    id: 1,
-    code: '-',
-    name: 'Default',
-    ...defaultValue
-  },
-  {
     id: 400,
     code: '400',
     name: 'Bad Request',

@@ -52,7 +52,10 @@
           :value="uri"
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isConnector"
+      >
         <FieldNumber
           label="Response Custom Status Code"
           required
