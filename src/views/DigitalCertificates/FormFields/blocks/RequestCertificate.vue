@@ -87,6 +87,7 @@
           class="w-full md:w-14rem"
           label="Key Algorithm"
           appendTo="self"
+          required
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
