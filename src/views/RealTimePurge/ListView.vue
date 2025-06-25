@@ -25,6 +25,8 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
+        showHearderLoad
+        :showRowPending="isLoading"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -55,6 +57,8 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2'
+  import { useRoute, useRouter } from 'vue-router'
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -67,13 +71,20 @@
   })
 
   const listPurgeRef = ref('')
-
+  const route = useRoute()
+  const router = useRouter()
   const hasContentToList = ref(true)
   const isLoading = ref(null)
   const toast = useToast()
+  const timeToReload = 9000
 
-  const handleLoadData = (event) => {
+  const handleLoadData = async (event) => {
     hasContentToList.value = event
+    const { isPending } = route.query
+    if (isPending) {
+      isLoading.value = true
+      await handleTimeLoad()
+    }
   }
 
   const handleTrackEvent = () => {
@@ -116,14 +127,11 @@
   const handleRepurge = async (item) => {
     isLoading.value = true
     item.disabled = true
-    const timeToReload = 6000
     try {
       await repurgeEvent(item)
-      await new Promise((resolve) => setTimeout(resolve, timeToReload))
+      await handleTimeLoad()
     } finally {
-      isLoading.value = false
       item.disabled = false
-      listPurgeRef.value.reload()
     }
   }
 
@@ -172,4 +180,16 @@
       }
     ]
   })
+
+  const handleTimeLoad = async () => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, timeToReload))
+    } finally {
+      isLoading.value = false
+      listPurgeRef.value.reload()
+      router.replace({
+        query: {} 
+      })
+    }
+  }
 </script>

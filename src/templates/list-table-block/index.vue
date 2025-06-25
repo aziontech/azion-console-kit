@@ -112,6 +112,7 @@
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
+
           <template v-else>
             <component
               :is="col.component(extractFieldValue(rowData, col.field))"
@@ -120,6 +121,37 @@
           </template>
         </template>
       </Column>
+
+      <ColumnGroup
+        type="header"
+        v-if="showHearderLoad"
+      >
+        <Row>
+          <Column
+            :sortable="!col.disableSort"
+            v-for="col of selectedColumns"
+            :key="col.field"
+            :field="col.field"
+            :header="col.header"
+            :sortField="col?.sortField"
+          >
+          </Column>
+          <Column></Column>
+        </Row>
+        <Row v-if="showRowPending">
+          <Column :colspan="selectedColumns.length + 1">
+            <template #header>
+              <div class="w-full flex justify-center font-normal items-center gap-2">
+                Pending
+                <i
+                  class="pi pi-spin pi-spinner text-center"
+                  style="font-size: 1.3rem"
+                ></i>
+              </div>
+            </template>
+          </Column>
+        </Row>
+      </ColumnGroup>
 
       <Column
         :frozen="true"
@@ -310,6 +342,8 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
+  import ColumnGroup from 'primevue/columngroup' // optional
+  import Row from 'primevue/row' // optional
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -413,6 +447,14 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    showHearderLoad: {
+      type: Boolean,
+      default: false
+    },
+    showRowPending: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -616,10 +658,10 @@
       }
     }
 
-    const { icon, tooltip, disabled, shouldLoadOnClick } = firstAction
+    const { icon, tooltip, disabled } = firstAction
 
     return {
-      icon: shouldLoadOnClick && disabled ? 'pi pi-spin pi-spinner' : icon,
+      icon,
       tooltip,
       disabled
     }
