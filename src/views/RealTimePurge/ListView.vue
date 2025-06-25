@@ -12,6 +12,7 @@
         completed.
       </InlineMessage>
       <ListTableBlock
+        ref="listPurgeRef"
         v-if="hasContentToList"
         disabledList
         :listService="props.listRealTimePurgeService"
@@ -24,7 +25,6 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
-        :key="componentKey"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -66,7 +66,7 @@
     }
   })
 
-  const componentKey = ref(0)
+  const listPurgeRef = ref('')
 
   const hasContentToList = ref(true)
   const isLoading = ref(null)
@@ -123,7 +123,7 @@
     } finally {
       isLoading.value = false
       item.disabled = false
-      componentKey.value++
+      listPurgeRef.value.reload()
     }
   }
 
