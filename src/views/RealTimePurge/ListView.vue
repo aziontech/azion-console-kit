@@ -116,10 +116,10 @@
   const handleRepurge = async (item) => {
     isLoading.value = true
     item.disabled = true
-
+    const timeToReload = 6000
     try {
       await repurgeEvent(item)
-      await new Promise((resolve) => setTimeout(resolve, 6000))
+      await new Promise((resolve) => setTimeout(resolve, timeToReload))
     } finally {
       isLoading.value = false
       item.disabled = false
@@ -136,7 +136,6 @@
       shouldLoadOnClick: true,
       disabled: (rowData) => rowData.disabled,
       commandAction: async (item) => {
-        item.loading = true
         if (!item.disabled) {
           handleRepurge(item)
         }
