@@ -24,6 +24,7 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
+        :key="componentKey"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -50,7 +51,6 @@
   import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import InlineMessage from 'primevue/inlinemessage'
-  import DialogPurge from './Dialog'
   import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
@@ -66,18 +66,14 @@
     }
   })
 
+  const componentKey = ref(0)
+
   const hasContentToList = ref(true)
-  const showDialogPurge = ref(false)
   const isLoading = ref(null)
   const toast = useToast()
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
-  }
-
-  const closeDialog = () => {
-    isLoading.value = null
-    showDialogPurge.value = false
   }
 
   const handleTrackEvent = () => {
@@ -114,28 +110,36 @@
       handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
       showToast('error', error)
+    }
+  }
+
+  const handleRepurge = async (item) => {
+    isLoading.value = true
+    item.disabled = true
+
+    try {
+      await repurgeEvent(item)
+      await new Promise((resolve) => setTimeout(resolve, 6000))
     } finally {
       isLoading.value = false
-      closeDialog()
+      item.disabled = false
+      componentKey.value++
     }
   }
 
   const actionsRow = [
     {
-      type: 'dialog',
+      type: 'action',
       label: 'Repurge',
       icon: 'pi pi-refresh',
-      tooltip: 'Revalidate',
+      tooltip: 'Repurge',
+      shouldLoadOnClick: true,
       disabled: (rowData) => rowData.disabled,
-      dialog: {
-        component: DialogPurge,
-        body: (item) => ({
-          data: {
-            isLoading,
-            item,
-            repurge: repurgeEvent
-          }
-        })
+      commandAction: async (item) => {
+        item.loading = true
+        if (!item.disabled) {
+          handleRepurge(item)
+        }
       }
     }
   ]

@@ -606,11 +606,22 @@
   }
 
   const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
+    const [firstAction] = actionOptions(rowData) || []
+
+    if (!firstAction) {
+      return {
+        icon: '',
+        tooltip: '',
+        disabled: true
+      }
+    }
+
+    const { icon, tooltip, disabled, shouldLoadOnClick } = firstAction
+
     return {
-      icon: firstAction?.icon,
-      tooltip: firstAction?.tooltip,
-      disabled: firstAction?.disabled
+      icon: shouldLoadOnClick && disabled ? 'pi pi-spin pi-spinner' : icon,
+      tooltip,
+      disabled
     }
   }
 
