@@ -1074,9 +1074,9 @@
 
   // Variables
   const listDataSources = ref([
-    { label: 'Activity History', value: 'rtm_activity' },
+    { label: 'Activity History', value: 'activity' },
     { label: 'Edge Applications', value: 'http' },
-    { label: 'Edge Functions', value: 'cells_console' },
+    { label: 'Edge Functions', value: 'function' },
     { label: 'WAF Events', value: 'waf' }
   ])
   const listEndpoint = ref([
