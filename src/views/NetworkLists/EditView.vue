@@ -33,7 +33,15 @@
       .when('networkListType', {
         is: 'ip_cidr',
         then: (schema) => schema.required('IP/CIDR is a required field')
-      }),
+      })
+      .test(
+        'no-empty-lines',
+        'There must be no empty lines or lines with only whitespace',
+        (value) => {
+          if (typeof value !== 'string') return true
+          return value.split('\n').every((line) => line.trim() !== '')
+        }
+      ),
     itemsValuesCountry: yup.array().when('networkListType', {
       is: 'countries',
       then: (schema) =>
