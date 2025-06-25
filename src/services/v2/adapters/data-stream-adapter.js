@@ -3,8 +3,8 @@ import * as Errors from '@/services/axios/errors'
 
 const mapDataSourceName = {
   http: 'Edge Applications',
-  rtm_activity: 'Activity History',
-  cells_console: 'Edge Functions',
+  activity: 'Activity History',
+  functions: 'Edge Functions',
   waf: 'WAF Events'
 }
 

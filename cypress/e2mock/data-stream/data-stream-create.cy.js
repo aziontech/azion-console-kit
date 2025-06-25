@@ -7,8 +7,8 @@ let dataStreamName
 describe('Data Stream spec', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     dataStreamName = generateUniqueName('DataStream')
-    
-    cy.login()    
+
+    cy.login()
   })
 
   it('should successfully create a data stream with domain filters', () => {
@@ -29,7 +29,7 @@ describe('Data Stream spec', { tags: ['@dev4'] }, () => {
     cy.wait('@dataStreamList', { timeout: 30000 })
     cy.wait('@getOneWorkload')
 
-    cy.intercept('GET', '/v4/data_stream/data_sets?page=1&page_size=100&fields=id%2Cname', {
+    cy.intercept('GET', '/v4/data_stream/templates?page=1&page_size=100&fields=id%2Cname', {
       fixture: '/data-streaming/with_sampling_active.json'
     }).as('retrieveDataStream')
 

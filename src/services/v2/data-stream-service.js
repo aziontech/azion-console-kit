@@ -5,7 +5,7 @@ export class DataStreamService {
     this.http = http
     this.adapter = adapter
     this.baseURL = 'v4/data_stream/streams'
-    this.dataSetsEndpoint = 'v4/data_stream/data_sets'
+    this.dataSetsEndpoint = 'v4/data_stream/templates'
     this.workloadEndpoint = 'v4/workspace/workloads'
   }
 
