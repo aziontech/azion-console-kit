@@ -37,7 +37,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
-  import { ref, computed, inject } from 'vue'
+  import { ref, computed, inject, watch } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { validationSchema } from './FormFields/composables/validation'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
@@ -53,9 +53,9 @@
     isEdgeCertificate,
     isEdgeCertificateCSR,
     PRIVATE_KEY_TYPES,
-    CERTIFICATE_TYPES,
     certificateTypeList,
-    pageTitleByCertificateType
+    pageTitleByCertificateType,
+    certificateType
   } = useDigitalCertificate(route.query.certificate)
 
   const initialValues = ref({
@@ -71,7 +71,7 @@
     email: '',
     privateKeyType: PRIVATE_KEY_TYPES.RSA_2048,
     subjectAlternativeNames: '',
-    certificateType: CERTIFICATE_TYPES.EDGE_CERTIFICATE
+    certificateType: certificateType.value
   })
 
   const handleTrackSuccessCreated = () => {
@@ -115,5 +115,9 @@
 
   const isRenderInlineMessage = computed(() => {
     return isEdgeCertificate.value || isEdgeCertificateCSR.value
+  })
+
+  watch(certificateType, (newValue) => {
+    initialValues.value.certificateType = newValue
   })
 </script>
