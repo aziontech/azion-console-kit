@@ -203,7 +203,7 @@
       const result = await props.listRealTimePurgeService()
       countItens = result.filter((item) => item.user === user.email).length
       if (countItens === countPurge.value) {
-        listPurgeRef.value.data = result
+        listPurgeRef.value.reload()
         router.replace({ query: {} })
       }
     } while (countItens !== countPurge.value)
