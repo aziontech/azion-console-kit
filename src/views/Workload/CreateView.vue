@@ -15,10 +15,12 @@
       >
         <template #form>
           <FormFieldsWorkload
-            :edgeApplication="propsService.edgeApplication"
-            :edgeFirewall="propsService.edgeFirewall"
-            :digitalCertificates="propsService.digitalCertificates"
-            :customPages="propsService.customPages"
+            :listEdgeApplicationsService="listEdgeApplicationsService"
+            :loadEdgeApplicationsService="loadEdgeApplicationsService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
+            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            :isLoadingRequests="isLoadingRequests"
           />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -47,13 +49,13 @@
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { workloadService } from '@/services/v2'
+  import { workloadService, edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listDigitalCertificatesService: {
+    createDomainService: {
       type: Function,
       required: true
     },
@@ -87,24 +89,24 @@
     }
   })
 
-  const propsService = {
-    edgeApplication: {
-      listEdgeApplicationsService: props.listEdgeApplicationsService,
-      loadEdgeApplicationsService: props.loadEdgeApplicationsService
-    },
-    edgeFirewall: {
-      listEdgeFirewallService: props.listEdgeFirewallService,
-      loadEdgeFirewallService: props.loadEdgeFirewallService
-    },
-    digitalCertificates: {
-      listDigitalCertificatesService: props.listDigitalCertificatesService,
-      loadDigitalCertificatesService: props.loadDigitalCertificatesService
-    },
-    customPages: {
-      listCustomPagesService: props.listCustomPagesService,
-      loadCustomPagesService: props.loadCustomPagesService
-    }
-  }
+  // const propsService = {
+  //   edgeApplication: {
+  //     listEdgeApplicationsService: props.listEdgeApplicationsService,
+  //     loadEdgeApplicationsService: props.loadEdgeApplicationsService
+  //   },
+  //   edgeFirewall: {
+  //     listEdgeFirewallService: props.listEdgeFirewallService,
+  //     loadEdgeFirewallService: props.loadEdgeFirewallService
+  //   },
+  //   digitalCertificates: {
+  //     listDigitalCertificatesService: props.listDigitalCertificatesService,
+  //     loadDigitalCertificatesService: props.loadDigitalCertificatesService
+  //   },
+  //   customPages: {
+  //     listCustomPagesService: props.listCustomPagesService,
+  //     loadCustomPagesService: props.loadCustomPagesService
+  //   }
+  // }
 
   const toast = useToast()
   const route = useRoute()

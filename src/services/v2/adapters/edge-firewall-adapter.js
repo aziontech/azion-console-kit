@@ -1,4 +1,5 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 export const EdgeFirewallAdapter = {
   transformListEdgeFirewall(data) {
@@ -11,15 +12,7 @@ export const EdgeFirewallAdapter = {
           debugRules: edgeFirewall.debug_rules,
           lastModify: formatExhibitionDate(edgeFirewall.last_modified, 'full', undefined),
           lastModifyDate: edgeFirewall.last_modified,
-          status: edgeFirewall.active
-            ? {
-                content: 'Active',
-                severity: 'success'
-              }
-            : {
-                content: 'Inactive',
-                severity: 'danger'
-              }
+          status: parseStatusData(edgeFirewall.active)
         }
       }) || []
     )
@@ -29,12 +22,12 @@ export const EdgeFirewallAdapter = {
       id: data.id,
       name: data.name,
       isActive: data.active,
-      edgeFunctionsEnabled: data.modules.edge_functions_enabled,
-      networkProtectionEnabled: data.modules.network_protection_enabled,
-      wafEnabled: data.modules.waf_enabled,
+      edgeFunctionsEnabled: data.modules.edge_functions.enabled,
+      networkProtectionEnabled: data.modules.network_protection.enabled,
+      wafEnabled: data.modules.waf.enabled,
       debugRules: data.debug,
       domains: data.domains || [],
-      ddosProtectionUnmetered: true
+      ddosProtectionUnmetered: data.modules.ddos_protection.enabled
     }
   },
   transformPayload(payload) {
@@ -42,10 +35,18 @@ export const EdgeFirewallAdapter = {
       name: payload.name,
       active: payload.isActive,
       modules: {
-        ddos_protection_enabled: true,
-        edge_functions_enabled: payload.edgeFunctionsEnabled,
-        network_protection_enabled: payload.networkProtectionEnabled,
-        waf_enabled: payload.wafEnabled
+        ddos_protection: {
+          enabled: payload.ddosProtectionUnmetered
+        },
+        edge_functions: {
+          enabled: payload.edgeFunctionsEnabled
+        },
+        network_protection: {
+          enabled: payload.networkProtectionEnabled
+        },
+        waf: {
+          enabled: payload.wafEnabled
+        }
       },
       debug: payload.debugRules
     }

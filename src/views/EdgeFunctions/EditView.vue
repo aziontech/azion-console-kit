@@ -10,16 +10,9 @@
   import { ref, inject } from 'vue'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { edgeFunctionService } from '@/services/v2'
 
   const props = defineProps({
-    loadEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    editEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
@@ -51,7 +44,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -77,8 +70,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
+        :editService="edgeFunctionService.editEdgeFunctionService"
+        :loadService="edgeFunctionService.loadEdgeFunctionService"
         :updatedRedirect="props.updatedRedirect"
         @on-edit-success="handleTrackSuccessEdit"
         @on-edit-fail="handleTrackFailEdit"

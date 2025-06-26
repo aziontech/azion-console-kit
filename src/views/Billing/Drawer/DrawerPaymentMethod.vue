@@ -11,10 +11,6 @@
   const emit = defineEmits(['onSuccess'])
 
   const props = defineProps({
-    createPaymentMethodService: {
-      type: Function,
-      required: true
-    },
     getStripeClientService: { type: Function, required: true }
   })
 
@@ -56,7 +52,6 @@
 
 <template>
   <CreatePaymentMethodBlock
-    :createService="props.createPaymentMethodService"
     :stripeClientService="props.getStripeClientService"
     v-model:visible="showCreatePaymentMethodDrawer"
     v-if="showCreateDrawer"

@@ -24,10 +24,10 @@ function createDomainsItem() {
 
   return {
     label: handleTextDomainWorkload.pluralTitle,
-    icon: handleTextDomainWorkload.icon,
+    icon: 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
-    ...(handleTextDomainWorkload.tag && { tag: handleTextDomainWorkload.tag }),
-    id: 'domains'
+    id: 'domains',
+    tag: 'Preview'
   }
 }
 
@@ -59,16 +59,16 @@ function createSecureItems() {
       visible: !hasFlagBlockApiV4()
     },
     {
-      label: 'Edge Firewall',
-      to: '/edge-firewall',
-      icon: 'ai ai-edge-firewall',
-      id: 'edge-firewall'
-    },
-    {
       label: 'Edge DNS',
       to: '/edge-dns',
       icon: 'ai ai-edge-dns',
       id: 'edge-dns'
+    },
+    {
+      label: 'Edge Firewall',
+      to: '/edge-firewall',
+      icon: 'ai ai-edge-firewall',
+      id: 'edge-firewall'
     }
   ]
 }
@@ -134,6 +134,14 @@ function createToolsItems() {
 
 function createEdgeLibrariesItems() {
   return [
+    {
+      label: 'Custom Pages',
+      to: '/custom-pages',
+      icon: 'ai ai-custom-pages',
+      tag: 'Preview',
+      id: 'custom-pages',
+      visible: !hasFlagBlockApiV4()
+    },
     {
       label: 'Edge Functions',
       to: '/edge-functions',

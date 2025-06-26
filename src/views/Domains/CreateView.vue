@@ -20,8 +20,6 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
             :isLoadingRequests="isLoadingRequests"
           />
         </template>
@@ -62,14 +60,6 @@
       type: Function,
       required: true
     },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -79,14 +69,6 @@
       required: true
     },
     loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
       type: Function,
       required: true
     }

@@ -70,7 +70,7 @@
   })
 
   const listWafRulesServiceOptions = async (query) => {
-    return await props.listWafRulesService({ ...query, fields: 'name, id' })
+    return await props.listWafRulesService({ ...query, fields: 'name,id' })
   }
 
   const listNetworkList = async () => {
@@ -385,6 +385,7 @@
 
     return [
       { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
+      { value: 'tag_event', label: 'Tag Event' },
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
@@ -466,6 +467,11 @@
   const isWafBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
   }
+
+  const isTagEvent = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
+  }
+
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
   }
@@ -786,6 +792,17 @@
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
+              />
+            </template>
+
+            <template v-if="isTagEvent(behaviorItemIndex)">
+              <FieldText
+                class="w-full"
+                id="`behaviors[${behaviorItemIndex}].tag_event`"
+                :key="`${behaviorItem.key}-tag_event`"
+                placeholder="Tag Event"
+                :value="behaviors[behaviorItemIndex].value.tag_event"
+                :name="`behaviors[${behaviorItemIndex}].tag_event`"
               />
             </template>
 

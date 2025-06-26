@@ -20,8 +20,6 @@
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
             :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
             :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
             hasDomainName
             @copyDomainName="copyDomainName"
           />
@@ -56,14 +54,6 @@
 
   const props = defineProps({
     editDomainService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },

@@ -6,7 +6,11 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { edgeFirewallRulesEngineService, edgeFirewallFunctionService } from '@/services/v2'
+  import {
+    edgeFirewallRulesEngineService,
+    edgeFirewallFunctionService,
+    wafService
+  } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -34,10 +38,6 @@
       type: Function,
       required: true
     },
-    listWafRulesService: {
-      type: Function,
-      required: true
-    },
     editService: {
       type: Function,
       required: true
@@ -51,10 +51,6 @@
       required: true
     },
     loadNetworkListService: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesService: {
       type: Function,
       required: true
     }
@@ -204,7 +200,8 @@
   const listFunctionsServiceWithDecorator = async () => {
     return await edgeFirewallFunctionService.listFunctionsService(props.edgeFirewallId, {
       pageSize: 100,
-      fields: 'id,name'
+      fields: 'id,name',
+      ordering: 'active'
     })
   }
 
@@ -262,10 +259,10 @@
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :listWafRulesService="listWafRulesService"
+        :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
-        :loadWafRulesService="loadWafRulesService"
+        :loadWafRulesService="wafService.loadWafRule"
       />
     </template>
   </CreateDrawerBlock>
@@ -286,10 +283,10 @@
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
-        :listWafRulesService="listWafRulesService"
+        :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
-        :loadWafRulesService="loadWafRulesService"
+        :loadWafRulesService="wafService.loadWafRule"
       />
     </template>
   </EditDrawerBlock>

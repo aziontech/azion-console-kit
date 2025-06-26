@@ -14,9 +14,10 @@
   defineOptions({ name: 'edit-edge-firewall' })
   const emit = defineEmits(['updatedFirewall'])
 
-  defineProps({
+  const props = defineProps({
     loadDomains: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    updatedRedirect: { type: String, required: true },
+    edgeFirewall: { type: Object }
   })
 
   const loadingServices = ref(false)
@@ -35,6 +36,10 @@
     if (!formValid) return
     await onSubmit()
     emit('updatedFirewall', values)
+  }
+
+  const loadEdgeFirewallService = () => {
+    return props.edgeFirewall
   }
 
   const handleTrackSuccessEdit = () => {
@@ -63,7 +68,7 @@
   <div>
     <EditFormBlock
       :editService="edgeFirewallService.editEdgeFirewallService"
-      :loadService="edgeFirewallService.loadEdgeFirewallService"
+      :loadService="loadEdgeFirewallService"
       :schema="validationSchema"
       :updatedRedirect="updatedRedirect"
       disableRedirect

@@ -11,25 +11,21 @@
   import { ref, onMounted, inject } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
   import { useRoute } from 'vue-router'
+  import { edgeFunctionService } from '@/services/v2'
 
   const route = useRoute()
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    createEdgeFunctionsService: {
-      type: Function,
-      required: true
-    }
-  })
   const ARGS_INITIAL_STATE = '{}'
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Functions',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -55,7 +51,7 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    args: yup.string().test('validJson', 'Invalid JSON', (value) => {
+    defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
       let isValidJson = true
       try {
         JSON.parse(value)
@@ -78,6 +74,19 @@
     args: ARGS_INITIAL_STATE,
     initiatorType: 'edge_application'
   }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge function has been created',
+      actions: {
+        link: {
+          label: 'View Edge Function',
+          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -89,11 +98,12 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeFunctionsService"
+        :createService="edgeFunctionService.createEdgeFunctionsService"
         :schema="validationSchema"
         @on-response="handleTrackCreation"
         @on-response-fail="handleTrackFailedCreation"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />

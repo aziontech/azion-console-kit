@@ -92,9 +92,9 @@ export const WorkloadAdapter = {
           ? { content: 'Active', severity: 'success' }
           : { content: 'Inactive', severity: 'danger' },
         workloadHostname: {
-          content: workload.workload_hostname
+          content: workload.workload_domain
         },
-        domains: workload.alternate_domains
+        domains: workload.domains
       }
     })
   },

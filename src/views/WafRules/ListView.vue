@@ -1,40 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="WAF Rules" />
-    </template>
-    <template #content>
-      <FetchListTableBlock
-        v-if="hasContentToList"
-        :listService="listWafRulesService"
-        :columns="getColumns"
-        addButtonLabel="WAF Rule"
-        createPagePath="waf/create"
-        @on-before-go-to-edit="handleTrackClickToEdit"
-        @on-before-go-to-add-page="handleTrackClickToCreate"
-        editPagePath="waf/edit"
-        @on-load-data="handleLoadData"
-        :actions="actions"
-        :apiFields="WAF_API_FIELDS"
-        :defaultOrderingFieldName="'name'"
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No WAF rules have been created"
-        description="Click the button below to create your first WAF rule."
-        createButtonLabel="WAF Rule"
-        @click-to-create="handleTrackClickToEdit"
-        createPagePath="waf/create"
-        :documentationService="documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import { ref, computed, inject } from 'vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
@@ -44,19 +7,12 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CloneDialog from './Dialog/Clone.vue'
+  import { wafService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    listWafRulesService: {
-      required: true,
-      type: Function
-    },
-    deleteWafRulesService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -81,7 +37,7 @@
       label: 'Delete',
       title: 'WAF rule',
       icon: 'pi pi-trash',
-      service: props.deleteWafRulesService
+      service: wafService.deleteWafRule
     }
   ]
 
@@ -105,7 +61,7 @@
     hasContentToList.value = event
   }
 
-  const WAF_API_FIELDS = []
+  const WAF_API_FIELDS = ['id', 'name', 'threats_configuration', 'active']
 
   const getColumns = computed(() => {
     return [
@@ -138,3 +94,40 @@
     ]
   })
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="WAF Rules" />
+    </template>
+    <template #content>
+      <FetchListTableBlock
+        v-if="hasContentToList"
+        :listService="wafService.listWafRules"
+        :columns="getColumns"
+        addButtonLabel="WAF Rule"
+        createPagePath="waf/create"
+        @on-before-go-to-edit="handleTrackClickToEdit"
+        @on-before-go-to-add-page="handleTrackClickToCreate"
+        editPagePath="waf/edit"
+        @on-load-data="handleLoadData"
+        :actions="actions"
+        :apiFields="WAF_API_FIELDS"
+        :defaultOrderingFieldName="'name'"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No WAF rules have been created"
+        description="Click the button below to create your first WAF rule."
+        createButtonLabel="WAF Rule"
+        @click-to-create="handleTrackClickToEdit"
+        createPagePath="waf/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
+</template>

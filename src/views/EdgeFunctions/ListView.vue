@@ -6,7 +6,7 @@
     <template #content>
       <FetchListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeFunctionsService"
+        :listService="edgeFunctionService.listEdgeFunctionsService"
         :columns="getColumns"
         addButtonLabel="Edge Function"
         createPagePath="edge-functions/create?origin=list"
@@ -43,19 +43,12 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
+  import { edgeFunctionService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -68,6 +61,7 @@
     'name',
     'active',
     'language',
+    'vendor',
     'initiator_type',
     'reference_count',
     'last_editor'
@@ -77,7 +71,7 @@
       type: 'delete',
       title: 'edge function',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeFunctionsService
+      service: edgeFunctionService.deleteEdgeFunctionService
     }
   ]
 
@@ -113,6 +107,20 @@
     {
       field: 'referenceCount',
       header: 'Ref. Count'
+    },
+    {
+      field: 'vendor',
+      header: 'Vendor',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: {
+            text: columnData || '-',
+            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
+          },
+          columnAppearance: 'text-with-icon'
+        })
+      }
     },
     {
       field: 'language',

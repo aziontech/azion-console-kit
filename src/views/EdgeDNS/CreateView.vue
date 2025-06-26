@@ -1,32 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        pageTitle="Create Zone"
-        description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
-      >
-        <template #default>
-          <PrimeButton
-            outlined
-            icon="pi pi-copy"
-            class="max-md:w-full"
-            label="Copy Nameserver Values"
-            @click="handleCopyNameServers"
-          ></PrimeButton>
-        </template>
-      </PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Zone" />
     </template>
 
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeDNSService"
+        :createService="edgeDNSService.createEdgeDNSZonesService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
       >
         <template #form>
-          <FormFieldsEdgeDnsCreate></FormFieldsEdgeDnsCreate>
+          <FormFieldsEdgeDnsCreate />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
@@ -44,29 +32,15 @@
   import CreateFormBlock from '@templates/create-form-block'
   import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
   import * as yup from 'yup'
-  import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeDNSService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createEdgeDNSService: {
-      type: Function,
-      required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    }
-  })
-
-  const toast = useToast()
 
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -77,28 +51,39 @@
         const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
         return domainRegex.test(value)
       }),
+    dnssec: yup.boolean(),
     isActive: yup.boolean()
   })
 
   const initialValues = {
     name: '',
     domain: '',
+    dnssec: false,
     isActive: true
   }
 
-  const handleCopyNameServers = () => {
-    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
-  }
-
-  const handleResponse = () => {
+  const handleResponse = (response) => {
     tracker.product.productCreated({
       productName: 'Edge DNS Zone'
     })
+
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback:
+        'Your DNS zone has been created. To complete the setup, ensure the Azion nameservers are configured in your domain provider.',
+      additionalFeedback:
+        'For the DNSSEC, once the Key Tag and Digest are available in your zone, provide them to your provider to fully activate DNSSEC.',
+      actions: {
+        link: {
+          label: 'View Zone',
+          callback: () => response.redirectToUrl(`/edge-dns/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailedCreation = (error) => {

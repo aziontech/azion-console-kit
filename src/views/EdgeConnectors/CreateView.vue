@@ -5,9 +5,11 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="createEdgeConnectorsService"
+        @on-response="handleToast"
+        :createService="edgeConnectorsService.createEdgeConnectorsService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form="{ resetForm }">
           <FormFieldsEdgeConnectors
@@ -35,13 +37,7 @@
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-
-  defineProps({
-    createEdgeConnectorsService: {
-      type: Function,
-      required: true
-    }
-  })
+  import { edgeConnectorsService } from '@/services/v2'
 
   const initialValues = {
     type: 'http',
@@ -245,4 +241,17 @@
 
     status: yup.boolean().required()
   })
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Edge Connector successfully created',
+      actions: {
+        link: {
+          label: 'View Edge Connector',
+          callback: () => response.redirectToUrl(`/edge-connectors/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
 </script>

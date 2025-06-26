@@ -25,6 +25,27 @@ const LANGUAGE_WITH_ICON = {
   }
 }
 
+const parseLastEditor = (edgeFunctionData) => {
+  return edgeFunctionData?.version && edgeFunctionData?.vendor
+    ? edgeFunctionData.vendor
+    : edgeFunctionData.last_editor
+}
+
+const parseName = (edgeFunctionData) => {
+  const nameProps = { text: edgeFunctionData.name, tagProps: {} }
+
+  if (edgeFunctionData?.version && edgeFunctionData?.vendor) {
+    nameProps.tagProps = {
+      icon: 'pi pi-cart-plus',
+      value: 'Integration',
+      outlined: true,
+      severity: 'info'
+    }
+  }
+
+  return nameProps
+}
+
 const transformMap = {
   id: (value) => value.id,
   active: (value) => value.active,
@@ -32,14 +53,11 @@ const transformMap = {
   initiatorType: (value) => value.initiator_type,
   lastEditor: (value) => value.last_editor,
   referenceCount: (value) => value.reference_count,
-  jsonArgs: (value) => JSON.stringify(value.json_args, null, 2),
+  defaultArgs: (value) => JSON.stringify(value.default_args, null, 2),
   name: (value) => value.name,
   code: (value) => value.code,
   version: (value) => value.version || '-',
-  lastModified: (value) =>
-    value.last_modified
-      ? new Intl.DateTimeFormat('us', { dateStyle: 'full' })?.format(new Date(value.last_modified))
-      : null,
+  vendor: (value) => value.vendor || '-',
   isProprietaryCode: (value) => value.is_proprietary_code || false
 }
 
@@ -58,18 +76,44 @@ export const EdgeFunctionsAdapter = {
   transformLoadEdgeFunction({ data }, fields) {
     const adapt = adaptServiceDataResponseToLoad(data, fields, transformMap)
 
-    if (fields.includes('active') || fields.includes('language')) {
-      return {
-        ...adapt,
-        statusTag: STATUS_AS_TAG[data.active],
-        languageIcon: LANGUAGE_WITH_ICON[data.language]
-      }
-    }
-
     return adapt
   },
 
   transformEdgeFunctionsDropdown(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
+  },
+
+  transformEdgeFunctions(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
+  },
+
+  transformListEdgeFunction(data) {
+    return (
+      data?.map((edgeFunction) => {
+        return {
+          status: STATUS_AS_TAG[edgeFunction.active],
+          version: edgeFunction.version || '-',
+          language: LANGUAGE_WITH_ICON[edgeFunction.language],
+          initiatorType: edgeFunction.initiator_type,
+          id: edgeFunction.id,
+          lastEditor: parseLastEditor(edgeFunction),
+          name: parseName(edgeFunction),
+          vendor: edgeFunction.vendor,
+          referenceCount: edgeFunction.reference_count
+        }
+      }) || []
+    )
+  },
+
+  transformPayloadEdgeFunctions(payload) {
+    const parsedArgs = JSON.parse(payload.defaultArgs)
+    return {
+      name: payload.name,
+      code: payload.code,
+      language: payload.language,
+      initiator_type: payload.initiatorType,
+      default_args: parsedArgs,
+      active: payload.active
+    }
   }
 }

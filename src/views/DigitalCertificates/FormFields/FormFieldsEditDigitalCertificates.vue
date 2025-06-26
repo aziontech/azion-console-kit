@@ -21,7 +21,8 @@
 
   const certificateTypes = {
     EDGE_CERTIFICATE: 'edge_certificate',
-    TRUSTED: 'trusted_ca_certificate'
+    TRUSTED: 'trusted_ca_certificate',
+    CRL: 'CRL'
   }
 
   const csrCopied = ref(false)
@@ -43,7 +44,8 @@
   const isCertificateType = computed(() => {
     return {
       edgeCertificate: !csr.value && certificateType.value === certificateTypes.EDGE_CERTIFICATE,
-      trustedCertificate: certificateType.value === certificateTypes.TRUSTED
+      trustedCertificate: certificateType.value === certificateTypes.TRUSTED,
+      crl: certificateType.value === certificateTypes.CRL
     }
   })
 </script>
@@ -93,8 +95,8 @@
   <template v-else>
     <FormHorizontal
       v-if="csr"
-      title="Update CSR"
-      description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field. The current certificate is hidden to protect sensitive information."
+      title="Update a Server Certificate"
+      description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field."
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -109,7 +111,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldTextArea
             label="Certificate"
-            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
             name="certificate"
             :value="certificate"
             data-testid="digital-certificate__certificate-field"
@@ -164,7 +166,7 @@
             name="certificate"
             :value="certificate"
             data-testid="digital-certificate__certificate-field"
-            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -172,7 +174,35 @@
             label="Private Key"
             name="privateKey"
             :value="privateKey"
-            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+
+    <!-- CRL case -->
+    <FormHorizontal
+      v-if="isCertificateType.crl"
+      title="Update a Server Certificate"
+      description="Paste the PEM-encoded CRL in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            :value="name"
+            placeholder="My digital certificate"
+            data-testid="digital-certificate__name-field"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            data-testid="digital-certificate__certificate-field"
+            placeholder="-----BEGIN CRL----&#10;-----END CRL-----"
           />
         </div>
       </template>
@@ -200,7 +230,7 @@
             data-testid="trusted-certificates-form__certificate-field"
             name="certificate"
             :value="certificate"
-            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
             description="Intermediate certificates are accepted."
           />
         </div>

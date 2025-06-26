@@ -14,16 +14,19 @@ const toSnakeCase = (str) => {
  * @param {number} params.page - The page number
  * @param {number} params.pageSize - The number of items per page
  * @param {string} params.search - The search query
+ * @param {string} params.type - The type of the digital certificate
  * @returns {string} The query parameter string
  */
-export const buildQueryParams = ({ fields, ordering, page, pageSize, search }) => {
+export const buildQueryParams = ({ fields, ordering, page, pageSize, search, type, isDefault }) => {
   const params = new URLSearchParams()
   const paramsMap = {
     ...(ordering && { ordering: toSnakeCase(ordering) }),
     ...(page && { page: page?.toString() }),
     ...(pageSize && { page_size: pageSize?.toString() }),
     ...(fields && { fields }),
-    ...(search && { search })
+    ...(search && { search: search?.toString() }),
+    ...(type && { type }),
+    ...(isDefault && { is_default: isDefault })
   }
 
   Object.entries(paramsMap)

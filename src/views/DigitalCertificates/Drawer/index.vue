@@ -1,24 +1,21 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
-  import * as yup from 'yup'
-  import { ref, inject, defineExpose, watch } from 'vue'
-  import {
-    createDigitalCertificatesService,
-    createDigitalCertificatesCSRService
-  } from '@/services/digital-certificates-services'
+  import { ref, inject, defineExpose } from 'vue'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { validationSchema } from '../FormFields/composables/validation'
+  import { useDigitalCertificate } from '../FormFields/composables/certificate'
 
   defineOptions({
     name: 'digital-certificates-drawer'
   })
 
-  const props = defineProps({
-    useOnlyTrustedCa: {
-      type: Boolean
-    }
-  })
+  // const props = defineProps({
+  //   useOnlyTrustedCa: {
+  //     type: Boolean
+  //   }
+  // })
 
   const emit = defineEmits(['onSuccess', 'onEdgeApplicationCreated'])
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -27,26 +24,12 @@
   const DEBOUNCE_TIME_IN_MS = 300
   const showCreateDrawer = refDebounced(showCreateDigitalCertificateDrawer, DEBOUNCE_TIME_IN_MS)
 
-  const certificateTypes = {
-    EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
-    EDGE_CERTIFICATE_CSR: 'generateCSR',
-    TRUSTED: 'trusted_ca_certificate'
-  }
-  const CSRConditionalValidations = {
-    is: certificateTypes.EDGE_CERTIFICATE_CSR,
-    then: (schema) => schema.required('Field Required')
-  }
+  const { createService, PRIVATE_KEY_TYPES, CERTIFICATE_TYPES } = useDigitalCertificate()
 
-  const createServiceBySelectedType = ref(createDigitalCertificatesService)
-
-  const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
     digitalCertificateName: '',
-    // Edge Certificate values
     certificate: '',
     privateKey: undefined,
-
-    // CSR values
     common: '',
     country: '',
     state: '',
@@ -54,60 +37,9 @@
     organization: '',
     organizationUnity: '',
     email: '',
-    privateKeyType: 'RSA (2048)',
+    privateKeyType: PRIVATE_KEY_TYPES.RSA_2048,
     subjectAlternativeNames: '',
-    certificateType: props.useOnlyTrustedCa
-      ? certificateTypes.TRUSTED
-      : certificateTypes.EDGE_CERTIFICATE_CSR
-  })
-
-  const certificateRequiredField = (certificateType) => {
-    const isTrustedCA = certificateType === certificateTypes.TRUSTED
-
-    return isTrustedCA
-  }
-  const validationSchema = yup.object({
-    digitalCertificateName: yup.string().required('Name is a required field.'),
-
-    // Certificate Choices
-    certificateType: yup.string().required('Choose a certificate type.'),
-
-    // Edge Certificate Fields
-    certificate: yup.string().when(['certificateType'], {
-      is: certificateRequiredField,
-      then: (schema) => schema.required('Certificate is a required field.')
-    }),
-    privateKey: yup.string(),
-
-    // CSR Fields
-    common: yup.string().when('certificateType', CSRConditionalValidations),
-    country: yup.string().when('certificateType', {
-      is: certificateTypes.EDGE_CERTIFICATE_CSR,
-      then: (schema) =>
-        schema
-          .required('Country/Region is a required field.')
-          .max(2, 'Country/Region must be a 2-character country code.')
-          .min(2, 'Country/Region must be a 2-character country code.')
-    }),
-    state: yup.string().when('certificateType', CSRConditionalValidations),
-    city: yup.string().when('certificateType', CSRConditionalValidations),
-    organizationUnity: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('organization unity'),
-    organization: yup.string().when('certificateType', CSRConditionalValidations),
-    privateKeyType: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('private key type'),
-    email: yup.string().when('certificateType', {
-      is: certificateTypes.EDGE_CERTIFICATE_CSR,
-      then: (schema) => schema.required('Email is a required field.').email()
-    }),
-    subjectAlternativeNames: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)')
+    certificateType: CERTIFICATE_TYPES.EDGE_CERTIFICATE
   })
 
   const handleTrackSuccessCreated = () => {
@@ -136,18 +68,17 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
-    emit('onSuccess', response.domainId)
+    handleToast(response)
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
   }
 
-  watch(certificateSelection, () => {
-    const isEdgeCertificateCSR =
-      certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
-
-    createServiceBySelectedType.value = isEdgeCertificateCSR
-      ? createDigitalCertificatesCSRService
-      : createDigitalCertificatesService
-  })
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your digital certificate has been created!'
+    }
+    response.showToastWithActions(toast)
+  }
 
   defineExpose({
     showCreateDrawer,
@@ -159,20 +90,17 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateDigitalCertificateDrawer"
-    :createService="createServiceBySelectedType"
+    :createService="createService"
     :schema="validationSchema"
     drawerId="digital-certificates-drawer"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedToCreate"
     title="Create Digital Certificate"
+    disableToast
   >
     <template #formFields>
-      <FormFieldsCreateDigitalCertificates
-        isDrawer
-        v-model:certificate-selection="certificateSelection"
-        :useOnlyTrustedCa="useOnlyTrustedCa"
-      />
+      <FormFieldsCreateDigitalCertificates isDrawer />
     </template>
   </CreateDrawerBlock>
 </template>

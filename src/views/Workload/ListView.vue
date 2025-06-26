@@ -61,25 +61,34 @@
     'name',
     'domains',
     'workload_hostname',
-    'alternate_domains',
     'infrastructure',
     'active',
     'last_modified',
     'id',
     // 'protocols',
     'last_editor',
-    'product_version'
+    'product_version',
+    'workload_domain'
   ]
 
   const columnsHiddenByDefault = ['id', 'lastEditor', 'protocols']
 
   const hasContentToList = ref(true)
+
+  const deleteWorkloas = (id, name) => {
+    
+    return {
+      id,
+      name
+    }
+  }
+
   const actions = [
     {
       type: 'delete',
       title: 'domain',
       icon: 'pi pi-trash',
-      service: workloadService.deleteWorkload
+      service: deleteWorkloas
     }
   ]
 

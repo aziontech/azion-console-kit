@@ -56,7 +56,7 @@ const createDigitalCertificate = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?fields=*').as(
     'getDigitalCertificatesApi'
   )
 

@@ -126,12 +126,11 @@
         >
           <EditView
             v-if="activeTab === mapTabs.mainSettings"
-            :updatedRedirect="props.updatedRedirect"
-            :edgeApplicationServices="props.edgeApplicationServices"
-            :edgeFirewallServices="props.edgeFirewallServices"
-            :digitalCertificatesServices="props.digitalCertificatesServices"
-            :customPagesServices="props.customPagesServices"
-            :workload="workload"
+            :updatedRedirect="props.domainServices.updatedRedirect"
+            :editDomainService="props.domainServices.editDomainService"
+            :loadDigitalCertificatesService="props.domainServices.loadDigitalCertificatesService"
+            :clipboardWrite="props.domainServices.clipboardWrite"
+            :domain="domain"
             :showActionBar="activeTab === mapTabs.mainSettings"
           />
         </TabPanel>

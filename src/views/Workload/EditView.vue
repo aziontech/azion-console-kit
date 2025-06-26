@@ -10,12 +10,11 @@
     isTabs
   >
     <template #form>
-      <FormFieldsWorkload
-        isEdit
-        :edgeApplicationServices="props.edgeApplicationServices"
-        :edgeFirewallServices="props.edgeFirewallServices"
-        :digitalCertificatesServices="props.digitalCertificatesServices"
-        :customPagesServices="props.customPagesServices"
+      <FormFieldsEditDomains
+        :digitalCertificates="digitalCertificates"
+        :loadDigitalCertificatesService="loadDigitalCertificatesService"
+        hasDomainName
+        @copyDomainName="copyDomainName"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -31,7 +30,7 @@
 <script setup>
   import { ref, inject } from 'vue'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
+  // import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -40,12 +39,12 @@
   const tracker = inject('tracker')
 
   const props = defineProps({
-    updatedRedirect: {
-      type: String,
+    editDomainService: {
+      type: Function,
       required: true
     },
-    edgeApplicationServices: {
-      type: Object,
+    loadDigitalCertificatesService: {
+      type: Function,
       required: true
     },
     edgeFirewallServices: {

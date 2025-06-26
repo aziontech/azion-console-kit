@@ -9,9 +9,8 @@
   import { useDialog } from 'primevue/usedialog'
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
-  import { edgeFirewallRulesEngineService } from '@/services/v2'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
-  import { networkListsService } from '@/services/v2'
+  import { networkListsService, edgeFirewallRulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -44,10 +43,6 @@
       type: Function,
       required: true
     },
-    listWafRulesService: {
-      type: Function,
-      required: true
-    },
     edgeFirewallId: {
       type: String || Number,
       required: true
@@ -57,10 +52,6 @@
       required: true
     },
     reorderRulesEngine: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesService: {
       type: Function,
       required: true
     }
@@ -245,12 +236,10 @@
     :edgeFirewallModules="edgeFirewallModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
-    :listWafRulesService="listWafRulesService"
     :loadService="loadEdgeFirewallRulesEngineService"
     :editService="editEdgeFirewallRulesEngineService"
     :listNetworkListService="networkListsService.listNetworkLists"
     :loadNetworkListService="networkListsService.loadNetworkList"
-    :loadWafRulesService="loadWafRulesService"
     @onSuccess="reloadList"
   />
 

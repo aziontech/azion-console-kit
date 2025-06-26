@@ -29,7 +29,8 @@ import {
   convertValueToDate,
   convertDateToLocalTimezone,
   formatDateToUS,
-  convertValueToDateByUserTimezone
+  convertValueToDateByUserTimezone,
+  formatDateMonthAndYear
 } from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
@@ -57,6 +58,9 @@ import {
   SUPPORTED_VERSIONS
 } from './workload-protocol-settings'
 
+const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
+import { getExpiredDate } from './payment-method'
+
 export {
   HTTP_PORT_LIST_OPTIONS,
   HTTP3_PORT_LIST_OPTIONS,
@@ -64,6 +68,7 @@ export {
   TLS_VERSIONS_OPTIONS,
   SUPPORTED_CIPHERS_LIST_OPTIONS,
   SUPPORTED_VERSIONS,
+  checkIfFieldExist,
   InviteSession,
   azionPrivacyPolicyWindowOpener,
   azionOnboardingWindowOpener,
@@ -113,5 +118,7 @@ export {
   convertValueToDateByUserTimezone,
   getCurrentTimezone,
   TEXT_DOMAIN_WORKLOAD,
-  adaptServiceDataResponse
+  adaptServiceDataResponse,
+  formatDateMonthAndYear,
+  getExpiredDate
 }

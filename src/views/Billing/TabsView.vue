@@ -9,7 +9,7 @@
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
   import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
   import SkeletonBlock from '@/templates/skeleton-block'
-
+  import { paymentService } from '@/services/v2'
   import { ref, computed, provide, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
@@ -40,8 +40,6 @@
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
-    addCreditService: { type: Function, required: true },
-    createPaymentMethodService: { type: Function, required: true },
     paymentServices: { type: Object, required: true },
     billsServices: { type: Object, required: true },
     getStripeClientService: { type: Function, required: true }
@@ -162,12 +160,11 @@
         ref="drawerAddCreditRef"
         v-if="cardDefault.cardData"
         :cardDefault="cardDefault"
-        :createService="props.addCreditService"
+        :createService="paymentService.addCredit"
         @onSuccess="successAddCredit"
       />
       <DrawerPaymentMethod
         ref="drawerPaymentMethodRef"
-        :createPaymentMethodService="props.createPaymentMethodService"
         :getStripeClientService="props.getStripeClientService"
         @onSuccess="loadListPaymentMethods"
       />

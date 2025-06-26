@@ -135,11 +135,16 @@
           rows="16"
           cols="30"
           :value="ipCidr"
-          description="Separate each address value by using a new line and, optionally, use <code>#</code> to add
-          a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
-          removed."
           data-testid="network-list-form__ipcidr-list"
-        />
+        >
+          <template #description>
+            <small class="text-xs text-color-secondary font-normal leading-5">
+              Separate each address value by using a new line and, optionally, use
+              <code>#</code> to add a comment and <code>--LT</code> to add a date. Duplicated
+              entries are automatically removed.
+            </small>
+          </template>
+        </FieldTextArea>
       </div>
       <div
         class="flex flex-col w-full sm:max-w-3xl gap-2"
