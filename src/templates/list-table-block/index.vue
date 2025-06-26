@@ -28,6 +28,7 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
+      :first="firstItemIndex"
     >
       <template
         #header
@@ -491,7 +492,7 @@
       default: false
     }
   })
-
+  const firstItemIndex = ref(0)
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
@@ -710,7 +711,12 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV, data })
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 0
+    firstItemIndex.value = FIRST_NUMBER_PAGE
+  }
+
+  defineExpose({ reload, handleExportTableDataToCSV, data, updateDataTablePagination })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -728,6 +734,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
+    firstItemIndex.value = event.first
   }
 
   const filterBy = computed(() => {
