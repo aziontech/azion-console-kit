@@ -9,9 +9,11 @@
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { purgeService } from '@/services/v2'
+  import { usePurgeStore } from '@/stores/purge'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const purgeStore = usePurgeStore()
 
   defineProps({
     contactSalesRealTimePurgeService: {
@@ -21,6 +23,7 @@
   })
 
   const handleResponse = () => {
+    purgeStore.incrementPurgeCount()
     tracker.product.productCreated({
       productName: 'Purge'
     })

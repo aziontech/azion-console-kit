@@ -58,6 +58,8 @@
   import { useToast } from 'primevue/usetoast'
   import { purgeService } from '@/services/v2'
   import { useRoute, useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
+  import { usePurgeStore } from '@/stores/purge'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -77,17 +79,29 @@
   const isLoading = ref(null)
   const toast = useToast()
   const timeToReload = 9000
+  const { accountData } = useAccountStore()
+  const purgeStore = usePurgeStore()
+
+  const user = accountData
+  const countPurge = ref(0)
 
   const handleLoadData = async (event) => {
+    countPurge.value = listPurgeRef.value.data.filter((item) => item.user === user.email).length
     hasContentToList.value = event
     const { isPending } = route.query
-    if (isPending) {
+    const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
+
+    if (hasPendingMismatch) {
       isLoading.value = true
-      await handleTimeLoad()
+      countPurge.value++
+      handleTimeLoad()
+    } else {
+      router.replace({ query: {} })
     }
   }
 
   const handleTrackEvent = () => {
+    purgeStore.setPurgeCount(countPurge.value)
     tracker.product.clickToCreate({
       productName: 'Purge'
     })
@@ -127,6 +141,7 @@
   const handleRepurge = async (item) => {
     isLoading.value = true
     item.disabled = true
+    countPurge.value++
     try {
       await repurgeEvent(item)
       await handleTimeLoad()
@@ -182,14 +197,16 @@
   })
 
   const handleTimeLoad = async () => {
-    try {
+    let countItens = 0
+    do {
       await new Promise((resolve) => setTimeout(resolve, timeToReload))
-    } finally {
-      isLoading.value = false
-      listPurgeRef.value.reload()
-      router.replace({
-        query: {} 
-      })
-    }
+      const result = await props.listRealTimePurgeService()
+      countItens = result.filter((item) => item.user === user.email).length
+      if (countItens === countPurge.value) {
+        listPurgeRef.value.data = result
+        router.replace({ query: {} })
+      }
+    } while (countItens !== countPurge.value)
+    isLoading.value = false
   }
 </script>
