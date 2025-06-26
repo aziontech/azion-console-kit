@@ -25,7 +25,7 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
-        showHearderLoad
+        showHearderWithLoad
         :showRowPending="isLoading"
       >
       </ListTableBlock>

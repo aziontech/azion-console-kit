@@ -124,7 +124,7 @@
 
       <ColumnGroup
         type="header"
-        v-if="showHearderLoad"
+        v-if="showHearderWithLoad"
       >
         <Row>
           <Column
@@ -136,7 +136,41 @@
             :sortField="col?.sortField"
           >
           </Column>
-          <Column></Column>
+          <Column>
+            <template #header>
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+                data-testid="data-table-actions-column-header-toggle-columns"
+              >
+              </PrimeButton>
+              <OverlayPanel
+                ref="columnSelectorPanel"
+                :pt="{
+                  content: { class: 'p-0' }
+                }"
+                data-testid="data-table-actions-column-header-toggle-columns-panel"
+              >
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Hidden Columns', items: columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                  data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </template>
+          </Column>
         </Row>
         <Row v-if="showRowPending">
           <Column :colspan="selectedColumns.length + 1">
@@ -448,7 +482,7 @@
       type: Object,
       default: () => ({})
     },
-    showHearderLoad: {
+    showHearderWithLoad: {
       type: Boolean,
       default: false
     },
