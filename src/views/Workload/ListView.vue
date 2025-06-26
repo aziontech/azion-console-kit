@@ -76,7 +76,6 @@
   const hasContentToList = ref(true)
 
   const deleteWorkloas = (id, name) => {
-    
     return {
       id,
       name
