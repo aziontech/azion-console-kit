@@ -1,4 +1,3 @@
-// stores/usePurgeStore.js
 import { defineStore } from 'pinia'
 
 export const usePurgeStore = defineStore('purge', {

@@ -197,17 +197,17 @@
   })
 
   const handleTimeLoad = async () => {
-    let countItens = 0
+    let totalOfUserPurges = 0
     do {
       await new Promise((resolve) => setTimeout(resolve, timeToReload))
-      const result = await props.listRealTimePurgeService()
-      countItens = result.filter((item) => item.user === user.email).length
-      if (countItens === countPurge.value) {
-        listPurgeRef.value.data = result
+      const listPurge = await props.listRealTimePurgeService()
+      totalOfUserPurges = listPurge.filter((item) => item.user === user.email).length
+      if (totalOfUserPurges === countPurge.value) {
+        listPurgeRef.value.data = listPurge
         listPurgeRef.value.updateDataTablePagination()
         router.replace({ query: {} })
       }
-    } while (countItens !== countPurge.value)
+    } while (totalOfUserPurges !== countPurge.value)
     isLoading.value = false
   }
 </script>

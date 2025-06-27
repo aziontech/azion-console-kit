@@ -377,8 +377,8 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import ColumnGroup from 'primevue/columngroup' // optional
-  import Row from 'primevue/row' // optional
+  import ColumnGroup from 'primevue/columngroup'
+  import Row from 'primevue/row'
 
   defineOptions({ name: 'list-table-block-new' })
 
