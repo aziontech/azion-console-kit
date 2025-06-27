@@ -21,7 +21,7 @@ const parseName = (edgeApplication) => {
 const transformMap = {
   id: (value) => value.id,
   active: (value) => value.active,
-  name: (value) => (value.product_version === LOCKED_VALUE ? parseName(value.name) : value.name),
+  name: (value) => parseName(value),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
   lastModified: (value) => value.last_modified,
@@ -32,6 +32,12 @@ const transformMap = {
 export const EdgeAppAdapter = {
   transformListEdgeApp(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
+  },
+  transformListDropdownEdgeApp(data) {
+    return data.map((edgeApplication) => ({
+      id: edgeApplication.id,
+      name: edgeApplication.name
+    }))
   },
   transformLoadEdgeApp({ data }) {
     return {

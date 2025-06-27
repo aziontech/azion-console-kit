@@ -26,6 +26,27 @@ export class EdgeAppService {
     }
   }
 
+  listEdgeApplicationsServiceDropdown = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name']
+    }
+  ) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+    const { count, results } = data
+
+    const body = this.adapter?.transformListDropdownEdgeApp?.(results) ?? results
+
+    return {
+      body,
+      count
+    }
+  }
+
   loadEdgeApplicationService = async ({ id, params }) => {
     const { data } = await this.http.request({
       method: 'GET',

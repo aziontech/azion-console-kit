@@ -107,7 +107,7 @@
     'name',
     'last_editor',
     'last_modified',
-    'active',
+    'last_modify',
     'product_version'
   ]
 </script>

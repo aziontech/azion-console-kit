@@ -68,7 +68,7 @@
   }
 
   const listEdgeApplicationsDecorator = async (queryParams) => {
-    return await edgeAppService.listEdgeApplicationsService({
+    return await edgeAppService.listEdgeApplicationsServiceDropdown({
       ...handleQuery(queryParams)
     })
   }
