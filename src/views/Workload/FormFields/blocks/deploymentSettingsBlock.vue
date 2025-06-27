@@ -59,9 +59,23 @@
     customPage.value = id
   }
 
+  const handleQuery = (queryParams) => {
+    const query = {
+      ...queryParams,
+      fields: ['id', 'name']
+    }
+    return query
+  }
+
   const listEdgeApplicationsDecorator = async (queryParams) => {
     return await edgeAppService.listEdgeApplicationsService({
-      ...queryParams
+      ...handleQuery(queryParams)
+    })
+  }
+
+  const listEdgeFirewallDropdown = async (queryParams) => {
+    return await edgeFirewallService.listEdgeFirewallService({
+      ...handleQuery(queryParams)
     })
   }
 
@@ -133,7 +147,7 @@
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
           @onClear="handleEdgeFirewallClear"
-          :service="edgeFirewallService.listEdgeFirewallService"
+          :service="listEdgeFirewallDropdown"
           :loadService="edgeFirewallService.loadEdgeFirewallService"
           @onAccessDenied="handleEdgeFirewallAccessDenied"
           v-if="hasEdgeFirewallAccess"

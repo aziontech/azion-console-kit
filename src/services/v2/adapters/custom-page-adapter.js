@@ -1,6 +1,7 @@
 import { capitalizeFirstLetter } from '@/helpers'
 import { parseStatusData, parseDefaultData } from '../utils/adapter/parse-status-utils'
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const nullable = (value) => {
   return value ? value : null
@@ -31,21 +32,19 @@ const getPageAttributes = (type, page) => {
   }
 }
 
+const transformMap = {
+  id: (value) => value.id,
+  name: (value) => value.name,
+  lastEditor: (value) => value.last_editor,
+  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModified: (value) => value.last_modified,
+  active: (value) => parseStatusData(value.active),
+  default: (value) => parseDefaultData(value?.default)
+}
+
 export const CustomPageAdapter = {
-  transformListCustomPage(data) {
-    return (
-      data?.map((customPage) => {
-        return {
-          id: customPage?.id,
-          name: customPage?.name,
-          lastEditor: customPage?.last_editor,
-          lastModified: formatExhibitionDate(customPage?.last_modified, 'full', undefined),
-          lastModifyDate: customPage?.last_modified,
-          active: parseStatusData(customPage?.active),
-          default: parseDefaultData(customPage?.default)
-        }
-      }) || []
-    )
+  transformListCustomPage(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformPayloadCustomPage(payload) {
     const pages = payload.pages.map((page) => {
