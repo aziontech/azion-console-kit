@@ -137,7 +137,7 @@
             :sortField="col?.sortField"
           >
           </Column>
-          <Column>
+          <Column class="flex justify-end">
             <template #header>
               <PrimeButton
                 outlined
