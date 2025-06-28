@@ -103,8 +103,8 @@
     showToast('success', feedbackMessage)
   }
 
-  const redirectToUrl = (path) => {
-    router.push({ path })
+  const redirectToUrl = (path, params = {}) => {
+    router.push({ path, params, query: params })
   }
 
   const handleSuccess = (response) => {
@@ -115,7 +115,7 @@
     }
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
-    redirectToUrl(response?.urlToEditView)
+    redirectToUrl(response?.urlToEditView, response?.params)
   }
 
   const onSubmit = handleSubmit(
