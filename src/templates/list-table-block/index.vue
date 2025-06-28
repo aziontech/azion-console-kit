@@ -29,6 +29,7 @@
       :loading="isLoading"
       data-testid="data-table"
       :first="firstItemIndex"
+      :rowClass="stateClass"
     >
       <template
         #header
@@ -122,72 +123,6 @@
           </template>
         </template>
       </Column>
-
-      <ColumnGroup
-        type="header"
-        v-if="showHearderWithLoad"
-      >
-        <Row>
-          <Column
-            :sortable="!col.disableSort"
-            v-for="col of selectedColumns"
-            :key="col.field"
-            :field="col.field"
-            :header="col.header"
-            :sortField="col?.sortField"
-          >
-          </Column>
-          <Column class="flex justify-end">
-            <template #header>
-              <PrimeButton
-                outlined
-                icon="ai ai-column"
-                class="table-button"
-                @click="toggleColumnSelector"
-                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
-                data-testid="data-table-actions-column-header-toggle-columns"
-              >
-              </PrimeButton>
-              <OverlayPanel
-                ref="columnSelectorPanel"
-                :pt="{
-                  content: { class: 'p-0' }
-                }"
-                data-testid="data-table-actions-column-header-toggle-columns-panel"
-              >
-                <Listbox
-                  v-model="selectedColumns"
-                  multiple
-                  :options="[{ label: 'Hidden Columns', items: columns }]"
-                  class="hidden-columns-panel"
-                  optionLabel="header"
-                  optionGroupLabel="label"
-                  optionGroupChildren="items"
-                  data-testid="data-table-actions-column-header-toggle-columns-panel-listbox"
-                >
-                  <template #optiongroup="slotProps">
-                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
-                  </template>
-                </Listbox>
-              </OverlayPanel>
-            </template>
-          </Column>
-        </Row>
-        <Row v-if="showRowPending">
-          <Column :colspan="selectedColumns.length + 1">
-            <template #header>
-              <div class="w-full flex justify-center font-normal items-center gap-2">
-                Pending
-                <i
-                  class="pi pi-spin pi-spinner text-center"
-                  style="font-size: 1.3rem"
-                ></i>
-              </div>
-            </template>
-          </Column>
-        </Row>
-      </ColumnGroup>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -377,8 +312,6 @@
   import { getCsvCellContentFromRowData } from '@/helpers'
   import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-  import ColumnGroup from 'primevue/columngroup'
-  import Row from 'primevue/row'
 
   defineOptions({ name: 'list-table-block-new' })
 
@@ -482,14 +415,6 @@
     pt: {
       type: Object,
       default: () => ({})
-    },
-    showHearderWithLoad: {
-      type: Boolean,
-      default: false
-    },
-    showRowPending: {
-      type: Boolean,
-      default: false
     }
   })
   const firstItemIndex = ref(0)
@@ -529,6 +454,12 @@
     }
     selectedColumns.value = props.columns
   })
+
+  const stateClass = (data) => {
+    if (data?.focus) {
+      return 'transition-colors duration-1000 animate-highlight-fade'
+    }
+  }
 
   const formatSummaryToCSV = (summary) => {
     const summaryValue = summary

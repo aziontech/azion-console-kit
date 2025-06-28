@@ -51,9 +51,14 @@ export default {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
         slideDown: 'slideDown 220ms ease-in-out',
-        blink: 'blink 1.4s infinite both'
+        blink: 'blink 1.4s infinite both',
+        'highlight-fade': 'highlight 10s ease-out forwards',
       },
       keyframes: {
+        highlight: {
+          '0%, 99.9%': { backgroundColor: '#353535' },
+          '100%': { backgroundColor: 'transparent' }
+        },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' }

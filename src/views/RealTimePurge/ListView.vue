@@ -7,9 +7,10 @@
       <InlineMessage
         class="w-fit mb-8"
         severity="info"
+        icon="pi pi-spin pi-spinner"
+        v-if="isLoading"
       >
-        When creating a new purge, it's queued for execution and will appear in the table below once
-        completed.
+        Purge requests are queued. The table will update automatically once processing is complete.
       </InlineMessage>
       <ListTableBlock
         ref="listPurgeRef"
@@ -25,8 +26,6 @@
         :enableEditClick="false"
         emptyListMessage="No purge found."
         :actions="actionsRow"
-        showHearderWithLoad
-        :showRowPending="isLoading"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -81,6 +80,7 @@
   const timeToReload = 9000
   const { accountData } = useAccountStore()
   const purgeStore = usePurgeStore()
+  const repurgesNeedingFocus = ref(0)
 
   const user = accountData
   const countPurge = ref(0)
@@ -90,10 +90,10 @@
     hasContentToList.value = event
     const { isPending } = route.query
     const hasPendingMismatch = isPending && purgeStore.getPurgeCount !== countPurge.value
-
     if (hasPendingMismatch) {
       isLoading.value = true
       countPurge.value++
+      repurgesNeedingFocus.value++
       handleTimeLoad()
     } else {
       router.replace({ query: {} })
@@ -142,6 +142,7 @@
     isLoading.value = true
     item.disabled = true
     countPurge.value++
+    repurgesNeedingFocus.value++
     try {
       await repurgeEvent(item)
       await handleTimeLoad()
@@ -196,18 +197,33 @@
     ]
   })
 
+  const applyFocus = (usersPurge, listPurge) => {
+    const newPurge = usersPurge.slice(0, repurgesNeedingFocus.value)
+    const focusIds = newPurge.map((item) => item.id)
+    return listPurge.map((item) => ({
+      ...item,
+      focus: focusIds.includes(item.id)
+    }))
+  }
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
   const handleTimeLoad = async () => {
     let totalOfUserPurges = 0
     do {
-      await new Promise((resolve) => setTimeout(resolve, timeToReload))
+      await sleep(timeToReload)
       const listPurge = await props.listRealTimePurgeService()
-      totalOfUserPurges = listPurge.filter((item) => item.user === user.email).length
+      if (!repurgesNeedingFocus.value) return
+      const usersPurge = listPurge.filter((item) => item.user === user.email)
+      totalOfUserPurges = usersPurge.length
+
       if (totalOfUserPurges === countPurge.value) {
-        listPurgeRef.value.data = listPurge
+        listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
         listPurgeRef.value.updateDataTablePagination()
         router.replace({ query: {} })
       }
     } while (totalOfUserPurges !== countPurge.value)
     isLoading.value = false
+    repurgesNeedingFocus.value = 0
   }
 </script>
