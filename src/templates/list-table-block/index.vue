@@ -28,6 +28,8 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
+      :first="firstItemIndex"
+      :rowClass="stateClass"
     >
       <template
         #header
@@ -112,6 +114,7 @@
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
+
           <template v-else>
             <component
               :is="col.component(extractFieldValue(rowData, col.field))"
@@ -120,7 +123,6 @@
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -415,7 +417,7 @@
       default: () => ({})
     }
   })
-
+  const firstItemIndex = ref(0)
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
@@ -452,6 +454,12 @@
     }
     selectedColumns.value = props.columns
   })
+
+  const stateClass = (data) => {
+    if (data?.focus) {
+      return 'transition-colors duration-1000 animate-highlight-fade'
+    }
+  }
 
   const formatSummaryToCSV = (summary) => {
     const summaryValue = summary
@@ -606,11 +614,22 @@
   }
 
   const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
+    const [firstAction] = actionOptions(rowData) || []
+
+    if (!firstAction) {
+      return {
+        icon: '',
+        tooltip: '',
+        disabled: true
+      }
+    }
+
+    const { icon, tooltip, disabled } = firstAction
+
     return {
-      icon: firstAction?.icon,
-      tooltip: firstAction?.tooltip,
-      disabled: firstAction?.disabled
+      icon,
+      tooltip,
+      disabled
     }
   }
 
@@ -623,7 +642,12 @@
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV, data })
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 0
+    firstItemIndex.value = FIRST_NUMBER_PAGE
+  }
+
+  defineExpose({ reload, handleExportTableDataToCSV, data, updateDataTablePagination })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -641,6 +665,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
+    firstItemIndex.value = event.first
   }
 
   const filterBy = computed(() => {
