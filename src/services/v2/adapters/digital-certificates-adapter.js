@@ -49,8 +49,13 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ body, count }, { type, search }) {
-    let parsedDigitalCertificates = body?.map((item) => {
+  transformListDigitalCertificatesDropdown({ body, count }, { type, search }, certificateType) {
+    const certificateTypeMap = {
+      edge_certificate: EDGE_CERTIFICATE,
+      trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
+    }
+
+    let parsedDigitalCertificates = body?.filter((item) => item.type === certificateTypeMap[certificateType])?.map((item) => {
       return {
         id: item.id,
         name: item.name

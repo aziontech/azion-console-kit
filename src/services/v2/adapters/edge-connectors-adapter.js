@@ -138,6 +138,7 @@ export const EdgeConnectorsAdapter = {
       }) || []
     )
   },
+
   transformPayloadEdgeConnectors(payload) {
     const builder = buildTypePayload(payload.type, payload, 'POST')
 
@@ -160,6 +161,7 @@ export const EdgeConnectorsAdapter = {
       ...builder
     }
   },
+
   transformLoadEdgeConnectors({ data }) {
     const builder = buildTypePayload(data.type, data, 'GET')
 
