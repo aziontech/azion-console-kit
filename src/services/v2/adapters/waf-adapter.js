@@ -26,7 +26,7 @@ const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
   name: (value) => value.name,
-  // threatsConfiguration: (value) => parseThreatTypes(value.threats_configuration)
+  threatsConfiguration: (value) => parseThreatTypes(value.threats_configuration)
 }
 
 export const WafAdapter = {
