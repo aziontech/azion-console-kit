@@ -5,29 +5,16 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import PrimeButton from 'primevue/button'
-
+  import {
+    digitalCertificatesService,
+    digitalCertificatesCRLService
+  } from '../../../../services/v2'
   import { ref } from 'vue'
   import { useField } from 'vee-validate'
 
-  const props = defineProps({
-    isDrawer: {
-      type: Boolean,
-      default: false
-    },
-    noBorder: {
-      type: Boolean,
-      default: false
-    },
-    digitalCertificatesServices: {
-      type: Object,
-      required: true
-    }
-  })
-
   const digitalCertificateTrustedDrawerRef = ref('')
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return await props.digitalCertificatesServices.listDigitalCertificatesService({
-      type: 'trusted_ca_certificate',
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
       fields: ['id,name'],
       ...queryParams
     })
@@ -101,13 +88,52 @@
           required
           name="mtls.certificate"
           :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
-          :loadService="digitalCertificatesServices.loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           :disabled="!mtls.isEnabled"
           optionLabel="name"
           optionValue="value"
           :value="mtls.certificate"
           placeholder="Select a Trusted CA certificate"
-          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
+          description="Mutual Authentification requires a Trusted CA Certificate."
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateTrustedDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-trusted-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Trusted CA certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+      <div
+        v-if="mtls?.isEnabled"
+        class="flex flex-col w-full sm:max-w-xs gap-2"
+      >
+        <FieldDropdownLazyLoader
+          label="Certificate Revocation List  (CRL)"
+          data-testid="domains-form__mtls-crl-certificate-field"
+          required
+          name="mtls.crl"
+          :service="digitalCertificatesCRLService.listDigitalCertificatesCRLDropdown"
+          :loadService="digitalCertificatesCRLService.loadDigitalCertificateCRL"
+          :disabled="!mtls.isEnabled"
+          optionLabel="name"
+          optionValue="value"
+          :value="mtls.crl"
+          placeholder="Select a CRL certificate"
+          description="Ensures revoked certificates are rejected during mTLS authentication."
         >
           <template #footer>
             <ul class="p-2">

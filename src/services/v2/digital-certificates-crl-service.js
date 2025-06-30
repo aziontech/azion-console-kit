@@ -16,6 +16,18 @@ export class DigitalCertificatesCRLService {
     return { count: data.count, body }
   }
 
+  listDigitalCertificatesCRLDropdown = async ({ params }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+
+    const body = this.adapter?.transformListDigitalCertificatesCRLDropwdown(data.results)
+
+    return { count: data.count, body }
+  }
+
   createDigitalCertificateCRL = async (payload) => {
     const body = this.adapter?.transformCreateDigitalCertificateCRL(payload)
 
