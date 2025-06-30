@@ -8,12 +8,12 @@ describe('Edge Pulse spec', { tags: ['@dev6'] }, () => {
 
   it('should copy default and pre-loading tag in edge pulse', function () {
     // Act Default tag
-    cy.get(selectors.edgePulse.defaultTagCopyButton).realClick()
+    cy.get(selectors.edgePulse.defaultTagCopyButton).click()
     cy.verifyToast('Successfully copied!')
 
     // Act Pre-loading tag
     cy.get(selectors.edgePulse.preLoadingTab).click()
-    cy.get(selectors.edgePulse.preLoadingTagCopyButton).realClick()
+    cy.get(selectors.edgePulse.preLoadingTagCopyButton).click()
     cy.verifyToast('Successfully copied!')
   })
 })

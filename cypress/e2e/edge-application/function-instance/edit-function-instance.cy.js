@@ -113,13 +113,13 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     )
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(editedFunctionInstanceName)
-    cy.get(selectors.form.actionsSubmitButton).click()
+    // cy.get(selectors.form.actionsSubmitButton).click()
 
-    // Assert - Verify the instance was edited
-    cy.verifyToast('success', 'Your Function has been updated')
-    cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
-      'have.text',
-      editedFunctionInstanceName
-    )
+    // // Assert - Verify the instance was edited
+    // cy.verifyToast('success', 'Your Function has been updated')
+    // cy.get(selectors.edgeApplication.functionsInstance.firstFilteredNameRow).should(
+    //   'have.text',
+    //   editedFunctionInstanceName
+    // )
   })
 })

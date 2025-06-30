@@ -45,6 +45,7 @@ describe('Edge DNS spec', { tags: ['@dev5', '@dont_run_prod'] }, () => {
     cy.get(selectors.edgeDns.records.nameInput).type(recordTypeFixtures.name)
     cy.get(selectors.edgeDns.records.recordTypeDropdown).click()
     cy.get(selectors.edgeDns.records.recordTypeOption(recordTypeFixtures.recordTypeOption)).click()
+    cy.get(selectors.edgeDns.records.ttlInput).clear()
     cy.get(selectors.edgeDns.records.ttlInput).type(recordTypeFixtures.ttl)
     cy.get(selectors.edgeDns.records.valueTextarea).type(recordTypeFixtures.value)
     cy.get(selectors.edgeDns.records.policyTypeDropdown).click()

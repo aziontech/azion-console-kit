@@ -140,6 +140,8 @@
       .required()
       .label('Edge Function'),
     args: yup.string().test('validJson', 'Invalid JSON', (value) => {
+      if (!value || value.trim() === '') return true
+
       let isValidJson = true
       try {
         JSON.parse(value)
