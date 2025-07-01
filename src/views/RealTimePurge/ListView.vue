@@ -81,6 +81,9 @@
   const { accountData } = useAccountStore()
   const purgeStore = usePurgeStore()
   const repurgesNeedingFocus = ref(0)
+  const feedbackPurge = ref(
+    'The purge has been successfully triggered and is now listed in the table.'
+  )
 
   const user = accountData
   const countPurge = ref(0)
@@ -130,8 +133,7 @@
       layer: purgeToRepurge.layer
     }
     try {
-      const { feedback } = await purgeService.createPurge(dataPurge)
-      showToast('success', feedback)
+      await purgeService.createPurge(dataPurge)
       handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
       showToast('error', error)
@@ -221,6 +223,7 @@
         listPurgeRef.value.data = applyFocus(usersPurge, listPurge)
         listPurgeRef.value.updateDataTablePagination()
         router.replace({ query: {} })
+        showToast('success', feedbackPurge.value)
       }
     } while (totalOfUserPurges !== countPurge.value)
     isLoading.value = false
