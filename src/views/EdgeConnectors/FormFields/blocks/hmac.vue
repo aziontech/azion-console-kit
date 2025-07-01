@@ -7,8 +7,8 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="hmacActive"
-          name="hmacActive"
+          nameField="hmac.active"
+          name="hmac.active"
           auto
           :isCard="false"
           :value="hmacActive"
@@ -16,12 +16,15 @@
           data-testid="edge-connectors-form__hmac__hmac-active-field"
         />
       </div>
-      <div class="flex flex-col sm:max-w-sm w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-sm w-full gap-2"
+        v-if="hmacActive"
+      >
         <FieldTextIcon
           label="Type"
           required
           description="The HMAC authentication type is fixed to aws4_hmac_sha256, compatible with AWS S3 object storage."
-          name="hmacType"
+          name="hmac.type"
           :value="hmacType"
           placeholder="aws4_hmac_sha256"
           data-testid="edge-connectors-form__hmac__hmac-type-field"
@@ -29,46 +32,58 @@
           disabled
         />
       </div>
-      <div class="flex flex-col sm:max-w-xs w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-xs w-full gap-2"
+        v-if="hmacActive"
+      >
         <FieldText
           label="Region"
           required
           description="Region supported by the object storage provider."
-          name="region"
+          name="hmac.attributes.region"
           :value="region"
           placeholder="us-east-1"
           data-testid="edge-connectors-form__hmac__region-field"
         />
       </div>
-      <div class="flex flex-col sm:max-w-xs w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-xs w-full gap-2"
+        v-if="hmacActive"
+      >
         <FieldText
           label="Service"
           required
           description="Specify the service name for the object storage provider (e.g., s3)."
-          name="service"
+          name="hmac.attributes.service"
           :value="service"
           placeholder="s3"
           data-testid="edge-connectors-form__hmac__service-field"
         />
       </div>
-      <div class="flex flex-col sm:max-w-xs w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-xs w-full gap-2"
+        v-if="hmacActive"
+      >
         <FieldTextIcon
           label="Access Key"
           required
           description="Enter the Access Key provided by the object storage provider."
-          name="accessKey"
+          name="hmac.attributes.accessKey"
           :value="accessKey"
           placeholder="**********"
           data-testid="edge-connectors-form__hmac__access-key-field"
           icon="pi pi-eye"
         />
       </div>
-      <div class="flex flex-col sm:max-w-xs w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-xs w-full gap-2"
+        v-if="hmacActive"
+      >
         <FieldTextIcon
           label="Secret Key"
           required
           description="Enter the Secret Key provided by the object storage provider."
-          name="secretKey"
+          name="hmac.attributes.secretKey"
           :value="secretKey"
           placeholder="**********"
           data-testid="edge-connectors-form__hmac__secret-key-field"
@@ -89,12 +104,12 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
 
-  const { value: hmacActive } = useField('hmacActive')
-  const { value: hmacType } = useField('hmacType')
-  const { value: region } = useField('region')
-  const { value: service } = useField('service')
-  const { value: accessKey } = useField('accessKey')
-  const { value: secretKey } = useField('secretKey')
+  const { value: hmacActive } = useField('hmac.active')
+  const { value: hmacType } = useField('hmac.type')
+  const { value: region } = useField('hmac.attributes.region')
+  const { value: service } = useField('hmac.attributes.service')
+  const { value: accessKey } = useField('hmac.attributes.accessKey')
+  const { value: secretKey } = useField('hmac.attributes.secretKey')
 
   onMounted(() => {
     hmacType.value = 'aws4_hmac_sha256'

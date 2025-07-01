@@ -29,9 +29,9 @@
 
   const connectorTypeList = [
     {
-      title: 'HTTPS',
+      title: 'HTTP',
       inputValue: 'http',
-      subtitle: 'Connect to external origins via secure HTTPS protocol for seamless data delivery.'
+      subtitle: 'Connect to external origins via secure HTTP protocol for seamless data delivery.'
     },
     {
       title: 'Edge Storage',

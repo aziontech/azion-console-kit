@@ -7,8 +7,8 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="mutualAuthentication"
-          name="mutualAuthentication"
+          nameField="mtls.active"
+          name="mtls.active"
           auto
           :isCard="false"
           :value="mutualAuthentication"
@@ -30,7 +30,7 @@
           description="Mutual Authentification requires a Trusted CA Certificate."
           placeholder="Select a Trusted CA Certificate"
           required
-          name="trustedCaCertificate"
+          name="mtls.config.certificate"
           :service="listDigitalCertificatesDropdownDecorator"
           :loadService="digitalCertificatesService.loadDigitalCertificate"
           disableEmitFirstRender
@@ -67,7 +67,7 @@
           label="Certificate Revocation List  (CRL)"
           description="Ensures revoked certificates are rejected during mTLS authentication."
           placeholder="Select a Certificate Revocation List"
-          name="crlCertificate"
+          name="mtls.config.crl"
           :service="listDigitalCertificatesCRLDecorator"
           :loadService="digitalCertificatesCRLService.loadDigitalCertificateCRL"
           optionLabel="name"
@@ -114,9 +114,9 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsMutualAuthenticationSettings' })
 
-  const { value: mutualAuthentication } = useField('mutualAuthentication')
-  const { value: trustedCaCertificate } = useField('trustedCaCertificate')
-  const { value: crlCertificate } = useField('crlCertificate')
+  const { value: mutualAuthentication } = useField('mtls.active')
+  const { value: trustedCaCertificate } = useField('mtls.config.certificate')
+  const { value: crlCertificate } = useField('mtls.config.crl')
 
   const drawerRef = ref(null)
   const certificateType = ref('trusted_ca_certificate')

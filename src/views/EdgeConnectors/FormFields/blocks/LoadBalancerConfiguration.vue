@@ -8,7 +8,7 @@
       <div class="flex flex-col sm:max-w-sm w-full gap-2">
         <FieldDropdown
           label="Method"
-          name="method"
+          name="modules.loadBalancer.config.method"
           :options="methodsList"
           optionLabel="label"
           optionValue="value"
@@ -22,7 +22,7 @@
       <div class="flex flex-col sm:max-w-sm w-full gap-2">
         <FieldNumber
           label="Max Retries"
-          name="maxRetries"
+          name="modules.loadBalancer.config.maxRetries"
           :value="maxRetries"
           description="Maximum number of retry attempts for failed connections. Value 0 for no retries. Valid range: 0-20."
           data-testid="edge-connectors-form__load-balancer-configuration__max-retries-field"
@@ -32,7 +32,7 @@
       <div class="flex flex-col sm:max-w-sm w-full gap-2">
         <FieldNumber
           label="Connection Timeout"
-          name="connectionTimeout"
+          name="modules.loadBalancer.config.connectionTimeout"
           :value="connectionTimeout"
           description="Maximum time (in seconds) the Edge Connector will wait to establish a connection with the origin. Valid range: 1-300."
           data-testid="edge-connectors-form__load-balancer-configuration__connection-timeout-field"
@@ -42,7 +42,7 @@
       <div class="flex flex-col sm:max-w-sm w-full gap-2">
         <FieldNumber
           label="Read/Write Timeout"
-          name="readWriteTimeout"
+          name="modules.loadBalancer.config.readWriteTimeout"
           :value="readWriteTimeout"
           description="Maximum time (in seconds) the Edge Connector will wait for data to be read from or written to the origin. Valid range: 1-600."
           data-testid="edge-connectors-form__load-balancer-configuration__read-write-timeout-field"
@@ -60,10 +60,10 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsLoadBalancerConfiguration' })
 
-  const { value: method } = useField('method')
-  const { value: maxRetries } = useField('maxRetries')
-  const { value: connectionTimeout } = useField('connectionTimeout')
-  const { value: readWriteTimeout } = useField('readWriteTimeout')
+  const { value: method } = useField('modules.loadBalancer.config.method')
+  const { value: maxRetries } = useField('modules.loadBalancer.config.maxRetries')
+  const { value: connectionTimeout } = useField('modules.loadBalancer.config.connectionTimeout')
+  const { value: readWriteTimeout } = useField('modules.loadBalancer.config.readWriteTimeout')
 
   const methodsList = [
     { label: 'Round Robin', value: 'round_robin' },

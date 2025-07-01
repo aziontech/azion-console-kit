@@ -7,8 +7,8 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="loadBalancer"
-          name="loadBalancer"
+          nameField="modules.loadBalancer.enabled"
+          name="modules.loadBalancer.enabled"
           :value="loadBalancer"
           title="Load Balancer"
           subtitle="Distribute traffic across multiple addresses with load balancing settings. Enabling this module unlocks support for multiple addresses and advanced traffic distribution configurations."
@@ -17,8 +17,8 @@
       </div>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="originShield"
-          name="originShield"
+          nameField="modules.originShield.enabled"
+          name="modules.originShield.enabled"
           :value="originShield"
           title="Origin Shield"
           subtitle="Protect your origin by centralizing requests through a shield location. Enabling this module also unlocks HMAC authentication settings for secure content delivery."
@@ -36,6 +36,6 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsModules' })
 
-  const { value: loadBalancer } = useField('loadBalancer')
-  const { value: originShield } = useField('originShield')
+  const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
+  const { value: originShield } = useField('modules.originShield.enabled')
 </script>

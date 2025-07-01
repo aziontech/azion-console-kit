@@ -45,17 +45,40 @@
     connectionOptions: {
       host: '',
       pathPrefix: '',
-      realIpHeader: '',
-      realPortHeader: '',
-      followingRedirect: true,
-      dnsResolution: true,
-      transportPolicy: 'http'
+      realIpHeader: 'X-Real-IP',
+      realPortHeader: 'X-Real-PORT',
+      followingRedirect: false,
+      dnsResolution: 'preserve',
+      transportPolicy: 'preserve',
+      bucket: '',
+      prefix: '',
+      region: 'us-east-1'
     },
     modules: {
-      loadBalancerEnabled: false,
-      originShieldEnabled: false
+      loadBalancer: {
+        enabled: false,
+        config: {
+          method: 'round_robin',
+          maxRetries: 0,
+          connectionTimeout: 60,
+          readWriteTimeout: 120
+        }
+      },
+      originShield: {
+        enabled: false,
+        config: {
+          originIpAcl: true,
+          mtls: {
+            active: true,
+            config: {
+              certificate: null,
+              crl: []
+            }
+          }
+        }
+      }
     },
-    loaderBalancerConfiguration: {
+    loadBalancerConfiguration: {
       method: 'round_robin',
       maxRetries: 0,
       connectionTimeout: 60,
