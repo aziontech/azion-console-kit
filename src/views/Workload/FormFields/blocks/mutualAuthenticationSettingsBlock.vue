@@ -4,27 +4,23 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
+  import fieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import PrimeButton from 'primevue/button'
-  import {
-    digitalCertificatesService,
-    digitalCertificatesCRLService
-  } from '../../../../services/v2'
+  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
   import { ref } from 'vue'
   import { useField } from 'vee-validate'
 
-  const digitalCertificateTrustedDrawerRef = ref('')
+  const drawerRef = ref('')
+
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       fields: ['id,name'],
+      type: 'trusted_ca_certificate',
       ...queryParams
     })
   }
 
   const { value: mtls } = useField('mtls')
-
-  const openDigitalCertificateTrustedDrawer = () => {
-    digitalCertificateTrustedDrawerRef.value.openCreateDrawer()
-  }
 
   const mtlsModeRadioOptions = ref([
     {
@@ -41,15 +37,22 @@
     }
   ])
 
-  const onDigitalCertificateTrustedSuccess = (certificateId) => {
-    mtls.value.certificate = certificateId
+  const onDigitalCertificateTrustedSuccess = ({ type, id }) => {
+    if (type === 'trusted_ca_certificate') {
+      mtls.value.certificate = id
+      return
+    }
+    mtls.value.crl = [...mtls.value.crl, id]
+  }
+
+  const openDrawer = (certificate) => {
+    drawerRef.value.changeCertificateType(certificate)
+    drawerRef.value.openCreateDrawer()
   }
 </script>
 
 <template>
   <form-horizontal
-    :isDrawer="isDrawer"
-    :noBorder="noBorder"
     title="Mutual Authentication Settings"
     description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
   >
@@ -62,6 +65,8 @@
         :isCard="false"
         title="Mutual Authentication"
       />
+
+      {{ mtls }}
 
       <div v-show="mtls?.isEnabled">
         <div class="flex flex-col gap-3">
@@ -78,10 +83,10 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
         <DigitalCertificatesDrawer
-          ref="digitalCertificateTrustedDrawerRef"
-          useOnlyTrustedCa
+          ref="drawerRef"
           @onSuccess="onDigitalCertificateTrustedSuccess"
         />
+
         <FieldDropdownLazyLoader
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"
@@ -100,7 +105,7 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateTrustedDrawer"
+                  @click="openDrawer('trusted_ca_certificate')"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
@@ -121,10 +126,9 @@
         v-if="mtls?.isEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <FieldDropdownLazyLoader
+        <fieldDropdownMultiSelectLazyLoader
           label="Certificate Revocation List  (CRL)"
           data-testid="domains-form__mtls-crl-certificate-field"
-          required
           name="mtls.crl"
           :service="digitalCertificatesCRLService.listDigitalCertificatesCRLDropdown"
           :loadService="digitalCertificatesCRLService.loadDigitalCertificateCRL"
@@ -139,22 +143,22 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDigitalCertificateTrustedDrawer"
+                  @click="openDrawer('certificateRevogationList')"
                   class="w-full whitespace-nowrap flex"
                   text
                   size="small"
                   icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-digital-certificate-trusted-button"
+                  data-testid="domains-form__create-digital-certificate-crl-button"
                   :pt="{
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
                   }"
-                  label="Create Digital Trusted CA certificate"
+                  label="Create Digital CRL certificate"
                 />
               </li>
             </ul>
           </template>
-        </FieldDropdownLazyLoader>
+        </fieldDropdownMultiSelectLazyLoader>
       </div>
     </template>
   </form-horizontal>

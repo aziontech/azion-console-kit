@@ -14,14 +14,7 @@
         disableAfterCreateToastFeedback
       >
         <template #form>
-          <FormFieldsWorkload
-            :listEdgeApplicationsService="listEdgeApplicationsService"
-            :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
-            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
-            :isLoadingRequests="isLoadingRequests"
-          />
+          <FormFieldsWorkload />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
@@ -49,64 +42,17 @@
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { workloadService, edgeFirewallService } from '@/services/v2'
+  import { workloadService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    createDomainService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    listEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listCustomPagesService: {
-      type: Function,
-      required: true
-    },
-    loadCustomPagesService: {
+    clipboardWrite: {
       type: Function,
       required: true
     }
   })
-
-  // const propsService = {
-  //   edgeApplication: {
-  //     listEdgeApplicationsService: props.listEdgeApplicationsService,
-  //     loadEdgeApplicationsService: props.loadEdgeApplicationsService
-  //   },
-  //   edgeFirewall: {
-  //     listEdgeFirewallService: props.listEdgeFirewallService,
-  //     loadEdgeFirewallService: props.loadEdgeFirewallService
-  //   },
-  //   digitalCertificates: {
-  //     listDigitalCertificatesService: props.listDigitalCertificatesService,
-  //     loadDigitalCertificatesService: props.loadDigitalCertificatesService
-  //   },
-  //   customPages: {
-  //     listCustomPagesService: props.listCustomPagesService,
-  //     loadCustomPagesService: props.loadCustomPagesService
-  //   }
-  // }
 
   const toast = useToast()
   const route = useRoute()
@@ -257,12 +203,14 @@
       })
     }),
     mtls: yup.object({
+      isEnabled: yup.boolean(), // necessário para o .when funcionar
       verification: yup.string().label('Verification'),
       certificate: yup
         .string()
         .when('isEnabled', {
           is: true,
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('Trusted CA Certificate is required'),
+          otherwise: (schema) => schema.notRequired().nullable()
         })
         .label('Trusted CA Certificate'),
       crl: yup.array().label('Certificate Revocation List')

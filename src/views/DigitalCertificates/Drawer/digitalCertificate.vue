@@ -8,13 +8,7 @@
   import { useDigitalCertificate } from '../FormFields/composables/certificate'
 
   defineOptions({
-    name: 'digital-certificates-drawer'
-  })
-
-  const props = defineProps({
-    certificate: {
-      type: String
-    }
+    name: 'digital-certificate-drawer'
   })
 
   const emit = defineEmits(['onSuccess'])
@@ -24,8 +18,8 @@
   const DEBOUNCE_TIME_IN_MS = 300
   const showCreateDrawer = refDebounced(showCreateDigitalCertificateDrawer, DEBOUNCE_TIME_IN_MS)
 
-  const { createService, PRIVATE_KEY_TYPES, CERTIFICATE_TYPES, certificateType } =
-    useDigitalCertificate(props.certificate)
+  const { createService, PRIVATE_KEY_TYPES, CERTIFICATE_TYPES } =
+    useDigitalCertificate('edge_certificate')
 
   const initialValues = ref({
     digitalCertificateName: '',
@@ -64,13 +58,13 @@
   const closeCreateDrawer = () => {
     showCreateDigitalCertificateDrawer.value = false
   }
-  const openCreateDrawer = () => {
+  const openCreateDrawerDigitalCertificates = () => {
     showCreateDigitalCertificateDrawer.value = true
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
     handleToast(response)
-    emit('onSuccess', { type: certificateType.value, id: response.data.id })
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
   }
 
@@ -81,14 +75,9 @@
     response.showToastWithActions(toast)
   }
 
-  const changeCertificateType = (certificate) => {
-    certificateType.value = certificate
-  }
-
   defineExpose({
     showCreateDrawer,
-    openCreateDrawer,
-    changeCertificateType
+    openCreateDrawerDigitalCertificates
   })
 </script>
 
@@ -98,7 +87,7 @@
     v-model:visible="showCreateDigitalCertificateDrawer"
     :createService="createService"
     :schema="validationSchema"
-    drawerId="digital-certificates-drawer"
+    drawerId="digital-certificate-drawer"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedToCreate"

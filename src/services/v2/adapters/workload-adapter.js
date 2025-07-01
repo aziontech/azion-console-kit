@@ -45,7 +45,7 @@ export const WorkloadAdapter = {
       tls: {
         minimum_version: payload.tls.minimumVersion,
         ciphers: payload.tls.ciphers || null,
-        certificate: payload.tls.certificate ?? null
+        certificate: payload.tls.certificate || null
       },
       protocols: {
         http: {

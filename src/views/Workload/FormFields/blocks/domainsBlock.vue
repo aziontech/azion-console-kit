@@ -9,8 +9,9 @@
   import PrimeButton from 'primevue/button'
   import { clipboardWrite } from '@/helpers'
   import { useFieldArray, useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import { edgeDNSService } from '@/services/v2'
 
   const toast = useToast()
   const props = defineProps({
@@ -33,9 +34,9 @@
   const { value: workloadHostname } = useField('workloadHostname')
   const { value: useCustomDomain } = useField('useCustomDomain')
   const { errorMessage: customDomainErrorMessage } = useField('customDomain')
-  const { value: optionsDomains } = useField('optionsDomains')
+  // const { value: optionsDomains } = useField('optionsDomains')
 
-  const domainsOptions = computed(() => optionsDomains.value || [])
+  const domainsOptions = ref([])
 
   const addNewDomain = () => {
     pushDomain({
@@ -48,6 +49,18 @@
     if (domainsList.value.length > 1) {
       remove(domainId)
     }
+  }
+
+  const sugestionDomains = async () => {
+    const domains = await edgeDNSService.listEdgeDNSService({
+      fields: ['id', 'domain']
+    })
+    domainsOptions.value = domains.body.map((domain) => {
+      return {
+        label: domain.domain.content,
+        value: domain.id
+      }
+    })
   }
 
   const updateDomainSubdomain = (domainId, value) => {
@@ -73,14 +86,7 @@
     })
   }
 
-  const checkAvailability = () => {
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully checked!',
-      detail: 'The domain is available and can be used.'
-    })
-  }
+  sugestionDomains()
 </script>
 <template>
   <form-horizontal
@@ -243,28 +249,8 @@
                   class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
                   outlined
                 />
-                <PrimeButton
-                  label="Check availability"
-                  icon="pi pi-check-circle"
-                  @click="checkAvailability"
-                  outlined
-                  class="ml-2 rounded-md max-sm:hidden"
-                  size="small"
-                  data-testid="domains-form__check-availability-button"
-                  title="Check availability"
-                />
               </template>
             </FieldInputGroup>
-            <PrimeButton
-              label="Check availability"
-              icon="pi pi-check-circle"
-              @click="checkAvailability"
-              outlined
-              size="small"
-              class="max-sm:block hidden"
-              data-testid="domains-form__check-availability-button"
-              title="Check availability"
-            />
           </div>
         </div>
       </div>

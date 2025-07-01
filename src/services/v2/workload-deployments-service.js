@@ -5,38 +5,39 @@ export class WorkloadService {
     this.baseURL = 'v4/workspace/workloads'
   }
 
-  createWorkload = async (payload) => {
-    const body = this.adapter?.transformCreateWorkload?.(payload)
+  #getUrl(workloadId, suffix = '') {
+    return `${this.baseURL}/${workloadId}/deployments/${suffix}`
+  }
+
+  updateWorkloadDeployment = async (payload) => {
+    const body = this.adapter?.transformCreateWorkloadDeployment?.(payload)
     const { data } = await this.http.request({
-      method: 'POST',
-      url: `${this.baseURL}`,
+      method: 'PATCH',
+      url: this.#getUrl(payload.id),
       body
     })
 
     return {
-      feedback: 'Your workload has been created',
-      urlToEditView: `/workloads/edit/${data.id}`,
-      domainName: data.workload_hostname,
       id: parseInt(data.id)
     }
   }
 
-  listWorkloads = async (params) => {
+  listWorkloadDeployment = async (id, params) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}`,
+      url: this.#getUrl(id),
       params
     })
 
-    return this.adapter?.transformListWorkloads?.(data.results) || data.results
+    return this.adapter?.transformListWorkloadsDeployments?.(data.results) || data.results
   }
 
-  loadWorkload = async ({ id }) => {
+  loadWorkloadDeployment = async ({ id }) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.baseURL}/${id}`
+      url: this.#getUrl(id)
     })
 
-    return this.adapter?.transformLoadWorkload?.(data) || data
+    return this.adapter?.transformLoadWorkloadDeployments?.(data) || data
   }
 }

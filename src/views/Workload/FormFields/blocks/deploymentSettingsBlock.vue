@@ -9,14 +9,6 @@
   import { edgeAppService, edgeFirewallService, customPageService } from '@/services/v2'
   import { ref } from 'vue'
 
-  // const props = defineProps({
-  //   isEdit: { type: Boolean, default: false },
-  //   isDrawer: { type: Boolean, default: false },
-  //   noBorder: { type: Boolean, default: false },
-  //   edgeApplicationServices: { type: Object, required: true },
-  //   disabledEdgeApplicationDropdown: { type: Boolean, default: false }
-  // })
-
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { value: customPage } = useField('customPage')
@@ -89,8 +81,6 @@
 </script>
 <template>
   <form-horizontal
-    :isDrawer="isDrawer"
-    :noBorder="noBorder"
     title="Deployment Settings"
     description="Configure the deployment of your workload by selecting the appropriate Edge Application and Edge Firewall. The Edge Application handles traffic routing and processing at the edge, while the Edge Firewall provides security by filtering and blocking malicious traffic."
   >
@@ -110,7 +100,6 @@
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
-          :disabled="disabledEdgeApplicationDropdown"
           appendTo="self"
           placeholder="Select an edge application"
         >

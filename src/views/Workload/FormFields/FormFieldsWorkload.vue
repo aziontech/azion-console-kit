@@ -15,10 +15,6 @@
   const props = defineProps({
     isEdit: { type: Boolean, default: false },
     disabledEdgeApplicationDropdown: { type: Boolean, default: false },
-    edgeApplicationServices: { type: Object, required: true },
-    edgeFirewallServices: { type: Object, required: true },
-    customPagesServices: { type: Object, required: true },
-    digitalCertificatesServices: { type: Object, required: true },
     isDrawer: { type: Boolean },
     noBorder: { type: Boolean }
   })

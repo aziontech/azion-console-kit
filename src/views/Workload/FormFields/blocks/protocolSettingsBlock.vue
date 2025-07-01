@@ -3,12 +3,14 @@
   import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
+  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
   import { useField } from 'vee-validate'
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
+  import { digitalCertificatesService } from '@/services/v2'
+
   import {
     HTTP_PORT_LIST_OPTIONS,
     HTTPS_PORT_LIST_OPTIONS,
@@ -16,13 +18,6 @@
     TLS_VERSIONS_OPTIONS,
     SUPPORTED_CIPHERS_LIST_OPTIONS
   } from '@/helpers'
-
-  const props = defineProps({
-    isDrawer: { type: Boolean, default: false },
-    noBorder: { type: Boolean, default: false },
-    listDigitalCertificatesService: { type: Function, required: true },
-    loadDigitalCertificatesService: { type: Function, required: true }
-  })
 
   const digitalCertificateDrawerRef = ref('')
 
@@ -41,7 +36,8 @@
   const { setValue: setUseHttp3 } = useField('protocols.http.useHttp3')
   const { errorMessage: quicPortError, value: quicPortValue } = useField('protocols.http.quicPorts')
 
-  const openDigitalCertificateDrawer = () => {
+  const openDigitalCertificateDrawer = (type = 'edge_certificate') => {
+    digitalCertificateDrawerRef.value.changeCertificateType(type)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
 
@@ -60,22 +56,29 @@
   const showTlsAndCipherDropdown = computed(
     () => protocols.value.http.useHttps || protocols.value.http.useHttp3
   )
-  const onDigitalCertificateSuccess = (domainId) => {
-    tls.value.certificate = domainId
+  const onDigitalCertificateSuccess = ({ id }) => {
+    tls.value.certificate = id
   }
 
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type: 'edge_certificate',
       fields: ['id,name'],
       ...queryParams
     })
   }
+
+  watch(
+    () => tls.value?.certificate,
+    (newValue) => {
+      if (newValue === 1) {
+        openDigitalCertificateDrawer()
+      }
+    }
+  )
 </script>
 <template>
   <form-horizontal
-    :isDrawer="isDrawer"
-    :noBorder="noBorder"
     title="Protocol Settings"
     description="Configure the communication protocols used between the workload and its users. This section allows you to define security, compatibility, and performance settings to optimize how your workload operates at the edge."
     data-testid="form-horizontal-protocol-settings"
@@ -141,7 +144,7 @@
             label="Digital Certificate"
             name="tls.certificate"
             :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-            :loadService="props.loadDigitalCertificatesService"
+            :loadService="digitalCertificatesService.loadDigitalCertificate"
             optionLabel="name"
             optionValue="value"
             :value="tls.certificate"
@@ -152,7 +155,7 @@
               <ul class="p-2">
                 <li>
                   <PrimeButton
-                    @click="openDigitalCertificateDrawer"
+                    @click="openDigitalCertificateDrawer('edge_certificate')"
                     class="w-full whitespace-nowrap flex"
                     text
                     size="small"

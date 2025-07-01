@@ -58,7 +58,10 @@ export const DigitalCertificatesAdapter = {
     })
 
     if (type === 'edge_certificate') {
-      const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
+      const DEFAULT_CERTIFICATES = [
+        { id: 0, name: 'Azion (SAN)' },
+        { id: 1, name: "Let's Encrypt" }
+      ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
 
