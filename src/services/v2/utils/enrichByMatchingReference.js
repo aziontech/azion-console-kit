@@ -8,13 +8,14 @@
  * @param {Object} options Configurações opcionais como pageSize e fields
  * @returns {Promise<Array>} Lista enriquecida
  */
-export const enrichByMatchingReference = async (
+export const enrichByMatchingReference = async ({
   items,
   fetchReferencePage,
   getReferenceId,
   merge,
-  { pageSize = 100, fields = 'id,name' } = {}
-) => {
+  pageSize = 100,
+  fields = 'id,name'
+} = {}) => {
   const unresolvedIds = new Set(items.map((item) => item.id))
   const enriched = []
   const referenceMap = new Map()

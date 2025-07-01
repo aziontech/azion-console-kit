@@ -20,16 +20,17 @@ export class DataStreamService {
       params
     })
 
-    const enriched = await enrichByMatchingReference(
-      data.results,
-      this.listTemplates,
-      (item) => item.data_set_id,
-      (item, matchedRef) => ({
+    const enriched = await enrichByMatchingReference({
+      items: data.results,
+      fetchReferencePage: this.listTemplates,
+      getReferenceId: (item) =>
+        item.transform?.find((item) => item.type === 'render_template')?.attributes?.template,
+      merge: (item, matchedRef) => ({
         ...item,
         templateName: matchedRef.name
       }),
-      { pageSize: 100 }
-    )
+      pageSize: 100
+    })
 
     return {
       count: data.count,
@@ -49,7 +50,7 @@ export class DataStreamService {
     return { results, count: data.count }
   }
 
-  createDataSteramService = async (payload) => {
+  createDataStreamService = async (payload) => {
     const body = this.#getTransformed('transformPayloadDataStream', payload)
 
     const response = await this.http.request({
@@ -78,8 +79,11 @@ export class DataStreamService {
       method: 'GET',
       url: `${this.baseURL}/${id}`
     })
+    const filterWorkloads = data.data.transform?.find((item) => item.type === 'filter_workloads')
 
-    const workloads = await this.handlesWorkloads(data.data.filters.workloads)
+    const workloads = filterWorkloads
+      ? await this.handlesWorkloads(filterWorkloads.attributes.workloads)
+      : []
 
     return this.#getTransformed('transformLoadDataStream', [data.data, workloads])
   }

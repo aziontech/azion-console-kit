@@ -224,7 +224,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="dataStreamService.createDataSteramService"
+        :createService="dataStreamService.createDataStreamService"
         :schema="validationSchema"
         @on-response="handleToast"
         disableToast
