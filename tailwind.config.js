@@ -52,12 +52,12 @@ export default {
         fadeOut: 'fadeOut 220ms ease-in-out',
         slideDown: 'slideDown 220ms ease-in-out',
         blink: 'blink 1.4s infinite both',
-        'highlight-fade': 'highlight 10s ease-out forwards',
+        'highlight-fade': 'highlight ease-in forwards',
       },
       keyframes: {
         highlight: {
-          '0%, 99.9%': { backgroundColor: '#353535' },
-          '100%': { backgroundColor: 'transparent' }
+          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500'},
+          '100%': { backgroundColor: 'var(--surface-hover)',  fontWeight: '500'}
         },
         fadeIn: {
           '0%': { opacity: '0' },
