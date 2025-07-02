@@ -156,11 +156,11 @@
     try {
       await repurgeEvent(item)
       await handleTimeLoad()
-    } catch(error) {
+    } catch (error) {
       isLoading.value = false
     } finally {
       item.disabled = false
-    } 
+    }
   }
 
   const actionsRow = [
@@ -225,7 +225,7 @@
     do {
       await sleep(timeToReload)
       const listPurge = await props.listRealTimePurgeService()
-      if (!repurgesNeedingFocus.value ) return
+      if (!repurgesNeedingFocus.value) return
       const usersPurge = listPurge.filter((item) => item.user === user.email)
       totalOfUserPurges = usersPurge.length
 
