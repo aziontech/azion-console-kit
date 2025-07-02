@@ -31,7 +31,9 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
-  const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
+
+  //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
+  const CACHE_SETTING_API_FIELDS = []
 
   const listCacheSettingsServiceWithDecorator = async (query) => {
     return await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
