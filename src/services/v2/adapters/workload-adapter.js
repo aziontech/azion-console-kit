@@ -32,16 +32,16 @@ const parseName = ({ name, product_version }) => {
 
 export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
-    let domains = payload.domains.map((domain) => `${domain.subdomain}.${domain.domain}`)
+    let domains = payload.domains.map(({ subdomain, domain }) =>
+      subdomain ? `${subdomain}.${domain}` : domain
+    )
     if (payload.useCustomDomain) {
       domains.push(`${payload.customDomain}.azion.app`)
     }
     return {
       name: payload.name,
-      edge_application: payload.edgeApplication || null,
       active: payload.active,
       infrastructure: payload.infrastructure,
-      edge_firewall: payload.edgeFirewall || null,
       tls: {
         minimum_version: payload.tls.minimumVersion,
         ciphers: payload.tls.ciphers || null,

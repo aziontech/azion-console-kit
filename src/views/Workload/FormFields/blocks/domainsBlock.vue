@@ -34,7 +34,6 @@
   const { value: workloadHostname } = useField('workloadHostname')
   const { value: useCustomDomain } = useField('useCustomDomain')
   const { errorMessage: customDomainErrorMessage } = useField('customDomain')
-  // const { value: optionsDomains } = useField('optionsDomains')
 
   const domainsOptions = ref([])
 
@@ -84,6 +83,26 @@
       severity: 'success',
       summary: 'Successfully copied!'
     })
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  const handleLetEncrypt = () => {
+    if (!domains.value?.length) return
+
+    const [first, ...rest] = domains.value
+
+    const commonName = `${first.subdomain}.${first.domain}`
+    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+
+    const isDnsChallenge = domainsOptions.value.some((option) => option.label === first.domain)
+
+    const letEncrypt = {
+      commonName,
+      alternativeNames,
+      challenge: isDnsChallenge ? 'dns' : 'http'
+    }
+
+    return letEncrypt
   }
 
   sugestionDomains()
@@ -168,7 +187,7 @@
                   :name="`domains[${index}].domain`"
                   :options="domainsOptions"
                   optionLabel="label"
-                  optionValue="value"
+                  optionValue="label"
                   placeholder="example.net"
                   emptyMessage="No domains available"
                   :value="domain.domain"

@@ -65,9 +65,6 @@
         :isCard="false"
         title="Mutual Authentication"
       />
-
-      {{ mtls }}
-
       <div v-show="mtls?.isEnabled">
         <div class="flex flex-col gap-3">
           <FieldGroupRadio
