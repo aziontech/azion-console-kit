@@ -136,7 +136,15 @@
       await purgeService.createPurge(dataPurge)
       handleClickedOnEvent(purgeToRepurge.type)
     } catch (error) {
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
+        const errorMessage = error?.message || error
+        showToast('error', errorMessage)
+      }
+      isLoading.value = false
+      throw error
     }
   }
 
@@ -148,9 +156,11 @@
     try {
       await repurgeEvent(item)
       await handleTimeLoad()
+    } catch(error) {
+      isLoading.value = false
     } finally {
       item.disabled = false
-    }
+    } 
   }
 
   const actionsRow = [
@@ -215,7 +225,7 @@
     do {
       await sleep(timeToReload)
       const listPurge = await props.listRealTimePurgeService()
-      if (!repurgesNeedingFocus.value) return
+      if (!repurgesNeedingFocus.value ) return
       const usersPurge = listPurge.filter((item) => item.user === user.email)
       totalOfUserPurges = usersPurge.length
 
