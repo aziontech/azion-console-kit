@@ -1,9 +1,23 @@
-import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import {
+  adaptServiceDataResponse,
+  transformSnakeToCamel
+} from '@/services/v2/utils/adaptServiceDataResponse'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
   severity: status ? 'success' : 'danger'
 })
+
+const ALL_THREATS = [
+  'cross_site_scripting',
+  'directory_traversal',
+  'evading_tricks',
+  'file_upload',
+  'identified_attack',
+  'remote_file_inclusion',
+  'sql_injection',
+  'unwanted_access'
+]
 
 const parseThreatTypes = (threatsConfiguration) => {
   const threatTypesMap = {
@@ -17,95 +31,78 @@ const parseThreatTypes = (threatsConfiguration) => {
     sql_injection: 'SQL Injection'
   }
 
-  return Object.keys(threatTypesMap)
-    .filter((key) => threatsConfiguration[key])
-    .map((key) => threatTypesMap[key])
+  return threatsConfiguration.attributes.thresholds.map((item) => threatTypesMap[item.threat])
 }
 
 const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
   name: (value) => value.name,
-  threatsConfiguration: (value) => parseThreatTypes(value.threats_configuration)
+  threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
 export const WafAdapter = {
   transformListWafRules(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
-  adaptWafRulePayload({ payload, isEdit = false } = {}) {
-    const threatsConfiguration = {
-      bypass_addresses: payload.bypassAddresses,
-      cross_site_scripting_sensitivity: payload.crossSiteScriptingSensitivity,
-      directory_traversal_sensitivity: payload.directoryTraversalSensitivity,
-      evading_tricks_sensitivity: payload.evadingTricksSensitivity,
-      file_upload_sensitivity: payload.fileUploadSensitivity,
-      identified_attack_sensitivity: payload.identifiedAttackSensitivity,
-      remote_file_inclusion_sensitivity: payload.remoteFileInclusionSensitivity,
-      sql_injection_sensitivity: payload.sqlInjectionSensitivity,
-      unwanted_access_sensitivity: payload.unwantedAccessSensitivity,
-      file_upload: payload.fileUpload,
-      evading_tricks: payload.evadingTricks,
-      unwanted_access: payload.unwantedAccess,
-      identified_attack: payload.identifiedAttack,
-      cross_site_scripting: payload.crossSiteScripting,
-      directory_traversal: payload.directoryTraversal,
-      remote_file_inclusion: payload.remoteFileInclusion,
-      sql_injection: payload.sqlInjection
+  adaptWafRulePayload(payload) {
+    const camelToSnakeMap = {
+      crossSiteScripting: 'cross_site_scripting',
+      directoryTraversal: 'directory_traversal',
+      evadingTricks: 'evading_tricks',
+      fileUpload: 'file_upload',
+      identifiedAttack: 'identified_attack',
+      remoteFileInclusion: 'remote_file_inclusion',
+      sqlInjection: 'sql_injection',
+      unwantedAccess: 'unwanted_access'
     }
 
-    if (isEdit) {
-      threatsConfiguration.account_id = payload.id
-    }
+    const thresholds = Object.entries(camelToSnakeMap)
+      .filter(([camelKey]) => payload[camelKey] === true)
+      .map(([camelKey, snakeKey]) => ({
+        threat: snakeKey,
+        sensitivity: payload[`${camelKey}Sensitivity`] || 'medium'
+      }))
 
     return {
       name: payload.name,
       active: payload.active,
-      threats_configuration: threatsConfiguration
+      engine_settings: {
+        attributes: {
+          thresholds
+        }
+      }
     }
   },
+  transformLoadWafRule({ data: response }) {
+    const responseThresholds = response?.engine_settings?.attributes?.thresholds || []
 
-  transformLoadWafRule(response) {
-    const responseBody = response.data
-    const threatsConfiguration = responseBody.threats_configuration
+    const inputMap = Object.fromEntries(
+      responseThresholds.map(({ threat, sensitivity }) => [threat, sensitivity])
+    )
+
+    const threatsConfiguration = ALL_THREATS.reduce((acc, threat) => {
+      const camel = transformSnakeToCamel(threat)
+      acc[camel] = threat in inputMap
+      acc[`${camel}Sensitivity`] = inputMap[threat] || 'medium'
+      return acc
+    }, {})
 
     return {
-      id: responseBody.id,
-      name: responseBody.name,
-      active: responseBody.active,
-      bypassAddresses: threatsConfiguration.bypass_addresses,
-      crossSiteScriptingSensitivity: threatsConfiguration.cross_site_scripting_sensitivity,
-      directoryTraversalSensitivity: threatsConfiguration.directory_traversal_sensitivity,
-      evadingTricksSensitivity: threatsConfiguration.evading_tricks_sensitivity,
-      fileUploadSensitivity: threatsConfiguration.file_upload_sensitivity,
-      identifiedAttackSensitivity: threatsConfiguration.identified_attack_sensitivity,
-      mode: threatsConfiguration.mode,
-      remoteFileInclusionSensitivity: threatsConfiguration.remote_file_inclusion_sensitivity,
-      sqlInjectionSensitivity: threatsConfiguration.sql_injection_sensitivity,
-      unwantedAccessSensitivity: threatsConfiguration.unwanted_access_sensitivity,
-      fileUpload: threatsConfiguration.file_upload,
-      evadingTricks: threatsConfiguration.evading_tricks,
-      unwantedAccess: threatsConfiguration.unwanted_access,
-      identifiedAttack: threatsConfiguration.identified_attack,
-      crossSiteScripting: threatsConfiguration.cross_site_scripting,
-      directoryTraversal: threatsConfiguration.directory_traversal,
-      remoteFileInclusion: threatsConfiguration.remote_file_inclusion,
-      sqlInjection: threatsConfiguration.sql_injection
-    }
-  },
-  adaptCloneWafRulePayload(payload, wafRulesName) {
-    return {
-      id: payload.id,
-      name: wafRulesName
+      id: response.id,
+      name: response.name,
+      active: response.active,
+      ...threatsConfiguration
     }
   },
   adaptCreateWafRuleAllowedPayload(payload) {
-    const matchValidationValues = payload.matchZones.map((zone) => {
+    const matchValidationValues = payload.conditions.map((zone) => {
       if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
         zone.matches_on = null
       }
       return zone
     })
+    
     return {
       match_zones: matchValidationValues,
       path: payload.path,
@@ -228,7 +225,7 @@ export const WafAdapter = {
           lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
             new Date(waf.last_modified)
           ),
-          matchZones: parseMatchZone(waf.match_zones),
+          matchZones: parseMatchZone(waf.conditions),
           path: waf.path,
           name: waf.name,
           ruleId: getRuleIdText(waf.rule_id),

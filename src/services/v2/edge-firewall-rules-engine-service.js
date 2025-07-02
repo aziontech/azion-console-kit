@@ -6,7 +6,7 @@ export class EdgeFirewallRulesEngineService {
   }
 
   #getUrl = (edgeFirewallId, suffix = '') => {
-    return `${this.baseURL}/${edgeFirewallId}/rules${suffix}`
+    return `${this.baseURL}/${edgeFirewallId}/request_rules${suffix}`
   }
 
   #getTransformed = (method, data) => {

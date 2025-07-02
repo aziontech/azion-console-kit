@@ -22,15 +22,7 @@
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
-  const ALLOWED_RULES_API_FIELDS = [
-    'id',
-    'last_modified',
-    'rule_id',
-    'name',
-    'path',
-    'match_zones',
-    'active'
-  ]
+
 
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
@@ -129,7 +121,7 @@
       header: 'URI'
     },
     {
-      field: 'matchZones',
+      field: 'conditions',
       header: 'Match Zones',
       type: 'component',
       disableSort: true,
@@ -245,7 +237,6 @@
     emptyListMessage="No allowed rules found."
     isTabs
     :actions="actions"
-    :apiFields="ALLOWED_RULES_API_FIELDS"
   >
     <template #addButton>
       <PrimeButton

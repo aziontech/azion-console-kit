@@ -38,12 +38,12 @@ const adaptServiceDataResponseToLoad = (data, fields, transforms) => {
   )
 }
 
-const transformSnakeToCamel = (value) => {
+export const transformSnakeToCamel = (value) => {
   // eslint-disable-next-line id-length
   return value.replace(/_([a-z])/g, (_, g) => g.toUpperCase())
 }
 
-const transformCamelToSnake = (value) => {
+export const transformCamelToSnake = (value) => {
   // eslint-disable-next-line id-length
   return value.replace(/([A-Z])/g, '_$1').toLowerCase()
 }

@@ -42,7 +42,7 @@ export class WafService {
   }
 
   editWafRule = async (payload, wafId) => {
-    const adaptedPayload = this.adapter.adaptWafRulePayload({ payload, isEdit: true })
+    const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
     await this.http.request({
       method: 'PATCH',
       url: `${this.baseURL}/${wafId}`,
@@ -71,11 +71,13 @@ export class WafService {
   }
 
   cloneWafRule = async ({ wafRulesName, payload }) => {
-    const adaptedPayload = this.adapter.adaptCloneWafRulePayload(payload, wafRulesName)
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/${payload.id}/clone`,
-      body: adaptedPayload
+      body: {
+        id: payload.id,
+        name: wafRulesName
+      }
     })
 
     return {
