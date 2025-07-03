@@ -1,4 +1,4 @@
-export class WorkloadService {
+export class WorkloadDeploymentService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
@@ -6,33 +6,27 @@ export class WorkloadService {
   }
 
   #getUrl(workloadId, suffix = '') {
-    return `${this.baseURL}/${workloadId}/deployments/${suffix}`
+    return `${this.baseURL}/${workloadId}/deployments${suffix}`
   }
 
   createWorkloadDeployment = async (payload) => {
     const body = this.adapter?.transformCreateWorkloadDeployment?.(payload)
-    const { data } = await this.http.request({
+
+    await this.http.request({
       method: 'POST',
       url: this.#getUrl(payload.id),
       body
     })
-
-    return {
-      id: parseInt(data.id)
-    }
   }
 
   updateWorkloadDeployment = async (workloadId, payload) => {
-    const body = this.adapter?.transformCreateWorkloadDeployment?.(payload)
-    const { data } = await this.http.request({
+    const body = this.adapter?.transformEditWorkloadDeployment?.(payload)
+
+    await this.http.request({
       method: 'PATCH',
-      url: this.#getUrl(workloadId, payload.id),
+      url: this.#getUrl(workloadId, `/${payload.id}`),
       body
     })
-
-    return {
-      id: parseInt(data.id)
-    }
   }
 
   listWorkloadDeployment = async (id, params) => {

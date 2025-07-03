@@ -60,7 +60,7 @@
   const DOMAINS_API_FIELDS = [
     'name',
     'domains',
-    'workload_hostname',
+    'workload_domain',
     'infrastructure',
     'active',
     'last_modified',

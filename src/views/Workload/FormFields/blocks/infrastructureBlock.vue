@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeTag from 'primevue/tag'
-  import { ref } from 'vue'
+  import { computed } from 'vue'
   import { useField } from 'vee-validate'
 
   const props = defineProps({
@@ -20,21 +20,28 @@
     }
   })
 
-  const { value: networkMap } = useField('networkMap')
+  const { value: infrastructure } = useField('infrastructure')
 
   const tag = {
     value: 'The environment type cannot be changed after the domain is created',
     icon: 'pi pi-lock'
   }
 
-  const environmentOptionsRadios = ref([
+  const tagInfrastructureProduct = computed(() =>
+    props.isEdit && infrastructure.value === '1' ? tag : null
+  )
+  const tagInfrastructureStage = computed(() =>
+    props.isEdit && infrastructure.value === '2' ? tag : null
+  )
+
+  const environmentOptionsRadios = computed(() => [
     {
       title: 'Production Infrastructure (All Edge Locations)',
       subtitle:
         'Deploy to the Staging Network for testing with limited propagation to Edge Locations.',
       inputValue: '1',
       disabled: props.isEdit,
-      tag: props.isEdit && networkMap.value === '1' ? tag : null
+      tag: tagInfrastructureProduct.value
     },
     {
       title: 'Staging Infrastructure',
@@ -42,7 +49,7 @@
         'Deploy to the Staging Network for testing with limited propagation to Edge Locations.',
       inputValue: '2',
       disabled: props.isEdit,
-      tag: props.isEdit && networkMap.value === '2' ? tag : null
+      tag: tagInfrastructureStage.value
     }
   ])
 </script>
@@ -58,7 +65,7 @@
       <div class="flex flex-col gap-3">
         <FieldGroupRadio
           isCard
-          nameField="networkMap"
+          nameField="infrastructure"
           :options="environmentOptionsRadios"
         >
           <template #footer="{ item }">

@@ -1,12 +1,25 @@
-export const WorkloadAdapter = {
+export const WorkloadDeploymentAdapter = {
   transformCreateWorkloadDeployment(payload) {
     return {
       name: payload.name,
       strategy: {
+        type: 'default',
         attributes: {
           edge_application: payload.edgeApplication,
-          edge_firewall: payload.edgeFirewall,
-          custom_page: payload.customPage
+          edge_firewall: payload.edgeFirewall || null,
+          custom_page: payload.customPage || null
+        }
+      }
+    }
+  },
+  transformEditWorkloadDeployment(payload) {
+    return {
+      strategy: {
+        type: 'default',
+        attributes: {
+          edge_application: payload.edgeApplication,
+          edge_firewall: payload.edgeFirewall || null,
+          custom_page: payload.customPage || null
         }
       }
     }

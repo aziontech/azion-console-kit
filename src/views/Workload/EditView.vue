@@ -1,68 +1,49 @@
 <template>
-  <EditFormBlock
-    :editService="editWorkloadService"
-    :loadService="loadWorkload"
-    :schema="validationSchema"
-    :updatedRedirect="updatedRedirect"
-    @loaded-service-object="setWorkloadName"
-    @on-edit-success="handleTrackEditEvent"
-    @on-edit-fail="handleTrackFailEditEvent"
-    isTabs
-  >
-    <template #form>
-      <FormFieldsEditDomains
-        :digitalCertificates="digitalCertificates"
-        :loadDigitalCertificatesService="loadDigitalCertificatesService"
-        hasDomainName
-        @copyDomainName="copyDomainName"
-      />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock :pageTitle="workloadName" />
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading }">
-      <ActionBarTemplate
-        @onSubmit="onSubmit"
-        @onCancel="onCancel"
-        :loading="loading"
-      />
+    <template #content>
+      <EditFormBlock
+        :editService="workloadService.editWorkload"
+        :loadService="workloadService.loadWorkload"
+        :schema="validationSchema"
+        :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setWorkloadName"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
+      >
+        <template #form>
+          <FormFieldsWorkload isEdit />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
     </template>
-  </EditFormBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
   import { ref, inject } from 'vue'
   import EditFormBlock from '@/templates/edit-form-block'
-  // import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { workloadService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    editDomainService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    edgeFirewallServices: {
-      type: Object,
-      required: true
-    },
-    digitalCertificatesServices: {
-      type: Object,
-      required: true
-    },
-    customPagesServices: {
-      type: Object,
-      required: true
-    },
-    workload: {
-      type: Object,
-      required: true
-    }
+  defineProps({
+    updatedRedirect: { type: String, required: true }
   })
 
   const handleTrackEditEvent = () => {
@@ -87,10 +68,6 @@
 
   const setWorkloadName = async (workload) => {
     workloadName.value = workload.name
-  }
-
-  const loadWorkload = () => {
-    return props.workload
   }
 
   const validationSchema = yup.object({
@@ -140,15 +117,24 @@
       })
     }),
     mtls: yup.object({
+      isEnabled: yup.boolean(),
       verification: yup.string().label('Verification'),
       certificate: yup
         .string()
         .when('isEnabled', {
           is: true,
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('Trusted CA Certificate is required'),
+          otherwise: (schema) => schema.notRequired().nullable()
         })
         .label('Trusted CA Certificate'),
-      crl: yup.array().label('Certificate Revocation List')
+      crl: yup
+        .array()
+        .when('isEnabled', {
+          is: true,
+          then: (schema) => schema.required('Certificate Revocation List is required').min(1),
+          otherwise: (schema) => schema.nullable().notRequired()
+        })
+        .label('Certificate Revocation List')
     }),
     domains: yup
       .array()
@@ -195,6 +181,7 @@
             })
       })
       .label('Custom Domain'),
-    workloadHostnameAllowAccess: yup.boolean()
+    workloadHostnameAllowAccess: yup.boolean(),
+    edgeZoneOptions: yup.array()
   })
 </script>

@@ -7,8 +7,8 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
-  import { useField } from 'vee-validate'
-  import { ref, computed, watch } from 'vue'
+  import { useField, useFieldArray } from 'vee-validate'
+  import { ref, computed } from 'vue'
   import { digitalCertificatesService } from '@/services/v2'
 
   import {
@@ -20,6 +20,7 @@
   } from '@/helpers'
 
   const digitalCertificateDrawerRef = ref('')
+  const letEncryptObj = ref(null)
 
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
@@ -32,11 +33,15 @@
   const { errorMessage: httpsPortError, value: httpsPortValue } = useField(
     'protocols.http.httpsPorts'
   )
+  const { value: domains } = useField('domains')
+  const { fields: edgeZoneOptions } = useFieldArray('edgeZoneOptions')
+
   const { setValue: setUseHttps } = useField('protocols.http.useHttps')
   const { setValue: setUseHttp3 } = useField('protocols.http.useHttp3')
   const { errorMessage: quicPortError, value: quicPortValue } = useField('protocols.http.quicPorts')
 
   const openDigitalCertificateDrawer = (type = 'edge_certificate') => {
+    handleLetEncrypt()
     digitalCertificateDrawerRef.value.changeCertificateType(type)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
@@ -68,14 +73,31 @@
     })
   }
 
-  watch(
-    () => tls.value?.certificate,
-    (newValue) => {
-      if (newValue === 1) {
-        openDigitalCertificateDrawer()
-      }
+  function checkChallenge(domains, options) {
+    const labels = new Set(options.map((option) => option.value.label))
+    const allMatch = domains.every(({ domain }) => labels.has(domain))
+
+    return allMatch ? 'dns' : 'http'
+  }
+
+  const handleLetEncrypt = () => {
+    if (!domains.value?.length) return
+
+    const [first, ...rest] = domains.value
+
+    const commonName = `${first.subdomain}.${first.domain}`
+    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+
+    const isDnsChallenge = checkChallenge(domains.value, edgeZoneOptions.value)
+
+    const letEncrypt = {
+      commonName,
+      alternativeNames,
+      challenge: isDnsChallenge
     }
-  )
+
+    letEncryptObj.value = letEncrypt
+  }
 </script>
 <template>
   <form-horizontal
@@ -86,6 +108,7 @@
     <template #inputs>
       <DigitalCertificatesDrawer
         ref="digitalCertificateDrawerRef"
+        :letEncryptObj="letEncryptObj"
         @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex gap-6 max-sm:flex-col">
@@ -138,41 +161,6 @@
         class="flex gap-6 flex-col"
         v-if="protocols.http.useHttps"
       >
-        <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdownLazyLoader
-            data-testid="domains-form__edge-certificate-field"
-            label="Digital Certificate"
-            name="tls.certificate"
-            :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-            :loadService="digitalCertificatesService.loadDigitalCertificate"
-            optionLabel="name"
-            optionValue="value"
-            :value="tls.certificate"
-            appendTo="self"
-            placeholder="Select a certificate"
-          >
-            <template #footer>
-              <ul class="p-2">
-                <li>
-                  <PrimeButton
-                    @click="openDigitalCertificateDrawer('edge_certificate')"
-                    class="w-full whitespace-nowrap flex"
-                    text
-                    size="small"
-                    icon="pi pi-plus-circle"
-                    data-testid="domains-form__create-digital-certificate-button"
-                    :pt="{
-                      label: { class: 'w-full text-left' },
-                      root: { class: 'p-2' }
-                    }"
-                    label="Create Digital Certificate"
-                  />
-                </li>
-              </ul>
-            </template>
-          </FieldDropdownLazyLoader>
-        </div>
-
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
             for="port-https"
@@ -245,6 +233,42 @@
           />
         </div>
       </div>
+
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <FieldDropdownLazyLoader
+          data-testid="domains-form__edge-certificate-field"
+          label="Digital Certificate"
+          name="tls.certificate"
+          :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
+          optionLabel="name"
+          optionValue="value"
+          :value="tls.certificate"
+          appendTo="self"
+          placeholder="Select a certificate"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDigitalCertificateDrawer('edge_certificate')"
+                  class="w-full whitespace-nowrap flex"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Digital Certificate"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+      <hr class="surface-border" />
       <div class="flex gap-6 max-sm:flex-col">
         <FieldSwitchBlock
           data-testid="domains-form__use-http3-field"
@@ -302,6 +326,7 @@
           </span>
         </div>
       </div>
+      <hr class="surface-border" />
     </template>
   </form-horizontal>
 </template>

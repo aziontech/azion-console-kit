@@ -1,8 +1,8 @@
 export class WorkloadService {
-  constructor(http, adapter) {
+  constructor(http, adapter, workloadDeployment) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/workspace/workloads'
+    ;(this.baseURL = 'v4/workspace/workloads'), (this.workloadDeployment = workloadDeployment)
   }
 
   createWorkload = async (payload) => {
@@ -13,11 +13,21 @@ export class WorkloadService {
       body
     })
 
+    const workloadDeploymentPayload = {
+      edgeApplication: payload.edgeApplication,
+      edgeFirewall: payload.edgeFirewall,
+      customPage: payload.customPage,
+      id: data.data.id,
+      name: 'workload-deployment'
+    }
+
+    await this.workloadDeployment.createWorkloadDeployment(workloadDeploymentPayload)
+
     return {
       feedback: 'Your workload has been created',
-      urlToEditView: `/workloads/edit/${data.id}`,
-      domainName: data.workload_hostname,
-      id: parseInt(data.id)
+      urlToEditView: `/workloads/edit/${data.data.id}`,
+      domainName: data.data.workload_domain,
+      id: parseInt(data.data.id)
     }
   }
 
@@ -44,16 +54,27 @@ export class WorkloadService {
       url: `${this.baseURL}/${id}`
     })
 
-    return this.adapter?.transformLoadWorkload?.(data) || data
+    const workloadDeployment = await this.workloadDeployment.listWorkloadDeployment(id)
+
+    return this.adapter?.transformLoadWorkload?.(data, workloadDeployment[0]) || data
   }
 
-  editWorkload = async ({ id, payload }) => {
-    const body = this.adapter?.transformEditWorkload?.(payload)
+  editWorkload = async (payload) => {
+    const body = this.adapter?.transformCreateWorkload?.(payload)
     await this.http.request({
       method: 'PUT',
-      url: `${this.baseURL}/${id}`,
+      url: `${this.baseURL}/${payload.id}`,
       body
     })
+
+    const workloadDeploymentPayload = {
+      id: payload.workloadDeploymentId,
+      edgeApplication: payload.edgeApplication,
+      edgeFirewall: payload.edgeFirewall,
+      customPage: payload.customPage
+    }
+
+    await this.workloadDeployment.updateWorkloadDeployment(payload.id, workloadDeploymentPayload)
 
     return 'Your workload has been updated'
   }

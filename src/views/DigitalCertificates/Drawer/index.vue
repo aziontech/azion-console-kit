@@ -14,6 +14,9 @@
   const props = defineProps({
     certificate: {
       type: String
+    },
+    letEncryptObj: {
+      type: Object
     }
   })
 
@@ -106,6 +109,7 @@
     disableToast
   >
     <template #formFields>
+      test {{ props.letEncryptObj }}
       <FormFieldsCreateDigitalCertificates isDrawer />
     </template>
   </CreateDrawerBlock>

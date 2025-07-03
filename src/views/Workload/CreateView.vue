@@ -124,7 +124,7 @@
     name: '',
     edgeApplication: null,
     active: true,
-    networkMap: '1',
+    infrastructure: '1',
     edgeFirewall: null,
     tls: {
       certificate: 0,
@@ -260,6 +260,7 @@
             })
       })
       .label('Custom Domain'),
-    workloadHostnameAllowAccess: yup.boolean()
+    workloadHostnameAllowAccess: yup.boolean(),
+    edgeZoneOptions: yup.array()
   })
 </script>

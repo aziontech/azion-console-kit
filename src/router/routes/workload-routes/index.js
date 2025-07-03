@@ -1,6 +1,3 @@
-import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const workloadRoutes = {
   path: `/workloads`,
@@ -24,10 +21,6 @@ export const workloadRoutes = {
       path: 'create',
       name: 'create-workload',
       component: () => import('@views/Workload/CreateView.vue'),
-      props: {
-        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService
-      },
       meta: {
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
@@ -43,19 +36,11 @@ export const workloadRoutes = {
       }
     },
     {
-      path: 'edit/:id/:tab?',
+      path: 'edit/:id',
       name: `edit-workload`,
-      component: () => import('@views/Workload/TabsView.vue'),
+      component: () => import('@views/Workload/EditView.vue'),
       props: {
-        updatedRedirect: `list-workloads`,
-        edgeApplicationServices: {
-          listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-          loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService
-        },
-        customPagesServices: {
-          listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
-          loadCustomPagesService: CustomPagesServicesV4.loadCustomPagesService
-        }
+        updatedRedirect: `list-workloads`
       },
       meta: {
         flag: 'checkout_access_without_flag',

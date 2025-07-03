@@ -11,6 +11,33 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
+const extractAzionAppSubdomain = (rawDomains) => {
+  if (!Array.isArray(rawDomains) || rawDomains.length === 0) {
+    return {
+      azionAppSubdomain: '',
+      domains: [{ subdomain: '', domain: '' }]
+    }
+  }
+  return rawDomains.reduce(
+    (acc, item) => {
+      const match = item.match(/^(.+?)\.(.+)$/) || []
+      const subdomain = match[1] || ''
+      const domain = match[2] || item
+
+      if (domain === 'azion.app') {
+        // guarda apenas o subdomínio
+        acc.azionAppSubdomain = subdomain
+      } else {
+        // empurra os demais parsed
+        acc.domains.push({ subdomain, domain })
+      }
+
+      return acc
+    },
+    { azionAppSubdomain: null, domains: [] }
+  )
+}
+
 const LOCKED_VALUE = 'custom'
 
 const isLocked = (version) => version === LOCKED_VALUE
@@ -32,13 +59,15 @@ const parseName = ({ name, product_version }) => {
 
 export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
-    let domains = payload.domains.map(({ subdomain, domain }) =>
-      subdomain ? `${subdomain}.${domain}` : domain
-    )
+    let domains = payload.domains
+      .filter(({ subdomain, domain }) => subdomain || domain)
+      .map(({ subdomain, domain }) => (subdomain ? `${subdomain}.${domain}` : domain))
+
     if (payload.useCustomDomain) {
-      domains.push(`${payload.customDomain}.azion.app`)
+      domains.unshift(`${payload.customDomain}.azion.app`)
     }
-    return {
+
+    const payloadResquest = {
       name: payload.name,
       active: payload.active,
       infrastructure: payload.infrastructure,
@@ -62,13 +91,20 @@ export const WorkloadAdapter = {
         }
       },
       mtls: {
-        verification: payload.mtls.verification || 'enforce',
+        verification: payload.mtls.verification,
         certificate: payload.mtls.certificate ?? null,
         crl: payload.mtls.crl || null
       },
       domains,
       workload_hostname_allow_access: payload.workloadHostnameAllowAccess
     }
+
+    if (!payload.mtls.isEnabled) {
+      delete payloadResquest.mtls.verification
+      delete payloadResquest.mtls.crl
+    }
+
+    return payloadResquest
   },
   transformListWorkloads(data) {
     return data.map((workload) => {
@@ -98,35 +134,26 @@ export const WorkloadAdapter = {
       }
     })
   },
-  transformLoadWorkload({ data: workload }) {
+  transformLoadWorkload({ data: workload }, workloadDeployment) {
+    const { azionAppSubdomain, domains } = extractAzionAppSubdomain(workload.domains)
     return {
       id: workload.id,
       name: workload.name,
       active: workload.active,
-      workloadHostname: workload.workload_hostname?.replace(/\.azion\.app$/, ''),
-      domains: workload.alternate_domains?.length
-        ? workload.alternate_domains.map((domain) => {
-            const match = domain.match(/^(.+?)\.(.+)$/)
-            return {
-              subdomain: match ? match[1] : '',
-              domain: match ? match[2] : domain
-            }
-          })
-        : [{ subdomain: '', domain: '' }],
-      optionsDomains: workload.alternate_domains?.map((domain) => {
-        const match = domain.match(/^(.+?)\.(.+)$/)
-        const domainValue = match ? match[2] : domain
-        return {
-          value: domainValue,
-          label: domainValue
-        }
-      }),
+      workloadHostname: workload.workload_domain?.replace(/\.azion\.app$/, ''),
+      workloadDeploymentId: workloadDeployment.id,
+      edgeFirewall: workloadDeployment.edgeFirewall,
+      edgeApplication: workloadDeployment.edgeApplication,
+      customPage: workloadDeployment.customPage,
+      domains,
+      customDomain: azionAppSubdomain,
+      useCustomDomain: !!azionAppSubdomain,
       infrastructure: String(workload.infrastructure),
-      workloadHostnameAllowAccess: workload.workload_hostname_allow_access,
+      workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {
         minimumVersion: workload.tls.minimum_version || TLS_VERSIONS_OPTIONS[1].value,
         ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
-        certificate: workload.tls.certificate
+        certificate: workload.tls.certificate || 0
       },
       protocols: {
         http: {

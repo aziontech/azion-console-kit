@@ -9,7 +9,7 @@
   import PrimeButton from 'primevue/button'
   import { clipboardWrite } from '@/helpers'
   import { useFieldArray, useField } from 'vee-validate'
-  import { ref } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import { edgeDNSService } from '@/services/v2'
 
@@ -33,8 +33,10 @@
   const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
   const { value: workloadHostname } = useField('workloadHostname')
   const { value: useCustomDomain } = useField('useCustomDomain')
-  const { errorMessage: customDomainErrorMessage } = useField('customDomain')
-
+  // eslint-disable-next-line no-unused-vars
+  const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
+  const { value: infrastructure } = useField('infrastructure')
+  const { replace: replaceEdgeZoneOptions } = useFieldArray('edgeZoneOptions')
   const domainsOptions = ref([])
 
   const addNewDomain = () => {
@@ -60,6 +62,8 @@
         value: domain.id
       }
     })
+
+    replaceEdgeZoneOptions(domainsOptions.value)
   }
 
   const updateDomainSubdomain = (domainId, value) => {
@@ -85,25 +89,13 @@
     })
   }
 
-  // eslint-disable-next-line no-unused-vars
-  const handleLetEncrypt = () => {
-    if (!domains.value?.length) return
+  const disabledCustomDomain = computed(() => infrastructure.value === '2')
 
-    const [first, ...rest] = domains.value
-
-    const commonName = `${first.subdomain}.${first.domain}`
-    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
-
-    const isDnsChallenge = domainsOptions.value.some((option) => option.label === first.domain)
-
-    const letEncrypt = {
-      commonName,
-      alternativeNames,
-      challenge: isDnsChallenge ? 'dns' : 'http'
+  watch(disabledCustomDomain, (isDisabled) => {
+    if (isDisabled) {
+      useCustomDomain.value = false
     }
-
-    return letEncrypt
-  }
+  })
 
   sugestionDomains()
 </script>
@@ -115,40 +107,6 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
-      <div
-        v-if="props.isEdit"
-        class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
-      >
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <LabelBlock label="Workload Domain" />
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock" />
-            <InputText
-              id="workloadHostname"
-              data-testid="edit-domains-form__domain-field__input"
-              v-model="workloadHostname"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              disabled
-            />
-          </span>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            The default domain used to route traffic to your workload.
-          </small>
-        </div>
-        <div class="max-w-fit w-full flex items-end">
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            aria-label="Copy to Clipboard"
-            label="Copy to Clipboard"
-            @click="copyDomainName"
-          />
-        </div>
-      </div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 max-sm:gap-6">
           <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
@@ -243,6 +201,7 @@
           data-testid="domains-form__custom-domain-field"
           nameField="useCustomDomain"
           name="useCustomDomain"
+          :disabled="disabledCustomDomain"
           auto
           :isCard="false"
           title="Custom Domain (azion.app)"
@@ -271,6 +230,38 @@
               </template>
             </FieldInputGroup>
           </div>
+        </div>
+      </div>
+      <div
+        v-if="props.isEdit"
+        class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <LabelBlock label="Workload Domain" />
+          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+            <i class="pi pi-lock" />
+            <InputText
+              id="workloadHostname"
+              data-testid="edit-domains-form__domain-field__input"
+              v-model="workloadHostname"
+              type="text"
+              class="flex flex-col w-full"
+              :feedback="false"
+              disabled
+            />
+          </span>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            The default domain used to route traffic to your workload.
+          </small>
+        </div>
+        <div class="max-w-fit w-full flex items-end">
+          <PrimeButton
+            icon="pi pi-clone"
+            outlined
+            data-testid="edit-domains-form__domain-field__copy-button"
+            type="button"
+            @click="copyDomainName"
+          />
         </div>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
