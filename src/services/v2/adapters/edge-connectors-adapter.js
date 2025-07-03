@@ -21,15 +21,12 @@ const extractAddressesPostRequest = (addresses) => {
 const extractAddressesLoadRequest = (addresses) => {
   return addresses.map((address) => {
     return {
+      active: address.active,
       address: address.address,
       plainPort: address.plain_port,
       tlsPort: address.tls_port,
       serverRole: address.server_role,
-      weight: address.weight,
-      active: address.active,
-      maxConns: address.max_conns,
-      maxFails: address.max_fails,
-      failTimeout: address.fail_timeout
+      weight: address.weight
     }
   })
 }
@@ -51,10 +48,10 @@ const typeBuilders = {
   http: (payload) => ({
     address: !payload.modules.loadBalancer.enabled
       ? {
-          address: payload.address.address,
-          plain_port: payload.address.plainPort,
-          tls_port: payload.address.tlsPort
-        }
+        address: payload.address.address,
+        plain_port: payload.address.plainPort,
+        tls_port: payload.address.tlsPort
+      }
       : null,
     addresses: payload.modules.loadBalancer.enabled
       ? extractAddressesPostRequest(payload.addresses)
@@ -73,34 +70,34 @@ const typeBuilders = {
         enabled: payload.modules.originShield.enabled,
         config: payload.modules.originShield.enabled
           ? {
-              origin_ip_acl: {
-                enabled: payload.modules.originShield.config.originIpAcl.enabled
-              },
-              hmac: {
-                enabled: payload.modules.originShield.config.hmac.enabled,
-                config: {
-                  type: payload.modules.originShield.config.hmac.config.type,
-                  attributes: {
-                    region: payload.modules.originShield.config.hmac.config.attributes.region,
-                    service: payload.modules.originShield.config.hmac.config.attributes.service,
-                    access_key:
-                      payload.modules.originShield.config.hmac.config.attributes.accessKey,
-                    secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
-                  }
+            origin_ip_acl: {
+              enabled: payload.modules.originShield.config.originIpAcl.enabled
+            },
+            hmac: {
+              enabled: payload.modules.originShield.config.hmac.enabled,
+              config: {
+                type: payload.modules.originShield.config.hmac.config.type,
+                attributes: {
+                  region: payload.modules.originShield.config.hmac.config.attributes.region,
+                  service: payload.modules.originShield.config.hmac.config.attributes.service,
+                  access_key:
+                    payload.modules.originShield.config.hmac.config.attributes.accessKey,
+                  secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
                 }
               }
             }
+          }
           : null
       },
       load_balancer: {
         enabled: payload.modules.loadBalancer.enabled,
         config: payload.modules.loadBalancer.enabled
           ? {
-              method: payload.modules.loadBalancer.config.method,
-              max_retries: payload.modules.loadBalancer.config.maxRetries,
-              connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
-              read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
-            }
+            method: payload.modules.loadBalancer.config.method,
+            max_retries: payload.modules.loadBalancer.config.maxRetries,
+            connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
+            read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
+          }
           : null
       }
     }
@@ -109,30 +106,61 @@ const typeBuilders = {
 
 const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
-    liveIngestEndpoint: data.type_properties.endpoint
+    connectionOptions: {
+      region: data.type_properties.endpoint
+    }
   }),
+
   edge_storage: (data) => ({
-    edgeStorage: {
+    connectionOptions: {
       bucket: data.type_properties.bucket,
       prefix: data.type_properties.prefix
     }
   }),
-  http: (data) => ({
-    addresses: extractAddressesLoadRequest(data.addresses),
-    http: {
-      versions: data.type_properties.versions,
-      host: data.type_properties.host,
-      path: data.type_properties.path,
-      followingRedirect: data.type_properties.following_redirect,
-      realIpHeader: data.type_properties.real_ip_header,
-      realPortHeader: data.type_properties.real_port_header
-    }
-  })
-}
 
-const buildTypePayload = (type, payload, action) => {
-  const builder = action === 'POST' ? typeBuilders[type] : typeBuildersLoadRequest[type]
-  return builder(payload)
+  http: (data) => ({
+    connectionOptions: {
+      dnsResolution: data.connection_options.dns_resolution,
+      transportPolicy: data.connection_options.transport_policy,
+      host: data.connection_options.host,
+      pathPrefix: data.connection_options.path_prefix,
+      realIpHeader: data.connection_options.real_ip_header,
+      realPortHeader: data.connection_options.real_port_header,
+      followingRedirect: data.connection_options.following_redirect
+    },
+    modules: {
+      loadBalancer: {
+        enabled: data.modules.load_balancer.enabled,
+        config: {
+          method: data.modules.load_balancer.config.method,
+          maxRetries: data.modules.load_balancer.config.max_retries,
+          connectionTimeout: data.modules.load_balancer.config.connection_timeout,
+          readWriteTimeout: data.modules.load_balancer.config.read_write_timeout
+        }
+      },
+      originShield: {
+        enabled: data.modules.origin_shield_enabled,
+        config: {
+          originIpAcl: {
+            enabled: data.modules.origin_ip_acl.enabled
+          },
+          hmac: {
+            enabled: data.modules.hmac.enabled,
+            config: {
+              type: data.modules.hmac.config.type,
+              attributes: {
+                region: data.modules.hmac.config.attributes.region,
+                service: data.modules.hmac.config.attributes.service,
+                accessKey: data.modules.hmac.config.attributes.access_key,
+                secretKey: data.modules.hmac.config.attributes.secret_key
+              }
+            }
+          }
+        }
+      }
+    },
+    addresses: extractAddressesLoadRequest(data.addresses),
+  })
 }
 
 export const EdgeConnectorsAdapter = {
@@ -146,10 +174,10 @@ export const EdgeConnectorsAdapter = {
           header: edgeConnectors?.type_properties?.real_port_header,
           address: edgeConnectors?.addresses
             ? edgeConnectors?.addresses
-                .map((el) => {
-                  return el.address
-                })
-                .join(',')
+              .map((el) => {
+                return el.address
+              })
+              .join(',')
             : [],
           active: edgeConnectors?.active
             ? parseStatusData(edgeConnectors.active)
@@ -176,22 +204,15 @@ export const EdgeConnectorsAdapter = {
   },
 
   transformLoadEdgeConnectors({ data }) {
-    const builder = buildTypePayload(data.type, data, 'GET')
+    const builder = typeBuildersLoadRequest[data.type]
+    const attributes = builder(data)
 
     return {
       id: data.id,
-      type: data.type,
       name: data.name,
-      loadBalancerEnabled: data.modules.load_balancer_enabled,
-      originShieldEnabled: data.modules.origin_shield_enabled,
-      tlsPolicy: data.tls.policy,
-      loadBalanceMethod: data.load_balance_method,
-      connectionPreference: data.connection_preference,
-      connectionTimeout: data.connection_timeout,
-      readWriteTimeout: data.read_write_timeout,
-      maxRetries: data.max_retries,
-      status: data.active,
-      ...builder
+      type: data.type,
+      active: data.active,
+      attributes
     }
   }
 }
