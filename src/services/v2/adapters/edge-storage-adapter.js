@@ -1,6 +1,4 @@
-import {
-  adaptServiceDataResponse
-} from '@/services/v2/utils/adaptServiceDataResponse'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const transformMap = {

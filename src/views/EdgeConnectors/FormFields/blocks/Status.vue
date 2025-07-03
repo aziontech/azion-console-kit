@@ -1,18 +1,18 @@
 <template>
   <FormHorizontal
-    title="Origin IP ACL"
+    title="Status"
     data-testid="edge-connectors-form__section__origin-ip-acl"
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="modules.originShield.config.originIpAcl.enabled"
-          name="modules.originShield.config.originIpAcl.enabled"
+          nameField="active"
+          name="active"
           auto
           :isCard="false"
-          :value="originIpAcl"
+          :value="active"
           title="Active"
-          data-testid="edge-connectors-form__origin-ip-acl__origin-ip-acl-field"
+          data-testid="edge-connectors-form__status__active-field"
         />
       </div>
     </template>
@@ -24,7 +24,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  defineOptions({ name: 'EdgeConnectorsFormFieldsOriginIpAcl' })
+  defineOptions({ name: 'EdgeConnectorsFormFieldsStatus' })
 
-  const { value: originIpAcl } = useField('modules.originShield.config.originIpAcl.enabled')
+  const { value: active } = useField('active')
 </script>

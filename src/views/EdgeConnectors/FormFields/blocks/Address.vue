@@ -121,50 +121,11 @@
               <div class="flex sm:flex-row flex-col gap-5">
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
-                    label="Max Conns"
-                    :name="`addresses[${addressIndex}].maxConns`"
-                    :value="addresses[addressIndex].value.maxConns"
-                    description="Maximum number of open connections per ..."
-                    data-testid="edge-connectors-form__address-management__max-conns-field"
-                  />
-                </div>
-
-                <div class="flex flex-col sm:max-w-sm w-full gap-2">
-                  <FieldNumber
                     label="Weight"
                     :name="`addresses[${addressIndex}].weight`"
                     :value="addresses[addressIndex].value.weight"
                     description="Higher weights allocate more traffic to this address."
                     data-testid="edge-connectors-form__address-management__weight-field"
-                  />
-                </div>
-              </div>
-
-              <Divider
-                align="left"
-                type="solid"
-              >
-                <b>Health Checks</b>
-              </Divider>
-
-              <div class="flex sm:flex-row flex-col gap-5">
-                <div class="flex flex-col sm:max-w-sm w-full gap-2">
-                  <FieldNumber
-                    label="Max Fails"
-                    :name="`addresses[${addressIndex}].maxFails`"
-                    :value="addresses[addressIndex].value.maxFails"
-                    description="Maximum number of communication attempts before marking as unavailable"
-                    data-testid="edge-connectors-form__address-management__max-fails-field"
-                  />
-                </div>
-
-                <div class="flex flex-col sm:max-w-sm w-full gap-2">
-                  <FieldNumber
-                    label="Fail Timeout"
-                    :name="`addresses[${addressIndex}].failTimeout`"
-                    :value="addresses[addressIndex].value.failTimeout"
-                    description="Timeout for communication attempts"
-                    data-testid="edge-connectors-form__address-management__fail-timeout-field"
                   />
                 </div>
               </div>
@@ -287,10 +248,7 @@
     plainPort: 80,
     tlsPort: 443,
     serverRole: 'primary',
-    maxConns: 0,
     weight: 1,
-    maxFails: 1,
-    failTimeout: 10,
     active: true
   }
 

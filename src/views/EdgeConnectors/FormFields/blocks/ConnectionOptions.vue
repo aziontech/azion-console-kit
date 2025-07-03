@@ -12,7 +12,6 @@
         <div class="flex flex-col sm:max-w-sm w-full gap-2">
           <FieldText
             label="Host"
-            required
             description="Enter the domain or IP address of the origin server (e.g., 'example.com' or '192.168.0.1')."
             name="connectionOptions.host"
             :value="host"
@@ -37,7 +36,7 @@
         <div class="flex sm:flex-row flex-col w-full gap-8">
           <div class="flex flex-col sm:max-w-xs w-full gap-2">
             <FieldText
-              label="Real Ip Header"
+              label="Real IP Header"
               description="Provide the header name that contains the client's real IP address (e.g., 'X-Real-IP')."
               name="connectionOptions.realIpHeader"
               :value="realIpHeader"
@@ -123,7 +122,6 @@
         <div class="flex flex-col sm:max-w-sm w-full gap-2">
           <FieldText
             label="Prefix"
-            required
             description="Specify the prefix to filter the objects within the selected bucket (e.g., images/ or logs/)."
             name="connectionOptions.prefix"
             :value="prefix"

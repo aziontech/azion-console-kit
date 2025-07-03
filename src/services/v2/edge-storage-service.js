@@ -21,4 +21,4 @@ export class EdgeStorageService {
 
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
-} 
+}

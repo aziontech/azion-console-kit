@@ -4,15 +4,16 @@ import { parseStatusData } from '../utils/adapter/parse-status-utils'
 const extractAddressesPostRequest = (addresses) => {
   return addresses.map((address) => {
     return {
-      address: address.address,
-      plain_port: address.plainPort,
-      tls_port: address.tlsPort,
-      server_role: address.serverRole,
-      weight: address.weight,
       active: address.active,
-      max_conns: address.maxConns,
-      max_fails: address.maxFails,
-      fail_timeout: address.failTimeout
+      address: address.address,
+      http_port: address.plainPort,
+      https_port: address.tlsPort,
+      modules: {
+        load_balancer: {
+          server_role: address.serverRole,
+          weight: address.weight
+        }
+      }
     }
   })
 }
@@ -35,39 +36,73 @@ const extractAddressesLoadRequest = (addresses) => {
 
 const typeBuilders = {
   live_ingest: (payload) => ({
-    type_properties: {
-      endpoint: payload.liveIngestEndpoint
-    }
-  }),
-
-  s3: (payload) => ({
-    addresses: extractAddressesPostRequest(payload.addresses),
-    type_properties: {
-      host: payload.s3.host,
-      bucket: payload.s3.bucket,
-      path: payload.s3.path,
-      region: payload.s3.region,
-      access_key: payload.s3.accessKey,
-      secret_key: payload.s3.secretKey
+    attributes: {
+      endpoint: payload.connectionOptions.region
     }
   }),
 
   edge_storage: (payload) => ({
-    type_properties: {
-      bucket: payload.edgeStorage.bucket,
-      prefix: payload.edgeStorage.prefix
+    attributes: {
+      bucket: payload.connectionOptions.bucket,
+      prefix: payload.connectionOptionsprefix
     }
   }),
 
   http: (payload) => ({
-    addresses: extractAddressesPostRequest(payload.addresses),
-    type_properties: {
-      versions: payload.http.versions,
-      host: payload.http.host,
-      path: payload.http.path,
-      following_redirect: payload.http.followingRedirect,
-      real_ip_header: payload.http.realIpHeader,
-      real_port_header: payload.http.realPortHeader
+    address: !payload.modules.loadBalancer.enabled
+      ? {
+          address: payload.address.address,
+          plain_port: payload.address.plainPort,
+          tls_port: payload.address.tlsPort
+        }
+      : null,
+    addresses: payload.modules.loadBalancer.enabled
+      ? extractAddressesPostRequest(payload.addresses)
+      : [],
+    connection_options: {
+      dns_resolution: payload.connectionOptions.dnsResolution,
+      transport_policy: payload.connectionOptions.transportPolicy,
+      host: payload.connectionOptions.host,
+      path_prefix: payload.connectionOptions.pathPrefix,
+      following_redirect: payload.connectionOptions.followingRedirect,
+      real_ip_header: payload.connectionOptions.realIpHeader,
+      real_port_header: payload.connectionOptions.realPortHeader
+    },
+    modules: {
+      origin_shield: {
+        enabled: payload.modules.originShield.enabled,
+        config: payload.modules.originShield.enabled
+          ? {
+              origin_ip_acl: {
+                enabled: payload.modules.originShield.config.originIpAcl.enabled
+              },
+              hmac: {
+                enabled: payload.modules.originShield.config.hmac.enabled,
+                config: {
+                  type: payload.modules.originShield.config.hmac.config.type,
+                  attributes: {
+                    region: payload.modules.originShield.config.hmac.config.attributes.region,
+                    service: payload.modules.originShield.config.hmac.config.attributes.service,
+                    access_key:
+                      payload.modules.originShield.config.hmac.config.attributes.accessKey,
+                    secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
+                  }
+                }
+              }
+            }
+          : null
+      },
+      load_balancer: {
+        enabled: payload.modules.loadBalancer.enabled,
+        config: payload.modules.loadBalancer.enabled
+          ? {
+              method: payload.modules.loadBalancer.config.method,
+              max_retries: payload.modules.loadBalancer.config.maxRetries,
+              connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
+              read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
+            }
+          : null
+      }
     }
   })
 }
@@ -75,17 +110,6 @@ const typeBuilders = {
 const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
     liveIngestEndpoint: data.type_properties.endpoint
-  }),
-  s3: (data) => ({
-    addresses: extractAddressesLoadRequest(data.addresses),
-    s3: {
-      host: data.type_properties.host,
-      bucket: data.type_properties.bucket,
-      path: data.type_properties.path,
-      region: data.type_properties.region,
-      accessKey: data.type_properties.access_key,
-      secretKey: data.type_properties.secret_key
-    }
   }),
   edge_storage: (data) => ({
     edgeStorage: {
@@ -140,25 +164,14 @@ export const EdgeConnectorsAdapter = {
   },
 
   transformPayloadEdgeConnectors(payload) {
-    const builder = buildTypePayload(payload.type, payload, 'POST')
+    const builder = typeBuilders[payload.type]
+    const attributes = builder(payload)
 
     return {
       name: payload.name,
       type: payload.type,
-      modules: {
-        origin_shield_enabled: payload.originShieldEnabled,
-        load_balancer_enabled: payload.loadBalancerEnabled
-      },
-      active: payload.status,
-      tls: {
-        policy: payload.tlsPolicy
-      },
-      load_balance_method: payload.loadBalanceMethod,
-      connection_preference: payload.connectionPreference,
-      connection_timeout: payload.connectionTimeout,
-      read_write_timeout: payload.readWriteTimeout,
-      max_retries: payload.maxRetries,
-      ...builder
+      active: payload.active,
+      attributes
     }
   },
 

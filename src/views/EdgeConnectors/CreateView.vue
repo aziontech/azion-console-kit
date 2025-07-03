@@ -42,8 +42,9 @@
   const initialValues = {
     name: '',
     type: 'http',
+    active: true,
     connectionOptions: {
-      host: '',
+      host: '${host}',
       pathPrefix: '',
       realIpHeader: 'X-Real-IP',
       realPortHeader: 'X-Real-PORT',
@@ -67,46 +68,27 @@
       originShield: {
         enabled: false,
         config: {
-          originIpAcl: true,
-          mtls: {
-            active: true,
-            config: {
-              certificate: null,
-              crl: []
+          originIpAcl: {
+            enabled: true
+          },
+          hmac: {
+            enabled: true,
+            type: 'aws4_hmac_sha256',
+            attributes: {
+              region: '',
+              service: '',
+              accessKey: '',
+              secretKey: ''
             }
           }
         }
       }
-    },
-    loadBalancerConfiguration: {
-      method: 'round_robin',
-      maxRetries: 0,
-      connectionTimeout: 60,
-      readWriteTimeout: 120
     },
     addresses: [],
     address: {
       address: '',
       tlsPort: 80,
       plainPort: 80
-    },
-    originIpAcl: true,
-    mtls: {
-      active: true,
-      config: {
-        certificate: null,
-        crl: []
-      }
-    },
-    hmac: {
-      active: true,
-      type: 'aws4_hmac_sha256',
-      attributes: {
-        region: '',
-        service: '',
-        accessKey: '',
-        secretKey: ''
-      }
     }
   }
 

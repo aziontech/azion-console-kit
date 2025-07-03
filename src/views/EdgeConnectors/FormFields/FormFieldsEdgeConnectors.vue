@@ -8,16 +8,17 @@
 
   <EdgeConnectorsFormFieldsConnectionOptions />
 
-  <EdgeConnectorsFormFieldsModules v-if="type === 'http'" />
+  <EdgeConnectorsFormFieldsModules v-if="isHttpEnabled" />
 
-  <EdgeConnectorsFormFieldsLoadBalancerConfiguration v-if="type === 'http'" />
+  <EdgeConnectorsFormFieldsLoadBalancerConfiguration v-if="enableLoadBalancerConfiguration" />
 
-  <EdgeConnectorsFormFieldsAddress v-if="type === 'http'" />
+  <EdgeConnectorsFormFieldsAddress v-if="isHttpEnabled" />
 
   <EdgeConnectorsFormFieldsOriginIpAcl v-if="originShieldEnabled" />
 
-  <!-- <EdgeConnectorsFormFieldsMutualAuthenticationSettings v-if="originShieldEnabled" /> -->
   <EdgeConnectorsFormFieldsHmac v-if="originShieldEnabled" />
+
+  <EdgeConnectorsFormFieldsStatus />
 </template>
 
 <script setup>
@@ -28,9 +29,10 @@
   import EdgeConnectorsFormFieldsLoadBalancerConfiguration from './blocks/LoadBalancerConfiguration.vue'
   import EdgeConnectorsFormFieldsAddress from './blocks/Address.vue'
   import EdgeConnectorsFormFieldsOriginIpAcl from './blocks/OriginIpAcl.vue'
-  // import EdgeConnectorsFormFieldsMutualAuthenticationSettings from './blocks/MutualAuthenticationSettings.vue'
   import EdgeConnectorsFormFieldsHmac from './blocks/hmac.vue'
+  import EdgeConnectorsFormFieldsStatus from './blocks/Status.vue'
   import { useField } from 'vee-validate'
+  import { computed } from 'vue'
 
   defineProps({
     hiddenTitle: {
@@ -44,5 +46,11 @@
   })
 
   const { value: originShieldEnabled } = useField('modules.originShield.enabled')
+  const { value: loadBalancerEnabled } = useField('modules.loadBalancer.enabled')
   const { value: type } = useField('type')
+
+  const isHttpEnabled = computed(() => type.value === 'http')
+  const enableLoadBalancerConfiguration = computed(
+    () => loadBalancerEnabled.value && isHttpEnabled.value
+  )
 </script>

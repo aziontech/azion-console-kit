@@ -143,7 +143,6 @@ const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSReco
 const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
 
-
 export {
   vcsService,
   cacheSettingsService,

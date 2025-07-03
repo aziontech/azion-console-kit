@@ -7,8 +7,8 @@
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <FieldSwitchBlock
-          nameField="hmac.active"
-          name="hmac.active"
+          nameField="modules.originShield.config.hmac.enabled"
+          name="modules.originShield.config.hmac.enabled"
           auto
           :isCard="false"
           :value="hmacActive"
@@ -24,7 +24,7 @@
           label="Type"
           required
           description="The HMAC authentication type is fixed to aws4_hmac_sha256, compatible with AWS S3 object storage."
-          name="hmac.type"
+          name="modules.originShield.config.hmac.config.type"
           :value="hmacType"
           placeholder="aws4_hmac_sha256"
           data-testid="edge-connectors-form__hmac__hmac-type-field"
@@ -40,7 +40,7 @@
           label="Region"
           required
           description="Region supported by the object storage provider."
-          name="hmac.attributes.region"
+          name="modules.originShield.config.hmac.config.attributes.region"
           :value="region"
           placeholder="us-east-1"
           data-testid="edge-connectors-form__hmac__region-field"
@@ -54,7 +54,7 @@
           label="Service"
           required
           description="Specify the service name for the object storage provider (e.g., s3)."
-          name="hmac.attributes.service"
+          name="modules.originShield.config.hmac.config.attributes.service"
           :value="service"
           placeholder="s3"
           data-testid="edge-connectors-form__hmac__service-field"
@@ -64,15 +64,14 @@
         class="flex flex-col sm:max-w-xs w-full gap-2"
         v-if="hmacActive"
       >
-        <FieldTextIcon
+        <FieldText
           label="Access Key"
           required
           description="Enter the Access Key provided by the object storage provider."
-          name="hmac.attributes.accessKey"
+          name="modules.originShield.config.hmac.config.attributes.accessKey"
           :value="accessKey"
-          placeholder="**********"
+          placeholder="Access Key"
           data-testid="edge-connectors-form__hmac__access-key-field"
-          icon="pi pi-eye"
         />
       </div>
       <div
@@ -83,7 +82,7 @@
           label="Secret Key"
           required
           description="Enter the Secret Key provided by the object storage provider."
-          name="hmac.attributes.secretKey"
+          name="modules.originShield.config.hmac.config.attributes.secretKey"
           :value="secretKey"
           placeholder="**********"
           data-testid="edge-connectors-form__hmac__secret-key-field"
@@ -104,12 +103,16 @@
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
 
-  const { value: hmacActive } = useField('hmac.active')
-  const { value: hmacType } = useField('hmac.type')
-  const { value: region } = useField('hmac.attributes.region')
-  const { value: service } = useField('hmac.attributes.service')
-  const { value: accessKey } = useField('hmac.attributes.accessKey')
-  const { value: secretKey } = useField('hmac.attributes.secretKey')
+  const { value: hmacActive } = useField('modules.originShield.config.hmac.enabled')
+  const { value: hmacType } = useField('modules.originShield.config.hmac.config.type')
+  const { value: region } = useField('modules.originShield.config.hmac.config.attributes.region')
+  const { value: service } = useField('modules.originShield.config.hmac.config.attributes.service')
+  const { value: accessKey } = useField(
+    'modules.originShield.config.hmac.config.attributes.accessKey'
+  )
+  const { value: secretKey } = useField(
+    'modules.originShield.config.hmac.config.attributes.secretKey'
+  )
 
   onMounted(() => {
     hmacType.value = 'aws4_hmac_sha256'

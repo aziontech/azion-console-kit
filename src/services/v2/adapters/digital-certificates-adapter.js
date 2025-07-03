@@ -55,12 +55,14 @@ export const DigitalCertificatesAdapter = {
       trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
     }
 
-    let parsedDigitalCertificates = body?.filter((item) => item.type === certificateTypeMap[certificateType])?.map((item) => {
-      return {
-        id: item.id,
-        name: item.name
-      }
-    })
+    let parsedDigitalCertificates = body
+      ?.filter((item) => item.type === certificateTypeMap[certificateType])
+      ?.map((item) => {
+        return {
+          id: item.id,
+          name: item.name
+        }
+      })
 
     if (type === 'edge_certificate') {
       const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
