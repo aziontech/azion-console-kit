@@ -93,22 +93,31 @@
   const cacheSettingsRadioOptions = (type) => {
     const isBrowser = type === 'browser'
 
-    const browserSubtitle =
-      'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
-    const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
-
     const options = [
       {
         title: 'Honor cache policies',
-        subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
+        subtitle: isBrowser
+          ? 'Respect the cache policies defined by the origin server.'
+          : 'Use the cache policies defined by the origin server, or set a custom maximum cache TTL for edge caching.',
         inputValue: 'honor',
         disabled: !isBrowser && l2CachingEnabled.value
       },
-      { title: 'Override cache settings', inputValue: 'override' }
+      {
+        title: 'Override cache settings',
+        subtitle: isBrowser
+          ? "Override the origin server's cache policies and define a custom cache behavior for browsers."
+          : "Customize the edge cache behavior by overriding the origin server's cache policies.",
+        inputValue: 'override'
+      }
     ]
 
     if (isBrowser) {
-      options.push({ title: 'No cache', inputValue: 'no-cache' })
+      options.push({
+        title: 'No cache',
+        subtitle:
+          'Disable browser caching to ensure content is always fetched directly from the server',
+        inputValue: 'no-cache'
+      })
     }
 
     return options
@@ -270,7 +279,7 @@
           label="Name"
           required
           placeholder="My cache setting"
-          description="Give a unique and descriptive name to identify the setting."
+          description="Give a unique and descriptive name to identify the cache setting."
           data-testid="edge-application-cache-settings-form__name-field"
         />
       </div>
@@ -278,13 +287,12 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Cache Expiration Policies"
-    description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
+    title="Browser Cache"
+    description="Define how the browser handles cached content. Configure the behavior to optimize performance and ensure up-to-date content delivery."
     :isDrawer="true"
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Browser Cache Settings"
         nameField="browserCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('browser')"
@@ -297,7 +305,7 @@
       >
         <LabelBlock
           for="browserCacheSettingsMaximumTtl"
-          label="Maximum TTL (seconds)"
+          label="Max Age"
           isRequired
         />
 
@@ -316,13 +324,24 @@
           }"
           data-testid="edge-application-cache-settings-form__browser-cache-settings-maximum-ttl-field__input"
         />
+        <small class="text-color-secondary text-xs font-normal leading-5">
+          Maximum time (in seconds) content can be cached by the browser.
+        </small>
         <small
           v-if="browserCacheSettingsMaximumTtlError"
           class="p-error text-xs font-normal leading-tight"
           >{{ browserCacheSettingsMaximumTtlError }}</small
         >
       </div>
+    </template>
+  </FormHorizontal>
 
+  <FormHorizontal
+    title="Edge Cache"
+    description="Manage caching at the edge to improve performance and reduce latency for end users."
+    :isDrawer="true"
+  >
+    <template #inputs>
       <FieldGroupRadio
         label="Edge Cache Settings"
         nameField="cdnCacheSettings"
@@ -336,7 +355,7 @@
           for="cdnCacheSettingsMaximumTtl"
           class="text-color text-sm font-medium"
         >
-          {{ showCdnMaxTtl ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+          {{ showCdnMaxTtl ? 'Max Age' : 'Default TTL' }}
         </label>
         <InputNumber
           showButtons
@@ -349,8 +368,7 @@
           data-testid="edge-application-cache-settings-form__cdn-cache-settings-maximum-ttl-field__input"
         />
         <small class="text-color-secondary text-xs font-normal leading-5">
-          Enable Application Accelerator in the Main Settings tab to use values lower than 60
-          seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
+          Maximum time (in seconds) content is cached at the edge.
         </small>
         <small
           v-if="cdnCacheSettingsMaximumTtlError"
@@ -359,6 +377,70 @@
         >
       </div>
 
+      <FieldSwitchBlock
+        nameField="enableStaleCache"
+        name="enableStaleCache"
+        auto
+        :isCard="false"
+        title="Stale cache"
+        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
+        description="Enable stale cache to serve expired content temporarily while fetching updated content from the origin."
+      />
+
+      <FieldSwitchBlock
+        nameField="sliceConfigurationEnabled"
+        name="sliceConfigurationEnabled"
+        auto
+        :isCard="false"
+        title="Large file optimization"
+        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
+        description="Optimize caching for large files by splitting them into smaller fragments for efficient delivery."
+      />
+      <FieldGroupCheckbox
+        :class="{ hidden: !sliceConfigurationEnabled }"
+        label="Layer"
+        :options="layerFileOptimizationRadioOptions"
+        :isCard="false"
+        data-testid="edge-application-cache-settings-form__slice-configuration-layer-field"
+      />
+      <div
+        v-if="showSliceConfigurationRange"
+        class="flex flex-col sm:max-w-xs w-full gap-2"
+      >
+        <label
+          for="sliceConfigurationRange"
+          class="text-color text-sm font-medium"
+          >Fragment Size (KB)</label
+        >
+        <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+          <i class="pi pi-lock text-color-secondary" />
+          <InputNumber
+            class="w-full"
+            name="sliceConfigurationRange"
+            :min="1024"
+            :max="1024"
+            v-model="sliceConfigurationRange"
+            id="sliceConfigurationRange"
+            placeholder="1024 Kbps"
+            type="number"
+            disabled
+            data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
+          />
+        </span>
+
+        <small class="text-color-secondary text-xs font-normal leading-5">
+          Define the range of segmentation of large files.
+        </small>
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Tiered Cache"
+    description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year."
+    :isDrawer="true"
+  >
+    <template #inputs>
       <div
         class="flex gap-2 w-full items-start"
         v-if="props.showTieredCache"
@@ -398,55 +480,12 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Large File Optimization"
-    description="Enable file segmentation to break down large files into small fragments that can be cached at the edge."
+    title="Application Accelerator"
+    description="Enhance application performance by defining how cache varies based on specific request attributes."
     :isDrawer="true"
   >
     <template #inputs>
-      <FieldSwitchBlock
-        nameField="sliceConfigurationEnabled"
-        name="sliceConfigurationEnabled"
-        auto
-        :isCard="false"
-        title="Active"
-        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
-      />
-      <FieldGroupCheckbox
-        :class="{ hidden: !sliceConfigurationEnabled }"
-        label="Layer"
-        :options="layerFileOptimizationRadioOptions"
-        :isCard="false"
-        data-testid="edge-application-cache-settings-form__slice-configuration-layer-field"
-      />
-      <div
-        v-if="showSliceConfigurationRange"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
-      >
-        <label
-          for="sliceConfigurationRange"
-          class="text-color text-sm font-medium"
-          >Fragment Size (KB)</label
-        >
-        <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-          <i class="pi pi-lock text-color-secondary" />
-          <InputNumber
-            class="w-full"
-            name="sliceConfigurationRange"
-            :min="1024"
-            :max="1024"
-            v-model="sliceConfigurationRange"
-            id="sliceConfigurationRange"
-            placeholder="1024 Kbps"
-            type="number"
-            disabled
-            data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
-          />
-        </span>
 
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Define the range of segmentation of large files.
-        </small>
-      </div>
     </template>
   </FormHorizontal>
 
