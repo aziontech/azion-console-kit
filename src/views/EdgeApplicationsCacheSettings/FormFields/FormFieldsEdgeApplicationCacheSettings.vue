@@ -1,271 +1,3 @@
-<script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import PrimeButton from 'primevue/button'
-  import InputNumber from 'primevue/inputnumber'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
-  import FieldGroupCheckbox from '@/templates/form-fields-inputs/fieldGroupCheckbox'
-  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import LabelBlock from '@/templates/label-block'
-
-  import { useField, useFieldArray } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
-
-  const emit = defineEmits(['l2-caching-enabled'])
-
-  const props = defineProps({
-    isApplicationAcceleratorEnabled: {
-      required: true,
-      type: Boolean
-    },
-    showTieredCache: {
-      type: Boolean,
-      required: true
-    }
-  })
-
-  const TIERED_CACHE_REGION = ref([
-    {
-      label: 'na-united-states',
-      value: 'na-united-states'
-    },
-    {
-      label: 'sa-brazil',
-      value: 'sa-brazil'
-    }
-  ])
-
-  const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
-      return CDN_MAXIMUM_TTL_MIN_VALUE
-    }
-    return CDN_MAXIMUM_TTL_MAX_VALUE
-  })
-
-  const MAX_VALUE_NUMBER_INPUT = 31536000
-
-  const { value: browserCacheSettings } = useField('browserCacheSettings')
-  const {
-    value: browserCacheSettingsMaximumTtl,
-    errorMessage: browserCacheSettingsMaximumTtlError
-  } = useField('browserCacheSettingsMaximumTtl')
-  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-  const { value: cdnCacheSettingsMaximumTtl, errorMessage: cdnCacheSettingsMaximumTtlError } =
-    useField('cdnCacheSettingsMaximumTtl')
-  const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
-  const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
-  const { value: isSliceL2CachingEnabled } = useField('isSliceL2CachingEnabled')
-  const { value: cacheByQueryString } = useField('cacheByQueryString')
-  const { value: queryStringFields } = useField('queryStringFields')
-  const { value: l2CachingEnabled } = useField('l2CachingEnabled')
-  const { value: l2Region } = useField('l2Region')
-  const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
-
-  const { value: cacheByCookies } = useField('cacheByCookies')
-  const { value: cookieNames } = useField('cookieNames')
-  const { value: adaptiveDeliveryAction } = useField('adaptiveDeliveryAction')
-  const {
-    fields: deviceGroup,
-    push: addDeviceGroup,
-    remove: removeDeviceGroup
-  } = useFieldArray('deviceGroup')
-
-  const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
-  const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
-  const showSliceConfigurationRange = computed(() => {
-    return !!sliceConfigurationEnabled.value
-  })
-  const showQueryFields = computed(() => {
-    return ['whitelist', 'blacklist'].includes(cacheByQueryString.value)
-  })
-  const showCookieNames = computed(() => {
-    return ['whitelist', 'blacklist'].includes(cacheByCookies.value)
-  })
-  const showDeviceGroupFields = computed(() => {
-    return adaptiveDeliveryAction.value === 'whitelist'
-  })
-
-  const cacheSettingsRadioOptions = (type) => {
-    const isBrowser = type === 'browser'
-
-    const options = [
-      {
-        title: 'Honor cache policies',
-        subtitle: isBrowser
-          ? 'Respect the cache policies defined by the origin server.'
-          : 'Use the cache policies defined by the origin server, or set a custom maximum cache TTL for edge caching.',
-        inputValue: 'honor',
-        disabled: !isBrowser && l2CachingEnabled.value
-      },
-      {
-        title: 'Override cache settings',
-        subtitle: isBrowser
-          ? "Override the origin server's cache policies and define a custom cache behavior for browsers."
-          : "Customize the edge cache behavior by overriding the origin server's cache policies.",
-        inputValue: 'override'
-      }
-    ]
-
-    if (isBrowser) {
-      options.push({
-        title: 'No cache',
-        subtitle:
-          'Disable browser caching to ensure content is always fetched directly from the server',
-        inputValue: 'no-cache'
-      })
-    }
-
-    return options
-  }
-
-  const layerFileOptimizationRadioOptions = computed(() => [
-    {
-      title: 'Edge Cache',
-      value: true,
-      disabled: showSliceConfigurationRange.value,
-      nameField: 'isSliceEdgeCachingEnabled',
-      binary: true
-    },
-    {
-      title: 'Tiered Cache',
-      value: false,
-      disabled: !l2CachingEnabled.value,
-      nameField: 'isSliceL2CachingEnabled',
-      binary: true
-    }
-  ])
-
-  const queryStringRadioOptions = [
-    {
-      title: 'Content does not vary by Query String (Improves Caching)',
-      inputValue: 'ignore'
-    },
-    {
-      title: 'Content varies by some Query String fields (Allowlist)',
-      inputValue: 'whitelist',
-      disabled: !props.isApplicationAcceleratorEnabled
-    },
-    {
-      title: 'Content varies by Query String, except for some fields (Blocklist)',
-      inputValue: 'blacklist',
-      disabled: !props.isApplicationAcceleratorEnabled
-    },
-    {
-      title: 'Content varies by all Query String fields',
-      inputValue: 'all'
-    }
-  ]
-
-  const cookieRadioOptions = [
-    {
-      title: 'Content does not vary by Cookies (Improves Caching)',
-      inputValue: 'ignore'
-    },
-    {
-      title: 'Content varies by some Cookies (Allowlist)',
-      inputValue: 'whitelist',
-      disabled: !props.isApplicationAcceleratorEnabled
-    },
-    {
-      title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
-      inputValue: 'blacklist',
-      disabled: !props.isApplicationAcceleratorEnabled
-    },
-    {
-      title: 'Content varies by all Cookies',
-      inputValue: 'all',
-      disabled: !props.isApplicationAcceleratorEnabled
-    }
-  ]
-
-  const adaptiveDeliveryRadioOptions = [
-    {
-      title: 'Content does not vary by Device Groups (Improves Caching)',
-      inputValue: 'ignore'
-    },
-    {
-      title: 'Content varies by some Device Groups (Allowlist)',
-      inputValue: 'whitelist'
-    }
-  ]
-
-  const advancedCacheSwitchOptions = computed(() => {
-    const options = [
-      {
-        title: 'Enable Stale Cache',
-        nameField: 'enableStaleCache',
-        subtitle: 'Serve stale content from the cache if origin servers are unavailable.'
-      }
-    ]
-
-    if (props.isApplicationAcceleratorEnabled) {
-      options.push(
-        {
-          title: 'Query String Sort',
-          nameField: 'enableQueryStringSort',
-          subtitle:
-            'Consider objects with the same query strings, regardless of the order of the fields, as the same cached file.'
-        },
-        {
-          title: 'Enable Caching for POST',
-          nameField: 'enableCachingForPost',
-          subtitle:
-            'Allow POST requests to be cached. The POST method will be included in the cache key.'
-        },
-        {
-          title: 'Enable Caching for OPTIONS',
-          nameField: 'enableCachingForOptions',
-          subtitle:
-            'Allow OPTIONS requests to be cached. The OPTIONS method will be included in the cache key.'
-        }
-      )
-    }
-
-    return options
-  })
-
-  const handleL2CachingToggle = (value) => {
-    emit('l2-caching-enabled', value)
-    if (value) {
-      cdnCacheSettings.value = 'override'
-      isSliceEdgeCachingEnabled.value = true
-      sliceConfigurationEnabled.value = true
-      return
-    }
-
-    isSliceL2CachingEnabled.value = false
-
-    const hasNotApplicationAcceleratorAndExceedMinimumValue =
-      !props.isApplicationAcceleratorEnabled &&
-      cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
-
-    if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {
-      cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
-    }
-  }
-  watch(adaptiveDeliveryAction, (value) => {
-    if (value === 'whitelist' && deviceGroup.value.length === 0) {
-      addDeviceGroup({ id: '' })
-    }
-  })
-
-  watch(sliceConfigurationEnabled, (value) => {
-    isSliceEdgeCachingEnabled.value = value
-    if (!value) {
-      isSliceL2CachingEnabled.value = false
-    }
-  })
-
-  watch(browserCacheSettings, (cacheSettings) => {
-    if (cacheSettings === 'no-cache') browserCacheSettingsMaximumTtl.value = 0
-  })
-</script>
-
 <template>
   <FormHorizontal
     title="General"
@@ -286,208 +18,11 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal
-    title="Browser Cache"
-    description="Define how the browser handles cached content. Configure the behavior to optimize performance and ensure up-to-date content delivery."
-    :isDrawer="true"
-  >
-    <template #inputs>
-      <FieldGroupRadio
-        nameField="browserCacheSettings"
-        :isCard="false"
-        :options="cacheSettingsRadioOptions('browser')"
-        data-testid="edge-application-cache-settings-form__browser-cache-settings-field"
-      />
+  <BrowserCache />
 
-      <div
-        v-if="showMaxTtl"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
-      >
-        <LabelBlock
-          for="browserCacheSettingsMaximumTtl"
-          label="Max Age"
-          isRequired
-        />
+  <EdgeCache @enableSliceConfiguration="enableSliceConfiguration" />
 
-        <InputNumber
-          showButtons
-          v-model="browserCacheSettingsMaximumTtl"
-          id="browserCacheSettingsMaximumTtl"
-          :min="0"
-          :max="31536000"
-          :step="1"
-          :class="{ 'p-invalid': browserCacheSettingsMaximumTtlError }"
-          :pt="{
-            input: {
-              name: 'browserCacheSettingsMaximumTtl'
-            }
-          }"
-          data-testid="edge-application-cache-settings-form__browser-cache-settings-maximum-ttl-field__input"
-        />
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Maximum time (in seconds) content can be cached by the browser.
-        </small>
-        <small
-          v-if="browserCacheSettingsMaximumTtlError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ browserCacheSettingsMaximumTtlError }}</small
-        >
-      </div>
-    </template>
-  </FormHorizontal>
-
-  <FormHorizontal
-    title="Edge Cache"
-    description="Manage caching at the edge to improve performance and reduce latency for end users."
-    :isDrawer="true"
-  >
-    <template #inputs>
-      <FieldGroupRadio
-        label="Edge Cache Settings"
-        nameField="cdnCacheSettings"
-        :isCard="false"
-        :options="cacheSettingsRadioOptions('cdn')"
-        data-testid="edge-application-cache-settings-form__cdn-cache-settings-field"
-      />
-
-      <div class="flex flex-col sm:max-w-xs w-full gap-2">
-        <label
-          for="cdnCacheSettingsMaximumTtl"
-          class="text-color text-sm font-medium"
-        >
-          {{ showCdnMaxTtl ? 'Max Age' : 'Default TTL' }}
-        </label>
-        <InputNumber
-          showButtons
-          v-model="cdnCacheSettingsMaximumTtl"
-          id="cdnCacheSettingsMaximumTtl"
-          :min="cdnCacheSettingsMaximumTtlMinimumValue"
-          :max="MAX_VALUE_NUMBER_INPUT"
-          :step="1"
-          :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
-          data-testid="edge-application-cache-settings-form__cdn-cache-settings-maximum-ttl-field__input"
-        />
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Maximum time (in seconds) content is cached at the edge.
-        </small>
-        <small
-          v-if="cdnCacheSettingsMaximumTtlError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ cdnCacheSettingsMaximumTtlError }}</small
-        >
-      </div>
-
-      <FieldSwitchBlock
-        nameField="enableStaleCache"
-        name="enableStaleCache"
-        auto
-        :isCard="false"
-        title="Stale cache"
-        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
-        description="Enable stale cache to serve expired content temporarily while fetching updated content from the origin."
-      />
-
-      <FieldSwitchBlock
-        nameField="sliceConfigurationEnabled"
-        name="sliceConfigurationEnabled"
-        auto
-        :isCard="false"
-        title="Large file optimization"
-        data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
-        description="Optimize caching for large files by splitting them into smaller fragments for efficient delivery."
-      />
-      <FieldGroupCheckbox
-        :class="{ hidden: !sliceConfigurationEnabled }"
-        label="Layer"
-        :options="layerFileOptimizationRadioOptions"
-        :isCard="false"
-        data-testid="edge-application-cache-settings-form__slice-configuration-layer-field"
-      />
-      <div
-        v-if="showSliceConfigurationRange"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
-      >
-        <label
-          for="sliceConfigurationRange"
-          class="text-color text-sm font-medium"
-          >Fragment Size (KB)</label
-        >
-        <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-          <i class="pi pi-lock text-color-secondary" />
-          <InputNumber
-            class="w-full"
-            name="sliceConfigurationRange"
-            :min="1024"
-            :max="1024"
-            v-model="sliceConfigurationRange"
-            id="sliceConfigurationRange"
-            placeholder="1024 Kbps"
-            type="number"
-            disabled
-            data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
-          />
-        </span>
-
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Define the range of segmentation of large files.
-        </small>
-      </div>
-    </template>
-  </FormHorizontal>
-
-  <FormHorizontal
-    title="Tiered Cache"
-    description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year."
-    :isDrawer="true"
-  >
-    <template #inputs>
-      <div
-        class="flex gap-2 w-full items-start"
-        v-if="props.showTieredCache"
-      >
-        <FieldSwitchBlock
-          nameField="l2CachingEnabled"
-          name="l2CachingEnabled"
-          @onSwitchChange="handleL2CachingToggle"
-          auto
-          :isCard="false"
-          title="Tiered Cache"
-          subtitle="Enable Tiered Cache if you want to reduce the traffic to your origin and increase
-            performance and availability."
-          data-testid="edge-application-cache-settings-form__tiered-caching-enabled-field"
-        />
-      </div>
-
-      <div
-        class="flex flex-col w-full sm:max-w-xs gap-2"
-        v-if="props.showTieredCache"
-      >
-        <FieldDropdown
-          label="Tiered Cache Region"
-          name="l2Region"
-          :options="TIERED_CACHE_REGION"
-          optionLabel="label"
-          optionValue="value"
-          :value="l2Region"
-          inputId="l2Region"
-          placeholder="Select an Tiered Cache Region"
-          :disabled="!l2CachingEnabled"
-          description="Choose an Tiered Cache Region suitable for your application."
-          data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
-        />
-      </div>
-    </template>
-  </FormHorizontal>
-
-  <FormHorizontal
-    title="Application Accelerator"
-    description="Enhance application performance by defining how cache varies based on specific request attributes."
-    :isDrawer="true"
-  >
-    <template #inputs>
-
-    </template>
-  </FormHorizontal>
+  <TieredCache v-if="showTieredCacheForm" />
 
   <FormHorizontal
     title="Advanced Cache Key"
@@ -601,3 +136,171 @@
     </template>
   </FormHorizontal>
 </template>
+
+<script setup>
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import PrimeButton from 'primevue/button'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
+  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import LabelBlock from '@/templates/label-block'
+
+  // Form blocks
+  import BrowserCache from './blocks/BrowserCache.vue'
+  import EdgeCache from './blocks/EdgeCache.vue'
+  import TieredCache from './blocks/TieredCache.vue'
+
+  import { useField, useFieldArray } from 'vee-validate'
+  import { computed, watch } from 'vue'
+
+  const emit = defineEmits(['l2-caching-enabled'])
+
+  const props = defineProps({
+    isApplicationAcceleratorEnabled: {
+      required: true,
+      type: Boolean
+    },
+    showTieredCache: {
+      type: Boolean,
+      required: true
+    }
+  })
+
+  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
+  const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
+  const { value: isSliceTieredCache } = useField('isSliceTieredCache')
+  const { value: cacheByQueryString } = useField('cacheByQueryString')
+  const { value: queryStringFields } = useField('queryStringFields')
+  const { value: tieredCache } = useField('tieredCache')
+  const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
+
+  const { value: cacheByCookies } = useField('cacheByCookies')
+  const { value: cookieNames } = useField('cookieNames')
+  const { value: adaptiveDeliveryAction } = useField('adaptiveDeliveryAction')
+  const {
+    fields: deviceGroup,
+    push: addDeviceGroup,
+    remove: removeDeviceGroup
+  } = useFieldArray('deviceGroup')
+
+  const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
+
+  const showQueryFields = computed(() => {
+    return ['whitelist', 'blacklist'].includes(cacheByQueryString.value)
+  })
+  const showCookieNames = computed(() => {
+    return ['whitelist', 'blacklist'].includes(cacheByCookies.value)
+  })
+  const showDeviceGroupFields = computed(() => {
+    return adaptiveDeliveryAction.value === 'whitelist'
+  })
+
+  const queryStringRadioOptions = [
+    {
+      title: 'Content does not vary by Query String (Improves Caching)',
+      inputValue: 'ignore'
+    },
+    {
+      title: 'Content varies by some Query String fields (Allowlist)',
+      inputValue: 'whitelist',
+      disabled: !props.isApplicationAcceleratorEnabled
+    },
+    {
+      title: 'Content varies by Query String, except for some fields (Blocklist)',
+      inputValue: 'blacklist',
+      disabled: !props.isApplicationAcceleratorEnabled
+    },
+    {
+      title: 'Content varies by all Query String fields',
+      inputValue: 'all'
+    }
+  ]
+
+  const cookieRadioOptions = [
+    {
+      title: 'Content does not vary by Cookies (Improves Caching)',
+      inputValue: 'ignore'
+    },
+    {
+      title: 'Content varies by some Cookies (Allowlist)',
+      inputValue: 'whitelist',
+      disabled: !props.isApplicationAcceleratorEnabled
+    },
+    {
+      title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
+      inputValue: 'blacklist',
+      disabled: !props.isApplicationAcceleratorEnabled
+    },
+    {
+      title: 'Content varies by all Cookies',
+      inputValue: 'all',
+      disabled: !props.isApplicationAcceleratorEnabled
+    }
+  ]
+
+  const adaptiveDeliveryRadioOptions = [
+    {
+      title: 'Content does not vary by Device Groups (Improves Caching)',
+      inputValue: 'ignore'
+    },
+    {
+      title: 'Content varies by some Device Groups (Allowlist)',
+      inputValue: 'whitelist'
+    }
+  ]
+
+  const advancedCacheSwitchOptions = computed(() => {
+    const options = [
+      {
+        title: 'Enable Stale Cache',
+        nameField: 'enableStaleCache',
+        subtitle: 'Serve stale content from the cache if origin servers are unavailable.'
+      }
+    ]
+
+    if (props.isApplicationAcceleratorEnabled) {
+      options.push(
+        {
+          title: 'Query String Sort',
+          nameField: 'enableQueryStringSort',
+          subtitle:
+            'Consider objects with the same query strings, regardless of the order of the fields, as the same cached file.'
+        },
+        {
+          title: 'Enable Caching for POST',
+          nameField: 'enableCachingForPost',
+          subtitle:
+            'Allow POST requests to be cached. The POST method will be included in the cache key.'
+        },
+        {
+          title: 'Enable Caching for OPTIONS',
+          nameField: 'enableCachingForOptions',
+          subtitle:
+            'Allow OPTIONS requests to be cached. The OPTIONS method will be included in the cache key.'
+        }
+      )
+    }
+
+    return options
+  })
+
+  const enableSliceConfiguration = (isEnabled) => {
+    console.log('isSliceTieredCache isEnabled :', isEnabled)
+    isSliceEdgeCachingEnabled.value = isEnabled
+    isSliceTieredCache.value = isEnabled
+  }
+
+  const showTieredCacheForm = computed(() => {
+    return isSliceTieredCache.value && showTieredCache
+  })
+
+  watch(adaptiveDeliveryAction, (value) => {
+    if (value === 'whitelist' && deviceGroup.value.length === 0) {
+      addDeviceGroup({ id: '' })
+    }
+  })
+</script>

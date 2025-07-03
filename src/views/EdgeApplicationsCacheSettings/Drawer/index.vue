@@ -69,8 +69,8 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    l2CachingEnabled: false,
-    isSliceL2CachingEnabled: false,
+    tieredCache: false,
+    isSliceTieredCacheEnabled: false,
     isSliceEdgeCachingEnabled: false
   })
 
@@ -80,11 +80,11 @@
       : CDN_MAXIMUM_TTL_MAX_VALUE
   )
   const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
-  const l2CachingEnabled = ref()
+  const tieredCacheEnabled = ref()
 
   const setNewMinimumValue = (value) => {
-    l2CachingEnabled.value = value
-    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
+    tieredCacheEnabled.value = value
+    if (tieredCacheEnabled.value || props.isApplicationAcceleratorEnabled) {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MIN_VALUE
     } else {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MAX_VALUE
