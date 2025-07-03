@@ -79,7 +79,10 @@
 
       displayText.value = notificationPayment.value.description(total)
     } else {
-      displayText.value = notificationPayment.value.description(20, 30)
+      displayText.value = notificationPayment.value.description({
+        total: 20,
+        days: 30
+      })
     }
   }
 
@@ -88,8 +91,8 @@
       title: 'Your account is blocked',
       type: 'error',
       description: (total = 0) => {
-        const displayTotal = total || 'pending'
-        return `Your account is blocked due to $${displayTotal} in pending payments. To unblock your account, update or verify your`
+        const displayTotal = total !== '--' ? `${total}` : 'pending'
+        return `Your account is blocked due to ${displayTotal} in pending payments. To unblock your account, update or verify your`
       }
     },
     DEFAULTING: {
@@ -103,10 +106,8 @@
     TRIAL: {
       title: 'Your free trial credit balance is running',
       type: 'info',
-      description: (total = 20, days = 30) => {
-        const displayTotal = total || 20
-        const displayDays = days || 30
-        return `You have $${displayTotal} to use in ${displayDays} days. To use Azion with no service interruptions at the end of your trial, add a`
+      description: ({ total = 20, days = 30 }) => {
+        return `You have $${total} to use in ${days} days. To use Azion with no service interruptions at the end of your trial, add a`
       }
     }
   }

@@ -1,16 +1,4 @@
 <template>
-  <DrawerAddCredit
-    ref="drawerAddCreditRef"
-    v-if="props.cardDefault.cardData"
-    :cardDefault="props.cardDefault"
-    :createService="paymentService.addCredit"
-    @onSuccess="successAddCredit"
-  />
-  <DrawerPaymentMethod
-    ref="drawerPaymentMethodRef"
-    :getStripeClientService="props.getStripeClientService"
-    @onSuccess="successAddPaymentMethod"
-  />
   <ListTableBlock
     ref="listPaymentMethodsRef"
     v-if="hasContentToList"
@@ -30,7 +18,7 @@
           icon="pi pi-plus"
           label="Credit"
           size="small"
-          @click="openDrawerAddCredit"
+          @click="openDrawerAddCreditWithValidation"
           data-testid="payment-methods__add-credit__button"
           outlined
         />
@@ -68,14 +56,14 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2'
-  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
-  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { useBillingDrawers } from '@/composables/use-billing-drawers'
 
   import { ref } from 'vue'
   const emit = defineEmits(['update-credit-event'])
   const hasContentToList = ref(true)
   const toast = useToast()
+
+  const { openDrawerAddCredit, openDrawerPaymentMethod } = useBillingDrawers()
 
   const props = defineProps({
     documentPaymentMethodService: {
@@ -102,15 +90,10 @@
 
   const listPaymentMethodsRef = ref('')
 
-  const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
-
-  const openDrawerAddCredit = () => {
-    if (props.cardDefault.cardData) drawerAddCreditRef.value.openDrawer()
-  }
-
-  const openDrawerPaymentMethod = () => {
-    drawerPaymentMethodRef.value.openDrawer()
+  const openDrawerAddCreditWithValidation = () => {
+    if (props.cardDefault.cardData) {
+      openDrawerAddCredit()
+    }
   }
 
   const API_FIELDS = [
@@ -204,29 +187,7 @@
     hasContentToList.value = true
   }
 
-  const updateAccountStatus = async () => {
-    try {
-      await loadUserAndAccountInfo()
-    } catch (error) {
-      showToast(
-        'error',
-        'An error occurred while updating account status. Please refresh the page to see the latest changes.'
-      )
-    }
-  }
-
-  const successAddCredit = async () => {
-    await updateAccountStatus()
-  }
-
-  const successAddPaymentMethod = async () => {
-    await updateAccountStatus()
-    reloadList()
-  }
-
   defineExpose({
-    reloadList,
-    openDrawerAddCredit,
-    openDrawerPaymentMethod
+    reloadList
   })
 </script>

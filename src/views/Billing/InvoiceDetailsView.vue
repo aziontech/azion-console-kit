@@ -167,6 +167,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
+  import { useBillingDrawers } from '@/composables/use-billing-drawers'
   import ContentBlock from '@/templates/content-block'
   import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -201,11 +202,12 @@
   })
 
   const route = useRoute()
-  const router = useRouter()
   const toast = useToast()
   const accountStore = useAccountStore()
 
   const { accountIsNotRegular } = storeToRefs(accountStore)
+
+  const { openDrawerPaymentMethod } = useBillingDrawers()
 
   const invoiceData = ref({})
   const cardDefault = ref({})
@@ -231,7 +233,7 @@
   }
 
   const goToPaymentMethod = () => {
-    router.push('/billing/payment')
+    openDrawerPaymentMethod()
   }
 
   const listServiceAndProductsChanges = async () => {

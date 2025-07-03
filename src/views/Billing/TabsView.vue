@@ -8,16 +8,23 @@
   import BillsView from '@/views/Billing/BillsView.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
   import NotificationPayment from './components/notification-payment'
+  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
+  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
 
   import { ref, computed, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
+  import { provideBillingDrawers } from '@/composables/use-billing-drawers'
+  import { paymentService } from '@/services/v2'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { useToast } from 'primevue/usetoast'
 
   const route = useRoute()
   const router = useRouter()
   const accountStore = useAccountStore()
+  const toast = useToast()
 
   const { accountIsNotRegular } = storeToRefs(accountStore)
 
@@ -25,6 +32,13 @@
 
   const viewBillsRef = ref(null)
   const paymentListViewRef = ref(null)
+
+  const {
+    drawerAddCreditRef,
+    drawerPaymentMethodRef,
+    openDrawerAddCredit: openDrawerAddCreditGlobal,
+    openDrawerPaymentMethod: openDrawerPaymentMethodGlobal
+  } = provideBillingDrawers()
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -104,13 +118,47 @@
   }
 
   const goToPaymentCredit = () => {
-    if (activeTab.value !== TABS_MAP.payment) changeTab(TABS_MAP.payment)
-    paymentListViewRef.value.openDrawerAddCredit()
+    openDrawerAddCreditGlobal()
   }
 
   const goToPaymentMethod = () => {
-    if (activeTab.value !== TABS_MAP.payment) changeTab(TABS_MAP.payment)
-    paymentListViewRef.value.openDrawerPaymentMethod()
+    openDrawerPaymentMethodGlobal()
+  }
+
+  // Helper functions for drawer success callbacks
+  const showToast = (severity, detail) => {
+    if (!detail) return
+    const options = {
+      closable: true,
+      severity,
+      summary: severity,
+      detail
+    }
+    toast.add(options)
+  }
+
+  const updateAccountStatus = async () => {
+    try {
+      await loadUserAndAccountInfo()
+    } catch (error) {
+      showToast(
+        'error',
+        'An error occurred while updating account status. Please refresh the page to see the latest changes.'
+      )
+    }
+  }
+
+  const successAddCredit = async () => {
+    await updateAccountStatus()
+    await loadCardDefault()
+  }
+
+  const successAddPaymentMethod = async () => {
+    await updateAccountStatus()
+    await loadCardDefault()
+    if (paymentListViewRef.value) {
+      paymentListViewRef.value.reloadList()
+    }
   }
 
   onMounted(() => {
@@ -200,4 +248,17 @@
       </TabView>
     </template>
   </ContentBlock>
+
+  <DrawerAddCredit
+    ref="drawerAddCreditRef"
+    v-if="cardDefault.cardData"
+    :cardDefault="cardDefault"
+    :createService="paymentService.addCredit"
+    @onSuccess="successAddCredit"
+  />
+  <DrawerPaymentMethod
+    ref="drawerPaymentMethodRef"
+    :getStripeClientService="props.getStripeClientService"
+    @onSuccess="successAddPaymentMethod"
+  />
 </template>

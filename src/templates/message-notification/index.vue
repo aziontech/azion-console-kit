@@ -28,29 +28,6 @@
           class="w-full min-w-max"
           v-bind="action"
         />
-        <!-- :icon="action.icon"
-          :label="action.label"
-          :outlined="action.outlined"
-          :severity="action.severity"
-          :disabled="action.disabled"
-          @click="action.onClick" -->
-
-        <!-- <PrimeButton
-        class="w-full min-w-max"
-        icon="pi pi-plus"
-        label="Credit"
-        @click="props.clickAddCredit"
-        outlined
-        :disabled="props.disabledBtnAddCredit"
-      />
-      <PrimeButton
-        class="w-full min-w-max"
-        icon="pi pi-plus"
-        severity="secondary"
-        @click="props.clickAddPaymentMethod"
-        label="Payment Method"
-        :disabled="props.disabledBtnAddPaymentMethod"
-      /> -->
       </slot>
     </div>
   </div>
