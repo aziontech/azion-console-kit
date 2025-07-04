@@ -33,6 +33,10 @@
     disabled: {
       type: Boolean,
       default: false
+    },
+    hasDivider: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -79,7 +83,7 @@
           </template>
         </FieldCheckboxBlock>
         <PrimeDivider
-          v-if="showDivider(index)"
+          v-if="showDivider(index) && hasDivider"
           class="my-2"
         />
       </template>

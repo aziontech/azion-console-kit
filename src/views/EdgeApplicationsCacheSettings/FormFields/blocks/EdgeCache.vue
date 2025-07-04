@@ -94,15 +94,18 @@
 </template>
 
 <script setup>
-  import { computed, watch, emit } from 'vue'
+  import { computed, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import LabelBlock from '@/templates/label-block'
+  import InputNumber from 'primevue/inputnumber'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
+  const emit = defineEmits(['enableSliceConfiguration'])
 
   const props = defineProps({
-    tiereCacheEnabled: {
-      type: Boolean,
-      required: true
-    },
     isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
@@ -118,7 +121,7 @@
         subtitle:
           'Use the cache policies defined by the origin server, or set a custom maximum cache TTL for edge caching.',
         inputValue: 'honor',
-        disabled: true
+        disabled: !!showSliceConfigurationRange.value
       },
       {
         title: 'Override cache settings',
@@ -132,12 +135,14 @@
     useField('cdnCacheSettingsMaximumTtl')
   const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
   const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
+  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
 
   const showSliceConfigurationRange = computed(() => {
     return !!sliceConfigurationEnabled.value
   })
 
   watch(sliceConfigurationEnabled, (value) => {
+    cdnCacheSettings.value = value ? 'override' : 'honor'
     emit('enableSliceConfiguration', value)
   })
 

@@ -264,7 +264,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
-        @l2-caching-enabled="setNewMinimumValue"
+        @tiered-caching-enabled="setNewMinimumValue"
       />
     </template>
   </CreateDrawerBlock>
@@ -284,7 +284,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
-        @l2-caching-enabled="setNewMinimumValue"
+        @tiered-caching-enabled="setNewMinimumValue"
       />
     </template>
   </EditDrawerBlock>

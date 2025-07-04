@@ -15,7 +15,6 @@
           :value="tieredCacheRegion"
           inputId="tieredCacheRegion"
           placeholder="Select an Tiered Cache Region"
-          :disabled="!tieredCache"
           description="Choose an Tiered Cache Region suitable for your application."
           data-testid="edge-application-cache-settings-form__tiered-caching-region-field"
         />
@@ -26,6 +25,8 @@
 
 <script setup>
   import { useField } from 'vee-validate'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
   const TIERED_CACHE_REGION = [
     {
@@ -38,6 +39,5 @@
     }
   ]
 
-  const { value: tieredCache } = useField('TieredCache')
   const { value: tieredCacheRegion } = useField('tieredCacheRegion')
 </script>

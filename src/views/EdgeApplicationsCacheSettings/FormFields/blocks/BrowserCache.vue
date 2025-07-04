@@ -51,9 +51,9 @@
 </template>
 
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
-  import LabelBlock from '@/templates/form-fields-inputs/labelBlock.vue'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import LabelBlock from '@/templates/label-block'
   import InputNumber from 'primevue/inputnumber'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
