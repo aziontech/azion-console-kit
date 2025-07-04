@@ -19,27 +19,7 @@
           optionLabel="name"
           optionValue="value"
           placeholder="Select a Edge Connector"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openCreateEdgeConnectorDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-connector-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Connector"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
+        />
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -60,6 +40,7 @@
           label="Response Custom Status Code"
           required
           name="customStatusCode"
+          :value="customStatusCode"
           :min="100"
           :max="599"
         />
@@ -98,6 +79,7 @@
           icon="pi pi-lock"
           placeholder="Response body"
           name="response"
+          :value="response"
           rows="4"
           disabled
         />
@@ -113,18 +95,21 @@
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
-  import PrimeButton from 'primevue/button'
+
   import { edgeConnectorsService } from '@/services/v2'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
+  const { value: response } = useField('response')
+
   const { value: typeValue } = useField('type')
   const { value: ttl } = useField('ttl')
+  const { value: customStatusCode } = useField('customStatusCode')
   const { value: connector } = useField('connector')
   const { value: uri } = useField('uri')
 
   const isConnector = computed(() => {
-    return typeValue.value === 'Connector'
+    return typeValue.value === 'PageConnector'
   })
 
   const props = defineProps({

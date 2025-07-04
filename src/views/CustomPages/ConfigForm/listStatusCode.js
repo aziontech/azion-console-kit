@@ -1,5 +1,5 @@
 const defaultValue = {
-  type: 'Default',
+  type: 'PageDefault',
   customStatusCode: '-',
   connector: null,
   ttl: 0,

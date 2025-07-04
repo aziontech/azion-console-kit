@@ -7,6 +7,7 @@
         data-testid="edit-domains-form__active-field"
         nameField="active"
         name="active"
+        :value="active"
         auto
         :isCard="false"
         title="Active"
@@ -20,4 +21,7 @@
   import blockCustomPageBlock from '@/views/CustomPages/Blocks/customPageBlock'
   import blockStatusCodeBlock from '@/views/CustomPages/Blocks/statusCodeBlock'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import { useField } from 'vee-validate'
+
+  const { value: active } = useField('active')
 </script>
