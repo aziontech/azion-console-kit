@@ -40,6 +40,10 @@
     iconPosition: {
       type: String,
       default: 'right'
+    },
+    required: {
+      type: Boolean,
+      default: false
     }
   })
 

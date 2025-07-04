@@ -1,11 +1,20 @@
 <template>
-  <GeneralBlock />
+  <GeneralBlock :isDrawer="isDrawer" />
 
-  <ImportRequestCertificate v-if="isRenderImportRequestCertificate" />
+  <ImportRequestCertificate
+    v-if="isRenderImportRequestCertificate"
+    :isDrawer="isDrawer"
+  />
 
-  <ImportServerCertificate v-if="isRenderImportServerCertificate" />
+  <ImportServerCertificate
+    v-if="isRenderImportServerCertificate"
+    :isDrawer="isDrawer"
+  />
 
-  <RequestCertificate v-if="isRenderRequestCertificate" />
+  <RequestCertificate
+    v-if="isRenderRequestCertificate"
+    :isDrawer="isDrawer"
+  />
 </template>
 
 <script setup>
@@ -17,6 +26,13 @@
   import { useDigitalCertificate } from './composables/certificate'
 
   defineOptions({ name: 'FormFieldsCreateDigitalCertificates' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const {
     isEdgeCertificate,

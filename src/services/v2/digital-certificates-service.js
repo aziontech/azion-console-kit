@@ -46,9 +46,9 @@ export class DigitalCertificatesService {
     return this.adapter?.transformListDigitalCertificates?.(data, params)
   }
 
-  listDigitalCertificatesDropdown = async (params) => {
+  listDigitalCertificatesDropdown = async (params, type = 'edge_certificate') => {
     const data = await this.listDigitalCertificates(params)
-    return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
+    return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params, type)
   }
 
   loadDigitalCertificate = async ({ id }) => {
