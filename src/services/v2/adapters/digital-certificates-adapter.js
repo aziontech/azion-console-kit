@@ -19,6 +19,21 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
+  transformCreateDigitalCertificateLetEncrypt(payload) {
+    return {
+      name: `Let's Encrypt - ${payload.name}`,
+      certificate: null,
+      private_key: null,
+      type: 'edge_certificate',
+      challenge: payload.letEncrypt.challenge,
+      authority: 'lets_encrypt',
+      key_algorithm: 'rsa_2048',
+      active: true,
+      common_name: payload.letEncrypt.commonName,
+      alternative_names: payload.letEncrypt.alternativeNames
+    }
+  },
+
   transformListDigitalCertificates({ results, count }) {
     const formattedResults = results?.map((item) => {
       const subjectNames = checkIfFieldExist(
@@ -58,7 +73,10 @@ export const DigitalCertificatesAdapter = {
     })
 
     if (type === 'edge_certificate') {
-      const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
+      const DEFAULT_CERTIFICATES = [
+        { id: 0, name: 'Azion (SAN)' },
+        { id: 1, name: "Let's Encrypt" }
+      ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
 

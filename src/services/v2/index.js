@@ -150,7 +150,12 @@ const workloadDeploymentService = new WorkloadDeploymentService(
   httpService,
   WorkloadDeploymentAdapter
 )
-const workloadService = new WorkloadService(httpService, WorkloadAdapter, workloadDeploymentService)
+const workloadService = new WorkloadService(
+  httpService,
+  WorkloadAdapter,
+  workloadDeploymentService,
+  digitalCertificatesService
+)
 
 export {
   vcsService,

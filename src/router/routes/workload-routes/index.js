@@ -1,4 +1,6 @@
 /** @type {import('vue-router').RouteRecordRaw} */
+import { clipboardWrite } from '@/helpers/clipboard'
+
 export const workloadRoutes = {
   path: `/workloads`,
   name: `/workloads`,
@@ -21,6 +23,9 @@ export const workloadRoutes = {
       path: 'create',
       name: 'create-workload',
       component: () => import('@views/Workload/CreateView.vue'),
+      props: {
+        clipboardWrite
+      },
       meta: {
         flag: 'checkout_access_without_flag',
         breadCrumbs: [

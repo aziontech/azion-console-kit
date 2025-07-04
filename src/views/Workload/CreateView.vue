@@ -6,7 +6,7 @@
     <template #content>
       <CreateFormBlock
         :createService="workloadService.createWorkload"
-        disabledCallback
+        disableToast
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
@@ -29,17 +29,13 @@
 </template>
 
 <script setup>
-  import { ref, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-
+  import { inject } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2'
@@ -54,25 +50,10 @@
     }
   })
 
-  const toast = useToast()
   const route = useRoute()
-  const dialog = useDialog()
-  const router = useRouter()
 
-  const domainName = ref('')
-
-  const handleResponse = (value) => {
-    domainName.value = value?.domainName
-    dialog.open(CopyDomainDialog, {
-      data: {
-        domain: domainName.value,
-        copy: copyDomain
-      },
-      onClose: () => {
-        router.push({ path: value.urlToEditView })
-        renderToastDomainCreateSuccesfully()
-      }
-    })
+  const handleResponse = (response) => {
+    handleToast(response)
     tracker.product.productCreated({
       productName: 'Domain',
       createdFrom: 'singleEntity',
@@ -80,32 +61,27 @@
     })
   }
 
-  const copyDomain = async () => {
-    try {
-      props.clipboardWrite(domainName.value)
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Successfully copied!'
-      })
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: 'The domain was not copied to the clipboard. Try copying it again.'
-      })
+  const handleToast = (response) => {
+    const toast = {
+      feedback: response.feedback,
+      actions: {
+        link: {
+          label: 'View Workload',
+          callback: () => response.redirectToUrl(response.urlToEditView)
+        },
+        secondary: {
+          label: 'Copy Workload URL',
+          icon: 'pi pi-copy',
+          animation: {
+            time: 3000,
+            icon: 'pi pi-check',
+            label: 'Copied'
+          },
+          callback: () => props.clipboardWrite(response.domainName)
+        }
+      }
     }
-  }
-
-  const renderToastDomainCreateSuccesfully = () => {
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Success',
-      detail: 'The domain is now available in the Workload management section.'
-    })
+    response.showToastWithActions(toast)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -203,8 +179,8 @@
       })
     }),
     mtls: yup.object({
-      isEnabled: yup.boolean(), // necessário para o .when funcionar
-      verification: yup.string().label('Verification'),
+      isEnabled: yup.boolean(),
+      verification: yup.string().nullable().notRequired().label('Verification'),
       certificate: yup
         .string()
         .when('isEnabled', {
@@ -261,6 +237,11 @@
       })
       .label('Custom Domain'),
     workloadHostnameAllowAccess: yup.boolean(),
-    edgeZoneOptions: yup.array()
+    edgeZoneOptions: yup.array(),
+    letEncrypt: yup.object({
+      commonName: yup.string(),
+      alternativeNames: yup.array(),
+      challenge: yup.string()
+    })
   })
 </script>

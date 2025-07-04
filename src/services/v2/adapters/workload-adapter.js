@@ -172,7 +172,7 @@ export const WorkloadAdapter = {
       },
       mtls: {
         isEnabled: !!workload?.mtls?.certificate,
-        verification: workload.mtls.verification,
+        verification: workload.mtls.verification?.toLowerCase() || null,
         certificate: workload.mtls.certificate,
         crl: workload.mtls.crl
       },

@@ -1,12 +1,20 @@
 export class WorkloadService {
-  constructor(http, adapter, workloadDeployment) {
+  constructor(http, adapter, workloadDeployment, digitalCertificate) {
     this.http = http
     this.adapter = adapter
-    ;(this.baseURL = 'v4/workspace/workloads'), (this.workloadDeployment = workloadDeployment)
+    ;(this.baseURL = 'v4/workspace/workloads'),
+      (this.workloadDeployment = workloadDeployment),
+      (this.digitalCertificate = digitalCertificate)
   }
 
   createWorkload = async (payload) => {
+    if (payload.tls.certificate === 1) {
+      const { id } = await this.digitalCertificate.createDigitalCertificateLetEncrypt(payload)
+      payload.tls.certificate = id
+    }
+
     const body = this.adapter?.transformCreateWorkload?.(payload)
+
     const { data } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}`,
@@ -24,7 +32,8 @@ export class WorkloadService {
     await this.workloadDeployment.createWorkloadDeployment(workloadDeploymentPayload)
 
     return {
-      feedback: 'Your workload has been created',
+      feedback:
+        'Your workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
       urlToEditView: `/workloads/edit/${data.data.id}`,
       domainName: data.data.workload_domain,
       id: parseInt(data.data.id)
@@ -60,7 +69,13 @@ export class WorkloadService {
   }
 
   editWorkload = async (payload) => {
+    if (payload.tls.certificate === 1) {
+      const { id } = await this.digitalCertificate.createDigitalCertificateLetEncrypt(payload)
+      payload.tls.certificate = id
+    }
+
     const body = this.adapter?.transformCreateWorkload?.(payload)
+
     await this.http.request({
       method: 'PUT',
       url: `${this.baseURL}/${payload.id}`,

@@ -118,7 +118,7 @@
     }),
     mtls: yup.object({
       isEnabled: yup.boolean(),
-      verification: yup.string().label('Verification'),
+      verification: yup.string().nullable().notRequired().label('Verification'),
       certificate: yup
         .string()
         .when('isEnabled', {
@@ -182,6 +182,11 @@
       })
       .label('Custom Domain'),
     workloadHostnameAllowAccess: yup.boolean(),
-    edgeZoneOptions: yup.array()
+    edgeZoneOptions: yup.array(),
+    letEncrypt: yup.object({
+      commonName: yup.string(),
+      alternativeNames: yup.array(),
+      challenge: yup.string()
+    })
   })
 </script>

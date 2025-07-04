@@ -107,6 +107,38 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
+      <div
+        v-if="props.isEdit"
+        class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <LabelBlock label="Workload Domain" />
+          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+            <i class="pi pi-lock" />
+            <InputText
+              id="workloadHostname"
+              data-testid="edit-domains-form__domain-field__input"
+              v-model="workloadHostname"
+              type="text"
+              class="flex flex-col w-full"
+              :feedback="false"
+              disabled
+            />
+          </span>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            The default domain used to route traffic to your workload.
+          </small>
+        </div>
+        <div class="max-w-fit w-full flex items-end">
+          <PrimeButton
+            icon="pi pi-clone"
+            outlined
+            data-testid="edit-domains-form__domain-field__copy-button"
+            type="button"
+            @click="copyDomainName"
+          />
+        </div>
+      </div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 max-sm:gap-6">
           <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
@@ -217,6 +249,7 @@
               placeholder="my-custom-name"
               label="Azion Custom Domain"
               required
+              :value="customDomain"
               name="customDomain"
               data-testid="workload-custom-domain-field"
             >
@@ -232,38 +265,7 @@
           </div>
         </div>
       </div>
-      <div
-        v-if="props.isEdit"
-        class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
-      >
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <LabelBlock label="Workload Domain" />
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock" />
-            <InputText
-              id="workloadHostname"
-              data-testid="edit-domains-form__domain-field__input"
-              v-model="workloadHostname"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              disabled
-            />
-          </span>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            The default domain used to route traffic to your workload.
-          </small>
-        </div>
-        <div class="max-w-fit w-full flex items-end">
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            @click="copyDomainName"
-          />
-        </div>
-      </div>
+
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldSwitchBlock
           data-testid="domains-form__workload-domain-allow-access-field"
