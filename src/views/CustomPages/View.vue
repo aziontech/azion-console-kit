@@ -69,6 +69,11 @@
     return props.mode === 'create' ? 'Create Custom Page' : 'Edit Custom Page'
   })
 
+  const loadService = async (id) => {
+    const payload = await customPageService.loadCustomPagesService(id)
+    return payload
+  }
+
   const componentForm = computed(() => {
     return {
       create: {
@@ -84,7 +89,7 @@
         component: EditFormBlock,
         props: {
           editService: customPageService.editCustomPagesService,
-          loadService: customPageService.loadCustomPagesService,
+          loadService: loadService,
           schema: validationSchema,
           updatedRedirect: props.updatedRedirect
         }
