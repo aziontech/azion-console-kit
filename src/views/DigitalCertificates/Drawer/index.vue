@@ -10,14 +10,25 @@
   defineOptions({
     name: 'digital-certificates-drawer'
   })
-  const emit = defineEmits(['onSuccess', 'onEdgeApplicationCreated'])
+
+  const props = defineProps({
+    certificate: {
+      type: String
+    },
+    letEncryptObj: {
+      type: Object
+    }
+  })
+
+  const emit = defineEmits(['onSuccess'])
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const showCreateDigitalCertificateDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const showCreateDrawer = refDebounced(showCreateDigitalCertificateDrawer, DEBOUNCE_TIME_IN_MS)
 
-  const { createService, PRIVATE_KEY_TYPES, CERTIFICATE_TYPES } = useDigitalCertificate()
+  const { createService, PRIVATE_KEY_TYPES, CERTIFICATE_TYPES, certificateType } =
+    useDigitalCertificate(props.certificate)
 
   const initialValues = ref({
     digitalCertificateName: '',
@@ -62,7 +73,7 @@
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
     handleToast(response)
-    emit('onSuccess', response.data.id)
+    emit('onSuccess', { type: certificateType.value, id: response.data.id })
     closeCreateDrawer()
   }
 
@@ -73,9 +84,14 @@
     response.showToastWithActions(toast)
   }
 
+  const changeCertificateType = (certificate) => {
+    certificateType.value = certificate
+  }
+
   defineExpose({
     showCreateDrawer,
-    openCreateDrawer
+    openCreateDrawer,
+    changeCertificateType
   })
 </script>
 
@@ -93,6 +109,7 @@
     disableToast
   >
     <template #formFields>
+      test {{ props.letEncryptObj }}
       <FormFieldsCreateDigitalCertificates isDrawer />
     </template>
   </CreateDrawerBlock>

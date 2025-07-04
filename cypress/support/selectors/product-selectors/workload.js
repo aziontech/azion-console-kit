@@ -1,6 +1,7 @@
 export default {
     createButton: '[data-testid="create_Workload_button"]',
     nameInput: '[data-testid="domains-form__name-field__input"]',
+    customHostname: '#customHostname',
     portHttp: '[data-testid="form-horizontal-delivery-settings-http-ports-multi-select"]',
     portHttps: '[data-testid="form-horizontal-delivery-settings-https-ports-multi-select"]',
     useHttpsField: '[data-testid="domains-form__use-https-field"]',

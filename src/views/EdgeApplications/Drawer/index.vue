@@ -60,9 +60,9 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
-    handleToast()
+    handleToast(response)
     emit('onSuccess')
-    emit('onEdgeApplicationCreated', response.applicationId)
+    emit('onEdgeApplicationCreated', response.data.id)
     closeCreateDrawer()
   }
   const handleToast = (response) => {

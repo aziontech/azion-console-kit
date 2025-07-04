@@ -63,6 +63,13 @@
       await loadListIntegrations()
     } catch (error) {
       error.showWithOptions(toast, { summary: 'Save failed' })
+      error.showErrors(toast)
+      error.showWithCallback(toast, (error) => {
+        return {
+          summary: `Save failed ${error.detail}`,
+          severity: 'error'
+        }
+      })
     } finally {
       isGithubConnectLoading.value = false
     }

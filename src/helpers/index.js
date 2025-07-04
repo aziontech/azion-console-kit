@@ -49,10 +49,25 @@ import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
 import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
 import { adaptServiceDataResponse } from '../services/v2/utils/adaptServiceDataResponse'
+import {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS
+} from './workload-protocol-settings'
+
 const checkIfFieldExist = (field, defaultValue = '-') => field ?? defaultValue
 import { getExpiredDate } from './payment-method'
 
 export {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  TLS_VERSIONS_OPTIONS,
+  SUPPORTED_CIPHERS_LIST_OPTIONS,
+  SUPPORTED_VERSIONS,
   checkIfFieldExist,
   InviteSession,
   azionPrivacyPolicyWindowOpener,

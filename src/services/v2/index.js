@@ -93,6 +93,14 @@ import { EdgeDNSRecordsService } from './edge-dns-records-service'
 import { PaymentService } from './payment-service'
 import { PaymentAdapter } from './adapters/payment-adapter'
 
+// Workload
+import { WorkloadService } from './workload-service'
+import { WorkloadAdapter } from './adapters/workload-adapter'
+
+// Workload Deployment
+import { WorkloadDeploymentService } from './workload-deployments-service'
+import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapter'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -138,6 +146,16 @@ const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 
 const paymentService = new PaymentService(httpService, PaymentAdapter)
+const workloadDeploymentService = new WorkloadDeploymentService(
+  httpService,
+  WorkloadDeploymentAdapter
+)
+const workloadService = new WorkloadService(
+  httpService,
+  WorkloadAdapter,
+  workloadDeploymentService,
+  digitalCertificatesService
+)
 
 export {
   vcsService,
@@ -163,5 +181,7 @@ export {
   digitalCertificatesCRService,
   edgeDNSService,
   edgeDNSRecordsService,
-  paymentService
+  paymentService,
+  workloadService,
+  workloadDeploymentService
 }
