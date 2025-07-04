@@ -17,6 +17,7 @@
   import EditViewV3 from './V3/EditView.vue'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import MigrationMessage from './components/MigrationMessage.vue'
 
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { edgeAppService } from '@/services/v2'
@@ -321,6 +322,8 @@
 <template>
   <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
+      <MigrationMessage />
+
       <PageHeadingBlock
         :pageTitle="tabTitle"
         :tag="tagLocked"
