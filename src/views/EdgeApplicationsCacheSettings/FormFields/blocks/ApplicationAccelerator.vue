@@ -187,10 +187,7 @@
               />
             </div>
 
-            <div
-              v-if="showDeviceGroupFields"
-
-            >
+            <div v-if="showDeviceGroupFields">
               <FieldMultiSelectLazyLoader
                 name="deviceGroups"
                 class="w-full"
