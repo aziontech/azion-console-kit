@@ -1,16 +1,36 @@
 export class WorkloadService {
-  constructor(http, adapter, workloadDeployment, digitalCertificate) {
+  constructor(http, adapter, workloadDeployment, digitalCertificate, digitalCertificateAdapter) {
     this.http = http
     this.adapter = adapter
     ;(this.baseURL = 'v4/workspace/workloads'),
       (this.workloadDeployment = workloadDeployment),
-      (this.digitalCertificate = digitalCertificate)
+      (this.digitalCertificate = digitalCertificate),
+      (this.digitalCertificateAdapter = digitalCertificateAdapter)
+  }
+
+  _hasAnyFieldChanged(oldObj, newObj, keysToCheck) {
+    if (!oldObj) return false
+    const payload =
+      this.digitalCertificateAdapter.transformCreateDigitalCertificateLetEncrypt?.(newObj)
+    return keysToCheck.some((key) => oldObj[key] !== payload[key])
   }
 
   createWorkload = async (payload) => {
+    let certificateId = null
+    let objLetEncrypt = null
+    const keysToCheck = ['name', 'challenge', 'common_name', 'alternative_names']
+
     if (payload.tls.certificate === 1) {
-      const { id } = await this.digitalCertificate.createDigitalCertificateLetEncrypt(payload)
-      payload.tls.certificate = id
+      if (certificateId === null || this._hasAnyFieldChanged(objLetEncrypt, payload, keysToCheck)) {
+        const certificate = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
+          payload
+        )
+        payload.tls.certificate = certificate.id
+        certificateId = certificate.id
+        objLetEncrypt = certificate
+        return
+      }
+      payload.tls.certificate = certificateId
     }
 
     const body = this.adapter?.transformCreateWorkload?.(payload)
