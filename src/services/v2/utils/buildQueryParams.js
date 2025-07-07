@@ -17,7 +17,16 @@ const toSnakeCase = (str) => {
  * @param {string} params.type - The type of the digital certificate
  * @returns {string} The query parameter string
  */
-export const buildQueryParams = ({ fields, ordering, page, pageSize, search, type, isDefault }) => {
+export const buildQueryParams = ({
+  fields,
+  ordering,
+  page,
+  pageSize,
+  search,
+  type,
+  isDefault,
+  active
+}) => {
   const params = new URLSearchParams()
   const paramsMap = {
     ...(ordering && { ordering: toSnakeCase(ordering) }),
@@ -26,6 +35,7 @@ export const buildQueryParams = ({ fields, ordering, page, pageSize, search, typ
     ...(fields && { fields }),
     ...(search && { search: search?.toString() }),
     ...(type && { type }),
+    ...(active && { active }),
     ...(isDefault && { is_default: isDefault })
   }
 
