@@ -3,3 +3,4 @@ export const CDN_MAXIMUM_TTL_MIN_VALUE = 3
 export const TTL_MAX_VALUE_RECORDS = 604800
 export const TTL_DEFAULT = 3600
 export const TTL_DEFAULT_ANAME = 20
+export const CDN_CACHE_MAX_VALUE = 31536000
