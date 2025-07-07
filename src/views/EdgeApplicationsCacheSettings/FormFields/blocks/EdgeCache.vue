@@ -2,7 +2,7 @@
   <FormHorizontal
     title="Edge Cache"
     description="Manage caching at the edge to improve performance and reduce latency for end users."
-    :isDrawer="true"
+    isDrawer
   >
     <template #inputs>
       <FieldGroupRadio
@@ -24,7 +24,7 @@
           v-model="cdnCacheSettingsMaximumTtl"
           id="cdnCacheSettingsMaximumTtl"
           :min="cdnCacheSettingsMaximumTtlMinimumValue"
-          :max="MAX_VALUE_NUMBER_INPUT"
+          :max="CDN_CACHE_MAX_VALUE"
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
           data-testid="edge-application-cache-settings-form__cdn-cache-settings-maximum-ttl-field__input"
@@ -96,7 +96,11 @@
 <script setup>
   import { computed, watch } from 'vue'
   import { useField } from 'vee-validate'
-  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+  import {
+    CDN_MAXIMUM_TTL_MAX_VALUE,
+    CDN_MAXIMUM_TTL_MIN_VALUE,
+    CDN_CACHE_MAX_VALUE
+  } from '@/utils/constants'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import LabelBlock from '@/templates/label-block'
@@ -111,8 +115,6 @@
       required: true
     }
   })
-
-  const MAX_VALUE_NUMBER_INPUT = 31536000
 
   const getEdgeCacheRadioOptions = () => {
     return [

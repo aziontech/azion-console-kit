@@ -2,7 +2,7 @@
   <FormHorizontal
     title="General"
     description="Create a set of cache configurations to apply to the edge application. Use Rules Engine to activate cache settings."
-    :isDrawer="true"
+    isDrawer
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

@@ -2,7 +2,7 @@
   <FormHorizontal
     title="Tiered Cache"
     description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year."
-    :isDrawer="true"
+    isDrawer
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

@@ -2,7 +2,7 @@
   <FormHorizontal
     title="Application Accelerator"
     description="Enhance application performance by defining how cache varies based on specific request attributes."
-    :isDrawer="true"
+    isDrawer
   >
     <template #inputs>
       <!-- Cache vary by Method -->

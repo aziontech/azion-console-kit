@@ -11,6 +11,14 @@ const parseTextToArray = (text) => text?.split('\n') ?? []
 const parseDeviceGroups = (ids) => ids?.map((id) => ({ id })) ?? []
 const parseDeviceGroup = (group) => group?.map(({ id }) => id) ?? []
 
+function resolveTieredCacheRegion(payload) {
+  if (!payload.tieredCache) {
+    return undefined
+  }
+
+  return payload.tieredCacheRegion ?? 'na-united-states'
+}
+
 export const CacheSettingsAdapter = {
   requestPayload(payload) {
     return {
@@ -27,9 +35,7 @@ export const CacheSettingsAdapter = {
           caching_for_options_enabled: payload.enableCachingForOptions,
           stale_cache_enabled: payload.enableStaleCache,
           tiered_cache_enabled: payload.tieredCache,
-          tiered_cache_region: payload.tieredCache
-            ? payload.tieredCacheRegion ?? 'na-united-states'
-            : undefined
+          tiered_cache_region: resolveTieredCacheRegion(payload)
         },
         application_controls: {
           cache_by_query_string: payload.cacheByQueryString,

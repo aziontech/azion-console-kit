@@ -2,7 +2,7 @@
   <FormHorizontal
     title="Browser Cache"
     description="Define how the browser handles cached content. Configure the behavior to optimize performance and ensure up-to-date content delivery."
-    :isDrawer="true"
+    isDrawer
   >
     <template #inputs>
       <FieldGroupRadio
