@@ -1,34 +1,29 @@
-import { capitalizeFirstLetter } from '@/helpers'
 import { parseStatusData, parseDefaultData } from '../utils/adapter/parse-status-utils'
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
-const nullable = (value) => {
-  return value ? value : null
-}
+const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null : value)
 
-const typesPage = {
-  default: 'PageDefault',
-  connector: 'PageConnector',
-  custom: 'PageCustom'
-}
-
-const getPageAttributes = (type, page) => {
+const getPage = (page) => {
   const typeAttributes = {
-    connector: {
-      connector: page.connector,
-      ttl: page.ttl,
-      uri: page.uri
+    PageConnector: {
+      connector: nullable(page.connector),
+      ttl: nullable(page.ttl),
+      uri: nullable(page.uri),
+      custom_status_code: nullable(page.customStatusCode)
     },
-    default: {
-      content_type: page.contentType,
-      response: page.response
+    PageDefault: {
+      content_type: nullable(page.contentType),
+      response: nullable(page.response)
     }
   }
 
   return {
-    ...(typeAttributes[type] || {}),
-    custom_status_code: page.custom_status_code
+    type: page.type,
+    attributes: {
+      ...(typeAttributes[page.type] || {}),
+      custom_status_code: nullable(page.customStatusCode)
+    }
   }
 }
 
@@ -46,48 +41,29 @@ export const CustomPageAdapter = {
   transformListCustomPage(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
-  transformPayloadCustomPage(payload) {
-    const pages = payload.pages.map((page) => {
-      return {
-        code: page.code.toLowerCase(),
-        ttl: page.ttl,
-        uri: nullable(page.uri),
-        custom_status_code: nullable(page.customStatusCode)
-      }
-    })
+  transformPayloadCreateCustomPage(payload) {
+    const pages = payload.pages.filter((page) => page.type !== 'PageDefault')
+
     return {
       name: payload.name,
-      active: payload.isActive,
-      default: payload.isDefault,
-      connector_custom_pages: {
-        edge_connector: nullable(payload.edgeConnectorId),
-        pages
-      }
+      active: payload.active,
+      pages: [
+        ...pages.map((page) => {
+          return {
+            code: page.code.toLowerCase(),
+            page: getPage(page)
+          }
+        }),
+        {
+          code: 'default',
+          page: {
+            type: 'PageDefault'
+          }
+        }
+      ]
     }
   },
   transformLoadCustomPage({ data }) {
-    const pages = data.connector_custom_pages.pages.map((page) => {
-      return {
-        code: capitalizeFirstLetter(page.code),
-        ttl: page.ttl,
-        uri: page.uri,
-        customStatusCode: page.custom_status_code
-      }
-    })
-
-    return {
-      id: data.id,
-      name: data.name,
-      lastEditor: data.last_editor,
-      lastModified: data.last_modified,
-      isActive: data.active,
-      isDefault: data.default,
-      productVersion: data.product_version,
-      edgeConnectorId: data.connector_custom_pages.edge_connector,
-      pages
-    }
-  },
-  transformLoadCustomPageStatusCode({ data }) {
     return {
       id: data.id,
       name: data.name,
@@ -95,12 +71,15 @@ export const CustomPageAdapter = {
       last_modified: data.last_modified,
       active: data.active,
       product_version: data.product_version,
-      pages: data.pages.map(({ type, ...page }) => ({
-        code: page.code,
-        page: {
-          type: typesPage[type],
-          attributes: getPageAttributes(type, page)
-        }
+      pages: data.pages.map((item) => ({
+        code: nullable(item.code),
+        type: nullable(item.page.type),
+        customStatusCode: nullable(item.page.attributes.custom_status_code),
+        connector: nullable(item.page.attributes.connector),
+        ttl: nullable(item.page.attributes.ttl),
+        uri: nullable(item.page.attributes.uri),
+        contentType: nullable(item.page.attributes.content_type),
+        response: nullable(item.page.attributes.response)
       }))
     }
   }

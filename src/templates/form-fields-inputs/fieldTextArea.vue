@@ -93,7 +93,7 @@
     <i
       v-if="props.icon"
       :class="props.icon"
-      class="text-color-secondary top-5"
+      class="text-color-secondary top-5 right-5"
     />
     <TextArea
       :data-testid="customTestId.textarea"
