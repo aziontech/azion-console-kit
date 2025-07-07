@@ -55,6 +55,10 @@
   const showDivider = (position) => {
     return position < pickListSize.value && !props.isCard
   }
+
+  const isRenderDivider = (index) => {
+    return showDivider(index) && props.hasDivider
+  }
 </script>
 
 <template>
@@ -83,7 +87,7 @@
           </template>
         </FieldCheckboxBlock>
         <PrimeDivider
-          v-if="showDivider(index) && hasDivider"
+          v-if="isRenderDivider(index)"
           class="my-2"
         />
       </template>
