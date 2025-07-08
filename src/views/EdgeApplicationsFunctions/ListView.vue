@@ -71,7 +71,7 @@
     'id',
     'name',
     'edge_function',
-    'json_args',
+    'args',
     'last_modified',
     'last_editor'
   ]
