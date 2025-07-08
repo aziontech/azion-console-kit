@@ -30,9 +30,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import { useField } from 'vee-validate'
-  import { ref, watch, onMounted } from 'vue'
-  import { dataStreamService } from '@/services/v2'
-  import { useAccountStore } from '@/stores/account'
+  import { ref } from 'vue'
 
   defineProps({
     disabled: {
@@ -48,46 +46,5 @@
     { label: 'WAF Events', value: 'waf' }
   ])
 
-  const listTemplates = ref([])
-
   const { value: dataSource } = useField('dataSource')
-  const { value: dataSet } = useField('dataSet')
-  const { value: template } = useField('template')
-
-  const loaderDataStreamTemplates = async () => {
-    const templates = await dataStreamService.listTemplates({
-      fields: 'id,name,data_set'
-    })
-    listTemplates.value = templates.results
-
-    return listTemplates.value[0].id ?? ''
-  }
-
-  const insertDataSet = async (templateID, isFirstRender) => {
-    const index = listTemplates.value.map((el) => el.id).indexOf(templateID)
-    try {
-      if (templateID === 'CUSTOM_TEMPLATE' && !isFirstRender) {
-        dataSet.value = ''
-      } else {
-        const dataSetJSON = JSON.parse(listTemplates.value[index].dataSet)
-        dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
-      }
-    } catch (exception) {
-      if ((!dataSet.value || templateID !== 'CUSTOM_TEMPLATE') && index > 0) {
-        dataSet.value = listTemplates.value[index].dataSet
-      }
-    }
-  }
-
-
-  watch(
-    () => listTemplates.value,
-    (newValue) => {
-      if (newValue.length) insertDataSet(template.value, false)
-    }
-  )
-
-  onMounted(async () => {
-    await loaderDataStreamTemplates()
-  })
 </script>
