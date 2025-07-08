@@ -240,8 +240,7 @@
     edgeZoneOptions: yup.array(),
     letEncrypt: yup.object({
       commonName: yup.string(),
-      alternativeNames: yup.array(),
-      challenge: yup.string()
+      alternativeNames: yup.array()
     })
   })
 </script>

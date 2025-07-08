@@ -39,7 +39,6 @@
   const { replace: replaceEdgeZoneOptions } = useFieldArray('edgeZoneOptions')
   const { setValue: setCommonName } = useField('letEncrypt.commonName')
   const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
-  const { setValue: setChallenge } = useField('letEncrypt.challenge')
   const { value: letEncrypt } = useField('letEncrypt')
   const domainsOptions = ref([])
 
@@ -102,13 +101,6 @@
     }
   })
 
-  function checkChallenge(domains, options) {
-    const labels = new Set(options.map((option) => option.value.label))
-    const allMatch = domains.every(({ domain }) => labels.has(domain))
-
-    return allMatch ? 'dns' : 'http'
-  }
-
   const handleLetEncrypt = () => {
     if (!domains.value?.length) return
 
@@ -117,16 +109,9 @@
     const commonName = `${first.subdomain}.${first.domain}`
     const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
 
-    const isDnsChallenge = checkChallenge(domains.value, domainsOptions.value)
-
-    setChallenge(isDnsChallenge)
     setAlternativeNames(alternativeNames)
     setCommonName(commonName)
   }
-
-  watch([domains.value, customDomain.value], () => {
-    handleLetEncrypt()
-  })
 
   sugestionDomains()
 </script>
@@ -138,7 +123,7 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
-      {{ letEncrypt }}
+      tes: {{ letEncrypt }}
       <div
         v-if="props.isEdit"
         class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
@@ -197,6 +182,7 @@
                   class="max-sm:text-left sm:text-right"
                   :class="{ 'p-invalid': domainsErrorMessage }"
                   :value="domain.subdomain"
+                  @blur="handleLetEncrypt"
                   @input="updateDomainSubdomain(index, $event.target.value)"
                   data-testid="domains-form__subdomain-field"
                 />
@@ -213,6 +199,7 @@
                   placeholder="example.net"
                   emptyMessage="No domains available"
                   :value="domain.domain"
+                  @blur="handleLetEncrypt"
                   :class="{ 'p-invalid': domainsErrorMessage }"
                   @change="updateDomainType(index, $event.value)"
                   data-testid="domains-form__domain-dropdown"
