@@ -1,58 +1,15 @@
-import { createHttpService } from './base/httpServiceFactory'
-import { EdgeFunctionService } from './edge-function-service'
-import { EdgeFunctionsAdapter } from './adapters/edge-function-adapter'
+import { enrichByMatchingReference } from './utils/enrichByMatchingReference'
 
 export class EdgeApplicationFunctionService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
     this.baseURL = 'v4/edge_application/applications'
+    this.functionListEndpoint = 'v4/edge_functions/functions'
   }
 
   #getUrl(edgeApplicationId, suffix = '') {
     return `${this.baseURL}/${edgeApplicationId}/functions${suffix}`
-  }
-
-  #getEdgeFunctionService = () => {
-    const httpService = createHttpService()
-    return new EdgeFunctionService(httpService, EdgeFunctionsAdapter)
-  }
-
-  #enrichFunctionsWithNames = async (functions) => {
-    const unresolvedIds = new Set(functions.map((fn) => fn.edgeFunction))
-    const enriched = []
-    const nameMap = new Map()
-
-    let page = 1
-    const pageSize = 100
-
-    while (unresolvedIds.size > 0) {
-      const { body: data, count } = await this.#getEdgeFunctionService().listEdgeFunctions({
-        page,
-        pageSize,
-        fields: ['id', 'name', 'version', 'initiator_type'],
-        initiatorType: 'edge_application'
-      })
-      if (!data?.length) break
-
-      data.forEach((fn) => nameMap.set(fn.id, fn.name, fn.version))
-
-      for (const instance of functions) {
-        if (unresolvedIds.has(instance.edgeFunction) && nameMap.has(instance.edgeFunction)) {
-          enriched.push({
-            ...instance,
-            functionInstanced: nameMap.get(instance.edgeFunction),
-            version: nameMap.get(instance.edgeFunction)
-          })
-          unresolvedIds.delete(instance.edgeFunction)
-        }
-      }
-
-      if (count < pageSize) break
-      page++
-    }
-
-    return enriched
   }
 
   listFunctions = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
@@ -62,9 +19,14 @@ export class EdgeApplicationFunctionService {
       params
     })
 
-    const { results } = data
+    const { results, count } = data
 
-    return this.adapter?.transformListFunctions?.(results, params?.fields) ?? results
+    const body = this.adapter?.transformListFunctions?.(results, params?.fields) ?? results
+
+    return {
+      body,
+      count
+    }
   }
 
   listEdgeApplicationFunctions = async (
@@ -72,15 +34,34 @@ export class EdgeApplicationFunctionService {
     params = { pageSize: 10, fields: [] }
   ) => {
     params.fields = ['id', 'name', 'last_editor', 'last_modified', 'edge_function']
-    const functions = await this.listFunctions(edgeApplicationId, params)
-    if (!functions) return []
+    const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
+    if (!count) return []
 
-    const enrichedFunctions = await this.#enrichFunctionsWithNames(functions)
+    const enrichedFunctions = await enrichByMatchingReference(
+      functionInstances,
+      this.#listFunctionNames,
+      (item) => item.edgeFunction,
+      (item, matchedRef) => ({
+        ...item,
+        functionInstanced: matchedRef.name
+      }),
+      { pageSize: 100 }
+    )
 
     return {
-      count: functions?.count,
+      count: count,
       body: enrichedFunctions
     }
+  }
+
+  #listFunctionNames = async (params = { page: 1, pageSize: 100, fields: 'id,name' }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.functionListEndpoint,
+      params
+    })
+
+    return { results: data.results, count: data.count }
   }
 
   loadEdgeApplicationFunction = async ({ edgeApplicationID, functionID }) => {
