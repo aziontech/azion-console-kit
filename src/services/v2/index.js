@@ -154,7 +154,8 @@ const workloadService = new WorkloadService(
   httpService,
   WorkloadAdapter,
   workloadDeploymentService,
-  digitalCertificatesService
+  digitalCertificatesService,
+  DigitalCertificatesAdapter
 )
 
 export {

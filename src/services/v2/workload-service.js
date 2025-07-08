@@ -2,6 +2,9 @@ export class WorkloadService {
   constructor(http, adapter, workloadDeployment, digitalCertificate, digitalCertificateAdapter) {
     this.http = http
     this.adapter = adapter
+    this.certificateId = null
+    this.objLetEncrypt = null
+    this.workload = null
     ;(this.baseURL = 'v4/workspace/workloads'),
       (this.workloadDeployment = workloadDeployment),
       (this.digitalCertificate = digitalCertificate),
@@ -16,36 +19,45 @@ export class WorkloadService {
   }
 
   createWorkload = async (payload) => {
-    let certificateId = null
-    let objLetEncrypt = null
-    const keysToCheck = ['name', 'challenge', 'common_name', 'alternative_names']
+    const keysToCheck = ['common_name', 'alternative_names']
 
     if (payload.tls.certificate === 1) {
-      if (certificateId === null || this._hasAnyFieldChanged(objLetEncrypt, payload, keysToCheck)) {
+      if (this._hasAnyFieldChanged(this.objLetEncrypt, payload, keysToCheck)) {
+        // TODO update let encrypt here
+        const certificate = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
+          payload,
+          this.certificateId
+        )
+        payload.tls.certificate = certificate.id
+        this.certificateId = certificate.id
+        this.objLetEncrypt = certificate
+      } else if (this.certificateId === null) {
         const certificate = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
           payload
         )
         payload.tls.certificate = certificate.id
-        certificateId = certificate.id
-        objLetEncrypt = certificate
-        return
+        this.certificateId = certificate.id
+        this.objLetEncrypt = certificate
       }
-      payload.tls.certificate = certificateId
+      payload.tls.certificate = this.certificateId
     }
 
     const body = this.adapter?.transformCreateWorkload?.(payload)
 
-    const { data } = await this.http.request({
-      method: 'POST',
-      url: `${this.baseURL}`,
-      body
-    })
+    if (!this.workload) {
+      const { data } = await this.http.request({
+        method: 'POST',
+        url: `${this.baseURL}`,
+        body
+      })
+      this.workload = data.data
+    }
 
     const workloadDeploymentPayload = {
       edgeApplication: payload.edgeApplication,
       edgeFirewall: payload.edgeFirewall,
       customPage: payload.customPage,
-      id: data.data.id,
+      id: this.workload.id,
       name: 'workload-deployment'
     }
 
@@ -54,9 +66,9 @@ export class WorkloadService {
     return {
       feedback:
         'Your workload has been created. After propagation the domain will be available in the Workload URL. You also can add a custom domain.',
-      urlToEditView: `/workloads/edit/${data.data.id}`,
-      domainName: data.data.workload_domain,
-      id: parseInt(data.data.id)
+      urlToEditView: `/workloads/edit/${this.workload.id}`,
+      domainName: this.workload.workload_domain,
+      id: parseInt(this.workload.id)
     }
   }
 

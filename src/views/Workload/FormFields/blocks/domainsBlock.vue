@@ -37,6 +37,10 @@
   const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
   const { value: infrastructure } = useField('infrastructure')
   const { replace: replaceEdgeZoneOptions } = useFieldArray('edgeZoneOptions')
+  const { setValue: setCommonName } = useField('letEncrypt.commonName')
+  const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
+  const { setValue: setChallenge } = useField('letEncrypt.challenge')
+  const { value: letEncrypt } = useField('letEncrypt')
   const domainsOptions = ref([])
 
   const addNewDomain = () => {
@@ -54,7 +58,8 @@
 
   const sugestionDomains = async () => {
     const domains = await edgeDNSService.listEdgeDNSService({
-      fields: ['id', 'domain']
+      fields: ['id', 'domain'],
+      active: true
     })
     domainsOptions.value = domains.body.map((domain) => {
       return {
@@ -97,6 +102,32 @@
     }
   })
 
+  function checkChallenge(domains, options) {
+    const labels = new Set(options.map((option) => option.value.label))
+    const allMatch = domains.every(({ domain }) => labels.has(domain))
+
+    return allMatch ? 'dns' : 'http'
+  }
+
+  const handleLetEncrypt = () => {
+    if (!domains.value?.length) return
+
+    const [first, ...rest] = domains.value
+
+    const commonName = `${first.subdomain}.${first.domain}`
+    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+
+    const isDnsChallenge = checkChallenge(domains.value, domainsOptions.value)
+
+    setChallenge(isDnsChallenge)
+    setAlternativeNames(alternativeNames)
+    setCommonName(commonName)
+  }
+
+  watch([domains.value, customDomain.value], () => {
+    handleLetEncrypt()
+  })
+
   sugestionDomains()
 </script>
 <template>
@@ -107,6 +138,7 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
+      {{ letEncrypt }}
       <div
         v-if="props.isEdit"
         class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
@@ -236,7 +268,7 @@
           :disabled="disabledCustomDomain"
           auto
           :isCard="false"
-          title="Custom Domain (azion.app)"
+          title="Custom Domain"
           subtitle="You can use an free azion.app domain."
         />
         <div

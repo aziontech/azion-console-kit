@@ -54,7 +54,8 @@
   const handleQuery = (queryParams) => {
     const query = {
       ...queryParams,
-      fields: ['id', 'name']
+      fields: ['id', 'name'],
+      active: true
     }
     return query
   }
@@ -71,8 +72,8 @@
     })
   }
 
-  const handleListCustomPages = async () => {
-    return await customPageService.listCustomPagesService({ fields: ['id', 'name'] })
+  const handleListCustomPages = async (queryParams) => {
+    return await customPageService.listCustomPagesService({ ...handleQuery(queryParams) })
   }
 
   const handleEdgeFirewallCreated = (id) => {

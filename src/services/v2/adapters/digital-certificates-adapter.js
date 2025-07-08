@@ -1,4 +1,4 @@
-import { getCurrentTimezone, checkIfFieldExist } from '@/helpers'
+import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
@@ -19,19 +19,25 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformCreateDigitalCertificateLetEncrypt(payload) {
-    return {
-      name: `Let's Encrypt - ${payload.name}`,
+  transformCreateDigitalCertificateLetEncrypt(payload, sourceCertificate) {
+    const payloadRequest = {
+      name: `Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
       certificate: null,
       private_key: null,
       type: 'edge_certificate',
-      challenge: payload.letEncrypt.challenge,
+      challenge: 'dns',
       authority: 'lets_encrypt',
       key_algorithm: 'rsa_2048',
       active: true,
       common_name: payload.letEncrypt.commonName,
       alternative_names: payload.letEncrypt.alternativeNames
     }
+
+    if (sourceCertificate) {
+      payloadRequest.source_certificate = sourceCertificate
+    }
+
+    return payloadRequest
   },
 
   transformListDigitalCertificates({ results, count }) {

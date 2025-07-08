@@ -7,8 +7,8 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import MultiSelect from 'primevue/multiselect'
-  import { useField, useFieldArray } from 'vee-validate'
-  import { ref, computed, watch } from 'vue'
+  import { useField } from 'vee-validate'
+  import { ref, computed } from 'vue'
   import { digitalCertificatesService } from '@/services/v2'
 
   import {
@@ -32,20 +32,13 @@
   const { errorMessage: httpsPortError, value: httpsPortValue } = useField(
     'protocols.http.httpsPorts'
   )
-  const { value: domains } = useField('domains')
-  const { fields: edgeZoneOptions } = useFieldArray('edgeZoneOptions')
 
   const { setValue: setUseHttps } = useField('protocols.http.useHttps')
   const { setValue: setUseHttp3 } = useField('protocols.http.useHttp3')
 
-  const { setValue: setCommonName } = useField('letEncrypt.commonName')
-  const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
-  const { setValue: setChallenge } = useField('letEncrypt.challenge')
-
   const { errorMessage: quicPortError, value: quicPortValue } = useField('protocols.http.quicPorts')
 
   const openDigitalCertificateDrawer = (type = 'edge_certificate') => {
-    handleLetEncrypt()
     digitalCertificateDrawerRef.value.changeCertificateType(type)
     digitalCertificateDrawerRef.value.openCreateDrawer()
   }
@@ -76,37 +69,6 @@
       ...queryParams
     })
   }
-
-  function checkChallenge(domains, options) {
-    const labels = new Set(options.map((option) => option.value.label))
-    const allMatch = domains.every(({ domain }) => labels.has(domain))
-
-    return allMatch ? 'dns' : 'http'
-  }
-
-  const handleLetEncrypt = () => {
-    if (!domains.value?.length) return
-
-    const [first, ...rest] = domains.value
-
-    const commonName = `${first.subdomain}.${first.domain}`
-    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
-
-    const isDnsChallenge = checkChallenge(domains.value, edgeZoneOptions.value)
-
-    setChallenge(isDnsChallenge)
-    setAlternativeNames(alternativeNames)
-    setCommonName(commonName)
-  }
-
-  watch(
-    () => tls?.value?.certificate,
-    (newValue) => {
-      if (newValue === 1) {
-        handleLetEncrypt()
-      }
-    }
-  )
 </script>
 <template>
   <form-horizontal
@@ -181,6 +143,7 @@
             :value="tls.certificate"
             appendTo="self"
             placeholder="Select a certificate"
+            enableCustomLabel
           >
             <template #footer>
               <ul class="p-2">

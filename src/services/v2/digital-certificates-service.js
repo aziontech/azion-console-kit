@@ -17,8 +17,11 @@ export class DigitalCertificatesService {
     return data
   }
 
-  createDigitalCertificateLetEncrypt = async (payload) => {
-    const body = this.adapter?.transformCreateDigitalCertificateLetEncrypt?.(payload)
+  createDigitalCertificateLetEncrypt = async (payload, sourceCertificate) => {
+    const body = this.adapter?.transformCreateDigitalCertificateLetEncrypt?.(
+      payload,
+      sourceCertificate
+    )
 
     const { data } = await this.http.request({
       method: 'POST',

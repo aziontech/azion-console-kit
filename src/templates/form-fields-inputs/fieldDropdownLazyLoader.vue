@@ -49,6 +49,15 @@
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
+    <template #option="slotProps">
+      <div class="flex align-items-center">
+        <i
+          v-if="slotProps.option.icon"
+          :class="`pi ${slotProps.option.icon}`"
+        ></i>
+        <div>{{ slotProps.option.name }}</div>
+      </div>
+    </template>
 
     <template #header>
       <div class="p-2 flex">

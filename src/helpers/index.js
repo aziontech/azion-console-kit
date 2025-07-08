@@ -30,7 +30,8 @@ import {
   convertDateToLocalTimezone,
   formatDateToUS,
   convertValueToDateByUserTimezone,
-  formatDateMonthAndYear
+  formatDateMonthAndYear,
+  getCurrentDateTimeIntl
 } from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
 import { windowOpen } from './window-open'
@@ -120,5 +121,6 @@ export {
   TEXT_DOMAIN_WORKLOAD,
   adaptServiceDataResponse,
   formatDateMonthAndYear,
-  getExpiredDate
+  getExpiredDate,
+  getCurrentDateTimeIntl
 }
