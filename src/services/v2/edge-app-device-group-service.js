@@ -54,13 +54,13 @@ export class DeviceGroupService {
   editDeviceGroupService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'PUT',
       url: this.getUrl(edgeApplicationId, `/${payload.id}`),
       body
     })
 
-    return data.results
+    return 'Device Group successfully updated'
   }
 
   deleteDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {
