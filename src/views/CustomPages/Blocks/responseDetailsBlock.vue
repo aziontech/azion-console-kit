@@ -14,32 +14,12 @@
           required
           name="connector"
           :value="connector"
-          :service="edgeConnectorsService.listEdgeConnectorsService"
+          :service="listEdgeConnectors"
           :loadService="edgeConnectorsService.loadEdgeConnectorsService"
           optionLabel="name"
           optionValue="value"
           placeholder="Select a Edge Connector"
-        >
-          <template #footer>
-            <ul class="p-2">
-              <li>
-                <PrimeButton
-                  @click="openCreateEdgeConnectorDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
-                  size="small"
-                  icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-connector-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
-                  label="Create Edge Connector"
-                />
-              </li>
-            </ul>
-          </template>
-        </FieldDropdownLazyLoader>
+        />
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -60,6 +40,7 @@
           label="Response Custom Status Code"
           required
           name="customStatusCode"
+          :value="customStatusCode"
           :min="100"
           :max="599"
         />
@@ -98,9 +79,21 @@
           icon="pi pi-lock"
           placeholder="Response body"
           name="response"
+          :value="response"
           rows="4"
           disabled
         />
+        <div class="flex">
+          <PrimeButton
+            icon="pi pi-clone"
+            outlined
+            type="button"
+            aria-label="Copy Response"
+            label="Copy Response"
+            @click="copyResponse"
+            :data-testid="`copy-response-button`"
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -114,17 +107,24 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
   import PrimeButton from 'primevue/button'
+  import { clipboardWrite } from '@/helpers'
   import { edgeConnectorsService } from '@/services/v2'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
+
+  const { value: response } = useField('response')
 
   const { value: typeValue } = useField('type')
   const { value: ttl } = useField('ttl')
+  const { value: customStatusCode } = useField('customStatusCode')
   const { value: connector } = useField('connector')
   const { value: uri } = useField('uri')
 
   const isConnector = computed(() => {
-    return typeValue.value === 'Connector'
+    return typeValue.value === 'PageConnector'
   })
 
   const props = defineProps({
@@ -133,4 +133,30 @@
       default: false
     }
   })
+
+  const listEdgeConnectors = async (params) => {
+    params.fields = 'id,name'
+    // params.type = 'live_ingest'
+    params.active = true
+    return await edgeConnectorsService.listEdgeConnectorsService(params)
+  }
+
+  const copyResponse = () => {
+    try {
+      clipboardWrite(response.value)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Response copied to clipboard',
+        life: 3000
+      })
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to copy response to clipboard',
+        life: 3000
+      })
+    }
+  }
 </script>

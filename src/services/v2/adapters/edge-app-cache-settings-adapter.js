@@ -11,6 +11,14 @@ const parseTextToArray = (text) => text?.split('\n') ?? []
 const parseDeviceGroups = (ids) => ids?.map((id) => ({ id })) ?? []
 const parseDeviceGroup = (group) => group?.map(({ id }) => id) ?? []
 
+function resolveTieredCacheRegion(payload) {
+  if (!payload.tieredCache) {
+    return undefined
+  }
+
+  return payload.tieredCacheRegion ?? 'na-united-states'
+}
+
 export const CacheSettingsAdapter = {
   requestPayload(payload) {
     return {
@@ -26,10 +34,8 @@ export const CacheSettingsAdapter = {
           caching_for_post_enabled: payload.enableCachingForPost,
           caching_for_options_enabled: payload.enableCachingForOptions,
           stale_cache_enabled: payload.enableStaleCache,
-          tiered_cache_enabled: payload.l2CachingEnabled,
-          tiered_cache_region: payload.l2CachingEnabled
-            ? payload.l2Region ?? 'na-united-states'
-            : undefined
+          tiered_cache_enabled: payload.tieredCache,
+          tiered_cache_region: resolveTieredCacheRegion(payload)
         },
         application_controls: {
           cache_by_query_string: payload.cacheByQueryString,
@@ -43,7 +49,7 @@ export const CacheSettingsAdapter = {
         slice_controls: {
           slice_configuration_enabled: payload.sliceConfigurationEnabled,
           slice_edge_caching_enabled: payload.isSliceEdgeCachingEnabled,
-          slice_tiered_caching_enabled: payload.isSliceL2CachingEnabled,
+          slice_tiered_caching_enabled: payload.isSliceTieredCache,
           slice_configuration_range: payload.sliceConfigurationRange
         }
       }
@@ -75,8 +81,8 @@ export const CacheSettingsAdapter = {
       enableCachingForPost: edge.caching_for_post_enabled,
       enableCachingForOptions: edge.caching_for_options_enabled,
       enableStaleCache: edge.stale_cache_enabled,
-      l2CachingEnabled: edge.tiered_cache_enabled,
-      l2Region: edge.tiered_cache_region,
+      tieredCache: edge.tiered_cache_enabled,
+      tieredCacheRegion: edge.tiered_cache_region,
       cacheByQueryString: controls.cache_by_query_string,
       queryStringFields: parseContentToTextArea(controls.query_string_fields),
       enableQueryStringSort: controls.query_string_sort_enabled,
@@ -87,7 +93,7 @@ export const CacheSettingsAdapter = {
       sliceConfigurationEnabled: slice.slice_configuration_enabled,
       sliceConfigurationRange: slice.slice_configuration_range,
       isSliceEdgeCachingEnabled: slice.slice_edge_caching_enabled,
-      isSliceL2CachingEnabled: slice.slice_tiered_caching_enabled
+      isSliceTieredCache: slice.slice_tiered_caching_enabled
     }
   }
 }
