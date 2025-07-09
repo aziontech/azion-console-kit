@@ -24,7 +24,7 @@
 
   <TieredCache v-if="showTieredCacheForm" />
 
-  <ApplicationAccelerator />
+  <ApplicationAccelerator v-if="isApplicationAcceleratorEnabled" />
 </template>
 
 <script setup>
