@@ -1,4 +1,5 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 const LOCKED_VALUE = 'custom'
 
@@ -28,7 +29,7 @@ export const EdgeAppAdapter = {
           lastEditor: edgeApplication.last_editor,
           lastModify: formatExhibitionDate(edgeApplication.last_modified, 'full'),
           lastModified: edgeApplication.last_modified,
-          active: edgeApplication.active,
+          active: parseStatusData(edgeApplication.active),
           isLocked: edgeApplication.product_version === LOCKED_VALUE
         }
       }) || []
