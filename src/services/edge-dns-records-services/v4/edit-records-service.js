@@ -19,7 +19,10 @@ const adapt = (payload) => {
   return {
     record_type: payload.selectedRecordType,
     entry: payload.name,
-    answers_list: payload.value.split('\n'),
+    answers_list: payload.value
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean),
     ttl: payload.ttl,
     policy: payload.selectedPolicy,
     weight: payload.weight,
