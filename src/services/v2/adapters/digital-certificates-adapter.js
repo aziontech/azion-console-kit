@@ -70,18 +70,19 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ body, count }, { type, search }) {
-    let parsedDigitalCertificates = body?.map((item) => {
+  transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
+    let parsedDigitalCertificates = results?.map((item) => {
       return {
         id: item.id,
-        name: item.name
+        name: item.name,
+        status: item.status
       }
     })
 
     if (type === 'edge_certificate') {
       const DEFAULT_CERTIFICATES = [
-        { id: 0, name: 'Azion (SAN)' },
-        { id: 1, name: "Let's Encrypt" }
+        { id: 0, name: 'Azion (SAN)', status: 'active', icon: 'pi-chevron-circle-right' },
+        { id: 1, name: "Let's Encrypt", status: 'active', icon: 'pi-chevron-circle-right' }
       ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)

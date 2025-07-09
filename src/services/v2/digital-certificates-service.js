@@ -62,7 +62,19 @@ export class DigitalCertificatesService {
   }
 
   listDigitalCertificatesDropdown = async (params) => {
-    const data = await this.listDigitalCertificates(params)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params: {
+        search: '',
+        fields: '',
+        ordering: 'name',
+        page: 1,
+        pageSize: 10,
+        ...params
+      }
+    })
+
     return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
   }
 

@@ -2,7 +2,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
+
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
@@ -65,7 +66,7 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type: 'edge_certificate',
-      fields: ['id,name'],
+      fields: ['id,name,status'],
       ...queryParams
     })
   }
@@ -132,7 +133,7 @@
         v-if="protocols.http.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdownLazyLoader
+          <fieldDropdownLazyLoaderWithFilter
             data-testid="domains-form__edge-certificate-field"
             label="Digital Certificate"
             name="tls.certificate"
@@ -144,6 +145,8 @@
             appendTo="self"
             placeholder="Select a certificate"
             enableCustomLabel
+            keyToFilter="status"
+            :valuesToFilter="['active', 'challenge_verification']"
           >
             <template #footer>
               <ul class="p-2">
@@ -164,7 +167,7 @@
                 </li>
               </ul>
             </template>
-          </FieldDropdownLazyLoader>
+          </fieldDropdownLazyLoaderWithFilter>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
