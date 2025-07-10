@@ -62,7 +62,7 @@ export class EdgeDNSRecordsService {
     await this.http.request({
       method: 'PUT',
       url: this.getUrl(`/${payload.edgeDNSId}/records/${payload.id}`),
-      body: this.adapter?.transformPayloadEdit?.(payload)
+      body: this.adapter?.transformPayload?.(payload)
     })
 
     return 'Edge DNS Record has been updated'
