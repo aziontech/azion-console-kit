@@ -38,19 +38,10 @@ export const EdgeDNSRecordsAdapter = {
       name: payload.name,
       ttl: payload.ttl,
       type: payload.selectedRecordType,
-      rdata: [payload.value],
-      policy: payload.selectedPolicy,
-      weight: payload.weight
-    }
-  },
-
-  transformPayloadEdit(payload) {
-    return {
-      description: payload.description,
-      name: payload.name,
-      ttl: payload.ttl,
-      type: payload.selectedRecordType,
-      rdata: payload.value.split('\n'),
+      rdata: payload.value
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean),
       policy: payload.selectedPolicy,
       weight: payload.weight
     }
