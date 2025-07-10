@@ -36,10 +36,8 @@
   // eslint-disable-next-line no-unused-vars
   const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
   const { value: infrastructure } = useField('infrastructure')
-  const { replace: replaceEdgeZoneOptions } = useFieldArray('edgeZoneOptions')
   const { setValue: setCommonName } = useField('letEncrypt.commonName')
   const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
-  const { value: letEncrypt } = useField('letEncrypt')
   const domainsOptions = ref([])
 
   const addNewDomain = () => {
@@ -66,8 +64,6 @@
         value: domain.id
       }
     })
-
-    replaceEdgeZoneOptions(domainsOptions.value)
   }
 
   const updateDomainSubdomain = (domainId, value) => {
@@ -123,7 +119,6 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
-      tes: {{ letEncrypt }}
       <div
         v-if="props.isEdit"
         class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"

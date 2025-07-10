@@ -182,7 +182,6 @@
       })
       .label('Custom Domain'),
     workloadHostnameAllowAccess: yup.boolean(),
-    edgeZoneOptions: yup.array(),
     letEncrypt: yup.object({
       commonName: yup.string(),
       alternativeNames: yup.array()
