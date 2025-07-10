@@ -8,12 +8,14 @@ const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
       address: address?.address,
       http_port: address?.plainPort,
       https_port: address?.tlsPort,
-      modules: loaderBalancerIsEnabled ? {
-        load_balancer: {
-          server_role: address?.serverRole,
-          weight: address?.weight
-        }
-      } : null
+      modules: loaderBalancerIsEnabled
+        ? {
+            load_balancer: {
+              server_role: address?.serverRole,
+              weight: address?.weight
+            }
+          }
+        : null
     }
   })
 }
@@ -51,34 +53,34 @@ const typeBuilders = {
         enabled: payload.modules.originShield.enabled,
         config: payload.modules.originShield.enabled
           ? {
-            origin_ip_acl: {
-              enabled: payload.modules.originShield.config.originIpAcl.enabled
-            },
-            hmac: {
-              enabled: payload.modules.originShield.config.hmac.enabled,
-              config: {
-                type: payload.modules.originShield.config.hmac.config.type,
-                attributes: {
-                  region: payload.modules.originShield.config.hmac.config.attributes.region,
-                  service: payload.modules.originShield.config.hmac.config.attributes.service,
-                  access_key:
-                    payload.modules.originShield.config.hmac.config.attributes.accessKey,
-                  secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
+              origin_ip_acl: {
+                enabled: payload.modules.originShield.config.originIpAcl.enabled
+              },
+              hmac: {
+                enabled: payload.modules.originShield.config.hmac.enabled,
+                config: {
+                  type: payload.modules.originShield.config.hmac.config.type,
+                  attributes: {
+                    region: payload.modules.originShield.config.hmac.config.attributes.region,
+                    service: payload.modules.originShield.config.hmac.config.attributes.service,
+                    access_key:
+                      payload.modules.originShield.config.hmac.config.attributes.accessKey,
+                    secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
+                  }
                 }
               }
             }
-          }
           : null
       },
       load_balancer: {
         enabled: payload.modules.loadBalancer.enabled,
         config: payload.modules.loadBalancer.enabled
           ? {
-            method: payload.modules.loadBalancer.config.method,
-            max_retries: payload.modules.loadBalancer.config.maxRetries,
-            connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
-            read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
-          }
+              method: payload.modules.loadBalancer.config.method,
+              max_retries: payload.modules.loadBalancer.config.maxRetries,
+              connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
+              read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
+            }
           : null
       }
     }
@@ -87,7 +89,10 @@ const typeBuilders = {
       payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
 
     const result = {
-      addresses: extractAddressesPostRequest(payload.addresses, payload.modules.loadBalancer.enabled),
+      addresses: extractAddressesPostRequest(
+        payload.addresses,
+        payload.modules.loadBalancer.enabled
+      ),
       connection_options: {
         dns_resolution: payload.connectionOptions.dnsResolution,
         transport_policy: payload.connectionOptions.transportPolicy,
@@ -177,10 +182,10 @@ export const EdgeConnectorsAdapter = {
           header: edgeConnectors?.type_properties?.real_port_header,
           address: edgeConnectors?.addresses
             ? edgeConnectors?.addresses
-              .map((el) => {
-                return el.address
-              })
-              .join(',')
+                .map((el) => {
+                  return el.address
+                })
+                .join(',')
             : [],
           active: edgeConnectors?.active
             ? parseStatusData(edgeConnectors.active)

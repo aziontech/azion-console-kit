@@ -75,18 +75,16 @@ const validationSchema = yup.object({
       })
     })
   }),
-  addresses: yup
-    .array()
-    .of(
-      yup.object({
-        address: yup.string().required('Address is a required field.'),
-        plainPort: yup.number(),
-        tlsPort: yup.number(),
-        serverRole: yup.string(),
-        weight: yup.number(),
-        active: yup.boolean()
-      })
-    )
+  addresses: yup.array().of(
+    yup.object({
+      address: yup.string().required('Address is a required field.'),
+      plainPort: yup.number(),
+      tlsPort: yup.number(),
+      serverRole: yup.string(),
+      weight: yup.number(),
+      active: yup.boolean()
+    })
+  )
 })
 
 export { validationSchema }
