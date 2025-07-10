@@ -30,7 +30,7 @@
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
       initiatorType: 'edge_application',
-      fields: ['id', 'name', 'json_args', 'initiator_type'],
+      fields: ['id', 'name', 'args', 'initiator_type'],
       ...queryParams
     })
   }
@@ -38,7 +38,7 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'json_args']
+      fields: ['id', 'name', 'args']
     })
   }
 
