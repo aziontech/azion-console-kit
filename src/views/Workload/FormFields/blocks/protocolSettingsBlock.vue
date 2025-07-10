@@ -67,7 +67,7 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type: 'edge_certificate',
-      fields: ['id,name,status,authority'],
+      fields: ['id,name,status,authority,type'],
       ...queryParams
     })
   }

@@ -100,6 +100,9 @@ import { WorkloadAdapter } from './adapters/workload-adapter'
 // Workload Deployment
 import { WorkloadDeploymentService } from './workload-deployments-service'
 import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapter'
+// Edge Storage
+import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
+import { EdgeStorageService } from './edge-storage-service'
 
 const httpService = createHttpService()
 
@@ -144,7 +147,7 @@ const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
 )
 const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
-
+const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
 const workloadDeploymentService = new WorkloadDeploymentService(
   httpService,
@@ -184,5 +187,6 @@ export {
   edgeDNSRecordsService,
   paymentService,
   workloadService,
-  workloadDeploymentService
+  workloadDeploymentService,
+  edgeStorageService
 }

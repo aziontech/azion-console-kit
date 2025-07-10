@@ -71,12 +71,12 @@ export const DigitalCertificatesAdapter = {
   },
 
   transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
-    let parsedDigitalCertificates = results?.map((item) => {
+    let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
         name: item.name,
-        status: item.status,
-        authority: item.authority
+        authority: item?.authority,
+        status: item?.status
       }
     })
 

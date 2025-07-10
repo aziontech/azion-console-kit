@@ -14,7 +14,7 @@
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
-      fields: ['id,name'],
+      fields: ['id,name, type'],
       type: 'trusted_ca_certificate',
       ...queryParams
     })
