@@ -59,7 +59,7 @@
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
     title="Infrastructure"
-    description="Select Global Edge Network to set this as a production workload or select Staging Network for a testing workload that won’t affect your production environment."
+    description="Select the infrastructure type for your workload. Once this option is saved, it cannot be modified."
   >
     <template #inputs>
       <div class="flex flex-col gap-3">
