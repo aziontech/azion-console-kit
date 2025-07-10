@@ -4,7 +4,6 @@
   import { useField } from 'vee-validate'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { computed } from 'vue'
-  // Blocks
   import BlocksDomains from './blocks/domainsBlock.vue'
   import BlocksDeploymentSettings from './blocks/deploymentSettingsBlock.vue'
   import BlocksProtocolSettings from './blocks/protocolSettingsBlock.vue'

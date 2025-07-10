@@ -24,6 +24,7 @@
 
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
+  const { value: authorityCertificate } = useField('authorityCertificate')
 
   useField('tls.certificate', { initialValue: 0 })
   useField('tls.ciphers', { initialValue: 'Modern_v2025Q1' })
@@ -66,9 +67,15 @@
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
       type: 'edge_certificate',
-      fields: ['id,name,status'],
+      fields: ['id,name,status,authority'],
       ...queryParams
     })
+  }
+
+  const moreOptions = ['authority']
+
+  const selectCertificate = (value) => {
+    authorityCertificate.value = value.authority
   }
 </script>
 <template>
@@ -134,6 +141,7 @@
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <fieldDropdownLazyLoaderWithFilter
+            ref="dropdownCertificate"
             data-testid="domains-form__edge-certificate-field"
             label="Digital Certificate"
             name="tls.certificate"
@@ -146,7 +154,9 @@
             placeholder="Select a certificate"
             enableCustomLabel
             keyToFilter="status"
+            :moreOptions="moreOptions"
             :valuesToFilter="['active', 'challenge_verification']"
+            @onSelectOption="selectCertificate"
           >
             <template #footer>
               <ul class="p-2">

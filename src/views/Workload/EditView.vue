@@ -152,7 +152,6 @@
             .string()
             .test('valid-domain', 'Invalid Domain format', function (value) {
               if (!value) return true // Allow empty domain
-              // Regex para validar domínio: deve conter letras/números, ponto e TLD
               return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/.test(value)
             })
             .label('Domain')
@@ -170,6 +169,7 @@
     useCustomDomain: yup.boolean(),
     customDomain: yup
       .string()
+      .nullable()
       .when('useCustomDomain', {
         is: true,
         then: (schema) =>
@@ -185,6 +185,7 @@
     letEncrypt: yup.object({
       commonName: yup.string(),
       alternativeNames: yup.array()
-    })
+    }),
+    authorityCertificate: yup.string()
   })
 </script>

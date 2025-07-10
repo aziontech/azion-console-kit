@@ -75,7 +75,8 @@ export const DigitalCertificatesAdapter = {
       return {
         id: item.id,
         name: item.name,
-        status: item.status
+        status: item.status,
+        authority: item.authority
       }
     })
 
@@ -114,7 +115,8 @@ export const DigitalCertificatesAdapter = {
       status,
       certificate_type,
       certificate_content,
-      certificate
+      certificate,
+      authority
     } = data
 
     return {
@@ -129,7 +131,8 @@ export const DigitalCertificatesAdapter = {
       status,
       certificateType: certificate_type,
       certificateContent: certificate_content,
-      certificate
+      certificate,
+      authority
     }
   },
 

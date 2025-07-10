@@ -79,7 +79,7 @@ export class DigitalCertificatesService {
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'csr', 'managed', 'certificate']
+    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate']
 
     const { data } = await this.http.request({
       method: 'GET',

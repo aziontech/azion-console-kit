@@ -23,12 +23,9 @@ const extractAzionAppSubdomain = (rawDomains) => {
       const match = item.match(/^(.+?)\.(.+)$/) || []
       const subdomain = match[1] || ''
       const domain = match[2] || item
-
       if (domain === 'azion.app') {
-        // guarda apenas o subdomínio
         acc.azionAppSubdomain = subdomain
       } else {
-        // empurra os demais parsed
         acc.domains.push({ subdomain, domain })
       }
 

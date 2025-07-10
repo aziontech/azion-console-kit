@@ -65,7 +65,6 @@
     'active',
     'last_modified',
     'id',
-    // 'protocols',
     'last_editor',
     'product_version',
     'workload_domain'
@@ -75,19 +74,12 @@
 
   const hasContentToList = ref(true)
 
-  const deleteWorkloas = (id, name) => {
-    return {
-      id,
-      name
-    }
-  }
-
   const actions = [
     {
       type: 'delete',
       title: 'domain',
       icon: 'pi pi-trash',
-      service: deleteWorkloas
+      service: workloadService.deleteWorkload
     }
   ]
 

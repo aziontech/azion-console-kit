@@ -89,7 +89,9 @@
     })
   }
 
-  const disabledCustomDomain = computed(() => infrastructure.value === '2')
+  const stagingInfrastructure = '2'
+
+  const disabledCustomDomain = computed(() => infrastructure.value === stagingInfrastructure)
 
   watch(disabledCustomDomain, (isDisabled) => {
     if (isDisabled) {
@@ -97,6 +99,7 @@
     }
   })
 
+  const hasMultipleDomains = computed(() => domainsList.value.length !== 1)
   const handleLetEncrypt = () => {
     if (!domains.value?.length) return
 
@@ -203,7 +206,7 @@
             </div>
 
             <PrimeButton
-              v-if="domainsList.length !== 1"
+              v-if="hasMultipleDomains"
               @click="removeDomain(index)"
               icon="pi pi-trash"
               class="p-button-outlined p-button-sm p-button-danger"

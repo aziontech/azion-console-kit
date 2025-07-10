@@ -1,4 +1,4 @@
-import { parseStatusData, parseDefaultData } from '../utils/adapter/parse-status-utils'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
@@ -33,8 +33,7 @@ const transformMap = {
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
   lastModified: (value) => value.last_modified,
-  active: (value) => parseStatusData(value.active),
-  default: (value) => parseDefaultData(value?.default)
+  active: (value) => parseStatusData(value.active)
 }
 
 export const CustomPageAdapter = {

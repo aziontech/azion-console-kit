@@ -155,14 +155,6 @@ function createEdgeLibrariesItems() {
       id: 'edge-services'
     },
     {
-      label: 'Custom Pages',
-      to: '/custom-pages',
-      icon: 'ai ai-custom-pages',
-      id: 'custom-pages',
-      tag: 'Preview',
-      visible: !hasFlagBlockApiV4()
-    },
-    {
       label: 'Digital Certificates',
       to: '/digital-certificates',
       icon: 'ai ai-digital-certificates',

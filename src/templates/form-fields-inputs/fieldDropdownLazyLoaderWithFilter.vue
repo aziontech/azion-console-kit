@@ -443,6 +443,11 @@
 
     if (!existitemInList) {
       loadSelectedValue(value)
+    } else {
+      const selectedOption = data.value.find(
+        (option) => option[props.optionValue] === inputValue.value
+      )
+      emit('onSelectOption', selectedOption)
     }
   }
 </script>

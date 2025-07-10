@@ -121,7 +121,8 @@
     'last_editor',
     'last_modified',
     'last_modify',
-    'product_version'
+    'product_version',
+    'active'
   ]
 </script>
 
