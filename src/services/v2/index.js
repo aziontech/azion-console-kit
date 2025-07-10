@@ -93,6 +93,10 @@ import { EdgeDNSRecordsService } from './edge-dns-records-service'
 import { PaymentService } from './payment-service'
 import { PaymentAdapter } from './adapters/payment-adapter'
 
+// Edge Storage
+import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
+import { EdgeStorageService } from './edge-storage-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -136,7 +140,7 @@ const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
 )
 const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
-
+const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
 
 export {
@@ -163,5 +167,6 @@ export {
   digitalCertificatesCRService,
   edgeDNSService,
   edgeDNSRecordsService,
-  paymentService
+  paymentService,
+  edgeStorageService
 }
