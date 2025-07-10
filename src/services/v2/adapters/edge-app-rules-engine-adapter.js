@@ -10,30 +10,31 @@ export const RulesEngineAdapter = {
       false: { content: 'Inactive', severity: 'danger' }
     }
 
-    const response = data?.map((rule, index) => ({
-      id: rule.id,
-      stringId: rule.id?.toString(),
-      name: rule.name,
-      phase: {
-        content: capitalizeFirstLetter(phase),
-        outlined: true,
-        severity: 'info'
-      },
-      behaviors: rule.behaviors,
-      criteria: rule.criteria,
-      status: statusMap[rule.active],
-      position: {
-        value: index,
-        immutableValue: index,
-        altered: false,
-        min: 0,
-        max: data.length - 1,
-        phase: phase
-      },
-      description: rule.description || '-',
-      lastEditor: rule.last_editor || '-',
-      lastModified: formatExhibitionDate(rule.last_modified, 'full')
-    })) || []
+    const response =
+      data?.map((rule, index) => ({
+        id: rule.id,
+        stringId: rule.id?.toString(),
+        name: rule.name,
+        phase: {
+          content: capitalizeFirstLetter(phase),
+          outlined: true,
+          severity: 'info'
+        },
+        behaviors: rule.behaviors,
+        criteria: rule.criteria,
+        status: statusMap[rule.active],
+        position: {
+          value: index,
+          immutableValue: index,
+          altered: false,
+          min: 0,
+          max: data.length - 1,
+          phase: phase
+        },
+        description: rule.description || '-',
+        lastEditor: rule.last_editor || '-',
+        lastModified: formatExhibitionDate(rule.last_modified, 'full')
+      })) || []
 
     return response
   },

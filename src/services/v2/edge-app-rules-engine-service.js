@@ -109,8 +109,16 @@ export class RulesEngineService {
   }
 
   async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, ...params }) {
-    const { count, body } = await this.listRulesEngine({ edgeApplicationId, phase: 'request', ...params })
-    const { count: countResponse, body: bodyResponse } = await this.listRulesEngine({ edgeApplicationId, phase: 'response', ...params })
+    const { count, body } = await this.listRulesEngine({
+      edgeApplicationId,
+      phase: 'request',
+      ...params
+    })
+    const { count: countResponse, body: bodyResponse } = await this.listRulesEngine({
+      edgeApplicationId,
+      phase: 'response',
+      ...params
+    })
 
     const data = {
       count: count + countResponse,
