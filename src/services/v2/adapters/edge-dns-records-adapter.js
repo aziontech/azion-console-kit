@@ -27,7 +27,7 @@ export const EdgeDNSRecordsAdapter = {
       ...adapt,
       selectedPolicy: adapt.policy,
       selectedRecordType: adapt.type,
-      value: adapt.rdata?.[0]
+      value: adapt.rdata.join('\n')
     }
     return dataWithValue
   },
