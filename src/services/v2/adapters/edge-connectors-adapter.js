@@ -45,27 +45,8 @@ const typeBuilders = {
     }
   }),
 
-  http: (payload) => ({
-    address: !payload.modules.loadBalancer.enabled
-      ? {
-          address: payload.address.address,
-          plain_port: payload.address.plainPort,
-          tls_port: payload.address.tlsPort
-        }
-      : null,
-    addresses: payload.modules.loadBalancer.enabled
-      ? extractAddressesPostRequest(payload.addresses)
-      : [],
-    connection_options: {
-      dns_resolution: payload.connectionOptions.dnsResolution,
-      transport_policy: payload.connectionOptions.transportPolicy,
-      host: payload.connectionOptions.host,
-      path_prefix: payload.connectionOptions.pathPrefix,
-      following_redirect: payload.connectionOptions.followingRedirect,
-      real_ip_header: payload.connectionOptions.realIpHeader,
-      real_port_header: payload.connectionOptions.realPortHeader
-    },
-    modules: {
+  http: (payload) => {
+    const modules = {
       origin_shield: {
         enabled: payload.modules.originShield.enabled,
         config: payload.modules.originShield.enabled
@@ -101,7 +82,38 @@ const typeBuilders = {
           : null
       }
     }
-  })
+
+    const shouldSendModules =
+      payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
+
+    const result = {
+      addresses: payload.modules.loadBalancer.enabled
+        ? extractAddressesPostRequest(payload.addresses)
+        : [
+            {
+              address: payload.address.address,
+              plain_port: payload.address.plainPort,
+              tls_port: payload.address.tlsPort,
+              active: true
+            }
+          ],
+      connection_options: {
+        dns_resolution: payload.connectionOptions.dnsResolution,
+        transport_policy: payload.connectionOptions.transportPolicy,
+        host: payload.connectionOptions.host,
+        path_prefix: payload.connectionOptions.pathPrefix,
+        following_redirect: payload.connectionOptions.followingRedirect,
+        real_ip_header: payload.connectionOptions.realIpHeader,
+        real_port_header: payload.connectionOptions.realPortHeader
+      }
+    }
+
+    if (shouldSendModules) {
+      result.modules = modules
+    }
+
+    return result
+  }
 }
 
 const typeBuildersLoadRequest = {

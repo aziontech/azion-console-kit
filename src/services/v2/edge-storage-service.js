@@ -14,7 +14,7 @@ export class EdgeStorageService {
         fields: '',
         ordering: 'name',
         page: 1,
-        pageSize: 10,
+        pageSize: 100,
         ...params
       }
     })
