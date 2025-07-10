@@ -7,7 +7,7 @@
   import PrimeButton from 'primevue/button'
   import { edgeDNSService } from '@/services/v2'
   import LabelBlock from '@/templates/label-block'
-
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
   import { useField } from 'vee-validate'
   import { watch, ref } from 'vue'
 
@@ -186,7 +186,7 @@
           v-for="(entry, index) in dnssecData"
           :key="index"
         >
-          <div class="flex-1">
+          <div class="flex-1 sm:max-w-xs">
             <FieldTextIcon
               class="w-full"
               :label="entry.label"
@@ -200,18 +200,9 @@
             />
           </div>
           <div :class="entry.name === 'key-tag' || entry.name === 'digest' ? 'mb-6' : ''">
-            <PrimeButton
-              @click="handleCopy(entry.value)"
-              :data-testid="`edge-dns-form__${entry.name}-button`"
-              size="small"
-              icon="pi pi-copy"
-              outlined
-              severity="primary"
-              :pt="{
-                label: { class: 'w-full text-left' },
-                root: { class: 'p-2' }
-              }"
+            <copyBlock
               label="Copy to Clipboard"
+              @copy="handleCopy(entry.value)"
               :disabled="entry.disabledCopyButton"
             />
           </div>

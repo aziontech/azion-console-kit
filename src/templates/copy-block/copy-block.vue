@@ -5,46 +5,52 @@
       outlined
       data-testid="copy-block__copy-button"
       type="button"
-      :aria-label="labelButton"
-      :label="labelButton"
-      @click="copy"
+      :aria-label="labelText"
+      :label="labelText"
+      :disabled="disabled"
+      @click="animate"
       class="text-sm"
+      style="font-size: 14px"
     />
   </div>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed, onBeforeUnmount } from 'vue'
   import PrimeButton from 'primevue/button'
   const emit = defineEmits(['copy'])
-  const icon = ref('pi pi-clone')
 
   const props = defineProps({
     label: {
       type: String
+    },
+    disabled: {
+      type: Boolean
     }
   })
+  const copied = ref(false)
+  let timeoutId = null
 
-  const labelButton = ref(props.label)
+  const icon = computed(() => (copied.value ? 'pi pi-check' : 'pi pi-copy'))
 
-  const copy = () => {
+  const labelText = computed(() => {
+    if (!props.label) return ''
+    return copied.value ? 'Copied' : props.label
+  })
+
+  function animate() {
+    copied.value = true
     emit('copy')
-    animation()
+
+    if (timeoutId) clearTimeout(timeoutId)
+
+    timeoutId = setTimeout(() => {
+      copied.value = false
+      timeoutId = null
+    }, 2000)
   }
 
-  const animation = () => {
-    if (props.label) {
-      icon.value = 'pi pi-check'
-      labelButton.value = 'Copied'
-      setTimeout(() => {
-        icon.value = 'pi pi-clone'
-        labelButton.value = props.label
-      }, 2000)
-    } else {
-      icon.value = 'pi pi-check'
-      setTimeout(() => {
-        icon.value = 'pi pi-clone'
-      }, 2000)
-    }
-  }
+  onBeforeUnmount(() => {
+    if (timeoutId) clearTimeout(timeoutId)
+  })
 </script>
