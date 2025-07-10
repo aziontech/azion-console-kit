@@ -27,6 +27,15 @@ export const DigitalCertificatesCRLAdapter = {
     return formattedResults
   },
 
+  transformListDigitalCertificatesCRLDropwdown(data) {
+    return data?.map((item) => {
+      return {
+        id: checkIfFieldExist(item?.id, null),
+        name: checkIfFieldExist(item?.name)
+      }
+    })
+  },
+
   transformLoadDigitalCertificateCRL({ data }) {
     return {
       id: data?.id,

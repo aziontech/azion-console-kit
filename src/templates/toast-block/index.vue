@@ -48,8 +48,10 @@
             :data-testid="handleDataTestIdInItem(message, 'secondary')"
             outlined
             size="small"
-            :label="message.action.secondary.label"
+            :icon="getButtonIcon(message.action.secondary)"
+            :label="getButtonLabel(message.action.secondary)"
             @click="handleClick(message, 'secondary')"
+            :disabled="isButtonAnimating(message.action.secondary)"
           />
           <PrimeButton
             severity="secondary"
@@ -69,6 +71,7 @@
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
+  import { reactive } from 'vue'
 
   defineOptions({ name: 'ToastBlock' })
 
@@ -77,6 +80,8 @@
     SUMMARY: 100,
     DETAIL: 125
   }
+
+  const animatingButtons = reactive(new Map())
 
   const toastOptions = {
     root: {
@@ -209,7 +214,57 @@
     return parser[severity] || 'pi pi-check text-xs'
   }
 
+  const getButtonKey = (action) => {
+    return `${action.label}-${action.animation?.time || 'default'}`
+  }
+
+  const isButtonAnimating = (action) => {
+    if (!action.animation) return false
+    return animatingButtons.has(getButtonKey(action))
+  }
+
+  const getButtonIcon = (action) => {
+    if (!action.animation) return action.icon || null
+
+    const buttonKey = getButtonKey(action)
+    const isAnimating = animatingButtons.has(buttonKey)
+
+    if (isAnimating) {
+      return action.animation.icon
+    }
+
+    return action.icon || null
+  }
+
+  const getButtonLabel = (action) => {
+    if (!action.animation) return action.label
+
+    const buttonKey = getButtonKey(action)
+    const isAnimating = animatingButtons.has(buttonKey)
+
+    if (isAnimating) {
+      return action.animation.label
+    }
+
+    return action.label
+  }
+
+  const startButtonAnimation = (action) => {
+    if (!action.animation) return
+
+    const buttonKey = getButtonKey(action)
+    animatingButtons.set(buttonKey, true)
+
+    setTimeout(() => {
+      animatingButtons.delete(buttonKey)
+    }, action.animation.time)
+  }
+
   const handleClick = (message, action) => {
-    message.action[action].callback()
+    const actionData = message.action[action]
+    if (actionData.animation) {
+      startButtonAnimation(actionData)
+    }
+    actionData.callback()
   }
 </script>

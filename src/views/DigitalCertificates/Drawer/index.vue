@@ -73,7 +73,7 @@
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
     handleToast(response)
-    emit('onSuccess', response.data.id)
+    emit('onSuccess', { type: certificateType.value, id: response.data.id })
     closeCreateDrawer()
   }
 
@@ -93,9 +93,14 @@
     { immediate: true }
   )
 
+  const changeCertificateType = (certificate) => {
+    certificateType.value = certificate
+  }
+
   defineExpose({
     showCreateDrawer,
-    openCreateDrawer
+    openCreateDrawer,
+    changeCertificateType
   })
 </script>
 

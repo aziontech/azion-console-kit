@@ -50,7 +50,7 @@
       </span>
     </template>
     <template #option="slotProps">
-      <div class="flex align-items-center">
+      <div class="flex align-items-center gap-2">
         <i
           v-if="slotProps.option.icon"
           :class="`pi ${slotProps.option.icon}`"
@@ -167,6 +167,14 @@
     disableEmitFirstRender: {
       type: Boolean,
       default: false
+    },
+    keyToFilter: {
+      type: String,
+      default: ''
+    },
+    valuesToFilter: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -181,7 +189,7 @@
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
   const PERMISSION_DENIED = 'You do not have permission'
   const hasNoPermission = ref(false)
-
+  const notRequest = ref(false)
   const name = toRef(props, 'name')
   const slots = useSlots()
   const data = ref([])
@@ -203,12 +211,16 @@
 
   const handleLazyLoad = async (event) => {
     const { last } = event
-    const numberOfPage = Math.ceil(totalCount.value / PAGE_SIZE)
-    const goRequest = last >= data.value?.length
 
-    if (page.value < numberOfPage && goRequest && !loading.value) {
-      page.value += PAGE_INCREMENT
-      await fetchData(page.value)
+    if (!notRequest.value && last >= data.value?.length) {
+      try {
+        page.value += PAGE_INCREMENT
+        await fetchData(page.value)
+      } catch (error) {
+        notRequest.value = true
+      } finally {
+        loading.value = false
+      }
     }
   }
 
@@ -241,6 +253,26 @@
     ]
   }
 
+  const filterData = (result) => {
+    const filteredData = result.filter((item) =>
+      props.valuesToFilter.includes(item[props.keyToFilter])
+    )
+    return filteredData.map((item) => {
+      return {
+        [props.optionLabel]: item.name,
+        [props.optionValue]: item.id,
+        icon: item?.icon,
+        ...props?.moreOptions?.reduce(
+          (additionalFields, option) => ({
+            ...additionalFields,
+            [option]: item[option]
+          }),
+          {}
+        )
+      }
+    })
+  }
+
   /**
    * Workaround to resolve the issue described in https://github.com/primefaces/primevue/issues/4431
    * This should be remove from this field component as soon as the
@@ -270,19 +302,7 @@
       })
 
       totalCount.value = response.count
-      let results = response.body?.map((item) => {
-        return {
-          [props.optionLabel]: item.name,
-          [props.optionValue]: item.id,
-          ...props?.moreOptions?.reduce(
-            (additionalFields, option) => ({
-              ...additionalFields,
-              [option]: item[option]
-            }),
-            {}
-          )
-        }
-      })
+      let results = filterData(response.body)
 
       if (currentPage === INITIAL_PAGE) {
         data.value = results ? results : []
@@ -307,6 +327,7 @@
         preventValueSetWithoutPermission()
       }
       emit('onAccessDenied')
+      throw error(error)
     } finally {
       loading.value = false
     }
@@ -422,6 +443,11 @@
 
     if (!existitemInList) {
       loadSelectedValue(value)
+    } else {
+      const selectedOption = data.value.find(
+        (option) => option[props.optionValue] === inputValue.value
+      )
+      emit('onSelectOption', selectedOption)
     }
   }
 </script>
