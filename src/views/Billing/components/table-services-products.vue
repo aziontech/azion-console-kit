@@ -11,7 +11,7 @@
     groupRowsBy="region"
     class="w-full sm:w-1/2 h-fit"
     :pt="{
-      thead: { class: 'hidden' }, 
+      thead: { class: 'hidden' },
       rowexpansioncell: 'p-0'
     }"
   >

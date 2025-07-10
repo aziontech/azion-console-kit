@@ -295,7 +295,7 @@
         tab: 'payment'
       }
     }
-    
+
     router.push(routerPayment)
   }
 </script>

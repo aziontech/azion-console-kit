@@ -211,17 +211,19 @@ const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
 }
 
 const mapProducts = (products, metricsGrouped, regionMetricsGrouped) => {
-  return products.map((product) => {
-    const service = PRODUCT_NAMES[product.productSlug]
-    if (!service) return null
-    return {
-      service,
-      value: formatCurrencyString(product.currency, product.value),
-      slug: product.productSlug,
-      currency: product.currency,
-      descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
-    }
-  }).filter(Boolean)
+  return products
+    .map((product) => {
+      const service = PRODUCT_NAMES[product.productSlug]
+      if (!service) return null
+      return {
+        service,
+        value: formatCurrencyString(product.currency, product.value),
+        slug: product.productSlug,
+        currency: product.currency,
+        descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
+      }
+    })
+    .filter(Boolean)
 }
 
 const adapt = ({ body, statusCode }) => {

@@ -307,7 +307,7 @@
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
   const listPaymentHistoryRef = ref('')
-  
+
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }

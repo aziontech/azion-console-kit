@@ -1,10 +1,10 @@
 <template>
   <SkeletonBlock
-    v-if="!showNotification"
+    v-if="!showNotification && loadingNotification"
     class="w-full h-5rem"
   />
   <MessageNotification
-    v-else
+    v-else-if="showNotification"
     :title="notificationPayment.title"
     :typeMessage="notificationPayment.type"
     :buttons="actionsButtons"
@@ -38,6 +38,7 @@
   const { status } = accountData
 
   const showNotification = ref(false)
+  const loadingNotification = ref(false)
 
   const props = defineProps({
     disabledCredit: {
@@ -114,12 +115,21 @@
   }
 
   const loadText = async () => {
+    loadingNotification.value = true
     try {
-      if (!accountIsNotRegular) return
+      if (!accountIsNotRegular) {
+        loadingNotification.value = false
+        showNotification.value = false
+        return
+      }
 
       if (status === 'TRIAL' || status === 'ONLINE') {
         const { credit, days, formatCredit } = await billingGqlService.getCreditAndExpirationDate()
-        if (!(credit > 0 && days > 0)) return
+        if (!(credit > 0 && days > 0)) {
+          loadingNotification.value = false
+          showNotification.value = false
+          return
+        }
         notificationPayment.value = {
           ...NOTIFICATION_CONFIGS.TRIAL,
           description: NOTIFICATION_CONFIGS.TRIAL.getDescription(formatCredit, days)
@@ -131,10 +141,11 @@
           description: NOTIFICATION_CONFIGS[status].getDescription(total)
         }
       }
-
+      loadingNotification.value = false
       showNotification.value = true
     } catch {
       showNotification.value = false
+      loadingNotification.value = false
     }
   }
 

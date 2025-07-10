@@ -79,7 +79,10 @@ export class BillingGqlService {
     if (!amount || !days) return {}
 
     const { data: lastBill } = await this.#getLastBill(lastRecordGenerationDate)
-    const { credit, formatCredit } = this.adapter.transformMessageCreditAndExpirationDate(lastBill.bill, amount)
+    const { credit, formatCredit } = this.adapter.transformMessageCreditAndExpirationDate(
+      lastBill.bill,
+      amount
+    )
 
     return {
       credit,
