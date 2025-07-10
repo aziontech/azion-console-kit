@@ -87,18 +87,6 @@ const validationSchema = yup.object({
         active: yup.boolean()
       })
     )
-    .when(['modules.loadBalancer.enabled'], ([isLoadBalancerEnabled], schema) => {
-      return isLoadBalancerEnabled ? schema.required() : schema.strip()
-    }),
-  address: yup
-    .object({
-      address: yup.string().required('Address is a required field.'),
-      tlsPort: yup.number(),
-      plainPort: yup.number()
-    })
-    .when(['modules.loadBalancer.enabled', 'type'], ([isLoadBalancerEnabled, type], schema) => {
-      return !isLoadBalancerEnabled && type === 'http' ? schema.required() : schema.strip()
-    })
 })
 
 export { validationSchema }

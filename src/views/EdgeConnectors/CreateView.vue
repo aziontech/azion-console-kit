@@ -84,12 +84,16 @@
         }
       }
     },
-    addresses: [],
-    address: {
-      address: '',
-      tlsPort: 80,
-      plainPort: 80
-    }
+    addresses: [
+      {
+        address: '',
+        plainPort: 80,
+        tlsPort: 443,
+        serverRole: 'primary',
+        weight: 1,
+        active: true
+      }
+    ]
   }
 
   const handleToast = (response) => {
