@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="`w-full p-6 rounded-lg flex flex-col gap-4 justify-between items-center sm:flex-row ${messageStyle.messageBg}`"
+    :class="`w-full p-6 rounded-lg flex max-md:flex-col gap-4 justify-between items-center flex-row ${messageStyle.messageBg}`"
   >
     <div class="flex gap-3 items-center">
       <div
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div
-      class="flex gap-3 sm:flex-row flex-col"
+      class="flex gap-3 sm:flex-row max-md:w-full flex-col"
       v-if="hasButtons"
     >
       <slot name="actions">

@@ -91,7 +91,7 @@ const PRODUCT_NAMES = {
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',
-  real_time_events: 'Real-Time Events',
+  realtime_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
@@ -146,8 +146,10 @@ const mapProducts = (productsGrouped, productsGroupedByRegion) => {
         productsGroupedByRegion
       )
     } else {
+      const service = PRODUCT_NAMES[product.productSlug]
+      if (!service) return
       uniqueProducts.push({
-        service: PRODUCT_NAMES[product.productSlug],
+        service,
         value: 0,
         slug: product.productSlug,
         currency: 0,

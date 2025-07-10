@@ -190,6 +190,28 @@ const convertValueToDateByUserTimezone = (value, timezone) => {
   return date.toLocaleString('en-US', options)
 }
 
+/**
+ * Calculate remaining days between today and expiration date
+ * @param {string} dateStr - Date string in YYYY-MM-DD format
+ * @returns {number} Number of days remaining including today
+ */
+function getRemainingDays(dateStr) {
+  if (!dateStr || isNaN(Date.parse(dateStr))) return 0
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const expirationDate = new Date(year, month - 1, day)
+  expirationDate.setHours(0, 0, 0, 0)
+
+  const diffMs = expirationDate - today
+  if (diffMs < 0) return 0
+
+  const days = diffMs / (1000 * 60 * 60 * 24) + 1
+  return Math.floor(days)
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -200,5 +222,6 @@ export {
   formatExhibitionDate,
   formatDateToMonthYear,
   convertValueToDateByUserTimezone,
-  formatDateToDayMonthYearHour
+  formatDateToDayMonthYearHour,
+  getRemainingDays
 }

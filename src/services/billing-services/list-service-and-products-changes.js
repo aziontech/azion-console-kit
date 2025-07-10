@@ -135,7 +135,7 @@ const PRODUCT_NAMES = {
   web_application_firewall: 'Web Application Firewall',
   live_ingest: 'Live Ingest',
   data_stream: 'Data Stream',
-  real_time_events: 'Real-Time Events',
+  realtime_events: 'Real-Time Events',
   edge_dns: 'Edge DNS',
   ddos_protection_20gbps: 'DDoS Protection 20Gbps',
   ddos_protection_50gbps: 'DDoS Protection 50Gbps',
@@ -211,13 +211,17 @@ const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
 }
 
 const mapProducts = (products, metricsGrouped, regionMetricsGrouped) => {
-  return products.map((product) => ({
-    service: PRODUCT_NAMES[product.productSlug],
-    value: formatCurrencyString(product.currency, product.value),
-    slug: product.productSlug,
-    currency: product.currency,
-    descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
-  }))
+  return products.map((product) => {
+    const service = PRODUCT_NAMES[product.productSlug]
+    if (!service) return null
+    return {
+      service,
+      value: formatCurrencyString(product.currency, product.value),
+      slug: product.productSlug,
+      currency: product.currency,
+      descriptions: mapDescriptions(product, metricsGrouped, regionMetricsGrouped)
+    }
+  }).filter(Boolean)
 }
 
 const adapt = ({ body, statusCode }) => {

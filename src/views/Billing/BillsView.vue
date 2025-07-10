@@ -13,7 +13,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
-            :disabled="!currentInvoice.billId"
+            :disabled="disabledCurrentInvoice"
           />
         </div>
         <div class="flex justify-between mt-4">
@@ -297,6 +297,7 @@
   })
 
   const currentInvoice = ref({})
+  const disabledCurrentInvoice = ref(true)
 
   const defaultCardStatus = computed(() => ({
     loaded: props.cardDefault.loader,
@@ -306,7 +307,7 @@
   const isCurrentInvoiceLoaded = ref(true)
   const isYourServicePlanLoaded = ref(true)
   const listPaymentHistoryRef = ref('')
-
+  
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
@@ -315,6 +316,7 @@
     isCurrentInvoiceLoaded.value = false
     try {
       currentInvoice.value = await props.loadCurrentInvoiceService()
+      disabledCurrentInvoice.value = !currentInvoice.value.redirectId
     } finally {
       isCurrentInvoiceLoaded.value = true
     }
@@ -426,7 +428,7 @@
         },
         {
           field: 'amount',
-          header: 'Amount'
+          header: 'Transactions Amount'
         },
         {
           field: 'status',

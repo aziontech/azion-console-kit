@@ -1,12 +1,17 @@
 <template>
+  <SkeletonBlock
+    v-if="props.isLoading"
+    class="w-full sm:w-1/2 h-[200px]"
+  />
   <DataTable
+    v-else
     v-model:expandedRows="expandedRows"
     :value="props.listProduct"
     rowGroupMode="subheader"
     groupRowsBy="region"
     class="w-full sm:w-1/2 h-fit"
     :pt="{
-      thead: { class: 'hidden' },
+      thead: { class: 'hidden' }, 
       rowexpansioncell: 'p-0'
     }"
   >
@@ -71,6 +76,7 @@
   import { ref } from 'vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
+  import SkeletonBlock from '@/templates/skeleton-block'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
@@ -86,6 +92,10 @@
     listProduct: {
       type: Array,
       required: true
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   })
 

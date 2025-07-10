@@ -92,6 +92,10 @@ import { EdgeDNSRecordsService } from './edge-dns-records-service'
 import { PaymentService } from './payment-service'
 import { PaymentAdapter } from './adapters/payment-adapter'
 
+// Billing GQL
+import { BillingGqlService } from './billing-gql-service'
+import { BillingGqlAdapter } from './adapters/billing-gql-adapter'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -135,6 +139,8 @@ const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSReco
 
 const paymentService = new PaymentService(httpService, PaymentAdapter)
 
+const billingGqlService = new BillingGqlService(httpService, BillingGqlAdapter)
+
 export {
   vcsService,
   cacheSettingsService,
@@ -159,5 +165,6 @@ export {
   digitalCertificatesCRService,
   edgeDNSService,
   edgeDNSRecordsService,
-  paymentService
+  paymentService,
+  billingGqlService
 }

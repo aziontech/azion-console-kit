@@ -56,14 +56,15 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2'
-  import { useBillingDrawers } from '@/composables/use-billing-drawers'
 
   import { ref } from 'vue'
-  const emit = defineEmits(['update-credit-event'])
+  const emit = defineEmits([
+    'update-credit-event',
+    'openDrawerAddCredit',
+    'openDrawerAddPaymentMethod'
+  ])
   const hasContentToList = ref(true)
   const toast = useToast()
-
-  const { openDrawerAddCredit, openDrawerPaymentMethod } = useBillingDrawers()
 
   const props = defineProps({
     documentPaymentMethodService: {
@@ -92,8 +93,12 @@
 
   const openDrawerAddCreditWithValidation = () => {
     if (props.cardDefault.cardData) {
-      openDrawerAddCredit()
+      emit('openDrawerAddCredit')
     }
+  }
+
+  const openDrawerPaymentMethod = () => {
+    emit('openDrawerAddPaymentMethod')
   }
 
   const API_FIELDS = [
@@ -157,7 +162,11 @@
       emit('update-credit-event')
       reloadList()
     } catch (error) {
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     }
   }
 
