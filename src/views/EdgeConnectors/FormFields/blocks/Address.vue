@@ -154,8 +154,8 @@
                 label="Address"
                 required
                 description="IPv4/IPv6 address or CNAME to resolve."
-                name="address.address"
-                :value="address"
+                :name="`addresses[${0}].address`"
+                :value="addresses[0]?.value.address"
                 placeholder=""
                 data-testid="edge-connectors-form__address-management__address-field"
               />
@@ -165,8 +165,8 @@
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
                   label="Plain Port"
-                  name="address.plainPort"
-                  :value="plainPort"
+                  :name="`addresses[${0}]?.plainPort`"
+                  :value="addresses[0]?.value.plainPort"
                   description=""
                   data-testid="edge-connectors-form__address-management__plain-port-field"
                 />
@@ -175,8 +175,8 @@
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
                   label="TLS Port"
-                  name="address.tlsPort"
-                  :value="tlsPort"
+                  :name="`addresses[${0}]?.tlsPort`"
+                  :value="addresses[0]?.value.tlsPort"
                   description=""
                   data-testid="edge-connectors-form__address-management__tls-port-field"
                 />
@@ -194,7 +194,7 @@
           size="small"
           outlined
           :disabled="!isLoadBalancerEnabled"
-          @click="addNewAddress"
+          @click="addNewAddress('click')"
         />
 
         <div
@@ -227,10 +227,6 @@
   import { computed, watch, ref } from 'vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsAddress' })
-
-  const { value: address } = useField('address.address')
-  const { value: plainPort } = useField('address.plainPort')
-  const { value: tlsPort } = useField('address.tlsPort')
 
   const { fields: addresses, push: pushAddress, remove: removeAddress } = useFieldArray('addresses')
 

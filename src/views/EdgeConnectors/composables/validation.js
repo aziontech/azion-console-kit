@@ -75,30 +75,16 @@ const validationSchema = yup.object({
       })
     })
   }),
-  addresses: yup
-    .array()
-    .of(
-      yup.object({
-        address: yup.string().required('Address is a required field.'),
-        plainPort: yup.number(),
-        tlsPort: yup.number(),
-        serverRole: yup.string(),
-        weight: yup.number(),
-        active: yup.boolean()
-      })
-    )
-    .when(['modules.loadBalancer.enabled'], ([isLoadBalancerEnabled], schema) => {
-      return isLoadBalancerEnabled ? schema.required() : schema.strip()
-    }),
-  address: yup
-    .object({
+  addresses: yup.array().of(
+    yup.object({
       address: yup.string().required('Address is a required field.'),
+      plainPort: yup.number(),
       tlsPort: yup.number(),
-      plainPort: yup.number()
+      serverRole: yup.string(),
+      weight: yup.number(),
+      active: yup.boolean()
     })
-    .when(['modules.loadBalancer.enabled', 'type'], ([isLoadBalancerEnabled, type], schema) => {
-      return !isLoadBalancerEnabled && type === 'http' ? schema.required() : schema.strip()
-    })
+  )
 })
 
 export { validationSchema }

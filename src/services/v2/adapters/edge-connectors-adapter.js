@@ -1,19 +1,21 @@
 import { getCurrentTimezone } from '@/helpers'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
-const extractAddressesPostRequest = (addresses) => {
+const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
   return addresses.map((address) => {
     return {
-      active: address.active,
-      address: address.address,
-      http_port: address.plainPort,
-      https_port: address.tlsPort,
-      modules: {
-        load_balancer: {
-          server_role: address.serverRole,
-          weight: address.weight
-        }
-      }
+      active: address?.active,
+      address: address?.address,
+      http_port: address?.plainPort,
+      https_port: address?.tlsPort,
+      modules: loaderBalancerIsEnabled
+        ? {
+            load_balancer: {
+              server_role: address?.serverRole,
+              weight: address?.weight
+            }
+          }
+        : null
     }
   })
 }
@@ -23,10 +25,10 @@ const extractAddressesLoadRequest = (addresses) => {
     return {
       active: address.active,
       address: address.address,
-      plainPort: address.plain_port,
-      tlsPort: address.tls_port,
-      serverRole: address.server_role,
-      weight: address.weight
+      plainPort: address.http_port,
+      tlsPort: address.https_port,
+      serverRole: address.modules?.load_balancer?.server_role,
+      weight: address.modules?.load_balancer?.weight
     }
   })
 }
@@ -87,16 +89,10 @@ const typeBuilders = {
       payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
 
     const result = {
-      addresses: payload.modules.loadBalancer.enabled
-        ? extractAddressesPostRequest(payload.addresses)
-        : [
-            {
-              address: payload.address.address,
-              plain_port: payload.address.plainPort,
-              tls_port: payload.address.tlsPort,
-              active: true
-            }
-          ],
+      addresses: extractAddressesPostRequest(
+        payload.addresses,
+        payload.modules.loadBalancer.enabled
+      ),
       connection_options: {
         dns_resolution: payload.connectionOptions.dnsResolution,
         transport_policy: payload.connectionOptions.transportPolicy,
@@ -119,59 +115,59 @@ const typeBuilders = {
 const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
     connectionOptions: {
-      region: data.type_properties.endpoint
+      region: data.attributes.type_properties.endpoint
     }
   }),
 
   edge_storage: (data) => ({
     connectionOptions: {
-      bucket: data.type_properties.bucket,
-      prefix: data.type_properties.prefix
+      bucket: data.attributes.type_properties.bucket,
+      prefix: data.attributes.type_properties.prefix
     }
   }),
 
   http: (data) => ({
     connectionOptions: {
-      dnsResolution: data.connection_options.dns_resolution,
-      transportPolicy: data.connection_options.transport_policy,
-      host: data.connection_options.host,
-      pathPrefix: data.connection_options.path_prefix,
-      realIpHeader: data.connection_options.real_ip_header,
-      realPortHeader: data.connection_options.real_port_header,
-      followingRedirect: data.connection_options.following_redirect
+      dnsResolution: data.attributes.connection_options.dns_resolution,
+      transportPolicy: data.attributes.connection_options.transport_policy,
+      host: data.attributes.connection_options.host,
+      pathPrefix: data.attributes.connection_options.path_prefix,
+      realIpHeader: data.attributes.connection_options.real_ip_header,
+      realPortHeader: data.attributes.connection_options.real_port_header,
+      followingRedirect: data.attributes.connection_options.following_redirect
     },
     modules: {
       loadBalancer: {
-        enabled: data.modules.load_balancer.enabled,
+        enabled: data.attributes.modules.load_balancer.enabled,
         config: {
-          method: data.modules.load_balancer.config.method,
-          maxRetries: data.modules.load_balancer.config.max_retries,
-          connectionTimeout: data.modules.load_balancer.config.connection_timeout,
-          readWriteTimeout: data.modules.load_balancer.config.read_write_timeout
+          method: data.attributes.modules.load_balancer?.config?.method,
+          maxRetries: data.attributes.modules.load_balancer?.config?.max_retries,
+          connectionTimeout: data.attributes.modules.load_balancer?.config?.connection_timeout,
+          readWriteTimeout: data.attributes.modules.load_balancer?.config?.read_write_timeout
         }
       },
       originShield: {
-        enabled: data.modules.origin_shield_enabled,
+        enabled: data.attributes.modules.origin_shield_enabled,
         config: {
           originIpAcl: {
-            enabled: data.modules.origin_ip_acl.enabled
+            enabled: data.attributes.modules.origin_ip_acl?.enabled
           },
           hmac: {
-            enabled: data.modules.hmac.enabled,
+            enabled: data.attributes.modules.hmac?.enabled,
             config: {
-              type: data.modules.hmac.config.type,
+              type: data.attributes.modules.hmac?.config?.type,
               attributes: {
-                region: data.modules.hmac.config.attributes.region,
-                service: data.modules.hmac.config.attributes.service,
-                accessKey: data.modules.hmac.config.attributes.access_key,
-                secretKey: data.modules.hmac.config.attributes.secret_key
+                region: data.attributes.modules.hmac?.config?.attributes?.region,
+                service: data.attributes.modules.hmac?.config?.attributes?.service,
+                accessKey: data.attributes.modules.hmac?.config?.attributes?.access_key,
+                secretKey: data.attributes.modules.hmac?.config?.attributes?.secret_key
               }
             }
           }
         }
       }
     },
-    addresses: extractAddressesLoadRequest(data.addresses)
+    addresses: extractAddressesLoadRequest(data.attributes.addresses)
   })
 }
 
@@ -224,7 +220,7 @@ export const EdgeConnectorsAdapter = {
       name: data.name,
       type: data.type,
       active: data.active,
-      attributes
+      ...attributes
     }
   }
 }
