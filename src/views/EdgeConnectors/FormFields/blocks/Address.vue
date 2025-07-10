@@ -203,7 +203,7 @@
         >
           <i class="pi pi-lock text-color-secondary"></i>
           <p class="text-xs font-normal text-color-secondary">
-            You can add more address enabling Load Balancer module above.
+            You can add more addresses enabling Load Balancer module above.
           </p>
         </div>
       </div>
