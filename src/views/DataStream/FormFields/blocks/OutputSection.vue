@@ -41,6 +41,46 @@
         </div>
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
+            label="Payload Format"
+            required
+            name="payloadFormat"
+            :value="payloadFormat"
+            description="The format that payload will be sent. The $dataset variable will be replaced by all logs already with the log line separator applied."
+            placeholder="$dataset"
+            data-testid="data-stream-form__destination__payload-format-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            :disabled="hasNoPermissionToEditDataStream"
+            label="Payload Log Line Separator"
+            required
+            name="lineSeparator"
+            :value="lineSeparator"
+            :description="placeholderLineSeparator"
+            data-testid="data-stream-form__destination__payload-line-separator-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldNumber
+            :disabled="hasNoPermissionToEditDataStream"
+            label="Payload Max Size"
+            name="maxSize"
+            :min="MIN_PAYLOAD_SIZE_IN_BYTES"
+            :max="MAX_PAYLOAD_SIZE_IN_BYTES"
+            :value="maxSize"
+            description="Customizable maximum size of data packets in bytes. Accepts values starting from 1000000."
+            placeholder="1000000"
+            :useGrouping="false"
+            data-testid="data-stream-form__destination__payload-max-size-field"
+          />
+        </div>
+
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
@@ -781,6 +821,7 @@
 </template>
 
 <script setup>
+  import { MIN_PAYLOAD_SIZE_IN_BYTES, MAX_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
@@ -809,6 +850,9 @@
   const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
   const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
   const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
+  const { value: payloadFormat } = useField('payloadFormat')
+  const { value: lineSeparator } = useField('lineSeparator')
+  const { value: maxSize } = useField('maxSize')
 
   // Kafka
   const { value: bootstrapServers } = useField('bootstrapServers')
@@ -899,4 +943,9 @@
     formatOnPaste: true
   }
   const serviceAccountMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
+
+  const placeholderLineSeparator = computed(() => {
+    const text = '"\\n"'
+    return `Character that'll be used at the end of each log line. The ${text} escape sequence breaks values into different lines in NDJSON format.`
+  })
 </script>

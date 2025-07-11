@@ -22,6 +22,7 @@
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import InlineMessage from 'primevue/inlinemessage'
+  import { MIN_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
 
   import GeneralSection from './blocks/GeneralSection.vue'
   import InputSection from './blocks/InputSection.vue'
@@ -51,10 +52,7 @@
    * @returns {Promise<Array>} Array with domains and template data
    */
   const loadInitialData = async () => {
-    const [domainsData, templateData] = await Promise.all([
-      loadDomains(),
-      loadTemplates()
-    ])
+    const [domainsData, templateData] = await Promise.all([loadDomains(), loadTemplates()])
     return [domainsData, templateData]
   }
 
@@ -102,7 +100,65 @@
       endpoint: 'standard',
       status: true,
       hasSampling: false,
-      samplingPercentage: 0
+      samplingPercentage: 0,
+
+      // Standard endpoint fields
+      endpointUrl: '',
+      headers: [{ value: '', deleted: false }],
+      maxSize: MIN_PAYLOAD_SIZE_IN_BYTES,
+      lineSeparator: '\\n',
+      payloadFormat: '$dataset',
+
+      // Kafka endpoint fields
+      bootstrapServers: '',
+      kafkaTopic: '',
+      useTls: false,
+
+      // S3 endpoint fields
+      host: '',
+      bucket: '',
+      region: '',
+      accessKey: '',
+      secretKey: '',
+      objectKey: '',
+      contentType: '',
+
+      // Google Big Query endpoint fields
+      projectID: '',
+      datasetID: '',
+      tableID: '',
+      serviceAccountKey: '',
+
+      // Elasticsearch endpoint fields
+      elasticsearchUrl: '',
+      apiKey: '',
+
+      // Splunk endpoint fields
+      splunkUrl: '',
+      splunkApiKey: '',
+
+      // AWS Kinesis Firehose endpoint fields
+      streamName: '',
+      awsRegion: '',
+      awsAccessKey: '',
+      awsSecretKey: '',
+
+      // Datadog endpoint fields
+      datadogUrl: '',
+      datadogApiKey: '',
+
+      // QRadar endpoint fields
+      QRadarUrl: '',
+
+      // Azure Monitor endpoint fields
+      logType: '',
+      sharedKey: '',
+      workspaceID: '',
+
+      // Azure Blob Storage endpoint fields
+      storageAccount: '',
+      containerName: '',
+      blobToken: ''
     }
 
     props.resetForm({ values: initialValues })

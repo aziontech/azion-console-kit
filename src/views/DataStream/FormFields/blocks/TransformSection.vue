@@ -1,6 +1,6 @@
 <template>
   <FormHorizontal
-    :title="`${handleTextDomainWorkload.singularTitle}`"
+    title="Transform"
     :description="`Associate ${handleTextDomainWorkload.singularLabel} with this stream to define the addresses from which the data will be collected.`"
     data-testid="data-stream-form__section__domains"
   >
