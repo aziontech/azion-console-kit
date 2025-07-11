@@ -1,5 +1,5 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
-import { parseStatusData } from '../utils/adapter/parse-status-utils'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const LOCKED_VALUE = 'custom'
 
@@ -18,22 +18,26 @@ const parseName = (edgeApplication) => {
   return nameProps
 }
 
+const transformMap = {
+  id: (value) => value.id,
+  active: (value) => value.active,
+  name: (value) => parseName(value),
+  lastEditor: (value) => value.last_editor,
+  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModified: (value) => value.last_modified,
+  disableEditClick: (value) => value.product_version === LOCKED_VALUE,
+  isLocked: (value) => value.product_version === LOCKED_VALUE
+}
+
 export const EdgeAppAdapter = {
-  transformListEdgeApp(data, isDropdown) {
-    return (
-      data?.map((edgeApplication) => {
-        return {
-          id: edgeApplication.id,
-          name: isDropdown ? edgeApplication.name : parseName(edgeApplication),
-          disableEditClick: edgeApplication.product_version === LOCKED_VALUE,
-          lastEditor: edgeApplication.last_editor,
-          lastModify: formatExhibitionDate(edgeApplication.last_modified, 'full'),
-          lastModified: edgeApplication.last_modified,
-          active: parseStatusData(edgeApplication.active),
-          isLocked: edgeApplication.product_version === LOCKED_VALUE
-        }
-      }) || []
-    )
+  transformListEdgeApp(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
+  },
+  transformListDropdownEdgeApp(data) {
+    return data.map((edgeApplication) => ({
+      id: edgeApplication.id,
+      name: edgeApplication.name
+    }))
   },
 
   transformLoadEdgeApp({ data }) {

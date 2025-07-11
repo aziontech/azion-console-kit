@@ -120,8 +120,9 @@
     'name',
     'last_editor',
     'last_modified',
-    'active',
-    'product_version'
+    'last_modify',
+    'product_version',
+    'active'
   ]
 </script>
 

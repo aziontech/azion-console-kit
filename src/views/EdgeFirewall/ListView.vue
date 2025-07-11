@@ -18,8 +18,8 @@
     'name',
     'debug_rules',
     'last_editor',
-    'modules',
     'last_modified',
+    'last_modify',
     'active'
   ]
 
@@ -67,7 +67,7 @@
       header: 'Last Modified'
     },
     {
-      field: 'status',
+      field: 'active',
       header: 'Status',
       sortField: 'active',
       filterPath: 'active',
