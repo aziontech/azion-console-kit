@@ -3,9 +3,23 @@ import * as Errors from '@/services/axios/errors'
 
 const mapDataSourceName = {
   http: 'Edge Applications',
-  rtm_activity: 'Activity History',
-  cells_console: 'Edge Functions',
+  activity: 'Activity History',
+  functions: 'Edge Functions',
   waf: 'WAF Events'
+}
+
+const endpointTypeNameMap = {
+  standard: 'HTTP',
+  kafka: 'Kafka',
+  s3: 'Amazon S3',
+  big_query: 'BigQuery',
+  elasticsearch: 'Elasticsearch',
+  splunk: 'Splunk',
+  aws_kinesis_firehose: 'AWS Kinesis Firehose',
+  datadog: 'Datadog',
+  qradar: 'QRadar',
+  azure_monitor: 'Azure Monitor',
+  azure_blob_storage: 'Azure Blob Storage'
 }
 
 const getWorkloadIds = (workloads) => {
@@ -45,84 +59,106 @@ const parseByEndpointType = (payload) => {
   switch (payload.endpoint) {
     case 'standard':
       return {
-        endpoint_type: 'standard',
-        url: payload.endpointUrl,
-        payload_format: payload.payloadFormat,
-        log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
-        max_size: payload.maxSize,
-        headers: getHeadersPostRequest(payload.headers)
+        type: 'standard',
+        attributes: {
+          url: payload.endpointUrl,
+          payload_format: payload.payloadFormat,
+          log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
+          max_size: payload.maxSize,
+          headers: getHeadersPostRequest(payload.headers)
+        }
       }
     case 'kafka':
       return {
-        endpoint_type: 'kafka',
-        kafka_topic: payload.kafkaTopic,
-        bootstrap_servers: payload.bootstrapServers,
-        use_tls: payload.useTls
+        type: 'kafka',
+        attributes: {
+          kafka_topic: payload.kafkaTopic,
+          bootstrap_servers: payload.bootstrapServers,
+          use_tls: payload.useTls
+        }
       }
     case 's3':
       return {
-        endpoint_type: 's3',
-        access_key: payload.accessKey,
-        region: payload.region,
-        object_key_prefix: payload.objectKey,
-        bucket_name: payload.bucket,
-        content_type: payload.contentType,
-        host_url: payload.host,
-        secret_key: payload.secretKey
+        type: 's3',
+        attributes: {
+          access_key: payload.accessKey,
+          region: payload.region,
+          object_key_prefix: payload.objectKey,
+          bucket_name: payload.bucket,
+          content_type: payload.contentType,
+          host_url: payload.host,
+          secret_key: payload.secretKey
+        }
       }
     case 'big_query':
       return {
-        endpoint_type: 'big_query',
-        dataset_id: payload.datasetID,
-        project_id: payload.projectID,
-        table_id: payload.tableID,
-        service_account_key: payload.serviceAccountKey
+        type: 'big_query',
+        attributes: {
+          dataset_id: payload.datasetID,
+          project_id: payload.projectID,
+          table_id: payload.tableID,
+          service_account_key: payload.serviceAccountKey
+        }
       }
     case 'elasticsearch':
       return {
-        endpoint_type: 'elasticsearch',
-        url: payload.elasticsearchUrl,
-        api_key: payload.apiKey
+        type: 'elasticsearch',
+        attributes: {
+          url: payload.elasticsearchUrl,
+          api_key: payload.apiKey
+        }
       }
     case 'splunk':
       return {
-        endpoint_type: 'splunk',
-        url: payload.splunkUrl,
-        api_key: payload.splunkApiKey
+        type: 'splunk',
+        attributes: {
+          url: payload.splunkUrl,
+          api_key: payload.splunkApiKey
+        }
       }
     case 'aws_kinesis_firehose':
       return {
-        endpoint_type: 'aws_kinesis_firehose',
-        access_key: payload.awsAccessKey,
-        stream_name: payload.streamName,
-        region: payload.awsRegion,
-        secret_key: payload.awsSecretKey
+        type: 'aws_kinesis_firehose',
+        attributes: {
+          access_key: payload.awsAccessKey,
+          stream_name: payload.streamName,
+          region: payload.awsRegion,
+          secret_key: payload.awsSecretKey
+        }
       }
     case 'datadog':
       return {
-        endpoint_type: 'datadog',
-        url: payload.datadogUrl,
-        api_key: payload.datadogApiKey
+        type: 'datadog',
+        attributes: {
+          url: payload.datadogUrl,
+          api_key: payload.datadogApiKey
+        }
       }
     case 'qradar':
       return {
-        endpoint_type: 'qradar',
-        url: payload.QRadarUrl
+        type: 'qradar',
+        attributes: {
+          url: payload.QRadarUrl
+        }
       }
     case 'azure_monitor':
       return {
-        endpoint_type: 'azure_monitor',
-        log_type: payload.logType,
-        shared_key: payload.sharedKey,
-        time_generated_field: payload.generatedField,
-        workspace_id: payload.workspaceID
+        type: 'azure_monitor',
+        attributes: {
+          log_type: payload.logType,
+          shared_key: payload.sharedKey,
+          time_generated_field: payload.generatedField,
+          workspace_id: payload.workspaceID
+        }
       }
     case 'azure_blob_storage':
       return {
-        endpoint_type: 'azure_blob_storage',
-        storage_account: payload.storageAccount,
-        container_name: payload.containerName,
-        blob_sas_token: payload.blobToken
+        type: 'azure_blob_storage',
+        attributes: {
+          storage_account: payload.storageAccount,
+          container_name: payload.containerName,
+          blob_sas_token: payload.blobToken
+        }
       }
     default:
       throw new Errors.InvalidDataStreamEndpointType().message
@@ -130,79 +166,81 @@ const parseByEndpointType = (payload) => {
 }
 
 const getInfoByEndpoint = (payload) => {
-  switch (payload.endpoint.endpoint_type) {
+  const endpointAttributes = payload.attributes
+
+  switch (payload.type) {
     case 'standard':
       return {
-        endpointUrl: payload.endpoint.url,
-        payloadFormat: payload.endpoint.payload_format,
+        endpointUrl: endpointAttributes.url,
+        payloadFormat: endpointAttributes.payload_format,
         lineSeparator:
-          payload.endpoint.log_line_separator === '\n'
+          endpointAttributes.log_line_separator === '\n'
             ? '\\n'
-            : payload.endpoint.log_line_separator,
-        maxSize: payload.endpoint.max_size,
+            : endpointAttributes.log_line_separator,
+        maxSize: endpointAttributes.max_size,
         ...getHeadersLoadRequest(payload)
       }
     case 'kafka':
       return {
-        kafkaTopic: payload.endpoint.kafka_topic,
-        bootstrapServers: payload.endpoint.bootstrap_servers,
-        useTls: payload.endpoint.use_tls
+        kafkaTopic: endpointAttributes.kafka_topic,
+        bootstrapServers: endpointAttributes.bootstrap_servers,
+        useTls: endpointAttributes.use_tls
       }
     case 's3':
       return {
-        accessKey: payload.endpoint.access_key,
-        region: payload.endpoint.region,
-        objectKey: payload.endpoint.object_key_prefix,
-        bucket: payload.endpoint.bucket_name,
-        contentType: payload.endpoint.content_type,
-        host: payload.endpoint.host_url,
-        secretKey: payload.endpoint.secret_key
+        accessKey: endpointAttributes.access_key,
+        region: endpointAttributes.region,
+        objectKey: endpointAttributes.object_key_prefix,
+        bucket: endpointAttributes.bucket_name,
+        contentType: endpointAttributes.content_type,
+        host: endpointAttributes.host_url,
+        secretKey: endpointAttributes.secret_key
       }
     case 'big_query':
       return {
-        datasetID: payload.endpoint.dataset_id,
-        projectID: payload.endpoint.project_id,
-        tableID: payload.endpoint.table_id,
-        serviceAccountKey: payload.endpoint.service_account_key
+        datasetID: endpointAttributes.dataset_id,
+        projectID: endpointAttributes.project_id,
+        tableID: endpointAttributes.table_id,
+        serviceAccountKey: endpointAttributes.service_account_key
       }
     case 'elasticsearch':
       return {
-        elasticsearchUrl: payload.endpoint.url,
-        apiKey: payload.endpoint.api_key
+        elasticsearchUrl: endpointAttributes.url,
+        apiKey: endpointAttributes.api_key
       }
     case 'splunk':
       return {
-        splunkUrl: payload.endpoint.url,
-        splunkApiKey: payload.endpoint.api_key
+        splunkUrl: endpointAttributes.url,
+        splunkApiKey: endpointAttributes.api_key
       }
     case 'aws_kinesis_firehose':
       return {
-        awsAccessKey: payload.endpoint.access_key,
-        streamName: payload.endpoint.stream_name,
-        awsRegion: payload.endpoint.region,
-        awsSecretKey: payload.endpoint.secret_key
+        awsAccessKey: endpointAttributes.access_key,
+        streamName: endpointAttributes.stream_name,
+        awsRegion: endpointAttributes.region,
+        awsSecretKey: endpointAttributes.secret_key
       }
     case 'datadog':
       return {
-        datadogUrl: payload.endpoint.url,
-        datadogApiKey: payload.endpoint.api_key
+        datadogUrl: endpointAttributes.url,
+        datadogApiKey: endpointAttributes.api_key
       }
     case 'qradar':
       return {
-        QRadarUrl: payload.endpoint.url
+        QRadarUrl: endpointAttributes.url
       }
     case 'azure_monitor':
       return {
-        logType: payload.endpoint.log_type,
-        sharedKey: payload.endpoint.shared_key,
-        generatedField: payload.endpoint.time_generated_field,
-        workspaceID: payload.endpoint.workspace_id
+        logType: endpointAttributes.log_type,
+        sharedKey: endpointAttributes.shared_key,
+        generatedField: endpointAttributes.time_generated_field,
+        workspaceID: endpointAttributes.workspace_id
       }
     case 'azure_blob_storage':
       return {
-        storageAccount: payload.endpoint.storage_account,
-        containerName: payload.endpoint.container_name,
-        blobToken: payload.endpoint.blob_sas_token
+        storageAccount: endpointAttributes.storage_account,
+        containerName: endpointAttributes.container_name,
+        blobToken: endpointAttributes.blob_sas_token
       }
     default:
       return {}
@@ -213,12 +251,15 @@ export const DataStreamAdapter = {
   transformListDataStream(data) {
     return (
       data?.map((dataStream) => {
+        const dataSourceInput = dataStream.inputs.find((input) => input.type === 'raw_logs')
+        const dataSetType = dataStream.outputs[0].type
+
         return {
           id: dataStream.id,
           name: dataStream.name,
           templateName: dataStream.templateName,
-          dataSource: mapDataSourceName[dataStream.data_source],
-          endpointType: dataStream.endpoint.endpoint_type,
+          dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
+          endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
           active: parseStatusData(dataStream.active)
         }
       }) || []
@@ -230,7 +271,9 @@ export const DataStreamAdapter = {
         return {
           id: template.id,
           name: template.name,
-          dataSet: template.data_set
+          dataSet: template?.data_set,
+          custom: template?.custom,
+          active: template?.active
         }
       }) || []
     )
@@ -253,15 +296,42 @@ export const DataStreamAdapter = {
     } else {
       parsedPayload = {
         name: payload.name,
-        data_set_id: payload.template,
-        data_source: payload.dataSource,
-        filters: {
-          sampling_enable: allDomains,
-          sampling_rate: 100,
-          workloads: getWorkloadIds(payload.domains[1])
-        },
-        active: payload.status,
-        endpoint: parseByEndpointType(payload)
+        inputs: [
+          {
+            type: 'raw_logs',
+            attributes: {
+              data_source: payload.dataSource
+            }
+          }
+        ],
+        outputs: [parseByEndpointType(payload)],
+        transform: [
+          {
+            type: 'render_template',
+            attributes: {
+              template: payload.template
+            }
+          }
+        ],
+        active: payload.status
+      }
+
+      if (allDomains) {
+        parsedPayload.transform.push({
+          type: 'filter_workloads',
+          attributes: {
+            workloads: getWorkloadIds(payload.domains[0])
+          }
+        })
+      }
+
+      if (!allDomains) {
+        parsedPayload.transform.push({
+          type: 'sampling',
+          attributes: {
+            rate: 100
+          }
+        })
       }
     }
 
@@ -273,20 +343,38 @@ export const DataStreamAdapter = {
   },
   transformLoadDataStream(datas) {
     const [payload, workloads] = datas
+
+    const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
+    const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')
+    const templateId = payload.transform?.find((item) => item.type === 'render_template')
+    const endpointOutput = payload.outputs[0]
+
     return {
       id: payload.id,
       name: payload.name,
-      template: payload.data_set_id ?? 'CUSTOM_TEMPLATE',
+      template: templateId?.attributes?.template ?? 'CUSTOM_TEMPLATE',
       dataSet: payload?.data_set,
-      dataSource: payload.data_source,
+      dataSource: dataSourceInput?.attributes?.data_source,
       domains: workloads,
-      domainOption: payload.filters.sampling_enable ? '1' : '0',
+      domainOption: samplingTransform ? '1' : '0',
       status: payload.active,
-      filters: payload.filters,
-      endpoint: payload.endpoint.endpoint_type,
-      hasSampling: payload.filters.sampling_enable,
-      samplingPercentage: payload.filters.sampling_rate,
-      ...getInfoByEndpoint(payload)
+      endpoint: endpointOutput.type,
+      hasSampling: !!samplingTransform,
+      samplingPercentage: samplingTransform?.attributes?.rate,
+      ...getInfoByEndpoint(endpointOutput)
+    }
+  },
+  transformPayloadTemplate(payload) {
+    return {
+      name: payload.name,
+      data_set: JSON.stringify(JSON.parse(payload.dataSet), null, '\t')
+    }
+  },
+  transformLoadTemplate(payload) {
+    return {
+      id: payload.id,
+      name: payload.name,
+      dataSet: payload?.data_set
     }
   }
 }
