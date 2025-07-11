@@ -68,14 +68,15 @@ export class DataStreamService {
   createTemplateService = async (payload) => {
     const body = this.#getTransformed('transformPayloadTemplate', payload)
 
-    await this.http.request({
+    const response = await this.http.request({
       method: 'POST',
       url: this.dataSetsEndpoint,
       body
     })
 
     return {
-      feedback: 'Your custom template has been created'
+      feedback: 'Your custom template has been created',
+      id: response.data.data.id
     }
   }
 
