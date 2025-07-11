@@ -57,6 +57,14 @@
       type: Boolean,
       default: false
     },
+    optionGroupLabel: {
+      type: String,
+      default: ''
+    },
+    optionGroupChildren: {
+      type: String,
+      default: ''
+    },
     editable: {
       type: Boolean,
       default: false
@@ -154,6 +162,8 @@
     :optionDisabled="props.optionDisabled"
     :filter="props.filter"
     :optionValue="props.optionValue"
+    :optionGroupLabel="props.optionGroupLabel"
+    :optionGroupChildren="props.optionGroupChildren"
     :placeholder="props.placeholder"
     :autoFilterFocus="props.filter"
     :emptyMessage="props.emptyMessage"
