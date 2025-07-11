@@ -27,7 +27,10 @@
     data-testid="data-stream-edit-template-drawer"
   >
     <template #formFields>
-      <FormFieldsTemplate @onDelete="handleDeleteTemplate" :templateId="templateId" />
+      <FormFieldsTemplate
+        @onDelete="handleDeleteTemplate"
+        :templateId="templateId"
+      />
     </template>
   </EditDrawerBlock>
 </template>

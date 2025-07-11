@@ -86,10 +86,9 @@
    * Initializes form with default values
    */
   const initializeForm = async () => {
-    if (!props.resetForm) return
-
     const [domainsData, templateId] = await loadInitialData()
 
+    if (!props.resetForm) return
     const initialValues = {
       name: name.value,
       dataSource: 'http',

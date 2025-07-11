@@ -46,10 +46,7 @@
         :schema="validationSchema"
       >
         <template #form>
-          <FormFieldsDataStream
-            :listDataStreamTemplateService="props.listDataStreamTemplateService"
-            :listDataStreamDomainsService="props.listDataStreamDomainsService"
-          />
+          <FormFieldsDataStream />
         </template>
         <template
           v-if="hasNoPermissionToEditDataStream"

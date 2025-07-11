@@ -835,6 +835,7 @@
   import RadioButton from 'primevue/radiobutton'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
 
   const store = useAccountStore()
 

@@ -20,11 +20,14 @@ export class DataStreamService {
       params
     })
 
+    const getTemplateId = (item) =>
+      item.transform?.find((transform) => transform.type === 'render_template')?.attributes
+        ?.template
+
     const enriched = await enrichByMatchingReference({
       items: data.results,
       fetchReferencePage: this.listTemplates,
-      getReferenceId: (item) =>
-        item.transform?.find((item) => item.type === 'render_template')?.attributes?.template,
+      getReferenceId: getTemplateId,
       merge: (item, matchedRef) => ({
         ...item,
         templateName: matchedRef.name
