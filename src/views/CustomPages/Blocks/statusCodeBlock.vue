@@ -29,15 +29,16 @@
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectStatusCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@templates/list-table-block'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+
   const listStatusCodeRef = ref(null)
-  const hasContentToList = ref(true)
+  const hasContentToList = computed(() => !!pagesValue.value)
   const drawerRef = ref(null)
 
-  const { fields: pages } = useFieldArray('pages')
+  const { fields: pages, replace: replacePages } = useFieldArray('pages')
   const { value: pagesValue } = useField('pages')
 
   const props = defineProps({
@@ -51,6 +52,18 @@
     root: 'flex-col',
     description: 'max-w-md',
     content: 'max-w-full'
+  }
+
+  const TYPES_PAGE = {
+    PageDefault: 'Default',
+    PageConnector: 'Connector'
+  }
+
+  const getTagColumnTypeStatus = (type) => {
+    return {
+      content: TYPES_PAGE[type],
+      severity: type === 'PageDefault' ? 'info' : ''
+    }
   }
 
   const loaderStatusCodeColumns = [
@@ -80,10 +93,7 @@
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
-          data: {
-            content: columnData,
-            severity: columnData === 'Default' ? 'info' : ''
-          },
+          data: getTagColumnTypeStatus(columnData),
           columnAppearance: 'tag'
         })
       }
@@ -129,6 +139,15 @@
   ])
 
   const listStatusCodeService = () => {
+    const mergedPages = !pagesValue.value?.length
+      ? STATUS_CODE_OPTIONS
+      : STATUS_CODE_OPTIONS.map((option) => ({
+          ...option,
+          ...pagesValue.value.find((page) => page.code === option.code),
+          response: option.response
+        }))
+
+    replacePages(mergedPages)
     return pagesValue.value
   }
 

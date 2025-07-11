@@ -337,6 +337,10 @@
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
     },
+    hiddenByDefault: {
+      type: Array,
+      default: () => []
+    },
     loadDisabled: {
       type: Boolean
     },
@@ -736,7 +740,9 @@
         ordering: props.defaultOrderingFieldName
       })
     }
-    selectedColumns.value = props.columns
+    selectedColumns.value = props.columns.filter(
+      (col) => !props.hiddenByDefault?.includes(col.field)
+    )
   })
 
   watch(
