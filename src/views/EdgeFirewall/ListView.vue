@@ -58,6 +58,15 @@
       header: 'Name'
     },
     {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'last_modified',
+      header: 'Last Modified'
+    },
+    {
       field: 'active',
       header: 'Status',
       sortField: 'active',
@@ -69,15 +78,6 @@
           columnAppearance: 'tag'
         })
       }
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModify',
-      sortField: 'last_modified',
-      header: 'Last Modified'
     }
   ])
 
