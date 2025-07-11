@@ -167,7 +167,6 @@ const parseByEndpointType = (payload) => {
 
 const getInfoByEndpoint = (payload) => {
   const endpointAttributes = payload.attributes
-  console.log('endpointAttributes :', endpointAttributes);
 
   switch (payload.type) {
     case 'standard':
