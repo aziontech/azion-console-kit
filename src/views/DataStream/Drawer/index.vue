@@ -89,7 +89,6 @@
   }
 
   const handleCreateTemplate = (response) => {
-  console.log('response :', response);
     emit('onSuccess', response.id)
     showCreateTemplateDrawer.value = false
   }
