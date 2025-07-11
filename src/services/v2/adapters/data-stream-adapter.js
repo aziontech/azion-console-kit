@@ -279,7 +279,6 @@ export const DataStreamAdapter = {
     )
   },
   transformPayloadDataStream(payload) {
-    console.log('payload :', payload.domains)
     const allDomains = payload.domains[1].length <= 0
 
     let parsedPayload = {
