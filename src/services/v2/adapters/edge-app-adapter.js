@@ -1,5 +1,6 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 const LOCKED_VALUE = 'custom'
 
@@ -20,7 +21,7 @@ const parseName = (edgeApplication) => {
 
 const transformMap = {
   id: (value) => value.id,
-  active: (value) => value.active,
+  active: (value) => parseStatusData(value.active),
   name: (value) => parseName(value),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),

@@ -105,7 +105,7 @@
 
     const [first, ...rest] = domains.value
 
-    const commonName = `${first.subdomain}.${first.domain}`
+    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
     const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
 
     setAlternativeNames(alternativeNames)

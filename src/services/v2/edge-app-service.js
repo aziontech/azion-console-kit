@@ -19,7 +19,6 @@ export class EdgeAppService {
     const { count, results } = data
 
     const body = this.adapter?.transformListEdgeApp?.(results, params.fields) ?? results
-
     return {
       body,
       count

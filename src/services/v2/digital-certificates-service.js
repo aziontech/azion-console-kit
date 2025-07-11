@@ -31,7 +31,7 @@ export class DigitalCertificatesService {
 
     const hasCertificateId = response.data.id
 
-    if (hasCertificateId) {
+    if (!hasCertificateId) {
       return {
         id: response.data.certificate
       }
