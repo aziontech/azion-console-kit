@@ -16,6 +16,13 @@ export const EdgeFirewallAdapter = {
   transformListEdgeFirewall(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
+  transformListEdgeFirewallDropdown(data) {
+    return data.map((edgeFirewall) => ({
+      id: edgeFirewall.id,
+      name: edgeFirewall.name,
+      active: edgeFirewall?.active
+    }))
+  },
   transformLoadEdgeFirewall({ data }) {
     return {
       id: data.id,
