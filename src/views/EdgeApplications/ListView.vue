@@ -98,6 +98,19 @@
         field: 'lastModify',
         sortField: 'lastModified',
         header: 'Last Modified'
+      },
+      {
+        field: 'active',
+        header: 'Status',
+        sortField: 'active',
+        filterPath: 'active',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
     ]
   })
@@ -107,8 +120,9 @@
     'name',
     'last_editor',
     'last_modified',
-    'active',
-    'product_version'
+    'last_modify',
+    'product_version',
+    'active'
   ]
 </script>
 

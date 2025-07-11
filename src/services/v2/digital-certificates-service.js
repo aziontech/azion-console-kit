@@ -17,6 +17,21 @@ export class DigitalCertificatesService {
     return data
   }
 
+  createDigitalCertificateLetEncrypt = async (payload, sourceCertificate) => {
+    const body = this.adapter?.transformCreateDigitalCertificateLetEncrypt?.(
+      payload,
+      sourceCertificate
+    )
+
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/request`,
+      body
+    })
+
+    return data.data
+  }
+
   editDigitalCertificate = async (payload) => {
     const body = this.adapter?.transformEditDigitalCertificate?.(payload)
 
@@ -47,12 +62,24 @@ export class DigitalCertificatesService {
   }
 
   listDigitalCertificatesDropdown = async (params) => {
-    const data = await this.listDigitalCertificates(params)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params: {
+        search: '',
+        fields: '',
+        ordering: 'name',
+        page: 1,
+        pageSize: 10,
+        ...params
+      }
+    })
+
     return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'csr', 'managed', 'certificate']
+    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate']
 
     const { data } = await this.http.request({
       method: 'GET',

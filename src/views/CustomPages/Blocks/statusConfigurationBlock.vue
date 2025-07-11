@@ -25,8 +25,8 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
 
   const listTypes = [
-    { label: 'Default', value: 'Default' },
-    { label: 'Connector', value: 'Connector' }
+    { label: 'Default', value: 'PageDefault' },
+    { label: 'Connector', value: 'PageConnector' }
   ]
 
   const props = defineProps({

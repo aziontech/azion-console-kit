@@ -1,22 +1,22 @@
 import { adaptBehavior, parsedBehavior } from '@/helpers/helper-behavior'
 import { adaptCriteria } from '@/helpers/helper-criteria'
+import { formatExhibitionDate } from '@/helpers/convert-date'
+import { capitalizeFirstLetter } from '@/helpers/capitalize-first-letter'
 
 export const RulesEngineAdapter = {
-  transformListRulesEngine(data) {
+  transformListRulesEngine(data, phase) {
     const statusMap = {
       true: { content: 'Active', severity: 'success' },
       false: { content: 'Inactive', severity: 'danger' }
     }
 
-    const capitalizeFirstLetter = (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : '')
-
-    return (
+    const response =
       data?.map((rule, index) => ({
         id: rule.id,
         stringId: rule.id?.toString(),
         name: rule.name,
         phase: {
-          content: capitalizeFirstLetter(rule.phase),
+          content: capitalizeFirstLetter(phase),
           outlined: true,
           severity: 'info'
         },
@@ -28,17 +28,21 @@ export const RulesEngineAdapter = {
           immutableValue: index,
           altered: false,
           min: 0,
-          max: data.length - 1
+          max: data.length - 1,
+          phase: phase
         },
-        description: rule.description || '-'
+        description: rule.description || '-',
+        lastEditor: rule.last_editor || '-',
+        lastModified: formatExhibitionDate(rule.last_modified, 'full')
       })) || []
-    )
+
+    return response
   },
 
   transformCreateRulesEngine(payload) {
     return {
       name: payload.name,
-      phase: payload.phase || 'default',
+      phase: payload.phase,
       active: payload.isActive,
       behaviors: adaptBehavior(payload.behaviors),
       criteria: payload.criteria,
@@ -62,16 +66,26 @@ export const RulesEngineAdapter = {
   },
 
   transformReorderRulesEngine(newOrderData) {
-    return { order: newOrderData.map((data) => data.id) }
+    const requestData = newOrderData.filter((el) => el.phase.content.toLowerCase() === 'request')
+    const responseData = newOrderData.filter((el) => el.phase.content.toLowerCase() === 'response')
+
+    const requestIds = requestData.map((data) => data.id)
+    const responseIds = responseData.map((data) => data.id)
+
+    return {
+      request: requestIds,
+      response: responseIds
+    }
   },
 
-  transformLoadRulesEngine(response) {
+  transformLoadRulesEngine(response, phase) {
     const rule = response.data
+
     return {
       id: rule.id,
       stringId: rule.id?.toString(),
       name: rule.name,
-      phase: rule.phase,
+      phase,
       criteria: rule.criteria,
       behaviors: parsedBehavior(rule.behaviors),
       isActive: rule.active,

@@ -64,6 +64,18 @@
     optionGroupChildren: {
       type: String,
       default: ''
+    },
+    editable: {
+      type: Boolean,
+      default: false
+    },
+    emptyMessage: {
+      type: String,
+      default: 'No available options'
+    },
+    emptyFilterMessage: {
+      type: String,
+      default: 'No results found'
     }
   })
 
@@ -139,6 +151,7 @@
     v-if="props.label"
   />
   <Dropdown
+    :editable="props.editable"
     appendTo="self"
     :id="name"
     :name="props.name"
@@ -153,6 +166,8 @@
     :optionGroupChildren="props.optionGroupChildren"
     :placeholder="props.placeholder"
     :autoFilterFocus="props.filter"
+    :emptyMessage="props.emptyMessage"
+    :emptyFilterMessage="props.emptyFilterMessage"
     @change="emitChange"
     @blur="emitBlur"
     :class="{ 'p-invalid': errorMessage }"
