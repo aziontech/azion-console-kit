@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2'
@@ -117,4 +117,18 @@
       inputValue: '0'
     }
   ]
+
+  watch(
+    () => domainOption.value,
+    (option) => {
+      if (option === '1') {
+        if (domains.value[1] && domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
+          })
+          domains.value[1] = []
+        }
+      }
+    }
+  )
 </script>

@@ -63,7 +63,7 @@ const parseByEndpointType = (payload) => {
         attributes: {
           url: payload.endpointUrl,
           payload_format: payload.payloadFormat,
-          log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
+          log_line_separator: payload.lineSeparator,
           max_size: payload.maxSize,
           headers: getHeadersPostRequest(payload.headers)
         }
@@ -167,6 +167,7 @@ const parseByEndpointType = (payload) => {
 
 const getInfoByEndpoint = (payload) => {
   const endpointAttributes = payload.attributes
+  console.log('endpointAttributes :', endpointAttributes);
 
   switch (payload.type) {
     case 'standard':
@@ -279,70 +280,53 @@ export const DataStreamAdapter = {
     )
   },
   transformPayloadDataStream(payload) {
+    console.log('payload :', payload.domains)
     const allDomains = payload.domains[1].length <= 0
-    let parsedPayload
 
-    if (payload.template === 'CUSTOM_TEMPLATE') {
-      parsedPayload = {
-        name: payload.name,
-        template_model: JSON.stringify(JSON.parse(payload.dataSet), null, '\t'),
-        filters: {
-          sampling_enable: allDomains,
-          sampling_rate: 100,
+    let parsedPayload = {
+      name: payload.name,
+      inputs: [
+        {
+          type: 'raw_logs',
+          attributes: {
+            data_source: payload.dataSource
+          }
+        }
+      ],
+      outputs: [parseByEndpointType(payload)],
+      transform: [
+        {
+          type: 'render_template',
+          attributes: {
+            template: payload.template
+          }
+        }
+      ],
+      active: payload.status
+    }
+
+    if (!allDomains) {
+      parsedPayload.transform.push({
+        type: 'filter_workloads',
+        attributes: {
           workloads: getWorkloadIds(payload.domains[1])
-        },
-        endpoint: parseByEndpointType(payload)
-      }
-    } else {
-      parsedPayload = {
-        name: payload.name,
-        inputs: [
-          {
-            type: 'raw_logs',
-            attributes: {
-              data_source: payload.dataSource
-            }
-          }
-        ],
-        outputs: [parseByEndpointType(payload)],
-        transform: [
-          {
-            type: 'render_template',
-            attributes: {
-              template: payload.template
-            }
-          }
-        ],
-        active: payload.status
-      }
-
-      if (allDomains) {
-        parsedPayload.transform.push({
-          type: 'filter_workloads',
-          attributes: {
-            workloads: getWorkloadIds(payload.domains[0])
-          }
-        })
-      }
-
-      if (!allDomains) {
-        parsedPayload.transform.push({
-          type: 'sampling',
-          attributes: {
-            rate: 100
-          }
-        })
-      }
+        }
+      })
     }
 
     if (payload.hasSampling) {
-      parsedPayload.filters.sampling_rate = payload.samplingPercentage
+      parsedPayload.transform.push({
+        type: 'sampling',
+        attributes: {
+          rate: payload.samplingPercentage
+        }
+      })
     }
 
     return parsedPayload
   },
-  transformLoadDataStream(datas) {
-    const [payload, workloads] = datas
+  transformLoadDataStream(data) {
+    const [payload, workloads] = data
 
     const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
     const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')

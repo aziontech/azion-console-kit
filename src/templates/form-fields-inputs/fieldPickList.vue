@@ -194,6 +194,7 @@
     data.value[0].pop()
   }
   const fetchData = async (currentPage = 1) => {
+  console.log('currentPage :', currentPage);
     loading.value = true
     loadingPickList()
     try {
