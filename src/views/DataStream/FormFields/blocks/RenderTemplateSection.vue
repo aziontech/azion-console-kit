@@ -132,7 +132,7 @@
   }
   const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
 
-  const loaderDataStreamTemplates = async () => {
+  const loaderDataStreamTemplates = async (templateId = null) => {
     const templates = await dataStreamService.listTemplates({
       fields: 'id,name,data_set,custom',
       pageSize: 1000
@@ -154,12 +154,14 @@
 
     const hasFirstItem = listTemplates.value[0]?.items[0]?.id
 
-    if (hasFirstItem) {
+    if (hasFirstItem && !templateId) {
       const firstTemplate = listTemplates.value[0].items[0]
       template.value = firstTemplate.id
 
       await insertDataSet(firstTemplate.id, firstTemplate)
       setIsCustomTemplate(firstTemplate)
+    } else {
+      template.value = templateId
     }
 
     return !!hasFirstItem ?? ''
@@ -234,8 +236,9 @@
     }
   )
 
-  const handleSuccess = () => {
+  const handleSuccess = (templateId) => {
     drawerTemplateRef.value.closeDrawer?.()
+    loaderDataStreamTemplates(templateId)
   }
 
   const handleDeleteTemplate = () => {

@@ -280,6 +280,7 @@ export const DataStreamAdapter = {
   },
   transformPayloadDataStream(payload) {
     const allDomains = payload.domains[1].length <= 0
+    const selectedDomains = payload.domains[1]
 
     let parsedPayload = {
       name: payload.name,
@@ -307,7 +308,7 @@ export const DataStreamAdapter = {
       parsedPayload.transform.push({
         type: 'filter_workloads',
         attributes: {
-          workloads: getWorkloadIds(payload.domains[1])
+          workloads: getWorkloadIds(selectedDomains)
         }
       })
     }
