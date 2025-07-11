@@ -156,30 +156,22 @@ export class WafService {
     return 'Your waf rule allowed has been updated'
   }
 
-  listWafRulesAllowed = async ({
-    wafId,
-    fields = '',
-    search = '',
-    ordering = '',
-    page = 1,
-    pageSize = 10
-  }) => {
-    const params = { fields, ordering, page, pageSize, search }
-    const { data } = await this.http.request({
-      url: `${this.baseURL}/${wafId}/exceptions`,
-      method: 'GET',
-      params
-    })
-
-    return this.adapter?.transformListWafRulesAllowed?.(data) ?? data
-  }
-
   loadWafRuleAllowed = async ({ id, allowedId }) => {
     const { data } = await this.http.request({
       url: `${this.baseURL}/${id}/exceptions/${allowedId.id}`,
       method: 'GET'
     })
 
-    return this.adapter?.transformLoadWafRuleAllowed?.(data) ?? data
+    return this.adapter?.transformLoadWafRuleAllowed?.(data)
+  }
+
+  listWafRulesAllowed = async (params) => {
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${params.wafId}/exceptions`,
+      method: 'GET',
+      params
+    })
+
+    return this.adapter?.transformListWafRulesAllowed?.(data)
   }
 }

@@ -2,15 +2,14 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import LabelBlock from '@/templates/label-block'
-
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
+  import { defaultConditions } from '@/views/WafRules/Config'
   import { ref } from 'vue'
 
-  import { useField } from 'vee-validate'
+  import { useField, useFieldArray } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules-allowed' })
 
   const props = defineProps({
@@ -24,75 +23,34 @@
       default: false
     }
   })
-  const { value: matchZones } = useField('matchZones')
+
+  const {
+    fields: conditions,
+    push: pushCondition,
+    remove: removeCondition
+  } = useFieldArray('conditions')
   const { value: path } = useField('path')
   const { value: name } = useField('name')
   const { value: ruleId } = useField('ruleId')
+  const { value: operator } = useField('operator')
   const { value: status } = useField('status')
+  const activeAccordions = ref([0])
 
-  const matchZonesOptions = ref([
-    { name: 'Conditional Query String', value: 'conditional_query_string' },
-    { name: 'Conditional Request Body', value: 'conditional_request_body' },
-    { name: 'Conditional Request Header', value: 'conditional_request_header' },
-    { name: 'File Name (Multipart Body)', value: 'file_name' },
-    { name: 'Path', value: 'path' },
-    { name: 'Query String', value: 'query_string' },
-    { name: 'Raw Body', value: 'raw_body' },
-    { name: 'Request Body', value: 'request_body' },
-    { name: 'Request Header', value: 'request_header' }
-  ])
-
-  const radioOptions = ref([
-    {
-      title: 'Value',
-      subtitle: 'Adds the value into the allowed rule.',
-      inputValue: 'value'
-    },
-    {
-      title: 'Name',
-      subtitle: 'Adds the key name into the allowed rule.',
-      inputValue: 'name'
-    }
-  ])
+  const conditionsOptions = ref(defaultConditions)
 
   const ruleIdOption = ref(props.optionsRuleIds)
 
-  const addMatchZones = () => {
-    const newArray = matchZones.value
-    matchZones.value = [...newArray, { matches_on: 'value', zone: 'path', zone_input: null }]
-  }
-
-  const descriptionAllowedFormField = ref(
-    'Configure the behavior that should be used to allow a rule.'
-  )
-
-  const showInputNameHeader = (value) => {
-    return value === 'conditional_query_header'
-  }
-
-  const showConditionalInputs = (value) => {
-    const conditionalInputs = [
-      'conditional_query_string',
-      'conditional_request_body',
-      'conditional_request_header'
-    ]
-    return conditionalInputs.includes(value)
-  }
-
-  const showMatchOnInputs = (value) => {
-    const conditionalInputs = [
-      'conditional_query_string',
-      'conditional_request_body',
-      'conditional_request_header',
-      'query_string',
-      'request_body',
-      'request_header'
-    ]
-    return conditionalInputs.includes(value)
+  const addCondition = () => {
+    pushCondition({ match: 'specific_url', field: null })
   }
 
   const deleteMatchZone = (index) => {
-    matchZones.value.splice(index, 1)
+    activeAccordions.value.splice(index, 1)
+    removeCondition(index)
+    if (activeAccordions.value[index]) {
+      const invertedAccordionState = activeAccordions.value[index] === null ? 0 : null
+      activeAccordions.value[index] = invertedAccordionState
+    }
   }
 </script>
 
@@ -103,30 +61,25 @@
     description="Create a match zone to allow specific rules to amplify the security levels of the application and prevent false positives."
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <LabelBlock
-          for="ruleid"
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldDropdown
+          data-testid="allowed-rules-form__rule-id"
           label="Rule ID"
-          isRequired
-        />
-        <Dropdown
-          appendTo="self"
-          id="ruleid"
-          v-model="ruleId"
+          required
+          name="ruleId"
+          filter
           :options="ruleIdOption"
+          :disabled="props.disabledRuleId"
+          :value="ruleId"
           optionLabel="text"
           optionValue="value"
-          class="w-full"
-          :disabled="props.disabledRuleId"
+          appendTo="self"
+          description="Select the rule that matches the request to be allowed."
           :pt="{
             panel: { class: 'sm:!w-[500px]' },
-            item: { class: 'whitespace-pre-line' }
+            item: { class: 'whitespace-pre-line', style: { height: 'auto !important' } }
           }"
-          data-testid="allowed-rules-form__rule-id-field"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Select the rule that matches the request to be allowed.
-        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -144,7 +97,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Match Zone Set"
-    :description="descriptionAllowedFormField"
+    description="Configure the behavior that should be used to allow a rule."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -157,100 +110,63 @@
           data-testid="allowed-rules-form__path-field"
         />
       </div>
-      <Divider
-        align="left"
-        type="dashed"
-      ></Divider>
       <div class="flex flex-col gap-8">
         <div
-          v-for="(item, index) in matchZones"
+          v-for="(item, index) in conditions"
           :key="index"
           class="flex flex-col gap-6"
         >
-          <div
-            class="flex gap-3"
-            v-if="index"
-          >
-            <Divider
-              align="left"
-              type="dashed"
-              :key="index"
-            >
-              And
-            </Divider>
-            <PrimeButton
-              outlined
-              severity="secondary"
-              icon="pi pi-trash"
-              aria-label="Trash"
-              v-tooltip.bottom="{ value: 'Delete', showDelay: 200 }"
-              @click="deleteMatchZone(index)"
-              :data-testid="`allowed-rules-form__delete-match-zone[${index}]__button`"
-            />
-          </div>
-
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <LabelBlock
-              for="ruleid"
-              label="Match Zone"
-              isRequired
-            />
-            <Dropdown
-              appendTo="self"
-              id="ruleid"
-              v-model="matchZones[index].zone"
-              :options="matchZonesOptions"
-              optionLabel="name"
-              optionValue="value"
-              class="w-full"
-              :data-testid="`allowed-rules-form__match-zone[${index}]-field`"
-            />
-          </div>
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="showConditionalInputs(matchZones[index].zone)"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                v-if="showInputNameHeader(matchZones[index].zone)"
-                class="text-color text-sm font-medium"
-                >Header</label
-              >
-              <FieldText
-                label="Field"
-                :name="`matchZones[${index}].zone_input`"
-                :value="matchZones[index].zone_input"
-                description="Add a specific value that represents the match option or leave it blank to consider empty values."
-                :data-testid="`allowed-rules-form__zone[${index}]__header-field`"
-              />
-            </div>
-          </div>
-          <div
-            class="flex flex-col gap-2"
-            v-if="showMatchOnInputs(matchZones[index].zone)"
-          >
-            <FieldGroupRadio
-              label="Matches On"
-              required
-              :nameField="`matchZones[${index}].matches_on`"
-              :isCard="false"
-              :options="radioOptions"
-              :data-testid="`allowed-rules-form__zone[${index}]__matches-on-field`"
-            />
-          </div>
+          <Accordion v-model:activeIndex="activeAccordions[index]">
+            <AccordionTab :header="conditions[index].value.title">
+              <template #header>
+                <div class="ml-auto flex justify-center items-center">
+                  <PrimeButton
+                    icon="pi pi-trash"
+                    size="small"
+                    outlined
+                    @click="deleteMatchZone(index)"
+                    :data-testid="`allowed-rules-form__delete-match-zone[${index}]__button`"
+                  />
+                </div>
+              </template>
+              <div class="flex flex-col gap-5">
+                <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                  <FieldDropdown
+                    :data-testid="`allowed-rules-form__match-zone[${index}]-field`"
+                    label="Match Zone"
+                    required
+                    :name="`conditions[${index}].match`"
+                    :options="conditionsOptions"
+                    :value="conditions[index].value.match"
+                    optionLabel="title"
+                    optionValue="value"
+                    appendTo="self"
+                    description="Define the matching criteria to identify and allow specific requests based on your selected parameters."
+                  />
+                </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <FieldText
+                    label="Field"
+                    :name="`conditions[${index}].field`"
+                    :value="conditions[index].value.field"
+                    description="Add a specific value that represents the match option or leave it blank to consider empty values."
+                    :data-testid="`allowed-rules-form__zone[${index}]__header-field`"
+                  />
+                </div>
+              </div>
+            </AccordionTab>
+          </Accordion>
         </div>
       </div>
-
-      <Divider type="solid"></Divider>
       <div>
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="New Match Zone"
+          label="Match Zone"
           class="sm:w-auto"
-          :disabled="matchZones?.length >= 9"
+          :disabled="conditions?.length >= 9"
           outlined
-          @click="addMatchZones"
+          @click="addCondition"
           data-testid="allowed-rules-form__add-match-zone__button"
         />
       </div>
@@ -263,8 +179,9 @@
     <template #inputs>
       <div class="flex gap-3 items-center">
         <FieldSwitchBlock
-          nameField="useRegex"
-          name="useRegex"
+          nameField="operator"
+          name="operator"
+          :value="operator"
           auto
           :isCard="false"
           title="Active"

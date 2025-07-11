@@ -2,6 +2,7 @@ import {
   adaptServiceDataResponse,
   transformSnakeToCamel
 } from '@/services/v2/utils/adaptServiceDataResponse'
+import { defaultConditions } from '@/views/WafRules/Config'
 
 const parseStatusData = (status) => ({
   content: status ? 'Active' : 'Inactive',
@@ -41,10 +42,20 @@ const transformMap = {
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
+const getPrefix = (condition) => {
+  const prefixSpecific = condition.match.includes('specific_')
+  const prefixValue = condition.match.includes('_value') ? 'value' : ''
+  const prefixName = condition.match.includes('_name') ? 'name' : ''
+  const prefixField = prefixValue || prefixName
+  const prefix = prefixSpecific ? prefixField : ''
+
+  return { prefix, prefixSpecific }
+}
+
 export const WafAdapter = {
   transformListWafRules(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
-  },
+  }, //OK
   adaptWafRulePayload(payload) {
     const camelToSnakeMap = {
       crossSiteScripting: 'cross_site_scripting',
@@ -73,7 +84,7 @@ export const WafAdapter = {
         }
       }
     }
-  },
+  }, //OK
   transformLoadWafRule({ data: response }) {
     const responseThresholds = response?.engine_settings?.attributes?.thresholds || []
 
@@ -94,24 +105,27 @@ export const WafAdapter = {
       active: response.active,
       ...threatsConfiguration
     }
-  },
+  }, //OK
   adaptCreateWafRuleAllowedPayload(payload) {
-    const matchValidationValues = payload.conditions.map((zone) => {
-      if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
-        zone.matches_on = null
-      }
-      return zone
-    })
-    
-    return {
-      match_zones: matchValidationValues,
+    const formatConditions =
+      payload.conditions?.map((condition) => {
+        const { prefix } = getPrefix(condition)
+        return {
+          match: condition.match,
+          ...(prefix && { [prefix]: condition[prefix] })
+        }
+      }) || []
+
+    const payloadReturn = {
+      conditions: formatConditions,
       path: payload.path,
       name: payload.name,
       rule_id: payload.ruleId,
       active: payload.status,
-      use_regex: payload.useRegex
+      operator: payload.operator ? 'regex' : 'contains'
     }
-  },
+    return payloadReturn
+  }, //OK - FALTA TALVEZ VERFICAR A QUESTAO DE SPECIFIC E ANY
   adaptCreateWafRuleAllowedTuningPayload(attack, hasMatchValue, name, path) {
     const MAP_MATCH_ZONES_CONDITIONAL = {
       query_string: 'conditional_query_string',
@@ -177,46 +191,6 @@ export const WafAdapter = {
       severity: status ? 'success' : 'danger'
     })
 
-    const replaceString = (str, value) => str.replace('$value', value)
-
-    const parseMatchZone = (waf) => {
-      const arrayMatchZone = []
-      const zones = {
-        query_string: 'Query String$value',
-        raw_body: 'Raw Body',
-        request_body: 'Request Body$value',
-        request_header: 'Request Header$value',
-        path: 'Path',
-        file_name: 'File Name (Multipart Body)',
-        conditional_request_header: 'Conditional Request Header$value',
-        conditional_request_body: 'Conditional Request Body$value',
-        conditional_query_string: 'Conditional Query String$value'
-      }
-
-      for (const matchZone of waf) {
-        let value = zones[matchZone.zone]
-
-        if (!value) continue
-
-        if (matchZone.zone_input) {
-          const label = matchZone.matches_on === 'name' ? 'Name' : 'Value'
-          value = replaceString(value, `: ${matchZone.zone_input} (${label})`)
-        } else if (matchZone.matches_on) {
-          const label =
-            matchZone.matches_on === 'name'
-              ? ' (Name)'
-              : matchZone.matches_on === 'value'
-              ? ' (Value)'
-              : ''
-          value = replaceString(value, label)
-        }
-
-        arrayMatchZone.push(value)
-      }
-      return arrayMatchZone
-    }
-    const getRuleIdText = (ruleId) => ruleId
-
     const isArray = Array.isArray(data.results)
     const parsedWafRulesAllowed = isArray
       ? data.results.map((waf) => ({
@@ -225,12 +199,14 @@ export const WafAdapter = {
           lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
             new Date(waf.last_modified)
           ),
-          matchZones: parseMatchZone(waf.conditions),
+          conditions: waf.conditions.map(
+            (condition) => defaultConditions.find((match) => match.value === condition.match)?.title
+          ),
           path: waf.path,
           name: waf.name,
-          ruleId: getRuleIdText(waf.rule_id),
+          ruleId: waf.rule_id,
           status: parseStatusData(waf.active),
-          useRegex: waf.use_regex
+          operator: waf.operator
         }))
       : []
 
@@ -238,17 +214,86 @@ export const WafAdapter = {
       count: data?.count ?? 0,
       body: parsedWafRulesAllowed
     }
-  },
-  transformLoadWafRuleAllowed(data) {
-    const waf = data.data || data
+  }, // OK
+  transformLoadWafRuleAllowed({ data: waf }) {
+    const conditions = [
+      {
+        match: 'any_http_header_value'
+      },
+      {
+        match: 'any_http_header_name'
+      },
+      {
+        match: 'specific_http_header_value',
+        value: 'user-agent'
+      },
+      {
+        match: 'specific_http_header_name',
+        name: 'user-agent'
+      },
+      {
+        match: 'any_query_string_value'
+      },
+      {
+        match: 'any_query_string_name'
+      },
+      {
+        match: 'specific_query_string_value',
+        value: 'foo'
+      },
+      {
+        match: 'specific_query_string_name',
+        name: 'foo'
+      },
+      {
+        match: 'body_form_field_value'
+      },
+      {
+        match: 'body_form_field_name'
+      },
+      {
+        match: 'specific_body_form_field_value',
+        value: 'bar'
+      },
+      {
+        match: 'specific_body_form_field_name',
+        name: 'bar'
+      },
+      {
+        match: 'any_url'
+      },
+      {
+        match: 'specific_url',
+        value: '/path'
+      },
+      {
+        match: 'raw_body'
+      },
+      {
+        match: 'file_extension'
+      }
+    ]
+
+    waf.conditions = conditions || []
+
+    const formatConditions = waf.conditions.map((condition) => {
+      const { prefix } = getPrefix(condition)
+
+      return {
+        ...condition,
+        title: defaultConditions.find((match) => match.value === condition.match)?.title,
+        field: prefix ? condition[prefix] : undefined
+      }
+    })
 
     return {
-      matchZones: waf.match_zones,
+      id: waf.id,
+      conditions: formatConditions,
       path: waf.path,
       name: waf.name,
       ruleId: waf.rule_id,
       status: waf.active,
-      useRegex: waf.use_regex
+      operator: waf.operator === 'regex'
     }
-  }
+  } // OK
 }

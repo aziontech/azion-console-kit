@@ -12,6 +12,7 @@
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2'
+  import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -23,18 +24,12 @@
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
 
-
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
   const props = defineProps({
     documentationServiceAllowed: {
       required: true,
       type: Function
-    },
-    optionsRuleIds: {
-      required: true,
-      type: Array,
-      default: () => []
     }
   })
 
@@ -42,18 +37,18 @@
     ruleId: yup.string().required().label('rule id'),
     name: yup.string().required(),
     path: yup.string(),
-    matchZones: yup.array(),
+    conditions: yup.array(),
     status: yup.boolean(),
-    useRegex: yup.boolean()
+    operator: yup.boolean()
   })
 
   const initialValues = {
-    matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
+    conditions: [itemDefaultCondition],
     path: '',
     name: '',
     ruleId: 0,
     status: true,
-    useRegex: false
+    operator: false
   }
 
   const wafRuleId = ref(route.params.id)
@@ -253,7 +248,7 @@
     title="No allowed rule has been created."
     description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
     createButtonLabel="Allowed Rule"
-    :documentationService="documentationServiceAllowed"
+    :documentationService="props.documentationServiceAllowed"
     :inTabs="true"
   >
     <template #default>
@@ -289,7 +284,7 @@
     title="Create Allowed Rule"
   >
     <template #formFields>
-      <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
+      <FormFieldsAllowed :optionsRuleIds="optionsRuleIds"></FormFieldsAllowed>
     </template>
   </CreateDrawerBlock>
 
@@ -307,7 +302,7 @@
     <template #formFields>
       <FormFieldsAllowed
         :disabledRuleId="true"
-        :optionsRuleIds="props.optionsRuleIds"
+        :optionsRuleIds="optionsRuleIds"
       />
     </template>
   </EditDrawerBlock>
