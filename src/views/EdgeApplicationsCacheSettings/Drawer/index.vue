@@ -70,7 +70,7 @@
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
     tieredCache: false,
-    isSliceTieredCacheEnabled: false,
+    isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false
   })
 
