@@ -18,11 +18,22 @@ const extractAzionAppSubdomain = (rawDomains) => {
       domains: [{ subdomain: '', domain: '' }]
     }
   }
+
   return rawDomains.reduce(
     (acc, item) => {
-      const match = item.match(/^(.+?)\.(.+)$/) || []
-      const subdomain = match[1] || ''
-      const domain = match[2] || item
+      if (typeof item !== 'string' || item.trim() === '') {
+        return acc
+      }
+
+      const parts = item.split('.')
+      let subdomain = ''
+      let domain = item
+
+      if (parts.length >= 3) {
+        subdomain = parts.shift()
+        domain = parts.join('.')
+      }
+
       if (domain === 'azion.app') {
         acc.azionAppSubdomain = subdomain
       } else {
@@ -31,7 +42,7 @@ const extractAzionAppSubdomain = (rawDomains) => {
 
       return acc
     },
-    { azionAppSubdomain: null, domains: [] }
+    { azionAppSubdomain: '', domains: [] }
   )
 }
 

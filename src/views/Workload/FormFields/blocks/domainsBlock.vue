@@ -56,7 +56,7 @@
   const sugestionDomains = async () => {
     const domains = await edgeDNSService.listEdgeDNSService({
       fields: ['id', 'domain'],
-      active: true
+      active: 'True' //To-Do: replace with true (boolean type) once API is fixed
     })
     domainsOptions.value = domains.body.map((domain) => {
       return {
@@ -105,7 +105,7 @@
 
     const [first, ...rest] = domains.value
 
-    const commonName = `${first.subdomain}.${first.domain}`
+    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
     const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
 
     setAlternativeNames(alternativeNames)
