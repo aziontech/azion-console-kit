@@ -23,19 +23,21 @@ export class DigitalCertificatesService {
       sourceCertificate
     )
 
-    const { data } = await this.http.request({
+    const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/request`,
       body
     })
 
-    if (!data.data.id) {
+    const hasCertificateId = response.data.id
+
+    if (hasCertificateId) {
       return {
-        id: data.data.certificate
+        id: response.data.certificate
       }
     }
 
-    return data.data
+    return response.data
   }
 
   editDigitalCertificate = async (payload) => {

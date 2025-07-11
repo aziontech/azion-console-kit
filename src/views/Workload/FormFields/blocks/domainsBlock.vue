@@ -56,7 +56,7 @@
   const sugestionDomains = async () => {
     const domains = await edgeDNSService.listEdgeDNSService({
       fields: ['id', 'domain'],
-      active: 'True'
+      active: 'True' //To-Do: replace with true (boolean type) once API is fixed
     })
     domainsOptions.value = domains.body.map((domain) => {
       return {

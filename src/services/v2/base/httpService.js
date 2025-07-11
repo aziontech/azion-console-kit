@@ -36,7 +36,7 @@ export class HttpService {
       const respData = axiosError.response?.data
       const firstErr = respData?.errors?.[0]
 
-      if (firstErr?.meta !== undefined) {
+      if (firstErr?.meta) {
         return {
           data: {
             data: firstErr.meta
