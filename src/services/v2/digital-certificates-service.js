@@ -29,6 +29,12 @@ export class DigitalCertificatesService {
       body
     })
 
+    if (!data.data.id) {
+      return {
+        id: data.data.certificate
+      }
+    }
+
     return data.data
   }
 

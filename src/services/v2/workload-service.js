@@ -120,11 +120,24 @@ export class WorkloadService {
     return 'Your workload has been updated'
   }
 
+  #dropFirstAzion = (domains) => {
+    return domains.filter((domain, index) => !(index === 0 && domain.endsWith('.azion.app')))
+  }
+
+  #handleDomains = (payload) => {
+    const [first, ...rest] = payload.domains
+
+    const commonName = `${first.subdomain}.${first.domain}`
+    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+    payload.letEncrypt.commonName = commonName
+    payload.letEncrypt.alternativeNames = alternativeNames
+  }
+
   #ensureCertificateForEdit = async (payload) => {
     const isNewCertificate = payload.tls.certificate === 1
     const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'
 
-    const [commonName, ...alternativeNames] = this.initialDomains
+    const [commonName, ...alternativeNames] = this.#dropFirstAzion(this.initialDomains)
     const letEncryptBase = {
       common_name: commonName,
       alternative_names: alternativeNames
@@ -134,14 +147,9 @@ export class WorkloadService {
 
     if (isNewCertificate) {
       shouldCreate = true
+      this.#handleDomains(payload)
     } else if (isLetsEncrypt) {
-      const [first, ...rest] = payload.domains
-
-      const commonName = `${first.subdomain}.${first.domain}`
-      const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
-      payload.letEncrypt.commonName = commonName
-      payload.letEncrypt.alternativeNames = alternativeNames
-
+      this.#handleDomains(payload)
       const changed = hasAnyFieldChanged(
         this.digitalCertificateAdapter,
         letEncryptBase,

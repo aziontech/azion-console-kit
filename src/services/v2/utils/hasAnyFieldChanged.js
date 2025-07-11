@@ -1,6 +1,5 @@
 export const hasAnyFieldChanged = (adapter, oldObj, newObj, keysToCheck) => {
   if (!oldObj || !newObj) return false
-
   const payload = adapter.transformCreateDigitalCertificateLetEncrypt?.(newObj)
 
   const isDifferent = (previousValue, currentValue) => {

@@ -2,7 +2,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
+
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import fieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import PrimeButton from 'primevue/button'
@@ -14,7 +15,7 @@
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return await digitalCertificatesService.listDigitalCertificatesDropdown({
-      fields: ['id,name, type'],
+      fields: ['id,name, type, status'],
       type: 'trusted_ca_certificate',
       ...queryParams
     })
@@ -84,7 +85,7 @@
           @onSuccess="onDigitalCertificateTrustedSuccess"
         />
 
-        <FieldDropdownLazyLoader
+        <fieldDropdownLazyLoaderWithFilter
           label="Trusted CA Certificate"
           data-testid="domains-form__mtls-trusted-certificate-field"
           required
@@ -94,6 +95,8 @@
           :disabled="!mtls.isEnabled"
           optionLabel="name"
           optionValue="value"
+          keyToFilter="status"
+          :valuesToFilter="['active', 'challenge_verification']"
           :value="mtls.certificate"
           placeholder="Select a Trusted CA certificate"
           description="Mutual Authentification requires a Trusted CA Certificate."
@@ -117,7 +120,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdownLazyLoader>
+        </fieldDropdownLazyLoaderWithFilter>
       </div>
       <div
         v-if="mtls?.isEnabled"

@@ -325,8 +325,8 @@
       if (typeof error === 'string' && error?.includes(PERMISSION_DENIED)) {
         hasNoPermission.value = true
         preventValueSetWithoutPermission()
+        emit('onAccessDenied')
       }
-      emit('onAccessDenied')
       throw error(error)
     } finally {
       loading.value = false

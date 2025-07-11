@@ -36,7 +36,8 @@ export const EdgeAppAdapter = {
   transformListDropdownEdgeApp(data) {
     return data.map((edgeApplication) => ({
       id: edgeApplication.id,
-      name: edgeApplication.name
+      name: edgeApplication.name,
+      active: edgeApplication?.active
     }))
   },
 

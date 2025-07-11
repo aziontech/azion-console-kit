@@ -32,8 +32,20 @@ export class HttpService {
       })
 
       return response
-    } catch (error) {
-      throw this.errorHandler.create(error)
+    } catch (axiosError) {
+      const respData = axiosError.response?.data
+      const firstErr = respData?.errors?.[0]
+
+      if (firstErr?.meta !== undefined) {
+        return {
+          data: {
+            data: firstErr.meta
+          },
+          status: axiosError.response.status
+        }
+      }
+
+      throw this.errorHandler.create(axiosError)
     }
   }
 
