@@ -33,18 +33,10 @@ export class HttpService {
 
       return response
     } catch (axiosError) {
-      const respData = axiosError.response?.data
-      const firstErr = respData?.errors?.[0]
-
-      if (firstErr?.meta) {
-        return {
-          data: {
-            data: firstErr.meta
-          },
-          status: axiosError.response.status
-        }
+      const meta = this.errorHandler.createMeta(axiosError)
+      if (meta) {
+        return meta
       }
-
       throw this.errorHandler.create(axiosError)
     }
   }

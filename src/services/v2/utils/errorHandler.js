@@ -15,6 +15,22 @@ export class ErrorHandler {
     return new ErrorHandler(status, messages)
   }
 
+  static createMeta(axiosError) {
+    const respData = axiosError.response?.data
+    const firstErr = respData?.errors?.[0]
+
+    if (firstErr?.meta) {
+      return {
+        data: {
+          data: firstErr.meta
+        },
+        status: axiosError.response.status
+      }
+    }
+
+    return null
+  }
+
   static _extractMessages(error) {
     if (!error?.response) {
       return [this.ERROR_MESSAGES.CONNECTION_ERROR]
