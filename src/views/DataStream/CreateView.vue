@@ -11,7 +11,6 @@
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import { dataStreamService } from '@/services/v2'
 
-  // Schema de Validação
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     dataSource: yup.string().required(),
@@ -194,6 +193,77 @@
     })
   })
 
+  // Initial Values for the form
+  const initialValues = {
+    // Basic fields
+    name: '',
+    dataSource: '',
+    template: '',
+    dataSet: '',
+    domainOption: '',
+    endpoint: '',
+    status: true,
+    hasSampling: false,
+    samplingPercentage: 0,
+
+    // Standard endpoint fields
+    endpointUrl: '',
+    headers: [],
+    lineSeparator: '\n',
+    payloadFormat: '',
+
+    // Kafka endpoint fields
+    bootstrapServers: '',
+    kafkaTopic: '',
+    useTls: false,
+
+    // S3 endpoint fields
+    host: '',
+    bucket: '',
+    region: '',
+    accessKey: '',
+    secretKey: '',
+    objectKey: '',
+    contentType: '',
+
+    // Google Big Query endpoint fields
+    projectID: '',
+    datasetID: '',
+    tableID: '',
+    serviceAccountKey: '',
+
+    // Elasticsearch endpoint fields
+    elasticsearchUrl: '',
+    apiKey: '',
+
+    // Splunk endpoint fields
+    splunkUrl: '',
+    splunkApiKey: '',
+
+    // AWS Kinesis Firehose endpoint fields
+    streamName: '',
+    awsRegion: '',
+    awsAccessKey: '',
+    awsSecretKey: '',
+
+    // Datadog endpoint fields
+    datadogUrl: '',
+    datadogApiKey: '',
+
+    // QRadar endpoint fields
+    QRadarUrl: '',
+
+    // Azure Monitor endpoint fields
+    logType: '',
+    sharedKey: '',
+    workspaceID: '',
+
+    // Azure Blob Storage endpoint fields
+    storageAccount: '',
+    containerName: '',
+    blobToken: ''
+  }
+
   const displaySamplingDialog = ref(false)
   const formSubmit = (onSubmit, values) => {
     if (!values.hasSampling) {
@@ -226,10 +296,12 @@
       <CreateFormBlock
         :createService="dataStreamService.createDataStreamService"
         :schema="validationSchema"
+        :initialValues="initialValues"
         @on-response="handleToast"
         disableToast
       >
-        <template #form="{ resetForm }">
+        <template #form="{ resetForm, errors }">
+         <pre>{{errors}}</pre>
           <FormFieldsDataStream :resetForm="resetForm" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">

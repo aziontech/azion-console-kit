@@ -1,8 +1,8 @@
 <template>
   <FormHorizontal
-    title="Destination"
+    title="Output"
     description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform."
-    data-testid="data-stream-form__section__destination"
+    data-testid="data-stream-form__section__output"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -36,7 +36,7 @@
             name="endpointUrl"
             :value="endpointUrl"
             placeholder="https://app.domain.com/"
-            data-testid="data-stream-form__destination__url-field"
+            data-testid="data-stream-form__output__url-field"
           />
         </div>
 
@@ -793,7 +793,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
   import LabelBlock from '@/templates/label-block'
-  import vueMonacoEditor from 'vue-monaco-editor'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
   const store = useAccountStore()
 
@@ -880,7 +880,7 @@
 
   const MAX_HEADER_COUNT = 5
   const hasLessThanFive = computed(() => {
-    return headers.value.length < MAX_HEADER_COUNT
+    return headers?.value?.length < MAX_HEADER_COUNT
   })
 
   const listContentType = ref([

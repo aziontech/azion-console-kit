@@ -271,7 +271,9 @@ export const DataStreamAdapter = {
         return {
           id: template.id,
           name: template.name,
-          dataSet: template.data_set
+          dataSet: template?.data_set,
+          custom: template?.custom,
+          active: template?.active
         }
       }) || []
     )
@@ -360,6 +362,19 @@ export const DataStreamAdapter = {
       hasSampling: !!samplingTransform,
       samplingPercentage: samplingTransform?.attributes?.rate,
       ...getInfoByEndpoint(endpointOutput)
+    }
+  },
+  transformPayloadTemplate(payload) {
+    return {
+      name: payload.name,
+      data_set: JSON.stringify(JSON.parse(payload.dataSet), null, '\t')
+    }
+  },
+  transformLoadTemplate(payload) {
+    return {
+      id: payload.id,
+      name: payload.name,
+      dataSet: payload?.data_set
     }
   }
 }
