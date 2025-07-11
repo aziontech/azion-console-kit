@@ -1,75 +1,103 @@
 <script setup>
-  import { ref } from 'vue'
-  import { useField } from 'vee-validate'
-  import PrimeButton from 'primevue/button'
-
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import Drawer from '@/views/EdgeApplications/Drawer'
+  import PrimeButton from 'primevue/button'
+  import { useField } from 'vee-validate'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import DrawerCustomPages from '@/views/CustomPages/Drawer'
-
-  const props = defineProps({
-    listEdgeApplicationsService: { type: Function, required: true },
-    loadEdgeApplicationsService: { type: Function, required: true },
-    listEdgeFirewallService: { type: Function, required: true },
-    loadEdgeFirewallService: { type: Function, required: true },
-    listCustomPagesService: { type: Function, required: true },
-    loadCustomPagesService: { type: Function, required: true }
-  })
-
-  const handleListCustomPages = async (query) => {
-    return await props.listCustomPagesService({ ...query, fields: ['id', 'name'] })
-  }
-
-  defineOptions({ name: 'form-fields-variables' })
-  const emit = defineEmits(['edgeFirewallCreated'])
-
-  const drawerRef = ref(null)
-  const drawerEdgeFirewallRef = ref(null)
-  const drawerCustomPagesRef = ref(null)
+  import DrawerEdgeApplication from '@/views/EdgeApplications/Drawer'
+  import { edgeAppService, edgeFirewallService, customPageService } from '@/services/v2'
+  import { ref } from 'vue'
 
   const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeFirewall } = useField('edgeFirewall')
   const { value: customPage } = useField('customPage')
 
-  const openDrawer = () => drawerRef.value?.openCreateDrawer()
-  const openDrawerEdgeFirewall = () => drawerEdgeFirewallRef.value?.openCreateDrawer()
-  const openDrawerCustomPages = () => drawerCustomPagesRef.value?.openCreateDrawer()
+  const drawerRef = ref('')
+  const drawerEdgeFirewallRef = ref('')
+  const drawerCustomPagesRef = ref(null)
 
-  const handleEdgeApplicationCreated = (edgeApplicationId) => {
-    edgeApplication.value = edgeApplicationId
+  const hasEdgeFirewallAccess = ref(true)
+
+  const handleEdgeFirewallClear = () => {
+    edgeFirewall.value = null
   }
 
-  const handleEdgeFirewallCreated = (edgeFirewallId) => {
-    edgeFirewall.value = edgeFirewallId
-    emit('edgeFirewallCreated')
+  const handleCustomPageClear = () => {
+    customPage.value = null
   }
 
-  const handleCustomPagesCreated = (customPageId) => {
-    customPage.value = customPageId
-    emit('customPageCreated')
+  const openDrawerEdgeApplication = () => {
+    drawerRef.value.openCreateDrawer()
+  }
+
+  const openDrawerEdgeFirewall = () => {
+    drawerEdgeFirewallRef.value.openCreateDrawer()
+  }
+
+  const openDrawerCustomPages = () => {
+    drawerCustomPagesRef.value.openCreateDrawer()
+  }
+
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
+
+  const handleEdgeApplicationCreated = (id) => {
+    edgeApplication.value = id
+  }
+
+  const handleCustomPagesCreated = (id) => {
+    customPage.value = id
+  }
+
+  const handleQuery = (queryParams) => {
+    const query = {
+      ...queryParams,
+      fields: ['id', 'name'],
+      active: true
+    }
+    return query
+  }
+
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await edgeAppService.listEdgeApplicationsServiceDropdown({
+      ...handleQuery(queryParams)
+    })
+  }
+
+  const listEdgeFirewallDropdown = async (queryParams) => {
+    return await edgeFirewallService.listEdgeFirewallService({
+      ...handleQuery(queryParams)
+    })
+  }
+
+  const handleListCustomPages = async (queryParams) => {
+    return await customPageService.listCustomPagesService({ ...handleQuery(queryParams) })
+  }
+
+  const handleEdgeFirewallCreated = (id) => {
+    edgeFirewall.value = id
   }
 </script>
-
 <template>
-  <FormHorizontal
+  <form-horizontal
     title="Deployment Settings"
-    description="Select the edge application and edge firewall to be associated with the domain."
+    description="Configure the deployment of your workload by selecting the appropriate Edge Application and Edge Firewall. The Edge Application handles traffic routing and processing at the edge, while the Edge Firewall provides security by filtering and blocking malicious traffic."
   >
     <template #inputs>
-      <Drawer
-        ref="drawerRef"
-        @onEdgeApplicationCreated="handleEdgeApplicationCreated"
-      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeApplication
+          ref="drawerRef"
+          @onEdgeApplicationCreated="handleEdgeApplicationCreated"
+        />
         <FieldDropdownLazyLoader
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
           name="edgeApplication"
-          :service="listEdgeApplicationsService"
-          :loadService="loadEdgeApplicationsService"
+          :service="listEdgeApplicationsDecorator"
+          :loadService="edgeAppService.loadEdgeApplicationService"
           optionLabel="name"
           optionValue="value"
           :value="edgeApplication"
@@ -80,12 +108,12 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  @click="openDrawer"
+                  @click="openDrawerEdgeApplication"
                   class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
                   text
                   size="small"
                   icon="pi pi-plus-circle"
-                  data-testid="domains-form__create-edge-application-button"
                   :pt="{
                     label: { class: 'w-full text-left' },
                     root: { class: 'p-2' }
@@ -97,6 +125,7 @@
           </template>
         </FieldDropdownLazyLoader>
       </div>
+
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <DrawerEdgeFirewall
           ref="drawerEdgeFirewallRef"
@@ -104,11 +133,14 @@
         />
         <FieldDropdownLazyLoader
           label="Edge Firewall"
-          enableClearOption
+          :enableClearOption="!!edgeFirewall"
           data-testid="domains-form__edge-firewall-field"
           name="edgeFirewall"
-          :service="listEdgeFirewallService"
-          :loadService="loadEdgeFirewallService"
+          @onClear="handleEdgeFirewallClear"
+          :service="listEdgeFirewallDropdown"
+          :loadService="edgeFirewallService.loadEdgeFirewallService"
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          v-if="hasEdgeFirewallAccess"
           optionLabel="name"
           optionValue="value"
           :value="edgeFirewall"
@@ -144,11 +176,12 @@
         />
         <FieldDropdownLazyLoader
           label="Custom Page"
-          enableClearOption
+          :enableClearOption="!!customPage"
           data-testid="domains-form__custom-page-field"
           name="customPage"
+          @onClear="handleCustomPageClear"
           :service="handleListCustomPages"
-          :loadService="loadCustomPagesService"
+          :loadService="customPageService.loadCustomPagesService"
           optionLabel="name"
           optionValue="value"
           :value="customPage"
@@ -177,5 +210,5 @@
         </FieldDropdownLazyLoader>
       </div>
     </template>
-  </FormHorizontal>
+  </form-horizontal>
 </template>

@@ -99,8 +99,8 @@
           :loadService="loadEdgeFunctionServiceDecorator"
           :moreOptions="['jsonArgs']"
           disableEmitFirstRender
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           :value="edgeFunctionID"
           inputId="edgeFunctionID"
           @onSelectOption="changeArgs"

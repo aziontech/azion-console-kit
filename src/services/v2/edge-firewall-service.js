@@ -5,7 +5,12 @@ export class EdgeFirewallService {
     this.baseURL = 'v4/edge_firewall/firewalls'
   }
 
-  listEdgeFirewallService = async (params = { pageSize: 10 }) => {
+  listEdgeFirewallService = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name', 'debug_rules', 'last_editor', 'last_modified', 'active']
+    }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -15,7 +20,7 @@ export class EdgeFirewallService {
     const { results, count } = data
 
     const parsedEdgeFirewalls = await Promise.all(
-      this.adapter?.transformListEdgeFirewall?.(results) ?? results
+      this.adapter?.transformListEdgeFirewall?.(results, params.fields) ?? results
     )
 
     return {

@@ -9,7 +9,7 @@
         :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
-        :listService="listDomainsService"
+        :listService="workloadService.listWorkloads"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
@@ -18,6 +18,7 @@
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
         :defaultOrderingFieldName="'name'"
+        :hiddenByDefault="columnsHiddenByDefault"
       />
       <EmptyResultsBlock
         v-else
@@ -26,7 +27,7 @@
         :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
-        :documentationService="documentationService"
+        :documentationService="Helpers.documentationCatalog.domains"
       >
         <template #illustration>
           <Illustration />
@@ -45,6 +46,8 @@
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import { workloadService } from '@/services/v2'
+  import * as Helpers from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -52,75 +55,62 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    listDomainsService: {
-      required: true,
-      type: Function
-    },
-    deleteDomainService: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
-    }
-  })
-
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
   const DOMAINS_API_FIELDS = [
-    'id',
     'name',
-    'edge_application',
+    'domains',
+    'workload_domain',
+    'infrastructure',
     'active',
-    'alternate_domains',
-    'workload_hostname',
-    'product_version'
+    'last_modified',
+    'id',
+    'last_editor',
+    'product_version',
+    'workload_domain'
   ]
 
+  const columnsHiddenByDefault = ['id', 'lastEditor', 'protocols']
+
   const hasContentToList = ref(true)
+
   const actions = [
     {
       type: 'delete',
       title: 'domain',
       icon: 'pi pi-trash',
-      service: props.deleteDomainService
+      service: workloadService.deleteWorkload
     }
   ]
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Domain'
+      productName: 'Workload'
     })
-  }
-
-  const showLockedMessage = () => {
-    const options = {
-      closable: true,
-      severity: 'warn',
-      summary: 'Warning',
-      detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
-    }
-
-    toast.add(options)
   }
 
   const handleTrackEditEvent = (domain) => {
     tracker.product.clickToEdit({
-      productName: 'Domain'
+      productName: 'Workload'
     })
     if (domain.isLocked) {
-      showLockedMessage()
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'Warning',
+        detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+      })
     }
   }
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        filterPath: 'id',
+        sortField: 'id'
+      },
       {
         field: 'name',
         header: 'Name',
@@ -134,9 +124,22 @@
         }
       },
       {
-        field: 'domainName',
-        header: 'Domain Name',
-        filterPath: 'domainName.content',
+        field: 'domains',
+        header: 'Domains',
+        filterPath: 'domains',
+        disableSort: true,
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'expand-column'
+          })
+        }
+      },
+      {
+        field: 'workloadHostname',
+        header: 'Workload Domain',
+        filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
         component: (columnData) => {
@@ -144,19 +147,16 @@
             data: columnData,
             columnAppearance: 'text-with-clipboard',
             dependencies: {
-              copyContentService: props.clipboardWrite
+              copyContentService: Helpers.clipboardWrite
             }
           })
         }
       },
       {
-        field: 'cnames',
-        header: 'CNAME',
-        filterPath: 'description.value',
-        type: 'component',
-        disableSort: true,
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        field: 'infrastructure',
+        header: 'Infrastructure',
+        filterPath: 'infrastructure',
+        sortField: 'infrastructure'
       },
       {
         field: 'active',
@@ -169,6 +169,24 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        filterPath: 'lastModified',
+        sortField: 'lastModified'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        filterPath: 'lastEditor',
+        sortField: 'lastEditor'
+      },
+      {
+        field: 'protocols',
+        header: 'Protocols',
+        filterPath: 'protocols',
+        sortField: 'protocols'
       }
     ]
   })

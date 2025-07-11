@@ -1,75 +1,54 @@
 <template>
-  <EditFormBlock
-    :editService="editDomainService"
-    :loadService="loadDomainService"
-    :schema="validationSchema"
-    :updatedRedirect="updatedRedirect"
-    @loaded-service-object="setDomainName"
-    @on-edit-success="handleTrackEditEvent"
-    @on-edit-fail="handleTrackFailEditEvent"
-    isTabs
-  >
-    <template #form>
-      <FormFieldsEditDomains
-        :digitalCertificates="digitalCertificates"
-        :loadDigitalCertificatesService="loadDigitalCertificatesService"
-        hasDomainName
-        @copyDomainName="copyDomainName"
-      />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock :pageTitle="workloadName" />
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading }">
-      <ActionBarTemplate
-        @onSubmit="onSubmit"
-        @onCancel="onCancel"
-        :loading="loading"
-      />
+    <template #content>
+      <EditFormBlock
+        :editService="workloadService.editWorkload"
+        :loadService="workloadService.loadWorkload"
+        :schema="validationSchema"
+        :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setWorkloadName"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
+      >
+        <template #form>
+          <FormFieldsWorkload isEdit />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
     </template>
-  </EditFormBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
   import { ref, inject } from 'vue'
-
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { workloadService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    editDomainService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
-    updateDigitalCertificates: {
-      type: Function,
-      required: true
-    },
-    domain: {
-      type: Object,
-      required: true
-    }
+  defineProps({
+    updatedRedirect: { type: String, required: true }
   })
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
-      productName: 'Domain'
+      productName: 'Workload'
     })
   }
 
@@ -77,7 +56,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Domain',
+        productName: 'Workload',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -85,35 +64,16 @@
       .track()
   }
 
-  const digitalCertificates = ref([])
-  const toast = useToast()
-  const domainName = ref()
+  const workloadName = ref()
 
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
-  }
-
-  const copyDomainName = ({ name }) => {
-    props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
-  }
-
-  const setDomainName = async (domain) => {
-    domainName.value = domain.name
-  }
-
-  const loadDomainService = () => {
-    return props.domain
+  const setWorkloadName = async (workload) => {
+    workloadName.value = workload.name
   }
 
   const validationSchema = yup.object({
-    id: yup.string().required(),
     name: yup
       .string()
+      .label('Name')
       .required()
       .test(
         'only-ascii',
@@ -123,42 +83,109 @@
           return nameRegex.test(value)
         }
       ),
-    domainName: yup.string().required(),
-    httpsPort: yup.array().when('useHttps', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    httpPort: yup.array().min(1).required(),
-    quicPort: yup.array().when('useHtpp3', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    cnames: yup
-      .string()
-      .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .test({
-        name: 'no-whitespace',
-        message: `Space characters aren't allowed.`,
-        test: (value) => value?.includes(' ') === false
-      }),
-    cnameAccessOnly: yup.boolean(),
-    edgeCertificate: yup.string().optional(),
-    mtlsIsEnabled: yup.boolean(),
-    mtlsVerification: yup.string(),
-    mtlsTrustedCertificate: yup
-      .string()
-      .when('mtlsIsEnabled', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .label('Trusted CA Certificate'),
+    edgeApplication: yup.number().required().label('Edge Application'),
     active: yup.boolean(),
-    environment: yup.string()
+    networkMap: yup.string(),
+    infrastructure: yup.string(),
+    edgeFirewall: yup.number().label('Edge Firewall').nullable(),
+    tls: yup.object({
+      isEnabled: yup.boolean(),
+      certificate: yup.string(),
+      ciphers: yup.string(),
+      minimumVersion: yup.string()
+    }),
+    protocols: yup.object({
+      http: yup.object({
+        useHttps: yup.boolean(),
+        useHttp3: yup.boolean(),
+        versions: yup.array(),
+        httpPorts: yup.array().when('useHttp3', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        }),
+        httpsPorts: yup.array().when('useHttps', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        }),
+        quicPorts: yup.array().when('useHttp3', {
+          is: true,
+          then: (schema) => schema.min(1, 'At least one port is required'),
+          otherwise: (schema) => schema.notRequired()
+        })
+      })
+    }),
+    mtls: yup.object({
+      isEnabled: yup.boolean(),
+      verification: yup.string().nullable().notRequired().label('Verification'),
+      certificate: yup
+        .string()
+        .when('isEnabled', {
+          is: true,
+          then: (schema) => schema.required('Trusted CA Certificate is required'),
+          otherwise: (schema) => schema.notRequired().nullable()
+        })
+        .label('Trusted CA Certificate'),
+      crl: yup
+        .array()
+        .when('isEnabled', {
+          is: true,
+          then: (schema) => schema.required('Certificate Revocation List is required').min(1),
+          otherwise: (schema) => schema.nullable().notRequired()
+        })
+        .label('Certificate Revocation List')
+    }),
+    domains: yup
+      .array()
+      .of(
+        yup.object({
+          id: yup.number(),
+          subdomain: yup
+            .string()
+            .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
+              if (!value) return true // Allow empty subdomain
+              return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            })
+            .label('Subdomain'),
+          domain: yup
+            .string()
+            .test('valid-domain', 'Invalid Domain format', function (value) {
+              if (!value) return true // Allow empty domain
+              return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/.test(value)
+            })
+            .label('Domain')
+        })
+      )
+      .when('workloadHostnameAllowAccess', {
+        is: false,
+        then: (schema) =>
+          schema.test(
+            'has-filled-domain',
+            'At least one domain with subdomain and domain is required',
+            (value) => value?.some((domain) => domain.subdomain && domain.domain)
+          )
+      }),
+    useCustomDomain: yup.boolean(),
+    customDomain: yup
+      .string()
+      .nullable()
+      .when('useCustomDomain', {
+        is: true,
+        then: (schema) =>
+          schema
+            .required()
+            .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
+              if (!value) return true // Allow empty hostname
+              return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            })
+      })
+      .label('Custom Domain'),
+    workloadHostnameAllowAccess: yup.boolean(),
+    letEncrypt: yup.object({
+      commonName: yup.string(),
+      alternativeNames: yup.array()
+    }),
+    authorityCertificate: yup.string()
   })
 </script>
