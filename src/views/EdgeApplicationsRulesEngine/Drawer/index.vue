@@ -162,7 +162,7 @@
         props.edgeApplicationId,
         params
       )
-      functionsInstanceOptions.value = responseFunctions.map((el) => {
+      functionsInstanceOptions.value = responseFunctions?.body?.map((el) => {
         return {
           id: el.id,
           name: el.name.text

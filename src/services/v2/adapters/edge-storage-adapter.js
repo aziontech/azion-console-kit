@@ -2,6 +2,7 @@ import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataRe
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const transformMap = {
+  id: (value) => value.name,
   name: (value) => value.name,
   active: (value) => parseStatusData(value.active),
   edgeAccess: (value) => value.edge_access,
