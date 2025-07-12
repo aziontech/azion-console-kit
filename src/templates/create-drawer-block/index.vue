@@ -110,7 +110,7 @@
     const options = {
       closable: true,
       severity: 'success',
-      summary: 'success',
+      summary: 'Success',
       detail: toastData.feedback,
       additionalDetails: toastData?.additionalFeedback,
       action: toastData?.actions

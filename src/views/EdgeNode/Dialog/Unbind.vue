@@ -132,7 +132,7 @@
     loading.value = true
     try {
       const feedback = await data.service(data.selectedID)
-      showToast('success', feedback ?? 'Unbound successfully!')
+      showToast('success', 'Success', feedback ?? 'Unbound successfully!')
       resetForm()
       dialogRef.value.close({ updated: true })
     } catch (error) {

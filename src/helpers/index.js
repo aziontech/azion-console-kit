@@ -31,6 +31,7 @@ import {
   formatDateToUS,
   convertValueToDateByUserTimezone,
   formatDateMonthAndYear,
+  getRemainingDays,
   getCurrentDateTimeIntl
 } from './convert-date'
 import { formatCurrencyString, formatUnitValue } from './convert-number'
@@ -122,5 +123,6 @@ export {
   adaptServiceDataResponse,
   formatDateMonthAndYear,
   getExpiredDate,
+  getRemainingDays,
   getCurrentDateTimeIntl
 }

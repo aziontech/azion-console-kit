@@ -93,6 +93,10 @@ import { EdgeDNSRecordsService } from './edge-dns-records-service'
 import { PaymentService } from './payment-service'
 import { PaymentAdapter } from './adapters/payment-adapter'
 
+// Billing GQL
+import { BillingGqlService } from './billing-gql-service'
+import { BillingGqlAdapter } from './adapters/billing-gql-adapter'
+
 // Workload
 import { WorkloadService } from './workload-service'
 import { WorkloadAdapter } from './adapters/workload-adapter'
@@ -100,6 +104,7 @@ import { WorkloadAdapter } from './adapters/workload-adapter'
 // Workload Deployment
 import { WorkloadDeploymentService } from './workload-deployments-service'
 import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapter'
+
 // Edge Storage
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
@@ -149,6 +154,8 @@ const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
 const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
+
+const billingGqlService = new BillingGqlService(httpService, BillingGqlAdapter)
 const workloadDeploymentService = new WorkloadDeploymentService(
   httpService,
   WorkloadDeploymentAdapter
@@ -186,6 +193,7 @@ export {
   edgeDNSService,
   edgeDNSRecordsService,
   paymentService,
+  billingGqlService,
   workloadService,
   workloadDeploymentService,
   edgeStorageService

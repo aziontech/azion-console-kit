@@ -37,8 +37,9 @@ const adapt = (httpResponse, accountIsNotRegular) => {
         )}`
       : emptyDefaultValue
   const parseInvoice = {
+    redirectId: invoiceData?.billId,
     billId: invoiceData?.billId || emptyDefaultValue,
-    total: invoiceData?.totalValue || emptyDefaultValue,
+    total: invoiceData?.totalValue || 0,
     currency: invoiceData?.currency || emptyDefaultValue,
     billingPeriod,
     productChanges: emptyDefaultValue,

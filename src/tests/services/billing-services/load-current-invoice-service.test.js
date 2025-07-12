@@ -27,6 +27,7 @@ const fixtures = {
     creditUsedForPayment: 0,
     currency: 'BRL',
     productChanges: '---',
+    redirectId: 2707388,
     servicePlan: '---',
     total: '0.00',
     temporaryBill: true
@@ -70,9 +71,10 @@ describe('BillingServices', () => {
       creditUsedForPayment: 0,
       currency: '---',
       productChanges: '---',
+      redirectId: undefined,
       servicePlan: '---',
       temporaryBill: '---',
-      total: '---'
+      total: 0
     })
   })
 
