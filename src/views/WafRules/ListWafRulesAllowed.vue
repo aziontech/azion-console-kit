@@ -105,7 +105,7 @@
     },
     {
       field: 'name',
-      header: 'Name',
+      header: 'Description',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
@@ -113,11 +113,11 @@
 
     {
       field: 'path',
-      header: 'URI'
+      header: 'Path'
     },
     {
       field: 'conditions',
-      header: 'Match Zones',
+      header: 'Conditions',
       type: 'component',
       disableSort: true,
       component: (columnData) =>

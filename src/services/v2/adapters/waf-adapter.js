@@ -42,20 +42,20 @@ const transformMap = {
   threatsConfiguration: (value) => parseThreatTypes(value.engine_settings)
 }
 
-const getPrefix = (condition) => {
-  const prefixSpecific = condition.match.includes('specific_')
-  const prefixValue = condition.match.includes('_value') ? 'value' : ''
-  const prefixName = condition.match.includes('_name') ? 'name' : ''
-  const prefixField = prefixValue || prefixName
-  const prefix = prefixSpecific ? prefixField : ''
+const getPrefix = ({ match }) => {
+  const prefixSpecific = match.includes('specific_')
+  const suffixValue = match.includes('_value') ? 'value' : ''
+  const suffixName = match.includes('_name') ? 'name' : ''
+  const suffixField = suffixValue || suffixName
+  const suffix = prefixSpecific ? suffixField : ''
 
-  return { prefix, prefixSpecific }
+  return { prefixSpecific, suffix }
 }
 
 export const WafAdapter = {
   transformListWafRules(data, fields) {
     return adaptServiceDataResponse(data, fields, transformMap)
-  }, //OK
+  },
   adaptWafRulePayload(payload) {
     const camelToSnakeMap = {
       crossSiteScripting: 'cross_site_scripting',
@@ -84,7 +84,7 @@ export const WafAdapter = {
         }
       }
     }
-  }, //OK
+  },
   transformLoadWafRule({ data: response }) {
     const responseThresholds = response?.engine_settings?.attributes?.thresholds || []
 
@@ -105,14 +105,14 @@ export const WafAdapter = {
       active: response.active,
       ...threatsConfiguration
     }
-  }, //OK
+  },
   adaptCreateWafRuleAllowedPayload(payload) {
     const formatConditions =
       payload.conditions?.map((condition) => {
-        const { prefix } = getPrefix(condition)
+        const { suffix } = getPrefix(condition)
         return {
           match: condition.match,
-          ...(prefix && { [prefix]: condition[prefix] })
+          ...(suffix && { [suffix]: condition.field })
         }
       }) || []
 
@@ -125,64 +125,62 @@ export const WafAdapter = {
       operator: payload.operator ? 'regex' : 'contains'
     }
     return payloadReturn
-  }, //OK - FALTA TALVEZ VERFICAR A QUESTAO DE SPECIFIC E ANY
-  adaptCreateWafRuleAllowedTuningPayload(attack, hasMatchValue, name, path) {
-    const MAP_MATCH_ZONES_CONDITIONAL = {
-      query_string: 'conditional_query_string',
-      request_body: 'conditional_request_body',
-      request_header: 'conditional_request_header',
-      body: 'conditional_request_body',
-      file_name: 'file_name',
-      path: 'path',
-      raw_body: 'raw_body',
-      cookie: 'conditional_request_header'
-    }
-
-    const MAP_MATCH_ZONES = {
-      query_string: 'query_string',
-      request_body: 'request_body',
-      request_header: 'request_header',
-      body: 'request_body',
-      file_name: 'file_name',
-      path: 'path',
-      raw_body: 'raw_body',
-      cookie: 'request_header'
-    }
-
-    function checkAndReturnDefault(zone, hasMatchValue) {
-      const defaultZone = 'conditional_request_header'
-      const ZONES = hasMatchValue ? MAP_MATCH_ZONES_CONDITIONAL : MAP_MATCH_ZONES
-      return ZONES[zone] || defaultZone
-    }
-
-    function removeEmptyLinesAndSpaces(name) {
-      return name
+  },
+  adaptCreateWafRuleAllowedTuningPayload(attack, name, path) {
+    const payloadReturn = {
+      rule_id: attack.ruleId,
+      ...(path && { path }),
+      name: name
         .split('\n')
         .filter((line) => line.trim() !== '')
         .join(' ')
         .trim()
     }
 
-    const REQUEST_BODY_EXCEPTION_RULE_ID = 11
-    let matchZones = {
-      zone:
-        attack.ruleId === REQUEST_BODY_EXCEPTION_RULE_ID
-          ? 'request_body'
-          : checkAndReturnDefault(attack.matchZone, hasMatchValue),
-      matches_on: attack.matchesOn
+    const hasMatchValue = !!attack.matchValue
+    const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
+    const valueField = attack.matchValue === '-' ? null : attack.matchValue
+
+    const MAP_ZONES = hasMatchValue
+      ? {
+          query_string: 'specific_query_string',
+          request_body: 'specific_request_body',
+          request_header: 'specific_request_header',
+          body: 'specific_request_body',
+          file_name: 'file_extension',
+          raw_body: 'raw_body',
+          cookie: 'specific_request_header'
+        }
+      : {
+          query_string: 'any_query_string',
+          request_body: 'any_request_body',
+          request_header: 'any_request_header',
+          body: 'any_request_body',
+          file_name: 'file_extension',
+          raw_body: 'raw_body',
+          cookie: 'any_request_header'
+        }
+
+    if (attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY) {
+      return {
+        ...payloadReturn,
+        conditions: [{ match: 'any_request_body' }]
+      }
     }
 
-    if (hasMatchValue) {
-      const isCookieZone = attack.matchZone === 'cookie'
-      const zoneInputValue = attack.matchValue === '-' ? null : attack.matchValue
-      matchZones.zone_input = isCookieZone ? 'cookie' : zoneInputValue
-    }
+    const match = MAP_ZONES[attack.matchZone] || 'specific_request_header'
+    const suffix = hasMatchValue ? `_${attack.matchesOn}` : ''
 
     return {
-      rule_id: attack.ruleId,
-      match_zones: [matchZones],
-      ...(path && { path }),
-      name: removeEmptyLinesAndSpaces(name)
+      ...payloadReturn,
+      conditions: [
+        {
+          match: `${match}${suffix}`,
+          ...(hasMatchValue && {
+            [attack.matchesOn]: attack.matchZone === 'cookie' ? attack.matchZone : valueField
+          })
+        }
+      ]
     }
   },
   transformListWafRulesAllowed(data) {
@@ -214,75 +212,15 @@ export const WafAdapter = {
       count: data?.count ?? 0,
       body: parsedWafRulesAllowed
     }
-  }, // OK
+  },
   transformLoadWafRuleAllowed({ data: waf }) {
-    const conditions = [
-      {
-        match: 'any_http_header_value'
-      },
-      {
-        match: 'any_http_header_name'
-      },
-      {
-        match: 'specific_http_header_value',
-        value: 'user-agent'
-      },
-      {
-        match: 'specific_http_header_name',
-        name: 'user-agent'
-      },
-      {
-        match: 'any_query_string_value'
-      },
-      {
-        match: 'any_query_string_name'
-      },
-      {
-        match: 'specific_query_string_value',
-        value: 'foo'
-      },
-      {
-        match: 'specific_query_string_name',
-        name: 'foo'
-      },
-      {
-        match: 'body_form_field_value'
-      },
-      {
-        match: 'body_form_field_name'
-      },
-      {
-        match: 'specific_body_form_field_value',
-        value: 'bar'
-      },
-      {
-        match: 'specific_body_form_field_name',
-        name: 'bar'
-      },
-      {
-        match: 'any_url'
-      },
-      {
-        match: 'specific_url',
-        value: '/path'
-      },
-      {
-        match: 'raw_body'
-      },
-      {
-        match: 'file_extension'
-      }
-    ]
-
-    waf.conditions = conditions || []
-
     const formatConditions = waf.conditions.map((condition) => {
-      const { prefix } = getPrefix(condition)
+      const { suffix } = getPrefix(condition)
 
       return {
         ...condition,
         title: defaultConditions.find((match) => match.value === condition.match)?.title,
-        field: prefix ? condition[prefix] : undefined
+        field: suffix ? condition[suffix] : undefined
       }
     })
 
@@ -295,5 +233,5 @@ export const WafAdapter = {
       status: waf.active,
       operator: waf.operator === 'regex'
     }
-  } // OK
+  }
 }

@@ -1,18 +1,25 @@
 export const defaultConditions = [
   { title: 'Any HTTP Header Value', value: 'any_http_header_value' },
   { title: 'Any HTTP Header Name', value: 'any_http_header_name' },
-  { title: 'Specific HTTP Header Value', value: 'specific_http_header_value' },
-  { title: 'Specific HTTP Header Name', value: 'specific_http_header_name' },
+  { title: 'Specific HTTP Header Value', value: 'specific_http_header_value', isField: 'Value' },
+  { title: 'Specific HTTP Header Name', value: 'specific_http_header_name', isField: 'Name' },
   { title: 'Any Query String Value', value: 'any_query_string_value' },
   { title: 'Any Query String Name', value: 'any_query_string_name' },
-  { title: 'Specific Query String Value', value: 'specific_query_string_value' },
-  { title: 'Specific Query String Name', value: 'specific_query_string_name' },
+  { title: 'Specific Query String Value', value: 'specific_query_string_value', isField: 'Value' },
+  { title: 'Specific Query String Name', value: 'specific_query_string_name', isField: 'Name' },
   { title: 'Body Form Field Value', value: 'body_form_field_value' },
   { title: 'Body Form Field Name', value: 'body_form_field_name' },
-  { title: 'Specific Body Form Field Value', value: 'specific_body_form_field_value' },
-  { title: 'Specific Body Form Field Name', value: 'specific_body_form_field_name' },
+  {
+    title: 'Specific Body Form Field Value',
+    value: 'specific_body_form_field_value',
+    isField: 'Value'
+  },
+  {
+    title: 'Specific Body Form Field Name',
+    value: 'specific_body_form_field_name',
+    isField: 'Name'
+  },
   { title: 'Any URL', value: 'any_url' },
-  { title: 'Specific URL', value: 'specific_url' },
   { title: 'Raw Body', value: 'raw_body' },
   { title: 'File Extension', value: 'file_extension' }
 ]
@@ -242,4 +249,7 @@ export const optionsRuleIds = [
 ]
 
 /* eslint-enable no-useless-escape */
-export const itemDefaultCondition = { title: 'Specific URL', value: 'specific_url' }
+export const itemDefaultCondition = {
+  title: 'Any HTTP Header Value',
+  match: 'any_http_header_value'
+}
