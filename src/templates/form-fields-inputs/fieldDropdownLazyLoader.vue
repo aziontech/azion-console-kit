@@ -49,6 +49,15 @@
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
+    <template #option="slotProps">
+      <div class="flex align-items-center">
+        <i
+          v-if="slotProps.option.icon"
+          :class="`pi ${slotProps.option.icon}`"
+        ></i>
+        <div>{{ slotProps.option.name }}</div>
+      </div>
+    </template>
 
     <template #header>
       <div class="p-2 flex">
@@ -293,7 +302,7 @@
       }
     } catch (error) {
       //Here we check if the error was caused by a lack of permission. If that's not the case, we add the ID to avoid blocking the user's experience.
-      if (error.includes(PERMISSION_DENIED)) {
+      if (typeof error === 'string' && error?.includes(PERMISSION_DENIED)) {
         hasNoPermission.value = true
         preventValueSetWithoutPermission()
       }

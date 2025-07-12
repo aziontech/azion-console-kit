@@ -26,8 +26,12 @@ const convertPortToInt = (ports) => {
 }
 
 const adapt = (payload) => {
-  payload.domains[0].allow_access = !payload.cnameAccessOnly
-  const domains = payload.domains
+  if (payload.customHostname) {
+    const sufix = '.azion.app'
+    payload.domains[0] = `${payload.customHostname}${sufix}`
+  } else {
+    payload.domains[0] = []
+  }
 
   const dataRequest = {
     name: payload.name,
@@ -49,7 +53,8 @@ const adapt = (payload) => {
       verification: payload.mtlsVerification,
       certificate: payload.mtlsTrustedCertificate
     },
-    domains,
+    workload_hostname_allow_access: payload.workloadHostnameAllowAccess,
+    domains: payload.domains,
     network_map: payload.environment
   }
 

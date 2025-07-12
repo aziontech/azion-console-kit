@@ -76,6 +76,7 @@
   const selectedPhase = ref('Request phase')
   const dialog = useDialog()
   const toast = useToast()
+  const currentPhase = ref('request')
 
   const getColumns = computed(() => {
     return [
@@ -91,11 +92,6 @@
         disableSort: true
       },
       {
-        field: 'description',
-        header: 'Description',
-        disableSort: true
-      },
-      {
         field: 'status',
         header: 'Status',
         type: 'component',
@@ -107,6 +103,21 @@
             columnAppearance: 'tag'
           })
         },
+        disableSort: true
+      },
+      {
+        field: 'description',
+        header: 'Description',
+        disableSort: true
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        disableSort: true
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
         disableSort: true
       }
     ]
@@ -129,7 +140,7 @@
   }
 
   const listRulesEngineWithDecorator = async (query) => {
-    const data = await rulesEngineService.listRulesEngine({
+    const data = await rulesEngineService.listRulesEngineRequestAndResponsePhase({
       edgeApplicationId: props.edgeApplicationId,
       ...query
     })
@@ -137,8 +148,7 @@
   }
 
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
-    const phase =
-      ruleData.phase.content == 'Default' ? 'request' : ruleData.phase.content.toLowerCase()
+    const phase = ruleData.phase?.content.toLowerCase()
 
     return await rulesEngineService.deleteRulesEngine({
       edgeApplicationId: props.edgeApplicationId,
@@ -157,6 +167,7 @@
   }
 
   const openEditRulesEngineDrawer = (item) => {
+    currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
 
@@ -202,7 +213,8 @@
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {
-        rules: alteredRows
+        rules: alteredRows,
+        isEdgeApplicationRulesEngine: true
       },
       onClose: ({ data }) => {
         if (data?.updated || data?.reset) {
@@ -235,9 +247,11 @@
     :documentationService="documentationService"
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
+    :currentPhase="currentPhase"
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
+
   <TableBlock
     ref="listRulesEngineRef"
     orderableRows
@@ -258,6 +272,7 @@
     groupColumn="phase.content"
     :expandedRowGroups="['Default', 'Request', 'Response']"
     expandableRowGroups
+    isEdgeApplicationRulesEngine
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div

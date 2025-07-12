@@ -32,8 +32,12 @@ export class HttpService {
       })
 
       return response
-    } catch (error) {
-      throw this.errorHandler.create(error)
+    } catch (axiosError) {
+      const meta = this.errorHandler.createMeta(axiosError)
+      if (meta) {
+        return meta
+      }
+      throw this.errorHandler.create(axiosError)
     }
   }
 

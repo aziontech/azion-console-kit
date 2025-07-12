@@ -30,9 +30,7 @@
       title: 'Edge Cache',
       inputValue: 'edge_cache',
       subtitle: `Purge content from Azion's edge cache layer.`
-    }
-  ]
-  const subscriptionLayerRadioOptions = [
+    },
     {
       title: 'Tiered Cache',
       inputValue: 'tiered_cache',
@@ -42,6 +40,18 @@
   ]
 
   const isLayerTieredCache = computed(() => layer.value === 'tiered_cache')
+
+  const showHelperTextArguments = computed(() => {
+    const helpText = {
+      cacheKey: '',
+      default: 'Separate each argument using a new line.'
+    }
+    if (purgeType.value === 'cachekey') {
+      helpText.cacheKey = `Use this specific format ”httpswww.example.com/images/image.jpg”`
+    }
+
+    return helpText
+  })
 
   const purgeTypeRadioOptions = computed(() => {
     return [
@@ -61,7 +71,7 @@
         inputValue: 'url',
         name: 'url-purge-type',
         hide: isLayerTieredCache.value,
-        subtitle: `Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.`
+        subtitle: `Enter a list of content URLs to be purged.`
       },
       {
         title: 'Wildcard',
@@ -81,17 +91,9 @@
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Default Layer"
         nameField="layer"
         isCard
         :options="layerRadioOptions"
-      />
-
-      <FieldGroupRadio
-        label="Subscription Layer"
-        nameField="layer"
-        isCard
-        :options="subscriptionLayerRadioOptions"
       />
     </template>
   </FormHorizontal>
@@ -132,9 +134,13 @@
           name="argumentsPurge"
           rows="2"
           :placeholder="computedPurgeArgumentsPlaceHolder"
-          description="Separate each argument using a new line."
           autoResize
-        />
+        >
+          <template #description>
+            <p v-if="showHelperTextArguments.cacheKey">{{ showHelperTextArguments.cacheKey }}</p>
+            {{ showHelperTextArguments.default }}
+          </template>
+        </FieldTextArea>
       </div>
     </template>
   </FormHorizontal>

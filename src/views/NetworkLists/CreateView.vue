@@ -57,7 +57,8 @@
     networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
     selectedCountries: yup.array().when('networkListType', {
       is: 'countries',
-      then: (schema) => schema.required('Countries is a required field').min(1)
+      then: (schema) =>
+        schema.required('Countries is a required field').min(1, 'Select at least one country')
     }),
     ipCidr: yup.string().when('networkListType', {
       is: 'ip_cidr',

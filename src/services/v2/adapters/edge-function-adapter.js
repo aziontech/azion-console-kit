@@ -57,6 +57,7 @@ const transformMap = {
   name: (value) => value.name,
   code: (value) => value.code,
   version: (value) => value.version || '-',
+  vendor: (value) => value.vendor || '-',
   isProprietaryCode: (value) => value.is_proprietary_code || false
 }
 
@@ -97,6 +98,7 @@ export const EdgeFunctionsAdapter = {
           id: edgeFunction.id,
           lastEditor: parseLastEditor(edgeFunction),
           name: parseName(edgeFunction),
+          vendor: edgeFunction.vendor,
           referenceCount: edgeFunction.reference_count
         }
       }) || []

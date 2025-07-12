@@ -2,6 +2,7 @@
   import { computed, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -39,6 +40,10 @@
     iconPosition: {
       type: String,
       default: 'right'
+    },
+    required: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -59,13 +64,11 @@
 </script>
 
 <template>
-  <label
-    v-if="props.label"
+  <LabelBlock
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
-  >
-    {{ props.label }}
-  </label>
+    :label="props.label"
+    :isRequired="props.required"
+  />
   <span
     class="w-full"
     :class="iconPositionClass"

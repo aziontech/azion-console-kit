@@ -11,6 +11,7 @@ import { DigitalCertificatesCSRAdapter } from './adapters/digital-certificates-c
 import { DigitalCertificatesCSRService } from './digital-certificates-csr-service'
 
 // Digital Certificates CRL Service
+import { DigitalCertificatesCRLAdapter } from './adapters/digital-certificates-crl-adapter'
 import { DigitalCertificatesCRLService } from './digital-certificates-crl-service'
 
 // Digital Certificates CR Service
@@ -96,6 +97,18 @@ import { PaymentAdapter } from './adapters/payment-adapter'
 import { BillingGqlService } from './billing-gql-service'
 import { BillingGqlAdapter } from './adapters/billing-gql-adapter'
 
+// Workload
+import { WorkloadService } from './workload-service'
+import { WorkloadAdapter } from './adapters/workload-adapter'
+
+// Workload Deployment
+import { WorkloadDeploymentService } from './workload-deployments-service'
+import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapter'
+
+// Edge Storage
+import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
+import { EdgeStorageService } from './edge-storage-service'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -128,7 +141,10 @@ const dataStreamService = new DataStreamService(httpService, DataStreamAdapter)
 const customPageService = new CustomPageService(httpService, CustomPageAdapter)
 const mafService = new MFAService(httpService, MFAAdapter)
 const edgeConnectorsService = new EdgeConnectorsService(httpService, EdgeConnectorsAdapter)
-const digitalCertificatesCRLService = new DigitalCertificatesCRLService(httpService)
+const digitalCertificatesCRLService = new DigitalCertificatesCRLService(
+  httpService,
+  DigitalCertificatesCRLAdapter
+)
 const digitalCertificatesCRService = new DigitalCertificatesCRService(httpService)
 const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
   httpService,
@@ -136,10 +152,21 @@ const digitalCertificatesCSRService = new DigitalCertificatesCSRService(
 )
 const edgeDNSService = new EdgeDNSService(httpService, EdgeDNSAdapter)
 const edgeDNSRecordsService = new EdgeDNSRecordsService(httpService, EdgeDNSRecordsAdapter)
-
+const edgeStorageService = new EdgeStorageService(httpService, EdgeStorageAdapter)
 const paymentService = new PaymentService(httpService, PaymentAdapter)
 
 const billingGqlService = new BillingGqlService(httpService, BillingGqlAdapter)
+const workloadDeploymentService = new WorkloadDeploymentService(
+  httpService,
+  WorkloadDeploymentAdapter
+)
+const workloadService = new WorkloadService(
+  httpService,
+  WorkloadAdapter,
+  workloadDeploymentService,
+  digitalCertificatesService,
+  DigitalCertificatesAdapter
+)
 
 export {
   vcsService,
@@ -166,5 +193,8 @@ export {
   edgeDNSService,
   edgeDNSRecordsService,
   paymentService,
-  billingGqlService
+  billingGqlService,
+  workloadService,
+  workloadDeploymentService,
+  edgeStorageService
 }

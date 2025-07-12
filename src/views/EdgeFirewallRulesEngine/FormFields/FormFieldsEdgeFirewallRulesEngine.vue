@@ -70,7 +70,7 @@
   })
 
   const listWafRulesServiceOptions = async (query) => {
-    return await props.listWafRulesService({ ...query, fields: 'name,id' })
+    return await props.listWafRulesService({ ...query, fields: 'name,id', active: true })
   }
 
   const listNetworkList = async () => {
@@ -380,20 +380,17 @@
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
+    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
 
     return [
       { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
+      { value: 'tag_event', label: 'Tag Event' },
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
-        value: 'set_waf_ruleset',
-        label: `${
-          hasWebApplicationFirewallModuleEnabled
-            ? 'Set WAF Rule Set'
-            : 'Set WAF Rule Set - requires WAF'
-        }`,
+        value: 'set_waf',
+        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
         disabled:
           wafBehaviorIsAlreadySelected ||
           !hasWebApplicationFirewallModuleEnabled ||
@@ -464,8 +461,13 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
   }
+
+  const isTagEvent = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
+  }
+
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
   }
@@ -490,7 +492,7 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
@@ -555,7 +557,7 @@
             <Divider
               align="left"
               type="dashed"
-              class="capitalize"
+              class="capitalize z-0"
             >
               {{ criteriaRow.conditional }}
             </Divider>
@@ -732,6 +734,7 @@
           <Divider
             align="left"
             type="dashed"
+            class="z-0"
           >
             {{ generateBehaviorLabelSection(behaviorItem) }}
           </Divider>
@@ -789,6 +792,17 @@
               />
             </template>
 
+            <template v-if="isTagEvent(behaviorItemIndex)">
+              <FieldText
+                class="w-full"
+                id="`behaviors[${behaviorItemIndex}].tag_event`"
+                :key="`${behaviorItem.key}-tag_event`"
+                placeholder="Tag Event"
+                :value="behaviors[behaviorItemIndex].value.tag_event"
+                :name="`behaviors[${behaviorItemIndex}].tag_event`"
+              />
+            </template>
+
             <template v-if="isWafBehavior(behaviorItemIndex)">
               <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
@@ -809,8 +823,8 @@
                 :name="`behaviors[${behaviorItemIndex}].mode`"
                 :options="[
                   {
-                    label: 'Learning',
-                    value: 'learning'
+                    label: 'Logging',
+                    value: 'logging'
                   },
                   {
                     label: 'Blocking',

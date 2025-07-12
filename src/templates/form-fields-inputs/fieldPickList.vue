@@ -142,7 +142,7 @@
     return data.value[0]
   })
   const filteredTarget = computed(() => {
-    return data.value[1].filter((item) =>
+    return data.value[1]?.filter((item) =>
       item.name.toLowerCase().includes(searchTarget.value.toLowerCase())
     )
   })

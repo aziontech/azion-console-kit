@@ -1,11 +1,8 @@
 <script setup>
   import { useEdgeDNSStore } from '@/stores/edge-dns'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-
-  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
@@ -45,20 +42,20 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    :title="`${handleTextDomainWorkload.singularTitle}`"
+    title="Domain Name"
     description="Provide the domain name you want to host."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          :label="`${handleTextDomainWorkload.singularTitle} Name`"
+          label="Domain Name"
           required
           name="domain"
           placeholder="mydomain.com"
           data-testid="edge-dns-form__domain"
         >
           <template #description>
-            Add the root {{ handleTextDomainWorkload.singularLabel }} name. Example:
+            Add the root domain name. Example:
             <code>mydomain.com</code>.
           </template>
         </FieldText>

@@ -5,7 +5,7 @@ export class DataStreamService {
     this.http = http
     this.adapter = adapter
     this.baseURL = 'v4/data_stream/streams'
-    this.dataSetsEndpoint = 'v4/data_stream/data_sets'
+    this.dataSetsEndpoint = 'v4/data_stream/templates'
     this.workloadEndpoint = 'v4/workspace/workloads'
   }
 
@@ -20,16 +20,20 @@ export class DataStreamService {
       params
     })
 
-    const enriched = await enrichByMatchingReference(
-      data.results,
-      this.listTemplates,
-      (item) => item.data_set_id,
-      (item, matchedRef) => ({
+    const getTemplateId = (item) =>
+      item.transform?.find((transform) => transform.type === 'render_template')?.attributes
+        ?.template
+
+    const enriched = await enrichByMatchingReference({
+      items: data.results,
+      fetchReferencePage: this.listTemplates,
+      getReferenceId: getTemplateId,
+      merge: (item, matchedRef) => ({
         ...item,
         templateName: matchedRef.name
       }),
-      { pageSize: 100 }
-    )
+      pageSize: 100
+    })
 
     return {
       count: data.count,
@@ -49,7 +53,7 @@ export class DataStreamService {
     return { results, count: data.count }
   }
 
-  createDataSteramService = async (payload) => {
+  createDataStreamService = async (payload) => {
     const body = this.#getTransformed('transformPayloadDataStream', payload)
 
     const response = await this.http.request({
@@ -59,6 +63,53 @@ export class DataStreamService {
     })
 
     return response.data
+  }
+
+  createTemplateService = async (payload) => {
+    const body = this.#getTransformed('transformPayloadTemplate', payload)
+
+    const response = await this.http.request({
+      method: 'POST',
+      url: this.dataSetsEndpoint,
+      body
+    })
+
+    return {
+      feedback: 'Your custom template has been created',
+      id: response.data.data.id
+    }
+  }
+
+  editTemplateService = async (payload) => {
+    const body = this.#getTransformed('transformPayloadTemplate', payload)
+
+    await this.http.request({
+      method: 'PATCH',
+      url: `${this.dataSetsEndpoint}/${payload.id}`,
+      body
+    })
+
+    return {
+      feedback: 'Your custom template has been updated'
+    }
+  }
+
+  deleteTemplateService = async (id) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.dataSetsEndpoint}/${id}`
+    })
+
+    return 'Template successfully deleted'
+  }
+
+  loadTemplateService = async ({ id }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `${this.dataSetsEndpoint}/${id}`
+    })
+
+    return this.#getTransformed('transformLoadTemplate', data.data)
   }
 
   editDataStreamService = async (payload) => {
@@ -78,8 +129,11 @@ export class DataStreamService {
       method: 'GET',
       url: `${this.baseURL}/${id}`
     })
+    const filterWorkloads = data.data.transform?.find((item) => item.type === 'filter_workloads')
 
-    const workloads = await this.handlesWorkloads(data.data.filters.workloads)
+    const workloads = filterWorkloads
+      ? await this.handlesWorkloads(filterWorkloads.attributes.workloads)
+      : []
 
     return this.#getTransformed('transformLoadDataStream', [data.data, workloads])
   }

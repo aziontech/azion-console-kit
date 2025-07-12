@@ -54,29 +54,6 @@
         header: 'Name'
       },
       {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        sortField: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'default',
-        header: 'Default',
-        sortField: 'default',
-        filterPath: 'default',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        },
-        disableSort: false
-      },
-      {
         field: 'active',
         header: 'Active',
         sortField: 'active',
@@ -89,18 +66,20 @@
           })
         },
         disableSort: false
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        sortField: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })
 
-  const CUSTOM_PAGES_API_FIELDS = [
-    'id',
-    'name',
-    'last_editor',
-    'last_modified',
-    'default',
-    'active'
-  ]
+  const CUSTOM_PAGES_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'active']
 </script>
 
 <template>
