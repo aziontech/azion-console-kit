@@ -57,6 +57,10 @@
       type: Boolean,
       default: false
     },
+    pt: {
+      type: Object,
+      default: () => {}
+    },
     optionGroupLabel: {
       type: String,
       default: ''
@@ -140,6 +144,22 @@
       loadingIcon: `${id}__loading-icon`
     }
   })
+
+  const passThrough = computed(() => {
+    return {
+      filterInput: {
+        class: 'w-full',
+        'data-testid': customTestId.value.filterInput
+      },
+      trigger: {
+        'data-testid': customTestId.value.trigger
+      },
+      loadingIcon: {
+        'data-testid': customTestId.value.loadingIcon
+      },
+      ...props.pt
+    }
+  })
 </script>
 
 <template>
@@ -174,18 +194,7 @@
     v-bind="$attrs"
     :disabled="props.disabled"
     class="w-full"
-    :pt="{
-      filterInput: {
-        class: 'w-full',
-        'data-testid': customTestId.filterInput
-      },
-      trigger: {
-        'data-testid': customTestId.trigger
-      },
-      loadingIcon: {
-        'data-testid': customTestId.loadingIcon
-      }
-    }"
+    :pt="passThrough"
     :data-testid="customTestId.dropdown"
   >
     <template

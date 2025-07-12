@@ -48,8 +48,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/TabsView.vue'),
       props: {
         wafRulesAllowed: {
-          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          optionsRuleIds: WafRulesService.optionsRuleIds
+          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed
         },
         wafServices: {
           updatedRedirect: 'list-waf-rules'

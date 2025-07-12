@@ -42,7 +42,7 @@ export class WafService {
   }
 
   editWafRule = async (payload, wafId) => {
-    const adaptedPayload = this.adapter.adaptWafRulePayload({ payload, isEdit: true })
+    const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
     await this.http.request({
       method: 'PATCH',
       url: `${this.baseURL}/${wafId}`,
@@ -71,11 +71,13 @@ export class WafService {
   }
 
   cloneWafRule = async ({ wafRulesName, payload }) => {
-    const adaptedPayload = this.adapter.adaptCloneWafRulePayload(payload, wafRulesName)
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/${payload.id}/clone`,
-      body: adaptedPayload
+      body: {
+        id: payload.id,
+        name: wafRulesName
+      }
     })
 
     return {
@@ -109,24 +111,13 @@ export class WafService {
 
   createWafRulesAllowedTuning = async ({ attackEvents, wafId, name }) => {
     const requests = attackEvents.flatMap((attack) => {
-      const hasMatchValue = !!attack.matchValue
-
       if (!attack?.top10Paths) {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
-          attack,
-          hasMatchValue,
-          name
-        )
+        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name)
         return [this._createTuningRequest({ wafId, payload })]
       }
 
       return attack.top10Paths.map(({ path }) => {
-        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(
-          attack,
-          hasMatchValue,
-          name,
-          path
-        )
+        const payload = this.adapter.adaptCreateWafRuleAllowedTuningPayload(attack, name, path)
         return this._createTuningRequest({ wafId, payload })
       })
     })
@@ -154,30 +145,22 @@ export class WafService {
     return 'Your waf rule allowed has been updated'
   }
 
-  listWafRulesAllowed = async ({
-    wafId,
-    fields = '',
-    search = '',
-    ordering = '',
-    page = 1,
-    pageSize = 10
-  }) => {
-    const params = { fields, ordering, page, pageSize, search }
-    const { data } = await this.http.request({
-      url: `${this.baseURL}/${wafId}/exceptions`,
-      method: 'GET',
-      params
-    })
-
-    return this.adapter?.transformListWafRulesAllowed?.(data) ?? data
-  }
-
   loadWafRuleAllowed = async ({ id, allowedId }) => {
     const { data } = await this.http.request({
       url: `${this.baseURL}/${id}/exceptions/${allowedId.id}`,
       method: 'GET'
     })
 
-    return this.adapter?.transformLoadWafRuleAllowed?.(data) ?? data
+    return this.adapter?.transformLoadWafRuleAllowed?.(data)
+  }
+
+  listWafRulesAllowed = async (params) => {
+    const { data } = await this.http.request({
+      url: `${this.baseURL}/${params.wafId}/exceptions`,
+      method: 'GET',
+      params
+    })
+
+    return this.adapter?.transformListWafRulesAllowed?.(data)
   }
 }
