@@ -1,6 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
+
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
@@ -54,7 +56,7 @@
   const handleQuery = (queryParams) => {
     const query = {
       ...queryParams,
-      fields: ['id', 'name'],
+      fields: ['id', 'name', 'active'],
       active: true
     }
     return query
@@ -67,7 +69,7 @@
   }
 
   const listEdgeFirewallDropdown = async (queryParams) => {
-    return await edgeFirewallService.listEdgeFirewallService({
+    return await edgeFirewallService.listEdgeFirewallServiceDropdown({
       ...handleQuery(queryParams)
     })
   }
@@ -91,7 +93,7 @@
           ref="drawerRef"
           @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
-        <FieldDropdownLazyLoader
+        <fieldDropdownLazyLoaderWithFilter
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
@@ -102,6 +104,8 @@
           optionValue="value"
           :value="edgeApplication"
           appendTo="self"
+          keyToFilter="active"
+          :valuesToFilter="[true]"
           placeholder="Select an edge application"
         >
           <template #footer>
@@ -123,7 +127,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdownLazyLoader>
+        </fieldDropdownLazyLoaderWithFilter>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -131,7 +135,7 @@
           ref="drawerEdgeFirewallRef"
           @onSuccess="handleEdgeFirewallCreated"
         />
-        <FieldDropdownLazyLoader
+        <fieldDropdownLazyLoaderWithFilter
           label="Edge Firewall"
           :enableClearOption="!!edgeFirewall"
           data-testid="domains-form__edge-firewall-field"
@@ -145,6 +149,8 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
+          keyToFilter="active"
+          :valuesToFilter="[true]"
           placeholder="Select an edge firewall"
         >
           <template #footer>
@@ -166,7 +172,7 @@
               </li>
             </ul>
           </template>
-        </FieldDropdownLazyLoader>
+        </fieldDropdownLazyLoaderWithFilter>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

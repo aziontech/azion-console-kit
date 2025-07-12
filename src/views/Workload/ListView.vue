@@ -45,6 +45,7 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2'
   import * as Helpers from '@/helpers'
@@ -77,7 +78,7 @@
   const actions = [
     {
       type: 'delete',
-      title: 'domain',
+      title: `${handleTextDomainWorkload.singularLabel}`,
       icon: 'pi pi-trash',
       service: workloadService.deleteWorkload
     }

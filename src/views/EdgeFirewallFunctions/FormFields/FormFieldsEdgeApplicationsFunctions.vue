@@ -99,8 +99,8 @@
           :moreOptions="['jsonArgs']"
           disableEmitFirstRender
           @onSelectOption="changeArgs"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           appendTo="self"
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
         >

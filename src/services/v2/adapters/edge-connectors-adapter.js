@@ -35,16 +35,12 @@ const extractAddressesLoadRequest = (addresses) => {
 
 const typeBuilders = {
   live_ingest: (payload) => ({
-    attributes: {
-      endpoint: payload.connectionOptions.region
-    }
+    region: payload.connectionOptions.region
   }),
 
   edge_storage: (payload) => ({
-    attributes: {
-      bucket: payload.connectionOptions.bucket,
-      prefix: payload.connectionOptionsprefix
-    }
+    bucket: payload.connectionOptions.bucket,
+    prefix: payload.connectionOptions.prefix
   }),
 
   http: (payload) => {
@@ -115,14 +111,14 @@ const typeBuilders = {
 const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
     connectionOptions: {
-      region: data.attributes.type_properties.endpoint
+      region: data.attributes.region
     }
   }),
 
   edge_storage: (data) => ({
     connectionOptions: {
-      bucket: data.attributes.type_properties.bucket,
-      prefix: data.attributes.type_properties.prefix
+      bucket: data.attributes.bucket,
+      prefix: data.attributes.prefix
     }
   }),
 
@@ -171,6 +167,12 @@ const typeBuildersLoadRequest = {
   })
 }
 
+const edgeConnectorsTypes = {
+  http: 'HTTP',
+  edge_storage: 'Edge Storage',
+  live_ingest: 'Live Ingest'
+}
+
 export const EdgeConnectorsAdapter = {
   transformListEdgeConnectors(data) {
     return (
@@ -178,15 +180,15 @@ export const EdgeConnectorsAdapter = {
         return {
           id: edgeConnectors.id,
           name: edgeConnectors.name,
-          type: edgeConnectors?.type,
-          header: edgeConnectors?.type_properties?.real_port_header,
-          address: edgeConnectors?.addresses
-            ? edgeConnectors?.addresses
+          type: edgeConnectorsTypes[edgeConnectors?.type],
+          header: edgeConnectors?.attributes?.connection_options?.host || '-',
+          address: edgeConnectors?.attributes?.addresses
+            ? edgeConnectors?.attributes?.addresses
                 .map((el) => {
                   return el.address
                 })
-                .join(',')
-            : [],
+                .join(', ')
+            : '-',
           active: edgeConnectors?.active
             ? parseStatusData(edgeConnectors.active)
             : edgeConnectors?.active,

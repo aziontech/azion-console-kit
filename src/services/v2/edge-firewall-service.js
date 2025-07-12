@@ -29,6 +29,30 @@ export class EdgeFirewallService {
     }
   }
 
+  listEdgeFirewallServiceDropdown = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name', 'active']
+    }
+  ) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+
+    const { results, count } = data
+
+    const parsedEdgeFirewalls = await Promise.all(
+      this.adapter?.transformListEdgeFirewallDropdown?.(results, params.fields) ?? results
+    )
+
+    return {
+      count,
+      body: parsedEdgeFirewalls
+    }
+  }
+
   createEdgeFirewallService = async (payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 

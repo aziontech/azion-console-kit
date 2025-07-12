@@ -31,7 +31,8 @@ export const DigitalCertificatesCRLAdapter = {
     return data?.map((item) => {
       return {
         id: checkIfFieldExist(item?.id, null),
-        name: checkIfFieldExist(item?.name)
+        name: checkIfFieldExist(item?.name),
+        status: item?.status
       }
     })
   },

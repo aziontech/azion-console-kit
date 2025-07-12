@@ -57,21 +57,21 @@ const adaptBehavior = (behaviors) => {
 
 const parsedBehavior = (behaviors) => {
   return behaviors.map((behavior) => {
-    let behaviorItem = { [MAP_BEHAVIOR[behavior.type] || 'target']: behavior.attributes.value }
+    let behaviorItem = { [MAP_BEHAVIOR[behavior.type] || 'target']: behavior.attributes?.value }
     if (behavior.type === 'capture_match_groups') {
       behaviorItem = { ...behavior.attributes }
     }
-    if (behavior.type === 'set_cache_policy' && typeof behavior.attributes.value === 'number') {
+    if (behavior.type === 'set_cache_policy' && typeof behavior.attributes?.value === 'number') {
       behaviorItem = { cacheId: behavior.attributes.value.toString() }
     }
-    if (behavior.type === 'set_origin' && typeof behavior.attributes.value === 'number') {
+    if (behavior.type === 'set_origin' && typeof behavior.attributes?.value === 'number') {
       behaviorItem = { originId: behavior.attributes.value.toString() }
     }
-    if (behavior.type === 'set_edge_connector' && typeof behavior.attributes.value === 'number') {
+    if (behavior.type === 'set_edge_connector' && typeof behavior.attributes?.value === 'number') {
       behaviorItem = { edgeConnectorId: parseInt(behavior.attributes.value) }
     }
     if (behavior.type === 'run_function') {
-      behaviorItem = { functionId: behavior.attributes.value.toString() }
+      behaviorItem = { functionId: behavior.attributes?.value.toString() }
     }
 
     return {
