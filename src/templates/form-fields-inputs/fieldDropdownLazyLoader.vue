@@ -16,6 +16,8 @@
     :optionLabel="props.optionLabel"
     :optionDisabled="props.optionDisabled"
     :optionValue="props.optionValue"
+    :optionGroupLabel="props.optionGroupLabel"
+    :optionGroupChildren="props.optionGroupChildren"
     :placeholder="props.placeholder"
     :showClear="props.enableClearOption"
     @change="emitChange"
@@ -167,6 +169,14 @@
     disableEmitFirstRender: {
       type: Boolean,
       default: false
+    },
+    optionGroupLabel: {
+      type: String,
+      default: ''
+    },
+    optionGroupChildren: {
+      type: String,
+      default: ''
     }
   })
 
