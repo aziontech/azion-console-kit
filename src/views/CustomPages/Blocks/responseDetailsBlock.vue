@@ -29,6 +29,7 @@
           label="Page Path (URI)"
           placeholder="/path/error_page.html"
           name="uri"
+          required
           :value="uri"
         />
       </div>

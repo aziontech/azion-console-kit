@@ -16,6 +16,17 @@
           appendTo="self"
         />
       </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldDropdown
+          label="Page Code"
+          required
+          name="pageCode"
+          :options="CODE_OPTIONS"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+        />
+      </div>
     </template>
   </FormHorizontal>
 </template>
@@ -23,7 +34,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-
+  import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
   const listTypes = [
     { label: 'Default', value: 'PageDefault' },
     { label: 'Connector', value: 'PageConnector' }
@@ -31,6 +42,10 @@
 
   const props = defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isEdit: {
       type: Boolean,
       default: false
     }

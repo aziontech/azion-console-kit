@@ -20,12 +20,23 @@
         :listService="listStatusCodeService"
         :actions="actionsRow"
         emptyListMessage="No status codes found."
-      />
+      >
+        <template #addButton>
+          <PrimeButton
+            icon="pi pi-plus"
+            label="Add Status Code"
+            data-testid="status-code__add-button"
+            @click="openEditStatusCodeDrawer"
+            class="w-full sm:w-auto"
+          />
+        </template>
+      </ListTableBlock>
     </template>
   </FormHorizontal>
 </template>
 
 <script setup>
+  import PrimeButton from 'primevue/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectStatusCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@templates/list-table-block'

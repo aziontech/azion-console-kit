@@ -232,21 +232,9 @@ footer {
 
 export const STATUS_CODE_OPTIONS = [
   {
-    id: 400,
-    code: '400',
-    name: 'Bad Request',
-    ...defaultValue
-  },
-  {
-    id: 401,
-    code: '401',
-    name: 'Unauthorized',
-    ...defaultValue
-  },
-  {
-    id: 403,
-    code: '403',
-    name: 'Forbidden',
+    id: 1,
+    code: 'Default',
+    name: 'Default',
     ...defaultValue
   },
   {
@@ -254,113 +242,30 @@ export const STATUS_CODE_OPTIONS = [
     code: '404',
     name: 'Not Found',
     ...defaultValue
-  },
-  {
-    id: 405,
-    code: '405',
-    name: 'Method Not Allowed',
-    ...defaultValue
-  },
-  {
-    id: 406,
-    code: '406',
-    name: 'Not Acceptable',
-    ...defaultValue
-  },
-  {
-    id: 408,
-    code: '408',
-    name: 'Request Timeout',
-    ...defaultValue
-  },
-  {
-    id: 409,
-    code: '409',
-    name: 'Conflict',
-    ...defaultValue
-  },
-  {
-    id: 410,
-    code: '410',
-    name: 'Gone',
-    ...defaultValue
-  },
-  {
-    id: 411,
-    code: '411',
-    name: 'Length Required',
-    ...defaultValue
-  },
-  {
-    id: 414,
-    code: '414',
-    name: 'URI Too Long',
-    ...defaultValue
-  },
-  {
-    id: 415,
-    code: '415',
-    name: 'Unsupported Media Type',
-    ...defaultValue
-  },
-  {
-    id: 416,
-    code: '416',
-    name: 'Range Not Satisfiable',
-    ...defaultValue
-  },
-  {
-    id: 426,
-    code: '426',
-    name: 'Upgrade Required',
-    ...defaultValue
-  },
-  {
-    id: 429,
-    code: '429',
-    name: 'Too Many Requests',
-    ...defaultValue
-  },
-  {
-    id: 431,
-    code: '431',
-    name: 'Request Header Fields Too Large',
-    ...defaultValue
-  },
-  {
-    id: 500,
-    code: '500',
-    name: 'Internal Server Error',
-    ...defaultValue
-  },
-  {
-    id: 501,
-    code: '501',
-    name: 'Not Implemented',
-    ...defaultValue
-  },
-  {
-    id: 502,
-    code: '502',
-    name: 'Bad Gateway',
-    ...defaultValue
-  },
-  {
-    id: 503,
-    code: '503',
-    name: 'Service Unavailable',
-    ...defaultValue
-  },
-  {
-    id: 504,
-    code: '504',
-    name: 'Gateway Timeout',
-    ...defaultValue
-  },
-  {
-    id: 505,
-    code: '505',
-    name: 'HTTP Version Not Supported',
-    ...defaultValue
   }
+]
+
+export const CODE_OPTIONS = [
+  { label: '400', value: 400 },
+  { label: '401', value: 401 },
+  { label: '403', value: 403 },
+  { label: '404', value: 404 },
+  { label: '405', value: 405 },
+  { label: '406', value: 406 },
+  { label: '408', value: 408 },
+  { label: '409', value: 409 },
+  { label: '410', value: 410 },
+  { label: '411', value: 411 },
+  { label: '414', value: 414 },
+  { label: '415', value: 415 },
+  { label: '416', value: 416 },
+  { label: '426', value: 426 },
+  { label: '429', value: 429 },
+  { label: '431', value: 431 },
+  { label: '500', value: 500 },
+  { label: '501', value: 501 },
+  { label: '502', value: 502 },
+  { label: '503', value: 503 },
+  { label: '504', value: 504 },
+  { label: '505', value: 505 }
 ]

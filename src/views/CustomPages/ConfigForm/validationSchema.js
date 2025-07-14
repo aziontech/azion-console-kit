@@ -19,6 +19,7 @@ export const pageSchema = yup.object().shape({
     is: 'PageConnector',
     then: (schema) =>
       schema
+        .required()
         .transform((value) => (value === '' ? null : value))
         .nullable()
         .matches(isUriValidRegex, 'Invalid URI')
