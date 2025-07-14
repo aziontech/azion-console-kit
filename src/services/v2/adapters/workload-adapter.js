@@ -66,7 +66,7 @@ const parseName = ({ name, product_version }) => {
 }
 
 const handleTls = (payload) => {
-  if (payload.protocols.http.useHttp3) {
+  if (payload.protocols.http.useHttps) {
     return {
       minimum_version: payload.tls.minimumVersion || null,
       ciphers: payload.tls.ciphers || null,
@@ -120,6 +120,7 @@ export const WorkloadAdapter = {
     }
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
+      delete payloadResquest.protocols.http.https_ports
     }
 
     return payloadResquest
