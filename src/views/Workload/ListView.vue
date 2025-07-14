@@ -22,8 +22,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No workload have been created"
-        description="Click the button below to create your first workload."
+        :title="titleEmptyPage"
+        :description="descriptionEmptyPage"
         :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
@@ -195,4 +195,11 @@
   function handleLoadData(event) {
     hasContentToList.value = event
   }
+
+  const titleEmptyPage = computed(
+    () => `No ${handleTextDomainWorkload.singularLabel} have been created`
+  )
+  const descriptionEmptyPage = computed(
+    () => `Click the button below to create your first ${handleTextDomainWorkload.singularLabel}.`
+  )
 </script>

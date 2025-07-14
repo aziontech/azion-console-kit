@@ -128,7 +128,9 @@ export class WorkloadService {
     const [first, ...rest] = payload.domains
 
     const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
-    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+    const alternativeNames = rest
+      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
+      .filter((name) => name.trim() !== '.')
     payload.letEncrypt.commonName = commonName
     payload.letEncrypt.alternativeNames = alternativeNames
   }
