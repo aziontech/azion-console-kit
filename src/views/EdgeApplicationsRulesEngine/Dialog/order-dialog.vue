@@ -56,7 +56,7 @@
           />
           <PrimeButton
             severity="secondary"
-            label="Save and Apply"
+            label="Save"
             icon-pos="right"
             @click="saveRules()"
             data-testid="review-changes-dialog-footer-delete-button"
