@@ -42,7 +42,8 @@
     'on-edit-success',
     'on-edit-fail',
     'on-load-fail',
-    'loaded-service-object'
+    'loaded-service-object',
+    'onError'
   ])
 
   const { scrollToError } = useScrollToError()
@@ -133,6 +134,7 @@
         }
         goBackToList()
       } catch (error) {
+      console.log('error :', error);
         blockViewRedirection.value = true
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
