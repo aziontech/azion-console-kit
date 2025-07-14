@@ -134,7 +134,6 @@
         }
         goBackToList()
       } catch (error) {
-      console.log('error :', error);
         blockViewRedirection.value = true
         // Check if error is an ErrorHandler instance (from v2 services)
         if (error && typeof error.showErrors === 'function') {
