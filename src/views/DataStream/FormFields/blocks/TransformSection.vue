@@ -16,7 +16,7 @@
         />
       </div>
       <div
-        v-if="domainOption === '0'"
+        v-if="domainOption === FILTERED_DOMAINS_OPTION"
         class="flex flex-col gap-2"
       >
         <LabelBlock
@@ -43,7 +43,7 @@
       </div>
 
       <div
-        v-if="domainOption === '1'"
+        v-if="domainOption === ALL_DOMAINS_OPTION"
         class="flex flex-col w-full gap-2"
       >
         <FieldSwitchBlock
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2'
@@ -103,18 +103,35 @@
   const { value: hasSampling } = useField('hasSampling')
   const { value: samplingPercentage } = useField('samplingPercentage')
 
+  const ALL_DOMAINS_OPTION = '1'
+  const FILTERED_DOMAINS_OPTION = '0'
+
   const hasNoPermissionToEditDataStream = computed(() => !store.hasPermissionToEditDataStream)
 
   const domainsRadioOptions = [
     {
       title: `All Current and Future ${handleTextDomainWorkload.pluralTitle}`,
-      inputValue: '1',
-      subtitle: `By selecting the All Current and Future ${handleTextDomainWorkload.pluralTitle} option, you can activate the Sampling option.`
+      subtitle: `By selecting the All Current and Future ${handleTextDomainWorkload.pluralTitle} option, you can activate the Sampling option.`,
+      inputValue: ALL_DOMAINS_OPTION
     },
     {
       title: `Filter ${handleTextDomainWorkload.pluralTitle}`,
       subtitle: `Select specific ${handleTextDomainWorkload.pluralTitle} to filter the data collected by this stream.`,
-      inputValue: '0'
+      inputValue: FILTERED_DOMAINS_OPTION
     }
   ]
+
+  watch(
+    () => domainOption.value,
+    (option) => {
+      if (option === ALL_DOMAINS_OPTION) {
+        if (domains.value[1] && domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
+          })
+          domains.value[1] = []
+        }
+      }
+    }
+  )
 </script>

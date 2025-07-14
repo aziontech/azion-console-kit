@@ -18,7 +18,7 @@
           icon="pi pi-plus"
           label="Credit"
           size="small"
-          @click="drawersMethods.openDrawerAddCredit"
+          @click="openDrawerAddCreditWithValidation"
           data-testid="payment-methods__add-credit__button"
           outlined
         />
@@ -27,7 +27,7 @@
           data-testid="payment-methods__add-payment-method__button"
           severity="secondary"
           size="small"
-          @click="drawersMethods.openDrawerPaymentMethod"
+          @click="openDrawerPaymentMethod"
           label="Payment Method"
         />
       </div>
@@ -39,7 +39,7 @@
     description="Click the button below to add a payment method."
     createButtonLabel="Payment Method"
     inTabs
-    @click-to-create="drawersMethods.openDrawerPaymentMethod"
+    @click-to-create="openDrawerPaymentMethod"
     :documentationService="props.documentPaymentMethodService"
   >
     <template #illustration>
@@ -57,13 +57,25 @@
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2'
 
-  import { ref, inject } from 'vue'
-  const emit = defineEmits(['update-credit-event'])
+  import { ref } from 'vue'
+  const emit = defineEmits([
+    'update-credit-event',
+    'openDrawerAddCredit',
+    'openDrawerAddPaymentMethod'
+  ])
   const hasContentToList = ref(true)
   const toast = useToast()
 
   const props = defineProps({
     documentPaymentMethodService: {
+      type: Function,
+      required: true
+    },
+    cardDefault: {
+      type: Object,
+      required: true
+    },
+    getStripeClientService: {
       type: Function,
       required: true
     }
@@ -79,7 +91,15 @@
 
   const listPaymentMethodsRef = ref('')
 
-  const drawersMethods = inject('drawersMethods')
+  const openDrawerAddCreditWithValidation = () => {
+    if (props.cardDefault.cardData) {
+      emit('openDrawerAddCredit')
+    }
+  }
+
+  const openDrawerPaymentMethod = () => {
+    emit('openDrawerAddPaymentMethod')
+  }
 
   const API_FIELDS = [
     'id',
@@ -142,7 +162,11 @@
       emit('update-credit-event')
       reloadList()
     } catch (error) {
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        showToast('error', 'Error', error)
+      }
     }
   }
 
