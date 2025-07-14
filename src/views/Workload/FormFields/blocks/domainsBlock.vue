@@ -51,6 +51,7 @@
     if (domainsList.value.length > 1) {
       remove(domainId)
     }
+    handleLetEncrypt()
   }
 
   const sugestionDomains = async () => {
@@ -106,7 +107,9 @@
     const [first, ...rest] = domains.value
 
     const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
-    const alternativeNames = rest.map(({ subdomain, domain }) => `${subdomain}.${domain}`)
+    const alternativeNames = rest
+      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
+      .filter((name) => name.trim() !== '.')
 
     setAlternativeNames(alternativeNames)
     setCommonName(commonName)
