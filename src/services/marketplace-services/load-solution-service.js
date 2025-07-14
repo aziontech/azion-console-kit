@@ -10,7 +10,7 @@ export const loadSolutionService = async ({ vendor, solution }) => {
   return parseHttpResponse(httpResponse)
 }
 const removeStyleAttributes = (html) => {
-  return html.replace(/style="[^"]*"/g, '')
+  return html?.replace(/style="[^"]*"/g, '')
 }
 
 const adapt = (httpResponse) => {
