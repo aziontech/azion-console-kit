@@ -143,20 +143,22 @@
                         <p class="text-sm font-normal text-color-secondary">
                           {{ labelFieldCondition(conditions[indexCondition]) }}:
                         </p>
-                        <p class="text-sm font-medium text-color">
+                        <p class="text-sm font-medium text-color break-all whitespace-normal">
                           {{ conditions[indexCondition].field }}
                         </p>
                       </div>
                     </div>
                   </div>
-                  <PrimeButton
-                    icon="pi pi-trash"
-                    severity="primary"
-                    outlined
-                    :disabled="conditions.length === 1"
-                    @click.stop="deleteMatchZone(indexCondition)"
-                    :data-testid="`allowed-rules-form__delete-match-zone[${indexCondition}]__button`"
-                  />
+                  <div>
+                    <PrimeButton
+                      icon="pi pi-trash"
+                      severity="primary"
+                      outlined
+                      :disabled="conditions.length === 1"
+                      @click.stop="deleteMatchZone(indexCondition)"
+                      :data-testid="`allowed-rules-form__delete-match-zone[${indexCondition}]__button`"
+                    />
+                  </div>
                 </div>
               </template>
               <div class="flex flex-col gap-5">
@@ -183,7 +185,7 @@
                     :name="`conditions[${indexCondition}].field`"
                     :value="conditions[indexCondition].field"
                     required
-                    description="Add a specific value that represents the match option or leave it blank to consider empty values."
+                    description="Add a specific value that represents the match option."
                     :data-testid="`allowed-rules-form__zone[${indexCondition}]__header-field`"
                   />
                 </div>
