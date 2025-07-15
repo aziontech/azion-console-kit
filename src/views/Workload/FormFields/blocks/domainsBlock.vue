@@ -36,6 +36,8 @@
   // eslint-disable-next-line no-unused-vars
   const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
   const { value: infrastructure } = useField('infrastructure')
+  const { value: tls } = useField('tls')
+
   const { setValue: setCommonName } = useField('letEncrypt.commonName')
   const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
   const domainsOptions = ref([])
@@ -101,6 +103,19 @@
   })
 
   const hasMultipleDomains = computed(() => domainsList.value.length !== 1)
+
+  const checkHasDomain = () => {
+    let hasDomain = false
+    domains.value.forEach((domain) => {
+      if (domain.domain) {
+        hasDomain = true
+      }
+    })
+
+    if (hasDomain && tls.value.certificate === 0) {
+      tls.value.certificate = 1
+    }
+  }
   const handleLetEncrypt = () => {
     if (!domains.value?.length) return
 
@@ -113,6 +128,7 @@
 
     setAlternativeNames(alternativeNames)
     setCommonName(commonName)
+    checkHasDomain()
   }
 
   sugestionDomains()

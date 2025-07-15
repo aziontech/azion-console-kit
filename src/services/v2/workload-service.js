@@ -49,6 +49,10 @@ export class WorkloadService {
       body
     })
 
+    if (data.hasError) {
+      throw data.error()
+    }
+
     this._workloadData = data.data
     return this._workloadData
   }
