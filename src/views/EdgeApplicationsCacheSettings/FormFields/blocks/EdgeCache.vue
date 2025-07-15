@@ -61,7 +61,7 @@
 
       <div
         v-if="showSliceConfigurationRange"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
+        class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
       >
         <label
           for="sliceConfigurationRange"
@@ -69,17 +69,15 @@
           >Offset (KB)</label
         >
         <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-          <i class="pi pi-lock text-color-secondary" />
           <InputNumber
             class="w-full"
             name="sliceConfigurationRange"
-            :min="1024"
+            :min="0"
             :max="1024"
             v-model="sliceConfigurationRange"
             id="sliceConfigurationRange"
             placeholder="1024 Kbps"
             type="number"
-            disabled
             data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
           />
         </span>
@@ -87,6 +85,12 @@
         <small class="text-color-secondary text-xs font-normal leading-5">
           Specify the fragment size (in KB) of each slice when optimizing large files. Valid range:
           1-1024.
+        </small>
+        <small
+          v-if="sliceConfigurationRangeError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ sliceConfigurationRangeError }}
         </small>
       </div>
     </template>
@@ -120,8 +124,7 @@
     return [
       {
         title: 'Honor cache policies',
-        subtitle:
-          'Use the cache policies defined by the origin server, or set a custom maximum cache TTL for edge caching.',
+        subtitle: `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`,
         inputValue: 'honor',
         disabled: !!showSliceConfigurationRange.value
       },
@@ -135,7 +138,8 @@
 
   const { value: cdnCacheSettingsMaximumTtl, errorMessage: cdnCacheSettingsMaximumTtlError } =
     useField('cdnCacheSettingsMaximumTtl')
-  const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
+  const { value: sliceConfigurationRange, errorMessage: sliceConfigurationRangeError } =
+    useField('sliceConfigurationRange')
   const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
 
