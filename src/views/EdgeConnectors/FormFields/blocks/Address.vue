@@ -27,13 +27,13 @@
                   </div>
                   <div class="flex gap-2">
                     <div class="flex gap-1">
-                      <p class="text-sm font-normal text-color-secondary">Plain Port:</p>
+                      <p class="text-sm font-normal text-color-secondary">Http Port:</p>
                       <p class="text-sm font-medium text-color">
                         {{ addresses[addressIndex].value.plainPort }}
                       </p>
                     </div>
                     <div class="flex gap-1">
-                      <p class="text-sm font-normal text-color-secondary">TLS Port:</p>
+                      <p class="text-sm font-normal text-color-secondary">Https Port:</p>
                       <p class="text-sm font-medium text-color">
                         {{ addresses[addressIndex].value.tlsPort }}
                       </p>
@@ -78,21 +78,23 @@
               <div class="flex sm:flex-row flex-col gap-5">
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
-                    label="Plain Port"
-                    :name="`addresses[${addressIndex}].plainPort`"
-                    :value="addresses[addressIndex].value.plainPort"
+                    label="Http Port"
+                    :name="`addresses[${addressIndex}].httpPort`"
+                    :value="addresses[addressIndex].value.httpPort"
+                    :min="0"
                     description="Specify the plain (non-encrypted) port for communication with the origin (e.g., 80 for HTTP)."
-                    data-testid="edge-connectors-form__address-management__plain-port-field"
+                    data-testid="edge-connectors-form__address-management__http-port-field"
                   />
                 </div>
 
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
-                    label="TLS Port"
-                    :name="`addresses[${addressIndex}].tlsPort`"
-                    :value="addresses[addressIndex].value.tlsPort"
+                    label="Https Port"
+                    :name="`addresses[${addressIndex}].httpsPort`"
+                    :value="addresses[addressIndex].value.httpsPort"
+                    :min="0"
                     description="Specify the secure port for encrypted communication with the origin (e.g., 443 for HTTPS)."
-                    data-testid="edge-connectors-form__address-management__tls-port-field"
+                    data-testid="edge-connectors-form__address-management__https-port-field"
                   />
                 </div>
               </div>
@@ -164,21 +166,23 @@
             <div class="flex sm:flex-row flex-col gap-5">
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
-                  label="Plain Port"
-                  :name="`addresses[${0}]?.plainPort`"
-                  :value="addresses[0]?.value.plainPort"
+                  label="Http Port"
+                  :name="`addresses[${0}]?.httpPort`"
+                  :value="addresses[0]?.value.httpPort"
+                  :min="0"
                   description=""
-                  data-testid="edge-connectors-form__address-management__plain-port-field"
+                  data-testid="edge-connectors-form__address-management__http-port-field"
                 />
               </div>
 
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
-                  label="TLS Port"
-                  :name="`addresses[${0}]?.tlsPort`"
-                  :value="addresses[0]?.value.tlsPort"
+                  label="Https Port"
+                  :name="`addresses[${0}]?.httpsPort`"
+                  :value="addresses[0]?.value.httpsPort"
+                  :min="0"
                   description=""
-                  data-testid="edge-connectors-form__address-management__tls-port-field"
+                  data-testid="edge-connectors-form__address-management__https-port-field"
                 />
               </div>
             </div>
@@ -193,7 +197,7 @@
           icon="pi pi-plus-circle"
           size="small"
           outlined
-          :disabled="!isLoadBalancerEnabled"
+          :disabled="disableAddButton"
           @click="addNewAddress('click')"
         />
 
@@ -233,6 +237,7 @@
   const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
 
   const activeAccordions = ref([0])
+  const maximumAddressQuantity = 15
 
   const serverRoleList = [
     { label: 'Primary', value: 'primary' },
@@ -253,7 +258,9 @@
   })
 
   const addNewAddress = () => {
-    pushAddress(DEFAULT_ADDRESS)
+    if (addresses.value.length < maximumAddressQuantity) {
+      pushAddress(DEFAULT_ADDRESS)
+    }
   }
 
   const removeAddressByIndex = (index) => {
@@ -261,6 +268,10 @@
     activeAccordions.value.splice(index, 1)
     removeAddress(index)
   }
+
+  const disableAddButton = computed(() => {
+    return addresses.value.length === maximumAddressQuantity || !isLoadBalancerEnabled.value
+  })
 
   watch(isLoadBalancerEnabled, (newValue) => {
     if (newValue) {

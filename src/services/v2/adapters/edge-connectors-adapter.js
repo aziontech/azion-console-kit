@@ -6,8 +6,8 @@ const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
     return {
       active: address?.active,
       address: address?.address,
-      http_port: address?.plainPort,
-      https_port: address?.tlsPort,
+      http_port: address?.httpPort,
+      https_port: address?.httpsPort,
       modules: loaderBalancerIsEnabled
         ? {
             load_balancer: {
@@ -25,8 +25,8 @@ const extractAddressesLoadRequest = (addresses) => {
     return {
       active: address.active,
       address: address.address,
-      plainPort: address.http_port,
-      tlsPort: address.https_port,
+      httpPort: address.http_port,
+      httpsPort: address.https_port,
       serverRole: address.modules?.load_balancer?.server_role,
       weight: address.modules?.load_balancer?.weight
     }

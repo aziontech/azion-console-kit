@@ -1,26 +1,29 @@
 <template>
   <FormHorizontal
-    title="Input"
-    description="Define the source and the variables from which data should be collected."
+    title="Render Template"
+    description="Choose or create a template to define the structure of the data sent to the destination platform."
     data-testid="data-stream-form__section__data-settings"
   >
     <template #inputs>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdown
+          <FieldDropdownLazyLoader
+            ref="templateDropdownRef"
             label="Template"
-            required
             name="template"
-            :options="listTemplates"
-            optionGroupLabel="label"
-            optionGroupChildren="items"
+            :value="template"
+            :service="loaderDataStreamTemplates"
+            :loadService="dataStreamService.loadTemplateService"
+            @onSelectOption="handleSelectTemplate"
+            :moreOptions="['custom', 'dataSet']"
             optionLabel="name"
             optionValue="id"
-            :value="template"
-            appendTo="self"
+            optionGroupLabel="label"
+            optionGroupChildren="items"
             description="Represents a preset of variables for specific sources or an open template to choose variables."
             data-testid="data-stream-form__data-settings__template-field"
             :disabled="disabled"
+            placeholder="Select a Template"
           >
             <template #footer>
               <ul class="p-2">
@@ -41,7 +44,7 @@
                 </li>
               </ul>
             </template>
-          </FieldDropdown>
+          </FieldDropdownLazyLoader>
         </div>
       </div>
       <div class="flex flex-col gap-2 relative">
@@ -57,7 +60,6 @@
           :options="dataSetMonacoOptions"
           class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
-          :readOnly="true"
         />
         <PrimeButton
           v-if="isCustomTemplate"
@@ -95,13 +97,13 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch, onMounted } from 'vue'
+  import { computed, ref } from 'vue'
   import { dataStreamService } from '@/services/v2'
   import { useAccountStore } from '@/stores/account'
   import DrawerTemplate from '@/views/DataStream/Drawer'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
 
   defineProps({
     disabled: {
@@ -112,8 +114,6 @@
 
   const store = useAccountStore()
 
-  const listTemplates = ref([])
-
   const { value: dataSet } = useField('dataSet')
   const { value: template } = useField('template')
 
@@ -122,59 +122,41 @@
   })
 
   const drawerTemplateRef = ref(null)
+  const templateDropdownRef = ref(null)
   const isCustomTemplate = ref(false)
 
   const DEFAULT_MONACO_OPTIONS = {
     minimap: { enabled: false },
     wordWrap: 'on',
     tabSize: 2,
-    formatOnPaste: true
+    formatOnPaste: true,
+    readOnly: true
   }
   const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
 
-  const loaderDataStreamTemplates = async (templateId = null) => {
+  const loaderDataStreamTemplates = async (params = { page: 1, pageSize: 100 }) => {
     const templates = await dataStreamService.listTemplates({
       fields: 'id,name,data_set,custom',
-      pageSize: 1000
+      ...params,
+      ordering: '!custom'
     })
 
     const itemsCustom = templates.results.filter((template) => template.custom)
     const itemsAzion = templates.results.filter((template) => !template.custom)
 
-    listTemplates.value = [
-      {
-        label: `Azion's Templates`,
-        items: itemsAzion
-      },
-      {
-        label: 'Custom Templates',
-        items: itemsCustom
-      }
-    ]
-
-    const hasFirstItem = listTemplates.value[0]?.items[0]?.id
-
-    if (hasFirstItem && !templateId) {
-      const firstTemplate = listTemplates.value[0].items[0]
-      template.value = firstTemplate.id
-
-      await insertDataSet(firstTemplate.id, firstTemplate)
-      setIsCustomTemplate(firstTemplate)
-    } else {
-      template.value = templateId
+    return {
+      body: [
+        {
+          label: `Azion's Templates`,
+          items: itemsAzion
+        },
+        {
+          label: 'Custom Templates',
+          items: itemsCustom
+        }
+      ],
+      count: templates.count
     }
-
-    return !!hasFirstItem ?? ''
-  }
-
-  const findTemplateById = (templateId) => {
-    if (!templateId || !listTemplates.value?.length) return null
-
-    for (const group of listTemplates.value) {
-      const template = group.items?.find((item) => item.id === templateId)
-      if (template) return template
-    }
-    return null
   }
 
   const processTemplateDataSet = (selectedTemplate) => {
@@ -199,8 +181,8 @@
     isCustomTemplate.value = selectedTemplate.custom
   }
 
-  const insertDataSet = async (templateId, selectedTemplate = null) => {
-    const template = selectedTemplate || findTemplateById(templateId)
+  const insertDataSet = async (selectedTemplate = null) => {
+    const template = selectedTemplate
 
     if (!template) {
       dataSet.value = ''
@@ -210,39 +192,20 @@
     processTemplateDataSet(template)
   }
 
-  watch(
-    () => template.value,
-    (newTemplateId) => {
-      if (!newTemplateId || !listTemplates.value?.length) return
-
-      const selectedTemplate = findTemplateById(newTemplateId)
-      insertDataSet(newTemplateId, selectedTemplate)
-
-      const isReadOnlyTemplate = selectedTemplate?.custom === false
-      dataSetMonacoOptions.value.readOnly = isReadOnlyTemplate
-      setIsCustomTemplate(selectedTemplate)
-    }
-  )
-
-  watch(
-    () => listTemplates.value,
-    (newTemplatesList) => {
-      if (!newTemplatesList?.length || !template.value) return
-
-      const selectedTemplate = findTemplateById(template.value)
-      if (selectedTemplate) {
-        insertDataSet(template.value, selectedTemplate)
-      }
-    }
-  )
-
-  const handleSuccess = (templateId) => {
+  const handleSuccess = async () => {
     drawerTemplateRef.value.closeDrawer?.()
-    loaderDataStreamTemplates(templateId)
+    if (templateDropdownRef.value?.refreshData) {
+      await templateDropdownRef.value.refreshData()
+    }
   }
 
   const handleDeleteTemplate = () => {
-    loaderDataStreamTemplates()
+    loaderDataStreamTemplates({ page: 1, pageSize: 100 })
+  }
+
+  const handleSelectTemplate = (template) => {
+    insertDataSet(template)
+    setIsCustomTemplate(template)
   }
 
   const openCreateTemplateDrawer = () => {
@@ -262,8 +225,4 @@
       drawerTemplateRef.value.openCreateDrawer(dataSet.value)
     }
   }
-
-  onMounted(async () => {
-    await loaderDataStreamTemplates()
-  })
 </script>

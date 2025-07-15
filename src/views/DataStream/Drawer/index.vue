@@ -89,12 +89,12 @@
   }
 
   const handleCreateTemplate = (response) => {
-    emit('onSuccess', response.id)
+    emit('onSuccess', response)
     showCreateTemplateDrawer.value = false
   }
 
   const handleEditTemplate = (response) => {
-    emit('onSuccess', response.id)
+    emit('onSuccess', response)
     showEditTemplateDrawer.value = false
   }
 
