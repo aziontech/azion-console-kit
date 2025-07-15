@@ -91,7 +91,11 @@
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
     handleToast(response)
-    emit('onSuccess', { type: certificateType.value, id: response.data.id })
+    emit('onSuccess', {
+      type: certificateType.value,
+      id: response.data.id,
+      authority: response.data.authority
+    })
     closeCreateDrawer()
   }
 

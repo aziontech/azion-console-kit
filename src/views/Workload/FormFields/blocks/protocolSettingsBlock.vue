@@ -60,8 +60,9 @@
   const showTlsAndCipherDropdown = computed(
     () => protocols.value.http.useHttps || protocols.value.http.useHttp3
   )
-  const onDigitalCertificateSuccess = ({ id }) => {
+  const onDigitalCertificateSuccess = ({ id, authority }) => {
     tls.value.certificate = id
+    authorityCertificate.value = authority
   }
 
   const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
@@ -146,6 +147,10 @@
             data-testid="domains-form__edge-certificate-field"
             label="Digital Certificate"
             name="tls.certificate"
+            showGroup
+            optionGroupLabel="group"
+            optionGroupChildren="items"
+            defaultGroup="My certificates"
             :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
             :loadService="digitalCertificatesService.loadDigitalCertificate"
             optionLabel="name"

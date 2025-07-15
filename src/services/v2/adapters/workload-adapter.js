@@ -34,7 +34,7 @@ function extractAzionAppSubdomain(fullDomains) {
   })
 
   return {
-    cleanDomains,
+    cleanDomains: cleanDomains.length ? cleanDomains : [{ subdomain: '', domain: '' }],
     azionAppSubdomains
   }
 }

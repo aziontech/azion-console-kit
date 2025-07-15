@@ -23,6 +23,8 @@
     :class="errorMessage ? 'p-invalid' : ''"
     v-bind="$attrs"
     class="w-full"
+    :optionGroupLabel="props.optionGroupLabel"
+    :optionGroupChildren="props.optionGroupChildren"
     :pt="{
       clearIcon: {
         'data-testid': customTestId.clearIcon
@@ -175,6 +177,22 @@
     valuesToFilter: {
       type: Array,
       default: () => []
+    },
+    showGroup: {
+      type: Boolean,
+      default: false
+    },
+    optionGroupLabel: {
+      type: String,
+      default: ''
+    },
+    optionGroupChildren: {
+      type: String,
+      default: ''
+    },
+    defaultGroup: {
+      type: String,
+      default: ''
     }
   })
 
@@ -211,8 +229,15 @@
 
   const handleLazyLoad = async (event) => {
     const { last } = event
+    let totalItems = 0
 
-    if (!notRequest.value && last >= data.value?.length) {
+    if (props.showGroup) {
+      totalItems = data.value.reduce((acc, group) => acc + group.items.length, 0)
+    } else {
+      totalItems = data.value.length
+    }
+
+    if (!notRequest.value && last >= totalItems) {
       try {
         page.value += PAGE_INCREMENT
         await fetchData(page.value)
@@ -228,10 +253,20 @@
     emit('onBlur')
   }
 
+  const selectedOptionHandler = () => {
+    if (props.showGroup) {
+      const group = data.value.find((group) => group.group === props.defaultGroup)
+      if (!group || !Array.isArray(group.items)) {
+        return null
+      }
+      return group.items.find((item) => item[props.optionValue] === inputValue.value) || null
+    }
+
+    return data.value.find((item) => item[props.optionValue] === inputValue.value) || null
+  }
+
   const emitChange = () => {
-    const selectedOption = data.value.find(
-      (option) => option[props.optionValue] === inputValue.value
-    )
+    const selectedOption = selectedOptionHandler()
 
     emit('onChange', inputValue.value)
 
@@ -257,11 +292,11 @@
     const filteredData = result.filter((item) =>
       props.valuesToFilter.includes(item[props.keyToFilter])
     )
-    return filteredData.map((item) => {
+    const mappedData = filteredData.map((item) => {
       return {
         [props.optionLabel]: item.name,
         [props.optionValue]: item.id,
-        icon: item?.icon,
+        group: item?.group,
         ...props?.moreOptions?.reduce(
           (additionalFields, option) => ({
             ...additionalFields,
@@ -271,6 +306,24 @@
         )
       }
     })
+
+    if (props.showGroup) {
+      const groupedData = mappedData.reduce((acc, item) => {
+        const group = item.group
+        if (!acc[group]) {
+          acc[group] = []
+        }
+        acc[group].push(item)
+        return acc
+      }, {})
+
+      return Object.entries(groupedData).map(([group, items]) => ({
+        group,
+        items
+      }))
+    }
+
+    return mappedData
   }
 
   /**
@@ -309,12 +362,27 @@
       } else {
         const uniqueResults = results.filter(
           (newItem) =>
-            !data.value.some(
-              (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
-            )
+            !data.value.some((groupOrItem) => {
+              if (Array.isArray(groupOrItem.items)) {
+                return groupOrItem.items.some(
+                  (item) => item[props.optionValue] === newItem[props.optionValue]
+                )
+              }
+              return groupOrItem[props.optionValue] === newItem[props.optionValue]
+            })
         )
 
-        data.value = [...data.value, ...uniqueResults]
+        if (props.showGroup) {
+          data.value = data.value.map((group) => {
+            if (group.group === props.defaultGroup) {
+              const findGroup = uniqueResults.find((item) => item.group === group.group)
+              group.items = [...group.items, ...findGroup.items]
+            }
+            return group
+          })
+        } else {
+          data.value = [...data.value, ...uniqueResults]
+        }
       }
 
       if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
@@ -357,7 +425,15 @@
       )
 
       if (!optionExists) {
-        data.value = [newOption, ...data.value]
+        if (props.showGroup) {
+          data.value.map((item) => {
+            if (item.group === props.defaultGroup) {
+              item.items.unshift(newOption)
+            }
+          })
+        } else {
+          data.value = [...data.value, newOption]
+        }
       }
 
       if (disableEmitInit.value) {
@@ -444,9 +520,7 @@
     if (!existitemInList) {
       loadSelectedValue(value)
     } else {
-      const selectedOption = data.value.find(
-        (option) => option[props.optionValue] === inputValue.value
-      )
+      const selectedOption = selectedOptionHandler()
       emit('onSelectOption', selectedOption)
     }
   }

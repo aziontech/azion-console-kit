@@ -195,6 +195,6 @@
       commonName: yup.string(),
       alternativeNames: yup.array()
     }),
-    authorityCertificate: yup.string()
+    authorityCertificate: yup.string().nullable()
   })
 </script>
