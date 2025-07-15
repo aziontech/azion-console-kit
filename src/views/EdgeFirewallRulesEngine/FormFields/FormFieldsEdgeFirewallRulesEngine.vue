@@ -390,11 +390,7 @@
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
         value: 'set_waf',
-        label: `${
-          hasWebApplicationFirewallModuleEnabled
-            ? 'Set WAF Rule Set'
-            : 'Set WAF Rule Set - requires WAF'
-        }`,
+        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
         disabled:
           wafBehaviorIsAlreadySelected ||
           !hasWebApplicationFirewallModuleEnabled ||
@@ -827,7 +823,7 @@
                 :name="`behaviors[${behaviorItemIndex}].mode`"
                 :options="[
                   {
-                    label: 'Learning',
+                    label: 'Logging',
                     value: 'logging'
                   },
                   {

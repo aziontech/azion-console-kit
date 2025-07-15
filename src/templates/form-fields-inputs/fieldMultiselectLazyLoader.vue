@@ -49,6 +49,9 @@
           />
         </div>
       </template>
+      <template #footer>
+        <slot name="footer" />
+      </template>
     </MultiSelect>
     <small
       v-if="errorMessage"
@@ -258,4 +261,14 @@
     },
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
+
+  const refreshData = async () => {
+    page.value = INITIAL_PAGE
+    search.value = ''
+    await fetchListData()
+  }
+
+  defineExpose({
+    refreshData
+  })
 </script>

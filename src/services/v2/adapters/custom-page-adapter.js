@@ -1,5 +1,6 @@
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null : value)
 
@@ -26,20 +27,18 @@ const getPage = (page) => {
   }
 }
 
+const transformMap = {
+  id: (value) => value.id,
+  name: (value) => value.name,
+  lastEditor: (value) => value.last_editor,
+  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModified: (value) => value.last_modified,
+  active: (value) => parseStatusData(value.active)
+}
+
 export const CustomPageAdapter = {
-  transformListCustomPage(data) {
-    return (
-      data?.map((customPage) => {
-        return {
-          id: customPage?.id,
-          name: customPage?.name,
-          lastEditor: customPage?.last_editor,
-          lastModified: formatExhibitionDate(customPage?.last_modified, 'full', undefined),
-          lastModifyDate: customPage?.last_modified,
-          active: parseStatusData(customPage?.active)
-        }
-      }) || []
-    )
+  transformListCustomPage(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformPayloadCreateCustomPage(payload) {
     const pages = payload.pages.filter((page) => page.type !== 'PageDefault')

@@ -73,9 +73,9 @@
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
     tieredCache: false,
-    isSliceTieredCacheEnabled: false,
-    isSliceEdgeCachingEnabled: false,
-    tieredCacheRegion: 'na-united-states'
+    tieredCacheRegion: 'near-edge',
+    isSliceTieredCache: false,
+    isSliceEdgeCachingEnabled: false
   })
 
   const minimumAcceptableValue = computed(() =>
@@ -103,8 +103,8 @@
       .required()
       .label('Tiered Cache Region')
       .oneOf(
-        ['na-united-states', 'sa-brazil'],
-        'Tiered Cache Region must be either "na-united-states" or "sa-brazil"'
+        ['near-edge', 'br-east-1', 'br-east-2'],
+        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "br-east-2"'
       ),
     browserCacheSettingsMaximumTtl: yup
       .number()

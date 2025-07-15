@@ -65,6 +65,6 @@
   }
 
   const showTieredCacheForm = computed(() => {
-    return isSliceTieredCache.value && props.showTieredCache
+    return props.showTieredCache
   })
 </script>

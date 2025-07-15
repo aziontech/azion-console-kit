@@ -124,8 +124,7 @@
     return [
       {
         title: 'Honor cache policies',
-        subtitle:
-          'Use the cache policies defined by the origin server, or set a custom maximum cache TTL for edge caching.',
+        subtitle: `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`,
         inputValue: 'honor',
         disabled: !!showSliceConfigurationRange.value
       },

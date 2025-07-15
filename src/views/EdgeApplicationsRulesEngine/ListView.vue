@@ -57,8 +57,6 @@
     'name',
     'description',
     'phase',
-    'behaviors',
-    'criteria',
     'active',
     'order',
     'last_modified',
@@ -76,6 +74,7 @@
   const selectedPhase = ref('Request phase')
   const dialog = useDialog()
   const toast = useToast()
+  const currentPhase = ref('request')
 
   const getColumns = computed(() => {
     return [
@@ -91,11 +90,6 @@
         disableSort: true
       },
       {
-        field: 'description',
-        header: 'Description',
-        disableSort: true
-      },
-      {
         field: 'status',
         header: 'Status',
         type: 'component',
@@ -107,6 +101,21 @@
             columnAppearance: 'tag'
           })
         },
+        disableSort: true
+      },
+      {
+        field: 'description',
+        header: 'Description',
+        disableSort: true
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        disableSort: true
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
         disableSort: true
       }
     ]
@@ -128,17 +137,16 @@
     hasContentToList.value = event
   }
 
-  const listRulesEngineWithDecorator = async (query) => {
-    const data = await rulesEngineService.listRulesEngine({
+  const listRulesEngineWithDecorator = async (params) => {
+    const data = await rulesEngineService.listRulesEngineRequestAndResponsePhase({
       edgeApplicationId: props.edgeApplicationId,
-      ...query
+      params
     })
     return data
   }
 
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
-    const phase =
-      ruleData.phase.content == 'Default' ? 'request' : ruleData.phase.content.toLowerCase()
+    const phase = ruleData.phase?.content.toLowerCase()
 
     return await rulesEngineService.deleteRulesEngine({
       edgeApplicationId: props.edgeApplicationId,
@@ -157,13 +165,9 @@
   }
 
   const openEditRulesEngineDrawer = (item) => {
+    currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
-
-  const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
-  const descriptionEmptyState = computed(
-    () => `Click the button below to create your first ${selectedPhase.value} rule.`
-  )
 
   const actions = [
     {
@@ -202,7 +206,8 @@
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {
-        rules: alteredRows
+        rules: alteredRows,
+        isEdgeApplicationRulesEngine: true
       },
       onClose: ({ data }) => {
         if (data?.updated || data?.reset) {
@@ -235,12 +240,15 @@
     :documentationService="documentationService"
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
+    :currentPhase="currentPhase"
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
+
   <TableBlock
     ref="listRulesEngineRef"
     orderableRows
+    v-if="hasContentToList"
     :columns="getColumns"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
@@ -258,6 +266,7 @@
     groupColumn="phase.content"
     :expandedRowGroups="['Default', 'Request', 'Response']"
     expandableRowGroups
+    isEdgeApplicationRulesEngine
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
@@ -303,29 +312,25 @@
         </teleport>
       </div>
     </template>
-
-    <template #noRecordsFound>
-      <EmptyResultsBlock
-        v-if="!hasContentToList"
-        :title="titleEmptyState"
-        :description="descriptionEmptyState"
-        :createButtonLabel="selectedPhase"
-        :documentationService="documentationService"
-        :inTabs="true"
-        :noBorder="true"
-        data-testid="rules-engine-empty-results"
-      >
-        <template #default>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            @click="openCreateRulesEngineDrawerByPhase"
-            severity="secondary"
-            icon="pi pi-plus"
-            label="Rule"
-            data-testid="rules-engine-empty-results-create-button"
-          />
-        </template>
-      </EmptyResultsBlock>
-    </template>
   </TableBlock>
+
+  <EmptyResultsBlock
+    v-else
+    title="No rules engine have been created"
+    description="Click the button below to create your first rules engine."
+    createButtonLabel="Create Rules Engine"
+    :documentationService="documentationService"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Rule"
+        @click="openCreateRulesEngineDrawerByPhase"
+        data-testid="edge-application-rules-engine-list__create-rules-engine__button"
+      />
+    </template>
+  </EmptyResultsBlock>
 </template>

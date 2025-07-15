@@ -13,7 +13,7 @@
             label="Details"
             :loading="!isCurrentInvoiceLoaded"
             @click="goToBillingDetails()"
-            :disabled="!currentInvoice.billId"
+            :disabled="disabledCurrentInvoice"
           />
         </div>
         <div class="flex justify-between mt-4">
@@ -57,7 +57,7 @@
         v-if="accountIsNotRegular"
       >
         <div class="flex justify-between">
-          <span class="text-color-secondary text-sm">Credit Used for Payment</span>
+          <span class="text-color-secondary text-sm">Credit that will be used for payment</span>
           <SkeletonBlock
             :isLoaded="isCurrentInvoiceLoaded"
             class="text-color"
@@ -193,14 +193,6 @@
     </div>
   </div>
 
-  <NotificationPayment
-    v-if="user.disclaimer"
-    :clickAddCredit="drawersMethods.openDrawerAddCredit"
-    :clickAddPaymentMethod="drawersMethods.openDrawerPaymentMethod"
-    :clickLinkPaymentMethod="goToPayment"
-    :disabledBtnAddCredit="!defaultCardStatus.hasData"
-  />
-
   <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
 
   <ListTableBlock
@@ -215,6 +207,7 @@
     :actions="actionsRow"
     emptyListMessage="No payment activity found."
   />
+
   <EmptyResultsBlock
     v-else
     title="No payment activity has been recorded"
@@ -229,7 +222,7 @@
         label="Credit"
         icon="pi pi-plus"
         :disabled="!defaultCardStatus.hasData"
-        @click="drawersMethods.openDrawerAddCredit"
+        @click="goToPayment"
         outlined
       >
       </PrimeButton>
@@ -238,7 +231,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Payment Method"
-        @click="drawersMethods.openDrawerPaymentMethod"
+        @click="goToPayment"
       />
     </template>
   </EmptyResultsBlock>
@@ -250,14 +243,13 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@templates/list-table-block'
-  import NotificationPayment from './components/notification-payment'
   import PrimeButton from 'primevue/button'
   import Tag from 'primevue/tag'
   import cardFlagBlock from '@templates/card-flag-block'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
-  import { ref, computed, onMounted, inject } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
 
   const router = useRouter()
   const hasContentToList = ref(true)
@@ -269,7 +261,6 @@
   const { accountData, accountIsNotRegular } = storeToRefs(accountStore)
 
   const user = accountData
-  const drawersMethods = inject('drawersMethods')
 
   const props = defineProps({
     listPaymentHistoryService: {
@@ -306,6 +297,7 @@
   })
 
   const currentInvoice = ref({})
+  const disabledCurrentInvoice = ref(true)
 
   const defaultCardStatus = computed(() => ({
     loaded: props.cardDefault.loader,
@@ -324,6 +316,7 @@
     isCurrentInvoiceLoaded.value = false
     try {
       currentInvoice.value = await props.loadCurrentInvoiceService()
+      disabledCurrentInvoice.value = !currentInvoice.value.redirectId
     } finally {
       isCurrentInvoiceLoaded.value = true
     }
@@ -435,7 +428,7 @@
         },
         {
           field: 'amount',
-          header: 'Amount'
+          header: 'Transactions Amount'
         },
         {
           field: 'status',

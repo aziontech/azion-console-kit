@@ -36,10 +36,6 @@
     editDeviceGroupService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -93,10 +89,6 @@
     showEditDrawer.value = true
   }
 
-  const closeDrawerEdit = () => {
-    showEditDrawer.value = false
-  }
-
   const handleTrackSuccessEdit = () => {
     tracker.product.productEdited({
       productName: 'Device Groups'
@@ -139,8 +131,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   defineExpose({

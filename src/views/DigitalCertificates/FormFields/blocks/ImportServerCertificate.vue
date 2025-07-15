@@ -2,13 +2,13 @@
   <FormHorizontal
     :title="tabTitleByDCType"
     :description="tabDescriptionByDCType"
+    :isDrawer="isDrawer"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           data-testid="import-server-certificate-form__certificate-field"
           :label="getTitleByCertificateType"
-          required
           :placeholder="getPlaceholderByCertificateType"
           name="certificate"
           :value="certificate"
@@ -41,6 +41,13 @@
   import { useDigitalCertificate } from '../composables/certificate'
 
   defineOptions({ name: 'ImportServerCertificate' })
+
+  defineProps({
+    isDrawer: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const { isEdgeCertificate, CERTIFICATE_TYPES, certificateType } = useDigitalCertificate()
 
