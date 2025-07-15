@@ -87,6 +87,7 @@
     <template #inputs>
       <DigitalCertificatesDrawer
         ref="digitalCertificateDrawerRef"
+        isWorkloadCreation
         @onSuccess="onDigitalCertificateSuccess"
       />
       <div class="flex gap-6 max-sm:flex-col">

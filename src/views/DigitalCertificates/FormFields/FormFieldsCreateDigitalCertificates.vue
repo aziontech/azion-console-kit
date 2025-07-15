@@ -4,9 +4,11 @@
   <ImportRequestCertificate
     v-if="isRenderImportRequestCertificate"
     :isDrawer="isDrawer"
+    :isWorkloadCreation="isWorkloadCreation"
   />
 
   <ImportServerCertificate
+    :isWorkloadCreation="isWorkloadCreation"
     v-if="isRenderImportServerCertificate"
     :isDrawer="isDrawer"
   />
@@ -29,6 +31,10 @@
 
   defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isWorkloadCreation: {
       type: Boolean,
       default: false
     }
