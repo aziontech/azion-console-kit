@@ -9,32 +9,6 @@ export class RulesEngineService {
     return `${this.baseURL}/${edgeApplicationId}/${phase}${suffix}`
   }
 
-  async listRulesEngine({
-    edgeApplicationId,
-    phase = 'request',
-    fields = '',
-    search = '',
-    ordering = '',
-    page = 1,
-    pageSize = 100
-  }) {
-    const currentPhase = this.getCurrentPhase(phase)
-    const params = { fields, search, ordering, page, pageSize }
-    const { data } = await this.http.request({
-      method: 'GET',
-      url: this.getUrl(edgeApplicationId, currentPhase),
-      params
-    })
-
-    const { results, count } = data
-    const transformedData = this.adapter?.transformListRulesEngine?.(results, phase) ?? results
-
-    return {
-      count,
-      body: transformedData
-    }
-  }
-
   async createRulesEngine(payload) {
     const { edgeApplicationId, phase } = payload
     const currentPhase = this.getCurrentPhase(phase)
@@ -108,21 +82,74 @@ export class RulesEngineService {
     return 'Rules Engine successfully ordered'
   }
 
-  async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, ...params }) {
-    const { count, body } = await this.listRulesEngine({
-      edgeApplicationId,
-      phase: 'request',
-      ...params
-    })
-    const { count: countResponse, body: bodyResponse } = await this.listRulesEngine({
-      edgeApplicationId,
-      phase: 'response',
-      ...params
+  async _listRulesEngine({
+    edgeApplicationId,
+    phase = 'request',
+    fields = '',
+    search = '',
+    ordering = '',
+    page = 1,
+    pageSize = 100
+  }) {
+    const currentPhase = this.getCurrentPhase(phase)
+    const params = { fields, search, ordering, page, pageSize }
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.getUrl(edgeApplicationId, currentPhase),
+      params
     })
 
+    const { results, count } = data
+
+    return {
+      count,
+      body: results
+    }
+  }
+
+  async _fetchAllRulesForPhase(edgeApplicationId, phase, params) {
+    const PAGE_SIZE = 100
+    let allRules = []
+
+    const { count, body } = await this._listRulesEngine({
+      edgeApplicationId,
+      phase,
+      page: 1,
+      ...params
+    })
+    allRules.push(...body)
+
+    if (count > PAGE_SIZE) {
+      const totalPages = Math.ceil(count / PAGE_SIZE)
+      const promisesPerPage = []
+
+      for (let page = 2; page <= totalPages; page++) {
+        promisesPerPage.push(this._listRulesEngine({ edgeApplicationId, phase, page, ...params }))
+      }
+
+      const subsequentPages = await Promise.all(promisesPerPage)
+
+      subsequentPages.forEach((pageResponse) => {
+        allRules.push(...pageResponse.body)
+      })
+    }
+
+    const transformedData = this.adapter?.transformListRulesEngine?.(allRules, phase) ?? allRules
+
+    return transformedData
+  }
+
+  async listRulesEngineRequestAndResponsePhase({ edgeApplicationId, params }) {
+    const [requestRules, responseRules] = await Promise.all([
+      this._fetchAllRulesForPhase(edgeApplicationId, 'request', params),
+      this._fetchAllRulesForPhase(edgeApplicationId, 'response', params)
+    ])
+
+    const responseBody = [...requestRules, ...responseRules]
+
     const data = {
-      count: count + countResponse,
-      body: [...body, ...bodyResponse]
+      count: responseBody.length,
+      body: responseBody
     }
 
     return data
