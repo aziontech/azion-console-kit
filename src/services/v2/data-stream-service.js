@@ -132,8 +132,8 @@ export class DataStreamService {
     const filterWorkloads = data.data.transform?.find((item) => item.type === 'filter_workloads')
 
     const workloads = filterWorkloads
-      ? await this.handlesWorkloads(filterWorkloads.attributes.workloads)
-      : []
+      ? await this.handlesWorkloads(filterWorkloads.attributes?.workloads)
+      : await this.handlesWorkloads([])
 
     return this.#getTransformed('transformLoadDataStream', [data.data, workloads])
   }
