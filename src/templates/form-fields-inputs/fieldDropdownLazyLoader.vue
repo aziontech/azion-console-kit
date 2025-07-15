@@ -230,23 +230,20 @@
     let selectedOption = null
 
     // Check if data is grouped
-    const isGroupedData = data.value.length > 0 && 
-      data.value.some(item => item[props.optionGroupLabel] && item[props.optionGroupChildren])
+    const isGroupedData =
+      data.value.length > 0 &&
+      data.value.some((item) => item[props.optionGroupLabel] && item[props.optionGroupChildren])
 
     if (isGroupedData) {
       // Search for the selected option within groups
       for (const group of data.value) {
         const groupItems = group[props.optionGroupChildren] || []
-        selectedOption = groupItems.find(
-          (option) => option[props.optionValue] === inputValue.value
-        )
+        selectedOption = groupItems.find((option) => option[props.optionValue] === inputValue.value)
         if (selectedOption) break
       }
     } else {
       // Search in flat data (existing behavior)
-      selectedOption = data.value.find(
-        (option) => option[props.optionValue] === inputValue.value
-      )
+      selectedOption = data.value.find((option) => option[props.optionValue] === inputValue.value)
     }
 
     emit('onChange', inputValue.value)
@@ -300,26 +297,28 @@
       totalCount.value = response.count
 
       // Check if response is grouped data (has label and items structure)
-      const isGroupedData = Array.isArray(response.body) &&
-        response.body.some(item => item.label && Array.isArray(item.items))
+      const isGroupedData =
+        Array.isArray(response.body) &&
+        response.body.some((item) => item.label && Array.isArray(item.items))
 
       let results
 
       if (isGroupedData) {
         // Process grouped data
-        results = response.body.map(group => ({
+        results = response.body.map((group) => ({
           [props.optionGroupLabel]: group.label,
-          [props.optionGroupChildren]: group.items?.map(item => ({
-            [props.optionLabel]: item.name,
-            [props.optionValue]: item.id,
-            ...props?.moreOptions?.reduce(
-              (additionalFields, option) => ({
-                ...additionalFields,
-                [option]: item[option]
-              }),
-              {}
-            )
-          })) || []
+          [props.optionGroupChildren]:
+            group.items?.map((item) => ({
+              [props.optionLabel]: item.name,
+              [props.optionValue]: item.id,
+              ...props?.moreOptions?.reduce(
+                (additionalFields, option) => ({
+                  ...additionalFields,
+                  [option]: item[option]
+                }),
+                {}
+              )
+            })) || []
         }))
       } else {
         // Process flat data (existing behavior)
@@ -345,9 +344,10 @@
           // For grouped data, merge groups and their items
           const mergedGroups = []
 
-          results.forEach(newGroup => {
+          results.forEach((newGroup) => {
             const existingGroupIndex = data.value.findIndex(
-              existingGroup => existingGroup[props.optionGroupLabel] === newGroup[props.optionGroupLabel]
+              (existingGroup) =>
+                existingGroup[props.optionGroupLabel] === newGroup[props.optionGroupLabel]
             )
 
             if (existingGroupIndex >= 0) {
@@ -356,12 +356,16 @@
               const newItems = newGroup[props.optionGroupChildren] || []
 
               const uniqueNewItems = newItems.filter(
-                newItem => !existingItems.some(
-                  existingItem => existingItem[props.optionValue] === newItem[props.optionValue]
-                )
+                (newItem) =>
+                  !existingItems.some(
+                    (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
+                  )
               )
 
-              data.value[existingGroupIndex][props.optionGroupChildren] = [...existingItems, ...uniqueNewItems]
+              data.value[existingGroupIndex][props.optionGroupChildren] = [
+                ...existingItems,
+                ...uniqueNewItems
+              ]
             } else {
               // Add new group
               mergedGroups.push(newGroup)
@@ -417,29 +421,35 @@
       }
 
       // Check if data is grouped
-      const isGroupedData = data.value.length > 0 &&
-        data.value.some(item => item[props.optionGroupLabel] && item[props.optionGroupChildren])
+      const isGroupedData =
+        data.value.length > 0 &&
+        data.value.some((item) => item[props.optionGroupLabel] && item[props.optionGroupChildren])
 
       let optionExists = false
 
       if (isGroupedData) {
         // Check if option exists in any group
-        optionExists = data.value.some(group =>
+        optionExists = data.value.some((group) =>
           group[props.optionGroupChildren]?.some(
-            item => item[props.optionValue] === newOption[props.optionValue]
+            (item) => item[props.optionValue] === newOption[props.optionValue]
           )
         )
 
         if (!optionExists) {
           // Add to first group or create a new group
           if (data.value.length > 0) {
-            data.value[0][props.optionGroupChildren] = [newOption, ...data.value[0][props.optionGroupChildren]]
+            data.value[0][props.optionGroupChildren] = [
+              newOption,
+              ...data.value[0][props.optionGroupChildren]
+            ]
           } else {
             // Create a default group if no groups exist
-            data.value = [{
-              [props.optionGroupLabel]: 'Options',
-              [props.optionGroupChildren]: [newOption]
-            }]
+            data.value = [
+              {
+                [props.optionGroupLabel]: 'Options',
+                [props.optionGroupChildren]: [newOption]
+              }
+            ]
           }
         }
       } else {
