@@ -14,17 +14,19 @@
           optionLabel="label"
           optionValue="value"
           appendTo="self"
+          :disabled="props.isEdit"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldDropdown
           label="Page Code"
           required
-          name="pageCode"
+          name="code.value"
           :options="CODE_OPTIONS"
           optionLabel="label"
           optionValue="value"
           appendTo="self"
+          :disabled="props.isEdit"
         />
       </div>
     </template>

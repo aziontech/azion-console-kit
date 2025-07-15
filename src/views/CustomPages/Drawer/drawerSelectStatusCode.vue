@@ -5,7 +5,7 @@
   import { ref, computed } from 'vue'
   import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
-
+  import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
   defineOptions({
     name: 'custom-pages-drawer'
   })
@@ -27,10 +27,9 @@
 
   const title = computed(() => {
     const item = itemStatusCode.value
-    if (!item || !item.name) return 'Edit Status Code'
-
-    const code = item.name !== 'Default' ? `${item.code}:` : ''
-    return `${code} ${item.name}`.trim()
+    if (!item || !item.code) return 'Create Status Code'
+    const name = CODE_OPTIONS.find((option) => option.value === item.code.value)?.label
+    return `${name}`.trim()
   })
 
   const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {

@@ -26,7 +26,7 @@
             icon="pi pi-plus"
             label="Add Status Code"
             data-testid="status-code__add-button"
-            @click="openEditStatusCodeDrawer"
+            @click="openCreateStatusCodeDrawer"
             class="w-full sm:w-auto"
           />
         </template>
@@ -49,7 +49,7 @@
   const hasContentToList = computed(() => !!pagesValue.value)
   const drawerRef = ref(null)
 
-  const { fields: pages, replace: replacePages } = useFieldArray('pages')
+  const { fields: pages, replace: replacePages, remove: removePage } = useFieldArray('pages')
   const { value: pagesValue } = useField('pages')
 
   const props = defineProps({
@@ -65,57 +65,70 @@
     content: 'max-w-full'
   }
 
-  const TYPES_PAGE = {
-    PageDefault: 'Default',
-    PageConnector: 'Connector'
-  }
-
-  const getTagColumnTypeStatus = (type) => {
-    return {
-      content: TYPES_PAGE[type],
-      severity: type === 'PageDefault' ? 'info' : ''
-    }
+  const defaultTag = ({ origin }) => {
+    return origin === 'Azion'
+      ? {
+          value: 'Azion',
+          severity: 'info'
+        }
+      : {}
   }
 
   const loaderStatusCodeColumns = [
     {
       field: 'code',
-      header: 'Code',
+      header: 'Page Code',
       type: 'component',
+      filterPath: 'code.value',
+      sortField: 'code.value',
       component: (columnData) => {
         return columnBuilder({
           data: {
-            content: columnData,
-            severity: 'danger'
+            text: columnData.value,
+            tagProps: defaultTag(columnData)
           },
-          columnAppearance: 'tag'
+          columnAppearance: 'text-with-tag'
         })
       }
     },
     {
-      field: 'name',
-      header: 'Name'
-    },
-    {
-      field: 'type',
-      header: 'Type',
-      sortField: 'type',
-      filterPath: 'type',
+      field: 'uri',
+      header: 'Page Path (URI)',
       type: 'component',
+      filterPath: 'uri',
+      sortField: 'uri',
       component: (columnData) => {
         return columnBuilder({
-          data: getTagColumnTypeStatus(columnData),
-          columnAppearance: 'tag'
+          data: { text: columnData || '-' },
+          columnAppearance: 'text-format'
         })
       }
     },
     {
       field: 'customStatusCode',
-      header: 'Custom Status'
+      header: 'Custom Status',
+      type: 'component',
+      filterPath: 'customStatusCode',
+      sortField: 'customStatusCode',
+      component: (columnData) => {
+        return columnBuilder({
+          data: { text: columnData || '-' },
+          columnAppearance: 'text-format'
+        })
+      }
     },
     {
       field: 'ttl',
-      header: 'Response TTL'
+      header: 'Response TTL',
+      type: 'component',
+      filterPath: 'ttl',
+      sortField: 'ttl',
+      component: (columnData) => {
+        return columnBuilder({
+          data: { text: `${columnData || '0'} (seconds)` },
+          columnAppearance: 'text-format'
+        })
+      }
     }
   ]
 
@@ -124,45 +137,41 @@
     if (idx !== -1) {
       pages.value[idx].value = { ...pages.value[idx].value, ...item }
     }
-    if (listStatusCodeRef.value && listStatusCodeRef.value.reloadList) {
-      listStatusCodeRef.value.reloadList()
-    }
   }
 
-  const actionsRow = ref([
+  const deletePage = (idPage) => {
+    const idx = pages.value.findIndex((page) => page.value.id === idPage)
+    if (idx !== -1) removePage(idx)
+    listStatusCodeRef.value.reload()
+  }
+
+  const actionsRow = [
     {
-      label: 'Edit',
-      icon: 'pi pi-pencil',
-      type: 'action',
-      commandAction: async (item) => {
-        openEditStatusCodeDrawer(item)
-      }
-    },
-    {
-      label: 'Reset to default',
-      icon: 'pi pi-undo',
-      type: 'action',
-      commandAction: async (item) => {
-        const defaultItem = STATUS_CODE_OPTIONS.find((option) => option.code === item.code)
-        updateList(defaultItem)
-      }
+      type: 'delete',
+      label: 'Delete',
+      title: 'Page Code',
+      icon: 'pi pi-trash',
+      disabled: (item) => item.code.origin === 'Azion',
+      service: (item) => deletePage(item)
     }
-  ])
+  ]
 
   const listStatusCodeService = () => {
-    const mergedPages = !pagesValue.value?.length
-      ? STATUS_CODE_OPTIONS
-      : STATUS_CODE_OPTIONS.map((option) => ({
-          ...option,
-          ...pagesValue.value.find((page) => page.code === option.code),
-          response: option.response
-        }))
-
-    replacePages(mergedPages)
-    return pagesValue.value
+    const onMountedStart = pagesValue.value.find((page) => page.code.origin === 'Azion')
+    if (onMountedStart) {
+      replacePages(pagesValue.value)
+      return pagesValue.value
+    }
+    const mergePagesDefault = [...pagesValue.value, ...STATUS_CODE_OPTIONS]
+    replacePages(mergePagesDefault)
+    return mergePagesDefault
   }
 
   const openEditStatusCodeDrawer = (item) => {
     drawerRef.value.openEditDrawer(item)
+  }
+
+  const openCreateStatusCodeDrawer = () => {
+    drawerRef.value.openEditDrawer({})
   }
 </script>

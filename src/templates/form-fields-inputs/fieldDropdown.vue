@@ -145,6 +145,11 @@
     }
   })
 
+  const isDisabledIcon = computed(() => {
+    const iconDisabled = props.iconDisabled || 'pi pi-lock'
+    return props.disabled ? iconDisabled : ''
+  })
+
   const passThrough = computed(() => {
     return {
       filterInput: {
@@ -171,6 +176,7 @@
     v-if="props.label"
   />
   <Dropdown
+    :dropdown-icon="isDisabledIcon"
     :editable="props.editable"
     appendTo="self"
     :id="name"

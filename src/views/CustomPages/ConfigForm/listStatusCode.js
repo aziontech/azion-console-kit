@@ -1,6 +1,7 @@
 const defaultValue = {
   type: 'PageDefault',
-  customStatusCode: '-',
+  customStatusCode: null,
+  uri: null,
   connector: null,
   ttl: 0,
   contentType: 'text/html',
@@ -233,39 +234,38 @@ footer {
 export const STATUS_CODE_OPTIONS = [
   {
     id: 1,
-    code: 'Default',
-    name: 'Default',
+    code: { value: 'default', origin: 'Azion' },
     ...defaultValue
   },
   {
-    id: 404,
-    code: '404',
-    name: 'Not Found',
+    id: 2,
+    code: { value: '404', origin: 'Azion' },
     ...defaultValue
   }
 ]
 
 export const CODE_OPTIONS = [
-  { label: '400', value: 400 },
-  { label: '401', value: 401 },
-  { label: '403', value: 403 },
-  { label: '404', value: 404 },
-  { label: '405', value: 405 },
-  { label: '406', value: 406 },
-  { label: '408', value: 408 },
-  { label: '409', value: 409 },
-  { label: '410', value: 410 },
-  { label: '411', value: 411 },
-  { label: '414', value: 414 },
-  { label: '415', value: 415 },
-  { label: '416', value: 416 },
-  { label: '426', value: 426 },
-  { label: '429', value: 429 },
-  { label: '431', value: 431 },
-  { label: '500', value: 500 },
-  { label: '501', value: 501 },
-  { label: '502', value: 502 },
-  { label: '503', value: 503 },
-  { label: '504', value: 504 },
-  { label: '505', value: 505 }
+  { label: 'Default', value: 'default' },
+  { label: '400 - Bad Request', value: '400' },
+  { label: '401 - Unauthorized', value: '401' },
+  { label: '403 - Forbidden', value: '403' },
+  { label: '404 - Not Found', value: '404' },
+  { label: '405 - Method Not Allowed', value: '405' },
+  { label: '406 - Not Acceptable', value: '406' },
+  { label: '408 - Request Timeout', value: '408' },
+  { label: '409 - Conflict', value: '409' },
+  { label: '410 - Gone', value: '410' },
+  { label: '411 - Length Required', value: '411' },
+  { label: '414 - URI Too Long', value: '414' },
+  { label: '415 - Unsupported Media Type', value: '415' },
+  { label: '416 - Range Not Satisfiable', value: '416' },
+  { label: '426 - Upgrade Required', value: '426' },
+  { label: '429 - Too Many Requests', value: '429' },
+  { label: '431 - Request Header Fields Too Large', value: '431' },
+  { label: '500 - Internal Server Error', value: '500' },
+  { label: '501 - Not Implemented', value: '501' },
+  { label: '502 - Bad Gateway', value: '502' },
+  { label: '503 - Service Unavailable', value: '503' },
+  { label: '504 - Gateway Timeout', value: '504' },
+  { label: '505 - HTTP Version Not Supported', value: '505' }
 ]

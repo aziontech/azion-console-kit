@@ -71,7 +71,7 @@ export const CustomPageAdapter = {
       active: data.active,
       product_version: data.product_version,
       pages: data.pages.map((item) => ({
-        code: nullable(item.code),
+        code: { value: nullable(item.code) },
         type: nullable(item.page.type),
         customStatusCode: nullable(item.page.attributes.custom_status_code),
         connector: nullable(item.page.attributes.connector),

@@ -151,7 +151,7 @@
       closable: true,
       severity,
       summary,
-      detail
+      detail: detail || 'An error occurred while trying to delete the item. Please try again.'
     })
   }
 

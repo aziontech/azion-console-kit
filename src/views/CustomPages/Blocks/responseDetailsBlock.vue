@@ -132,6 +132,10 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
     }
   })
 
