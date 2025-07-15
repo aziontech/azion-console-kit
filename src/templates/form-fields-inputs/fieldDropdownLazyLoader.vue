@@ -227,9 +227,27 @@
   }
 
   const emitChange = () => {
-    const selectedOption = data.value.find(
-      (option) => option[props.optionValue] === inputValue.value
-    )
+    let selectedOption = null
+
+    // Check if data is grouped
+    const isGroupedData = data.value.length > 0 && 
+      data.value.some(item => item[props.optionGroupLabel] && item[props.optionGroupChildren])
+
+    if (isGroupedData) {
+      // Search for the selected option within groups
+      for (const group of data.value) {
+        const groupItems = group[props.optionGroupChildren] || []
+        selectedOption = groupItems.find(
+          (option) => option[props.optionValue] === inputValue.value
+        )
+        if (selectedOption) break
+      }
+    } else {
+      // Search in flat data (existing behavior)
+      selectedOption = data.value.find(
+        (option) => option[props.optionValue] === inputValue.value
+      )
+    }
 
     emit('onChange', inputValue.value)
 
@@ -280,31 +298,88 @@
       })
 
       totalCount.value = response.count
-      let results = response.body?.map((item) => {
-        return {
-          [props.optionLabel]: item.name,
-          [props.optionValue]: item.id,
-          ...props?.moreOptions?.reduce(
-            (additionalFields, option) => ({
-              ...additionalFields,
-              [option]: item[option]
-            }),
-            {}
-          )
-        }
-      })
+
+      // Check if response is grouped data (has label and items structure)
+      const isGroupedData = Array.isArray(response.body) &&
+        response.body.some(item => item.label && Array.isArray(item.items))
+
+      let results
+
+      if (isGroupedData) {
+        // Process grouped data
+        results = response.body.map(group => ({
+          [props.optionGroupLabel]: group.label,
+          [props.optionGroupChildren]: group.items?.map(item => ({
+            [props.optionLabel]: item.name,
+            [props.optionValue]: item.id,
+            ...props?.moreOptions?.reduce(
+              (additionalFields, option) => ({
+                ...additionalFields,
+                [option]: item[option]
+              }),
+              {}
+            )
+          })) || []
+        }))
+      } else {
+        // Process flat data (existing behavior)
+        results = response.body?.map((item) => {
+          return {
+            [props.optionLabel]: item.name,
+            [props.optionValue]: item.id,
+            ...props?.moreOptions?.reduce(
+              (additionalFields, option) => ({
+                ...additionalFields,
+                [option]: item[option]
+              }),
+              {}
+            )
+          }
+        })
+      }
 
       if (currentPage === INITIAL_PAGE) {
         data.value = results ? results : []
       } else {
-        const uniqueResults = results.filter(
-          (newItem) =>
-            !data.value.some(
-              (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
-            )
-        )
+        if (isGroupedData) {
+          // For grouped data, merge groups and their items
+          const mergedGroups = []
 
-        data.value = [...data.value, ...uniqueResults]
+          results.forEach(newGroup => {
+            const existingGroupIndex = data.value.findIndex(
+              existingGroup => existingGroup[props.optionGroupLabel] === newGroup[props.optionGroupLabel]
+            )
+
+            if (existingGroupIndex >= 0) {
+              // Merge items into existing group
+              const existingItems = data.value[existingGroupIndex][props.optionGroupChildren] || []
+              const newItems = newGroup[props.optionGroupChildren] || []
+
+              const uniqueNewItems = newItems.filter(
+                newItem => !existingItems.some(
+                  existingItem => existingItem[props.optionValue] === newItem[props.optionValue]
+                )
+              )
+
+              data.value[existingGroupIndex][props.optionGroupChildren] = [...existingItems, ...uniqueNewItems]
+            } else {
+              // Add new group
+              mergedGroups.push(newGroup)
+            }
+          })
+
+          data.value = [...data.value, ...mergedGroups]
+        } else {
+          // For flat data (existing behavior)
+          const uniqueResults = results.filter(
+            (newItem) =>
+              !data.value.some(
+                (existingItem) => existingItem[props.optionValue] === newItem[props.optionValue]
+              )
+          )
+
+          data.value = [...data.value, ...uniqueResults]
+        }
       }
 
       if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
@@ -341,12 +416,41 @@
         )
       }
 
-      const optionExists = data.value.some(
-        (item) => item[props.optionValue] === newOption[props.optionValue]
-      )
+      // Check if data is grouped
+      const isGroupedData = data.value.length > 0 &&
+        data.value.some(item => item[props.optionGroupLabel] && item[props.optionGroupChildren])
 
-      if (!optionExists) {
-        data.value = [newOption, ...data.value]
+      let optionExists = false
+
+      if (isGroupedData) {
+        // Check if option exists in any group
+        optionExists = data.value.some(group =>
+          group[props.optionGroupChildren]?.some(
+            item => item[props.optionValue] === newOption[props.optionValue]
+          )
+        )
+
+        if (!optionExists) {
+          // Add to first group or create a new group
+          if (data.value.length > 0) {
+            data.value[0][props.optionGroupChildren] = [newOption, ...data.value[0][props.optionGroupChildren]]
+          } else {
+            // Create a default group if no groups exist
+            data.value = [{
+              [props.optionGroupLabel]: 'Options',
+              [props.optionGroupChildren]: [newOption]
+            }]
+          }
+        }
+      } else {
+        // Flat data (existing behavior)
+        optionExists = data.value.some(
+          (item) => item[props.optionValue] === newOption[props.optionValue]
+        )
+
+        if (!optionExists) {
+          data.value = [newOption, ...data.value]
+        }
       }
 
       if (disableEmitInit.value) {
@@ -434,4 +538,15 @@
       loadSelectedValue(value)
     }
   }
+
+  const refreshData = async () => {
+    page.value = INITIAL_PAGE
+    search.value = ''
+    await fetchData()
+  }
+
+  // Expose refresh function to parent components
+  defineExpose({
+    refreshData
+  })
 </script>

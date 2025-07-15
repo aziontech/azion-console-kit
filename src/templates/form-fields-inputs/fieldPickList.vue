@@ -69,11 +69,7 @@
             class="flex-1 flex flex-column gap-2"
             v-if="!slotProps.item?.loading"
           >
-            <span
-              class="regular-400 line-height-auto"
-              data-testid="picklist_name-item"
-              >{{ slotProps.item.name }}
-            </span>
+            <span data-testid="picklist_name-item">{{ slotProps.item.name }} </span>
           </div>
           <div
             class="flex-1 flex flex-column gap-2"
@@ -278,8 +274,8 @@
 </script>
 
 <style>
-.p-picklist-source-wrapper .p-picklist-list li,
-.p-picklist-target-wrapper .p-picklist-list li {
-  padding: 0 !important;
-}
+  .p-picklist-source-wrapper .p-picklist-list li,
+  .p-picklist-target-wrapper .p-picklist-list li {
+    padding: 0 !important;
+  }
 </style>

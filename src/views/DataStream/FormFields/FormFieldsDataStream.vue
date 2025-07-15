@@ -77,9 +77,10 @@
    */
   const loadTemplates = async () => {
     const templates = await dataStreamService.listTemplates({
-      fields: 'id,name,data_set'
+      fields: 'id,name,data_set',
+      ordering: 'name'
     })
-    return templates.results[0]?.id ?? ''
+    return templates.body[0]?.id ?? ''
   }
 
   /**
