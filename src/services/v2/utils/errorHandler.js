@@ -22,7 +22,8 @@ export class ErrorHandler {
     if (firstErr?.meta) {
       return {
         data: {
-          data: firstErr.meta
+          meta: firstErr.meta,
+          error: () => this.create(axiosError)
         },
         status: axiosError.response.status
       }

@@ -1,7 +1,7 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
-  import { ref, inject, defineExpose, watch } from 'vue'
+  import { ref, inject, defineExpose, watch, computed } from 'vue'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { validationSchema } from '../FormFields/composables/validation'
@@ -51,6 +51,18 @@
       productName: 'Digital Certificate'
     })
   }
+
+  const titleDrawer = computed(() => {
+    if (certificateType.value === 'generateCSR') {
+      return 'Create Edge Certificate CSR'
+    } else if (certificateType.value === 'trusted_ca_certificate') {
+      return 'Create Trusted CA Certificate'
+    } else if (certificateType.value === 'certificateRevogationList') {
+      return 'Create Certificate Revocation List'
+    }
+
+    return 'Create Digital Certificate'
+  })
 
   const handleTrackFailedToCreate = (error) => {
     const { fieldName, message } = handleTrackerError(error)
@@ -114,7 +126,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedToCreate"
-    title="Create Digital Certificate"
+    :title="titleDrawer"
     disableToast
   >
     <template #formFields>

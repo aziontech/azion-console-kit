@@ -9,7 +9,6 @@
         <FieldTextArea
           data-testid="import-server-certificate-form__certificate-field"
           :label="getTitleByCertificateType"
-          required
           :placeholder="getPlaceholderByCertificateType"
           name="certificate"
           :value="certificate"
