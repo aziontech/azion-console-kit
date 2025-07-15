@@ -103,8 +103,8 @@
     showToast('success', feedbackMessage)
   }
 
-  const redirectToUrl = (path) => {
-    router.push({ path })
+  const redirectToUrl = (path, params = {}) => {
+    router.push({ path, params, query: params })
   }
 
   const handleSuccess = (response) => {
@@ -115,7 +115,7 @@
     }
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
-    redirectToUrl(response?.urlToEditView)
+    redirectToUrl(response?.urlToEditView, response?.params)
   }
 
   const onSubmit = handleSubmit(
@@ -127,7 +127,7 @@
       } catch (error) {
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
-          emit('onError', error.message[0])
+          emit('on-response-fail', error.message[0] || error)
         } else {
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error

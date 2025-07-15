@@ -44,8 +44,8 @@ const getHeadersPostRequest = (listHeaders) => {
 
 const getHeadersLoadRequest = (payload) => {
   const headers = []
-  if (payload.endpoint && payload.endpoint?.headers) {
-    Object.entries(payload.endpoint?.headers).forEach((element) => {
+  if (payload.attributes && payload.attributes.headers) {
+    Object.entries(payload.attributes.headers).forEach((element) => {
       headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
     })
   }
@@ -63,7 +63,7 @@ const parseByEndpointType = (payload) => {
         attributes: {
           url: payload.endpointUrl,
           payload_format: payload.payloadFormat,
-          log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
+          log_line_separator: payload.lineSeparator,
           max_size: payload.maxSize,
           headers: getHeadersPostRequest(payload.headers)
         }
@@ -260,7 +260,11 @@ export const DataStreamAdapter = {
           templateName: dataStream.templateName,
           dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
-          active: parseStatusData(dataStream.active)
+          active: parseStatusData(dataStream.active),
+          lastEditor: dataStream.last_editor || '-',
+          lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+            new Date(dataStream.last_modified)
+          )
         }
       }) || []
     )
@@ -271,76 +275,66 @@ export const DataStreamAdapter = {
         return {
           id: template.id,
           name: template.name,
-          dataSet: template.data_set
+          dataSet: template?.data_set,
+          custom: template?.custom,
+          active: template?.active
         }
       }) || []
     )
   },
   transformPayloadDataStream(payload) {
-    const allDomains = payload.domains[1].length <= 0
-    let parsedPayload
+    const allDomains = !payload.domains[1]?.length
+    const selectedDomains = payload.domains[1] || []
 
-    if (payload.template === 'CUSTOM_TEMPLATE') {
-      parsedPayload = {
-        name: payload.name,
-        template_model: JSON.stringify(JSON.parse(payload.dataSet), null, '\t'),
-        filters: {
-          sampling_enable: allDomains,
-          sampling_rate: 100,
-          workloads: getWorkloadIds(payload.domains[1])
-        },
-        endpoint: parseByEndpointType(payload)
-      }
-    } else {
-      parsedPayload = {
-        name: payload.name,
-        inputs: [
-          {
-            type: 'raw_logs',
-            attributes: {
-              data_source: payload.dataSource
-            }
-          }
-        ],
-        outputs: [parseByEndpointType(payload)],
-        transform: [
-          {
-            type: 'render_template',
-            attributes: {
-              template: payload.template
-            }
-          }
-        ],
-        active: payload.status
-      }
-
-      if (allDomains) {
-        parsedPayload.transform.push({
-          type: 'filter_workloads',
+    let parsedPayload = {
+      name: payload.name,
+      inputs: [
+        {
+          type: 'raw_logs',
           attributes: {
-            workloads: getWorkloadIds(payload.domains[0])
+            data_source: payload.dataSource
           }
-        })
-      }
-
-      if (!allDomains) {
-        parsedPayload.transform.push({
-          type: 'sampling',
+        }
+      ],
+      outputs: [parseByEndpointType(payload)],
+      transform: [
+        {
+          type: 'render_template',
           attributes: {
-            rate: 100
+            template: payload.template
           }
-        })
-      }
+        }
+      ],
+      active: payload.status
+    }
+
+    if (!allDomains) {
+      parsedPayload.transform.push({
+        type: 'filter_workloads',
+        attributes: {
+          workloads: getWorkloadIds(selectedDomains)
+        }
+      })
     }
 
     if (payload.hasSampling) {
-      parsedPayload.filters.sampling_rate = payload.samplingPercentage
+      parsedPayload.transform.push({
+        type: 'sampling',
+        attributes: {
+          rate: payload.samplingPercentage
+        }
+      })
     }
 
     return parsedPayload
   },
+<<<<<<< HEAD
   transformLoadDataStream(datas) {
     const [payload, workloads] = datas
+=======
+  transformLoadDataStream(data) {
+    const [payload, workloads] = data
+>>>>>>> dev
 
     const dataSourceInput = payload.inputs.find((input) => input.type === 'raw_logs')
     const samplingTransform = payload.transform?.find((item) => item.type === 'sampling')
@@ -360,6 +354,22 @@ export const DataStreamAdapter = {
       hasSampling: !!samplingTransform,
       samplingPercentage: samplingTransform?.attributes?.rate,
       ...getInfoByEndpoint(endpointOutput)
+<<<<<<< HEAD
+=======
+    }
+  },
+  transformPayloadTemplate(payload) {
+    return {
+      name: payload.name,
+      data_set: JSON.stringify(JSON.parse(payload.dataSet), null, '\t')
+    }
+  },
+  transformLoadTemplate(payload) {
+    return {
+      id: payload.id,
+      name: payload.name,
+      dataSet: payload?.data_set
+>>>>>>> dev
     }
   }
 }

@@ -17,7 +17,7 @@
       :loading="loading"
       :placeholder="placeholder"
       :disabled="disabled"
-      class="w-full sm:max-w-xs overflow-hidden"
+      class="w-full overflow-hidden"
       @change="emitChange"
       @blur="emitBlur"
       display="chip"

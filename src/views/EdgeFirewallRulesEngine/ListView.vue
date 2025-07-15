@@ -154,20 +154,6 @@
       disableSort: true
     },
     {
-      field: 'status',
-      header: 'Status',
-      sortField: 'status.content',
-      filterPath: 'status.content',
-      type: 'component',
-      component: (columnData) => {
-        return columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-      },
-      disableSort: true
-    },
-    {
       field: 'description',
       header: 'Description',
       filterPath: 'description.value',
@@ -184,6 +170,20 @@
     {
       field: 'lastEditor',
       header: 'Last Editor',
+      disableSort: true
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      sortField: 'status.content',
+      filterPath: 'status.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      },
       disableSort: true
     }
   ])

@@ -1,90 +1,155 @@
 <template>
-  <div
-    class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-6 lg:gap-10 mt-8"
+  <SkeletonBlock
+    v-if="!showNotification && loadingNotification"
+    class="w-full h-5rem"
+  />
+  <MessageNotification
+    v-else-if="showNotification"
+    :title="notificationPayment.title"
+    :typeMessage="notificationPayment.type"
+    :buttons="actionsButtons"
   >
-    <div class="flex gap-3 items-center">
-      <div>
-        <Avatar
-          icon="pi pi-dollar"
-          size="large"
-          class="bg-opacity-20 min-w-[2rem]"
-        />
-      </div>
-
-      <div class="flex flex-col">
-        <h4 class="text-lg font-bold">{{ title }}</h4>
-        <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl text-sm">
-          <slot
-            name="textNotification"
-            :text="textDisclaimer"
-          >
-            {{ textDisclaimer }}
-            <PrimeButton
-              label="payment methods."
-              link
-              class="p-0 text-sm"
-              @click="clickLinkPaymentMethod"
-            />
-          </slot>
-        </p>
-      </div>
-    </div>
-    <div class="flex gap-3">
+    <template #description>
+      {{ notificationPayment.description }}
       <PrimeButton
-        class="w-full min-w-max"
-        icon="pi pi-plus"
-        label="Credit"
-        @click="props.clickAddCredit"
-        outlined
-        :disabled="props.disabledBtnAddCredit"
+        label="payment methods."
+        link
+        class="p-0 text-sm"
+        :disabled="props.disabledLinkPaymentMethod"
+        @click="redirectPayment"
       />
-      <PrimeButton
-        class="w-full min-w-max"
-        icon="pi pi-plus"
-        severity="secondary"
-        @click="props.clickAddPaymentMethod"
-        label="Payment Method"
-        :disabled="props.disabledBtnAddPaymentMethod"
-      />
-    </div>
-  </div>
+    </template>
+  </MessageNotification>
 </template>
 <script setup>
-  import Avatar from 'primevue/avatar'
-  import PrimeButton from 'primevue/button'
+  import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
-  import { ref, computed } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref, onMounted } from 'vue'
+  import { billingGqlService } from '@/services/v2'
+  import { formatUnitValue } from '@/helpers'
+  import SkeletonBlock from '@/templates/skeleton-block'
 
-  defineOptions({
-    name: 'notification-payment'
-  })
+  defineOptions({ name: 'notification-payment' })
 
-  const user = useAccountStore().accountData
+  const emit = defineEmits(['clickAddCredit', 'clickAddPaymentMethod', 'clickLink'])
+
+  const { accountIsNotRegular, accountData } = useAccountStore()
+  const { status } = accountData
+
+  const showNotification = ref(false)
+  const loadingNotification = ref(false)
 
   const props = defineProps({
-    clickAddCredit: Function,
-    clickAddPaymentMethod: Function,
-    clickLinkPaymentMethod: Function,
-    disabledBtnAddCredit: {
+    disabledCredit: {
       type: Boolean,
       default: false
     },
-    disabledBtnAddPaymentMethod: {
+    disabledPaymentMethod: {
       type: Boolean,
       default: false
+    },
+    disabledLinkPaymentMethod: {
+      type: Boolean,
+      default: false
+    },
+    loadCurrentInvoice: {
+      type: Function,
+      required: true
     }
   })
 
-  const textDisclaimer = ref(user.disclaimer)
-  textDisclaimer.value = textDisclaimer.value
-    .replace(/^Welcome to your trial period\. |<[^>]*>[^<]*<\/[^>]*>./g, '')
-    .replace(/\bpayment method\b/i, '')
-    .trim()
+  const redirectPayment = async () => {
+    emit('clickLink')
+  }
 
-  const title = computed(() => {
-    if (user.status === 'BLOCKED') {
-      return 'Account blocked due to some issues'
+  const notificationPayment = ref({})
+
+  const actionsButtons = computed(() => [
+    {
+      label: 'Credit',
+      icon: 'pi pi-plus',
+      onClick: () => emit('clickAddCredit'),
+      outlined: true,
+      disabled: props.disabledCredit
+    },
+    {
+      label: 'Payment Method',
+      icon: 'pi pi-plus',
+      onClick: () => emit('clickAddPaymentMethod'),
+      severity: 'secondary',
+      disabled: props.disabledPaymentMethod
     }
-    return 'The Free Trial credit balance is running'
+  ])
+
+  const totalPending = async () => {
+    return await props
+      .loadCurrentInvoice()
+      .then((invoice) => invoice?.total || '0')
+      .catch(() => '0')
+  }
+
+  const NOTIFICATION_CONFIGS = {
+    TRIAL: {
+      title: 'Your free trial credit balance is running',
+      type: 'info',
+      getDescription: (credit, days) =>
+        `You have $${credit} to use in ${days} days. To use Azion with no service interruptions at the end of your trial, add a`
+    },
+    BLOCKED: {
+      title: 'Your account is blocked',
+      type: 'error',
+      getDescription: (total) =>
+        `Your account is blocked due to $${
+          total !== '--' ? formatUnitValue(total) : 'pending'
+        } in pending payments. To unblock your account, update or verify your`
+    },
+    DEFAULTING: {
+      title: 'Pending Payments',
+      type: 'warning',
+      getDescription: (total) =>
+        `You have $${
+          total !== '--' ? formatUnitValue(total) : 'pending'
+        } in pending payments. To use Azion with no service interruptions update or verify your`
+    }
+  }
+
+  const loadText = async () => {
+    loadingNotification.value = true
+    try {
+      if (!accountIsNotRegular) {
+        loadingNotification.value = false
+        showNotification.value = false
+        return
+      }
+
+      if (status === 'TRIAL' || status === 'ONLINE') {
+        const { credit, days, formatCredit } = await billingGqlService.getCreditAndExpirationDate()
+        if (!(credit > 0 && days > 0)) {
+          loadingNotification.value = false
+          showNotification.value = false
+          return
+        }
+        notificationPayment.value = {
+          ...NOTIFICATION_CONFIGS.TRIAL,
+          description: NOTIFICATION_CONFIGS.TRIAL.getDescription(formatCredit, days)
+        }
+      } else if (status === 'BLOCKED' || status === 'DEFAULTING') {
+        const total = await totalPending()
+        notificationPayment.value = {
+          ...NOTIFICATION_CONFIGS[status],
+          description: NOTIFICATION_CONFIGS[status].getDescription(total)
+        }
+      }
+      loadingNotification.value = false
+      showNotification.value = true
+    } catch {
+      showNotification.value = false
+      loadingNotification.value = false
+    }
+  }
+
+  onMounted(() => {
+    loadText()
   })
 </script>

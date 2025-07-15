@@ -23,7 +23,10 @@ export class PurgeService {
 
     return {
       feedback: 'The purge is queued for execution. It’ll appear in the history once completed.',
-      urlToEditView: `/real-time-purge`
+      urlToEditView: `/real-time-purge`,
+      params: {
+        isPending: true
+      }
     }
   }
 }

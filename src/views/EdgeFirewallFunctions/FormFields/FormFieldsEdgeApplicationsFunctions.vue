@@ -29,7 +29,7 @@
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
       initiatorType: 'edge_firewall',
-      fields: ['id', 'name', 'json_args', 'initiator_type'],
+      fields: ['id', 'name', 'args', 'initiator_type'],
       ...queryParams
     })
   }
@@ -37,7 +37,7 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'json_args']
+      fields: ['id', 'name', 'args']
     })
   }
 
@@ -99,8 +99,8 @@
           :moreOptions="['jsonArgs']"
           disableEmitFirstRender
           @onSelectOption="changeArgs"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           appendTo="self"
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
         >

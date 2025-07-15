@@ -60,7 +60,6 @@
     { name: '80 (Default)', value: 80 },
     { name: '8008', value: 8008 },
     { name: '8080', value: 8080 },
-    // Custom Ports
     { name: '8880', value: 8880 }
   ]
   const HTTP3_PORT_LIST_OPTIONS = [{ name: '443 (Default)', value: 443 }]
@@ -71,7 +70,6 @@
     { name: '9441', value: 9441 },
     { name: '9442', value: 9442 },
     { name: '9443', value: 9443 },
-    // Custom Ports
     { name: '7777', value: 7777 },
     { name: '8888', value: 8888 },
     { name: '9553', value: 9553 },

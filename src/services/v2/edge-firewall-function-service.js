@@ -37,16 +37,16 @@ export class EdgeFirewallFunctionService {
     )
     this.countFunctions = count
 
-    const enrichedFunctions = await enrichByMatchingReference(
-      functionInstances,
-      this.#listFunctionNames,
-      (item) => item.edgeFunctionId,
-      (item, matchedRef) => ({
+    const enrichedFunctions = await enrichByMatchingReference({
+      items: functionInstances,
+      fetchReferencePage: this.#listFunctionNames,
+      getReferenceId: (item) => item.edgeFunctionId,
+      merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
       }),
-      { pageSize: 100 }
-    )
+      pageSize: 100
+    })
 
     return {
       body: this.#getTransformed('transformFunction', enrichedFunctions),
