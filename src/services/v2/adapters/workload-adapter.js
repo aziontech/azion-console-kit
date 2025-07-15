@@ -65,6 +65,18 @@ const parseName = ({ name, product_version }) => {
   return nameProps
 }
 
+const handleTls = (payload) => {
+  if (payload.protocols.http.useHttps) {
+    return {
+      minimum_version: payload.tls.minimumVersion || null,
+      ciphers: payload.tls.ciphers || null,
+      certificate: payload.tls.certificate || null
+    }
+  }
+
+  return null
+}
+
 export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
     let domains = payload.domains
@@ -79,11 +91,7 @@ export const WorkloadAdapter = {
       name: payload.name,
       active: payload.active,
       infrastructure: payload.infrastructure,
-      tls: {
-        minimum_version: payload.tls.minimumVersion,
-        ciphers: payload.tls.ciphers || null,
-        certificate: payload.tls.certificate || null
-      },
+      tls: handleTls(payload),
       protocols: {
         http: {
           versions: payload.protocols.http.useHttp3
@@ -108,8 +116,11 @@ export const WorkloadAdapter = {
     }
 
     if (!payload.mtls.isEnabled) {
-      delete payloadResquest.mtls.verification
-      delete payloadResquest.mtls.crl
+      delete payloadResquest.mtls
+    }
+    if (payloadResquest.tls === null) {
+      delete payloadResquest.tls
+      delete payloadResquest.protocols.http.https_ports
     }
 
     return payloadResquest

@@ -98,8 +98,8 @@
       domains: domainsData,
       endpoint: 'standard',
       status: true,
-      hasSampling: false,
-      samplingPercentage: 0,
+      hasSampling: true,
+      samplingPercentage: 100,
 
       // Standard endpoint fields
       endpointUrl: '',

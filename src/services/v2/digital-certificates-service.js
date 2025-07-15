@@ -29,12 +29,14 @@ export class DigitalCertificatesService {
       body
     })
 
-    const hasCertificateId = response.data.id
+    const hasCertificateId = response.meta?.id
+
+    if (!hasCertificateId && response.meta?.certificate) {
+      return { id: response.meta.certificate }
+    }
 
     if (!hasCertificateId) {
-      return {
-        id: response.data.certificate
-      }
+      throw response.error()
     }
 
     return response.data

@@ -44,8 +44,8 @@ const getHeadersPostRequest = (listHeaders) => {
 
 const getHeadersLoadRequest = (payload) => {
   const headers = []
-  if (payload.endpoint && payload.endpoint?.headers) {
-    Object.entries(payload.endpoint?.headers).forEach((element) => {
+  if (payload.attributes && payload.attributes?.headers) {
+    Object.entries(payload.attributes?.headers).forEach((element) => {
       headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
     })
   }
@@ -260,7 +260,11 @@ export const DataStreamAdapter = {
           templateName: dataStream.templateName,
           dataSource: mapDataSourceName[dataSourceInput.attributes.data_source],
           endpointType: endpointTypeNameMap[dataSetType] || dataSetType,
-          active: parseStatusData(dataStream.active)
+          active: parseStatusData(dataStream.active),
+          lastEditor: dataStream.last_editor || '-',
+          lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+            new Date(dataStream.last_modified)
+          )
         }
       }) || []
     )
@@ -279,8 +283,8 @@ export const DataStreamAdapter = {
     )
   },
   transformPayloadDataStream(payload) {
-    const allDomains = payload.domains[1].length <= 0
-    const selectedDomains = payload.domains[1]
+    const allDomains = !payload.domains[1]?.length
+    const selectedDomains = payload.domains[1] || []
 
     let parsedPayload = {
       name: payload.name,

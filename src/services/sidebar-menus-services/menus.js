@@ -21,14 +21,19 @@ function createMarketplaceItem() {
 
 function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-
-  return {
+  const menuOption = {
     label: handleTextDomainWorkload.pluralTitle,
     icon: 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains',
     tag: 'Preview'
   }
+
+  if (hasFlagBlockApiV4()) {
+    delete menuOption.tag
+  }
+
+  return menuOption
 }
 
 function createBuildItems() {
