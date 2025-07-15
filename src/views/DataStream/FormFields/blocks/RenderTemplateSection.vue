@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
-    title="Input"
-    description="Define the source and the variables from which data should be collected."
+    title="Render Template"
+    description="Choose or create a template to define the structure of the data sent to the destination platform."
     data-testid="data-stream-form__section__data-settings"
   >
     <template #inputs>
@@ -141,8 +141,8 @@
       ordering: '!custom'
     })
 
-    const itemsCustom = templates.body.filter((template) => template.custom)
-    const itemsAzion = templates.body.filter((template) => !template.custom)
+    const itemsCustom = templates.results.filter((template) => template.custom)
+    const itemsAzion = templates.results.filter((template) => !template.custom)
 
     return {
       body: [

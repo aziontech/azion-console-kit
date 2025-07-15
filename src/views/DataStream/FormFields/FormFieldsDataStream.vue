@@ -80,7 +80,7 @@
       fields: 'id,name,data_set',
       ordering: 'name'
     })
-    return templates.body[0]?.id ?? ''
+    return templates.results[0]?.id ?? ''
   }
 
   /**

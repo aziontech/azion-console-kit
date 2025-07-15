@@ -50,7 +50,7 @@ export class DataStreamService {
 
     const results = this.#getTransformed('transformListTemplate', data.results)
 
-    return { body: results, count: data.count }
+    return { results, count: data.count }
   }
 
   createDataStreamService = async (payload) => {
