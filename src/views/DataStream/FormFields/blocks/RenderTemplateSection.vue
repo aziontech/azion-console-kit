@@ -194,7 +194,6 @@
 
   const handleSuccess = async () => {
     drawerTemplateRef.value.closeDrawer?.()
-    // Refresh the dropdown data to show the new template
     if (templateDropdownRef.value?.refreshData) {
       await templateDropdownRef.value.refreshData()
     }
