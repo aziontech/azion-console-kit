@@ -44,8 +44,8 @@ const getHeadersPostRequest = (listHeaders) => {
 
 const getHeadersLoadRequest = (payload) => {
   const headers = []
-  if (payload.attributes && payload.attributes?.headers) {
-    Object.entries(payload.attributes?.headers).forEach((element) => {
+  if (payload.attributes && payload.attributes.headers) {
+    Object.entries(payload.attributes.headers).forEach((element) => {
       headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
     })
   }

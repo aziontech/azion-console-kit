@@ -22,13 +22,19 @@ const validationSchema = yup.object({
   // standard
   endpointUrl: yup.string().when('endpoint', {
     is: 'standard',
-    then: (schema) => schema.required('Endpoint URL is a required field')
+    then: (schema) =>
+      schema.required('Endpoint URL is a required field').url('Please enter a valid URL')
   }),
   headers: yup.array().of(
     yup.object().shape({
       value: yup.string().when('endpoint', {
         is: 'standard',
-        then: (schema) => schema.required('Header value is required')
+        then: (schema) =>
+          schema
+            .required('Header value is required')
+            .test('header-format', 'Header must be in format "header-name:value"', (value) => {
+              return value && value.includes(':')
+            })
       })
     })
   ),
