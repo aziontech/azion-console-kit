@@ -18,7 +18,16 @@ export class HttpService {
     return this.abortManager.getSignal(abortIdentifier, abortGroup)
   }
 
-  async request({ method, url, body = {}, params = {}, config = {}, abortIdentifier, abortGroup }) {
+  async request({
+    method,
+    url,
+    body = {},
+    params = {},
+    config = {},
+    abortIdentifier,
+    abortGroup,
+    processError = true
+  }) {
     const signal = this.#getSignal(abortIdentifier, abortGroup)
     const requestUrl = this.#buildRequestUrl(url, params)
 
@@ -33,8 +42,8 @@ export class HttpService {
 
       return response
     } catch (axiosError) {
-      const meta = this.errorHandler.createMeta(axiosError)
-      if (meta) {
+      if (!processError) {
+        const meta = this.errorHandler.createMeta(axiosError)
         return meta
       }
       throw this.errorHandler.create(axiosError)

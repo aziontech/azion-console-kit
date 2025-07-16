@@ -27,7 +27,7 @@
         :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
-        :documentationService="Helpers.documentationCatalog.domains"
+        :documentationService="documentationHandler"
       >
         <template #illustration>
           <Illustration />
@@ -90,6 +90,14 @@
     })
   }
 
+  const documentationHandler = () => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      Helpers.documentationCatalog.workload()
+    } else {
+      Helpers.documentationCatalog.domains()
+    }
+  }
+
   const handleTrackEditEvent = (domain) => {
     tracker.product.clickToEdit({
       productName: 'Workload'
@@ -103,6 +111,13 @@
       })
     }
   }
+
+  const domainNameColumn = computed(() => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      return 'Workload Domain'
+    }
+    return 'Domain name'
+  })
 
   const getColumns = computed(() => {
     return [
@@ -139,7 +154,7 @@
       },
       {
         field: 'workloadHostname',
-        header: 'Workload Domain',
+        header: domainNameColumn.value,
         filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
@@ -182,12 +197,6 @@
         header: 'Last Editor',
         filterPath: 'lastEditor',
         sortField: 'lastEditor'
-      },
-      {
-        field: 'protocols',
-        header: 'Protocols',
-        filterPath: 'protocols',
-        sortField: 'protocols'
       }
     ]
   })

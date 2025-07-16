@@ -160,8 +160,16 @@
           domain: yup
             .string()
             .test('valid-domain', 'Invalid Domain format', function (value) {
-              if (!value) return true // Allow empty domain
-              return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/.test(value)
+              if (!value) return true
+
+              if (value.endsWith('.')) return false
+
+              const dotCount = (value.match(/\./g) || []).length
+              if (dotCount > 10) return false
+              const segments = value.split('.')
+              return segments.every((segment) =>
+                /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+              )
             })
             .label('Domain')
         })

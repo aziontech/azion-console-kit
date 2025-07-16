@@ -6,6 +6,7 @@ import {
   TLS_VERSIONS_OPTIONS,
   SUPPORTED_CIPHERS_LIST_OPTIONS
 } from '@/helpers'
+import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
 
 const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
@@ -16,15 +17,7 @@ function extractAzionAppSubdomain(fullDomains) {
   let azionAppSubdomains = ''
 
   fullDomains.forEach((full) => {
-    const parts = full.split('.')
-
-    if (parts.length < 2) {
-      cleanDomains.push({ subdomain: '', domain: full })
-      return
-    }
-
-    const domain = parts.slice(-2).join('.')
-    const subdomain = parts.slice(0, -2).join('.')
+    const { domain, subdomain } = getPrimaryDomain(full)
 
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
@@ -153,10 +146,10 @@ export const WorkloadAdapter = {
       name: workload.name,
       active: workload.active,
       workloadHostname: workload.workload_domain?.replace(/\.azion\.app$/, ''),
-      workloadDeploymentId: workloadDeployment.id,
-      edgeFirewall: workloadDeployment.edgeFirewall,
-      edgeApplication: workloadDeployment.edgeApplication,
-      customPage: workloadDeployment.customPage,
+      workloadDeploymentId: workloadDeployment?.id,
+      edgeFirewall: workloadDeployment?.edgeFirewall,
+      edgeApplication: workloadDeployment?.edgeApplication,
+      customPage: workloadDeployment?.customPage,
       domains: cleanDomains,
       customDomain: azionAppSubdomains,
       useCustomDomain: !!azionAppSubdomains,

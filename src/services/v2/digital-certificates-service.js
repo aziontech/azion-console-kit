@@ -26,16 +26,15 @@ export class DigitalCertificatesService {
     const { data: response } = await this.http.request({
       method: 'POST',
       url: `${this.baseURL}/request`,
-      body
+      body,
+      processError: false
     })
 
-    const hasCertificateId = response.meta?.id
-
-    if (!hasCertificateId && response.meta?.certificate) {
+    if (response?.meta?.certificate) {
       return { id: response.meta.certificate }
     }
 
-    if (response.hasError) {
+    if (response?.meta) {
       throw response.error()
     }
 

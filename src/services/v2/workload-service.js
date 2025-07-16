@@ -121,7 +121,11 @@ export class WorkloadService {
   editWorkload = async (payload) => {
     await this.#ensureCertificateForEdit(payload)
     await this.#updateWorkload(payload)
-    await this.#updateDeployment(payload)
+    if (payload.workloadDeploymentId) {
+      await this.#updateDeployment(payload)
+    } else {
+      await this.#ensureDeployment(payload, payload.id)
+    }
 
     return 'Your workload has been updated'
   }
