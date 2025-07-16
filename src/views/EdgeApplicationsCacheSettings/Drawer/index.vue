@@ -43,6 +43,9 @@
     showTieredCache: {
       type: Boolean,
       required: true
+    },
+    isOverlapped: {
+      type: Boolean
     }
   })
 
@@ -270,6 +273,7 @@
     @onSuccess="handleCreateCacheSettings"
     @onError="handleFailedToCreate"
     title="Create Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
@@ -290,6 +294,7 @@
     @onSuccess="handleEditedCacheSettings"
     @onError="handleFailedToEdit"
     title="Edit Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings

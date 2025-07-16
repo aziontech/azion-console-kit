@@ -40,13 +40,14 @@ export class DeviceGroupService {
 
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
-    await this.http.request({
+    const result = await this.http.request({
       method: 'POST',
       url: this.getUrl(edgeApplicationId),
       body
     })
 
     return {
+      id: result.data.data.id,
       feedback: 'Device Group successfully created'
     }
   }

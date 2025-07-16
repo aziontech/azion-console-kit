@@ -90,6 +90,7 @@
   import InputText from 'primevue/inputtext'
   import { watchDebounced } from '@vueuse/core'
   import Divider from 'primevue/divider'
+  import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
     disabled: {
@@ -122,9 +123,12 @@
   const searchSource = ref('')
   const searchTarget = ref('')
   const originalSource = ref([])
-  const originalTargert = ref([])
+  const originalTarget = ref([])
   const data = ref(props.dataPick)
   const loading = ref(false)
+
+  const toast = useToast()
+
   const addUniqueItems = (targetArray, itemsToAdd) => {
     const existingIds = new Set(targetArray.map((item) => item.id))
     itemsToAdd.forEach((item) => {
@@ -162,12 +166,12 @@
     data.value[0] = originalSource.value.filter((item) => !idsParaRemover.has(item.id))
     originalSource.value = data.value[0]
   }
-  const setOrigionalTarget = (target) => {
-    originalTargert.value = target
+  const setOriginalTarget = (target) => {
+    originalTarget.value = target
   }
   const handleSelectItemWithSearchTarget = (targets) => {
     const map = new Map()
-    originalTargert.value.forEach((item) => {
+    originalTarget.value.forEach((item) => {
       map.set(item.id, item)
     })
     targets.forEach((item) => {
@@ -186,7 +190,7 @@
     if (searchTarget.value) {
       handleSelectItemWithSearchTarget(newTarget)
     } else {
-      setOrigionalTarget(newTarget)
+      setOriginalTarget(newTarget)
     }
   }
   const searchFilter = () => {
@@ -222,6 +226,13 @@
     } catch (error) {
       notRequest.value = true
       removeLoadingPickList()
+
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'No more items to load',
+        life: 3000
+      })
     } finally {
       loading.value = false
     }

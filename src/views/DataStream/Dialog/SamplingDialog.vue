@@ -20,11 +20,13 @@
 
     <div class="flex flex-col gap-3.5">
       <InlineMessage severity="warn">
-        After activating and saving these settings, all other streams will become inactive.
+        After activating and saving these settings, all other Data Streams from the same Data Source
+        will be disabled.
       </InlineMessage>
       <p class="text-color-secondary text-sm font-normal leading-tight">
-        This option reduces costs of data collection and analysis but, once it's enabled, only this
-        stream can be active in your account.
+        Sampling percentage is statistical and not absolutely precise. When multiple Data Streams
+        from the same Data Source have different sampling rates, the system uses the lowest
+        percentage. This feature optimizes data collection efficiency.
       </p>
     </div>
 

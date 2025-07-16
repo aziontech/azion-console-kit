@@ -190,7 +190,7 @@
             <div v-if="showDeviceGroupFields">
               <FieldMultiSelectLazyLoader
                 ref="deviceGroupFieldRef"
-                name="deviceGroups"
+                name="deviceGroup"
                 class="w-full"
                 label="Device Group"
                 required
@@ -198,7 +198,6 @@
                 :optionLabel="'name'"
                 :optionValue="'id'"
                 placeholder="Select Device Groups"
-                :disabled="false"
                 description="Select a device group to customize cache behavior for specific categories."
                 data-testid="edge-application-cache-settings-form__device-groups-multiselect"
               >
@@ -290,6 +289,7 @@
   const { value: enableCachingForOptions } = useField('enableCachingForOptions')
 
   const { value: adaptiveDeliveryAction } = useField('adaptiveDeliveryAction')
+  const { value: deviceGroup } = useField('deviceGroup')
 
   const behaviors = {
     ignore: {
@@ -350,8 +350,9 @@
     drawerDeviceGroups.value.openDrawerCreate()
   }
 
-  const handleSuccessDrawerDeviceGroups = () => {
+  const handleSuccessDrawerDeviceGroups = (createdItemId) => {
     drawerDeviceGroups.value.closeDrawer()
     deviceGroupFieldRef.value.refreshData()
+    deviceGroup.value = [...deviceGroup.value, createdItemId]
   }
 </script>

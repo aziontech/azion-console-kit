@@ -28,7 +28,6 @@
     }
   })
 
-  console.log('isTieredCacheEnabled :', props.isTieredCacheEnabled);
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
@@ -113,6 +112,7 @@
 <template>
   <Drawer
     ref="drawerRef"
+    :isOverlapped="true"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
     :createService="cacheSettingsService.createCacheSettingsService"

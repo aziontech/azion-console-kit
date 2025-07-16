@@ -90,7 +90,7 @@
   </FormHorizontal>
   <DrawerTemplate
     ref="drawerTemplateRef"
-    @onSuccess="handleSuccess"
+    @onSuccess="handleSuccessCreateNewTemplate"
     @onDelete="handleDeleteTemplate"
   />
 </template>
@@ -192,11 +192,13 @@
     processTemplateDataSet(template)
   }
 
-  const handleSuccess = async () => {
+  const handleSuccessCreateNewTemplate = async (response) => {
     drawerTemplateRef.value.closeDrawer?.()
     if (templateDropdownRef.value?.refreshData) {
       await templateDropdownRef.value.refreshData()
     }
+
+    template.value = response.id
   }
 
   const handleDeleteTemplate = () => {
