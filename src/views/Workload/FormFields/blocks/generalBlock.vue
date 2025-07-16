@@ -29,7 +29,7 @@
           label="Name"
           required
           name="name"
-          placeholder="My domain"
+          placeholder="My workload"
           :value="name"
           description="This is an identification name for the workload. Once you save the configuration, the URL will be automatically generated."
         />
