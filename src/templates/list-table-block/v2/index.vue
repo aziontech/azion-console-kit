@@ -120,7 +120,7 @@
         v-if="props.groupColumn"
       >
         <div
-          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
+          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer"
           @click="toggleGroup(slotProps.data)"
         >
           {{ getObjectPath(slotProps.data, props.groupColumn) }}
@@ -447,6 +447,10 @@
     expandableRowGroups: {
       type: Boolean,
       default: false
+    },
+    isEdgeApplicationRulesEngine: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -493,11 +497,13 @@
     return data.value.filter((row) => row.position.altered)
   })
 
-  const updateRowPositions = () => {
+  const updateRowPositions = (phase) => {
     data.value.forEach((row, index) => {
-      row.position.value = index
-      row.position.altered =
-        row.position.altered && row.position.immutableValue !== row.position.value
+      if (row.position.phase.toLowerCase() === phase.toLowerCase()) {
+        row.position.value = index
+        row.position.altered =
+          row.position.altered && row.position.immutableValue !== row.position.value
+      }
     })
   }
 
@@ -518,18 +524,68 @@
     }
   }
 
-  const onPositionChange = (updatedRow, newValue) => {
+  const changePositionOnEdgeApplicationRulesEngine = (updatedRow, position) => {
+    const targetPosition = parseInt(position, 10)
+    if (isNaN(targetPosition)) return
+
+    const ALL_RULES = data.value
+    const currentPhase = updatedRow.phase?.content
+    if (!currentPhase) return
+
+    const rulesInCurrentPhase = ALL_RULES.filter((item) => item.phase?.content === currentPhase)
+    const originalIndex = rulesInCurrentPhase.findIndex((rule) => rule.id === updatedRow.id)
+    if (originalIndex === -1) return
+
+    const maxAllowedPosition = rulesInCurrentPhase.length - 1
+    let newPosition = targetPosition
+
+    if (newPosition > maxAllowedPosition) {
+      newPosition = maxAllowedPosition
+      displayPositionExceededToast()
+    }
+
+    if (originalIndex === newPosition) return
+
+    const firstRule = rulesInCurrentPhase[originalIndex]
+    const secondRule = rulesInCurrentPhase[newPosition]
+
+    firstRule.position.value = targetPosition
+    firstRule.position.altered = true
+
+    secondRule.position.value = originalIndex
+    secondRule.position.altered = true
+
+    const temp = rulesInCurrentPhase[originalIndex]
+    rulesInCurrentPhase[originalIndex] = secondRule
+    rulesInCurrentPhase[targetPosition] = temp
+
+    const rulesInOtherPhases = ALL_RULES.filter((rule) => rule.phase?.content !== currentPhase)
+    data.value = [...rulesInOtherPhases, ...rulesInCurrentPhase]
+  }
+
+  const changePosition = (updatedRow, newValue) => {
     checkPositionExceededMaxResults(updatedRow.position.max)
-    const oldIndex = data.value.findIndex((item) => item.id === updatedRow.id)
+    const oldIndex = data.value.findIndex(
+      (item) => item.id === updatedRow.id && item.phase?.content === updatedRow.phase?.content
+    )
     if (oldIndex === -1) return
 
     const [movedItem] = data.value.splice(oldIndex, 1)
     movedItem.position.altered = true
     data.value.splice(newValue, 0, movedItem)
-    updateRowPositions()
+    updateRowPositions(updatedRow.phase?.content)
+  }
+
+  const onPositionChange = (updatedRow, newValue) => {
+    if (!props.isEdgeApplicationRulesEngine) {
+      changePosition(updatedRow, newValue)
+    } else {
+      changePositionOnEdgeApplicationRulesEngine(updatedRow, newValue)
+    }
+
     setTimeout(() => {
       const table = document.querySelector('.p-datatable')
-      const rowElement = table?.querySelector(`#row-${movedItem.position.value}`)
+      const rowElement = table?.querySelector(`#row-${newValue}`)
 
       if (rowElement) {
         rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -547,13 +603,60 @@
     }
   }
 
-  const onRowReorder = async (event) => {
+  const showInvalidMoveToast = () => {
+    toast.add({
+      severity: 'warn',
+      summary: 'Invalid Action',
+      detail: 'Rules can only be reordered within their own phase (Request or Response).',
+      life: 3000
+    })
+  }
+
+  const handleRuleDropToEdgeApplicationRulesEngine = (event) => {
     const { dragIndex, dropIndex } = event
-    const row = data.value[dragIndex]
-    if (data.value[dropIndex].name === 'Default Rule') return
-    if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
-      onPositionChange(row, dropIndex)
-      emit('on-reorder', { event, data })
+
+    const rules = data.value
+    const draggedRule = rules[dragIndex]
+    const targetRule = rules[dropIndex]
+
+    const isMoveInvalid =
+      !draggedRule || !targetRule || draggedRule.phase?.content !== targetRule.phase?.content
+
+    if (isMoveInvalid) {
+      showInvalidMoveToast()
+      reload()
+      return
+    }
+
+    const [movedRule] = rules.splice(dragIndex, 1)
+    rules.splice(dropIndex, 0, movedRule)
+
+    const affectedPhase = draggedRule.phase.content
+    const rulesInAffectedPhase = rules.filter((rule) => rule.phase?.content === affectedPhase)
+
+    rulesInAffectedPhase.forEach((rule, index) => {
+      const isTheRuleThatMoved = rule.id === movedRule.id
+      const positionHasChanged = rule.position.value !== index
+
+      if (isTheRuleThatMoved || positionHasChanged) {
+        rule.position.value = index
+        rule.position.altered = true
+      }
+    })
+
+    emit('on-reorder', { event, data: rules })
+  }
+
+  const onRowReorder = async (event) => {
+    if (!props.isEdgeApplicationRulesEngine) {
+      const { dragIndex, dropIndex } = event
+      const row = data.value[dragIndex]
+      if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
+        onPositionChange(row, dropIndex)
+        emit('on-reorder', { event, data })
+      }
+    } else {
+      handleRuleDropToEdgeApplicationRulesEngine(event)
     }
   }
 
@@ -737,6 +840,7 @@
 
   defineExpose({ reload })
 </script>
+
 <style lang="scss">
   .p-datatable {
     .p-datatable-tbody {

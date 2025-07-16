@@ -60,7 +60,7 @@
               <FieldDropdown
                 label="Behavior"
                 name="cacheByQueryString"
-                :options="behaviors"
+                :options="behaviorsByType.queryString"
                 optionLabel="label"
                 optionValue="value"
                 :value="cacheByQueryString"
@@ -122,7 +122,7 @@
               <FieldDropdown
                 label="Behavior"
                 name="cacheByCookies"
-                :options="behaviors"
+                :options="behaviorsByType.cookies"
                 optionLabel="label"
                 optionValue="value"
                 :value="cacheByCookies"
@@ -178,7 +178,7 @@
                 label="Behavior"
                 name="adaptiveDeliveryAction"
                 :value="adaptiveDeliveryAction"
-                :options="behaviors"
+                :options="behaviorsByType.devices"
                 optionLabel="label"
                 optionValue="value"
                 appendTo="self"
@@ -189,6 +189,7 @@
 
             <div v-if="showDeviceGroupFields">
               <FieldMultiSelectLazyLoader
+                ref="deviceGroupFieldRef"
                 name="deviceGroups"
                 class="w-full"
                 label="Device Group"
@@ -200,13 +201,42 @@
                 :disabled="false"
                 description="Select a device group to customize cache behavior for specific categories."
                 data-testid="edge-application-cache-settings-form__device-groups-multiselect"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        @click="openCreateDeviceGroupDrawer"
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="domains-form__create-edge-firewall-button"
+                        text
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Device Group"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldMultiSelectLazyLoader>
             </div>
           </div>
         </AccordionTab>
       </Accordion>
     </template>
   </FormHorizontal>
+
+  <DrawerDeviceGroups
+    ref="drawerDeviceGroups"
+    @onSuccess="handleSuccessDrawerDeviceGroups"
+    :edgeApplicationId="edgeApplicationId"
+    :createDeviceGroupService="deviceGroupService.createDeviceGroupService"
+    :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
+    :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
+  />
 </template>
 
 <script setup>
@@ -218,14 +248,18 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
+  import PrimeButton from 'primevue/button'
   import { deviceGroupService } from '@/services/v2'
   import { useRoute } from 'vue-router'
 
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
 
   const route = useRoute()
   const edgeApplicationId = route.params.id
+  const drawerDeviceGroups = ref('')
+  const deviceGroupFieldRef = ref('')
 
   const layerFileOptimizationRadioOptions = computed(() => [
     {
@@ -257,33 +291,41 @@
 
   const { value: adaptiveDeliveryAction } = useField('adaptiveDeliveryAction')
 
-  const behaviors = [
-    {
+  const behaviors = {
+    ignore: {
       label: 'Ignore',
       value: 'ignore'
     },
-    {
-      label: 'Whitelist',
-      value: 'whitelist'
+    allowlist: {
+      label: 'Allowlist',
+      value: 'allowlist'
     },
-    {
-      label: 'Blacklist',
-      value: 'blacklist'
+    denylist: {
+      label: 'Denylist',
+      value: 'denylist'
     },
-    {
+    all: {
       label: 'All',
       value: 'all'
     }
-  ]
+  }
+
+  const behaviorsByType = computed(() => {
+    return {
+      queryString: [behaviors.allowlist, behaviors.denylist, behaviors.ignore],
+      cookies: [behaviors.allowlist, behaviors.denylist, behaviors.ignore],
+      devices: [behaviors.allowlist, behaviors.ignore]
+    }
+  })
 
   const showQueryFields = computed(() => {
-    return ['whitelist', 'blacklist'].includes(cacheByQueryString.value)
+    return ['allowlist', 'denylist'].includes(cacheByQueryString.value)
   })
   const showCookieNames = computed(() => {
-    return ['whitelist', 'blacklist'].includes(cacheByCookies.value)
+    return ['allowlist', 'denylist'].includes(cacheByCookies.value)
   })
   const showDeviceGroupFields = computed(() => {
-    return adaptiveDeliveryAction.value === 'whitelist'
+    return adaptiveDeliveryAction.value === 'allowlist'
   })
 
   const selectedMethod = computed(() => {
@@ -302,5 +344,14 @@
 
   const listDeviceGroupsWithDecorator = async (params) => {
     return await deviceGroupService.listDeviceGroupService(edgeApplicationId, params)
+  }
+
+  const openCreateDeviceGroupDrawer = () => {
+    drawerDeviceGroups.value.openDrawerCreate()
+  }
+
+  const handleSuccessDrawerDeviceGroups = () => {
+    drawerDeviceGroups.value.closeDrawer()
+    deviceGroupFieldRef.value.refreshData()
   }
 </script>

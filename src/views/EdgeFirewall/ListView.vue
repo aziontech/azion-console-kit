@@ -18,8 +18,8 @@
     'name',
     'debug_rules',
     'last_editor',
-    'modules',
     'last_modified',
+    'last_modify',
     'active'
   ]
 
@@ -58,7 +58,16 @@
       header: 'Name'
     },
     {
-      field: 'status',
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'last_modified',
+      header: 'Last Modified'
+    },
+    {
+      field: 'active',
       header: 'Status',
       sortField: 'active',
       filterPath: 'active',
@@ -69,15 +78,6 @@
           columnAppearance: 'tag'
         })
       }
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModify',
-      sortField: 'last_modified',
-      header: 'Last Modified'
     }
   ])
 

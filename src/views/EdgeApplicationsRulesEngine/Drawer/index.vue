@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, inject, onMounted } from 'vue'
+  import { ref, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import { edgeApplicationFunctionService } from '@/services/v2'
@@ -49,6 +49,11 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    currentPhase: {
+      type: String,
+      required: false,
+      default: 'request'
     }
   })
 
@@ -67,12 +72,13 @@
   const functionsInstanceOptions = ref([])
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
+  const initialPhase = ref(props.currentPhase)
 
   const initialValues = ref({
     id: props.edgeApplicationId,
     name: '',
     description: '',
-    phase: 'request',
+    phase: initialPhase.value,
     criteria: [
       [
         {
@@ -136,8 +142,9 @@
   }
 
   const editService = async (payload) => {
+    const payloadEdit = { phase: props.currentPhase, ...payload }
     return await rulesEngineService.editRulesEngine({
-      payload,
+      payload: payloadEdit,
       edgeApplicationId: props.edgeApplicationId
     })
   }
@@ -155,7 +162,7 @@
         props.edgeApplicationId,
         params
       )
-      functionsInstanceOptions.value = responseFunctions.map((el) => {
+      functionsInstanceOptions.value = responseFunctions?.body?.map((el) => {
         return {
           id: el.id,
           name: el.name.text
@@ -206,11 +213,11 @@
   const loadService = async () => {
     return await rulesEngineService.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
-      edgeApplicationId: props.edgeApplicationId
+      edgeApplicationId: props.edgeApplicationId,
+      phase: initialPhase.value
     })
   }
 
-  const initialPhase = ref('request')
   const openDrawerCreate = (selectedPhase = 'request') => {
     initialValues.value.phase = selectedPhase
     initialPhase.value = selectedPhase
@@ -316,6 +323,13 @@
       listOriginsOptions()
     ])
   })
+
+  watch(
+    () => props.currentPhase,
+    (newPhase) => {
+      initialPhase.value = newPhase
+    }
+  )
 </script>
 
 <template>
@@ -356,6 +370,7 @@
       />
     </template>
   </CreateDrawerBlock>
+
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
     :isOverlapped="isOverlapped"

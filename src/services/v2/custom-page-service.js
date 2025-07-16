@@ -13,8 +13,7 @@ export class CustomPageService {
     })
 
     const { count, results } = data
-    const body = this.adapter?.transformListCustomPage?.(results) ?? results
-
+    const body = this.adapter?.transformListCustomPage?.(results, params.fields) ?? results
     return {
       body,
       count

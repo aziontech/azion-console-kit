@@ -207,7 +207,13 @@
       toggleDrawerVisibility(false)
     } catch (error) {
       emit('onError', error.message)
-      showToast('error', error.message)
+
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error.message || error
+        showToast('error', errorMessage)
+      }
     } finally {
       isSubmitting.value = false
     }

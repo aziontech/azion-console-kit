@@ -31,7 +31,8 @@ export const documentationCatalog = {
   wafTuning: () => openSearchResult('Tune'),
   customPages: () => openSearchResult('Error Responses'),
   mfaManagement: () => openSearchResult('MFA Management'),
-  edgeConnectors: () => openSearchResult('Origins')
+  edgeConnectors: () => openSearchResult('Origins'),
+  workload: () => openSearchResult('workload')
 }
 
 export const documentationGuideProducts = {

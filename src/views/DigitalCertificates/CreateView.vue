@@ -39,7 +39,7 @@
   import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { ref, computed, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { validationSchema } from './FormFields/composables/validation'
+  import validationSchemaHandler from './FormFields/composables/validation'
   import { useDigitalCertificate } from './FormFields/composables/certificate'
   import { useRoute } from 'vue-router'
 
@@ -57,6 +57,8 @@
     certificateTypeList,
     pageTitleByCertificateType
   } = useDigitalCertificate(route.query.certificate)
+
+  const validationSchema = validationSchemaHandler(false, CERTIFICATE_TYPES.EDGE_CERTIFICATE)
 
   const initialValues = ref({
     digitalCertificateName: '',

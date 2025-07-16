@@ -5,7 +5,12 @@ export class EdgeAppService {
     this.baseURL = 'v4/edge_application/applications'
   }
 
-  listEdgeApplicationsService = async (params = { pageSize: 10 }) => {
+  listEdgeApplicationsService = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name', 'active', 'last_editor', 'last_modified', 'product_version']
+    }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -13,7 +18,27 @@ export class EdgeAppService {
     })
     const { count, results } = data
 
-    const body = this.adapter?.transformListEdgeApp?.(results) ?? results
+    const body = this.adapter?.transformListEdgeApp?.(results, params.fields) ?? results
+    return {
+      body,
+      count
+    }
+  }
+
+  listEdgeApplicationsServiceDropdown = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name']
+    }
+  ) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+    const { count, results } = data
+
+    const body = this.adapter?.transformListDropdownEdgeApp?.(results) ?? results
 
     return {
       body,

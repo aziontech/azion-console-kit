@@ -166,7 +166,6 @@
           <ListWafRulesAllowed
             v-if="activeTab === mapTabs.allowed"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
-            :optionsRuleIds="props.wafRulesAllowed.optionsRuleIds"
             @handle-go-to-tuning="changeRouteByClickingOnTab"
           />
         </TabPanel>

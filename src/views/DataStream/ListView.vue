@@ -82,7 +82,16 @@
 
   const store = useAccountStore()
   const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
-  const DATA_STREAM_API_FIELDS = ['id', 'name', 'data_source', 'active', 'data_set_id', 'endpoint']
+  const DATA_STREAM_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'outputs',
+    'transform',
+    'inputs',
+    'last_editor',
+    'last_modified'
+  ]
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -172,6 +181,14 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })

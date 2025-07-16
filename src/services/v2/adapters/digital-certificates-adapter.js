@@ -1,4 +1,4 @@
-import { getCurrentTimezone, checkIfFieldExist } from '@/helpers'
+import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
@@ -17,6 +17,27 @@ export const DigitalCertificatesAdapter = {
       ...(!!certificate?.trim() && { certificate }),
       ...(!!privateKey?.trim() && { private_key: privateKey })
     }
+  },
+
+  transformCreateDigitalCertificateLetEncrypt(payload, sourceCertificate) {
+    const payloadRequest = {
+      name: `Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
+      certificate: null,
+      private_key: null,
+      type: 'edge_certificate',
+      challenge: 'dns',
+      authority: 'lets_encrypt',
+      key_algorithm: 'rsa_2048',
+      active: true,
+      common_name: payload.letEncrypt.commonName,
+      alternative_names: payload.letEncrypt.alternativeNames
+    }
+
+    if (sourceCertificate) {
+      payloadRequest.source_certificate = sourceCertificate
+    }
+
+    return payloadRequest
   },
 
   transformListDigitalCertificates({ results, count }) {
@@ -49,16 +70,22 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ body, count }, { type, search }) {
-    let parsedDigitalCertificates = body?.map((item) => {
+  transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
+    let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
-        name: item.name
+        name: item.name,
+        authority: item?.authority,
+        status: item?.status,
+        group: 'My certificates'
       }
     })
 
     if (type === 'edge_certificate') {
-      const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
+      const DEFAULT_CERTIFICATES = [
+        { id: 0, name: 'Azion (SAN)', status: 'active', group: 'Certificates presets' },
+        { id: 1, name: "Let's Encrypt", status: 'active', group: 'Certificates presets' }
+      ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
 
@@ -89,7 +116,8 @@ export const DigitalCertificatesAdapter = {
       status,
       certificate_type,
       certificate_content,
-      certificate
+      certificate,
+      authority
     } = data
 
     return {
@@ -104,7 +132,8 @@ export const DigitalCertificatesAdapter = {
       status,
       certificateType: certificate_type,
       certificateContent: certificate_content,
-      certificate
+      certificate,
+      authority
     }
   },
 

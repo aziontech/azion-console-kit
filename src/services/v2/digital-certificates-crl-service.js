@@ -5,13 +5,26 @@ export class DigitalCertificatesCRLService {
     this.baseURL = 'v4/digital_certificates/crls'
   }
 
-  listDigitalCertificatesCRL = async () => {
+  listDigitalCertificatesCRL = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.baseURL
+      url: this.baseURL,
+      params
     })
 
     const body = this.adapter?.transformListDigitalCertificatesCRL(data.results)
+
+    return { count: data.count, body }
+  }
+
+  listDigitalCertificatesCRLDropdown = async ({ params }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+
+    const body = this.adapter?.transformListDigitalCertificatesCRLDropwdown(data.results)
 
     return { count: data.count, body }
   }

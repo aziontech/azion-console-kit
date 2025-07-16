@@ -5,8 +5,14 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref, inject, computed } from 'vue'
-  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  import {
+    CDN_MAXIMUM_TTL_MAX_VALUE,
+    CDN_MAXIMUM_TTL_MIN_VALUE,
+    MAX_SLICE_RANGE_IN_KBYTES,
+    MAX_TTL_ONE_YEAR_IN_SECONDS
+  } from '@/utils/constants'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -48,9 +54,6 @@
   const showCreateDrawer = refDebounced(showCreateCacheSettingsDrawer, debouncedDrawerAnimate)
   const showEditDrawer = refDebounced(showEditCacheSettingsDrawer, debouncedDrawerAnimate)
 
-  const MAX_TTL_ONE_YEAR_IN_SECONDS = 31536000
-  const LOCKED_SLICE_RANGE_IN_KBYTES = 1024
-
   const initialValues = ref({
     name: '',
     browserCacheSettings: 'honor',
@@ -58,7 +61,7 @@
     cdnCacheSettings: 'honor',
     cdnCacheSettingsMaximumTtl: 60,
     sliceConfigurationEnabled: false,
-    sliceConfigurationRange: LOCKED_SLICE_RANGE_IN_KBYTES,
+    sliceConfigurationRange: MAX_SLICE_RANGE_IN_KBYTES,
     cacheByQueryString: 'ignore',
     queryStringFields: '',
     enableQueryStringSort: false,
@@ -70,7 +73,8 @@
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
     tieredCache: false,
-    isSliceTieredCacheEnabled: false,
+    tieredCacheRegion: 'near-edge',
+    isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false
   })
 
@@ -94,6 +98,14 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
+    tieredCacheRegion: yup
+      .string()
+      .required()
+      .label('Tiered Cache Region')
+      .oneOf(
+        ['near-edge', 'br-east-1', 'br-east-2'],
+        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "br-east-2"'
+      ),
     browserCacheSettingsMaximumTtl: yup
       .number()
       .label('Maximum TTL')
@@ -128,8 +140,7 @@
       .when('sliceConfigurationEnabled', {
         is: false,
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) =>
-          schema.required().min(LOCKED_SLICE_RANGE_IN_KBYTES).max(LOCKED_SLICE_RANGE_IN_KBYTES)
+        otherwise: (schema) => schema.required().min(0).max(MAX_SLICE_RANGE_IN_KBYTES)
       }),
     cacheByQueryString: yup.string().required().label('Cache by query string'),
     queryStringFields: yup

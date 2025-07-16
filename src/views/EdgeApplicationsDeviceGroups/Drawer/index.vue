@@ -36,10 +36,6 @@
     editDeviceGroupService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      type: Function,
-      required: true
     }
   })
 

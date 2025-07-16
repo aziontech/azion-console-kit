@@ -13,7 +13,7 @@ describe('Data Stream spec', { tags: ['@dev3'] }, () => {
 
   it('should create a data stream with the s3 connector', () => {
     // Arrange
-    cy.intercept('/v4/data_stream/data_sets?page=1&page_size=100&fields=id%2Cname').as('getTemplates')
+    cy.intercept('/v4/data_stream/templates?page=1&page_size=100&fields=id%2Cname').as('getTemplates')
 
 
     const s3Option = 2
