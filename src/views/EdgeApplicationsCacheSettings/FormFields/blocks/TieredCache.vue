@@ -30,12 +30,16 @@
 
   const TIERED_CACHE_REGION = [
     {
-      label: 'na-united-states',
-      value: 'na-united-states'
+      label: 'near-edge',
+      value: 'near-edge'
     },
     {
-      label: 'sa-brazil',
-      value: 'sa-brazil'
+      label: 'br-east-1',
+      value: 'br-east-1'
+    },
+    {
+      label: 'br-east-2',
+      value: 'br-east-2'
     }
   ]
 

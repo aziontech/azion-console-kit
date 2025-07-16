@@ -23,6 +23,7 @@ export class ErrorHandler {
       return {
         data: {
           meta: firstErr.meta,
+          hasError: true,
           error: () => this.create(axiosError)
         },
         status: axiosError.response.status

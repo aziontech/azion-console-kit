@@ -129,7 +129,6 @@
     :createDeviceGroupService="deviceGroupService.createDeviceGroupService"
     :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
     :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
-    :documentationService="documentationService"
   />
   <div v-if="hasContentToList">
     <FetchListTableBlock
