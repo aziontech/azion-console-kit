@@ -60,7 +60,7 @@
 
   const STREAMING_ENDPOINT_OPTIONS = [
     'br-east-1.azioningest.net',
-    'us-east-1.azioningest.net',
+    'br-east-2.azioningest.net',
     'br-east-3.azioningest.net',
     'us-east-1.azioningest.net',
     'us-east-2.azioningest.net'
