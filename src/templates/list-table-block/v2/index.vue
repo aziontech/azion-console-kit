@@ -120,7 +120,7 @@
         v-if="props.groupColumn"
       >
         <div
-          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer w-full h-full"
+          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer"
           @click="toggleGroup(slotProps.data)"
         >
           {{ getObjectPath(slotProps.data, props.groupColumn) }}
@@ -524,41 +524,43 @@
     }
   }
 
-  const changePositionOnEdgeApplicationRulesEngine = (updatedRow, newPosition) => {
+  const changePositionOnEdgeApplicationRulesEngine = (updatedRow, position) => {
+    const targetPosition = parseInt(position, 10)
+    if (isNaN(targetPosition)) return
+
     const ALL_RULES = data.value
     const currentPhase = updatedRow.phase?.content
-
     if (!currentPhase) return
 
     const rulesInCurrentPhase = ALL_RULES.filter((item) => item.phase?.content === currentPhase)
     const originalIndex = rulesInCurrentPhase.findIndex((rule) => rule.id === updatedRow.id)
-
     if (originalIndex === -1) return
 
     const maxAllowedPosition = rulesInCurrentPhase.length - 1
-    let validatedPosition = newPosition
+    let newPosition = targetPosition
 
-    if (validatedPosition > maxAllowedPosition) {
-      validatedPosition = maxAllowedPosition
+    if (newPosition > maxAllowedPosition) {
+      newPosition = maxAllowedPosition
       displayPositionExceededToast()
     }
 
-    const reorderedRules = [...rulesInCurrentPhase]
-    const [movedItem] = reorderedRules.splice(originalIndex, 1)
-    reorderedRules.splice(validatedPosition, 0, movedItem)
+    if (originalIndex === newPosition) return
 
-    reorderedRules.forEach((rule, index) => {
-      const isTheRuleThatMoved = rule.id === updatedRow.id
-      const positionHasChanged = rule.position.value !== index
+    const firstRule = rulesInCurrentPhase[originalIndex]
+    const secondRule = rulesInCurrentPhase[newPosition]
 
-      if (isTheRuleThatMoved || positionHasChanged) {
-        rule.position.value = index
-        rule.position.altered = true
-      }
-    })
+    firstRule.position.value = targetPosition
+    firstRule.position.altered = true
+
+    secondRule.position.value = originalIndex
+    secondRule.position.altered = true
+
+    const temp = rulesInCurrentPhase[originalIndex]
+    rulesInCurrentPhase[originalIndex] = secondRule
+    rulesInCurrentPhase[targetPosition] = temp
 
     const rulesInOtherPhases = ALL_RULES.filter((rule) => rule.phase?.content !== currentPhase)
-    data.value = [...rulesInOtherPhases, ...reorderedRules]
+    data.value = [...rulesInOtherPhases, ...rulesInCurrentPhase]
   }
 
   const changePosition = (updatedRow, newValue) => {
@@ -649,7 +651,6 @@
     if (!props.isEdgeApplicationRulesEngine) {
       const { dragIndex, dropIndex } = event
       const row = data.value[dragIndex]
-      if (data.value[dropIndex].name === 'Default Rule') return
       if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
         onPositionChange(row, dropIndex)
         emit('on-reorder', { event, data })

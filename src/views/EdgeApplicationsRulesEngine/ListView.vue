@@ -156,7 +156,11 @@
   }
 
   const reloadList = () => {
-    listRulesEngineRef.value.reload()
+    if (hasContentToList.value) {
+      listRulesEngineRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
@@ -287,15 +291,6 @@
           <div
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
-            <PrimeButton
-              class="bg-secondary"
-              outlined
-              label="Cancel"
-              @click="reload"
-              :disabled="isLoadingButtonOrder"
-              data-testid="rules-engine-cancel-order-button"
-            />
-
             <PrimeButton
               label="Review Changes"
               class="bg-surface"

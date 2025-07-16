@@ -124,7 +124,7 @@ export class RulesEngineService {
       const promisesPerPage = []
 
       for (let page = 2; page <= totalPages; page++) {
-        promisesPerPage.push(this._listRulesEngine({ edgeApplicationId, phase, page, ...params }))
+        promisesPerPage.push(this._listRulesEngine({ ...params, edgeApplicationId, phase, page }))
       }
 
       const subsequentPages = await Promise.all(promisesPerPage)
