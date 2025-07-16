@@ -9,8 +9,7 @@
       :label="labelText"
       :disabled="disabled"
       @click="animate"
-      class="text-sm"
-      style="font-size: 14px"
+      style="font-size: 0.875rem"
     />
   </div>
 </template>
@@ -19,6 +18,7 @@
   import { ref, computed, onBeforeUnmount } from 'vue'
   import PrimeButton from 'primevue/button'
   const emit = defineEmits(['copy'])
+  import * as Helpers from '@/helpers'
 
   const props = defineProps({
     label: {
@@ -26,6 +26,10 @@
     },
     disabled: {
       type: Boolean
+    },
+    value: {
+      type: String,
+      required: true
     }
   })
   const copied = ref(false)
@@ -41,6 +45,7 @@
   const animate = () => {
     copied.value = true
     emit('copy')
+    Helpers.clipboardWrite(props.value)
 
     if (timeoutId) clearTimeout(timeoutId)
 

@@ -2,7 +2,7 @@
   <div class="gap-2 flex items-center">
     <expand-text-column :value="content"></expand-text-column>
     <CopyBlock
-      @copy="handleCopyContent"
+      :value="content"
       v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
   </div>
@@ -21,15 +21,6 @@
       content: {
         type: String,
         required: true
-      },
-      copyContentService: {
-        required: true,
-        type: Function
-      }
-    },
-    methods: {
-      handleCopyContent() {
-        this.copyContentService(this.content)
       }
     }
   }

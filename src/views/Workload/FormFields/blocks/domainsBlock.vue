@@ -9,7 +9,6 @@
   import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   import PrimeButton from 'primevue/button'
-  import { clipboardWrite } from '@/helpers'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2'
@@ -83,10 +82,6 @@
     }
   }
 
-  const copyDomainName = () => {
-    clipboardWrite(workloadHostname.value)
-  }
-
   const stagingInfrastructure = '2'
 
   const disabledCustomDomain = computed(() => infrastructure.value === stagingInfrastructure)
@@ -158,7 +153,7 @@
             The default domain used to route traffic to your workload.
           </small>
         </div>
-        <copyBlock @copy="copyDomainName" />
+        <copyBlock :value="workloadHostname" />
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 max-sm:gap-6">
