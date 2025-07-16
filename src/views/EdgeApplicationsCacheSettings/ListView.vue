@@ -28,7 +28,6 @@
     }
   })
 
-  console.log('isTieredCacheEnabled :', props.isTieredCacheEnabled);
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
