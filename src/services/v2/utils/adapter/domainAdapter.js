@@ -1,4 +1,3 @@
-// src/services/domainAdapter.js
 import psl from 'psl'
 
 export function getPrimaryDomain(urlOrHostname) {
