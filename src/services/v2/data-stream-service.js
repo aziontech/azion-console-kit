@@ -83,14 +83,14 @@ export class DataStreamService {
   editTemplateService = async (payload) => {
     const body = this.#getTransformed('transformPayloadTemplate', payload)
 
-    await this.http.request({
+    const result = await this.http.request({
       method: 'PATCH',
       url: `${this.dataSetsEndpoint}/${payload.id}`,
       body
     })
-
     return {
-      feedback: 'Your custom template has been updated'
+      feedback: 'Your custom template has been updated',
+      id: result.data.data.id
     }
   }
 

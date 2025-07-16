@@ -436,4 +436,14 @@
     showLoader: true,
     loading
   }
+
+  const refreshData = async () => {
+    page.value = INITIAL_PAGE
+    search.value = ''
+    await fetchData()
+  }
+
+  defineExpose({
+    refreshData
+  })
 </script>

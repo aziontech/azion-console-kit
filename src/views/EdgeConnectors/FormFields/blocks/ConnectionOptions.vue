@@ -193,7 +193,7 @@
     { label: 'us-east-1', value: 'us-east-1' },
     { label: 'us-east-2', value: 'us-east-2' },
     { label: 'br-east-1', value: 'br-east-1' },
-    { label: 'br-east-2', value: 'br-east-2' },
+    { label: 'us-east-1', value: 'us-east-1' },
     { label: 'br-east-3', value: 'br-east-3' }
   ]
 

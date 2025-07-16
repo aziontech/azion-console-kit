@@ -183,12 +183,15 @@
                 optionValue="value"
                 appendTo="self"
                 description="Configure whether the cache should vary based on the type of device making the request."
-                data-testid="edge-application-cache-settings-form__accelarator__cache-by-query-string-behavior-field"
+                data-testid="edge-application-cache-settings-form__accelerator__cache-by-device-behavior-field"
               />
             </div>
 
-            <div v-if="showDeviceGroupFields">
-              <FieldMultiSelectLazyLoader
+            <div
+              v-if="showDeviceGroupFields"
+              class="flex flex-col gap-2"
+            >
+              <FieldDropdownMultiSelectLazyLoader
                 ref="deviceGroupFieldRef"
                 name="deviceGroup"
                 class="w-full"
@@ -220,7 +223,7 @@
                     </li>
                   </ul>
                 </template>
-              </FieldMultiSelectLazyLoader>
+              </FieldDropdownMultiSelectLazyLoader>
             </div>
           </div>
         </AccordionTab>
@@ -245,7 +248,7 @@
   import FieldGroupCheckbox from '@/templates/form-fields-inputs/fieldGroupCheckbox'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldMultiselectLazyLoader.vue'
+  import FieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import PrimeButton from 'primevue/button'

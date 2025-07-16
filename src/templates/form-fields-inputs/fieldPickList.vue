@@ -228,10 +228,10 @@
       removeLoadingPickList()
 
       toast.add({
-        severity: 'warn',
-        summary: 'Warning',
+        severity: 'info',
+        summary: 'Info',
         detail: 'No more items to load',
-        life: 3000
+        life: 5000
       })
     } finally {
       loading.value = false

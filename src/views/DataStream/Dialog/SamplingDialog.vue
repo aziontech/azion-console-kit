@@ -20,13 +20,11 @@
 
     <div class="flex flex-col gap-3.5">
       <InlineMessage severity="warn">
-        After activating and saving these settings, all other Data Streams from the same Data Source
-        will be disabled.
+        After activating and saving these settings, all other Data Streams will be disabled.
       </InlineMessage>
       <p class="text-color-secondary text-sm font-normal leading-tight">
         Sampling percentage is statistical and not absolutely precise. When multiple Data Streams
-        from the same Data Source have different sampling rates, the system uses the lowest
-        percentage. This feature optimizes data collection efficiency.
+        have different sampling rates, the system uses the lowest percentage.
       </p>
     </div>
 
