@@ -52,7 +52,7 @@
       dnsResolution: 'preserve',
       transportPolicy: 'preserve',
       bucket: '',
-      prefix: '',
+      prefix: '/',
       region: 'us-east-1'
     },
     modules: {

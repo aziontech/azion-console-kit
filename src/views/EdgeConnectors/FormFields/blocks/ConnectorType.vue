@@ -12,6 +12,7 @@
           :options="connectorTypeList"
           :value="type"
           data-testid="edge-connectors-form__connector-type__type-field"
+          :disabled="isEditRoute"
         />
       </div>
     </template>
@@ -20,6 +21,8 @@
 
 <script setup>
   import { useField } from 'vee-validate'
+  import { useRoute } from 'vue-router'
+  import { computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
 
@@ -45,4 +48,10 @@
         'Enable real-time ingestion of live streams directly into your workloads for immediate processing and delivery.'
     }
   ]
+
+  const route = useRoute()
+
+  const isEditRoute = computed(() => {
+    return route.name?.toString().includes('edit') || route.path.includes('edit')
+  })
 </script>

@@ -18,7 +18,9 @@
               <div class="flex flex-row items-center justify-between w-full">
                 <div>
                   <div class="flex flex-row items-center gap-3">
-                    <p>{{ addresses[addressIndex].value.address || 'example.com' }}</p>
+                    <p class="break-all whitespace-normal">
+                      {{ addresses[addressIndex].value.address || 'example.com' }}
+                    </p>
                     <Tag
                       value="Desactived"
                       severity="danger"
@@ -52,14 +54,16 @@
                     </div>
                   </div>
                 </div>
-                <PrimeButton
-                  icon="pi pi-trash"
-                  severity="primary"
-                  outlined
-                  :disabled="addresses.length === 1"
-                  @click="removeAddressByIndex(addressIndex)"
-                  :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
-                />
+                <div>
+                  <PrimeButton
+                    icon="pi pi-trash"
+                    severity="primary"
+                    outlined
+                    :disabled="addresses.length === 1"
+                    @click.stop="removeAddressByIndex(addressIndex)"
+                    :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
+                  />
+                </div>
               </div>
             </template>
             <div class="flex flex-col w-full gap-5">
@@ -246,8 +250,8 @@
 
   const DEFAULT_ADDRESS = {
     address: '',
-    plainPort: 80,
-    tlsPort: 443,
+    httpPort: 80,
+    httpsPort: 443,
     serverRole: 'primary',
     weight: 1,
     active: true

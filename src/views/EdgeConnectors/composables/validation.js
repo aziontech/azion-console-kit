@@ -75,20 +75,21 @@ const validationSchema = yup.object({
       })
     })
   }),
-  addresses: yup.array().of(
-    yup.object({
-      address: yup.string().when('$type', {
-        is: 'http',
-        then: (schema) => schema.required('Address is a required field.'),
-        otherwise: (schema) => schema.notRequired()
-      }),
-      httpPort: yup.number(),
-      httpsPort: yup.number(),
-      serverRole: yup.string(),
-      weight: yup.number(),
-      active: yup.boolean()
-    })
-  )
+  addresses: yup.array().when('type', {
+    is: 'http',
+    then: (schema) =>
+      schema.of(
+        yup.object({
+          address: yup.string().required('Address is a required field.'),
+          httpPort: yup.number(),
+          httpsPort: yup.number(),
+          serverRole: yup.string(),
+          weight: yup.number(),
+          active: yup.boolean()
+        })
+      ),
+    otherwise: (schema) => schema.strip()
+  })
 })
 
 export { validationSchema }

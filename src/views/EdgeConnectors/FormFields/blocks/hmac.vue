@@ -78,16 +78,26 @@
         class="flex flex-col sm:max-w-xs w-full gap-2"
         v-if="hmacActive"
       >
-        <FieldTextIcon
+        <LabelBlock
+          for="modules.originShield.config.hmac.config.attributes.secretKey"
           label="Secret Key"
-          required
+          isRequired
           description="Enter the Secret Key provided by the object storage provider."
-          name="modules.originShield.config.hmac.config.attributes.secretKey"
+        />
+        <Password
+          v-model="secretKey"
           :value="secretKey"
           placeholder="**********"
           data-testid="edge-connectors-form__hmac__secret-key-field"
-          icon="pi pi-eye"
+          toggleMask
+          :feedback="false"
         />
+        <small
+          class="p-error text-xs font-normal leading-tight"
+          v-if="hasRequestErrorMessage"
+        >
+          {{ hasRequestErrorMessage }}
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -100,6 +110,8 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import LabelBlock from '@/templates/label-block'
+  import Password from 'primevue/password'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
 
@@ -110,7 +122,7 @@
   const { value: accessKey } = useField(
     'modules.originShield.config.hmac.config.attributes.accessKey'
   )
-  const { value: secretKey } = useField(
+  const { value: secretKey, errorMessage: hasRequestErrorMessage } = useField(
     'modules.originShield.config.hmac.config.attributes.secretKey'
   )
 
