@@ -201,8 +201,12 @@
     template.value = response.id
   }
 
-  const handleDeleteTemplate = () => {
-    loaderDataStreamTemplates({ page: 1, pageSize: 100 })
+  const handleDeleteTemplate = async () => {
+    const templates = await loaderDataStreamTemplates({ page: 1, pageSize: 100 })
+    const firstAzionTemplate = templates.body[0].items[0]
+
+    template.value = firstAzionTemplate.id
+    dataSet.value = firstAzionTemplate.dataSet
   }
 
   const handleSelectTemplate = (template) => {

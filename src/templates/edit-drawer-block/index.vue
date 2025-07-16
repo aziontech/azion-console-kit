@@ -132,9 +132,8 @@
         blockViewRedirection.value = false
         emit('onSuccess', feedback)
 
-        const toastMessage = typeof feedback === 'object' && feedback?.feedback
-          ? feedback.feedback
-          : feedback
+        const toastMessage =
+          typeof feedback === 'object' && feedback?.feedback ? feedback.feedback : feedback
         showToast('success', toastMessage)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
