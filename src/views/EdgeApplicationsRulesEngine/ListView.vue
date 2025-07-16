@@ -156,7 +156,11 @@
   }
 
   const reloadList = () => {
-    listRulesEngineRef.value.reload()
+    if (hasContentToList.value) {
+      listRulesEngineRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
