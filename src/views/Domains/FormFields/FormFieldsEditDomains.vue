@@ -165,6 +165,10 @@
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
+
+  const handleCopy = (content) => {
+    emit('copyDomainName', { name: content })
+  }
 </script>
 
 <template>
@@ -238,7 +242,7 @@
               disabled
             />
           </span>
-          <copyBlock @copy="$emit('copyDomainName', { name: domainName })" />
+          <copyBlock @copy="handleCopy(domainName)" />
         </div>
       </div>
     </template>

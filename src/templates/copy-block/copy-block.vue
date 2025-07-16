@@ -38,7 +38,7 @@
     return copied.value ? 'Copied' : props.label
   })
 
-  function animate() {
+  const animate = () => {
     copied.value = true
     emit('copy')
 

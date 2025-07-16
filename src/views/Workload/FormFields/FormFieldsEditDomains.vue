@@ -34,6 +34,8 @@
     }
   })
 
+  const emit = defineEmits(['copyDomainName'])
+
   const EDGE_CERTIFICATE = 'edge_certificate'
   const TRUSTED_CA_CERTIFICATE = 'trusted_ca_certificate'
 
@@ -184,6 +186,10 @@
 
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
     return await listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
+  }
+
+  const handleCopy = (content) => {
+    emit('copyDomainName', { name: content })
   }
 </script>
 
@@ -462,7 +468,7 @@
             aria-label="Copy to Clipboard"
             label="Copy to Clipboard"
             :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: domainName })"
+            @click="handleCopy(domainName)"
           />
         </div>
       </div>
