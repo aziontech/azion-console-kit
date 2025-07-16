@@ -1,13 +1,13 @@
 export const parseStatusData = (status) => {
   const parsedStatus = status
     ? {
-        content: 'Active',
-        severity: 'success'
-      }
+      content: 'Active',
+      severity: 'success'
+    }
     : {
-        content: 'Inactive',
-        severity: 'danger'
-      }
+      content: 'Inactive',
+      severity: 'danger'
+    }
 
   return parsedStatus
 }
@@ -15,13 +15,13 @@ export const parseStatusData = (status) => {
 export const parseDefaultData = (status) => {
   const parsedStatus = status
     ? {
-        content: 'Yes',
-        severity: 'success'
-      }
+      content: 'Yes',
+      severity: 'success'
+    }
     : {
-        content: 'No',
-        severity: 'danger'
-      }
+      content: 'No',
+      severity: 'danger'
+    }
 
   return parsedStatus
 }

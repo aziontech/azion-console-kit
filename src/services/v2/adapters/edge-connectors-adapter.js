@@ -193,9 +193,7 @@ export const EdgeConnectorsAdapter = {
                 })
                 .join(', ')
             : '-',
-          active: edgeConnectors?.active
-            ? parseStatusData(edgeConnectors.active)
-            : edgeConnectors?.active,
+          active: parseStatusData(edgeConnectors.active),
           lastEditor: edgeConnectors?.last_editor,
           lastModified: edgeConnectors?.last_modified
             ? getCurrentTimezone(edgeConnectors.last_modified)
