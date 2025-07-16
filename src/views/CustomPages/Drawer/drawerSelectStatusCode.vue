@@ -27,9 +27,9 @@
 
   const title = computed(() => {
     const item = itemStatusCode.value
-    if (!item || !item.code) return 'Create Status Code'
+    if (!item || !item.code) return 'Create Custom Page Code'
     const name = CODE_OPTIONS.find((option) => option.value === item.code.value)?.label
-    return `${name}`.trim()
+    return `Edit Page Code: ${name}`.trim()
   })
 
   const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {
@@ -48,35 +48,35 @@
 
   const transformValuesByType = (values) => {
     switch (values.type) {
-      case 'Default':
+      case 'PageDefault':
         return {
           id: values.id,
           code: values.code,
-          type: 'Default',
+          type: values.type,
           contentType: values.contentType || 'text/html',
           response: values.response || '<html>...</html>',
-          customStatusCode: values.customStatusCode || '-',
+          customStatusCode: values.customStatusCode,
           ttl: 0
         }
-      case 'Custom':
+      case 'PageCustom':
         return {
           id: values.id,
           code: values.code,
-          type: 'Custom',
+          type: values.type,
           contentType: values.contentType || 'text/html',
           response: values.response || '<html>...</html>',
           ttl: 0,
-          customStatusCode: values.customStatusCode || '-'
+          customStatusCode: values.customStatusCode
         }
-      case 'Connector':
+      case 'PageConnector':
         return {
           id: values.id,
           code: values.code,
-          type: 'Connector',
+          type: values.type,
           connector: values.connector,
           ttl: values.ttl,
           uri: values.uri,
-          customStatusCode: values.customStatusCode || '-'
+          customStatusCode: values.customStatusCode
         }
 
       default:

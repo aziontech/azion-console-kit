@@ -141,7 +141,6 @@
 
   const listEdgeConnectors = async (params) => {
     params.fields = 'id,name'
-    // params.type = 'live_ingest'
     params.active = true
     return await edgeConnectorsService.listEdgeConnectorsService(params)
   }

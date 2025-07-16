@@ -1,12 +1,13 @@
 <template>
   <DrawerBlock
     ref="drawerRef"
+    :optionsStatusCode="pagesValue"
     @onSuccess="updateList"
   />
   <FormHorizontal
     :isDrawer="props.isDrawer"
-    title="Status Codes"
-    description="Use the Status Codes table to configure error pages by editing HTTP status codes. Click a row to open the settings panel and customize values like Response TTL, Custom Status Code, and Page Path (URI)."
+    title="Page Codes"
+    description="Use the Page Codes table to configure error pages by editing HTTP status codes. Click a row to open the settings panel and customize values like Response TTL, Custom Status Code, and Page Path (URI)."
     :pt="classesPt"
   >
     <template #inputs>
@@ -15,7 +16,7 @@
         ref="listStatusCodeRef"
         isTabs
         :enableEditClick="false"
-        :columns="loaderStatusCodeColumns"
+        :columns="statusCodeColumns"
         :editInDrawer="openEditStatusCodeDrawer"
         :listService="listStatusCodeService"
         :actions="actionsRow"
@@ -24,7 +25,7 @@
         <template #addButton>
           <PrimeButton
             icon="pi pi-plus"
-            label="Add Status Code"
+            label="Custom Page Code"
             data-testid="status-code__add-button"
             @click="openCreateStatusCodeDrawer"
             class="w-full sm:w-auto"
@@ -42,14 +43,13 @@
   import ListTableBlock from '@templates/list-table-block'
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useField, useFieldArray } from 'vee-validate'
+  import { useField } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
 
   const listStatusCodeRef = ref(null)
   const hasContentToList = computed(() => !!pagesValue.value)
   const drawerRef = ref(null)
 
-  const { fields: pages, replace: replacePages, remove: removePage } = useFieldArray('pages')
   const { value: pagesValue } = useField('pages')
 
   const props = defineProps({
@@ -74,7 +74,7 @@
       : {}
   }
 
-  const loaderStatusCodeColumns = [
+  const statusCodeColumns = [
     {
       field: 'code',
       header: 'Page Code',
@@ -84,7 +84,7 @@
       component: (columnData) => {
         return columnBuilder({
           data: {
-            text: columnData.value,
+            text: columnData.value === 'default' ? 'Default' : columnData.value,
             tagProps: defaultTag(columnData)
           },
           columnAppearance: 'text-with-tag'
@@ -133,15 +133,26 @@
   ]
 
   const updateList = (item) => {
-    const idx = pages.value.findIndex((page) => page.value.code === item.code)
+    if (item.code.origin) return
+
+    const idx = pagesValue.value.findIndex(
+      (page) => page.code.value === item.code.value && !page.code.origin
+    )
     if (idx !== -1) {
-      pages.value[idx].value = { ...pages.value[idx].value, ...item }
+      pagesValue.value[idx] = { ...pagesValue.value[idx], ...item }
+    } else {
+      pagesValue.value.push(item)
     }
+
+    listStatusCodeRef.value.reload()
   }
 
   const deletePage = (idPage) => {
-    const idx = pages.value.findIndex((page) => page.value.id === idPage)
-    if (idx !== -1) removePage(idx)
+    const idx = pagesValue.value.findIndex((page) => page.id === idPage)
+    if (idx !== -1) {
+      pagesValue.value.splice(idx, 1)
+    }
+
     listStatusCodeRef.value.reload()
   }
 
@@ -159,11 +170,9 @@
   const listStatusCodeService = () => {
     const onMountedStart = pagesValue.value.find((page) => page.code.origin === 'Azion')
     if (onMountedStart) {
-      replacePages(pagesValue.value)
       return pagesValue.value
     }
     const mergePagesDefault = [...pagesValue.value, ...STATUS_CODE_OPTIONS]
-    replacePages(mergePagesDefault)
     return mergePagesDefault
   }
 
@@ -172,6 +181,13 @@
   }
 
   const openCreateStatusCodeDrawer = () => {
-    drawerRef.value.openEditDrawer({})
+    drawerRef.value.openEditDrawer({
+      type: 'PageConnector',
+      connector: null,
+      customStatusCode: null,
+      uri: null,
+      ttl: null,
+      statusCode: null
+    })
   }
 </script>

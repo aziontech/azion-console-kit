@@ -49,7 +49,7 @@ export const CustomPageAdapter = {
       pages: [
         ...pages.map((page) => {
           return {
-            code: page.code.toLowerCase(),
+            code: page.code.value?.toLowerCase(),
             page: getPage(page)
           }
         }),

@@ -14,7 +14,7 @@
           optionLabel="label"
           optionValue="value"
           appendTo="self"
-          :disabled="props.isEdit"
+          disabled
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -22,7 +22,7 @@
           label="Page Code"
           required
           name="code.value"
-          :options="CODE_OPTIONS"
+          :options="optionsCode"
           optionLabel="label"
           optionValue="value"
           appendTo="self"
@@ -37,10 +37,17 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+  import { computed } from 'vue'
+
   const listTypes = [
-    { label: 'Default', value: 'PageDefault' },
-    { label: 'Connector', value: 'PageConnector' }
+    { label: 'Page Default', value: 'PageDefault' },
+    { label: 'Page Connector', value: 'PageConnector' }
   ]
+
+
+  const optionsCode = computed(() => {
+    return CODE_OPTIONS.filter((option) => !props.optionsStatusCode.includes(option.value))
+  })
 
   const props = defineProps({
     isDrawer: {
@@ -50,6 +57,10 @@
     isEdit: {
       type: Boolean,
       default: false
+    },
+    optionsStatusCode: {
+      type: Array,
+      default: () => []
     }
   })
 </script>

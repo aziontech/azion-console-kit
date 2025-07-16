@@ -3,7 +3,9 @@ import * as yup from 'yup'
 const isUriValidRegex = /^\/[/a-zA-Z0-9\-_.~@:]*$/
 
 export const pageSchema = yup.object().shape({
-  code: yup.string().required().label('Code'),
+  code: yup.object().shape({
+    value: yup.string().required().label('Code')
+  }),
   type: yup.string().required().label('Type'),
   connector: yup.number().when('type', {
     is: 'PageConnector',
@@ -21,7 +23,6 @@ export const pageSchema = yup.object().shape({
       schema
         .required()
         .transform((value) => (value === '' ? null : value))
-        .nullable()
         .matches(isUriValidRegex, 'Invalid URI')
         .default(null)
         .label('URI'),
@@ -37,7 +38,11 @@ export const pageSchema = yup.object().shape({
     then: (schema) => schema.required().label('Response'),
     otherwise: (schema) => schema.nullable()
   }),
-  customStatusCode: yup.string().nullable().default(null).label('Custom Status Code')
+  customStatusCode: yup.string().when('type', {
+    is: 'PageConnector',
+    then: (schema) => schema.required().default(null).label('Custom Status Code'),
+    otherwise: (schema) => schema.nullable()
+  })
 })
 
 export const validationSchema = yup.object({
@@ -49,6 +54,6 @@ export const validationSchema = yup.object({
 
 export const defaultValues = {
   name: '',
-  active: false,
+  active: true,
   pages: []
 }

@@ -2,6 +2,7 @@
   <block-status-configuration-block
     isDrawer
     :isEdit="isOption"
+    :optionsStatusCode="optionsStatusCode"
   />
   <block-response-details-block
     isDrawer
@@ -17,6 +18,10 @@
     itemStatusCode: {
       type: Object,
       default: () => ({})
+    },
+    optionsStatusCode: {
+      type: Array,
+      default: () => []
     }
   })
 
