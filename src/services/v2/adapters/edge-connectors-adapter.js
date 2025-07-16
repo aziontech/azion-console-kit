@@ -143,20 +143,24 @@ const typeBuildersLoadRequest = {
         }
       },
       originShield: {
-        enabled: data.attributes.modules.origin_shield_enabled,
+        enabled: data.attributes.modules.origin_shield.enabled,
         config: {
           originIpAcl: {
-            enabled: data.attributes.modules.origin_ip_acl?.enabled
+            enabled: data.attributes.modules.origin_shield?.config?.origin_ip_acl?.enabled
           },
           hmac: {
-            enabled: data.attributes.modules.hmac?.enabled,
+            enabled: data.attributes.modules.origin_shield.config.hmac?.enabled,
             config: {
-              type: data.attributes.modules.hmac?.config?.type,
+              type: data.attributes.modules.origin_shield.config.hmac?.config?.type,
               attributes: {
-                region: data.attributes.modules.hmac?.config?.attributes?.region,
-                service: data.attributes.modules.hmac?.config?.attributes?.service,
-                accessKey: data.attributes.modules.hmac?.config?.attributes?.access_key,
-                secretKey: data.attributes.modules.hmac?.config?.attributes?.secret_key
+                region:
+                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.region,
+                service:
+                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.service,
+                accessKey:
+                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.access_key,
+                secretKey:
+                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.secret_key
               }
             }
           }
