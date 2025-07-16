@@ -27,7 +27,7 @@
         :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
-        :documentationService="Helpers.documentationCatalog.domains"
+        :documentationService="documentationHandler"
       >
         <template #illustration>
           <Illustration />
@@ -88,6 +88,14 @@
     tracker.product.clickToCreate({
       productName: 'Workload'
     })
+  }
+
+  const documentationHandler = () => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      Helpers.documentationCatalog.workload()
+    } else {
+      Helpers.documentationCatalog.domains()
+    }
   }
 
   const handleTrackEditEvent = (domain) => {
@@ -182,12 +190,6 @@
         header: 'Last Editor',
         filterPath: 'lastEditor',
         sortField: 'lastEditor'
-      },
-      {
-        field: 'protocols',
-        header: 'Protocols',
-        filterPath: 'protocols',
-        sortField: 'protocols'
       }
     ]
   })

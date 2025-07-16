@@ -18,10 +18,6 @@ export class WorkloadDeploymentService {
       body
     })
 
-    if (response.hasError) {
-      throw response.error()
-    }
-
     return response
   }
 
@@ -33,10 +29,6 @@ export class WorkloadDeploymentService {
       url: this.#getUrl(workloadId, `/${payload.id}`),
       body
     })
-
-    if (response.hasError) {
-      throw response.error()
-    }
 
     return response
   }
