@@ -9,7 +9,7 @@
         <FieldGroupRadio
           nameField="certificateType"
           :isCard="true"
-          :options="certificateTypeRadioOptions"
+          :options="certificateRadioOptions"
           data-testid="digital-certificate-create-form__certificate-type"
         />
       </div>
@@ -19,15 +19,19 @@
 
 <script setup>
   import { useField } from 'vee-validate'
-  import { watch } from 'vue'
+  import { watch, computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
   import { useDigitalCertificate } from '../composables/certificate'
 
   defineOptions({ name: 'ImportOrRequestCertificate' })
 
-  defineProps({
+  const props = defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isWorkloadCreation: {
       type: Boolean,
       default: false
     }
@@ -52,6 +56,12 @@
       inputValue: CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR
     }
   ]
+
+  const certificateRadioOptions = computed(() => {
+    return props.isWorkloadCreation
+      ? certificateTypeRadioOptions.slice(0, 1)
+      : certificateTypeRadioOptions
+  })
 
   watch(
     () => formCertificateType.value,

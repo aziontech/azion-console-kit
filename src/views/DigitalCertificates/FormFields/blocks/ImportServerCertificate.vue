@@ -11,6 +11,7 @@
           :label="getTitleByCertificateType"
           :placeholder="getPlaceholderByCertificateType"
           name="certificate"
+          :required="isWorkloadCreation"
           :value="certificate"
           description="Intermediate certificates are accepted."
         />
@@ -44,6 +45,10 @@
 
   defineProps({
     isDrawer: {
+      type: Boolean,
+      default: false
+    },
+    isWorkloadCreation: {
       type: Boolean,
       default: false
     }

@@ -4,7 +4,7 @@
   import { ref, inject, defineExpose, watch, computed } from 'vue'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { validationSchema } from '../FormFields/composables/validation'
+  import validationSchemaHandler from '../FormFields/composables/validation'
   import { useDigitalCertificate } from '../FormFields/composables/certificate'
 
   defineOptions({
@@ -15,8 +15,14 @@
     certificate: {
       type: String,
       default: 'edge_certificate'
+    },
+    isWorkloadCreation: {
+      type: Boolean,
+      default: false
     }
   })
+
+  const validationSchema = validationSchemaHandler(props.isWorkloadCreation, props.certificate)
 
   const emit = defineEmits(['onSuccess', 'onEdgeApplicationCreated'])
 
@@ -85,7 +91,11 @@
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
     handleToast(response)
-    emit('onSuccess', { type: certificateType.value, id: response.data.id })
+    emit('onSuccess', {
+      type: certificateType.value,
+      id: response.data.id,
+      authority: response.data.authority
+    })
     closeCreateDrawer()
   }
 
@@ -130,7 +140,10 @@
     disableToast
   >
     <template #formFields>
-      <FormFieldsCreateDigitalCertificates isDrawer />
+      <FormFieldsCreateDigitalCertificates
+        isDrawer
+        :isWorkloadCreation="isWorkloadCreation"
+      />
     </template>
   </CreateDrawerBlock>
 </template>

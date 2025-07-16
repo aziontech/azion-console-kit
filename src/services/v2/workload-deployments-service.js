@@ -12,21 +12,33 @@ export class WorkloadDeploymentService {
   createWorkloadDeployment = async (payload) => {
     const body = this.adapter?.transformCreateWorkloadDeployment?.(payload)
 
-    await this.http.request({
+    const { data: response } = await this.http.request({
       method: 'POST',
       url: this.#getUrl(payload.id),
       body
     })
+
+    if (response.hasError) {
+      throw response.error()
+    }
+
+    return response
   }
 
   updateWorkloadDeployment = async (workloadId, payload) => {
     const body = this.adapter?.transformEditWorkloadDeployment?.(payload)
 
-    await this.http.request({
+    const { data: response } = await this.http.request({
       method: 'PATCH',
       url: this.#getUrl(workloadId, `/${payload.id}`),
       body
     })
+
+    if (response.hasError) {
+      throw response.error()
+    }
+
+    return response
   }
 
   listWorkloadDeployment = async (id, params) => {

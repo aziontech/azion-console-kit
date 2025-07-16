@@ -144,8 +144,17 @@
           subdomain: yup
             .string()
             .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
-              if (!value) return true // Allow empty subdomain
-              return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+              if (!value) return true
+
+              if (value.endsWith('.')) return false
+
+              const dotCount = (value.match(/\./g) || []).length
+              if (dotCount > 10) return false
+
+              const segments = value.split('.')
+              return segments.every((segment) =>
+                /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+              )
             })
             .label('Subdomain'),
           domain: yup
@@ -186,6 +195,6 @@
       commonName: yup.string(),
       alternativeNames: yup.array()
     }),
-    authorityCertificate: yup.string()
+    authorityCertificate: yup.string().nullable()
   })
 </script>

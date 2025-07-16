@@ -43,11 +43,16 @@ export class WorkloadService {
     }
 
     const body = this.adapter.transformCreateWorkload(payload)
+
     const { data } = await this.http.request({
       method: 'POST',
       url: this.baseURL,
       body
     })
+
+    if (data.hasError) {
+      throw data.error()
+    }
 
     this._workloadData = data.data
     return this._workloadData
@@ -67,6 +72,7 @@ export class WorkloadService {
     await this.workloadDeployment.createWorkloadDeployment(deployPayload)
 
     payload._deploymentCreated = true
+    this._workloadData = null
   }
 
   createWorkload = async (payload) => {
@@ -162,7 +168,6 @@ export class WorkloadService {
     }
 
     if (!shouldCreate) {
-      payload.tls.certificate = this._certificateId
       return
     }
 

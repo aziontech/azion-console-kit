@@ -11,39 +11,32 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
-const extractAzionAppSubdomain = (rawDomains) => {
-  if (!Array.isArray(rawDomains) || rawDomains.length === 0) {
-    return {
-      azionAppSubdomain: '',
-      domains: [{ subdomain: '', domain: '' }]
+function extractAzionAppSubdomain(fullDomains) {
+  const cleanDomains = []
+  let azionAppSubdomains = ''
+
+  fullDomains.forEach((full) => {
+    const parts = full.split('.')
+
+    if (parts.length < 2) {
+      cleanDomains.push({ subdomain: '', domain: full })
+      return
     }
+
+    const domain = parts.slice(-2).join('.')
+    const subdomain = parts.slice(0, -2).join('.')
+
+    if (domain === 'azion.app') {
+      azionAppSubdomains = subdomain
+    } else {
+      cleanDomains.push({ subdomain, domain })
+    }
+  })
+
+  return {
+    cleanDomains: cleanDomains.length ? cleanDomains : [{ subdomain: '', domain: '' }],
+    azionAppSubdomains
   }
-
-  return rawDomains.reduce(
-    (acc, item) => {
-      if (typeof item !== 'string' || item.trim() === '') {
-        return acc
-      }
-
-      const parts = item.split('.')
-      let subdomain = ''
-      let domain = item
-
-      if (parts.length >= 3) {
-        subdomain = parts.shift()
-        domain = parts.join('.')
-      }
-
-      if (domain === 'azion.app') {
-        acc.azionAppSubdomain = subdomain
-      } else {
-        acc.domains.push({ subdomain, domain })
-      }
-
-      return acc
-    },
-    { azionAppSubdomain: '', domains: [] }
-  )
 }
 
 const LOCKED_VALUE = 'custom'
@@ -154,7 +147,7 @@ export const WorkloadAdapter = {
     })
   },
   transformLoadWorkload({ data: workload }, workloadDeployment) {
-    const { azionAppSubdomain, domains } = extractAzionAppSubdomain(workload.domains)
+    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains)
     return {
       id: workload.id,
       name: workload.name,
@@ -164,9 +157,9 @@ export const WorkloadAdapter = {
       edgeFirewall: workloadDeployment.edgeFirewall,
       edgeApplication: workloadDeployment.edgeApplication,
       customPage: workloadDeployment.customPage,
-      domains,
-      customDomain: azionAppSubdomain,
-      useCustomDomain: !!azionAppSubdomain,
+      domains: cleanDomains,
+      customDomain: azionAppSubdomains,
+      useCustomDomain: !!azionAppSubdomains,
       infrastructure: String(workload.infrastructure),
       workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {

@@ -35,7 +35,7 @@ export class DigitalCertificatesService {
       return { id: response.meta.certificate }
     }
 
-    if (!hasCertificateId) {
+    if (response.hasError) {
       throw response.error()
     }
 
