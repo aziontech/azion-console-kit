@@ -19,6 +19,7 @@ export const domainsRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        flag: 'checkout_access',
         breadCrumbs: [
           {
             label: 'Domains',

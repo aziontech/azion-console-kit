@@ -112,6 +112,13 @@
     }
   }
 
+  const domainNameColumn = computed(() => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      return 'Workload Domain'
+    }
+    return 'Domain name'
+  })
+
   const getColumns = computed(() => {
     return [
       {
@@ -147,7 +154,7 @@
       },
       {
         field: 'workloadHostname',
-        header: 'Workload Domain',
+        header: domainNameColumn.value,
         filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
