@@ -7,6 +7,7 @@
   import Sidebar from 'primevue/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import PrimeButton from 'primevue/button'
 
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -51,6 +52,14 @@
     disableToast: {
       type: Boolean,
       default: false
+    },
+    expandable: {
+      type: Boolean,
+      default: false
+    },
+    expandedDefault: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -59,6 +68,11 @@
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
+  const isExpanded = ref(props.expandedDefault)
+
+  const toggleExpandDrawer = () => {
+    isExpanded.value = !isExpanded.value
+  }
 
   const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
@@ -171,9 +185,16 @@
       position="right"
       :pt="{
         root: {
-          class: `w-full transition-all duration-300 ease-in-out ${
-            props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
-          }`
+          class: [
+            'w-full',
+            'transition-all',
+            'duration-300',
+            'ease-in-out',
+            {
+              'max-w-5xl': !isExpanded && props.isOverlapped,
+              'max-w-4xl': !isExpanded && !props.isOverlapped
+            }
+          ]
         },
         headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
         content: { class: 'p-8' }
@@ -181,7 +202,15 @@
     >
       <template #header>
         <h2>{{ title }}</h2>
-        <ConsoleFeedback />
+        <div class="flex items-center gap-2">
+          <ConsoleFeedback styleTextColor="text-color" />
+          <PrimeButton
+            v-if="expandable"
+            @click="toggleExpandDrawer"
+            outlined
+            :icon="isExpanded ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+          />
+        </div>
       </template>
 
       <div class="flex w-full">
@@ -197,7 +226,7 @@
           />
         </form>
       </div>
-      <div class="fixed w-full left-0 bottom-0">
+      <div class="fixed w-full left-0 bottom-0 z-10">
         <slot
           name="actionBar"
           :goBack="handleGoBack"

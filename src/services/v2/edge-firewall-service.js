@@ -32,7 +32,7 @@ export class EdgeFirewallService {
   listEdgeFirewallServiceDropdown = async (
     params = {
       pageSize: 10,
-      fields: ['id', 'name', 'active']
+      fields: ['id', 'name']
     }
   ) => {
     const { data } = await this.http.request({
