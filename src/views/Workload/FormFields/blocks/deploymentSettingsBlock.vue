@@ -1,7 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
-  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
 
   import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
@@ -56,7 +55,7 @@
   const handleQuery = (queryParams) => {
     const query = {
       ...queryParams,
-      fields: ['id', 'name', 'active'],
+      fields: ['id', 'name'],
       active: true
     }
     return query
@@ -93,7 +92,7 @@
           ref="drawerRef"
           @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
-        <fieldDropdownLazyLoaderWithFilter
+        <FieldDropdownLazyLoader
           label="Edge Application"
           required
           data-testid="domains-form__edge-application-field"
@@ -104,8 +103,6 @@
           optionValue="value"
           :value="edgeApplication"
           appendTo="self"
-          keyToFilter="active"
-          :valuesToFilter="[true]"
           placeholder="Select an edge application"
         >
           <template #footer>
@@ -127,7 +124,7 @@
               </li>
             </ul>
           </template>
-        </fieldDropdownLazyLoaderWithFilter>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -135,7 +132,7 @@
           ref="drawerEdgeFirewallRef"
           @onSuccess="handleEdgeFirewallCreated"
         />
-        <fieldDropdownLazyLoaderWithFilter
+        <FieldDropdownLazyLoader
           label="Edge Firewall"
           :enableClearOption="!!edgeFirewall"
           data-testid="domains-form__edge-firewall-field"
@@ -149,8 +146,6 @@
           optionValue="value"
           :value="edgeFirewall"
           appendTo="self"
-          keyToFilter="active"
-          :valuesToFilter="[true]"
           placeholder="Select an edge firewall"
         >
           <template #footer>
@@ -172,7 +167,7 @@
               </li>
             </ul>
           </template>
-        </fieldDropdownLazyLoaderWithFilter>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">

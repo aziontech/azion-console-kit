@@ -49,7 +49,7 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectStatusCode'
+  import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import ListTableBlock from '@/templates/list-table-block'
   import { ref, computed } from 'vue'

@@ -74,7 +74,7 @@
     showEditCustomPagesDrawer.value = true
   }
   const handleCreateCustomPages = (response) => {
-    emit('onSuccess', response.id)
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
   }
   const handleEditedCustomPages = () => {
@@ -100,6 +100,8 @@
     @onSuccess="handleCreateCustomPages"
     title="Create Custom Page"
     isOverlapped
+    expandable
+    expandedDefault
   >
     <template #formFields>
       <FormFieldsCustomPages
