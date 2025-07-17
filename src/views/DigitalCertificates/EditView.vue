@@ -63,8 +63,8 @@
     name: yup.string().required('Name is a required field.'),
     type: yup.string(),
     csr: yup.string(),
-    certificate: yup.string(),
-    privateKey: yup.string(),
+    certificate: yup.string().nullable(),
+    privateKey: yup.string().nullable(),
     managed: yup
       .boolean()
       .isFalse(

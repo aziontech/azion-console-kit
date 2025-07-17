@@ -159,7 +159,7 @@
       filterPath: 'description.value',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' }),
       disableSort: true
     },
     {
