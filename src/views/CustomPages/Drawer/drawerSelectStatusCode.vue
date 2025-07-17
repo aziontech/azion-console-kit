@@ -6,8 +6,16 @@
   import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
   import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+
   defineOptions({
     name: 'custom-pages-drawer'
+  })
+
+  defineProps({
+    optionsStatusCode: {
+      type: Array,
+      default: () => []
+    }
   })
 
   const emit = defineEmits(['onSuccess'])
@@ -99,7 +107,10 @@
     :title="title"
   >
     <template #formFields>
-      <FormFieldsStatusCode :itemStatusCode="itemStatusCode" />
+      <FormFieldsStatusCode
+        :itemStatusCode="itemStatusCode"
+        :optionsStatusCode="optionsStatusCode"
+      />
     </template>
     <template #action-bar="{ handleSubmit, onCancel, formValid, scrollToErrorInDrawer }">
       <ActionBarBlock

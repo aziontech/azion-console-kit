@@ -44,11 +44,6 @@
     { label: 'Page Connector', value: 'PageConnector' }
   ]
 
-
-  const optionsCode = computed(() => {
-    return CODE_OPTIONS.filter((option) => !props.optionsStatusCode.includes(option.value))
-  })
-
   const props = defineProps({
     isDrawer: {
       type: Boolean,
@@ -62,5 +57,13 @@
       type: Array,
       default: () => []
     }
+  })
+
+  const optionsCode = computed(() => {
+    if (props.isEdit) {
+      return CODE_OPTIONS
+    }
+    const pagesCodes = new Set(props.optionsStatusCode.map((page) => page.code.value))
+    return CODE_OPTIONS.filter((option) => !pagesCodes.has(option.value))
   })
 </script>

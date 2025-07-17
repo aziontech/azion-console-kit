@@ -140,9 +140,12 @@
   })
 
   const listEdgeConnectors = async (params) => {
-    params.fields = 'id,name'
+    params.fields = 'id,name,type'
     params.active = true
-    return await edgeConnectorsService.listEdgeConnectorsService(params)
+    return await edgeConnectorsService.listEdgeConnectorsDropDownService(
+      params,
+      (item) => item.type !== 'Live Ingest'
+    )
   }
 
   const copyResponse = () => {

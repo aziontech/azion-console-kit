@@ -11,27 +11,32 @@
     :pt="classesPt"
   >
     <template #inputs>
-      <ListTableBlock
-        v-if="hasContentToList"
-        ref="listStatusCodeRef"
-        isTabs
-        :enableEditClick="false"
-        :columns="statusCodeColumns"
-        :editInDrawer="openEditStatusCodeDrawer"
-        :listService="listStatusCodeService"
-        :actions="actionsRow"
-        emptyListMessage="No status codes found."
-      >
-        <template #addButton>
-          <PrimeButton
-            icon="pi pi-plus"
-            label="Custom Page Code"
-            data-testid="status-code__add-button"
-            @click="openCreateStatusCodeDrawer"
-            class="w-full sm:w-auto"
-          />
-        </template>
-      </ListTableBlock>
+      <div>
+        <ListTableBlock
+          ref="listStatusCodeRef"
+          isTabs
+          v-if="hasContentToList"
+          :enableEditClick="false"
+          :columns="statusCodeColumns"
+          :editInDrawer="openEditStatusCodeDrawer"
+          :listService="listPagesCodeService"
+          :actions="actionsRow"
+          emptyListMessage="No status codes found."
+        >
+          <template #addButton>
+            <PrimeButton
+              icon="pi pi-plus"
+              label="Custom Page Code"
+              data-testid="status-code__add-button"
+              @click="openCreateStatusCodeDrawer"
+              class="w-full sm:w-auto"
+            />
+          </template>
+        </ListTableBlock>
+        <small class="p-error text-xs font-normal leading-tight">
+          {{ errorMessage }}
+        </small>
+      </div>
     </template>
   </FormHorizontal>
 </template>
@@ -40,17 +45,17 @@
   import PrimeButton from 'primevue/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectStatusCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
-  import ListTableBlock from '@templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
 
   const listStatusCodeRef = ref(null)
-  const hasContentToList = computed(() => !!pagesValue.value)
   const drawerRef = ref(null)
+  const hasContentToList = computed(() => !!pagesValue.value)
 
-  const { value: pagesValue } = useField('pages')
+  const { value: pagesValue, errorMessage } = useField('pages')
 
   const props = defineProps({
     isDrawer: {
@@ -167,13 +172,15 @@
     }
   ]
 
-  const listStatusCodeService = () => {
-    const onMountedStart = pagesValue.value.find((page) => page.code.origin === 'Azion')
-    if (onMountedStart) {
-      return pagesValue.value
+  const listPagesCodeService = () => {
+    const hasPages = !!pagesValue.value?.length
+    if (hasPages) {
+      const pagesCodes = new Set(pagesValue.value.map((page) => page.code.value))
+      const filteredPages = STATUS_CODE_OPTIONS.filter((page) => !pagesCodes.has(page.code.value))
+      return [...pagesValue.value, ...filteredPages]
     }
-    const mergePagesDefault = [...pagesValue.value, ...STATUS_CODE_OPTIONS]
-    return mergePagesDefault
+
+    return STATUS_CODE_OPTIONS
   }
 
   const openEditStatusCodeDrawer = (item) => {

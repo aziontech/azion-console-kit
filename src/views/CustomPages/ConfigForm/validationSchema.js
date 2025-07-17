@@ -49,7 +49,14 @@ export const validationSchema = yup.object({
   id: yup.number(),
   name: yup.string().required().label('Name'),
   active: yup.boolean().required().label('Active'),
-  pages: yup.array().of(pageSchema).required().label('Pages')
+  pages: yup
+    .array()
+    .of(pageSchema)
+    .test('at-least-one-page-with-code', 'You must have at least one page with code', (pages) =>
+      pages.some((page) => page.code.value !== '')
+    )
+    .required()
+    .label('Pages')
 })
 
 export const defaultValues = {
