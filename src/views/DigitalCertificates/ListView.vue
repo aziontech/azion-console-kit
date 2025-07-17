@@ -158,7 +158,7 @@
           type: 'component',
           sortField: 'name',
           component: (columnData) =>
-            columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
         },
         {
           field: 'issuer',
@@ -185,7 +185,7 @@
         type: 'component',
         sortField: 'name',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'subjectName',
@@ -193,7 +193,7 @@
         sortField: 'subject_name',
         type: 'component',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
         field: 'issuer',

@@ -23,14 +23,20 @@ const validationSchemaHandler = (isWorkloadCreation = false, certificateType) =>
   return yup.object({
     digitalCertificateName: yup.string().required('Name is a required field.'),
     certificateType: yup.string().required('Choose a certificate type.'),
-    certificate: yup.string().when('certificateType', {
-      is: () => certificateRequiredField(isWorkloadCreation, certificateType),
-      then: (schema) => schema.required('Certificate is a required field.')
-    }),
-    privateKey: yup.string().when(['certificateType'], {
-      is: () => certificateRequiredField(isWorkloadCreation),
-      then: (schema) => schema.required('Private Key is a required field.')
-    }),
+    certificate: yup
+      .string()
+      .when('certificateType', {
+        is: () => certificateRequiredField(isWorkloadCreation, certificateType),
+        then: (schema) => schema.required('Certificate is a required field.')
+      })
+      .nullable(),
+    privateKey: yup
+      .string()
+      .when(['certificateType'], {
+        is: () => certificateRequiredField(isWorkloadCreation),
+        then: (schema) => schema.required('Private Key is a required field.')
+      })
+      .nullable(),
     common: yup.string().when('certificateType', CSRConditionalValidations('Subject Name')),
     country: yup.string().when('certificateType', {
       is: CERTIFICATE_TYPES.EDGE_CERTIFICATE_CSR,

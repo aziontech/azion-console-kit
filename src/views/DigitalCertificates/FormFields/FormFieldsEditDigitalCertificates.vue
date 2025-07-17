@@ -80,9 +80,10 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Name *"
+            label="Name"
             name="name"
             disabled
+            required
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
@@ -101,8 +102,9 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Name *"
+            label="Name"
             name="name"
+            required
             placeholder="My digital certificate"
             :value="name"
             data-testid="digital-certificate__name-field"
@@ -153,8 +155,9 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Name *"
+            label="Name"
             name="name"
+            required
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
@@ -189,8 +192,9 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Name *"
+            label="Name"
             name="name"
+            required
             :value="name"
             placeholder="My digital certificate"
             data-testid="digital-certificate__name-field"
@@ -217,8 +221,9 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Name *"
+            label="Name"
             name="name"
+            required
             placeholder="My digital certificate"
             :value="name"
             data-testid="digital-certificate__name-field"

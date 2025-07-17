@@ -42,19 +42,25 @@ export const DigitalCertificatesAdapter = {
 
   transformListDigitalCertificates({ results, count }) {
     const formattedResults = results?.map((item) => {
-      const subjectNames = checkIfFieldExist(
-        item?.subject_name?.map((subject) => subject)?.join(',')
-      )
+      let subjectName = []
       const typeMap = {
         edge_certificate: EDGE_CERTIFICATE,
         trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
+      }
+
+      if (item.subject_name && item.subject_name.length) {
+        if (item.subject_name[0].includes(',')) {
+          subjectName = item.subject_name[0].split(',')
+        } else {
+          subjectName = item.subject_name
+        }
       }
 
       return {
         id: checkIfFieldExist(item?.id, null),
         name: checkIfFieldExist(item?.name),
         issuer: checkIfFieldExist(item?.issuer),
-        subjectName: subjectNames,
+        subjectName,
         type: checkIfFieldExist(typeMap[item?.type]),
         validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
         status: {

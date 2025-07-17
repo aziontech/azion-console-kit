@@ -41,7 +41,8 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'expand-text-column':
       return h(ExpandTextColumn, {
-        value: data
+        value: data.value,
+        sliceValue: data.sliceValue
       })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
