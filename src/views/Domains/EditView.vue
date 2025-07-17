@@ -45,7 +45,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeFirewallService } from '@/services/v2'
 
@@ -110,20 +109,10 @@
   }
 
   const digitalCertificates = ref([])
-  const toast = useToast()
   const domainName = ref()
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
-  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
   }
 
   const setDomainName = async (domain) => {

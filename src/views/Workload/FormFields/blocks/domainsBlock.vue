@@ -6,14 +6,13 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
+  import CopyBlock from '@/templates/copy-block/copy-block.vue'
+
   import PrimeButton from 'primevue/button'
-  import { clipboardWrite } from '@/helpers'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import { edgeDNSService } from '@/services/v2'
 
-  const toast = useToast()
   const props = defineProps({
     isDrawer: {
       type: Boolean,
@@ -81,15 +80,6 @@
     if (domain) {
       domain.domain = value
     }
-  }
-
-  const copyDomainName = () => {
-    clipboardWrite(workloadHostname.value)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
   }
 
   const stagingInfrastructure = '2'
@@ -163,15 +153,7 @@
             The default domain used to route traffic to your workload.
           </small>
         </div>
-        <div class="max-w-fit w-full flex items-end">
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            @click="copyDomainName"
-          />
-        </div>
+        <copyBlock :value="workloadHostname" />
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 max-sm:gap-6">
