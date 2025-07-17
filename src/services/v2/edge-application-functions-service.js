@@ -20,7 +20,6 @@ export class EdgeApplicationFunctionService {
     })
 
     const { results, count } = data
-
     const body = this.adapter?.transformListFunctions?.(results, params?.fields) ?? results
 
     return {
@@ -37,16 +36,16 @@ export class EdgeApplicationFunctionService {
     const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
     if (!count) return []
 
-    const enrichedFunctions = await enrichByMatchingReference(
-      functionInstances,
-      this.#listFunctionNames,
-      (item) => item.edgeFunction,
-      (item, matchedRef) => ({
+    const enrichedFunctions = await enrichByMatchingReference({
+      items: functionInstances,
+      fetchReferencePage: this.#listFunctionNames,
+      getReferenceId: (item) => item.edgeFunction,
+      merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
       }),
-      { pageSize: 100 }
-    )
+      pageSize: 100
+    })
 
     return {
       count: count,

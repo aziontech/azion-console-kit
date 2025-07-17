@@ -123,7 +123,7 @@
     description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
   >
     <template #inputs>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-3">
         <LabelBlock label="Nameservers" />
         <div
           class="flex items-center sm:max-w-lg w-full gap-2"
@@ -140,10 +140,7 @@
             />
           </div>
           <div>
-            <copyBlock
-              label="Copy to Clipboard"
-              :value="nameserver"
-            />
+            <copyBlock :value="nameserver" />
           </div>
         </div>
         <small class="text-xs text-color-secondary font-normal leading-5">
@@ -169,7 +166,7 @@
       </div>
       <div
         v-if="dnssec"
-        class="flex flex-col gap-4"
+        class="flex flex-col gap-8"
       >
         <div
           class="flex items-center sm:max-w-lg w-full gap-2"
@@ -191,7 +188,6 @@
           </div>
           <div :class="entry.name === 'key-tag' || entry.name === 'digest' ? 'mb-6' : ''">
             <copyBlock
-              label="Copy to Clipboard"
               :value="entry.value"
               :disabled="entry.disabledCopyButton"
             />

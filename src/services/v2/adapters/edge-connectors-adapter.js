@@ -134,33 +134,35 @@ const typeBuildersLoadRequest = {
     },
     modules: {
       loadBalancer: {
-        enabled: data.attributes.modules.load_balancer.enabled,
+        enabled: data.attributes.modules?.load_balancer?.enabled,
         config: {
-          method: data.attributes.modules.load_balancer?.config?.method,
-          maxRetries: data.attributes.modules.load_balancer?.config?.max_retries,
-          connectionTimeout: data.attributes.modules.load_balancer?.config?.connection_timeout,
-          readWriteTimeout: data.attributes.modules.load_balancer?.config?.read_write_timeout
+          method: data.attributes.modules?.load_balancer?.config?.method,
+          maxRetries: data.attributes.modules?.load_balancer?.config?.max_retries,
+          connectionTimeout: data.attributes.modules?.load_balancer?.config?.connection_timeout,
+          readWriteTimeout: data.attributes.modules?.load_balancer?.config?.read_write_timeout
         }
       },
       originShield: {
-        enabled: data.attributes.modules.origin_shield.enabled,
+        enabled: data.attributes.modules?.origin_shield?.enabled,
         config: {
           originIpAcl: {
-            enabled: data.attributes.modules.origin_shield?.config?.origin_ip_acl?.enabled
+            enabled: data.attributes.modules?.origin_shield?.config?.origin_ip_acl?.enabled
           },
           hmac: {
-            enabled: data.attributes.modules.origin_shield.config.hmac?.enabled,
+            enabled: data.attributes.modules?.origin_shield?.config?.hmac?.enabled,
             config: {
-              type: data.attributes.modules.origin_shield.config.hmac?.config?.type,
+              type: data.attributes.modules?.origin_shield?.config?.hmac?.config?.type,
               attributes: {
                 region:
-                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.region,
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes?.region,
                 service:
-                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.service,
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes?.service,
                 accessKey:
-                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.access_key,
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes
+                    ?.access_key,
                 secretKey:
-                  data.attributes.modules.origin_shield.config.hmac?.config?.attributes?.secret_key
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes
+                    ?.secret_key
               }
             }
           }
