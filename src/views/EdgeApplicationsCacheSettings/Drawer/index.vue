@@ -43,6 +43,9 @@
     showTieredCache: {
       type: Boolean,
       required: true
+    },
+    isOverlapped: {
+      type: Boolean
     }
   })
 
@@ -103,8 +106,8 @@
       .required()
       .label('Tiered Cache Region')
       .oneOf(
-        ['near-edge', 'br-east-1', 'br-east-2'],
-        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "br-east-2"'
+        ['near-edge', 'br-east-1', 'us-east-1'],
+        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "us-east-1"'
       ),
     browserCacheSettingsMaximumTtl: yup
       .number()
@@ -270,6 +273,7 @@
     @onSuccess="handleCreateCacheSettings"
     @onError="handleFailedToCreate"
     title="Create Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
@@ -290,6 +294,7 @@
     @onSuccess="handleEditedCacheSettings"
     @onError="handleFailedToEdit"
     title="Edit Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings

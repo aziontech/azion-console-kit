@@ -12,10 +12,15 @@
   import { validationSchema } from './FormFields/composables/validation'
 
   const displaySamplingDialog = ref(false)
-  const formSubmit = (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values, errors, formValid) => {
     if (!values.hasSampling) {
       onSubmit()
     } else {
+      if (!formValid) {
+        onSubmit()
+        return
+      }
+
       displaySamplingDialog.value = true
     }
   }
@@ -44,14 +49,15 @@
         :createService="dataStreamService.createDataStreamService"
         :schema="validationSchema"
         @on-response="handleToast"
+        @on-response-fail="(error) => console.log(error)"
         disableToast
       >
         <template #form="{ resetForm }">
           <FormFieldsDataStream :resetForm="resetForm" />
         </template>
-        <template #action-bar="{ onSubmit, onCancel, loading, values }">
+        <template #action-bar="{ onSubmit, onCancel, loading, values, formValid }">
           <ActionBarBlockWithTeleport
-            @onSubmit="formSubmit(onSubmit, values)"
+            @onSubmit="formSubmit(onSubmit, values, formValid)"
             @onCancel="onCancel"
             :loading="loading"
           />
