@@ -12,6 +12,14 @@
   >
     <template #inputs>
       <div>
+        <InlineMessage
+          class="p-2"
+          name="pages"
+          severity="error"
+          v-if="errorMessage"
+        >
+          {{ errorMessage }}
+        </InlineMessage>
         <ListTableBlock
           ref="listStatusCodeRef"
           isTabs
@@ -29,13 +37,11 @@
               label="Custom Page Code"
               data-testid="status-code__add-button"
               @click="openCreateStatusCodeDrawer"
+              :disabled="disabledButtonAdd"
               class="w-full sm:w-auto"
             />
           </template>
         </ListTableBlock>
-        <small class="p-error text-xs font-normal leading-tight">
-          {{ errorMessage }}
-        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -50,12 +56,13 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+  import InlineMessage from 'primevue/inlinemessage'
 
   const listStatusCodeRef = ref(null)
   const drawerRef = ref(null)
   const hasContentToList = computed(() => !!pagesValue.value)
 
-  const { value: pagesValue, errorMessage } = useField('pages')
+  const { value: pagesValue, errorMessage, handleReset } = useField('pages')
 
   const props = defineProps({
     isDrawer: {
@@ -64,6 +71,11 @@
     }
   })
 
+  const NUMBER_MAX_PAGES = 23
+
+  const disabledButtonAdd = computed(
+    () => !!pagesValue.value?.length && pagesValue.value.length >= NUMBER_MAX_PAGES
+  )
   const classesPt = {
     root: 'flex-col',
     description: 'max-w-md',
@@ -138,6 +150,7 @@
   ]
 
   const updateList = (item) => {
+    handleReset()
     if (item.code.origin) return
 
     const idx = pagesValue.value.findIndex(

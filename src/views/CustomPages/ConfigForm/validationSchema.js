@@ -14,7 +14,7 @@ export const pageSchema = yup.object().shape({
   }),
   ttl: yup.number().when('type', {
     is: 'PageConnector',
-    then: (schema) => schema.required().label('TTL'),
+    then: (schema) => schema.required().min(0).max(31536000).label('TTL'),
     otherwise: (schema) => schema.nullable()
   }),
   uri: yup.string().when('type', {
@@ -38,9 +38,9 @@ export const pageSchema = yup.object().shape({
     then: (schema) => schema.required().label('Response'),
     otherwise: (schema) => schema.nullable()
   }),
-  customStatusCode: yup.string().when('type', {
+  customStatusCode: yup.number().when('type', {
     is: 'PageConnector',
-    then: (schema) => schema.required().default(null).label('Custom Status Code'),
+    then: (schema) => schema.required().min(100).max(599).default(null).label('Custom Status Code'),
     otherwise: (schema) => schema.nullable()
   })
 })
@@ -52,7 +52,7 @@ export const validationSchema = yup.object({
   pages: yup
     .array()
     .of(pageSchema)
-    .test('at-least-one-page-with-code', 'You must have at least one page with code', (pages) =>
+    .test('at-least-one-page-with-code', 'You must have at least one custom page code', (pages) =>
       pages.some((page) => page.code.value !== '')
     )
     .required()
