@@ -5,9 +5,17 @@
   import { ref, computed } from 'vue'
   import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
+  import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
 
   defineOptions({
     name: 'custom-pages-drawer'
+  })
+
+  defineProps({
+    optionsStatusCode: {
+      type: Array,
+      default: () => []
+    }
   })
 
   const emit = defineEmits(['onSuccess'])
@@ -27,10 +35,9 @@
 
   const title = computed(() => {
     const item = itemStatusCode.value
-    if (!item || !item.name) return 'Edit Status Code'
-
-    const code = item.name !== 'Default' ? `${item.code}:` : ''
-    return `${code} ${item.name}`.trim()
+    if (!item || !item.code) return 'Create Custom Page Code'
+    const name = CODE_OPTIONS.find((option) => option.value === item.code.value)?.label
+    return `Edit Page Code: ${name}`.trim()
   })
 
   const applyStatusCodes = async (handleSubmit, onCancel, scrollToErrorInDrawer) => {
@@ -49,35 +56,35 @@
 
   const transformValuesByType = (values) => {
     switch (values.type) {
-      case 'Default':
+      case 'PageDefault':
         return {
           id: values.id,
           code: values.code,
-          type: 'Default',
+          type: values.type,
           contentType: values.contentType || 'text/html',
           response: values.response || '<html>...</html>',
-          customStatusCode: values.customStatusCode || '-',
+          customStatusCode: values.customStatusCode,
           ttl: 0
         }
-      case 'Custom':
+      case 'PageCustom':
         return {
           id: values.id,
           code: values.code,
-          type: 'Custom',
+          type: values.type,
           contentType: values.contentType || 'text/html',
           response: values.response || '<html>...</html>',
           ttl: 0,
-          customStatusCode: values.customStatusCode || '-'
+          customStatusCode: values.customStatusCode
         }
-      case 'Connector':
+      case 'PageConnector':
         return {
           id: values.id,
           code: values.code,
-          type: 'Connector',
+          type: values.type,
           connector: values.connector,
           ttl: values.ttl,
           uri: values.uri,
-          customStatusCode: values.customStatusCode || '-'
+          customStatusCode: values.customStatusCode
         }
 
       default:
@@ -100,7 +107,10 @@
     :title="title"
   >
     <template #formFields>
-      <FormFieldsStatusCode :itemStatusCode="itemStatusCode" />
+      <FormFieldsStatusCode
+        :itemStatusCode="itemStatusCode"
+        :optionsStatusCode="optionsStatusCode"
+      />
     </template>
     <template #action-bar="{ handleSubmit, onCancel, formValid, scrollToErrorInDrawer }">
       <ActionBarBlock

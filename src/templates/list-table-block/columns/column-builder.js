@@ -16,6 +16,7 @@ import CountryFlagColumn from './country-flag-column.vue'
 import TagWithTooltip from './tag-with-tooltip'
 import LogBody from './log-body.vue'
 import TextWithIcon from './text-with-icon.vue'
+import TextFormatColumn from './text-format.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
@@ -30,6 +31,10 @@ import TextWithIcon from './text-with-icon.vue'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
+    case 'text-format':
+      return h(TextFormatColumn, {
+        text: data.text
+      })
     case 'expand-column':
       return h(ExpandColumn, {
         value: data

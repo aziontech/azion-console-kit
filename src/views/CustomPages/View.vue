@@ -65,12 +65,13 @@
     }
   })
 
-  const title = computed(() => {
-    return props.mode === 'create' ? 'Create Custom Page' : 'Edit Custom Page'
-  })
+  const labelTitleEdit = ref('Edit Custom Page')
+
+  const title = computed(() => (props.mode === 'create' ? 'Create Custom Page' : labelTitleEdit))
 
   const loadService = async (id) => {
     const payload = await customPageService.loadCustomPagesService(id)
+    labelTitleEdit.value = payload.name
     return payload
   }
 
@@ -91,6 +92,7 @@
           editService: customPageService.editCustomPagesService,
           loadService: loadService,
           schema: validationSchema,
+          title: labelTitleEdit,
           updatedRedirect: props.updatedRedirect
         }
       }

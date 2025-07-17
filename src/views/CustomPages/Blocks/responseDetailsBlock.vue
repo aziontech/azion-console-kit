@@ -29,6 +29,7 @@
           label="Page Path (URI)"
           placeholder="/path/error_page.html"
           name="uri"
+          required
           :value="uri"
         />
       </div>
@@ -83,17 +84,6 @@
           rows="4"
           disabled
         />
-        <div class="flex">
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            type="button"
-            aria-label="Copy Response"
-            label="Copy Response"
-            @click="copyResponse"
-            :data-testid="`copy-response-button`"
-          />
-        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -106,14 +96,9 @@
   import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextarea from '@/templates/form-fields-inputs/fieldTextArea'
-  import PrimeButton from 'primevue/button'
-  import { clipboardWrite } from '@/helpers'
   import { edgeConnectorsService } from '@/services/v2'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-
-  const toast = useToast()
 
   const { value: response } = useField('response')
 
@@ -131,32 +116,19 @@
     isDrawer: {
       type: Boolean,
       default: false
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
     }
   })
 
   const listEdgeConnectors = async (params) => {
-    params.fields = 'id,name'
-    // params.type = 'live_ingest'
+    params.fields = 'id,name,type'
     params.active = true
-    return await edgeConnectorsService.listEdgeConnectorsService(params)
-  }
-
-  const copyResponse = () => {
-    try {
-      clipboardWrite(response.value)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Response copied to clipboard',
-        life: 3000
-      })
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to copy response to clipboard',
-        life: 3000
-      })
-    }
+    return await edgeConnectorsService.listEdgeConnectorsDropDownService(
+      params,
+      (item) => item.type !== 'Live Ingest'
+    )
   }
 </script>

@@ -42,6 +42,7 @@ export const CustomPageAdapter = {
   },
   transformPayloadCreateCustomPage(payload) {
     const pages = payload.pages.filter((page) => page.type !== 'PageDefault')
+    const hasCodeDefault = pages.find((page) => page.code.value?.toLowerCase() === 'default')
 
     return {
       name: payload.name,
@@ -49,21 +50,26 @@ export const CustomPageAdapter = {
       pages: [
         ...pages.map((page) => {
           return {
-            code: page.code.toLowerCase(),
+            code: page.code.value?.toLowerCase(),
             page: getPage(page)
           }
         }),
-        {
-          code: 'default',
-          page: {
-            type: 'PageDefault'
-          }
-        }
+        // REMOVE THIS AS SOON AS THE API STARTS WORKING PROPERLY
+        ...(!hasCodeDefault
+          ? [
+              {
+                code: 'default',
+                page: {
+                  type: 'PageDefault'
+                }
+              }
+            ]
+          : [])
       ]
     }
   },
   transformLoadCustomPage({ data }) {
-    return {
+    const response = {
       id: data.id,
       name: data.name,
       last_editor: data.last_editor,
@@ -71,7 +77,7 @@ export const CustomPageAdapter = {
       active: data.active,
       product_version: data.product_version,
       pages: data.pages.map((item) => ({
-        code: nullable(item.code),
+        code: { value: nullable(item.code) },
         type: nullable(item.page.type),
         customStatusCode: nullable(item.page.attributes.custom_status_code),
         connector: nullable(item.page.attributes.connector),
@@ -81,5 +87,10 @@ export const CustomPageAdapter = {
         response: nullable(item.page.attributes.response)
       }))
     }
+
+    // REMOVE THIS AS SOON AS THE API STARTS WORKING PROPERLY
+    response.pages = response.pages.filter((page) => page.type !== 'PageDefault')
+
+    return response
   }
 }
