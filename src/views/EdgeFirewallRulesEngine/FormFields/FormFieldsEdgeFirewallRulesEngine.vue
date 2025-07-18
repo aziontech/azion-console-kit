@@ -8,7 +8,6 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted } from 'vue'
 
@@ -60,8 +59,6 @@
     { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
   ]
 
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const networkList = ref([])
   const hasWafAccess = ref(true)
@@ -294,63 +291,16 @@
     return criteriaVariableOptions
   }
 
-  /**
-   * Checks if a criteria can be deleted.
-   * @param {number} index - The index of the criteria.
-   * @returns {boolean}
-   */
-  const isNotFirstCriteria = (index) => {
-    return criteria.value.length > 1 && index < criteria.value.length - 1
-  }
-
-  /**
-   * Checks if is the last criteria divider.
-   * @param {number} criteriaIndex
-   * @returns {boolean}
-   */
   const isLastCriteriaSectionDivider = (criteriaIndex) => {
     return criteriaIndex !== criteria.value.length - 1
   }
 
-  /**
-   * Toggle the visibility of the conditional menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   * @param {number} conditionalIndex - The index of the conditional inside a criteria.
-   */
-  const toggleConditionalMenu = (event, index, conditionalIndex) => {
-    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
-  }
-
-  /**
-   * Toggle the visibility of the criteria menu.
-   * @param {Event} event
-   * @param {number} criteriaIndex
-   */
-  const toggleCriteriaMenu = ({ event, criteriaIndex }) => {
-    criteriaMenuRef.value[criteriaIndex].toggle(event)
-  }
-
-  /**
-   * @param {number} criteriaIndex
-   * @param {number} [criteriaInnerRowIndex]
-   * @returns {Array} options for the criteria menu available commands.
-   */
-  const criteriaMenuOptions = (criteriaIndex, criteriaInnerRowIndex = null) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          if (criteriaInnerRowIndex === null) {
-            removeCriteria(criteriaIndex)
-          } else {
-            removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
-          }
-        }
-      }
-    ]
+  const handleDeleteCriteria = (criteriaIndex, criteriaInnerRowIndex) => {
+    if (criteriaInnerRowIndex === null) {
+      removeCriteria(criteriaIndex)
+    } else {
+      removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
+    }
   }
 
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
@@ -373,7 +323,6 @@
     remove: removeBehavior,
     fields: behaviors
   } = useFieldArray('behaviors')
-  const behaviorsMenuRef = ref({})
 
   const behaviorsOptions = computed(() => {
     const edgeFirewallModules = props.enabledModules
@@ -410,21 +359,8 @@
     ]
   })
 
-  const toggleBehaviorMenu = (event, behaviorItemIndex) => {
-    behaviorsMenuRef.value[behaviorItemIndex].toggle(event)
-  }
-
-  const behaviorMenuOptions = (behaviorItemIndex) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          removeBehavior(behaviorItemIndex)
-        }
-      }
-    ]
+  const handleDeleteBehavior = (behaviorItemIndex) => {
+    removeBehavior(behaviorItemIndex)
   }
 
   const generateBehaviorLabelSection = (behaviorItem) => {
@@ -564,16 +500,10 @@
 
             <PrimeButton
               v-if="criteriaInnerRowIndex !== 0"
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-trash"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, criteriaIndex, criteriaInnerRowIndex)"
-            />
-            <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${criteriaInnerRowIndex}`] = el)"
-              id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(criteriaIndex, criteriaInnerRowIndex)"
-              :popup="true"
+              @click="handleDeleteCriteria(criteriaIndex, criteriaInnerRowIndex)"
             />
           </div>
 
@@ -689,19 +619,12 @@
             align="left"
             type="solid"
           />
-
           <PrimeButton
-            v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-ellipsis-h"
+            v-if="criteriaIndex !== criteria.length - 1"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu({ event, criteriaIndex: criteriaIndex + 1 })"
-          />
-          <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
-            id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(criteriaIndex + 1)"
-            :popup="true"
+            @click="handleDeleteCriteria(criteriaIndex, null)"
           />
         </div>
       </div>
@@ -738,20 +661,12 @@
           >
             {{ generateBehaviorLabelSection(behaviorItem) }}
           </Divider>
-
           <PrimeButton
             v-if="behaviorItemIndex !== 0"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, behaviorItemIndex)"
-          />
-
-          <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[behaviorItemIndex] = el)"
-            id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(behaviorItemIndex)"
-            :popup="true"
+            @click="handleDeleteBehavior(behaviorItemIndex)"
           />
         </div>
 
