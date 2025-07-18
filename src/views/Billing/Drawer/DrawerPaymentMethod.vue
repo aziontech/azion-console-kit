@@ -37,7 +37,7 @@
   const showPaymentMethod = () => {
     if (route.query.paymentSession || route.query.payment) {
       openDrawer()
-      router.push({ query: {} })
+      router.replace({ query: {} })
     }
   }
 

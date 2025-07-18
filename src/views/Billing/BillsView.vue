@@ -293,6 +293,24 @@
     },
     cardDefault: {
       type: Object
+    },
+    loadPaymentMethodDefaultService: {
+      type: Function
+    },
+    loadInvoiceDataService: {
+      type: Function
+    },
+    listServiceAndProductsChangesService: {
+      type: Function
+    },
+    getStripeClientService: {
+      type: Function
+    },
+    documentPaymentMethodService: {
+      type: Function
+    },
+    loadInvoiceLastUpdatedService: {
+      type: Function
     }
   })
 
@@ -386,9 +404,9 @@
 
   const isTrail = computed(() => user.value.status === 'TRIAL')
 
-  const reloadList = () => {
+  const reloadList = async () => {
     if (hasContentToList.value) {
-      listPaymentHistoryRef.value.reload()
+      await listPaymentHistoryRef.value.reload()
       return
     }
     hasContentToList.value = true

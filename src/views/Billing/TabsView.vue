@@ -13,13 +13,10 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import { loadUserAndAccountInfo } from '@/helpers/account-data'
-  import { useToast } from 'primevue/usetoast'
 
   const route = useRoute()
   const router = useRouter()
   const accountStore = useAccountStore()
-  const toast = useToast()
   const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
 
   const { accountIsNotRegular } = storeToRefs(accountStore)
@@ -101,36 +98,12 @@
     }
   }
 
-  const showToast = (severity, detail) => {
-    if (!detail) return
-    const options = {
-      closable: true,
-      severity,
-      summary: severity,
-      detail
-    }
-    toast.add(options)
-  }
-
-  const updateAccountStatus = async () => {
-    try {
-      emit('loadCard')
-      await loadUserAndAccountInfo()
-    } catch (error) {
-      showToast(
-        'error',
-        'An error occurred while updating account status. Please refresh the page to see the latest changes.'
-      )
-    }
-  }
-
-  const callBackDrawer = () => {
-    updateAccountStatus()
+  const callBackDrawer = async () => {
     if (paymentListViewRef.value) {
-      paymentListViewRef.value.reloadList()
+      await paymentListViewRef.value.reloadList()
     }
     if (viewBillsRef.value) {
-      viewBillsRef.value.reloadList()
+      await viewBillsRef.value.reloadList()
     }
   }
 
@@ -138,22 +111,21 @@
     changeTab(TABS_MAP.payment)
   }
 
-  const propsNotification = {
+  const propsNotification = () => ({
     redirectLink: redirectPaymentMethod,
     linkText: {
-      hidden: true
+      hidden: isActiveTab.value.payment
     },
     buttonCredit: {
-      hidden: true
+      hidden: isActiveTab.value.payment
     },
     buttonPaymentMethod: {
-      hidden: true
+      hidden: isActiveTab.value.payment
     }
-  }
+  })
 
   defineExpose({
-    callBackDrawer,
-    updateAccountStatus
+    callBackDrawer
   })
 
   onMounted(() => {
@@ -184,6 +156,12 @@
       </PageHeadingBlock>
     </template>
     <template #content>
+      <div class="mb-4">
+        <slot
+          name="notification"
+          v-bind="propsNotification()"
+        />
+      </div>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -197,15 +175,6 @@
             }
           }"
         >
-          <div
-            v-show="isActiveTab.bills"
-            class="mt-4"
-          >
-            <slot
-              name="notification"
-              :redirectLink="redirectPaymentMethod"
-            />
-          </div>
           <BillsView
             v-if="isActiveTab.bills"
             ref="viewBillsRef"
@@ -222,15 +191,6 @@
             }
           }"
         >
-          <div
-            v-show="isActiveTab.payment"
-            class="mt-4"
-          >
-            <slot
-              name="notification"
-              v-bind="propsNotification"
-            />
-          </div>
           <PaymentListView
             ref="paymentListViewRef"
             v-if="isActiveTab.payment"

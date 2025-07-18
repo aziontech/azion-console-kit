@@ -70,7 +70,7 @@ export class PaymentService {
       url: `${this.baseURL.credits}`,
       body: { amount }
     })
-    return 'Credit added successfully.'
+    return { feedback: 'Credit added successfully.' }
   }
 
   listPaymentsHistory = async (params = { pageSize: 200 }) => {

@@ -189,9 +189,9 @@
     }
   ])
 
-  const reloadList = () => {
+  const reloadList = async () => {
     if (hasContentToList.value) {
-      listPaymentMethodsRef.value.reload()
+      await listPaymentMethodsRef.value.reload()
       return
     }
     hasContentToList.value = true
