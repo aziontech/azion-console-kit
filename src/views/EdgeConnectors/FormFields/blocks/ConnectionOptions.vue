@@ -116,7 +116,20 @@
             :value="bucket"
             inputId="bucket"
             @onSelectOption="changeBucketName"
-          />
+          >
+            <template #description>
+              <p>
+                Bucket creation is not available in the graphical interface at the moment. Use
+                Azion's API to create buckets. Learn more:
+                <a
+                  @click="openDocsCreateBucket"
+                  class="text-[var(--text-color-link)] font-medium cursor-pointer"
+                  >documentation <i class="pi pi-external-link text-xs"></i
+                ></a>
+                .
+              </p>
+            </template>
+          </FieldDropdownLazyLoader>
         </div>
 
         <div class="flex flex-col sm:max-w-sm w-full gap-2">
@@ -162,6 +175,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
+  import { documentationStoreProducts } from '@/helpers/azion-documentation-catalog'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
 
@@ -196,6 +210,10 @@
     { label: 'br-east-2', value: 'br-east-2' },
     { label: 'br-east-3', value: 'br-east-3' }
   ]
+
+  const openDocsCreateBucket = () => {
+    documentationStoreProducts.bucket()
+  }
 
   const getDescriptionByType = computed(() => {
     switch (type.value) {

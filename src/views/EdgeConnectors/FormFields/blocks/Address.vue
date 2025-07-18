@@ -31,13 +31,13 @@
                     <div class="flex gap-1">
                       <p class="text-sm font-normal text-color-secondary">Http Port:</p>
                       <p class="text-sm font-medium text-color">
-                        {{ addresses[addressIndex].value.plainPort }}
+                        {{ addresses[addressIndex].value.httpPort }}
                       </p>
                     </div>
                     <div class="flex gap-1">
                       <p class="text-sm font-normal text-color-secondary">Https Port:</p>
                       <p class="text-sm font-medium text-color">
-                        {{ addresses[addressIndex].value.tlsPort }}
+                        {{ addresses[addressIndex].value.httpsPort }}
                       </p>
                     </div>
                     <div class="flex gap-1">
@@ -264,6 +264,8 @@
   const addNewAddress = () => {
     if (addresses.value.length < maximumAddressQuantity) {
       pushAddress(DEFAULT_ADDRESS)
+      const index = addresses.value.length - 1
+      activeAccordions.value[index] = 0
     }
   }
 
@@ -284,7 +286,11 @@
       }
     } else {
       if (addresses.value.length > 1) {
-        removeAddressByIndex(0)
+        // eslint-disable-next-line id-length
+        addresses.value.forEach((_, index) => {
+          if (index === 0) return
+          removeAddressByIndex(index)
+        })
       }
     }
   })

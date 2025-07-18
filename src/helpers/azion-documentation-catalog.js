@@ -61,3 +61,7 @@ export const documentationGuideProducts = {
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
   customPages: () => openDocumentationProducts('guides/customizing-error-response-page')
 }
+
+export const documentationStoreProducts = {
+  bucket: () => openDocumentationProducts('store/storage/create-bucket/')
+}
