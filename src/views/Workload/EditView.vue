@@ -127,14 +127,7 @@
           otherwise: (schema) => schema.notRequired().nullable()
         })
         .label('Trusted CA Certificate'),
-      crl: yup
-        .array()
-        .when('isEnabled', {
-          is: true,
-          then: (schema) => schema.required('Certificate Revocation List is required').min(1),
-          otherwise: (schema) => schema.nullable().notRequired()
-        })
-        .label('Certificate Revocation List')
+      crl: yup.array().label('Certificate Revocation List').nullable()
     }),
     domains: yup
       .array()
@@ -179,8 +172,8 @@
         then: (schema) =>
           schema.test(
             'has-filled-domain',
-            'At least one domain with subdomain and domain is required',
-            (value) => value?.some((domain) => domain.subdomain && domain.domain)
+            'When "Workload Allow Access" switch is off at least one domain is required.',
+            (value) => value?.some((domain) => domain.subdomain || domain.domain)
           )
       }),
     useCustomDomain: yup.boolean(),

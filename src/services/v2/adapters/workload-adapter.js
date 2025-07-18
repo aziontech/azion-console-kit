@@ -22,7 +22,7 @@ function extractAzionAppSubdomain(fullDomains) {
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
     } else {
-      cleanDomains.push({ subdomain, domain })
+      cleanDomains.push({ subdomain: subdomain ?? '', domain })
     }
   })
 

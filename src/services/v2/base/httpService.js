@@ -44,7 +44,9 @@ export class HttpService {
     } catch (axiosError) {
       if (!processError) {
         const meta = this.errorHandler.createMeta(axiosError)
-        return meta
+        if (meta) {
+          return meta
+        }
       }
       throw this.errorHandler.create(axiosError)
     }

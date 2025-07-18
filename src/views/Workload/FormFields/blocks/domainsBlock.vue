@@ -116,6 +116,7 @@
       .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
       .filter((name) => name.trim() !== '.')
 
+    alternativeNames.filter((name) => name !== '')
     setAlternativeNames(alternativeNames)
     setCommonName(commonName)
     checkHasDomain()
