@@ -132,7 +132,6 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
-      {{ domains }}
       <div
         v-if="props.isEdit"
         class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
