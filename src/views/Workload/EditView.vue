@@ -152,7 +152,7 @@
             .label('Subdomain'),
           domain: yup
             .string()
-            .test('valid-domain', 'Invalid Domain format', function (value) {
+            .test('valid-domain', 'Invalid Domain format ', function (value) {
               if (!value) {
                 return true
               }
@@ -160,20 +160,13 @@
               if (value.endsWith('.')) {
                 return false
               }
-              if (value.endsWith('.')) {
-                return false
-              }
 
-              const dotCount = (value.match(/\./g) || []).length
-
-              if (dotCount === 0) {
-                return false
-              }
-
-              if (dotCount > 10) {
-                return false
-              }
               const segments = value.split('.')
+              const dotCount = segments.length - 1
+              if (dotCount < 1 || dotCount > 10) {
+                return false
+              }
+
               return segments.every((segment) =>
                 /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
               )
