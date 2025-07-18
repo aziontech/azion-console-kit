@@ -5,19 +5,16 @@
     data-testid="edge-connectors-form__section__address-management"
   >
     <template #inputs>
-      <div
-        v-for="(_, addressIndex) in addresses"
-        :key="addressIndex"
-      >
-        <Accordion
-          v-model:activeIndex="activeAccordions[addressIndex]"
-          v-if="isLoadBalancerEnabled"
-        >
-          <AccordionTab>
+      <div v-if="isLoadBalancerEnabled">
+        <Accordion v-model:activeIndex="activeAccordions">
+          <AccordionTab
+            v-for="(_, addressIndex) in addresses"
+            :key="addressIndex"
+          >
             <template #header>
               <div class="flex flex-row items-center justify-between w-full">
                 <div>
-                  <div class="flex flex-row items-center gap-3">
+                  <div class="flex flex-row items-center gap-2">
                     <p class="break-all whitespace-normal">
                       {{ addresses[addressIndex].value.address || 'example.com' }}
                     </p>
@@ -25,6 +22,9 @@
                       value="Desactived"
                       severity="danger"
                       v-if="!addresses[addressIndex].value.active"
+                      :pt="{
+                        root: '!px-1.5 !py-0.5'
+                      }"
                     />
                   </div>
                   <div class="flex gap-2">
@@ -240,7 +240,7 @@
 
   const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
 
-  const activeAccordions = ref([0])
+  const activeAccordions = ref(0)
   const maximumAddressQuantity = 15
 
   const serverRoleList = [
@@ -265,13 +265,12 @@
     if (addresses.value.length < maximumAddressQuantity) {
       pushAddress(DEFAULT_ADDRESS)
       const index = addresses.value.length - 1
-      activeAccordions.value[index] = 0
+      activeAccordions.value = index
     }
   }
 
   const removeAddressByIndex = (index) => {
     if (addresses.value.length === 1) return
-    activeAccordions.value.splice(index, 1)
     removeAddress(index)
   }
 
