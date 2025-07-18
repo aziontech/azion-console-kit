@@ -354,7 +354,7 @@ export const DataStreamAdapter = {
   transformPayloadTemplate(payload) {
     return {
       name: payload.name,
-      data_set: JSON.stringify(JSON.parse(payload.dataSet), null, '\t')
+      data_set: payload.dataSet
     }
   },
   transformLoadTemplate(payload) {
