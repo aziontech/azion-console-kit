@@ -1,7 +1,7 @@
 import { billingRoutes } from '@/router/routes/billing-routes'
 
 const BILLING_REDIRECT_OPTIONS = {
-  path: `${billingRoutes.path}/payment`,
+  path: `${billingRoutes.path}/bills`,
   query: { paymentSession: 'true' }
 }
 

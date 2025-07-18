@@ -67,7 +67,7 @@ export const WafAdapter = {
       sqlInjection: 'sql_injection',
       unwantedAccess: 'unwanted_access'
     }
-
+    const { name, active } = payload
     const thresholds = Object.entries(camelToSnakeMap)
       .filter(([camelKey]) => payload[camelKey] === true)
       .map(([camelKey, snakeKey]) => ({
@@ -76,8 +76,8 @@ export const WafAdapter = {
       }))
 
     return {
-      name: payload.name,
-      active: payload.active,
+      name,
+      active,
       engine_settings: {
         attributes: {
           thresholds

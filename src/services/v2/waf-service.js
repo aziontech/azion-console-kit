@@ -31,7 +31,7 @@ export class WafService {
   }
 
   createWafRule = async (payload) => {
-    const adaptedPayload = this.adapter.adaptWafRulePayload({ payload })
+    const adaptedPayload = this.adapter.adaptWafRulePayload(payload)
     const { data: response } = await this.http.request({
       method: 'POST',
       url: this.baseURL,

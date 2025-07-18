@@ -138,6 +138,19 @@
     changeTab(TABS_MAP.payment)
   }
 
+  const propsNotification = {
+    redirectLink: redirectPaymentMethod,
+    linkText: {
+      hidden: true
+    },
+    buttonCredit: {
+      hidden: true
+    },
+    buttonPaymentMethod: {
+      hidden: true
+    }
+  }
+
   defineExpose({
     callBackDrawer,
     updateAccountStatus
@@ -215,7 +228,7 @@
           >
             <slot
               name="notification"
-              :redirectLink="redirectPaymentMethod"
+              v-bind="propsNotification"
             />
           </div>
           <PaymentListView
