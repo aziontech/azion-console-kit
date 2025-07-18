@@ -47,7 +47,6 @@ export class HttpService {
         if (meta) {
           return meta
         }
-        throw this.errorHandler.create(axiosError)
       }
       throw this.errorHandler.create(axiosError)
     }
