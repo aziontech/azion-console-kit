@@ -189,7 +189,7 @@
           otherwise: (schema) => schema.notRequired().nullable()
         })
         .label('Trusted CA Certificate'),
-      crl: yup.array().label('Certificate Revocation List')
+      crl: yup.array().label('Certificate Revocation List').nullable()
     }),
     domains: yup
       .array()
