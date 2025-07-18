@@ -233,8 +233,8 @@
         then: (schema) =>
           schema.test(
             'has-filled-domain',
-            'At least one domain with subdomain and domain is required',
-            (value) => value?.some((domain) => domain.subdomain && domain.domain)
+            'When "Workload Allow Access" switch is off at least one domain is required.',
+            (value) => value?.some((domain) => domain.subdomain || domain.domain)
           )
       }),
     useCustomDomain: yup.boolean(),

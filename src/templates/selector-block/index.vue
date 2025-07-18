@@ -6,7 +6,7 @@
   >
     <template #content>
       <label
-        class="flex gap-3"
+        class="flex gap-3 cursor-pointer"
         :class="classStateRootItem"
         :for="props.nameId"
       >

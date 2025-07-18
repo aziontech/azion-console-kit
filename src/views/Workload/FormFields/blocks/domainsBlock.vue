@@ -116,6 +116,7 @@
       .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
       .filter((name) => name.trim() !== '.')
 
+    alternativeNames.filter((name) => name !== '')
     setAlternativeNames(alternativeNames)
     setCommonName(commonName)
     checkHasDomain()
@@ -131,6 +132,7 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
+      {{ domains }}
       <div
         v-if="props.isEdit"
         class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"

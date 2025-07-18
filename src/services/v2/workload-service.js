@@ -142,7 +142,7 @@ export class WorkloadService {
       .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
       .filter((name) => name.trim() !== '.')
     payload.letEncrypt.commonName = commonName
-    payload.letEncrypt.alternativeNames = alternativeNames
+    payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
   }
 
   #ensureCertificateForEdit = async (payload) => {
