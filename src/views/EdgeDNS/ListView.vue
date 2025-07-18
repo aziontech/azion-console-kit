@@ -6,12 +6,9 @@
         description="Set Azion Edge DNS as the authoritative DNS server for a domain by copying the nameservers values."
       >
         <template #default>
-          <PrimeButton
-            outlined
-            icon="pi pi-copy"
-            class="max-md:w-full"
+          <copyBlock
+            :value="nameServers"
             label="Copy Nameserver Values"
-            @click="handleCopyNameServers"
           />
         </template>
       </PageHeadingBlock>
@@ -51,15 +48,14 @@
 
 <script setup>
   import { ref, computed, inject } from 'vue'
-  import { useToast } from 'primevue/usetoast'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import PrimeButton from 'primevue/button'
   import { edgeDNSService } from '@/services/v2'
+  import copyBlock from '@/templates/copy-block/copy-block.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -70,16 +66,12 @@
     documentationService: {
       required: true,
       type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
     }
   })
 
   const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active']
-  const toast = useToast()
   const hasContentToList = ref(true)
+  const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
   const actions = [
     {
       type: 'delete',
@@ -91,15 +83,6 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
-  }
-
-  const handleCopyNameServers = () => {
-    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'Successfully copied!'
-    })
   }
 
   const handleTrackEvent = () => {
