@@ -2443,10 +2443,10 @@ axios@^1.7.4:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-azion-theme@^1.11.4:
-  version "1.11.4"
-  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.11.4.tgz#6e9a09ba2f54bdf9ac5d71815bbc2f7e3bce9982"
-  integrity sha512-Mat1qPugPnLhJnFcapHR6wugBq6n8yKebSsBy0x/Q/yhhWePrn4JD0AT891IhnDia3W027cTVWwA1rJM392lEw==
+azion-theme@^1.11.6:
+  version "1.11.6"
+  resolved "https://registry.yarnpkg.com/azion-theme/-/azion-theme-1.11.6.tgz#51c1441a3ada1902afe1289181c5caa74b3e0ff0"
+  integrity sha512-xyDthwAlsRXvkpDQIgOurZr/Ua8qlBCWSBStckfenyzPcZjHK0TqgNKyyGrzntuvGhS29qN5ZVSrlQQvJsgMog==
 
 azion@^1.15.0:
   version "1.15.0"
