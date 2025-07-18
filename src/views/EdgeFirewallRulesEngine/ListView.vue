@@ -197,8 +197,6 @@
     }
   ]
 
-  const disabledOrdering = ref(true)
-
   const isLoadingButtonOrder = ref(false)
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
@@ -323,15 +321,6 @@
         label="Rules Engine"
         data-testid="create_Rules Engine_button"
         @click="openCreateDrawer"
-      />
-      <PrimeButton
-        icon="pi pi-save"
-        :disabled="disabledOrdering"
-        label="Save order"
-        :loading="isLoadingButtonOrder"
-        data-testid="rules-engine-save-order-button"
-        @click="updateRulesOrder(data, reload)"
-        v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
       />
     </template>
   </EmptyResultsBlock>
