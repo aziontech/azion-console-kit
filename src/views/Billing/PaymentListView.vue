@@ -184,6 +184,7 @@
       type: 'delete',
       icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
+      disabled: (item) => item.isDefault,
       service: paymentService.deleteCreditCard
     }
   ])
