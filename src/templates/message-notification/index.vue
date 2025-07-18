@@ -22,12 +22,16 @@
       v-if="hasButtons"
     >
       <slot name="actions">
-        <PrimeButton
+        <div
           v-for="(action, index) in buttons"
           :key="index"
-          class="w-full min-w-max"
-          v-bind="action"
-        />
+        >
+          <PrimeButton
+            class="w-full min-w-max"
+            v-if="!action.hidden"
+            v-bind="action"
+          />
+        </div>
       </slot>
     </div>
   </div>

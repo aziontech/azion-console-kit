@@ -12,12 +12,14 @@
     <template #description>
       {{ notificationPayment.description }}
       <PrimeButton
-        label="payment methods."
+        v-if="!props.linkText.hidden"
+        :label="labelLink"
         link
         class="p-0 text-sm"
-        :disabled="props.disabledLinkPaymentMethod"
+        :disabled="props.linkText.disabled"
         @click="redirectPayment"
       />
+      <span v-else>{{ labelLink }}</span>
     </template>
   </MessageNotification>
 </template>
@@ -39,19 +41,25 @@
 
   const showNotification = ref(false)
   const loadingNotification = ref(false)
-
+  const labelLink = ref('payment methods.')
   const props = defineProps({
-    disabledCredit: {
-      type: Boolean,
-      default: false
+    buttonCredit: {
+      type: Object,
+      default: () => ({
+        disabled: false
+      })
     },
-    disabledPaymentMethod: {
-      type: Boolean,
-      default: false
+    linkText: {
+      type: Object,
+      default: () => ({
+        disabled: false
+      })
     },
-    disabledLinkPaymentMethod: {
-      type: Boolean,
-      default: false
+    buttonPaymentMethod: {
+      type: Object,
+      default: () => ({
+        disabled: false
+      })
     },
     loadCurrentInvoice: {
       type: Function,
@@ -71,14 +79,14 @@
       icon: 'pi pi-plus',
       onClick: () => emit('clickAddCredit'),
       outlined: true,
-      disabled: props.disabledCredit
+      ...props.buttonCredit
     },
     {
       label: 'Payment Method',
       icon: 'pi pi-plus',
       onClick: () => emit('clickAddPaymentMethod'),
       severity: 'secondary',
-      disabled: props.disabledPaymentMethod
+      ...props.buttonPaymentMethod
     }
   ])
 
@@ -151,5 +159,13 @@
 
   onMounted(() => {
     loadText()
+  })
+
+  const reload = async () => {
+    await loadText()
+  }
+
+  defineExpose({
+    reload
   })
 </script>

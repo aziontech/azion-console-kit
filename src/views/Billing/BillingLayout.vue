@@ -9,13 +9,14 @@
       @openDrawerAddCredit="openDrawerCredit"
       @openDrawerAddPaymentMethod="openDrawerPaymentMethod"
     >
-      <template #notification="{ redirectLink }">
+      <template #notification="slotProp">
         <NotificationPayment
+          ref="notificationPaymentRef"
           :loadCurrentInvoice="props.loadCurrentInvoiceService"
-          :disabledCredit="!cardDefault.cardData"
+          v-bind="propsNotification(slotProp)"
           @clickAddCredit="openDrawerCredit"
           @clickAddPaymentMethod="openDrawerPaymentMethod"
-          @clickLink="redirectLink"
+          @clickLink="slotProp.redirectLink"
         />
       </template>
     </component>
@@ -59,11 +60,25 @@
   })
 
   const componentRef = ref(null)
+  const notificationPaymentRef = ref(null)
   const drawerAddCreditRef = ref(null)
   const drawerPaymentMethodRef = ref(null)
 
   const cardDefault = ref({
     loader: false
+  })
+
+  const propsNotification = ({ buttonCredit = {}, linkText = {}, buttonPaymentMethod = {} }) => ({
+    buttonCredit: {
+      hidden: !cardDefault.value.cardData,
+      ...buttonCredit
+    },
+    linkText: {
+      ...linkText
+    },
+    buttonPaymentMethod: {
+      ...buttonPaymentMethod
+    }
   })
 
   const loadCardDefault = async () => {
@@ -88,11 +103,13 @@
 
   const successAddCredit = () => {
     componentRef.value?.callBackDrawer()
+    notificationPaymentRef.value?.reload()
   }
 
   const successAddPaymentMethod = () => {
     componentRef.value?.callBackDrawer()
     loadCardDefault()
+    notificationPaymentRef.value?.reload()
   }
 
   onMounted(() => {
