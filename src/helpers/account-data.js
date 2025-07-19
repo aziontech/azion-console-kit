@@ -25,7 +25,7 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.jobRole = accountJobRole.jobRole
   accountInfo.isDeveloperSupportPlan = true
 
-  if (accountInfo.client_id) {
+  if (!accountInfo.client_id) {
     const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
       clientId: accountInfo.client_id
     })

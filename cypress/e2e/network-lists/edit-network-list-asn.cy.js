@@ -42,7 +42,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     //Act
     cy.get(selectors.networkLists.asnTextarea).click()
-    cy.get(selectors.networkLists.asnTextarea).type('{enter}123{enter}')
+    cy.get(selectors.networkLists.asnTextarea).type('{enter}123')
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your Network List has been updated.')
