@@ -16,6 +16,7 @@
 
   const { value: name } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
+  useField('active')
 
   const editorOptions = {
     minimap: { enabled: false },
