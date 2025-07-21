@@ -1,4 +1,17 @@
 <template>
+  <DrawerAddCredit
+    ref="drawerAddCreditRef"
+    v-if="props.cardDefault.cardData"
+    :cardDefault="props.cardDefault"
+    :createService="paymentService.addCredit"
+    @onSuccess="successCredit"
+  />
+  <DrawerPaymentMethod
+    ref="drawerPaymentMethodRef"
+    :getStripeClientService="props.getStripeClientService"
+    @onSuccess="successPaymentMethod"
+  />
+
   <SkeletonBlock
     v-if="!showNotification && loadingNotification"
     class="w-full h-5rem"
@@ -24,6 +37,9 @@
   </MessageNotification>
 </template>
 <script setup>
+  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit.vue'
+  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod.vue'
+  import { paymentService } from '@/services/v2'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'
@@ -31,18 +47,37 @@
   import { billingGqlService } from '@/services/v2'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'notification-payment' })
 
-  const emit = defineEmits(['clickAddCredit', 'clickAddPaymentMethod', 'clickLink'])
+  const emit = defineEmits([
+    'clickAddCredit',
+    'clickAddPaymentMethod',
+    'clickLink',
+    'onSuccessCredit',
+    'onSuccessPaymentMethod'
+  ])
 
-  const { accountIsNotRegular, accountData } = useAccountStore()
-  const { status } = accountData
-
+  const toast = useToast()
   const showNotification = ref(false)
   const loadingNotification = ref(false)
+  const drawerAddCreditRef = ref(null)
+  const drawerPaymentMethodRef = ref(null)
   const labelLink = ref('payment methods.')
+
   const props = defineProps({
+    getStripeClientService: {
+      type: Function,
+      required: true
+    },
+    cardDefault: {
+      type: Object,
+      default: () => ({
+        cardData: null
+      })
+    },
     buttonCredit: {
       type: Object,
       default: () => ({
@@ -62,8 +97,22 @@
       })
     },
     loadCurrentInvoice: {
-      type: Function,
-      required: true
+      type: Function
+    },
+    loadPaymentMethodDefaultService: {
+      type: Function
+    },
+    loadInvoiceDataService: {
+      type: Function
+    },
+    listServiceAndProductsChangesService: {
+      type: Function
+    },
+    documentPaymentMethodService: {
+      type: Function
+    },
+    loadInvoiceLastUpdatedService: {
+      type: Function
     }
   })
 
@@ -77,14 +126,21 @@
     {
       label: 'Credit',
       icon: 'pi pi-plus',
-      onClick: () => emit('clickAddCredit'),
+      onClick: () => {
+        openDrawerCredit()
+        emit('clickAddCredit')
+      },
+      hidden: !props.cardDefault.cardData,
       outlined: true,
       ...props.buttonCredit
     },
     {
       label: 'Payment Method',
       icon: 'pi pi-plus',
-      onClick: () => emit('clickAddPaymentMethod'),
+      onClick: () => {
+        openDrawerPaymentMethod()
+        emit('clickAddPaymentMethod')
+      },
       severity: 'secondary',
       ...props.buttonPaymentMethod
     }
@@ -122,12 +178,14 @@
     }
   }
 
-  const loadText = async () => {
+  const loadText = async ({ accountIsNotRegular, accountData }) => {
+    const { status } = accountData
     loadingNotification.value = true
+    showNotification.value = false
+
     try {
       if (!accountIsNotRegular) {
         loadingNotification.value = false
-        showNotification.value = false
         return
       }
 
@@ -157,15 +215,52 @@
     }
   }
 
-  onMounted(() => {
-    loadText()
-  })
-
   const reload = async () => {
-    await loadText()
+    await updateAccountStatus()
+    const account = useAccountStore()
+    await loadText(account)
   }
 
+  const updateAccountStatus = async () => {
+    try {
+      await loadUserAndAccountInfo()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail:
+          'An error occurred while updating account status. Please refresh the page to see the latest changes.'
+      })
+    }
+  }
+
+  const successPaymentMethod = () => {
+    reload()
+    emit('onSuccessPaymentMethod')
+  }
+
+  const successCredit = () => {
+    reload()
+    emit('onSuccessCredit')
+  }
+
+  const openDrawerCredit = async () => {
+    drawerAddCreditRef.value?.openDrawer()
+  }
+
+  const openDrawerPaymentMethod = async () => {
+    drawerPaymentMethodRef.value?.openDrawer()
+  }
+
+  onMounted(() => {
+    const account = useAccountStore()
+    loadText(account)
+  })
+
   defineExpose({
-    reload
+    reload,
+    openDrawerCredit,
+    openDrawerPaymentMethod
   })
 </script>

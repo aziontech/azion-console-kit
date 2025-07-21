@@ -8,41 +8,28 @@ export const pageSchema = yup.object().shape({
   }),
   type: yup.string().required().label('Type'),
   connector: yup.number().when('type', {
-    is: 'PageConnector',
+    is: 'page_connector',
     then: (schema) => schema.required().label('Connector'),
     otherwise: (schema) => schema.nullable()
   }),
-  ttl: yup.number().when('type', {
-    is: 'PageConnector',
-    then: (schema) => schema.required().min(0).max(31536000).label('TTL'),
-    otherwise: (schema) => schema.nullable()
-  }),
-  uri: yup.string().when('type', {
-    is: 'PageConnector',
-    then: (schema) =>
-      schema
-        .required()
-        .transform((value) => (value === '' ? null : value))
-        .matches(isUriValidRegex, 'Invalid URI')
-        .default(null)
-        .label('URI'),
-    otherwise: (schema) => schema.nullable()
-  }),
+  ttl: yup.number().default(0).min(0).max(31536000).label('TTL'),
+  uri: yup
+    .string()
+    .transform((value) => (value === '' ? null : value))
+    .matches(isUriValidRegex, 'Invalid URI')
+    .nullable()
+    .label('URI'),
   contentType: yup.string().when('type', {
-    is: 'PageDefault',
+    is: 'page_default',
     then: (schema) => schema.default('text/html').label('Content Type'),
     otherwise: (schema) => schema.nullable()
   }),
   response: yup.string().when('type', {
-    is: 'PageDefault',
+    is: 'page_default',
     then: (schema) => schema.required().label('Response'),
     otherwise: (schema) => schema.nullable()
   }),
-  customStatusCode: yup.number().when('type', {
-    is: 'PageConnector',
-    then: (schema) => schema.required().min(100).max(599).default(null).label('Custom Status Code'),
-    otherwise: (schema) => schema.nullable()
-  })
+  customStatusCode: yup.number().min(100).max(599).nullable().label('Custom Status Code')
 })
 
 export const validationSchema = yup.object({

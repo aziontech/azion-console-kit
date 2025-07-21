@@ -1,5 +1,5 @@
 const defaultValue = {
-  type: 'PageDefault',
+  type: 'page_default',
   customStatusCode: null,
   uri: null,
   connector: null,
@@ -233,10 +233,12 @@ footer {
 
 export const STATUS_CODE_OPTIONS = [
   {
+    id: 0,
     code: { value: 'default', origin: 'Azion' },
     ...defaultValue
   },
   {
+    id: 404,
     code: { value: '404', origin: 'Azion' },
     ...defaultValue
   }

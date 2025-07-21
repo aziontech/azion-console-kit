@@ -6,13 +6,13 @@ const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null :
 
 const getPage = (page) => {
   const typeAttributes = {
-    PageConnector: {
+    page_connector: {
       connector: nullable(page.connector),
       ttl: nullable(page.ttl),
       uri: nullable(page.uri),
       custom_status_code: nullable(page.customStatusCode)
     },
-    PageDefault: {
+    page_default: {
       content_type: nullable(page.contentType),
       response: nullable(page.response)
     }
@@ -41,8 +41,7 @@ export const CustomPageAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
   transformPayloadCreateCustomPage(payload) {
-    const pages = payload.pages.filter((page) => page.type !== 'PageDefault')
-    const hasCodeDefault = pages.find((page) => page.code.value?.toLowerCase() === 'default')
+    const pages = payload.pages.filter((page) => page.type !== 'page_default')
 
     return {
       name: payload.name,
@@ -53,18 +52,7 @@ export const CustomPageAdapter = {
             code: page.code.value?.toLowerCase(),
             page: getPage(page)
           }
-        }),
-        // REMOVE THIS AS SOON AS THE API STARTS WORKING PROPERLY
-        ...(!hasCodeDefault
-          ? [
-              {
-                code: 'default',
-                page: {
-                  type: 'PageDefault'
-                }
-              }
-            ]
-          : [])
+        })
       ]
     }
   },
@@ -77,6 +65,7 @@ export const CustomPageAdapter = {
       active: data.active,
       product_version: data.product_version,
       pages: data.pages.map((item) => ({
+        id: item.code === 'default' ? 0 : item.code,
         code: { value: nullable(item.code) },
         type: nullable(item.page.type),
         customStatusCode: nullable(item.page.attributes.custom_status_code),
@@ -87,9 +76,6 @@ export const CustomPageAdapter = {
         response: nullable(item.page.attributes.response)
       }))
     }
-
-    // REMOVE THIS AS SOON AS THE API STARTS WORKING PROPERLY
-    response.pages = response.pages.filter((page) => page.type !== 'PageDefault')
 
     return response
   }
