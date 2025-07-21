@@ -92,6 +92,7 @@
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
   const visibleOnSaved = ref(false)
+  const edgeDNSName = ref('')
 
   const defaultTabs = {
     mainSettings: 0,
@@ -368,12 +369,18 @@
       })
       .track()
   }
+
+  const loadEdgeDNS = async (id) => {
+    const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
+    edgeDNSName.value = edgeDNS.name
+    return edgeDNS
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Zone" />
+      <PageHeadingBlock :pageTitle="edgeDNSName" />
     </template>
     <template #content>
       <TabView
@@ -391,7 +398,7 @@
         >
           <EditFormBlock
             :editService="edgeDNSService.editEdgeDNSService"
-            :loadService="edgeDNSService.loadEdgeDNSService"
+            :loadService="loadEdgeDNS"
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"

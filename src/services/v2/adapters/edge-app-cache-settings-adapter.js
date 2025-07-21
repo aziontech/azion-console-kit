@@ -8,8 +8,6 @@ const formatCacheBehavior = (value) => CACHE_BEHAVIOR_LABELS[value] || value
 
 const parseContentToTextArea = (arr) => arr?.join('\n') ?? ''
 const parseTextToArray = (text) => text?.split('\n') ?? []
-const parseDeviceGroups = (ids) => ids?.map((id) => ({ id })) ?? []
-const parseDeviceGroup = (group) => group?.map(({ id }) => id) ?? []
 
 export const CacheSettingsAdapter = {
   requestPayload(payload) {
@@ -83,7 +81,7 @@ export const CacheSettingsAdapter = {
       if (payload.adaptiveDeliveryAction && payload.adaptiveDeliveryAction !== 'ignore') {
         appAccelerator.cache_vary_by_devices = {
           behavior: payload.adaptiveDeliveryAction,
-          device_group: parseDeviceGroup(payload.deviceGroup) || []
+          device_group: payload.deviceGroup || []
         }
       }
 
@@ -129,7 +127,6 @@ export const CacheSettingsAdapter = {
     // Extract cache vary by devices settings
     const cacheVaryByDevices = appAccelerator.cache_vary_by_devices || {}
     const adaptiveDeliveryAction = cacheVaryByDevices.behavior || 'ignore'
-    const deviceGroup = parseDeviceGroups(cacheVaryByDevices.device_group || [])
 
     return {
       id: data.id,
@@ -151,7 +148,7 @@ export const CacheSettingsAdapter = {
       cacheByCookies,
       cookieNames,
       adaptiveDeliveryAction,
-      deviceGroup
+      deviceGroup: cacheVaryByDevices.device_group || []
     }
   }
 }

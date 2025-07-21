@@ -12,8 +12,6 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { cacheSettingsService } from '@/services/v2'
 
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
@@ -614,138 +612,127 @@
   >
     <template #inputs>
       <div
-        class="flex flex-col gap-8"
+        class="flex flex-col"
         v-for="(_, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
-          <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
-            <template #header>
-              <div class="ml-auto flex justify-center items-center">
-                <PrimeButton
-                  :disabled="criteriaIndex === 0"
-                  icon="pi pi-trash"
-                  size="small"
-                  outlined
-                  @click="removeCriteriaDecorator(criteriaIndex)"
-                  :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
-                />
-              </div>
-            </template>
-            <div
-              v-for="(item, conditionalIndex) in criteria[criteriaIndex].value"
-              :key="conditionalIndex"
-              data-testid="rule-form-criteria-item-conditional"
-            >
-              <div class="flex items-center gap-2">
-                <Divider
-                  align="left"
-                  type="dashed"
-                  class="capitalize z-0"
-                  data-testid="rule-form-criteria-item-conditional-divider"
-                >
-                  {{ item.conditional }}
-                </Divider>
-
-                <PrimeButton
-                  v-if="conditionalIndex !== 0"
-                  icon="pi pi-trash"
-                  size="small"
-                  outlined
-                  @click="removeConditional(criteriaIndex, conditionalIndex)"
-                  data-testid="rule-form-criteria-item-conditional-remove-button"
-                />
-              </div>
-
-              <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-6 mb-8 w-full">
-                <div class="flex flex-col w-full">
-                  <FieldAutoComplete
-                    :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
-                    :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].variable"
-                    :suggestions="variableItems"
-                    :onComplete="searchVariableOption"
-                    icon="pi pi-search"
-                    :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
-                    completeOnFocus
-                  />
-                </div>
-                <div class="flex flex-col w-full sm:max-w-[160px]">
-                  <FieldDropdown
-                    :options="CRITERIA_OPERATOR_OPTIONS"
-                    optionLabel="label"
-                    optionValue="value"
-                    class="h-fit w-full"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].operator"
-                    :disabled="isDefaultPhase"
-                    :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
-                  />
-                </div>
-                <div class="flex flex-col w-full">
-                  <FieldText
-                    :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
-                    v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].argument"
-                    :disabled="isDefaultPhase"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="flex gap-2 w-full"
-              v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
-              data-testid="rule-form-criteria-item-conditional-add-button"
-            >
-              <PrimeButton
-                class="w-full"
-                icon="pi pi-plus-circle"
-                label="And"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-                outlined
-                @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
-              />
-              <PrimeButton
-                class="w-full"
-                icon="pi pi-plus-circle"
-                label="Or"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-                outlined
-                @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
-              />
-            </div>
-          </AccordionTab>
-        </Accordion>
-        <Divider
-          v-if="isNotLastCriteria(criteriaIndex)"
-          align="center"
-          type="dashed"
-          class="capitalize z-0"
+        <div
+          v-for="(item, conditionalIndex) in criteria[criteriaIndex].value"
+          :key="conditionalIndex"
+          data-testid="rule-form-criteria-item-conditional"
         >
-          and
-        </Divider>
+          <div class="flex items-center gap-2">
+            <Divider
+              align="left"
+              type="dashed"
+              class="capitalize z-0"
+              data-testid="rule-form-criteria-item-conditional-divider"
+            >
+              {{ item.conditional }}
+            </Divider>
+
+            <PrimeButton
+              v-if="conditionalIndex !== 0"
+              icon="pi pi-trash"
+              size="small"
+              outlined
+              @click="removeConditional(criteriaIndex, conditionalIndex)"
+              data-testid="rule-form-criteria-item-conditional-remove-button"
+            />
+          </div>
+
+          <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-6 mb-8 w-full">
+            <div class="flex flex-col w-full">
+              <FieldAutoComplete
+                :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
+                :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].variable"
+                :suggestions="variableItems"
+                :onComplete="searchVariableOption"
+                icon="pi pi-search"
+                :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
+                completeOnFocus
+              />
+            </div>
+            <div class="flex flex-col w-full sm:max-w-[160px]">
+              <FieldDropdown
+                :options="CRITERIA_OPERATOR_OPTIONS"
+                optionLabel="label"
+                optionValue="value"
+                class="h-fit w-full"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].operator"
+                :disabled="isDefaultPhase"
+                :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
+              />
+            </div>
+            <div class="flex flex-col w-full">
+              <FieldText
+                :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
+                v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].argument"
+                :disabled="isDefaultPhase"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex gap-2 mb-8"
+          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
+          data-testid="rule-form-criteria-item-conditional-add-button"
+        >
+          <PrimeButton
+            icon="pi pi-plus-circle"
+            label="And"
+            size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            outlined
+            @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
+          />
+          <PrimeButton
+            icon="pi pi-plus-circle"
+            label="Or"
+            size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            outlined
+            @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Divider
+            v-if="isNotLastCriteria(criteriaIndex)"
+            align="left"
+            type="dashed"
+            class="capitalize z-0"
+          >
+            and
+          </Divider>
+          <Divider
+            v-else
+            align="left"
+            type="solid"
+          />
+          <PrimeButton
+            v-if="criteriaIndex !== criteria.length - 1"
+            icon="pi pi-trash"
+            size="small"
+            outlined
+            @click="removeCriteriaDecorator(criteriaIndex)"
+            :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
+          />
+        </div>
       </div>
+
       <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
-          :pt="{
-            root: { class: 'justify-center' },
-            label: { class: 'grow-0' }
-          }"
           icon="pi pi-plus-circle"
           label="Add Criteria"
+          size="small"
           outlined
-          class="w-full"
           :disabled="maximumCriteriaReached"
           @click="addNewCriteria"
           data-testid="rule-form-criteria-add-button"
