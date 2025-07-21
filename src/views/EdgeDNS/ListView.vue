@@ -19,7 +19,7 @@
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
-        :listService="listEdgeDNSServiceDecorator"
+        :listService="edgeDNSService.listEdgeDNSService"
         :columns="getColumns"
         :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -28,7 +28,7 @@
         emptyListMessage="No zone found."
         data-testid="edge-dns-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
@@ -96,10 +96,7 @@
     })
   }
 
-  const listEdgeDNSServiceDecorator = async (query) => {
-    const params = { ...query, ordering: '-last_modified' }
-    return await edgeDNSService.listEdgeDNSService(params)
-  }
+
 
   const getColumns = computed(() => {
     return [
