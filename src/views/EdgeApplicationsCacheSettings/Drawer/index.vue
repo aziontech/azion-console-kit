@@ -63,7 +63,7 @@
     browserCacheSettingsMaximumTtl: 0,
     cdnCacheSettings: 'honor',
     cdnCacheSettingsMaximumTtl: 60,
-    sliceConfigurationEnabled: false,
+    enableLargeFileCache: false,
     sliceConfigurationRange: MAX_SLICE_RANGE_IN_KBYTES,
     cacheByQueryString: 'ignore',
     queryStringFields: '',
@@ -78,7 +78,8 @@
     tieredCache: false,
     tieredCacheRegion: 'near-edge',
     isSliceTieredCache: false,
-    isSliceEdgeCachingEnabled: false
+    isSliceEdgeCachingEnabled: false,
+    largeFileCacheOffset: 1024
   })
 
   const minimumAcceptableValue = computed(() =>
@@ -135,15 +136,15 @@
       .min(minimumAcceptableValue.value)
       .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
       .required(),
-    sliceConfigurationEnabled: yup.boolean().required(),
-    sliceConfigurationRange: yup
+    enableLargeFileCache: yup.boolean().required(),
+    largeFileCacheOffset: yup
       .number()
       .label('Large File Optimization Fragment Size')
       .transform((value) => (Number.isNaN(value) ? null : value))
-      .when('sliceConfigurationEnabled', {
-        is: false,
+      .when('enableLargeFileCache', {
+        is: (value) => value === false,
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.required().min(0).max(MAX_SLICE_RANGE_IN_KBYTES)
+        otherwise: (schema) => schema.required().min(MAX_SLICE_RANGE_IN_KBYTES)
       }),
     cacheByQueryString: yup.string().required().label('Cache by query string'),
     queryStringFields: yup
@@ -166,11 +167,11 @@
         then: (schema) => schema.required()
       }),
     adaptiveDeliveryAction: yup.string().label('Adaptive Delivery Action'),
-    deviceGroup: yup.array().of(
-      yup.object().shape({
-        id: yup.string().required().label('Device group id')
-      })
-    )
+    deviceGroup: yup.array().when('adaptiveDeliveryAction', {
+      is: (value) => value === 'allowlist',
+      then: (schema) => schema.min(1).required().label('Device Group'),
+      otherwise: (schema) => schema.notRequired().label('Device Group')
+    })
   })
 
   const closeCreateDrawer = () => {
