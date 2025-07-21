@@ -54,7 +54,7 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { useField } from 'vee-validate'
+  import { useField, useFieldArray } from 'vee-validate'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
   import InlineMessage from 'primevue/inlinemessage'
 
@@ -63,6 +63,12 @@
   const hasContentToList = computed(() => !!pagesValue.value)
 
   const { value: pagesValue, errorMessage, handleReset } = useField('pages')
+  const {
+    fields: pagesArray,
+    push: pushPages,
+    update: updatePages,
+    remove: removePages
+  } = useFieldArray('pages')
 
   const props = defineProps({
     isDrawer: {
@@ -76,6 +82,7 @@
   const disabledButtonAdd = computed(
     () => !!pagesValue.value?.length && pagesValue.value.length >= NUMBER_MAX_PAGES
   )
+
   const classesPt = {
     root: 'flex-col',
     description: 'max-w-md',
@@ -153,22 +160,22 @@
     handleReset()
     if (item.code.origin) return
 
-    const idx = pagesValue.value.findIndex(
-      (page) => page.code.value === item.code.value && !page.code.origin
+    const idx = pagesArray.value.findIndex(
+      ({ value: page }) => page.code.value === item.code.value && !page.code.origin
     )
     if (idx !== -1) {
-      pagesValue.value[idx] = { ...pagesValue.value[idx], ...item }
+      updatePages(idx, { ...item })
     } else {
-      pagesValue.value.push(item)
+      pushPages(item)
     }
 
     listStatusCodeRef.value.reload()
   }
 
   const deletePage = (idPage) => {
-    const idx = pagesValue.value.findIndex((page) => page.id === idPage)
+    const idx = pagesArray.value.findIndex(({ value: page }) => page.id === idPage)
     if (idx !== -1) {
-      pagesValue.value.splice(idx, 1)
+      removePages(idx)
     }
 
     listStatusCodeRef.value.reload()
@@ -202,11 +209,11 @@
 
   const openCreateStatusCodeDrawer = () => {
     drawerRef.value.openEditDrawer({
-      type: 'PageConnector',
+      type: 'page_connector',
       connector: null,
       customStatusCode: null,
       uri: null,
-      ttl: null,
+      ttl: 0,
       statusCode: null
     })
   }

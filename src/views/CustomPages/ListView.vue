@@ -72,14 +72,21 @@
         header: 'Last Editor'
       },
       {
-        field: 'lastModified',
+        field: 'lastModify',
         sortField: 'lastModified',
         header: 'Last Modified'
       }
     ]
   })
 
-  const CUSTOM_PAGES_API_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'active']
+  const CUSTOM_PAGES_API_FIELDS = [
+    'id',
+    'name',
+    'last_editor',
+    'last_modified',
+    'active',
+    'last_modify'
+  ]
 </script>
 
 <template>
@@ -106,7 +113,7 @@
         emptyListMessage="No Custom Pages found."
         data-testid="custom-pages-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

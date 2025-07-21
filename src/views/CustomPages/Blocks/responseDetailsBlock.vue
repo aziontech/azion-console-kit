@@ -29,7 +29,6 @@
           label="Page Path (URI)"
           placeholder="/path/error_page.html"
           name="uri"
-          required
           :value="uri"
         />
       </div>
@@ -39,7 +38,6 @@
       >
         <FieldNumber
           label="Response Custom Status Code"
-          required
           name="customStatusCode"
           :value="customStatusCode"
           :min="100"
@@ -52,7 +50,6 @@
       >
         <FieldNumber
           label="Response TTL"
-          required
           name="ttl"
           :value="ttl"
           :min="0"
@@ -109,7 +106,7 @@
   const { value: uri } = useField('uri')
 
   const isConnector = computed(() => {
-    return typeValue.value === 'PageConnector'
+    return typeValue.value === 'page_connector'
   })
 
   const props = defineProps({

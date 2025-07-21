@@ -54,11 +54,15 @@
     await submit()
   }
 
+  const idCode = (code) => {
+    return code.value === 'default' ? 0 : code.value
+  }
+
   const transformValuesByType = (values) => {
     switch (values.type) {
-      case 'PageDefault':
+      case 'page_default':
         return {
-          id: values.id,
+          id: idCode(values.code),
           code: values.code,
           type: values.type,
           contentType: values.contentType || 'text/html',
@@ -66,9 +70,9 @@
           customStatusCode: values.customStatusCode,
           ttl: 0
         }
-      case 'PageCustom':
+      case 'page_custom':
         return {
-          id: values.id,
+          id: idCode(values.code),
           code: values.code,
           type: values.type,
           contentType: values.contentType || 'text/html',
@@ -76,9 +80,9 @@
           ttl: 0,
           customStatusCode: values.customStatusCode
         }
-      case 'PageConnector':
+      case 'page_connector':
         return {
-          id: values.id,
+          id: idCode(values.code),
           code: values.code,
           type: values.type,
           connector: values.connector,

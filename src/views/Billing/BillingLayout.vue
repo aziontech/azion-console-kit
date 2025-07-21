@@ -12,34 +12,17 @@
       <template #notification="slotProp">
         <NotificationPayment
           ref="notificationPaymentRef"
-          :loadCurrentInvoice="props.loadCurrentInvoiceService"
           v-bind="propsNotification(slotProp)"
-          @clickAddCredit="openDrawerCredit"
-          @clickAddPaymentMethod="openDrawerPaymentMethod"
           @clickLink="slotProp.redirectLink"
+          @onSuccessCredit="successDrawer"
+          @onSuccessPaymentMethod="successDrawer"
         />
       </template>
     </component>
   </router-view>
-
-  <DrawerAddCredit
-    ref="drawerAddCreditRef"
-    v-if="cardDefault.cardData"
-    :cardDefault="cardDefault"
-    :createService="paymentService.addCredit"
-    @onSuccess="successAddCredit"
-  />
-  <DrawerPaymentMethod
-    ref="drawerPaymentMethodRef"
-    :getStripeClientService="props.getStripeClientService"
-    @onSuccess="successAddPaymentMethod"
-  />
 </template>
 
 <script setup>
-  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit.vue'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod.vue'
-  import { paymentService } from '@/services/v2'
   import { ref, onMounted } from 'vue'
   import NotificationPayment from '@/views/Billing/components/notification-payment'
 
@@ -61,16 +44,16 @@
 
   const componentRef = ref(null)
   const notificationPaymentRef = ref(null)
-  const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
 
   const cardDefault = ref({
     loader: false
   })
 
   const propsNotification = ({ buttonCredit = {}, linkText = {}, buttonPaymentMethod = {} }) => ({
+    loadCurrentInvoice: props.loadCurrentInvoiceService,
+    getStripeClientService: props.getStripeClientService,
+    cardDefault: cardDefault.value,
     buttonCredit: {
-      hidden: !cardDefault.value.cardData,
       ...buttonCredit
     },
     linkText: {
@@ -93,23 +76,17 @@
     }
   }
 
-  const openDrawerCredit = () => {
-    drawerAddCreditRef.value?.openDrawer()
+  const successDrawer = async () => {
+    componentRef.value?.callBackDrawer()
+    loadCardDefault()
+  }
+
+  const openDrawerCredit = async () => {
+    notificationPaymentRef.value?.openDrawerCredit()
   }
 
   const openDrawerPaymentMethod = () => {
-    drawerPaymentMethodRef.value?.openDrawer()
-  }
-
-  const successAddCredit = () => {
-    componentRef.value?.callBackDrawer()
-    notificationPaymentRef.value?.reload()
-  }
-
-  const successAddPaymentMethod = () => {
-    componentRef.value?.callBackDrawer()
-    loadCardDefault()
-    notificationPaymentRef.value?.reload()
+    notificationPaymentRef.value?.openDrawerPaymentMethod()
   }
 
   onMounted(() => {

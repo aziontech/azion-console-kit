@@ -499,10 +499,16 @@
 
   const updateRowPositions = (phase) => {
     data.value.forEach((row, index) => {
-      if (row.position.phase.toLowerCase() === phase.toLowerCase()) {
+      if (!props.isEdgeApplicationRulesEngine) {
         row.position.value = index
         row.position.altered =
           row.position.altered && row.position.immutableValue !== row.position.value
+      } else {
+        if (row.position.phase.toLowerCase() === phase.toLowerCase()) {
+          row.position.value = index
+          row.position.altered =
+            row.position.altered && row.position.immutableValue !== row.position.value
+        }
       }
     })
   }
@@ -550,10 +556,10 @@
     const secondRule = rulesInCurrentPhase[newPosition]
 
     firstRule.position.value = targetPosition
-    firstRule.position.altered = true
+    firstRule.position.altered = targetPosition !== firstRule.position.immutableValue
 
     secondRule.position.value = originalIndex
-    secondRule.position.altered = true
+    secondRule.position.altered = originalIndex !== secondRule.position.immutableValue
 
     const temp = rulesInCurrentPhase[originalIndex]
     rulesInCurrentPhase[originalIndex] = secondRule

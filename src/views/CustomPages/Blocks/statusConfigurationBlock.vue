@@ -40,8 +40,8 @@
   import { computed } from 'vue'
 
   const listTypes = [
-    { label: 'Page Default', value: 'PageDefault' },
-    { label: 'Page Connector', value: 'PageConnector' }
+    { label: 'Page Default', value: 'page_default' },
+    { label: 'Page Connector', value: 'page_connector' }
   ]
 
   const props = defineProps({
