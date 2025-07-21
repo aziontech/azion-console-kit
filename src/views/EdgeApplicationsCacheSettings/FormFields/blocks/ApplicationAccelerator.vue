@@ -200,6 +200,7 @@
                 :service="listDeviceGroupsWithDecorator"
                 :optionLabel="'name'"
                 :optionValue="'id'"
+                :value="deviceGroup"
                 placeholder="Select Device Groups"
                 description="Select a device group to customize cache behavior for specific categories."
                 data-testid="edge-application-cache-settings-form__device-groups-multiselect"

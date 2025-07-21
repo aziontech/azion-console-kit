@@ -50,8 +50,8 @@
       />
 
       <FieldSwitchBlock
-        nameField="sliceConfigurationEnabled"
-        name="sliceConfigurationEnabled"
+        nameField="enableLargeFileCache"
+        name="enableLargeFileCache"
         auto
         :isCard="false"
         title="Large file optimization"
@@ -64,18 +64,19 @@
         class="flex flex-col sm:max-w-xs w-full gap-2 pl-14"
       >
         <label
-          for="sliceConfigurationRange"
+          for="largeFileCacheOffset"
           class="text-color text-sm font-medium"
           >Offset (KB)</label
         >
         <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
           <InputNumber
             class="w-full"
-            name="sliceConfigurationRange"
+            name="largeFileCacheOffset"
             :min="0"
             :max="1024"
-            v-model="sliceConfigurationRange"
-            id="sliceConfigurationRange"
+            disabled
+            v-model="largeFileCacheOffset"
+            id="largeFileCacheOffset"
             placeholder="1024 Kbps"
             type="number"
             data-testid="edge-application-cache-settings-form__slice-configuration-range-field__input"
@@ -83,14 +84,13 @@
         </span>
 
         <small class="text-color-secondary text-xs font-normal leading-5">
-          Specify the fragment size (in KB) of each slice when optimizing large files. Valid range:
-          1-1024.
+          Specifies the fragment size (in KB) for large file optimization. Fixed at 1024 KB.
         </small>
         <small
-          v-if="sliceConfigurationRangeError"
+          v-if="largeFileCacheOffsetError"
           class="p-error text-xs font-normal leading-tight"
         >
-          {{ sliceConfigurationRangeError }}
+          {{ largeFileCacheOffsetError }}
         </small>
       </div>
     </template>
@@ -138,22 +138,22 @@
 
   const { value: cdnCacheSettingsMaximumTtl, errorMessage: cdnCacheSettingsMaximumTtlError } =
     useField('cdnCacheSettingsMaximumTtl')
-  const { value: sliceConfigurationRange, errorMessage: sliceConfigurationRangeError } =
-    useField('sliceConfigurationRange')
-  const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
+  const { value: largeFileCacheOffset, errorMessage: largeFileCacheOffsetError } =
+    useField('largeFileCacheOffset')
+  const { value: enableLargeFileCache } = useField('enableLargeFileCache')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
 
   const showSliceConfigurationRange = computed(() => {
-    return !!sliceConfigurationEnabled.value
+    return !!enableLargeFileCache.value
   })
 
-  watch(sliceConfigurationEnabled, (value) => {
+  watch(enableLargeFileCache, (value) => {
     cdnCacheSettings.value = value ? 'override' : 'honor'
     emit('enableSliceConfiguration', value)
   })
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    if (sliceConfigurationEnabled.value || props.isApplicationAcceleratorEnabled) {
+    if (enableLargeFileCache.value || props.isApplicationAcceleratorEnabled) {
       return CDN_MAXIMUM_TTL_MIN_VALUE
     }
     return CDN_MAXIMUM_TTL_MAX_VALUE
