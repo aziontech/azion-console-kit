@@ -198,6 +198,7 @@
                 label="Device Group"
                 required
                 :service="listDeviceGroupsWithDecorator"
+                :loadService="deviceGroupService.loadDeviceGroupService"
                 :optionLabel="'name'"
                 :optionValue="'id'"
                 :value="deviceGroup"
