@@ -128,7 +128,7 @@ export const CacheSettingsAdapter = {
     const cacheVaryByDevices = appAccelerator.cache_vary_by_devices || {}
     const adaptiveDeliveryAction = cacheVaryByDevices.behavior || 'ignore'
 
-    const result = {
+    return {
       id: data.id,
       name: data.name,
       browserCacheSettings: browserCache.behavior || 'honor',
@@ -150,7 +150,5 @@ export const CacheSettingsAdapter = {
       adaptiveDeliveryAction,
       deviceGroup: cacheVaryByDevices.device_group || []
     }
-
-    return result
   }
 }
