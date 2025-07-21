@@ -19,7 +19,7 @@
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
-        :listService="edgeDNSService.listEdgeDNSService"
+        :listService="listEdgeDNSServiceDecorator"
         :columns="getColumns"
         :apiFields="EDGE_DNS_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -69,7 +69,7 @@
     }
   })
 
-  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active']
+  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active', 'last_modified']
   const hasContentToList = ref(true)
   const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
   const actions = [
@@ -94,6 +94,11 @@
     tracker.product.clickToEdit({
       productName: 'Edge DNS Zone'
     })
+  }
+
+  const listEdgeDNSServiceDecorator = async (query) => {
+    const params = { ...query, ordering: '-last_modified' }
+    return await edgeDNSService.listEdgeDNSService(params)
   }
 
   const getColumns = computed(() => {
