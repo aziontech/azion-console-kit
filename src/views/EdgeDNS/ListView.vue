@@ -28,7 +28,7 @@
         emptyListMessage="No zone found."
         data-testid="edge-dns-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
@@ -69,7 +69,7 @@
     }
   })
 
-  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active']
+  const EDGE_DNS_API_FIELDS = ['id', 'name', 'domain', 'active', 'last_modified']
   const hasContentToList = ref(true)
   const nameServers = ref('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
   const actions = [
