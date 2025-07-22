@@ -88,26 +88,21 @@
             >Custom Headers</label
           >
           <div
-            class="flex p-inputgroup"
             v-for="(header, index) in headers"
             :key="index"
+            class="flex flex-col sm:max-w-lg w-full gap-2"
           >
-            <InputText
+            <FieldTextIcon
               :disabled="hasNoPermissionToEditDataStream"
-              v-model="header.value"
-              type="text"
-              id="header-value"
+              :value="header.value"
+              required
+              label="Header"
+              :showIcon="!!index"
+              @click-icon="removeHeader(index)"
+              :name="`headers[${index}].value`"
               placeholder="header-name:value"
               data-testid="data-stream-form__destination__headers-field__input"
-            />
-            <ButtonPrimer
-              :disabled="hasNoPermissionToEditDataStream"
               icon="pi pi-trash"
-              size="small"
-              outlined
-              v-if="header.deleted"
-              @click="removeHeader(index)"
-              data-testid="data-stream-form__destination__headers-field__remove-button"
             />
           </div>
 
@@ -827,9 +822,9 @@
   import { useAccountStore } from '@/stores/account'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon.vue'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea.vue'
   import ButtonPrimer from 'primevue/button'
-  import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'

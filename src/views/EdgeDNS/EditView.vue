@@ -135,10 +135,7 @@
         is: 'weighted',
         then: (schema) => schema.min(0).max(255).required()
       }),
-    description: yup.string().when('selectedPolicy', {
-      is: 'weighted',
-      then: (schema) => schema.required().label('Description')
-    }),
+    description: yup.string().required().label('Description'),
     edgeDNSID: yup.number()
   })
 

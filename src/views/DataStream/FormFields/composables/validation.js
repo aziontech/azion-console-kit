@@ -25,19 +25,22 @@ const validationSchema = yup.object({
     then: (schema) =>
       schema.required('Endpoint URL is a required field').url('Please enter a valid URL')
   }),
-  headers: yup.array().of(
-    yup.object().shape({
-      value: yup.string().when('endpoint', {
-        is: 'standard',
-        then: (schema) =>
-          schema
-            .required('Header value is required')
-            .test('header-format', 'Header must be in format "header-name:value"', (value) => {
-              return value && value.includes(':')
-            })
-      })
-    })
-  ),
+  headers: yup.array().when('endpoint', {
+    is: (value) => value === 'standard',
+    then: (arraySchema) =>
+      arraySchema.required('Headers are required when endpoint is standard.').of(
+        yup.object().shape({
+          value: yup
+            .string()
+            .required('Header item value is required.')
+            .matches(
+              /^([^:]+):(.+)$/,
+              'Header item must be in "Key:Value" format, where both key and value are not empty.'
+            )
+        })
+      ),
+    otherwise: (arraySchema) => arraySchema.notRequired().nullable().default([])
+  }),
   lineSeparator: yup.string().when('endpoint', {
     is: 'standard',
     then: (schema) => schema.required('Log Line Separator is a required field')

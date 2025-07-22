@@ -18,6 +18,7 @@
         @on-before-go-to-add-page="handleTrackEventGoToCreate"
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
+        :defaultOrderingFieldName="'-last_modified'"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">

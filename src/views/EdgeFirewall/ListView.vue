@@ -117,6 +117,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

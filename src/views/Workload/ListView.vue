@@ -17,7 +17,7 @@
         :emptyListMessage="`No ${handleTextDomainWorkload.singularLabel} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
         :hiddenByDefault="columnsHiddenByDefault"
       />
       <EmptyResultsBlock

@@ -317,8 +317,8 @@
 
   const behaviorsByType = computed(() => {
     return {
-      queryString: [behaviors.allowlist, behaviors.denylist, behaviors.ignore],
-      cookies: [behaviors.allowlist, behaviors.denylist, behaviors.ignore],
+      queryString: [behaviors.allowlist, behaviors.denylist, behaviors.ignore, behaviors.all],
+      cookies: [behaviors.allowlist, behaviors.denylist, behaviors.ignore, behaviors.all],
       devices: [behaviors.allowlist, behaviors.ignore]
     }
   })

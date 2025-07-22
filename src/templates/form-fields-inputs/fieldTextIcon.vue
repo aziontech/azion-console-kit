@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
   import LabelBlock from '@/templates/label-block'
-
+  const emit = defineEmits(['click-icon'])
   const props = defineProps({
     value: {
       type: String,
@@ -44,6 +44,10 @@
     required: {
       type: Boolean,
       default: false
+    },
+    showIcon: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -61,6 +65,10 @@
   const iconPositionClass = computed(() => {
     return props.icon ? `p-input-icon-${props.iconPosition}` : ''
   })
+
+  const handleClick = () => {
+    emit('click-icon')
+  }
 </script>
 
 <template>
@@ -74,9 +82,10 @@
     :class="iconPositionClass"
   >
     <i
-      v-if="props.icon"
+      v-if="props.showIcon && props.icon"
       :class="props.icon"
-      class="text-color-secondary"
+      class="text-color-secondary cursor-pointer"
+      @click="handleClick"
     />
     <InputText
       :id="props.name"

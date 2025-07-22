@@ -36,7 +36,7 @@
             emptyListMessage="No streams found."
             :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
-            :defaultOrderingFieldName="'name'"
+            :defaultOrderingFieldName="'-last_modified'"
           ></FetchListTableBlock>
           <EmptyResultsBlock
             v-else
