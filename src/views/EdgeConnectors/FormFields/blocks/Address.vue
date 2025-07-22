@@ -29,13 +29,13 @@
                   </div>
                   <div class="flex gap-2">
                     <div class="flex gap-1">
-                      <p class="text-sm font-normal text-color-secondary">Http Port:</p>
+                      <p class="text-sm font-normal text-color-secondary">HTTP Port:</p>
                       <p class="text-sm font-medium text-color">
                         {{ addresses[addressIndex].value.httpPort }}
                       </p>
                     </div>
                     <div class="flex gap-1">
-                      <p class="text-sm font-normal text-color-secondary">Https Port:</p>
+                      <p class="text-sm font-normal text-color-secondary">HTTPS Port:</p>
                       <p class="text-sm font-medium text-color">
                         {{ addresses[addressIndex].value.httpsPort }}
                       </p>
@@ -82,7 +82,7 @@
               <div class="flex sm:flex-row flex-col gap-5">
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
-                    label="Http Port"
+                    label="HTTP Port"
                     :name="`addresses[${addressIndex}].httpPort`"
                     :value="addresses[addressIndex].value.httpPort"
                     :min="0"
@@ -93,7 +93,7 @@
 
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
-                    label="Https Port"
+                    label="HTTPS Port"
                     :name="`addresses[${addressIndex}].httpsPort`"
                     :value="addresses[addressIndex].value.httpsPort"
                     :min="0"
@@ -170,7 +170,7 @@
             <div class="flex sm:flex-row flex-col gap-5">
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
-                  label="Http Port"
+                  label="HTTP Port"
                   :name="`addresses[${0}]?.httpPort`"
                   :value="addresses[0]?.value.httpPort"
                   :min="0"
@@ -181,7 +181,7 @@
 
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
-                  label="Https Port"
+                  label="HTTPS Port"
                   :name="`addresses[${0}]?.httpsPort`"
                   :value="addresses[0]?.value.httpsPort"
                   :min="0"

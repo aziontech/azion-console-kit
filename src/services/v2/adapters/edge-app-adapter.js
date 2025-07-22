@@ -56,7 +56,7 @@ export const EdgeAppAdapter = {
     }
   },
 
-  transformPayloadEdit(payload) {
+  transformPayload(payload) {
     return {
       name: payload.name,
       modules: {

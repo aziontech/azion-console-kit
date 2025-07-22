@@ -58,7 +58,13 @@
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false,
+    isActive: true
   })
 
   const handleBlocks = ['general']
