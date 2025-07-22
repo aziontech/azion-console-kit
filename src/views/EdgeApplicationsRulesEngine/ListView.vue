@@ -292,6 +292,12 @@
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
+              outlined
+              label="Discard Changes"
+              @click="reload"
+              data-testid="review-changes-dialog-footer-cancel-button"
+            />
+            <PrimeButton
               label="Review Changes"
               class="bg-surface"
               :badgeClass="badgeClass"
