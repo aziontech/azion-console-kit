@@ -259,10 +259,7 @@
         </div>
       </div>
 
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="isWeightedPolicy"
-      >
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"
           required

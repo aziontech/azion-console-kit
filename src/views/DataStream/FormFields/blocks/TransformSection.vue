@@ -28,7 +28,7 @@
         <FieldPickList
           :dataPick="domains"
           :service="dataStreamService.listWorkloadsService"
-          title="Domains"
+          :title="handleTextDomainWorkload.singularTitle"
           dataKey="id"
         />
 

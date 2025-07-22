@@ -149,7 +149,7 @@
         emptyListMessage="No edge applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

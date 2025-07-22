@@ -20,6 +20,7 @@
         editPagePath="/edge-connectors/edit"
         data-testid="edge-connectors-list-table-block"
         :apiFields="EDGE_CONNECTORS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
