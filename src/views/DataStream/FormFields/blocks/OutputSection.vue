@@ -104,15 +104,6 @@
               data-testid="data-stream-form__destination__headers-field__input"
               icon="pi pi-trash"
             />
-            <!-- <ButtonPrimer
-              :disabled="hasNoPermissionToEditDataStream"
-              icon="pi pi-trash"
-              size="small"
-              outlined
-              v-if="header.deleted"
-              @click="removeHeader(index)"
-              data-testid="data-stream-form__destination__headers-field__remove-button"
-            /> -->
           </div>
 
           <ButtonPrimer
