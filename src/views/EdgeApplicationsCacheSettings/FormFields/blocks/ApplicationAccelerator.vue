@@ -319,7 +319,7 @@
     return {
       queryString: [behaviors.allowlist, behaviors.denylist, behaviors.ignore, behaviors.all],
       cookies: [behaviors.allowlist, behaviors.denylist, behaviors.ignore, behaviors.all],
-      devices: [behaviors.allowlist, behaviors.ignore, behaviors.all]
+      devices: [behaviors.allowlist, behaviors.ignore]
     }
   })
 

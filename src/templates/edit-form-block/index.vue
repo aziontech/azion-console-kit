@@ -53,8 +53,7 @@
   const blockViewRedirection = ref(true)
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
-    validationSchema: props.schema,
-    validateOnValueUpdate: true
+    validationSchema: props.schema
   })
 
   let formHasUpdated, visibleOnSaved
