@@ -19,18 +19,15 @@
             data-testid="edge-connectors-form__connection-options__host-field"
           />
         </div>
-
         <div class="flex flex-col sm:max-w-sm w-full gap-2">
-          <FieldInputGroup
+          <FieldText
             label="Path"
             description="Specify the path to the resource on the origin server (e.g., '/api/v1/resource'). Use '/' for the root path."
             name="connectionOptions.path"
             :value="path"
-            placeholder="api/v1/resource"
+            placeholder="/api/v1/resource"
             data-testid="edge-connectors-form__connection-options__path-field"
-          >
-            <template #icon> / </template>
-          </FieldInputGroup>
+          />
         </div>
 
         <div class="flex sm:flex-row flex-col w-full gap-8">
@@ -171,7 +168,6 @@
   import { edgeStorageService } from '@/services/v2'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'

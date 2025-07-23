@@ -45,7 +45,7 @@
     active: true,
     connectionOptions: {
       host: '${host}',
-      pathPrefix: '',
+      path: '',
       realIpHeader: 'X-Real-IP',
       realPortHeader: 'X-Real-PORT',
       followingRedirect: false,

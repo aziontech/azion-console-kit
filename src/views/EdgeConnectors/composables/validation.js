@@ -11,7 +11,14 @@ const validationSchema = yup.object({
           dnsResolution: yup.string(),
           transportPolicy: yup.string(),
           host: yup.string(),
-          pathPrefix: yup.string(),
+          path: yup
+            .string()
+            .test('starts-with-slash', 'Path must start with a forward slash (/)', (value) => {
+              if (value === null || value === undefined || value === '') {
+                return true
+              }
+              return value.startsWith('/')
+            }),
           realIpHeader: yup.string(),
           realPortHeader: yup.string(),
           followingRedirect: yup.boolean()

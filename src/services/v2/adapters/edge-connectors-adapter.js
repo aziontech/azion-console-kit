@@ -93,7 +93,7 @@ const typeBuilders = {
         dns_resolution: payload.connectionOptions.dnsResolution,
         transport_policy: payload.connectionOptions.transportPolicy,
         host: payload.connectionOptions.host,
-        path_prefix: payload.connectionOptions.pathPrefix,
+        path_prefix: payload.connectionOptions.path,
         following_redirect: payload.connectionOptions.followingRedirect,
         real_ip_header: payload.connectionOptions.realIpHeader,
         real_port_header: payload.connectionOptions.realPortHeader
@@ -127,7 +127,7 @@ const typeBuildersLoadRequest = {
       dnsResolution: data.attributes.connection_options.dns_resolution,
       transportPolicy: data.attributes.connection_options.transport_policy,
       host: data.attributes.connection_options.host,
-      pathPrefix: data.attributes.connection_options.path_prefix,
+      path: data.attributes.connection_options.path_prefix,
       realIpHeader: data.attributes.connection_options.real_ip_header,
       realPortHeader: data.attributes.connection_options.real_port_header,
       followingRedirect: data.attributes.connection_options.following_redirect
