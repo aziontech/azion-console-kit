@@ -85,7 +85,8 @@
                     label="HTTP Port"
                     :name="`addresses[${addressIndex}].httpPort`"
                     :value="addresses[addressIndex].value.httpPort"
-                    :min="0"
+                    :min="1"
+                    :max="65535"
                     description="Specify the plain (non-encrypted) port for communication with the origin (e.g., 80 for HTTP)."
                     data-testid="edge-connectors-form__address-management__http-port-field"
                   />
@@ -96,7 +97,8 @@
                     label="HTTPS Port"
                     :name="`addresses[${addressIndex}].httpsPort`"
                     :value="addresses[addressIndex].value.httpsPort"
-                    :min="0"
+                    :min="1"
+                    :max="65535"
                     description="Specify the secure port for encrypted communication with the origin (e.g., 443 for HTTPS)."
                     data-testid="edge-connectors-form__address-management__https-port-field"
                   />
@@ -128,6 +130,8 @@
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
                     label="Weight"
+                    :min="1"
+                    :max="100"
                     :name="`addresses[${addressIndex}].weight`"
                     :value="addresses[addressIndex].value.weight"
                     description="Higher weights allocate more traffic to this address."
@@ -161,7 +165,7 @@
                 required
                 description="IPv4/IPv6 address or CNAME to resolve."
                 :name="`addresses[${0}].address`"
-                :value="addresses[0]?.value.address"
+                :value="addresses[0].value.address"
                 placeholder=""
                 data-testid="edge-connectors-form__address-management__address-field"
               />
@@ -171,8 +175,8 @@
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
                   label="HTTP Port"
-                  :name="`addresses[${0}]?.httpPort`"
-                  :value="addresses[0]?.value.httpPort"
+                  :name="`addresses[${0}].httpPort`"
+                  :value="addresses[0].value.httpPort"
                   :min="0"
                   description=""
                   data-testid="edge-connectors-form__address-management__http-port-field"
@@ -182,8 +186,8 @@
               <div class="flex flex-col sm:max-w-sm w-full gap-2">
                 <FieldNumber
                   label="HTTPS Port"
-                  :name="`addresses[${0}]?.httpsPort`"
-                  :value="addresses[0]?.value.httpsPort"
+                  :name="`addresses[${0}].httpsPort`"
+                  :value="addresses[0].value.httpsPort"
                   :min="0"
                   description=""
                   data-testid="edge-connectors-form__address-management__https-port-field"
