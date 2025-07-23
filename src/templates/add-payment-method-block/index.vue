@@ -1,6 +1,5 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
@@ -11,14 +10,13 @@
   import LabelBlock from '@/templates/label-block'
   import { useScrollToError } from '@/composables/useScrollToError'
   import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
   import { paymentService } from '@/services/v2'
+  import AddAddressBlock from './add-address.vue'
 
   defineOptions({ name: 'add-payment-method-block' })
 
-  const router = useRouter()
   const accountStore = useAccountStore()
 
   const stripe = ref(null)
@@ -28,6 +26,7 @@
   const cardExpiry = ref(null)
   const cardCvc = ref(null)
   const displayError = ref({})
+  const addAddressRef = ref(null)
   const { scrollToError } = useScrollToError()
   const MESSAGE_INPUTS_STRIPE = {
     invalid: {
@@ -140,10 +139,6 @@
     cardCvc.value?.on('blur', handleBlur)
   }
 
-  const redirectUserToAccountSettings = () => {
-    router.push({ name: 'account-settings', query: { payment: true } })
-  }
-
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
@@ -174,6 +169,9 @@
   const handleSubmit = async () => {
     isSubmitting.value = true
     try {
+      const address = await addAddressRef.value.saveAddress()
+      if (!address) return
+
       await validateCardholderName()
       const { token, error: hasErrors } = await stripe.value.createToken(cardNumber.value, {
         name: cardholderName.value
@@ -191,8 +189,8 @@
       }
 
       const payload = {
-        card_address_zip: accountData.postal_code,
-        card_country: accountData.country,
+        card_address_zip: Number(address.postal_code),
+        card_country: addAddressRef.value.getCountry(Number(address.country)),
         stripe_token: token.id,
         card_id: token.card.id,
         card_brand: token.card.brand,
@@ -218,11 +216,6 @@
       isSubmitting.value = false
     }
   }
-
-  const userContainAdress = computed(() => {
-    const accountData = accountStore.account
-    return !accountData.postal_code && !accountData.address
-  })
 </script>
 
 <template>
@@ -241,25 +234,12 @@
       <ConsoleFeedback />
     </template>
 
-    <div class="flex w-full">
+    <div class="flex flex-col gap-5 mb-5 w-full">
       <FormHorizontal
         :isDrawer="true"
         title="Payment Method"
       >
         <template #inputs>
-          <div v-if="userContainAdress">
-            <InlineMessage severity="warn">
-              Users must have a registered address before adding a payment method.
-              <PrimeButton
-                label="Register address now."
-                @click="redirectUserToAccountSettings"
-                iconPos="right"
-                class="p-0"
-                size="small"
-                link
-              />
-            </InlineMessage>
-          </div>
           <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
             <form
               ref="form"
@@ -363,6 +343,8 @@
           </div>
         </template>
       </FormHorizontal>
+
+      <AddAddressBlock ref="addAddressRef" />
     </div>
     <div class="fixed w-full left-0 bottom-0">
       <ActionBarBlock
