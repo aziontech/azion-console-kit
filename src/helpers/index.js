@@ -15,6 +15,7 @@ import {
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
+import { contactSalesEdgeApplicationService } from './azion-contact-sales-window-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
@@ -124,5 +125,6 @@ export {
   formatDateMonthAndYear,
   getExpiredDate,
   getRemainingDays,
-  getCurrentDateTimeIntl
+  getCurrentDateTimeIntl,
+  contactSalesEdgeApplicationService
 }

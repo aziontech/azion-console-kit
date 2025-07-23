@@ -57,12 +57,12 @@ export class EdgeAppService {
   }
 
   createEdgeApplicationService = async (payload) => {
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
+
     const { data } = await this.http.request({
       method: 'POST',
       url: this.baseURL,
-      body: {
-        name: payload.name
-      }
+      body
     })
 
     return data
@@ -85,7 +85,7 @@ export class EdgeAppService {
   }
 
   editEdgeApplicationService = async (payload) => {
-    const body = this.adapter?.transformPayloadEdit?.(payload) ?? payload
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
 
     await this.http.request({
       method: 'PATCH',

@@ -27,7 +27,13 @@
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    isActive: true,
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false
   })
 
   const handleBlocks = ['general']
@@ -93,6 +99,7 @@
     <template #formFields>
       <FormFieldsCreateEdgeApplications
         :handleBlock="handleBlocks"
+        isDrawer
         data-testid="create-edge-application-form-fields"
       />
     </template>
