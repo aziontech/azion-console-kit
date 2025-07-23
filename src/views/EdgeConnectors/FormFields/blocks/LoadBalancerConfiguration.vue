@@ -24,6 +24,8 @@
           label="Max Retries"
           name="modules.loadBalancer.config.maxRetries"
           :value="maxRetries"
+          :min="0"
+          :max="20"
           description="Maximum number of retry attempts for failed connections. Value 0 for no retries. Valid range: 0-20."
           data-testid="edge-connectors-form__load-balancer-configuration__max-retries-field"
         />
@@ -34,6 +36,8 @@
           label="Connection Timeout"
           name="modules.loadBalancer.config.connectionTimeout"
           :value="connectionTimeout"
+          :min="1"
+          :max="300"
           description="Maximum time (in seconds) the Edge Connector will wait to establish a connection with the origin. Valid range: 1-300."
           data-testid="edge-connectors-form__load-balancer-configuration__connection-timeout-field"
         />
@@ -44,6 +48,8 @@
           label="Read/Write Timeout"
           name="modules.loadBalancer.config.readWriteTimeout"
           :value="readWriteTimeout"
+          :min="1"
+          :max="600"
           description="Maximum time (in seconds) the Edge Connector will wait for data to be read from or written to the origin. Valid range: 1-600."
           data-testid="edge-connectors-form__load-balancer-configuration__read-write-timeout-field"
         />

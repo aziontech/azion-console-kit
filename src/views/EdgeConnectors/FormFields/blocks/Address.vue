@@ -85,7 +85,8 @@
                     label="HTTP Port"
                     :name="`addresses[${addressIndex}].httpPort`"
                     :value="addresses[addressIndex].value.httpPort"
-                    :min="0"
+                    :min="1"
+                    :max="65535"
                     description="Specify the plain (non-encrypted) port for communication with the origin (e.g., 80 for HTTP)."
                     data-testid="edge-connectors-form__address-management__http-port-field"
                   />
@@ -96,7 +97,8 @@
                     label="HTTPS Port"
                     :name="`addresses[${addressIndex}].httpsPort`"
                     :value="addresses[addressIndex].value.httpsPort"
-                    :min="0"
+                    :min="1"
+                    :max="65535"
                     description="Specify the secure port for encrypted communication with the origin (e.g., 443 for HTTPS)."
                     data-testid="edge-connectors-form__address-management__https-port-field"
                   />
@@ -128,6 +130,8 @@
                 <div class="flex flex-col sm:max-w-sm w-full gap-2">
                   <FieldNumber
                     label="Weight"
+                    :min="1"
+                    :max="100"
                     :name="`addresses[${addressIndex}].weight`"
                     :value="addresses[addressIndex].value.weight"
                     description="Higher weights allocate more traffic to this address."
