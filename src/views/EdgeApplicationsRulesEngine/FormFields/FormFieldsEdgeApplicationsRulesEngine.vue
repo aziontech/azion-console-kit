@@ -79,7 +79,7 @@
   const DISABLE_TARGET_OPTIONS = [
     'deliver',
     'enable_gzip',
-    'bypass_cache_phase',
+    'bypass_cache',
     'deny',
     'forward_cookies',
     'no_content',
@@ -88,7 +88,8 @@
     'run_function',
     'set_origin',
     'set_cache_policy',
-    'capture_match_groups'
+    'capture_match_groups',
+    'finish_request_phase'
   ]
 
   const VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS = ['${server_addr}', '${server_port}']
@@ -257,7 +258,7 @@
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
       label: 'Bypass Cache' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'bypass_cache_phase',
+      value: 'bypass_cache',
       requires: !props.hideApplicationAcceleratorInDescription
     },
     {
@@ -326,6 +327,7 @@
       requires: !props.hideApplicationAcceleratorInDescription
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
+    { label: 'Finish Request Phase', value: 'finish_request_phase', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
@@ -463,9 +465,9 @@
   const openAccordionWithFormErrors = () => {
     const errorsKeys = Object.keys(props.errors)
     if (errorsKeys.length > 0) {
-      const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
-      const index = match[1]
-      activeAccordions.value[index] = 0
+      const match = errorsKeys.find((key) => key.includes('criteria'))
+      const indexMatch = errorsKeys.indexOf(match)
+      activeAccordions.value[indexMatch] = 0
     }
   }
   watch(
@@ -775,6 +777,7 @@
         <div class="flex gap-2 mt-6 mb-8">
           <div class="w-1/2">
             <FieldDropdown
+              filter
               :key="behaviorItem.key"
               :name="`behaviors[${behaviorIndex}].name`"
               :options="behaviorsOptions"
