@@ -55,7 +55,7 @@
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
-  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+  import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
   import InlineMessage from 'primevue/inlinemessage'
 
   const listStatusCodeRef = ref(null)
