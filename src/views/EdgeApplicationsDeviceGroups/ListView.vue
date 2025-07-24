@@ -59,7 +59,14 @@
       },
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData },
+            columnAppearance: 'expand-text-column'
+          })
+        }
       },
       {
         field: 'userAgent',
