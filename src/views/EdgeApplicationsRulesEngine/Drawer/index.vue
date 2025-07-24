@@ -125,7 +125,20 @@
     ),
     behaviors: yup.array().of(
       yup.object().shape({
-        name: yup.string().required().label('behavior')
+        name: yup.string().required().label('behavior'),
+        captured_array: yup.string().when('name', {
+          is: (name) => name === 'capture_match_groups',
+          then: (schema) =>
+            schema
+              .matches(
+                /^[a-zA-Z][a-zA-Z_ ]{0,9}$/,
+                'Captured array name must start with a letter and contain only letters or underscores (maximum 10 characters).'
+              )
+              .min(1, 'Captured array name must have at least 1 character.')
+              .max(10, 'Captured array name must have at most 10 characters.')
+              .required(),
+          otherwise: (schema) => schema.notRequired()
+        })
       })
     )
   })
