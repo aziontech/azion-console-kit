@@ -1,4 +1,5 @@
 import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
@@ -90,7 +91,12 @@ export const DigitalCertificatesAdapter = {
     if (type === 'edge_certificate') {
       const DEFAULT_CERTIFICATES = [
         { id: 0, name: 'Azion (SAN)', status: 'active', group: 'Certificates presets' },
-        { id: 1, name: "Let's Encrypt", status: 'active', group: 'Certificates presets' }
+        {
+          id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
+          name: "Let's Encrypt",
+          status: 'active',
+          group: 'Certificates presets'
+        }
       ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
