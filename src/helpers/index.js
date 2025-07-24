@@ -52,6 +52,7 @@ import INFORMATION_TEXTS from './azion-information-texts'
 import { getCurrentTimezone } from './account-timezone'
 import TEXT_DOMAIN_WORKLOAD from './handle-text-workload-domain-flag'
 import { adaptServiceDataResponse } from '../services/v2/utils/adaptServiceDataResponse'
+import { formatString } from './format-strings'
 import {
   HTTP_PORT_LIST_OPTIONS,
   HTTP3_PORT_LIST_OPTIONS,
@@ -126,5 +127,6 @@ export {
   getExpiredDate,
   getRemainingDays,
   getCurrentDateTimeIntl,
-  contactSalesEdgeApplicationService
+  contactSalesEdgeApplicationService,
+  formatString
 }
