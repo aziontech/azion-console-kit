@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { formatDateToUSBilling } from '@/helpers/convert-date'
 import { makeBillingBaseUrl } from './make-billing-base-url'
-export const loadYourServicePlanService = async (disclaimer = '') => {
+export const loadYourServicePlanService = async () => {
   const { lastDayOfMonth, firstDayOfMonth } = getFirstDayCurrentDate()
 
   const payload = {
@@ -31,19 +31,12 @@ export const loadYourServicePlanService = async (disclaimer = '') => {
     body: payload
   })
 
-  httpResponse = adapt(httpResponse, disclaimer)
+  httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
-function extractPriceFromString(sentence) {
-  const regex = /USD (\d+\.\d+)/
-  const match = sentence.match(regex)
-
-  return match ? match[1] : '0.00'
-}
-
-const adapt = (httpResponse, disclaimer) => {
+const adapt = (httpResponse) => {
   const {
     body: { data },
     statusCode
@@ -62,8 +55,7 @@ const adapt = (httpResponse, disclaimer) => {
   const parseYourServicePlan = {
     paymentDate: formatDateToUSBilling(yourServicePlan.paymentDate),
     amount: yourServicePlan.amount,
-    currency: yourServicePlan.currency,
-    creditBalance: extractPriceFromString(disclaimer)
+    currency: yourServicePlan.currency
   }
 
   return {

@@ -20,6 +20,15 @@
         </header>
         <p
           class="text-sm text-color-secondary font-normal mt-3"
+          v-if="message.component"
+        >
+          <component
+            :is="message.component"
+            :v-bind="message.props"
+          />
+        </p>
+        <p
+          class="text-sm text-color-secondary font-normal mt-3"
           v-if="message.detail"
           :data-testid="handleDataTestIdInItem(message, 'detail')"
         >
@@ -54,8 +63,8 @@
             :disabled="isButtonAnimating(message.action.secondary)"
           />
           <PrimeButton
-            severity="secondary"
             v-if="message.action.primary"
+            severity="secondary"
             :data-testid="handleDataTestIdInItem(message, 'primary')"
             size="small"
             :label="message.action.primary.label"
@@ -102,7 +111,15 @@
 
   const parseText = (text, charLimit) => {
     const existsAndIsString = text && isString(text)
-    return existsAndIsString && text.substring(0, charLimit)
+    if (existsAndIsString) {
+      return text.substring(0, charLimit)
+    }
+    if (!text) {
+      return ''
+    }
+    // eslint-disable-next-line no-console
+    console.error('An unexpected error occurred', text)
+    return 'An unexpected error occurred'
   }
 
   const showActions = (message) => {
