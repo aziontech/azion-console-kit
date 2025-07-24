@@ -6,7 +6,7 @@
   import { ref } from 'vue'
   import { customPageService } from '@/services/v2'
 
-  import { validationSchema, defaultValues } from '../ConfigForm/validationSchema'
+  import { validationSchema, defaultValues } from '../Config/validationSchema'
 
   defineOptions({
     name: 'custom-pages-drawer'

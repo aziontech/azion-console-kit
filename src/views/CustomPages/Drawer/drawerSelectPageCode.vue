@@ -3,9 +3,9 @@
   import FormFieldsStatusCode from '../FormFields/DrawerStatusCode'
   import { refDebounced } from '@vueuse/core'
   import { ref, computed } from 'vue'
-  import { pageSchema } from '@/views/CustomPages/ConfigForm/validationSchema'
+  import { pageSchema } from '@/views/CustomPages/Config/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
-  import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+  import { CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
 
   defineOptions({
     name: 'custom-pages-drawer'

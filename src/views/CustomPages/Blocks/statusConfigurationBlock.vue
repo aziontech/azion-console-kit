@@ -36,7 +36,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import { CODE_OPTIONS } from '@/views/CustomPages/ConfigForm/listStatusCode'
+  import { CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
   import { computed } from 'vue'
 
   const listTypes = [
