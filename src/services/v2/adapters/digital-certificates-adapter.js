@@ -1,5 +1,5 @@
 import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
-import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
@@ -64,7 +64,7 @@ export const DigitalCertificatesAdapter = {
         type: checkIfFieldExist(typeMap[item?.type]),
         validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
         status: {
-          status: parseStatusData(item.status),
+          status: parseStatusString(item.status),
           statusDetail: item?.status_detail
         }
       }
