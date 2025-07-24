@@ -36,7 +36,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import { validationSchema } from './composables/validation'
+  import { validationSchema } from './Config/validation'
   import { edgeConnectorsService } from '@/services/v2'
 
   const initialValues = {
