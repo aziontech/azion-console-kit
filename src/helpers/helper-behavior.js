@@ -13,7 +13,7 @@ const adaptBehavior = (behaviors) => {
         attributes: {
           subject: behavior.subject,
           regex: behavior.regex,
-          captured_array_name: behavior.captured_array_name || behavior.captured_array
+          captured_array: behavior.captured_array_name || behavior.captured_array
         }
       }
     }
