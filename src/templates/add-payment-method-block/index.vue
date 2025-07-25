@@ -189,7 +189,7 @@
       }
 
       const payload = {
-        card_address_zip: Number(address.postal_code),
+        card_address_zip: address.postal_code,
         card_country: addAddressRef.value.getCountry(Number(address.country)),
         stripe_token: token.id,
         card_id: token.card.id,

@@ -72,22 +72,30 @@ export class BillingGqlService {
   }
 
   getCreditAndExpirationDate = async () => {
-    const { data: lastCredit } = await this.#getLastCreditAndExpirationDate()
+    try {
+      const { data: lastCredit } = await this.#getLastCreditAndExpirationDate()
 
-    const { amount, lastRecordGenerationDate, days } =
-      this.adapter.transformCreditAndExpirationDate(lastCredit)
-    if (!amount || !days) return {}
+      const { amount, lastRecordGenerationDate, days } =
+        this.adapter.transformCreditAndExpirationDate(lastCredit)
+      if (!amount || !days) return {}
 
-    const { data: lastBill } = await this.#getLastBill(lastRecordGenerationDate)
-    const { credit, formatCredit } = this.adapter.transformMessageCreditAndExpirationDate(
-      lastBill.bill,
-      amount
-    )
+      const { data: lastBill } = await this.#getLastBill(lastRecordGenerationDate)
+      const { credit, formatCredit } = this.adapter.transformMessageCreditAndExpirationDate(
+        lastBill.bill,
+        amount
+      )
 
-    return {
-      credit,
-      formatCredit,
-      days
+      return {
+        credit,
+        formatCredit,
+        days
+      }
+    } catch (error) {
+      return {
+        credit: 0,
+        formatCredit: '0,00',
+        days: 0
+      }
     }
   }
 }

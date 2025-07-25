@@ -1,15 +1,17 @@
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { loadAccountJobRoleService } from '@/services/account-settings-services'
+import { billingGqlService } from '@/services/v2'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo, accountJobRole] = await Promise.all([
+  const [accountInfo, userInfo, accountJobRole, creditAndExpirationDate] = await Promise.all([
     getAccountInfoService(),
     getUserInfoService(),
-    loadAccountJobRoleService()
+    loadAccountJobRoleService(),
+    billingGqlService.getCreditAndExpirationDate()
   ])
 
   accountInfo.is_account_owner = userInfo.results.is_account_owner
@@ -24,6 +26,9 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.colorTheme = accountStore.theme
   accountInfo.jobRole = accountJobRole.jobRole
   accountInfo.isDeveloperSupportPlan = true
+  accountInfo.credit = creditAndExpirationDate.credit
+  accountInfo.formatCredit = creditAndExpirationDate.formatCredit
+  accountInfo.days = creditAndExpirationDate.days
 
   if (accountInfo.client_id) {
     const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
