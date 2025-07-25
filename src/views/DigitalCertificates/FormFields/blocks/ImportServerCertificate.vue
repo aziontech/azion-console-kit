@@ -58,6 +58,7 @@
 
   const { value: certificate } = useField('certificate')
   const { value: privateKey } = useField('privateKey')
+  useField('certificateType', null, { initialValue: certificateType.value })
 
   const isRenderPrivateKey = computed(() => isEdgeCertificate.value)
 
