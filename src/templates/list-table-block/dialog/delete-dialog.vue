@@ -110,13 +110,16 @@
   const canDelete = ref(false)
 
   const confirmationText = computed(() => {
-    return data.selectedItemData.name?.text 
-    || data.selectedItemData?.key
-    || data.selectedItemData?.name
+    return (
+      data.selectedItemData.name?.text || data.selectedItemData?.key || data.selectedItemData?.name
+    )
   })
 
   const validationSchema = yup.object({
-    confirmation: yup.string().equals([confirmationText.value || ''], '').required('This is a required field')
+    confirmation: yup
+      .string()
+      .equals([confirmationText.value || ''], '')
+      .required('This is a required field')
   })
 
   const { errors, meta, resetForm } = useForm({
