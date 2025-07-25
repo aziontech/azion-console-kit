@@ -53,8 +53,10 @@
   }
   watch(
     () => useHttps.value,
-    () => {
-      mtls.value.isEnabled = false
+    (newValue) => {
+      if (!newValue) {
+        mtls.value.isEnabled = false
+      }
     }
   )
 </script>
