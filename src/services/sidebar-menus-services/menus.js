@@ -191,7 +191,7 @@ function createMarketplaceProductsItems() {
     },
     {
       label: 'SIEM',
-      to: 'https://f0semqqgv4.map.azionedge.net/login',
+      to: 'https://caixa-siem.azion.com/login',
       icon: 'pi pi-chart-bar',
       id: 'siem',
       external: true
