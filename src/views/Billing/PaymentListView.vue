@@ -198,7 +198,7 @@
         }
 
         const { account } = useAccountStore()
-        const hasSupport = account.isDeveloperSupportPlan
+        const hasSupport = !account.isDeveloperSupportPlan
 
         toast.add({
           closable: true,
