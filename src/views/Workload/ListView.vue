@@ -48,6 +48,7 @@
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2'
+  import { deleteDomainService } from '@/services/domains-services'
   import * as Helpers from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -74,13 +75,13 @@
   const columnsHiddenByDefault = ['id', 'lastEditor', 'protocols']
 
   const hasContentToList = ref(true)
-
+  const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const actions = [
     {
       type: 'delete',
       title: `${handleTextDomainWorkload.singularLabel}`,
       icon: 'pi pi-trash',
-      service: workloadService.deleteWorkload
+      service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
     }
   ]
 
@@ -91,7 +92,7 @@
   }
 
   const documentationHandler = () => {
-    if (handleTextDomainWorkload.singularLabel === 'workload') {
+    if (isWorkload.value) {
       Helpers.documentationCatalog.workload()
     } else {
       Helpers.documentationCatalog.domains()
