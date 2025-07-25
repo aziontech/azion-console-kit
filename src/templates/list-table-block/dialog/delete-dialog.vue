@@ -118,7 +118,7 @@
   const validationSchema = yup.object({
     confirmation: yup
       .string()
-      .equals([confirmationText.value || ''], '')
+      .equals([confirmationText.value], '')
       .required('This is a required field')
   })
 
