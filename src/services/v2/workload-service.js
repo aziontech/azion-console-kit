@@ -150,8 +150,9 @@ export class WorkloadService {
     const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'
 
     const [commonName, ...alternativeNames] = this.#dropFirstAzion(this.initialDomains)
+
     const letEncryptBase = {
-      common_name: commonName,
+      common_name: commonName || '',
       alternative_names: alternativeNames
     }
 
