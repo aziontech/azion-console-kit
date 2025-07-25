@@ -8,7 +8,7 @@
   import fieldDropdownMultiSelectLazyLoader from '@/templates/form-fields-inputs/fieldDropdownMultiSelectLazyLoader.vue'
   import PrimeButton from 'primevue/button'
   import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { useField } from 'vee-validate'
 
   const drawerRef = ref('')
@@ -22,6 +22,7 @@
   }
 
   const { value: mtls } = useField('mtls')
+  const { value: useHttps } = useField('protocols.http.useHttps')
 
   const mtlsModeRadioOptions = ref([
     {
@@ -50,6 +51,12 @@
     drawerRef.value.changeCertificateType(certificate)
     drawerRef.value.openCreateDrawer()
   }
+  watch(
+    () => useHttps.value,
+    () => {
+      mtls.value.isEnabled = false
+    }
+  )
 </script>
 
 <template>
@@ -58,14 +65,28 @@
     description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
   >
     <template #inputs>
-      <FieldSwitchBlock
-        data-testid="domains-form__mtls-is-enabled-field"
-        nameField="mtls.isEnabled"
-        name="mtls.isEnabled"
-        auto
-        :isCard="false"
-        title="Mutual Authentication"
-      />
+      <div class="flex flex-col">
+        <FieldSwitchBlock
+          data-testid="domains-form__mtls-is-enabled-field"
+          nameField="mtls.isEnabled"
+          name="mtls.isEnabled"
+          auto
+          :isCard="false"
+          title="Mutual Authentication"
+          :disabled="!useHttps"
+        />
+
+        <small
+          v-if="!useHttps"
+          class="flex items-center gap-1.5 ml-14"
+        >
+          <i class="pi pi-lock text-color-secondary"></i>
+          <span class="text-color-secondary text-sm font-normal">
+            You can active this setting enabling HTTPS support above.
+          </span>
+        </small>
+      </div>
+
       <div v-show="mtls?.isEnabled">
         <div class="flex flex-col gap-3">
           <FieldGroupRadio
