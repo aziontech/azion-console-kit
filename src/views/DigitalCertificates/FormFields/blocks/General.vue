@@ -39,9 +39,12 @@
   const { certificateType, CERTIFICATE_TYPES } = useDigitalCertificate()
 
   const { value: digitalCertificateName } = useField('digitalCertificateName')
+  const { value: certificateTypeValue } = useField('certificateType')
+
+  certificateTypeValue.value = certificateType.value
 
   const tabDescriptionByDCType = computed(() => {
-    switch (certificateType.value) {
+    switch (certificateTypeValue.value) {
       case CERTIFICATE_TYPES.TRUSTED:
         return 'Create a digital certificate that can be used for mutual Transport Layer Security (mTLS).'
       case CERTIFICATE_TYPES.CERTIFICATE_REVOCATION_LIST:
