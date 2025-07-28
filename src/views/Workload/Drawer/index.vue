@@ -9,16 +9,10 @@
     listEdgeApplicationsService,
     loadEdgeApplicationsService
   } from '@/services/edge-application-services/v4'
-  import {
-    listEdgeFirewallService,
-    loadEdgeFirewallService
-  } from '@/services/edge-firewall-services/v4'
-  import {
-    loadDigitalCertificateService,
-    listDigitalCertificatesServiceDropdown
-  } from '@/services/digital-certificates-services/v4'
+  import { edgeFirewallService } from '@/services/v2'
   import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateDomains.vue'
   import { useRoute } from 'vue-router'
+  import { digitalCertificatesService } from '@/services/v2'
 
   defineOptions({
     name: 'domain-drawer'
@@ -160,10 +154,9 @@
   >
     <template #formFields>
       <FormFieldsCreateDomains
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="listDigitalCertificatesServiceDropdown"
-        :loadDigitalCertificatesService="loadDigitalCertificateService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
+        :loadDigitalCertificatesService="digitalCertificatesService.loadDigitalCertificatesService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
         :disabledEdgeApplicationDropdown="true"

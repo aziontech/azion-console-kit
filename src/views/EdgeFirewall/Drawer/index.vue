@@ -4,8 +4,8 @@
   import * as yup from 'yup'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeFirewallService } from '@/services/edge-firewall-services/v4'
   import FormCreateEdgeFirewall from '../FormFields/FormFieldsEdgeFirewall'
+  import { edgeFirewallService } from '@/services/v2'
 
   defineOptions({
     name: 'edge-firewall-drawer'
@@ -62,8 +62,15 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
-    emit('onSuccess', response.id)
+    handleToast(response)
+    emit('onSuccess', response.data.id)
     closeCreateDrawer()
+  }
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Firewall has been created'
+    }
+    response.showToastWithActions(toast)
   }
   defineExpose({
     showCreateDrawer,
@@ -76,13 +83,14 @@
     v-if="showCreateDrawer"
     data-testid="edge-firewall-drawer"
     v-model:visible="showCreateEdgeFirewallDrawer"
-    :createService="createEdgeFirewallService"
+    :createService="edgeFirewallService.createEdgeFirewallService"
     :schema="validationSchema"
     :initialValues="initialValues"
     drawerId="edge-firewall-drawer"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Firewall"
+    disableToast
   >
     <template #formFields>
       <FormCreateEdgeFirewall />

@@ -10,20 +10,13 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS } from '@/helpers'
+  import { edgeAppService } from '@/services/v2'
 
   defineOptions({ name: 'list-edge-applications' })
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
-    listEdgeApplicationsService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeApplicationService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -49,7 +42,7 @@
       label: 'Delete',
       title: 'edge application',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeApplicationService
+      service: edgeAppService.deleteEdgeApplicationService
     }
   ]
 
@@ -105,6 +98,19 @@
         field: 'lastModify',
         sortField: 'lastModified',
         header: 'Last Modified'
+      },
+      {
+        field: 'active',
+        header: 'Status',
+        sortField: 'active',
+        filterPath: 'active',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       }
     ]
   })
@@ -114,8 +120,9 @@
     'name',
     'last_editor',
     'last_modified',
-    'active',
-    'product_version'
+    'last_modify',
+    'product_version',
+    'active'
   ]
 </script>
 
@@ -133,7 +140,7 @@
         addButtonLabel="Edge Application"
         createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
-        :listService="listEdgeApplicationsService"
+        :listService="edgeAppService.listEdgeApplicationsService"
         :columns="getColumns"
         :apiFields="EDGE_APPLICATION_API_FIELDS"
         @on-load-data="handleLoadData"
@@ -142,7 +149,7 @@
         emptyListMessage="No edge applications found."
         data-testid="edge-applications-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

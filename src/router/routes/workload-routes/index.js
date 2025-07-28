@@ -1,12 +1,6 @@
-import * as Helpers from '@/helpers'
-import * as EdgeApplicationServicesV4 from '@/services/edge-application-services/v4'
-import * as EdgeFirewallServicesV4 from '@/services/edge-firewall-services/v4'
-import * as DigitalCertificatesServicesV4 from '@/services/digital-certificates-services/v4'
-import * as CustomPagesServicesV4 from '@/services/custom-pages-services/v4'
-import * as WorkloadDeploymentServices from '@/services/workload-deployment-service'
-import * as WorkloadServices from '@/services/workloads-services'
-
 /** @type {import('vue-router').RouteRecordRaw} */
+import { clipboardWrite } from '@/helpers/clipboard'
+
 export const workloadRoutes = {
   path: `/workloads`,
   name: `/workloads`,
@@ -15,12 +9,6 @@ export const workloadRoutes = {
       path: '',
       name: `list-workloads`,
       component: () => import('@views/Workload/ListView.vue'),
-      props: {
-        listDomainsService: WorkloadServices.listWorkloadsService,
-        deleteDomainService: WorkloadServices.deleteWorkloadService,
-        documentationService: Helpers.documentationCatalog.domains,
-        clipboardWrite: Helpers.clipboardWrite
-      },
       meta: {
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
@@ -36,19 +24,10 @@ export const workloadRoutes = {
       name: 'create-workload',
       component: () => import('@views/Workload/CreateView.vue'),
       props: {
-        createDomainService: WorkloadServices.createWorkloadService,
-        listEdgeApplicationsService: EdgeApplicationServicesV4.listEdgeApplicationsService,
-        loadEdgeApplicationsService: EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-        listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-        loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService,
-        clipboardWrite: Helpers.clipboardWrite,
-        listDigitalCertificatesService:
-          DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-        loadDigitalCertificatesService: DigitalCertificatesServicesV4.loadDigitalCertificateService
+        clipboardWrite
       },
       meta: {
         flag: 'checkout_access_without_flag',
-
         breadCrumbs: [
           {
             label: `Workloads`,
@@ -62,34 +41,11 @@ export const workloadRoutes = {
       }
     },
     {
-      path: 'edit/:id/:tab?',
+      path: 'edit/:id',
       name: `edit-workload`,
-      component: () => import('@views/Workload/TabsView.vue'),
+      component: () => import('@views/Workload/EditView.vue'),
       props: {
-        domainServices: {
-          editDomainService: WorkloadServices.editWorkloadService,
-          loadDomainService: WorkloadServices.loadWorkloadService,
-          updatedRedirect: `list-workloads`,
-          clipboardWrite: Helpers.clipboardWrite,
-          listDigitalCertificatesService:
-            DigitalCertificatesServicesV4.listDigitalCertificatesServiceDropdown,
-          loadDigitalCertificatesService:
-            DigitalCertificatesServicesV4.loadDigitalCertificateService
-        },
-        workloadDeploymentServices: {
-          listWorkloadDeploymentService: WorkloadDeploymentServices.listWorkloadDeploymentsService,
-          editWorkloadDeploymentService: WorkloadDeploymentServices.editWorkloadDeploymentService,
-          listEdgeApplicationsService:
-            EdgeApplicationServicesV4.listEdgeApplicationsDropdownService,
-          loadEdgeApplicationsService:
-            EdgeApplicationServicesV4.loadEdgeApplicationsDropdownService,
-          listEdgeFirewallService: EdgeFirewallServicesV4.listEdgeFirewallService,
-          loadEdgeFirewallService: EdgeFirewallServicesV4.loadEdgeFirewallService
-        },
-        customPagesServices: {
-          listCustomPagesService: CustomPagesServicesV4.listCustomPagesService,
-          loadCustomPagesService: CustomPagesServicesV4.loadCustomPagesService
-        }
+        updatedRedirect: `list-workloads`
       },
       meta: {
         flag: 'checkout_access_without_flag',

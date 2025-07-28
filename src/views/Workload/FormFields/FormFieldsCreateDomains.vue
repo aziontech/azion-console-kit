@@ -14,6 +14,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
+  import { digitalCertificatesService } from '@/services/v2'
 
   const props = defineProps({
     digitalCertificates: {
@@ -48,10 +49,6 @@
       type: Function,
       required: true
     },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
     loadDigitalCertificatesService: {
       type: Function,
       required: true
@@ -75,8 +72,6 @@
     { name: '80 (Default)', value: 80 },
     { name: '8008', value: 8008 },
     { name: '8080', value: 8080 },
-
-    // Custom Ports
     { name: '8880', value: 8880 }
   ]
   const HTTP3_PORT_LIST_OPTIONS = [{ name: '443 (Default)', value: 443 }]
@@ -87,8 +82,6 @@
     { name: '9441', value: 9441 },
     { name: '9442', value: 9442 },
     { name: '9443', value: 9443 },
-
-    // Custom Ports
     { name: '7777', value: 7777 },
     { name: '8888', value: 8888 },
     { name: '9553', value: 9553 },
@@ -218,20 +211,20 @@
     edgeCertificate.value = domainId
   }
 
-  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: EDGE_CERTIFICATE,
+  const listDigitalCertificatesByType = async (type, queryParams) => {
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
+      type,
       fields: ['id,name'],
       ...queryParams
     })
   }
 
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
+  }
+
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: TRUSTED_CA_CERTIFICATE,
-      fields: ['id,name'],
-      ...queryParams
-    })
+    return listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
 
   const emit = defineEmits(['edgeApplicationCreated'])
@@ -586,7 +579,7 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"

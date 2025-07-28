@@ -5,7 +5,8 @@
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsCreateEdgeApplications'
   import { ref, inject, defineExpose } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeApplicationService } from '@/services/edge-application-services/v4'
+  import { edgeAppService } from '@/services/v2'
+
   import { useRoute } from 'vue-router'
 
   defineOptions({
@@ -26,7 +27,13 @@
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    isActive: true,
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false
   })
 
   const handleBlocks = ['general']
@@ -59,9 +66,16 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
+    handleToast(response)
     emit('onSuccess')
-    emit('onEdgeApplicationCreated', response.applicationId)
+    emit('onEdgeApplicationCreated', response.data.id)
     closeCreateDrawer()
+  }
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge application has been created'
+    }
+    response.showToastWithActions(toast)
   }
   defineExpose({
     showCreateDrawer,
@@ -74,16 +88,18 @@
     v-if="showCreateDrawer"
     data-testid="edge-application-drawer"
     v-model:visible="showCreateEdgeApplicationsDrawer"
-    :createService="createEdgeApplicationService"
+    :createService="edgeAppService.createEdgeApplicationService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Application"
+    disableToast
   >
     <template #formFields>
       <FormFieldsCreateEdgeApplications
         :handleBlock="handleBlocks"
+        isDrawer
         data-testid="create-edge-application-form-fields"
       />
     </template>

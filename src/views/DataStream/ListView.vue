@@ -25,17 +25,18 @@
         <div class="w-full">
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
+            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
             editPagePath="/data-stream/edit"
-            :listService="listDataStreamService"
+            :listService="dataStreamService.listDataStreamService"
             :columns="getColumns"
             @on-load-data="handleLoadData"
             emptyListMessage="No streams found."
             :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
-            :defaultOrderingFieldName="'name'"
+            :defaultOrderingFieldName="'-last_modified'"
           ></FetchListTableBlock>
           <EmptyResultsBlock
             v-else
@@ -69,18 +70,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import { useAccountStore } from '@/stores/account'
-
+  import { dataStreamService } from '@/services/v2'
   defineOptions({ name: 'data-stream-view' })
 
-  const props = defineProps({
-    listDataStreamService: {
-      required: true,
-      type: Function
-    },
-    deleteDataStreamService: {
-      required: true,
-      type: Function
-    },
+  defineProps({
     documentationService: {
       required: true,
       type: Function
@@ -89,7 +82,16 @@
 
   const store = useAccountStore()
   const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
-  const DATA_STREAM_API_FIELDS = ['id', 'name', 'data_source', 'active', 'data_set_id', 'endpoint']
+  const DATA_STREAM_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'outputs',
+    'transform',
+    'inputs',
+    'last_editor',
+    'last_modified'
+  ]
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -121,7 +123,7 @@
       type: 'delete',
       title: 'stream',
       icon: 'pi pi-trash',
-      service: props.deleteDataStreamService
+      service: dataStreamService.deleteDataStreamService
     }
   ]
 
@@ -179,6 +181,14 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })

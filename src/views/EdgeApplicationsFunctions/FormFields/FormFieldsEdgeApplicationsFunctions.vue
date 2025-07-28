@@ -5,42 +5,40 @@
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import PrimeButton from 'primevue/button'
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
+  import { edgeFunctionService } from '@/services/v2'
 
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
   const emit = defineEmits(['toggleDrawer'])
 
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFunctionService: {
-      type: Function,
-      required: true
-    }
-  })
-
   const drawerRef = ref('')
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleDrawerSuccess = (response) => {
-    edgeFunctionID.value = response.functionId
+  const handleDrawerSuccess = (functionId) => {
+    edgeFunctionID.value = functionId
   }
 
   const changeArgs = (target) => {
-    if (target?.args) {
-      args.value = target?.args
+    if (target?.jsonArgs) {
+      args.value = target?.jsonArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return props.listEdgeFunctionsService({
-      initiatorType: 'edge_application',
+    return edgeFunctionService.listEdgeFunctionsDropdown({
+      executionEnvironment: 'application',
+      fields: ['id', 'name', 'args', 'execution_environment'],
       ...queryParams
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = (queryParams) => {
+    return edgeFunctionService.loadEdgeFunction({
+      ...queryParams,
+      fields: ['id', 'name', 'args']
     })
   }
 
@@ -98,11 +96,11 @@
           required
           name="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
-          :loadService="loadEdgeFunctionService"
-          :moreOptions="['args']"
+          :loadService="loadEdgeFunctionServiceDecorator"
+          :moreOptions="['jsonArgs']"
           disableEmitFirstRender
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           :value="edgeFunctionID"
           inputId="edgeFunctionID"
           @onSelectOption="changeArgs"
@@ -132,7 +130,7 @@
       <div class="flex flex-col gap-2 w-full">
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"

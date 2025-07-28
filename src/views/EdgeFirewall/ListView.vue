@@ -6,6 +6,7 @@
   import CloneEdgeFirewall from './Dialog/Clone.vue'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
+  import { edgeFirewallService } from '@/services/v2'
 
   defineOptions({ name: 'edge-firewall-view' })
 
@@ -17,20 +18,12 @@
     'name',
     'debug_rules',
     'last_editor',
-    'modules',
     'last_modified',
+    'last_modify',
     'active'
   ]
 
   const props = defineProps({
-    listEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
-    deleteEdgeFirewallService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -55,7 +48,7 @@
       type: 'delete',
       title: 'edge firewall',
       icon: 'pi pi-trash',
-      service: props.deleteEdgeFirewallService
+      service: edgeFirewallService.deleteEdgeFirewallService
     }
   ]
 
@@ -65,7 +58,16 @@
       header: 'Name'
     },
     {
-      field: 'status',
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'last_modified',
+      header: 'Last Modified'
+    },
+    {
+      field: 'active',
       header: 'Status',
       sortField: 'active',
       filterPath: 'active',
@@ -76,15 +78,6 @@
           columnAppearance: 'tag'
         })
       }
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModify',
-      sortField: 'last_modified',
-      header: 'Last Modified'
     }
   ])
 
@@ -116,7 +109,7 @@
         addButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
-        :listService="listEdgeFirewallService"
+        :listService="edgeFirewallService.listEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
         :columns="getColumns"
         @on-load-data="handleLoadData"
@@ -124,6 +117,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

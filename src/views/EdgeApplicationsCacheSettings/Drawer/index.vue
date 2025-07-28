@@ -5,8 +5,14 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref, inject, computed } from 'vue'
-  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  import {
+    CDN_MAXIMUM_TTL_MAX_VALUE,
+    CDN_MAXIMUM_TTL_MIN_VALUE,
+    MAX_SLICE_RANGE_IN_KBYTES,
+    MAX_TTL_ONE_YEAR_IN_SECONDS
+  } from '@/utils/constants'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -37,6 +43,9 @@
     showTieredCache: {
       type: Boolean,
       required: true
+    },
+    isOverlapped: {
+      type: Boolean
     }
   })
 
@@ -48,17 +57,14 @@
   const showCreateDrawer = refDebounced(showCreateCacheSettingsDrawer, debouncedDrawerAnimate)
   const showEditDrawer = refDebounced(showEditCacheSettingsDrawer, debouncedDrawerAnimate)
 
-  const MAX_TTL_ONE_YEAR_IN_SECONDS = 31536000
-  const LOCKED_SLICE_RANGE_IN_KBYTES = 1024
-
   const initialValues = ref({
     name: '',
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: 0,
     cdnCacheSettings: 'honor',
     cdnCacheSettingsMaximumTtl: 60,
-    sliceConfigurationEnabled: false,
-    sliceConfigurationRange: LOCKED_SLICE_RANGE_IN_KBYTES,
+    enableLargeFileCache: false,
+    sliceConfigurationRange: MAX_SLICE_RANGE_IN_KBYTES,
     cacheByQueryString: 'ignore',
     queryStringFields: '',
     enableQueryStringSort: false,
@@ -69,9 +75,11 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    l2CachingEnabled: false,
-    isSliceL2CachingEnabled: false,
-    isSliceEdgeCachingEnabled: false
+    tieredCache: false,
+    tieredCacheRegion: 'near-edge',
+    isSliceTieredCache: false,
+    isSliceEdgeCachingEnabled: false,
+    largeFileCacheOffset: 1024
   })
 
   const minimumAcceptableValue = computed(() =>
@@ -80,11 +88,11 @@
       : CDN_MAXIMUM_TTL_MAX_VALUE
   )
   const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
-  const l2CachingEnabled = ref()
+  const tieredCacheEnabled = ref()
 
   const setNewMinimumValue = (value) => {
-    l2CachingEnabled.value = value
-    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
+    tieredCacheEnabled.value = value
+    if (tieredCacheEnabled.value || props.isApplicationAcceleratorEnabled) {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MIN_VALUE
     } else {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MAX_VALUE
@@ -94,6 +102,14 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
+    tieredCacheRegion: yup
+      .string()
+      .required()
+      .label('Tiered Cache Region')
+      .oneOf(
+        ['near-edge', 'br-east-1', 'us-east-1'],
+        'Tiered Cache Region must be either "near-edge" or "br-east-1" or "us-east-1"'
+      ),
     browserCacheSettingsMaximumTtl: yup
       .number()
       .label('Maximum TTL')
@@ -120,16 +136,15 @@
       .min(minimumAcceptableValue.value)
       .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
       .required(),
-    sliceConfigurationEnabled: yup.boolean().required(),
-    sliceConfigurationRange: yup
+    enableLargeFileCache: yup.boolean().required(),
+    largeFileCacheOffset: yup
       .number()
       .label('Large File Optimization Fragment Size')
       .transform((value) => (Number.isNaN(value) ? null : value))
-      .when('sliceConfigurationEnabled', {
-        is: false,
+      .when('enableLargeFileCache', {
+        is: (value) => value === false,
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) =>
-          schema.required().min(LOCKED_SLICE_RANGE_IN_KBYTES).max(LOCKED_SLICE_RANGE_IN_KBYTES)
+        otherwise: (schema) => schema.required().min(MAX_SLICE_RANGE_IN_KBYTES)
       }),
     cacheByQueryString: yup.string().required().label('Cache by query string'),
     queryStringFields: yup
@@ -152,11 +167,11 @@
         then: (schema) => schema.required()
       }),
     adaptiveDeliveryAction: yup.string().label('Adaptive Delivery Action'),
-    deviceGroup: yup.array().of(
-      yup.object().shape({
-        id: yup.string().required().label('Device group id')
-      })
-    )
+    deviceGroup: yup.array().when('adaptiveDeliveryAction', {
+      is: (value) => value === 'allowlist',
+      then: (schema) => schema.min(1).required().label('Device Group'),
+      otherwise: (schema) => schema.notRequired().label('Device Group')
+    })
   })
 
   const closeCreateDrawer = () => {
@@ -171,24 +186,15 @@
   }
 
   const createServiceWithEdgeApplicationIdDecorator = async (payload) => {
-    const result = await props.createService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    const result = await props.createService(props.edgeApplicationId, payload)
     return result
   }
 
   const loadCacheSettingsServiceWithDecorator = async (payload) => {
-    return props.loadService({
-      edgeApplicationId: props.edgeApplicationId,
-      id: payload.id
-    })
+    return props.loadService(props.edgeApplicationId, payload.id)
   }
   const editCacheSettingsServiceWithDecorator = async (payload) => {
-    return props.editService({
-      edgeApplicationId: props.edgeApplicationId,
-      ...payload
-    })
+    return props.editService(props.edgeApplicationId, payload)
   }
 
   const handleCreateCacheSettings = () => {
@@ -268,12 +274,13 @@
     @onSuccess="handleCreateCacheSettings"
     @onError="handleFailedToCreate"
     title="Create Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
-        @l2-caching-enabled="setNewMinimumValue"
+        @tiered-caching-enabled="setNewMinimumValue"
       />
     </template>
   </CreateDrawerBlock>
@@ -288,12 +295,13 @@
     @onSuccess="handleEditedCacheSettings"
     @onError="handleFailedToEdit"
     title="Edit Cache Settings"
+    :isOverlapped="props.isOverlapped"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
-        @l2-caching-enabled="setNewMinimumValue"
+        @tiered-caching-enabled="setNewMinimumValue"
       />
     </template>
   </EditDrawerBlock>

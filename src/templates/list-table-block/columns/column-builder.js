@@ -15,6 +15,8 @@ import CreditCardColumn from './credit-card-column.vue'
 import CountryFlagColumn from './country-flag-column.vue'
 import TagWithTooltip from './tag-with-tooltip'
 import LogBody from './log-body.vue'
+import TextWithIcon from './text-with-icon.vue'
+import TextFormatColumn from './text-format.vue'
 
 /**
  * Build and return a specific column based on the given appearance.
@@ -29,13 +31,18 @@ import LogBody from './log-body.vue'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
+    case 'text-format':
+      return h(TextFormatColumn, {
+        text: data.text
+      })
     case 'expand-column':
       return h(ExpandColumn, {
         value: data
       })
     case 'expand-text-column':
       return h(ExpandTextColumn, {
-        value: data
+        value: data.value,
+        sliceValue: data.sliceValue
       })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
@@ -116,6 +123,12 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
     case 'log-body':
       return h(LogBody, {
         value: data
+      })
+    case 'text-with-icon':
+      return h(TextWithIcon, {
+        text: data.text,
+        leftIcon: data.leftIcon,
+        rightIcon: data.rightIcon
       })
     default:
       throw new Error('Invalid column appearance')

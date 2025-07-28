@@ -10,6 +10,7 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { rulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -23,30 +24,6 @@
       required: true,
       type: String
     },
-    listRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    deleteRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    reorderRulesEngine: {
-      required: true,
-      type: Function
-    },
-    loadRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    editRulesEngineService: {
-      required: true,
-      type: Function
-    },
-    createRulesEngineService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
@@ -58,14 +35,6 @@
     isImageOptimizationEnabled: {
       required: true,
       type: Boolean
-    },
-    listEdgeApplicationFunctionsService: {
-      required: true,
-      type: Function
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
     },
     listOriginsService: {
       required: true,
@@ -88,8 +57,6 @@
     'name',
     'description',
     'phase',
-    'behaviors',
-    'criteria',
     'active',
     'order',
     'last_modified',
@@ -107,6 +74,7 @@
   const selectedPhase = ref('Request phase')
   const dialog = useDialog()
   const toast = useToast()
+  const currentPhase = ref('request')
 
   const getColumns = computed(() => {
     return [
@@ -122,11 +90,6 @@
         disableSort: true
       },
       {
-        field: 'description',
-        header: 'Description',
-        disableSort: true
-      },
-      {
         field: 'status',
         header: 'Status',
         type: 'component',
@@ -138,6 +101,21 @@
             columnAppearance: 'tag'
           })
         },
+        disableSort: true
+      },
+      {
+        field: 'description',
+        header: 'Description',
+        disableSort: true
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        disableSort: true
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
         disableSort: true
       }
     ]
@@ -159,19 +137,18 @@
     hasContentToList.value = event
   }
 
-  const listRulesEngineWithDecorator = async (query) => {
-    const data = await props.listRulesEngineService({
-      id: props.edgeApplicationId,
-      ...query
+  const listRulesEngineWithDecorator = async (params) => {
+    const data = await rulesEngineService.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId: props.edgeApplicationId,
+      params
     })
     return data
   }
 
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
-    const phase =
-      ruleData.phase.content == 'Default' ? 'request' : ruleData.phase.content.toLowerCase()
+    const phase = ruleData.phase?.content.toLowerCase()
 
-    return await props.deleteRulesEngineService({
+    return await rulesEngineService.deleteRulesEngine({
       edgeApplicationId: props.edgeApplicationId,
       ruleId,
       phase
@@ -179,7 +156,11 @@
   }
 
   const reloadList = () => {
-    listRulesEngineRef.value.reload()
+    if (hasContentToList.value) {
+      listRulesEngineRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
@@ -188,13 +169,9 @@
   }
 
   const openEditRulesEngineDrawer = (item) => {
+    currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
-
-  const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
-  const descriptionEmptyState = computed(
-    () => `Click the button below to create your first ${selectedPhase.value} rule.`
-  )
 
   const actions = [
     {
@@ -210,7 +187,7 @@
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true
     try {
-      await props.reorderRulesEngine(data, props.edgeApplicationId)
+      await rulesEngineService.reorderRulesEngine(data, props.edgeApplicationId)
       toast.add({
         closable: true,
         severity: 'success',
@@ -233,7 +210,8 @@
   const updateRulesOrder = async (rows, alteredRows, reload) => {
     dialog.open(orderDialog, {
       data: {
-        rules: alteredRows
+        rules: alteredRows,
+        isEdgeApplicationRulesEngine: true
       },
       onClose: ({ data }) => {
         if (data?.updated || data?.reset) {
@@ -260,23 +238,21 @@
     ref="drawerRulesEngineRef"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :isImageOptimizationEnabled="isImageOptimizationEnabled"
-    :listEdgeApplicationFunctionsService="listEdgeApplicationFunctionsService"
     :listOriginsService="listOriginsService"
     :clipboardWrite="clipboardWrite"
-    :listCacheSettingsService="listCacheSettingsService"
     :edgeApplicationId="edgeApplicationId"
-    :createRulesEngineService="createRulesEngineService"
-    :editRulesEngineService="editRulesEngineService"
-    :loadRulesEngineService="loadRulesEngineService"
     :documentationService="documentationService"
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
+    :currentPhase="currentPhase"
     @onSuccess="reloadList"
     data-testid="rules-engine-drawer"
   />
+
   <TableBlock
     ref="listRulesEngineRef"
     orderableRows
+    v-if="hasContentToList"
     :columns="getColumns"
     :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
@@ -294,6 +270,7 @@
     groupColumn="phase.content"
     :expandedRowGroups="['Default', 'Request', 'Response']"
     expandableRowGroups
+    isEdgeApplicationRulesEngine
   >
     <template #addButton="{ reload, data, columnOrderAltered, alteredRows }">
       <div
@@ -315,14 +292,11 @@
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
-              class="bg-secondary"
               outlined
-              label="Cancel"
+              label="Discard Changes"
               @click="reload"
-              :disabled="isLoadingButtonOrder"
-              data-testid="rules-engine-cancel-order-button"
+              data-testid="review-changes-dialog-footer-cancel-button"
             />
-
             <PrimeButton
               label="Review Changes"
               class="bg-surface"
@@ -339,29 +313,25 @@
         </teleport>
       </div>
     </template>
-
-    <template #noRecordsFound>
-      <EmptyResultsBlock
-        v-if="!hasContentToList"
-        :title="titleEmptyState"
-        :description="descriptionEmptyState"
-        :createButtonLabel="selectedPhase"
-        :documentationService="documentationService"
-        :inTabs="true"
-        :noBorder="true"
-        data-testid="rules-engine-empty-results"
-      >
-        <template #default>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            @click="openCreateRulesEngineDrawerByPhase"
-            severity="secondary"
-            icon="pi pi-plus"
-            label="Rule"
-            data-testid="rules-engine-empty-results-create-button"
-          />
-        </template>
-      </EmptyResultsBlock>
-    </template>
   </TableBlock>
+
+  <EmptyResultsBlock
+    v-else
+    title="No rules engine have been created"
+    description="Click the button below to create your first rules engine."
+    createButtonLabel="Create Rules Engine"
+    :documentationService="documentationService"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Rule"
+        @click="openCreateRulesEngineDrawerByPhase"
+        data-testid="edge-application-rules-engine-list__create-rules-engine__button"
+      />
+    </template>
+  </EmptyResultsBlock>
 </template>

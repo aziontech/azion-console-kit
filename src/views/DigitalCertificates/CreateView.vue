@@ -1,34 +1,21 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Digital Certificate"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="pageTitleByCertificateType"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="createServiceBySelectedType"
+        :createService="createService"
         :schema="validationSchema"
         :initialValues="initialValues"
-        @on-response="handleTrackSuccessCreated"
+        @on-response="handleSuccessResponse"
         @on-response-fail="handleTrackFailCreated"
+        disableToast
       >
         <template #form>
-          <InlineMessage
-            class="w-fit"
-            severity="info"
-          >
-            Create a Let's Encrypt™ digital certificate directly from
-            <PrimeButton
-              link
-              size="small"
-              class="p-0"
-              @click="navigateToDomains"
-            >
-              {{ handleTextDomainWorkload.pluralTitle }}
-            </PrimeButton>
-          </InlineMessage>
-          <FormFieldsCreateDigitalCertificates
-            v-model:certificate-selection="certificateSelection"
-          />
+          <InlineMessage :show="isRenderInlineMessage" />
+
+          <FormFieldsCreateDigitalCertificates />
         </template>
 
         <template #action-bar="{ onSubmit, onCancel, loading }">
@@ -45,58 +32,38 @@
 
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
-  import PrimeButton from 'primevue/button'
-  import InlineMessage from 'primevue/inlinemessage'
+  import InlineMessage from './FormFields/InlineMessage.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import * as yup from 'yup'
-  import { ref, watch, inject } from 'vue'
-  import { useRouter } from 'vue-router'
   import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
+  import { ref, computed, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
-  const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import validationSchemaHandler from './FormFields/composables/validation'
+  import { useDigitalCertificate } from './FormFields/composables/certificate'
+  import { useRoute } from 'vue-router'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    createDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    createDigitalCertificatesCSRService: {
-      type: Function,
-      required: true
-    }
-  })
+  const route = useRoute()
 
-  const router = useRouter()
+  const {
+    createService,
+    isEdgeCertificate,
+    isEdgeCertificateCSR,
+    PRIVATE_KEY_TYPES,
+    CERTIFICATE_TYPES,
+    certificateTypeList,
+    pageTitleByCertificateType
+  } = useDigitalCertificate(route.query.certificate)
 
-  const createDigitalCertificateService = props.createDigitalCertificatesService
-  const createCSRService = props.createDigitalCertificatesCSRService
+  const validationSchema = validationSchemaHandler(false, CERTIFICATE_TYPES.EDGE_CERTIFICATE)
 
-  const certificateTypes = {
-    EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
-    EDGE_CERTIFICATE_CSR: 'generateCSR',
-    TRUSTED: 'trusted_ca_certificate'
-  }
-  const CSRConditionalValidations = {
-    is: certificateTypes.EDGE_CERTIFICATE_CSR,
-    then: (schema) => schema.required('Field Required')
-  }
-
-  const createServiceBySelectedType = ref(createDigitalCertificateService)
-
-  const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
     digitalCertificateName: '',
-    // Edge Certificate values
     certificate: '',
     privateKey: undefined,
-
-    // CSR values
     common: '',
     country: '',
     state: '',
@@ -104,63 +71,10 @@
     organization: '',
     organizationUnity: '',
     email: '',
-    privateKeyType: 'RSA (2048)',
+    privateKeyType: PRIVATE_KEY_TYPES.RSA_2048,
     subjectAlternativeNames: '',
-    certificateType: 'edge_certificate'
+    certificateType: CERTIFICATE_TYPES.EDGE_CERTIFICATE
   })
-
-  const certificateRequiredField = (certificateType) => {
-    const isTrustedCA = certificateType === certificateTypes.TRUSTED
-
-    return isTrustedCA
-  }
-  const validationSchema = yup.object({
-    digitalCertificateName: yup.string().required('Name is a required field.'),
-
-    // Certificate Choices
-    certificateType: yup.string().required('Choose a certificate type.'),
-
-    // Edge Certificate Fields
-    certificate: yup.string().when(['certificateType'], {
-      is: certificateRequiredField,
-      then: (schema) => schema.required('Certificate is a required field.')
-    }),
-    privateKey: yup.string(),
-
-    // CSR Fields
-    common: yup.string().when('certificateType', CSRConditionalValidations),
-    country: yup.string().when('certificateType', {
-      is: certificateTypes.EDGE_CERTIFICATE_CSR,
-      then: (schema) =>
-        schema
-          .required('Country/Region is a required field.')
-          .max(2, 'Country/Region must be a 2-character country code.')
-          .min(2, 'Country/Region must be a 2-character country code.')
-    }),
-    state: yup.string().when('certificateType', CSRConditionalValidations),
-    city: yup.string().when('certificateType', CSRConditionalValidations),
-    organizationUnity: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('organization unity'),
-    organization: yup.string().when('certificateType', CSRConditionalValidations),
-    privateKeyType: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('private key type'),
-    email: yup.string().when('certificateType', {
-      is: certificateTypes.EDGE_CERTIFICATE_CSR,
-      then: (schema) => schema.required('Email is a required field.').email()
-    }),
-    subjectAlternativeNames: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)')
-  })
-
-  const navigateToDomains = () => {
-    router.push({ name: `list-${handleTextDomainWorkload.pluralLabel}` })
-  }
 
   const handleTrackSuccessCreated = () => {
     tracker.product.productCreated({
@@ -180,12 +94,28 @@
       .track()
   }
 
-  watch(certificateSelection, () => {
-    const isEdgeCertificateCSR =
-      certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
+  const handleSuccessResponse = (response) => {
+    handleTrackSuccessCreated()
+    handleToast(response)
+  }
 
-    createServiceBySelectedType.value = isEdgeCertificateCSR
-      ? createCSRService
-      : createDigitalCertificateService
+  const handleToast = (response) => {
+    const label =
+      certificateTypeList.value === 'Certificates' ? 'View Edge Certificate' : 'View CRL'
+
+    const toast = {
+      feedback: 'Your digital certificate has been created!',
+      actions: {
+        link: {
+          label,
+          callback: () => response.redirectToUrl(`/digital-certificates/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
+
+  const isRenderInlineMessage = computed(() => {
+    return isEdgeCertificate.value || isEdgeCertificateCSR.value
   })
 </script>

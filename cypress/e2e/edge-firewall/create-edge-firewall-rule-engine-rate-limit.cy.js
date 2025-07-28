@@ -21,7 +21,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
     cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
     cy.get(selectors.edgeFirewall.saveButton).click()
-    cy.verifyToast('success', 'Your Edge Firewall has been created')
+    cy.verifyToastWithAction('success', 'Your Edge Firewall has been created')
 
     cy.get(selectors.edgeFirewall.rulesEngineTab).click()
     cy.get(selectors.edgeFirewall.createRuleButton).click()
@@ -44,7 +44,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.behaviorLimitBy).click()
     cy.get(selectors.edgeFirewall.behaviorLimitByFirstOption).click()
 
-    cy.intercept('POST', '/api/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
+    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/rules*').as('addEdgeFirewallRule')
 
     cy.get(selectors.edgeFirewall.ruleSubmit).click()
 

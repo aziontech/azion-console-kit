@@ -4,6 +4,7 @@
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall'
   import { ref, inject } from 'vue'
   import * as yup from 'yup'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
@@ -14,10 +15,9 @@
   const emit = defineEmits(['updatedFirewall'])
 
   const props = defineProps({
-    editEdgeFirewallService: { type: Function, required: true },
-    edgeFirewall: { type: Object },
     loadDomains: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    updatedRedirect: { type: String, required: true },
+    edgeFirewall: { type: Object }
   })
 
   const loadingServices = ref(false)
@@ -32,14 +32,14 @@
     isActive: yup.boolean().label('Active')
   })
 
-  const loadEdgeFirewall = async () => {
-    return props.edgeFirewall
-  }
-
   const formSubmit = async (onSubmit, values, formValid) => {
     if (!formValid) return
     await onSubmit()
     emit('updatedFirewall', values)
+  }
+
+  const loadEdgeFirewallService = () => {
+    return props.edgeFirewall
   }
 
   const handleTrackSuccessEdit = () => {
@@ -67,8 +67,8 @@
 <template>
   <div>
     <EditFormBlock
-      :editService="props.editEdgeFirewallService"
-      :loadService="loadEdgeFirewall"
+      :editService="edgeFirewallService.editEdgeFirewallService"
+      :loadService="loadEdgeFirewallService"
       :schema="validationSchema"
       :updatedRedirect="updatedRedirect"
       disableRedirect

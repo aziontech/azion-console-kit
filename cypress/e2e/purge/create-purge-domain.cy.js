@@ -46,9 +46,7 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
-    'getDigitalCertificatesApi'
-  )
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?').as('getDigitalCertificatesApi')
 
   // Act
   cy.get(selectors.domains.digitalCertificateActionBar)
@@ -62,6 +60,9 @@ const createDigitalCertificateCase = () => {
 
 describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -76,8 +77,6 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been created')
-    cy.get(selectors.form.actionsCancelButton).click()
-
 
     // Arrange
     cy.openProduct('Domains')
@@ -88,12 +87,12 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
 
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
 
     cy.intercept(
       'GET',
-      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+      ' /v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
     ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.domains.createButton).click()
@@ -104,7 +103,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.domains.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
+    // cy.wait('@getEdgeFirewallList')
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.createEdgeFirewallButton).click()
     createEdgeFirewallCase()
@@ -140,7 +139,7 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
         cy.verifyToast(
           'Succesfully created!',
           'The domain is now available in the Domain management section.'
-        )        
+        )
 
         // Act
         cy.openProduct('Real-Time Purge')

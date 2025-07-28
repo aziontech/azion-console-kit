@@ -41,7 +41,7 @@ describe('WafRulesService', () => {
     const { sut } = makeSut()
     await sut({
       wafId: 4044,
-      tuningId: 10011,
+      tuningId: 1001,
       query: {
         domains: '1705587704',
         hourRange: '48',
@@ -69,7 +69,7 @@ describe('WafRulesService', () => {
 
     const result = await sut({
       wafId: 4044,
-      tuningId: 10011,
+      tuningId: 1001,
       query: {
         domains: '1705587704',
         hourRange: '48',

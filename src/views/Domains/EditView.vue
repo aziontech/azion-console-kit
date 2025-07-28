@@ -18,10 +18,8 @@
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             hasDomainName
             @copyDomainName="copyDomainName"
           />
@@ -47,22 +45,14 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
     editDomainService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },
@@ -119,20 +109,10 @@
   }
 
   const digitalCertificates = ref([])
-  const toast = useToast()
   const domainName = ref()
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
-  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
   }
 
   const setDomainName = async (domain) => {

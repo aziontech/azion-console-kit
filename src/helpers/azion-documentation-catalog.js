@@ -31,7 +31,8 @@ export const documentationCatalog = {
   wafTuning: () => openSearchResult('Tune'),
   customPages: () => openSearchResult('Error Responses'),
   mfaManagement: () => openSearchResult('MFA Management'),
-  edgeConnectors: () => openSearchResult('Origins')
+  edgeConnectors: () => openSearchResult('Origins'),
+  workload: () => openSearchResult('workload')
 }
 
 export const documentationGuideProducts = {
@@ -59,4 +60,8 @@ export const documentationGuideProducts = {
   paymentHistory: () =>
     openDocumentationProducts('guides/billing-and-subscriptions/#payment-history'),
   customPages: () => openDocumentationProducts('guides/customizing-error-response-page')
+}
+
+export const documentationStoreProducts = {
+  bucket: () => openDocumentationProducts('store/storage/create-bucket/')
 }

@@ -8,12 +8,13 @@
     </template>
     <template #content>
       <CreateFormBlock
-        @on-response="handleTrackCreation"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
-        :createService="props.createEdgeApplicationService"
+        :createService="edgeAppService.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
         data-testid="create-edge-application-form-block"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeApplications
@@ -46,27 +47,46 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeAppService } from '@/services/v2'
 
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'
   const route = useRoute()
-
-  const props = defineProps({
-    createEdgeApplicationService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validationSchema = yup.object({
     name: yup.string().required()
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false,
+    isActive: true
   })
 
   const handleBlocks = ['general']
+
+  const handleResponse = (response) => {
+    handleTrackCreation()
+    handleToast(response)
+  }
+
+  const handleToast = ({ data, showToastWithActions, redirectToUrl }) => {
+    const toast = {
+      feedback: 'Your edge application has been created',
+      actions: {
+        link: {
+          label: 'View Edge Application',
+          callback: () => redirectToUrl(`/edge-applications/edit/${data.id}`)
+        }
+      }
+    }
+
+    showToastWithActions(toast)
+  }
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({

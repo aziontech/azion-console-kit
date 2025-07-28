@@ -3,6 +3,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
+  import { deviceGroupService } from '@/services/v2'
   import PrimeButton from 'primevue/button'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { computed, ref, inject } from 'vue'
@@ -16,31 +17,11 @@
       required: true,
       type: String
     },
-    listDeviceGroupsService: {
-      required: true,
-      type: Function
-    },
-    createDeviceGroupService: {
-      required: true,
-      type: Function
-    },
-    loadDeviceGroupService: {
-      required: true,
-      type: Function
-    },
-    editDeviceGroupService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       required: true,
       type: Function
     },
     clipboardWrite: {
-      required: true,
-      type: Function
-    },
-    deleteDeviceGroupService: {
       required: true,
       type: Function
     }
@@ -78,7 +59,14 @@
       },
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: { value: columnData },
+            columnAppearance: 'expand-text-column'
+          })
+        }
       },
       {
         field: 'userAgent',
@@ -105,12 +93,12 @@
     hasContentToList.value = event
   }
 
-  const listDeviceGroupsWithDecorator = async (query) => {
-    return await props.listDeviceGroupsService({ id: props.edgeApplicationId, ...query })
+  const listDeviceGroupsWithDecorator = async (params) => {
+    return await deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)
   }
 
   const deleteDeviceGroupsWithDecorator = async (id) => {
-    return await props.deleteDeviceGroupService(id, props.edgeApplicationId)
+    return await deviceGroupService.deleteDeviceGroupService(props.edgeApplicationId, id)
   }
 
   const DEVICE_GROUP_API_FIELDS = ['id', 'name', 'user_agent']
@@ -145,10 +133,9 @@
     ref="drawerDeviceGroups"
     @onSuccess="handleSuccess"
     :edgeApplicationId="edgeApplicationId"
-    :createDeviceGroupService="createDeviceGroupService"
-    :loadDeviceGroupService="loadDeviceGroupService"
-    :editDeviceGroupService="editDeviceGroupService"
-    :documentationService="documentationService"
+    :createDeviceGroupService="deviceGroupService.createDeviceGroupService"
+    :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
+    :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
   />
   <div v-if="hasContentToList">
     <FetchListTableBlock

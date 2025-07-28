@@ -9,7 +9,7 @@
         :addButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         :editPagePath="`${handleTextDomainWorkload.pluralLabel}/edit`"
-        :listService="listDomainsService"
+        :listService="workloadService.listWorkloads"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
@@ -17,16 +17,17 @@
         :emptyListMessage="`No ${handleTextDomainWorkload.singularLabel} found.`"
         :actions="actions"
         :apiFields="DOMAINS_API_FIELDS"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="columnsHiddenByDefault"
       />
       <EmptyResultsBlock
         v-else
-        title="No workload have been created"
-        description="Click the button below to create your first workload."
+        :title="titleEmptyPage"
+        :description="descriptionEmptyPage"
         :createButtonLabel="`${handleTextDomainWorkload.singularTitle}`"
         :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
-        :documentationService="documentationService"
+        :documentationService="documentationHandler"
       >
         <template #illustration>
           <Illustration />
@@ -44,7 +45,11 @@
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { useToast } from 'primevue/usetoast'
   import { INFORMATION_TEXTS, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
+  import { workloadService } from '@/services/v2'
+  import { deleteDomainService } from '@/services/domains-services'
+  import * as Helpers from '@/helpers'
 
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
@@ -52,75 +57,77 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    listDomainsService: {
-      required: true,
-      type: Function
-    },
-    deleteDomainService: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    },
-    clipboardWrite: {
-      required: true,
-      type: Function
-    }
-  })
-
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
   const DOMAINS_API_FIELDS = [
-    'id',
     'name',
-    'edge_application',
-    'active',
-    'alternate_domains',
     'domains',
-    'product_version'
+    'workload_domain',
+    'infrastructure',
+    'active',
+    'last_modified',
+    'id',
+    'last_editor',
+    'product_version',
+    'workload_domain'
   ]
 
+  const columnsHiddenByDefault = ['id', 'lastEditor', 'protocols']
+
   const hasContentToList = ref(true)
+  const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
   const actions = [
     {
       type: 'delete',
-      title: 'domain',
+      title: `${handleTextDomainWorkload.singularLabel}`,
       icon: 'pi pi-trash',
-      service: props.deleteDomainService
+      service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
     }
   ]
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Domain'
+      productName: 'Workload'
     })
   }
 
-  const showLockedMessage = () => {
-    const options = {
-      closable: true,
-      severity: 'warn',
-      summary: 'Warning',
-      detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+  const documentationHandler = () => {
+    if (isWorkload.value) {
+      Helpers.documentationCatalog.workload()
+    } else {
+      Helpers.documentationCatalog.domains()
     }
-
-    toast.add(options)
   }
 
   const handleTrackEditEvent = (domain) => {
     tracker.product.clickToEdit({
-      productName: 'Domain'
+      productName: 'Workload'
     })
     if (domain.isLocked) {
-      showLockedMessage()
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'Warning',
+        detail: INFORMATION_TEXTS.LOCKED_MESSAGE_TOAST
+      })
     }
   }
 
+  const domainNameColumn = computed(() => {
+    if (handleTextDomainWorkload.singularLabel === 'workload') {
+      return 'Workload Domain'
+    }
+    return 'Domain name'
+  })
+
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        filterPath: 'id',
+        sortField: 'id'
+      },
       {
         field: 'name',
         header: 'Name',
@@ -134,9 +141,22 @@
         }
       },
       {
-        field: 'domainName',
-        header: 'Domain Name',
-        filterPath: 'domainName.content',
+        field: 'domains',
+        header: 'Domains',
+        filterPath: 'domains',
+        disableSort: true,
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'expand-column'
+          })
+        }
+      },
+      {
+        field: 'workloadHostname',
+        header: domainNameColumn.value,
+        filterPath: 'workloadHostname',
         disableSort: true,
         type: 'component',
         component: (columnData) => {
@@ -144,19 +164,16 @@
             data: columnData,
             columnAppearance: 'text-with-clipboard',
             dependencies: {
-              copyContentService: props.clipboardWrite
+              copyContentService: Helpers.clipboardWrite
             }
           })
         }
       },
       {
-        field: 'cnames',
-        header: 'CNAME',
-        filterPath: 'description.value',
-        type: 'component',
-        disableSort: true,
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+        field: 'infrastructure',
+        header: 'Infrastructure',
+        filterPath: 'infrastructure',
+        sortField: 'infrastructure'
       },
       {
         field: 'active',
@@ -169,6 +186,18 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        filterPath: 'lastModified',
+        sortField: 'lastModified'
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        filterPath: 'lastEditor',
+        sortField: 'lastEditor'
       }
     ]
   })
@@ -176,4 +205,11 @@
   function handleLoadData(event) {
     hasContentToList.value = event
   }
+
+  const titleEmptyPage = computed(
+    () => `No ${handleTextDomainWorkload.singularLabel} have been created`
+  )
+  const descriptionEmptyPage = computed(
+    () => `Click the button below to create your first ${handleTextDomainWorkload.singularLabel}.`
+  )
 </script>

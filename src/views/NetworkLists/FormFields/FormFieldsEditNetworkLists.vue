@@ -25,7 +25,8 @@
   const { value: name } = useField('name')
   const { value: itemsValues } = useField('itemsValues')
   const { value: networkListType } = useField('networkListType')
-  const { value: itemsValuesCountry } = useField('itemsValuesCountry')
+  const { value: itemsValuesCountry, errorMessage: itemsValuesCountryError } =
+    useField('itemsValuesCountry')
 
   const fetchCountries = async () => {
     const result = await props.listCountriesService()
@@ -113,11 +114,16 @@
           name="itemsValues"
           rows="16"
           :value="itemsValues"
-          description="Separate each address value by using a new line and, optionally, use <code>#</code> to add
-          a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
-          removed."
           data-testid="network-list-form__ipcidr-list"
-        />
+        >
+          <template #description>
+            <small class="text-xs text-color-secondary font-normal leading-5">
+              Separate each address value by using a new line and, optionally, use
+              <code>#</code> to add a comment and <code>--LT</code> to add a date. Duplicated
+              entries are automatically removed.
+            </small>
+          </template>
+        </FieldTextArea>
       </div>
       <div
         class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -132,6 +138,8 @@
           id="countriesList"
           v-model="itemsValuesCountry"
           :options="countriesList"
+          :loading="!countriesList.length"
+          :disabled="!countriesList.length"
           name="itemsValuesCountry"
           filter
           autoFilterFocus

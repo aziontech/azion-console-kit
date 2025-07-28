@@ -42,7 +42,8 @@
     'on-edit-success',
     'on-edit-fail',
     'on-load-fail',
-    'loaded-service-object'
+    'loaded-service-object',
+    'onError'
   ])
 
   const { scrollToError } = useScrollToError()
@@ -107,8 +108,12 @@
       emit('loaded-service-object', initialValues)
       resetForm({ values: initialValues })
     } catch (error) {
-      emit('on-load-fail', error)
-      showToast('error', error)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        emit('on-load-fail', error)
+        showToast('error', error)
+      }
       goBackToList()
     }
   }
@@ -118,7 +123,7 @@
       try {
         const feedback = await props.editService(values)
         if (!props.disableAfterCreateToastFeedback) {
-          showToast('success', feedback ?? 'edited successfully')
+          showToast('success', feedback || 'edited successfully')
         }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
@@ -129,11 +134,18 @@
         }
         goBackToList()
       } catch (error) {
-        const errorMessage = error?.message || error
-
-        emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        showToast('error', errorMessage)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          emit('on-edit-fail', error)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {

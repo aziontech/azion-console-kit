@@ -39,7 +39,7 @@
 
   const { value: name } = useField('name')
 
-  const { value: args, errorMessage: argsError } = useField('args', null, {
+  const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs', null, {
     initialValue: ARGS_INITIAL_STATE
   })
   const { value: code, errorMessage: codeError } = useField('code', null, {
@@ -57,22 +57,22 @@
   const updateObject = computed(() => {
     const previewValues = {
       code: code.value,
-      args: args.value
+      args: defaultArgs.value
     }
     emit('update:previewData', previewValues)
     return previewValues
   })
 
-  const initiatorTypeOptions = [
+  const executionEnvironmentOptions = [
     {
       title: 'Edge Application',
       subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
-      inputValue: 'edge_application'
+      inputValue: 'application'
     },
     {
       title: 'Edge Firewall',
       subtitle: 'Functions are executed by a firewall to apply security policies.',
-      inputValue: 'edge_firewall'
+      inputValue: 'firewall'
     }
   ]
 </script>
@@ -112,9 +112,9 @@
               label="Language"
               name="LANGUAGE_LABEL"
               icon="pi pi-lock"
+              disabled
               :value="LANGUAGE_LABEL"
               description="Currently, only JavaScript is supported."
-              readonly
             />
           </div>
         </template>
@@ -130,9 +130,9 @@
           <div class="flex flex-col w-full gap-2">
             <FieldGroupRadio
               required
-              nameField="initiatorType"
+              nameField="executionEnvironment"
               isCard
-              :options="initiatorTypeOptions"
+              :options="executionEnvironmentOptions"
             />
           </div>
         </template>
@@ -171,7 +171,7 @@
           <CodeEditor
             v-model="code"
             :initialValue="HelloWorldSample"
-            language="javascript"
+            runtime="javascript"
             :errors="hasCodeError"
           />
           <small
@@ -194,7 +194,7 @@
         <CodeEditor
           v-model="code"
           :initialValue="HelloWorldSample"
-          language="javascript"
+          runtime="javascript"
           :errors="hasCodeError"
         />
         <small
@@ -216,9 +216,9 @@
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
           <CodeEditor
-            v-model="args"
+            v-model="defaultArgs"
             :initialValue="ARGS_INITIAL_STATE"
-            language="json"
+            runtime="json"
             :errors="hasArgsError"
           />
         </SplitterPanel>
@@ -232,9 +232,9 @@
       </Splitter>
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
         <CodeEditor
-          v-model="args"
+          v-model="defaultArgs"
           :initialValue="ARGS_INITIAL_STATE"
-          language="json"
+          runtime="json"
           :errors="hasArgsError"
         />
       </div>

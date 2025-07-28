@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="props.createFunctionService"
+    :createService="edgeFirewallFunctionService.createEdgeFirewallService"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"
@@ -14,8 +14,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
+        :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
+        :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
       />
     </template>
   </CreateDrawerBlock>
@@ -35,8 +35,8 @@
     <template #formFields>
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
-        :listEdgeFunctionsService="listEdgeFunctionsService"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
+        :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
+        :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
       />
     </template>
   </EditDrawerBlock>
@@ -52,6 +52,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallFunctionService, edgeFunctionService } from '@/services/v2'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -65,22 +66,6 @@
     createFunctionService: {
       type: Function,
       required: true
-    },
-    editFunctionService: {
-      required: true,
-      type: Function
-    },
-    loadFunctionService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
-    },
-    loadEdgeFunctionService: {
-      required: true,
-      type: Function
     }
   })
 
@@ -169,18 +154,17 @@
   }
 
   const editService = async (payload) => {
-    return await props.editFunctionService({
+    return await edgeFirewallFunctionService.editEdgeFirewallFunctionService({
       ...payload,
       edgeFirewallID: props.edgeFirewallID
     })
   }
 
   const loadService = async () => {
-    const functions = await props.loadFunctionService({
-      edgeFirewallID: props.edgeFirewallID,
-      functionID: selectedFunctionToEdit.value
-    })
-    return functions
+    return await edgeFirewallFunctionService.loadFunctionsService(
+      props.edgeFirewallID,
+      selectedFunctionToEdit.value
+    )
   }
 
   const openDrawerCreate = () => {

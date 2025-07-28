@@ -18,10 +18,8 @@
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             :isLoadingRequests="isLoadingRequests"
           />
         </template>
@@ -51,6 +49,7 @@
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -58,14 +57,6 @@
 
   const props = defineProps({
     createDomainService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },
@@ -78,14 +69,6 @@
       required: true
     },
     loadEdgeApplicationsService: {
-      type: Function,
-      required: true
-    },
-    listEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFirewallService: {
       type: Function,
       required: true
     }

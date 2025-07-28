@@ -21,7 +21,7 @@ const nullable = (value) => {
 const adapt = (payload) => {
   const pages = payload.pages.map((page) => {
     return {
-      code: page.code.toLowerCase(),
+      code: page.code.value?.toLowerCase(),
       ttl: page.ttl,
       uri: nullable(page.uri),
       custom_status_code: nullable(page.customStatusCode)

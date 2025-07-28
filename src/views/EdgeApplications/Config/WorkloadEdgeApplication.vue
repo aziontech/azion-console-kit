@@ -7,12 +7,11 @@
     @on-response="handleResponse"
   >
     <template #form>
-      <FormFieldsCreateDomains
+      <FormFieldsCreateWorkload
         isDrawer
         noBorder
-        :listEdgeFirewallService="listEdgeFirewallService"
-        :loadEdgeFirewallService="loadEdgeFirewallService"
-        :listDigitalCertificatesService="listDigitalCertificatesService"
+        :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+        :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
         :loadDigitalCertificatesService="loadDigitalCertificateService"
         :loadEdgeApplicationsService="loadEdgeApplicationsService"
         :listEdgeApplicationsService="listEdgeApplicationsService"
@@ -31,10 +30,11 @@
 <script setup>
   import ActionBarAccordion from '@/templates/action-bar-block/action-bar-accordion.vue'
   import FormAccordion from '@/templates/create-form-block/form-accordion.vue'
-  import FormFieldsCreateDomains from '@/views/Workload/FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateWorkload from '@/views/Workload/FormFields/FormFieldsWorkload.vue'
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import * as yup from 'yup'
+  import { edgeFirewallService } from '@/services/v2'
 
   const emit = defineEmits(['createdDomain'])
 
@@ -44,10 +44,6 @@
       required: true
     },
     loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
       type: Function,
       required: true
     },

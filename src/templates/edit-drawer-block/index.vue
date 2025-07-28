@@ -33,7 +33,7 @@
     },
     editService: {
       type: Function,
-      required: true
+      default: () => {}
     },
     title: {
       type: String,
@@ -53,7 +53,7 @@
     }
   })
 
-  const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
+  const { meta, errors, handleSubmit, isSubmitting, values, resetForm } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -131,7 +131,10 @@
         const feedback = await props.editService(values)
         blockViewRedirection.value = false
         emit('onSuccess', feedback)
-        showToast('success', feedback)
+
+        const toastMessage =
+          typeof feedback === 'object' && feedback?.feedback ? feedback.feedback : feedback
+        showToast('success', toastMessage)
         showGoBack.value = props.showBarGoBack
         if (showGoBack.value) {
           blockViewRedirection.value = false
@@ -140,10 +143,17 @@
         formContext.resetForm()
         toggleDrawerVisibility(false)
       } catch (error) {
-        const errorMessage = error?.message || error
         blockViewRedirection.value = true
-        emit('onError', errorMessage)
-        showToast('error', errorMessage)
+        // Check if error is an ErrorHandler instance (from v2 services)
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+          emit('onError', error.message[0])
+        } else {
+          // Fallback for legacy errors or non-ErrorHandler errors
+          const errorMessage = error?.message || error
+          emit('onError', errorMessage)
+          showToast('error', errorMessage)
+        }
       }
     },
     ({ errors }) => {
@@ -167,53 +177,67 @@
 </script>
 
 <template>
-  <Sidebar
-    v-model:visible="visibleDrawer"
-    :update:visible="toggleDrawerVisibility"
-    position="right"
-    :pt="{
-      root: {
-        class: `w-full transition-all duration-300 ease-in-out ${
-          props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
-        }`
-      },
-      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
-      content: { class: 'p-8' }
-    }"
-  >
-    <template #header>
-      <h2>{{ title }}</h2>
-      <ConsoleFeedback />
-    </template>
-    <div class="pb-16 w-full space-y-8">
-      <form
-        @submit.prevent="handleSubmit"
-        class="w-full flex flex-col gap-8"
-      >
+  <Teleport to="body">
+    <Sidebar
+      v-model:visible="visibleDrawer"
+      :update:visible="toggleDrawerVisibility"
+      position="right"
+      :pt="{
+        root: {
+          class: `w-full transition-all duration-300 ease-in-out ${
+            props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+          }`
+        },
+        headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
+        content: { class: 'p-8' }
+      }"
+    >
+      <template #header>
+        <h2>{{ title }}</h2>
+        <ConsoleFeedback />
+      </template>
+      <div class="pb-16 w-full space-y-8">
+        <form
+          @submit.prevent="handleSubmit"
+          class="w-full flex flex-col gap-8"
+        >
+          <slot
+            name="formFields"
+            :errors="errors"
+            :disabledFields="isLoading"
+          />
+        </form>
+      </div>
+      <div class="w-full fixed left-0 bottom-0">
         <slot
-          name="formFields"
+          name="action-bar"
+          :onSubmit="onSubmit"
+          :formValid="meta.valid"
           :errors="errors"
-          :disabledFields="isLoading"
-        />
-      </form>
-    </div>
-    <div class="w-full fixed left-0 bottom-0">
-      <GoBack
-        :goBack="handleGoBack"
-        v-if="showGoBack"
-        :inDrawer="true"
-      />
-      <ActionBarBlock
-        v-else
-        @onCancel="closeDrawer"
-        @onSubmit="onSubmit"
-        :inDrawer="true"
-        :loading="isLoading"
-      />
-    </div>
-  </Sidebar>
-  <DialogUnsavedBlock
-    :blockRedirectUnsaved="formHasChanges"
-    :isDrawer="true"
-  />
+          :loading="isSubmitting"
+          :values="values"
+          :onCancel="closeDrawer"
+          :handleSubmit="handleSubmit"
+          :scrollToErrorInDrawer="scrollToErrorInDrawer"
+        >
+          <GoBack
+            :goBack="handleGoBack"
+            v-if="showGoBack"
+            :inDrawer="true"
+          />
+          <ActionBarBlock
+            v-else
+            @onCancel="closeDrawer"
+            @onSubmit="onSubmit"
+            :inDrawer="true"
+            :loading="isLoading"
+          />
+        </slot>
+      </div>
+    </Sidebar>
+    <DialogUnsavedBlock
+      :blockRedirectUnsaved="formHasChanges"
+      :isDrawer="true"
+    />
+  </Teleport>
 </template>

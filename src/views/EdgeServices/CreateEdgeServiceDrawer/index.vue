@@ -61,6 +61,7 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackSuccessCreated()
+    handleToast(response)
     emit('onSuccess', response.id)
     closeCreateDrawer()
   }
@@ -68,6 +69,12 @@
     showCreateDrawer,
     openCreateDrawer
   })
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Service has been created'
+    }
+    response.showToastWithActions(toast)
+  }
 </script>
 
 <template>
@@ -81,6 +88,7 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailCreated"
     title="Create Edge Service"
+    disableToast
   >
     <template #formFields>
       <FormFieldsEdgeService isDrawer />

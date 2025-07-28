@@ -43,7 +43,7 @@ const createDigitalCertificateCase = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?fields=*').as(
     'getDigitalCertificatesApi'
   )
 
@@ -75,11 +75,11 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
     cy.intercept(
       'GET',
-      '/api/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
+      '/v4/digital_certificates/certificates?ordering=name&page=1&page_size=100&fields=*&search=azion&type=*'
     ).as('searchDigitalCertificatesApi')
 
     cy.get(selectors.workload.createButton).click()
@@ -109,7 +109,6 @@ describe('Workload spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.createEdgeApplicationButton).click()
     createEdgeApplicationCase()
 
-    cy.wait('@getEdgeFirewallList')
     cy.get(selectors.workload.edgeFirewallField).click()
     cy.get(selectors.workload.createEdgeFirewallButton).click()
     createEdgeFirewallCase()

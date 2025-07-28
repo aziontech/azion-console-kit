@@ -1,5 +1,4 @@
 import * as Helpers from '@/helpers'
-import * as EdgeConnectorsService from '@/services/edge-connectors'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeConnectorsRoutes = {
@@ -11,8 +10,6 @@ export const edgeConnectorsRoutes = {
       name: 'list-edge-connectors',
       component: () => import('@views/EdgeConnectors/ListView.vue'),
       props: {
-        listEdgeConnectorsService: EdgeConnectorsService.listEdgeConnectorsService,
-        deleteEdgeConnectorsService: EdgeConnectorsService.deleteEdgeConnectorsService,
         documentationService: Helpers.documentationCatalog.edgeConnectors,
         clipboardWrite: Helpers.clipboardWrite
       },
@@ -30,9 +27,6 @@ export const edgeConnectorsRoutes = {
       path: 'create',
       name: 'create-edge-connectors',
       component: () => import('@views/EdgeConnectors/CreateView.vue'),
-      props: {
-        createEdgeConnectorsService: EdgeConnectorsService.createEdgeConnectorsService
-      },
       meta: {
         breadCrumbs: [
           {
@@ -51,10 +45,6 @@ export const edgeConnectorsRoutes = {
       path: 'edit/:id',
       name: 'edit-edge-connectors',
       component: () => import('@views/EdgeConnectors/EditView.vue'),
-      props: {
-        editEdgeConnectorsService: EdgeConnectorsService.editEdgeConnectorsService,
-        loadEdgeConnectorsService: EdgeConnectorsService.loadEdgeConnectorsService
-      },
       meta: {
         breadCrumbs: [
           {

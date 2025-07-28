@@ -9,7 +9,7 @@ export default {
   breadcrumbToList: '[data-testid="page-heading-block__breadcrumb__WAF Rules"]',
   listRow: (columnName) => `[data-testid="list-table-block__column__${columnName}__row"]`,
   seeMore: (columnName) =>
-    `[data-testid="list-table-block__column__${columnName}__row"] .underline`,
+    `[data-testid="list-table-block__column__${columnName}__row"]`,
   mainSettingsTab: '[data-testid="waf-rules-tabs__tab__main-settings"] > a',
   tuningTab: '[data-testid="waf-rules-tabs__tab__tuning"] > a',
   allowedRulesTab: '[data-testid="waf-rules-tabs__tab__allowed-rules"] > a',

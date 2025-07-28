@@ -1,12 +1,15 @@
 <script setup>
-  import { ref, inject, onMounted } from 'vue'
+  import { ref, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { cacheSettingsService, rulesEngineService } from '@/services/v2'
+
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -19,18 +22,6 @@
       type: String,
       required: true
     },
-    createRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    editRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    loadRulesEngineService: {
-      type: Function,
-      required: true
-    },
     documentationService: {
       type: Function,
       required: true
@@ -41,10 +32,6 @@
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
-    },
-    listCacheSettingsService: {
-      required: true,
-      type: Function
     },
     listOriginsService: {
       required: true,
@@ -62,6 +49,11 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    currentPhase: {
+      type: String,
+      required: false,
+      default: 'request'
     }
   })
 
@@ -80,12 +72,13 @@
   const functionsInstanceOptions = ref([])
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
+  const initialPhase = ref(props.currentPhase)
 
   const initialValues = ref({
     id: props.edgeApplicationId,
     name: '',
     description: '',
-    phase: 'request',
+    phase: initialPhase.value,
     criteria: [
       [
         {
@@ -132,7 +125,20 @@
     ),
     behaviors: yup.array().of(
       yup.object().shape({
-        name: yup.string().required().label('behavior')
+        name: yup.string().required().label('behavior'),
+        captured_array: yup.string().when('name', {
+          is: (name) => name === 'capture_match_groups',
+          then: (schema) =>
+            schema
+              .matches(
+                /^[a-zA-Z][a-zA-Z_ ]{0,9}$/,
+                'Captured array name must start with a letter and contain only letters or underscores (maximum 10 characters).'
+              )
+              .min(1, 'Captured array name must have at least 1 character.')
+              .max(10, 'Captured array name must have at most 10 characters.')
+              .required(),
+          otherwise: (schema) => schema.notRequired()
+        })
       })
     )
   })
@@ -142,16 +148,17 @@
   }
 
   const createService = async (payload) => {
-    return await props.createRulesEngineService({
+    return await rulesEngineService.createRulesEngine({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
   }
 
   const editService = async (payload) => {
-    return await props.editRulesEngineService({
-      payload,
-      id: props.edgeApplicationId
+    const payloadEdit = { phase: props.currentPhase, ...payload }
+    return await rulesEngineService.editRulesEngine({
+      payload: payloadEdit,
+      edgeApplicationId: props.edgeApplicationId
     })
   }
 
@@ -163,11 +170,17 @@
 
     try {
       loadingFunctionsInstance.value = true
-      const responseFunctions = await props.listEdgeApplicationFunctionsService({
-        id: props.edgeApplicationId,
-        fields: ['id', 'name']
+      const params = { fields: ['id', 'name'] }
+      const responseFunctions = await edgeApplicationFunctionService.listFunctions(
+        props.edgeApplicationId,
+        params
+      )
+      functionsInstanceOptions.value = responseFunctions?.body?.map((el) => {
+        return {
+          id: el.id,
+          name: el.name.text
+        }
       })
-      functionsInstanceOptions.value = responseFunctions.body
     } catch (error) {
       toast.add({
         closable: true,
@@ -182,9 +195,8 @@
   const listCacheSettingsOptions = async () => {
     isLoadingRequests.value = true
     try {
-      cacheSettingsOptions.value = await props.listCacheSettingsService({
-        id: props.edgeApplicationId
-      })
+      const result = await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId)
+      cacheSettingsOptions.value = result.body
     } catch (error) {
       toast.add({
         closable: true,
@@ -212,13 +224,13 @@
   }
 
   const loadService = async () => {
-    return await props.loadRulesEngineService({
+    return await rulesEngineService.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
-      edgeApplicationId: props.edgeApplicationId
+      edgeApplicationId: props.edgeApplicationId,
+      phase: initialPhase.value
     })
   }
 
-  const initialPhase = ref('request')
   const openDrawerCreate = (selectedPhase = 'request') => {
     initialValues.value.phase = selectedPhase
     initialPhase.value = selectedPhase
@@ -324,6 +336,13 @@
       listOriginsOptions()
     ])
   })
+
+  watch(
+    () => props.currentPhase,
+    (newPhase) => {
+      initialPhase.value = newPhase
+    }
+  )
 </script>
 
 <template>
@@ -364,6 +383,7 @@
       />
     </template>
   </CreateDrawerBlock>
+
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
     :isOverlapped="isOverlapped"

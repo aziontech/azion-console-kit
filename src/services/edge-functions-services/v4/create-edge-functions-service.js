@@ -20,7 +20,7 @@ const adapt = (payload) => {
     code: payload.code,
     language: payload.language,
     initiator_type: payload.initiatorType,
-    json_args: parsedArgs,
+    args: parsedArgs,
     active: payload.active
   }
 }
@@ -35,11 +35,8 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return {
-        feedback: 'Your edge function has been created',
-        urlToEditView: `/edge-functions/edit/${httpResponse.body.data.id}`,
-        functionId: httpResponse.body.data.id
-      }
+      const data = httpResponse.body.data
+      return data
     case 500:
       throw new Errors.InternalServerError().message
     default:

@@ -11,6 +11,7 @@
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { useField } from 'vee-validate'
   import { ref, watch } from 'vue'
+  import { digitalCertificatesService } from '@/services/v2'
 
   const props = defineProps({
     digitalCertificates: {
@@ -42,14 +43,6 @@
       required: true
     },
     loadEdgeFirewallService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
       type: Function,
       required: true
     }
@@ -142,20 +135,20 @@
     edgeCertificate.value = domainId
   }
 
-  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: EDGE_CERTIFICATE,
-      fields: ['id,name'],
+  const listDigitalCertificatesByType = async (type, queryParams) => {
+    return await digitalCertificatesService.listDigitalCertificatesDropdown({
+      type,
+      fields: ['id', 'name'],
       ...queryParams
     })
   }
 
+  const listDigitalCertificatesByEdgeCertificateTypeDecorator = async (queryParams) => {
+    return await listDigitalCertificatesByType(EDGE_CERTIFICATE, queryParams)
+  }
+
   const listDigitalCertificatesByTrustedCaCertificateTypeDecorator = async (queryParams) => {
-    return await props.listDigitalCertificatesService({
-      type: TRUSTED_CA_CERTIFICATE,
-      fields: ['id,name'],
-      ...queryParams
-    })
+    return await listDigitalCertificatesByType(TRUSTED_CA_CERTIFICATE, queryParams)
   }
 
   const emit = defineEmits(['edgeApplicationCreated'])
@@ -312,7 +305,7 @@
           label="Digital Certificate"
           name="edgeCertificate"
           :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           optionLabel="name"
           optionValue="value"
           :value="edgeCertificate"
@@ -377,7 +370,7 @@
           required
           name="mtlsTrustedCertificate"
           :service="listDigitalCertificatesByTrustedCaCertificateTypeDecorator"
-          :loadService="loadDigitalCertificatesService"
+          :loadService="digitalCertificatesService.loadDigitalCertificate"
           :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"
