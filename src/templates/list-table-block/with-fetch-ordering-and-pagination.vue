@@ -430,6 +430,10 @@
     lazy: {
       type: Boolean,
       default: true
+    },
+    firstLoadData: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -469,8 +473,6 @@
   const savedSearch = ref('')
   const savedOrdering = ref('')
   const firstItemIndex = ref(0)
-
-  const firstLoadData = ref(true)
 
   const filtersDynamically = computed(() => {
     return props.lazy ? {} : filters.value
@@ -611,11 +613,10 @@
       }
     } finally {
       isLoading.value = false
-      if (firstLoadData.value) {
+      if (props.firstLoadData) {
         const hasData = data.value?.length > 0
         emit('on-load-data', !!hasData)
       }
-      firstLoadData.value = false
     }
   }
 
