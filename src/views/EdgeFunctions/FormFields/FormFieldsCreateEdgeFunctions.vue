@@ -102,14 +102,14 @@
 
       <FormHorizontal
         class="mt-8"
-        title="Language"
+        title="Runtime"
         :isDrawer="isDrawer"
-        description="The language the edge function is written in."
+        description="The execution runtime used to run your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
             <FieldTextIcon
-              label="Language"
+              label="Runtime"
               name="LANGUAGE_LABEL"
               icon="pi pi-lock"
               disabled
@@ -123,8 +123,8 @@
       <FormHorizontal
         v-if="!isDrawer"
         class="mt-8"
-        title="Initiator Type"
-        description="Define the source or trigger that executes the edge function."
+        title="Execution Environment"
+        description="Specify the execution environment for your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
