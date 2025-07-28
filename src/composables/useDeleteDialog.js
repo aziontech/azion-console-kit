@@ -18,7 +18,7 @@ export function useDeleteDialog() {
    * @param {Function} [config.closeCallback] - Callback function when dialog is closed
    * @param {Function} [config.successCallback] - Callback function when deletion is successful
    */
-  function openDeleteDialog(config) {
+  const openDeleteDialog = (config) => {
     const { title, id, data, deleteService, closeCallback, successCallback } = config
 
     const bodyDelete = {
@@ -37,7 +37,7 @@ export function useDeleteDialog() {
     dialog.open(DeleteDialog, bodyDelete)
   }
 
-  function getDeleteConfirmationText(config) {
+  const getDeleteConfirmationText = (config) => {
     if (!config.data) return 'delete'
 
     return (
