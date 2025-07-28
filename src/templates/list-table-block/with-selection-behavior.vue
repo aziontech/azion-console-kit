@@ -280,7 +280,7 @@
   import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -366,6 +366,7 @@
   const menuRef = ref({})
   const toast = useToast()
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
 
@@ -416,20 +417,18 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  if (opt.data.updated) {
+                    reload()
+                  }
                 }
-                openDialog(DeleteDialog, bodyDelete)
-              }
+              })
               break
             case 'action':
               action.commandAction(rowData)

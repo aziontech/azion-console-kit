@@ -10,8 +10,7 @@
   import { useField } from 'vee-validate'
   import { useLoadingStore } from '@/stores/loading'
   import { deleteAccountService } from '@/services/account-services/delete-account-service'
-  import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import PrimeButton from 'primevue/button'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
@@ -52,7 +51,7 @@
   const citiesOptions = ref({ options: [], done: true })
 
   const { startLoading } = useLoadingStore()
-  const dialog = useDialog()
+  const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
   const toast = useToast()
   const showToast = (summary, severity) => {
     const options = {
@@ -104,17 +103,16 @@
   }
 
   const openDeleteDialog = () => {
-    const bodyDelete = {
+    openDeleteDialogComposable({
+      title: 'Personal Account',
+      id: accountStore.account.id,
       data: {
-        title: 'Personal Account',
-        deleteDialogVisible: true,
-        deleteService: decorateDeleteService,
-        entityDeleteMessage: ENTITY_DELETE_MESSAGE,
-        rerender: Math.random(),
-        onSuccess: logout
-      }
-    }
-    dialog.open(DeleteDialog, bodyDelete)
+        deleteConfirmationText: accountStore.account.full_name,
+        entityDeleteMessage: ENTITY_DELETE_MESSAGE
+      },
+      deleteService: decorateDeleteService,
+      successCallback: logout
+    })
   }
 
   const setCitiesOptions = async (regionId) => {

@@ -42,10 +42,9 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { onBeforeRouteLeave } from 'vue-router'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   defineOptions({ name: 'identity-providers-view' })
 
   const props = defineProps({
@@ -59,7 +58,7 @@
 
   const loadingStore = useLoadingStore()
   const toast = useToast()
-  const dialog = useDialog()
+  const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
   const hasContentToList = ref(true)
   const refListTable = ref(null)
@@ -141,28 +140,19 @@
     toast.add(options)
   }
 
-  const openDialog = (dialogComponent, body) => {
-    dialog.open(dialogComponent, body)
-  }
-
   const handleDeleteIdentityProvider = async (item) => {
     const deleteService =
       item.protocol === 'OIDC'
         ? props.deleteOIDCIdentityProviderService
         : props.deleteSAMLIdentityProviderService
 
-    const bodyDelete = {
-      data: {
-        title: 'Identity Provider',
-        selectedID: item.id,
-        selectedItemData: item,
-        deleteDialogVisible: true,
-        deleteService: deleteService,
-        rerender: Math.random()
-      },
-      onClose: (opt) => opt.data.updated && reload()
-    }
-    openDialog(DeleteDialog, bodyDelete)
+    openDeleteDialogComposable({
+      title: 'Identity Provider',
+      id: item.id,
+      data: item,
+      deleteService: deleteService,
+      closeCallback: (opt) => opt.data.updated && reload()
+    })
   }
 
   const handleLoadData = (event) => {

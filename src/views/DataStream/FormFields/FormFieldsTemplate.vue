@@ -66,9 +66,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import DangerCard from '@/templates/danger-card-block/index.vue'
-  import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import { computed, ref } from 'vue'
-  import { useDialog } from 'primevue/usedialog'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2'
@@ -77,7 +76,7 @@
   const { value: dataSet, errorMessage: dataSetErrorMessage } = useField('dataSet')
 
   const store = useAccountStore()
-  const dialog = useDialog()
+  const { openDeleteDialog: openDeleteDialogComposable } = useDeleteDialog()
 
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
@@ -105,17 +104,15 @@
   const emit = defineEmits(['onDelete'])
 
   const handleDeleteTemplate = () => {
-    const bodyDelete = {
+    openDeleteDialogComposable({
+      title: 'Custom Template',
+      id: props.templateId,
       data: {
-        title: 'Custom Template',
-        deleteDialogVisible: true,
-        deleteService: decorateDeleteService,
         entityDeleteMessage:
-          'This Custom Template will be deleted along with all associated data. Check the Help Center for more details.',
-        rerender: Math.random(),
-        onSuccess: () => emit('onDelete')
-      }
-    }
-    dialog.open(DeleteDialog, bodyDelete)
+          'This Custom Template will be deleted along with all associated data. Check the Help Center for more details.'
+      },
+      deleteService: decorateDeleteService,
+      successCallback: () => emit('onDelete')
+    })
   }
 </script>
