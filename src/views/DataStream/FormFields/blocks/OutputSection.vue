@@ -97,12 +97,11 @@
               :value="header.value"
               required
               label="Header"
-              :showIcon="!!index"
               @click-icon="removeHeader(index)"
               :name="`headers[${index}].value`"
               placeholder="header-name:value"
               data-testid="data-stream-form__destination__headers-field__input"
-              icon="pi pi-trash"
+              :icon="!!index && 'pi pi-trash'"
             />
           </div>
 

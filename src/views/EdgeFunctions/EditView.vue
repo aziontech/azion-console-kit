@@ -19,7 +19,7 @@
     }
   })
   const updateObject = ref({})
-  const language = ref(null)
+  const runtime = ref(null)
   const name = ref('')
 
   const handleTrackSuccessEdit = () => {
@@ -54,7 +54,7 @@
       return isValidJson
     }),
     active: yup.boolean(),
-    language: yup.string()
+    runtime: yup.string()
   })
 </script>
 
@@ -64,7 +64,7 @@
       <PageHeadingBlock :pageTitle="name">
         <MobileCodePreview
           :updateObject="updateObject"
-          :language="language"
+          :runtime="runtime"
         />
       </PageHeadingBlock>
     </template>
@@ -80,7 +80,7 @@
         <template #form>
           <FormFieldsEditEdgeFunctions
             v-model:preview-data="updateObject"
-            v-model:lang="language"
+            v-model:run="runtime"
             v-model:name="name"
           />
         </template>

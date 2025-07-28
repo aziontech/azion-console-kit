@@ -63,16 +63,16 @@
     return previewValues
   })
 
-  const initiatorTypeOptions = [
+  const executionEnvironmentOptions = [
     {
       title: 'Edge Application',
       subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
-      inputValue: 'edge_application'
+      inputValue: 'application'
     },
     {
       title: 'Edge Firewall',
       subtitle: 'Functions are executed by a firewall to apply security policies.',
-      inputValue: 'edge_firewall'
+      inputValue: 'firewall'
     }
   ]
 </script>
@@ -112,9 +112,9 @@
               label="Language"
               name="LANGUAGE_LABEL"
               icon="pi pi-lock"
+              disabled
               :value="LANGUAGE_LABEL"
               description="Currently, only JavaScript is supported."
-              readonly
             />
           </div>
         </template>
@@ -130,9 +130,9 @@
           <div class="flex flex-col w-full gap-2">
             <FieldGroupRadio
               required
-              nameField="initiatorType"
+              nameField="executionEnvironment"
               isCard
-              :options="initiatorTypeOptions"
+              :options="executionEnvironmentOptions"
             />
           </div>
         </template>
@@ -171,7 +171,7 @@
           <CodeEditor
             v-model="code"
             :initialValue="HelloWorldSample"
-            language="javascript"
+            runtime="javascript"
             :errors="hasCodeError"
           />
           <small
@@ -194,7 +194,7 @@
         <CodeEditor
           v-model="code"
           :initialValue="HelloWorldSample"
-          language="javascript"
+          runtime="javascript"
           :errors="hasCodeError"
         />
         <small
@@ -218,7 +218,7 @@
           <CodeEditor
             v-model="defaultArgs"
             :initialValue="ARGS_INITIAL_STATE"
-            language="json"
+            runtime="json"
             :errors="hasArgsError"
           />
         </SplitterPanel>
@@ -234,7 +234,7 @@
         <CodeEditor
           v-model="defaultArgs"
           :initialValue="ARGS_INITIAL_STATE"
-          language="json"
+          runtime="json"
           :errors="hasArgsError"
         />
       </div>
