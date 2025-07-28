@@ -33,6 +33,6 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEdgeConnectors from './FormFields/FormFieldsEdgeConnectors.vue'
-  import { validationSchema } from './composables/validation'
+  import { validationSchema } from './Config/validation'
   import { edgeConnectorsService } from '@/services/v2'
 </script>

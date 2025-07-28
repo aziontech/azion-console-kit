@@ -528,6 +528,9 @@
               break
             case 'delete':
               {
+                if (action.tryExecuteCommand && !action.tryExecuteCommand(rowData)) {
+                  return
+                }
                 const bodyDelete = {
                   data: {
                     title: action.title,

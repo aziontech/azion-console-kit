@@ -44,7 +44,6 @@
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'
   import { computed, ref, onMounted } from 'vue'
-  import { billingGqlService } from '@/services/v2'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
@@ -190,7 +189,7 @@
       }
 
       if (status === 'TRIAL' || status === 'ONLINE') {
-        const { credit, days, formatCredit } = await billingGqlService.getCreditAndExpirationDate()
+        const { credit, days, formatCredit } = accountData
         if (!(credit > 0 && days > 0)) {
           loadingNotification.value = false
           showNotification.value = false

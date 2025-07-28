@@ -56,8 +56,9 @@
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
   import { paymentService } from '@/services/v2'
-
-  import { ref } from 'vue'
+  import { openContactSupport, openAzionDiscord } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { h, ref } from 'vue'
   const emit = defineEmits([
     'update-credit-event',
     'openDrawerAddCredit',
@@ -143,14 +144,12 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    const options = {
+    toast.add({
       closable: true,
       severity,
       summary: severity,
       detail
-    }
-
-    toast.add(options)
+    })
   }
 
   const setPaymentAsDefault = async (payment) => {
@@ -176,6 +175,15 @@
       type: 'action',
       icon: 'pi pi-fw pi-check-circle',
       commandAction: async (item) => {
+        if (item.isDefault) {
+          toast.add({
+            closable: true,
+            severity: 'warning',
+            summary: 'Warning',
+            detail: 'This payment method is already set as default'
+          })
+          return
+        }
         await setPaymentAsDefault(item)
       }
     },
@@ -184,7 +192,30 @@
       type: 'delete',
       icon: 'pi pi-fw pi-trash',
       title: 'Payment Method',
-      disabled: (item) => item.isDefault,
+      tryExecuteCommand: (item) => {
+        if (!item.isDefault) {
+          return true
+        }
+
+        const { account } = useAccountStore()
+        const hasSupport = !account.isDeveloperSupportPlan
+
+        toast.add({
+          closable: true,
+          severity: 'warning',
+          summary: 'Warning',
+          component: h('div', [
+            'You need to have at least one credit card to use the platform. If you need help access the ',
+            h(PrimeButton, {
+              class: 'p-0 text-sm',
+              link: true,
+              label: 'support center.',
+              onClick: () => (hasSupport ? openContactSupport() : openAzionDiscord())
+            })
+          ])
+        })
+        return false
+      },
       service: paymentService.deleteCreditCard
     }
   ])

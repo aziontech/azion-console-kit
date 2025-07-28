@@ -140,31 +140,32 @@ export const WafAdapter = {
     const hasMatchValue = !!attack.matchValue
     const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
     const valueField = attack.matchValue === '-' ? null : attack.matchValue
-
     const MAP_ZONES = hasMatchValue
       ? {
           query_string: 'specific_query_string',
-          request_body: 'specific_request_body',
+          request_body: 'specific_body_form_field',
           request_header: 'specific_request_header',
-          body: 'specific_request_body',
+          body: 'specific_body_form_field',
           file_name: 'file_extension',
           raw_body: 'raw_body',
+          path: 'any_url',
           cookie: 'specific_request_header'
         }
       : {
           query_string: 'any_query_string',
-          request_body: 'any_request_body',
+          request_body: 'body_form_field',
           request_header: 'any_request_header',
-          body: 'any_request_body',
+          body: 'body_form_field',
           file_name: 'file_extension',
           raw_body: 'raw_body',
+          path: 'any_url',
           cookie: 'any_request_header'
         }
 
     if (attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY) {
       return {
         ...payloadReturn,
-        conditions: [{ match: 'any_request_body' }]
+        conditions: [{ match: 'body_form_field' }]
       }
     }
 

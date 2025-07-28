@@ -39,7 +39,9 @@
   const { certificateType, CERTIFICATE_TYPES } = useDigitalCertificate()
 
   const { value: digitalCertificateName } = useField('digitalCertificateName')
+  const { value: certificateTypeValue } = useField('certificateType')
 
+  certificateTypeValue.value = certificateType.value
   const tabDescriptionByDCType = computed(() => {
     switch (certificateType.value) {
       case CERTIFICATE_TYPES.TRUSTED:

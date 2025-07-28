@@ -236,7 +236,7 @@
     query.domains = props.domains.join(',')
     const response = await props.listService({
       wafId: props.wafRuleId,
-      tuningId: props.tuningObject.id,
+      tuningId: props.tuningObject.ruleId,
       query: query
     })
     totalRecordsFound.value = response.length
