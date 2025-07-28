@@ -30,7 +30,7 @@ export const loadUserAndAccountInfo = async () => {
   accountInfo.formatCredit = creditAndExpirationDate.formatCredit
   accountInfo.days = creditAndExpirationDate.days
 
-  if (accountInfo.client_id) {
+  if (!accountInfo.client_id) {
     const { isDeveloperSupportPlan, yourServicePlan } = await loadContractServicePlan({
       clientId: accountInfo.client_id
     })

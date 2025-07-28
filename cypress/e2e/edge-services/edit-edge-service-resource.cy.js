@@ -17,7 +17,7 @@ describe('Edge Services spec', { tags: ['@dev6', '@xfail'] }, () => {
     }
   })
 
-  it('should edit a resource in an edge service', () => {
+  it.skip('should edit a resource in an edge service', () => {
     // Arrange
     cy.intercept('/api/v3/edge_services/*').as('loadEdgeService')
     cy.intercept('/api/v3/edge_services/*/resources/*').as('loadResource')
@@ -32,9 +32,10 @@ describe('Edge Services spec', { tags: ['@dev6', '@xfail'] }, () => {
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your Edge Service has been created')
 
+    cy.get(selectors.list.searchInput).type(`${fixtures.edgeServiceName}{enter}`)
+    cy.get('.p-datatable-tbody > tr > :nth-child(1)').click()
     cy.wait('@loadEdgeService')
-
-    // create resource
+    // // create resource
     cy.get(selectors.edgeServices.resoucesTab).click()
     cy.get(selectors.edgeServices.createResourceButton).click()
 

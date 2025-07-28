@@ -21,7 +21,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.typeDropdown).find('li').eq(0).should('have.text', 'ASN').click()
 
     cy.get(selectors.networkLists.asnTextarea).click()
-    cy.get(selectors.networkLists.asnTextarea).type('9876{enter}6789{enter}')
+    cy.get(selectors.networkLists.asnTextarea).type('9876{enter}6789')
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
@@ -77,7 +77,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.ipcidrTextarea).click()
     cy.get(selectors.networkLists.ipcidrTextarea).type(
-      '192.168.172.4 #comment{enter}192.168.1.4 #comment{enter}'
+      '192.168.172.4 #comment{enter}192.168.1.4 #comment'
     )
 
     cy.get(selectors.networkLists.saveButton).click()
@@ -103,7 +103,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.typeDropdown).find('li').eq(0).should('have.text', 'ASN').click()
 
     cy.get(selectors.networkLists.asnTextarea).click()
-    cy.get(selectors.networkLists.asnTextarea).type('9876{enter}6789{enter}')
+    cy.get(selectors.networkLists.asnTextarea).type('9876{enter}6789')
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
@@ -122,7 +122,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     //Act
     cy.get(selectors.networkLists.asnTextarea).click()
-    cy.get(selectors.networkLists.asnTextarea).type('{enter}123{enter}')
+    cy.get(selectors.networkLists.asnTextarea).type('{enter}123')
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your Network List has been updated.')
@@ -199,7 +199,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.ipcidrTextarea).click()
     cy.get(selectors.networkLists.ipcidrTextarea).type(
-      '192.168.172.4 #comment{enter}192.168.1.4 #comment{enter}'
+      '192.168.172.4 #comment{enter}192.168.1.4 #comment'
     )
 
     cy.get(selectors.networkLists.saveButton).click()
