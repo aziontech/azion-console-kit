@@ -32,6 +32,10 @@ export const CacheSettingsAdapter = {
       }
     }
 
+    if (result.browser_cache.behavior === 'honor') {
+      result.browser_cache.max_age = 0
+    }
+
     // Add tiered_cache module if enabled
     if (payload.tieredCache) {
       result.modules.tiered_cache = {
