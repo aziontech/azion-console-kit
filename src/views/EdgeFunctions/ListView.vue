@@ -17,6 +17,7 @@
         emptyListMessage="No edge functions found."
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
@@ -60,9 +61,9 @@
     'id',
     'name',
     'active',
-    'language',
+    'runtime',
     'vendor',
-    'initiator_type',
+    'execution_environment',
     'reference_count',
     'last_editor'
   ]
@@ -123,9 +124,9 @@
       }
     },
     {
-      field: 'language',
+      field: 'runtime',
       header: 'Language',
-      filterPath: 'language.content',
+      filterPath: 'runtime.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -135,7 +136,7 @@
       }
     },
     {
-      field: 'initiatorType',
+      field: 'executionEnvironment',
       header: 'Initiator Type'
     },
     {

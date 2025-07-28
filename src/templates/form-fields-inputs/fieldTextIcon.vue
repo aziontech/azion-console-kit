@@ -44,10 +44,6 @@
     required: {
       type: Boolean,
       default: false
-    },
-    showIcon: {
-      type: Boolean,
-      default: false
     }
   })
 
@@ -82,7 +78,7 @@
     :class="iconPositionClass"
   >
     <i
-      v-if="props.showIcon && props.icon"
+      v-if="props.icon"
       :class="props.icon"
       class="text-color-secondary cursor-pointer"
       @click="handleClick"

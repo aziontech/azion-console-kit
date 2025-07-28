@@ -29,8 +29,8 @@
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
-      initiatorType: 'edge_application',
-      fields: ['id', 'name', 'args', 'initiator_type'],
+      executionEnvironment: 'application',
+      fields: ['id', 'name', 'args', 'execution_environment'],
       ...queryParams
     })
   }
@@ -130,7 +130,7 @@
       <div class="flex flex-col gap-2 w-full">
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"

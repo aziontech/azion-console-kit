@@ -60,19 +60,19 @@
       }
       return isValidJson
     }),
-    initiatorType: yup.string().required().label('Initiator Type'),
+    executionEnvironment: yup.string().required().label('Initiator Type'),
     active: yup.boolean(),
-    language: yup.string()
+    runtime: yup.string()
   })
   const updateObject = ref({})
 
   const initialValues = {
     name: '',
     active: true,
-    language: 'javascript',
+    runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
-    initiatorType: 'edge_application'
+    executionEnvironment: 'application'
   }
 
   const handleToast = (response) => {
@@ -81,7 +81,7 @@
       actions: {
         link: {
           label: 'View Edge Function',
-          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.id}`)
+          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
         }
       }
     }

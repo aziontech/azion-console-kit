@@ -42,23 +42,23 @@
       }
       return isValidJson
     }),
-    initiatorType: yup.string().required().label('Initiator Type'),
+    executionEnvironment: yup.string().required().label('Initiator Type'),
     active: yup.boolean(),
-    language: yup.string()
+    runtime: yup.string()
   })
   const updateObject = ref({})
 
-  const initiatorType = router.currentRoute.value.path.startsWith('/edge-firewall')
-    ? 'edge_firewall'
-    : 'edge_application'
+  const executionEnvironment = router.currentRoute.value.path.startsWith('/edge-firewall')
+    ? 'firewall'
+    : 'application'
 
   const initialValues = {
     name: '',
     active: true,
-    language: 'javascript',
+    runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
-    initiatorType: initiatorType
+    executionEnvironment: executionEnvironment
   }
   const handleTrackCreation = () => {
     tracker.product.productCreated({

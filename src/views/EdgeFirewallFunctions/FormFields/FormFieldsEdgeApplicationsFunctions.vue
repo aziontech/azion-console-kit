@@ -28,8 +28,8 @@
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
-      initiatorType: 'edge_firewall',
-      fields: ['id', 'name', 'args', 'initiator_type'],
+      executionEnvironment: 'firewall',
+      fields: ['id', 'name', 'args', 'execution_environment'],
       ...queryParams
     })
   }
@@ -134,7 +134,7 @@
         >
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"
