@@ -328,6 +328,11 @@
     const edgeFirewallModules = props.enabledModules
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
+    const currentBehaviors = behaviors.value.map((item) => item.value.name)
+    const wafBehaviorIsAlreadySelected =
+      currentBehaviors.length > 1 && currentBehaviors.includes('set_waf')
+    const runFunctionBehaviorIsAlreadySelected =
+      currentBehaviors.length > 1 && currentBehaviors.includes('run_function')
 
     return [
       { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
@@ -337,14 +342,20 @@
       {
         value: 'set_waf',
         label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
-        disabled: !hasWebApplicationFirewallModuleEnabled || !hasWafAccess.value
+        disabled:
+          wafBehaviorIsAlreadySelected ||
+          !hasWebApplicationFirewallModuleEnabled ||
+          !hasWafAccess.value
       },
       {
         value: 'run_function',
         label: `${
           hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
         }`,
-        disabled: !hasEdgeFunctionsModuleEnabled || !props.hasEdgeFunctionsProductAccess
+        disabled:
+          runFunctionBehaviorIsAlreadySelected ||
+          !hasEdgeFunctionsModuleEnabled ||
+          !props.hasEdgeFunctionsProductAccess
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
