@@ -41,7 +41,7 @@
             for="confirm-input"
             class="font-semibold text-sm"
             data-testid="delete-dialog-confirmation-input-label"
-            >To confirm, type "{{ confirmationText }}" in the box below:</label
+            >To confirm, type "{{ data.deleteConfirmationText }}" in the box below:</label
           >
           <InputText
             id="confirm-input"
@@ -109,16 +109,10 @@
   const loading = ref(false)
   const canDelete = ref(false)
 
-  const confirmationText = computed(() => {
-    return (
-      data.selectedItemData.name?.text || data.selectedItemData?.key || data.selectedItemData?.name
-    )
-  })
-
   const validationSchema = yup.object({
     confirmation: yup
       .string()
-      .equals([confirmationText.value], '')
+      .equals([data.deleteConfirmationText], '')
       .required('This is a required field')
   })
 
