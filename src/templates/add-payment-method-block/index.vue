@@ -182,9 +182,7 @@
         return
       }
 
-      const accountData = accountStore.account
-
-      if (!accountData.postal_code || !accountData.country) {
+      if (!address.postal_code || !address.country) {
         throw new Error('Account address are required to add a payment method.')
       }
 
