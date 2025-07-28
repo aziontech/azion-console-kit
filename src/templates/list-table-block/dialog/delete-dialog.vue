@@ -113,7 +113,8 @@
     confirmation: yup
       .string()
       .equals([data.deleteConfirmationText], '')
-      .required('This is a required field')
+      .label('Confirmation')
+      .required()
   })
 
   const { errors, meta, resetForm } = useForm({
