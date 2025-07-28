@@ -108,17 +108,17 @@
 
       <FormHorizontal
         class="mt-8"
-        title="Language"
-        description="The language the edge function is written in."
+        title="Runtime"
+        description="The execution runtime used to run your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
             <FieldTextIcon
-              label="Language"
+              label="Runtime"
               name="runtimeFormat.content"
               icon="pi pi-lock"
               disabled
-              description="Language isn't an editable field."
+              description="Runtime isn't an editable field."
             />
           </div>
         </template>
@@ -126,8 +126,8 @@
 
       <FormHorizontal
         class="mt-8"
-        title="Initiator Type"
-        description="Define the source or trigger that executes the edge function."
+        title="Execution Environment"
+        description="Specify the execution environment for your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
