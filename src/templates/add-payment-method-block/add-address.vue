@@ -125,7 +125,7 @@
     complement: yup.string()
   })
 
-  const { validate } = useForm({
+  const { validate, resetForm } = useForm({
     validationSchema: addressSchema,
     initialValues: {
       postalCode: '',
@@ -155,12 +155,17 @@
 
   const setInitialValues = async () => {
     const data = await getAccountSettingsService()
-    postalCode.value = data?.postalCode
-    country.value = data?.country
-    region.value = data?.region
-    city.value = data?.city
-    address.value = data?.address
-    complement.value = data?.complement
+    if (!data) return
+    resetForm({
+      values: {
+        postalCode: data?.postalCode,
+        country: data?.country,
+        region: data?.region,
+        city: data?.city,
+        address: data?.address,
+        complement: data?.complement
+      }
+    })
   }
 
   const saveAddress = async () => {
