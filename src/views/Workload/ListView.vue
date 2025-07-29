@@ -72,7 +72,7 @@
     'workload_domain'
   ]
 
-  const columnsHiddenByDefault = ['lastEditor', 'protocols']
+  const columnsHiddenByDefault = ['id', 'lastEditor', 'protocols']
 
   const hasContentToList = ref(true)
   const isWorkload = computed(() => handleTextDomainWorkload.singularLabel === 'workload')
