@@ -309,6 +309,10 @@
   const { hasAccessToSSOManagement } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
+  const hasAccessToActivityHistory = computed(() => {
+    return user.kind === 'reseller' || user.kind === 'group' || user.kind === 'brand'
+  })
+
   onBeforeMount(() => {
     switch (user.kind) {
       case 'brand':
@@ -349,7 +353,8 @@
     },
     {
       label: 'Activity History',
-      to: '/activity-history'
+      to: '/activity-history',
+      visible: !hasAccessToActivityHistory.value
     },
     {
       label: 'Teams Permissions',
