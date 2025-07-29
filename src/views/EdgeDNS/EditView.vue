@@ -50,6 +50,10 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
+      field: 'id',
+      header: 'ID'
+    },
+    {
       field: 'name',
       header: 'Name'
     },
