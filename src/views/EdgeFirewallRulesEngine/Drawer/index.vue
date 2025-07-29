@@ -42,10 +42,6 @@
       type: Function,
       required: true
     },
-    edgeFirewallModules: {
-      type: Object,
-      required: true
-    },
     listNetworkListService: {
       type: Function,
       required: true
@@ -256,7 +252,6 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
-        :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="wafService.listWafRules"
