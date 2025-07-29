@@ -324,42 +324,41 @@
     fields: behaviors
   } = useFieldArray('behaviors')
 
-  const behaviorsOptions = computed(() => {
+  const behaviorsOptions = ({ name }) => {
     const edgeFirewallModules = props.enabledModules
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected =
-      currentBehaviors.length > 1 && currentBehaviors.includes('set_waf')
+    const wafBehaviorIsAlreadySelected = name !== 'set_waf' && currentBehaviors.includes('set_waf')
     const runFunctionBehaviorIsAlreadySelected =
-      currentBehaviors.length > 1 && currentBehaviors.includes('run_function')
+      name !== 'run_function' && currentBehaviors.includes('run_function')
 
+    const disableWafBehavior =
+      wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled || !hasWafAccess.value
+    const disableRunFunctionBehavior =
+      runFunctionBehaviorIsAlreadySelected ||
+      !hasEdgeFunctionsModuleEnabled ||
+      !props.hasEdgeFunctionsProductAccess
     return [
-      { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
+      { value: 'deny', label: 'Deny (403 Forbidden)' },
       { value: 'tag_event', label: 'Tag Event' },
-      { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
-      { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
+      { value: 'drop', label: 'Drop (Close Without Response)' },
+      { value: 'set_rate_limit', label: 'Set Rate Limit' },
       {
         value: 'set_waf',
         label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
-        disabled:
-          wafBehaviorIsAlreadySelected ||
-          !hasWebApplicationFirewallModuleEnabled ||
-          !hasWafAccess.value
+        disabled: disableWafBehavior
       },
       {
         value: 'run_function',
         label: `${
           hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
         }`,
-        disabled:
-          runFunctionBehaviorIsAlreadySelected ||
-          !hasEdgeFunctionsModuleEnabled ||
-          !props.hasEdgeFunctionsProductAccess
+        disabled: disableRunFunctionBehavior
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
-  })
+  }
 
   const handleDeleteBehavior = (behaviorItemIndex) => {
     removeBehavior(behaviorItemIndex)
@@ -679,7 +678,8 @@
               :enableWorkaroundLabelToDisabledOptions="true"
               :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
-              :options="behaviorsOptions"
+              :options="behaviorsOptions(behaviors[behaviorItemIndex].value)"
+              filter
               placeholder="Select a behavior"
               optionLabel="label"
               optionValue="value"
