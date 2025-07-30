@@ -18,7 +18,7 @@ const adaptBehavior = (behaviors) => {
       }
     }
 
-    const behaviorInt = ['run_function', 'set_edge_connector', 'set_cache_policy']
+    const behaviorInt = ['run_function', 'set_edge_connector', 'set_cache_policy', 'set_origin']
     if (behaviorInt.includes(behavior.name)) {
       return {
         type: behavior.name,
