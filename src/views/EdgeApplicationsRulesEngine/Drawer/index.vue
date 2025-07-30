@@ -407,6 +407,8 @@
         :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
         @refreshFunctions="handleRefreshFunctions"
+        @refreshOrigins="handleRefreshOrigins"
+        @refreshCacheSettings="handleRefreshCacheSettings"
         :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :functionsInstanceOptions="functionsInstanceOptions"
