@@ -723,7 +723,7 @@
             icon="pi pi-trash"
             size="small"
             outlined
-            @click="removeCriteriaDecorator(criteriaIndex)"
+            @click="removeCriteriaDecorator(criteriaIndex + 1)"
             :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
           />
         </div>
