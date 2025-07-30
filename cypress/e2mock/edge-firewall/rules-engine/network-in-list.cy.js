@@ -10,7 +10,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
   beforeEach(() => {
     cy.login()
 
-    cy.intercept('GET', '/api/v4/edge_firewall/firewalls*', {
+    cy.intercept('GET', '/v4/edge_firewall/firewalls*', {
       statusCode: 200,
       body: {
         count: 1,
@@ -38,7 +38,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
     cy.openProduct('Edge Firewall')
     cy.wait('@listEdgeFirewalls')
 
-    cy.intercept('GET', `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}`, {
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}`, {
       statusCode: 200,
       body: {
         data: {
@@ -57,22 +57,20 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
         }
       }
     }).as('loadEdgeFirewall')
-
-    cy.intercept('GET', `/api/v3/edge_firewall/${MOCK_EDGE_FIREWALL_ID}/functions_instances*`, {
+    
+    
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/functions?page_size=100&fields=id%2Cname`, {
       statusCode: 200,
       body: {
         count: 0,
-        total_pages: 1,
-        schema_version: 3,
-        links: {
-          previous: null,
-          next: null
-        },
-        results: []
+        results: [{
+          id: 11312,
+          name: 'Edge function'
+        }]
       }
     }).as('listEdgeFirewallFunctions')
 
-    cy.intercept('GET', `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules*`, {
+    cy.intercept('GET', `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules*`, {
       statusCode: 200,
       body: {
         count: 1,
@@ -91,7 +89,7 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
 
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules/${MOCK_RULE_ID}`,
+      `/v4/edge_firewall/firewalls/${MOCK_EDGE_FIREWALL_ID}/rules/${MOCK_RULE_ID}`,
       {
         statusCode: 200,
         body: {
@@ -132,14 +130,14 @@ describe('Edge Firewall Rules Engine with Network List', { tags: ['@dev6'] }, ()
   })
 
   it('should load a rule with network list criteria and verify the network list name is displayed', () => {
-    cy.intercept('GET', '/api/v4/workspace/network_lists*', {
+    cy.intercept('GET', '/v4/workspace/network_lists*', {
       statusCode: 200,
       body: {
         count: 0,
         results: []
       }
     }).as('listNetworkLists')
-    cy.intercept('GET', `/api/v4/workspace/network_lists/${MOCK_NETWORK_LIST_ID}`, {
+    cy.intercept('GET', `/v4/workspace/network_lists/${MOCK_NETWORK_LIST_ID}`, {
       statusCode: 200,
       body: {
         data: {

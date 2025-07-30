@@ -20,7 +20,6 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
     cy.get(selectors.edgeFirewall.saveButton).click()
     cy.verifyToast('success', 'Your Edge Firewall has been created')
-    cy.get(selectors.edgeFirewall.cancelButton).click()
 
     // Assert
     cy.get(selectors.edgeFirewall.searchInput).clear()

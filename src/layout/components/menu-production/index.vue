@@ -49,12 +49,13 @@
           @click.middle="windowOpen(item.to)"
           :href="item.to"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
-          v-if="item?.clientFlag ? checkFlag(item?.clientFlag) : true"
+          v-if="hasClientFlag(item)"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
           <PrimeTag
             v-if="item.tag"
+            :severity="item.tag === 'New' ? 'primary' : 'info'"
             :value="item.tag"
             class="ml-2"
           />
@@ -167,4 +168,8 @@
     const response = listSidebarMenusService(showMarketplaceProductsInMenu.value)
     return response.body.menus
   })
+
+  const hasClientFlag = (item) => {
+    return item?.clientFlag ? checkFlag(item?.clientFlag) : true
+  }
 </script>

@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { FILTERS_RULES } from '@/helpers'
+import { FILTERS_RULES, TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
 
 describe('RealTimeMetricsModule', () => {
   describe('Filter rules constants', () => {
     it('should be defined', () => {
-      expect(FILTERS_RULES).toBeDefined()
+      expect(FILTERS_RULES()).toBeDefined()
     })
 
     it('should have the correct key:value pairs', () => {
@@ -56,14 +57,14 @@ describe('RealTimeMetricsModule', () => {
         },
         MOST_RELEVANT_FIELDS: {
           httpMetrics: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
             'Request Time'
           ],
           httpEvents: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
@@ -84,28 +85,28 @@ describe('RealTimeMetricsModule', () => {
             'Request Time'
           ],
           edgeFunctionsMetrics: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Edge Function Id',
             'Compute Time',
             'Invocations',
             'Edge Functions Instance Id List'
           ],
           edgeFunctionsEvents: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Edge Function Id',
             'Compute Time',
             'Invocations',
             'Edge Functions Instance Id List'
           ],
           imagesProcessedMetrics: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
             'Request Time'
           ],
           imagesProcessedEvents: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Status',
             'Upstream Status',
             'Upstream Cache Status',
@@ -114,13 +115,19 @@ describe('RealTimeMetricsModule', () => {
           idnsQueriesEvents: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
           dataStreamedEvents: [
-            'Domain',
+            handleTextDomainWorkload.singularTitle,
             'Data Streamed',
             'Endpoint Type',
             'Requests',
             'Configuration Id'
           ],
-          dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
+          dataStreamedMetrics: [
+            handleTextDomainWorkload.singularTitle,
+            'Status',
+            'Data Streamed',
+            'Endpoint Type',
+            'Requests'
+          ]
         },
         FILTER_LIKE_TYPE: {
           configurationIdIn: 'ArrayObjectDomain',
@@ -134,43 +141,43 @@ describe('RealTimeMetricsModule', () => {
           actionNe: 'StringObject'
         },
         FILTER_LIKE_ALIAS: {
-          configurationIdIn: 'Domain',
+          configurationIdIn: handleTextDomainWorkload.singularTitle,
           classifiedEq: 'Classified',
           classifiedNe: 'Classified'
         },
-        ALIAS_MAPPING: { configurationId: 'domain' }
+        ALIAS_MAPPING: { configurationId: handleTextDomainWorkload.singularLabel }
       }
 
-      expect(JSON.stringify(FILTERS_RULES)).toEqual(JSON.stringify(filterRules))
+      expect(JSON.stringify(FILTERS_RULES())).toEqual(JSON.stringify(filterRules))
     })
 
     it('should return false if the field is blacklisted', () => {
       const blacklistedField = { name: 'clientId' }
-      const result = FILTERS_RULES.verifyBlackListFields(blacklistedField)
+      const result = FILTERS_RULES().verifyBlackListFields(blacklistedField)
       expect(result).toBeFalsy()
     })
 
     it('should return true if the field is not blacklisted', () => {
-      const notBlacklistedField = { name: 'Domain' }
-      const result = FILTERS_RULES.verifyBlackListFields(notBlacklistedField)
+      const notBlacklistedField = { name: handleTextDomainWorkload.singularTitle }
+      const result = FILTERS_RULES().verifyBlackListFields(notBlacklistedField)
       expect(result).toBeTruthy()
     })
 
     it('should return true if the field type is supported', () => {
       const supportedField = { name: 'exampleField', type: { name: 'String' } }
-      const result = FILTERS_RULES.verifyWhiteListFields(supportedField)
+      const result = FILTERS_RULES().verifyWhiteListFields(supportedField)
       expect(result).toBe(true)
     })
 
     it('should return true if the field name is in FIELDS_LIKE', () => {
       const fieldsLikeField = { name: 'configurationIdIn', type: { name: 'ArrayObject' } }
-      const result = FILTERS_RULES.verifyWhiteListFields(fieldsLikeField)
+      const result = FILTERS_RULES().verifyWhiteListFields(fieldsLikeField)
       expect(result).toBe(true)
     })
 
     it('should return false if the field type is not supported and name is not in FIELDS_LIKE', () => {
       const unsupportedField = { name: 'unsupportedField', type: { name: 'UnsupportedType' } }
-      const result = FILTERS_RULES.verifyWhiteListFields(unsupportedField)
+      const result = FILTERS_RULES().verifyWhiteListFields(unsupportedField)
       expect(result).toBe(false)
     })
 
@@ -238,7 +245,7 @@ describe('RealTimeMetricsModule', () => {
         }
       ]
 
-      FILTERS_RULES.sortFields(filters)
+      FILTERS_RULES().sortFields(filters)
 
       expect(filters).toEqual([
         {

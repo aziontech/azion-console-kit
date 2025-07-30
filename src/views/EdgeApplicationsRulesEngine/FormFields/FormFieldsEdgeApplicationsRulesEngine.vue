@@ -4,26 +4,38 @@
 
   import FieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
-  import Accordion from 'primevue/accordion'
-  import AccordionTab from 'primevue/accordiontab'
-  import { createFunctionService } from '@/services/edge-application-functions-services'
+  import { cacheSettingsService } from '@/services/v2'
+
   import Drawer from '@/views/EdgeApplicationsCacheSettings/Drawer'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import {
-    listEdgeFunctionsDropdownService,
-    loadEdgeFunctionService
-  } from '@/services/edge-functions-services/v4'
   import DrawerFunction from '@/views/EdgeApplicationsFunctions/Drawer'
+  import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
+  import { edgeConnectorsService } from '@/services/v2'
+
+  const getBehaviorsOriginOrEdgeConnectors = () => {
+    if (!hasFlagBlockApiV4()) {
+      return [{ label: 'Set Edge Connectors', value: 'set_edge_connector', requires: false }]
+    } else {
+      return [{ label: 'Set Origin', value: 'set_origin', requires: false }]
+    }
+  }
+
+  const getEdgeConnectors = async (query) => {
+    return await edgeConnectorsService.listEdgeConnectorsService({
+      fields: 'id,name',
+      ...query
+    })
+  }
 
   const CRITERIA_OPERATOR_OPTIONS = [
     { label: 'is equal', value: 'is_equal' },
@@ -40,7 +52,7 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false },
+    ...getBehaviorsOriginOrEdgeConnectors(),
     { label: 'Run Function', value: 'run_function', requires: false },
     { label: 'No Content (204)', value: 'no_content', requires: false }
   ]
@@ -67,7 +79,7 @@
   const DISABLE_TARGET_OPTIONS = [
     'deliver',
     'enable_gzip',
-    'bypass_cache_phase',
+    'bypass_cache',
     'deny',
     'forward_cookies',
     'no_content',
@@ -76,7 +88,8 @@
     'run_function',
     'set_origin',
     'set_cache_policy',
-    'capture_match_groups'
+    'capture_match_groups',
+    'finish_request_phase'
   ]
 
   const VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS = ['${server_addr}', '${server_port}']
@@ -159,9 +172,6 @@
     isApplicationAcceleratorEnabled: {
       type: Boolean
     },
-    isDeliveryProtocolHttps: {
-      type: Boolean
-    },
     isImageOptimizationEnabled: {
       type: Boolean
     },
@@ -189,10 +199,6 @@
       type: Function,
       required: true
     },
-    isLoadBalancerEnabled: {
-      type: Boolean,
-      required: true
-    },
     loadingOrigins: {
       type: Boolean,
       default: false
@@ -217,7 +223,7 @@
       applicationAccelerator: !props.hideApplicationAcceleratorInDescription
         ? ' - Requires Application Accelerator'
         : empty,
-      https: !props.isDeliveryProtocolHttps ? ' - Requires Delivery Protocol with HTTPS' : empty,
+      https: empty,
       imageOptimization: !props.isImageOptimizationEnabled ? ' - Requires Image Processor' : empty,
       edgeFunction: !props.isEdgeFunctionEnabled ? ' - Requires Edge Functions' : empty
     }
@@ -252,7 +258,7 @@
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
       label: 'Bypass Cache' + behaviorsLabelsTags.value.applicationAccelerator,
-      value: 'bypass_cache_phase',
+      value: 'bypass_cache',
       requires: !props.hideApplicationAcceleratorInDescription
     },
     {
@@ -283,7 +289,7 @@
     {
       label: 'Redirect HTTP to HTTPS' + behaviorsLabelsTags.value.https,
       value: 'redirect_http_to_https',
-      requires: !props.isDeliveryProtocolHttps
+      requires: false
     },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
@@ -298,7 +304,7 @@
       requires: !props.isEdgeFunctionEnabled
     },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
-    { label: 'Set Origin', value: 'set_origin', requires: false }
+    ...getBehaviorsOriginOrEdgeConnectors()
   ])
 
   const behaviorsResponseOptions = ref([
@@ -321,6 +327,7 @@
       requires: !props.hideApplicationAcceleratorInDescription
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
+    { label: 'Finish Request Phase', value: 'finish_request_phase', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
@@ -458,9 +465,9 @@
   const openAccordionWithFormErrors = () => {
     const errorsKeys = Object.keys(props.errors)
     if (errorsKeys.length > 0) {
-      const match = errorsKeys[0].match(/criteria\[(\d+)\]/)
-      const index = match[1]
-      activeAccordions.value[index] = 0
+      const match = errorsKeys.find((key) => key.includes('criteria'))
+      const indexMatch = errorsKeys.indexOf(match)
+      activeAccordions.value[indexMatch] = 0
     }
   }
   watch(
@@ -528,7 +535,7 @@
         ref="drawerRef"
         @onSuccess="handleSuccess"
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
-        :createService="createCacheSettingsService"
+        :createService="cacheSettingsService.createCacheSettingsService"
         :edgeApplicationId="edgeApplicationId"
         :showTieredCache="isTieredCacheEnabled"
       />
@@ -539,15 +546,11 @@
         :edgeApplicationId="edgeApplicationId"
         :createService="createOriginService"
         :clipboardWrite="clipboardWrite"
-        :isLoadBalancerEnabled="isLoadBalancerEnabled"
       />
       <DrawerFunction
         ref="drawerFunctionRef"
         @onSuccess="handleSuccessFunction"
         :edgeApplicationId="edgeApplicationId"
-        :loadEdgeFunctionService="loadEdgeFunctionService"
-        :createFunctionService="createFunctionService"
-        :listEdgeFunctionsService="listEdgeFunctionsDropdownService"
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
@@ -611,138 +614,127 @@
   >
     <template #inputs>
       <div
-        class="flex flex-col gap-8"
+        class="flex flex-col"
         v-for="(_, criteriaIndex) in criteria"
         :key="criteriaIndex"
       >
-        <Accordion v-model:activeIndex="activeAccordions[criteriaIndex]">
-          <AccordionTab :header="`Criteria ${criteriaIndex + 1}`">
-            <template #header>
-              <div class="ml-auto flex justify-center items-center">
-                <PrimeButton
-                  :disabled="criteriaIndex === 0"
-                  icon="pi pi-trash"
-                  size="small"
-                  outlined
-                  @click="removeCriteriaDecorator(criteriaIndex)"
-                  :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
-                />
-              </div>
-            </template>
-            <div
-              v-for="(item, conditionalIndex) in criteria[criteriaIndex].value"
-              :key="conditionalIndex"
-              data-testid="rule-form-criteria-item-conditional"
-            >
-              <div class="flex items-center gap-2">
-                <Divider
-                  align="left"
-                  type="dashed"
-                  class="capitalize z-0"
-                  data-testid="rule-form-criteria-item-conditional-divider"
-                >
-                  {{ item.conditional }}
-                </Divider>
-
-                <PrimeButton
-                  v-if="conditionalIndex !== 0"
-                  icon="pi pi-trash"
-                  size="small"
-                  outlined
-                  @click="removeConditional(criteriaIndex, conditionalIndex)"
-                  data-testid="rule-form-criteria-item-conditional-remove-button"
-                />
-              </div>
-
-              <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-6 mb-8 w-full">
-                <div class="flex flex-col w-full">
-                  <FieldAutoComplete
-                    :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
-                    :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].variable"
-                    :suggestions="variableItems"
-                    :onComplete="searchVariableOption"
-                    icon="pi pi-search"
-                    :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
-                    completeOnFocus
-                  />
-                </div>
-                <div class="flex flex-col w-full sm:max-w-[160px]">
-                  <FieldDropdown
-                    :options="CRITERIA_OPERATOR_OPTIONS"
-                    optionLabel="label"
-                    optionValue="value"
-                    class="h-fit w-full"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].operator"
-                    :disabled="isDefaultPhase"
-                    :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
-                  />
-                </div>
-                <div class="flex flex-col w-full">
-                  <FieldText
-                    :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
-                    v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
-                    :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
-                    :value="criteria[criteriaIndex].value[conditionalIndex].argument"
-                    :disabled="isDefaultPhase"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="flex gap-2 w-full"
-              v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
-              data-testid="rule-form-criteria-item-conditional-add-button"
-            >
-              <PrimeButton
-                class="w-full"
-                icon="pi pi-plus-circle"
-                label="And"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-                outlined
-                @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
-              />
-              <PrimeButton
-                class="w-full"
-                icon="pi pi-plus-circle"
-                label="Or"
-                :pt="{
-                  root: { class: 'justify-center' },
-                  label: { class: 'grow-0' }
-                }"
-                :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
-                outlined
-                @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
-              />
-            </div>
-          </AccordionTab>
-        </Accordion>
-        <Divider
-          v-if="isNotLastCriteria(criteriaIndex)"
-          align="center"
-          type="dashed"
-          class="capitalize z-0"
+        <div
+          v-for="(item, conditionalIndex) in criteria[criteriaIndex].value"
+          :key="conditionalIndex"
+          data-testid="rule-form-criteria-item-conditional"
         >
-          and
-        </Divider>
+          <div class="flex items-center gap-2">
+            <Divider
+              align="left"
+              type="dashed"
+              class="capitalize z-0"
+              data-testid="rule-form-criteria-item-conditional-divider"
+            >
+              {{ item.conditional }}
+            </Divider>
+
+            <PrimeButton
+              v-if="conditionalIndex !== 0"
+              icon="pi pi-trash"
+              size="small"
+              outlined
+              @click="removeConditional(criteriaIndex, conditionalIndex)"
+              data-testid="rule-form-criteria-item-conditional-remove-button"
+            />
+          </div>
+
+          <div class="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-6 mb-8 w-full">
+            <div class="flex flex-col w-full">
+              <FieldAutoComplete
+                :data-testid="`edge-application-rule-form__criteria-variable[${criteriaIndex}][${conditionalIndex}]__autocomplete`"
+                :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].variable"
+                :suggestions="variableItems"
+                :onComplete="searchVariableOption"
+                icon="pi pi-search"
+                :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
+                completeOnFocus
+              />
+            </div>
+            <div class="flex flex-col w-full sm:max-w-[160px]">
+              <FieldDropdown
+                :options="CRITERIA_OPERATOR_OPTIONS"
+                optionLabel="label"
+                optionValue="value"
+                class="h-fit w-full"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].operator"
+                :disabled="isDefaultPhase"
+                :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
+              />
+            </div>
+            <div class="flex flex-col w-full">
+              <FieldText
+                :data-testid="`edge-application-rule-form__criteria-input-value[${criteriaIndex}][${conditionalIndex}]`"
+                v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].argument"
+                :disabled="isDefaultPhase"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex gap-2 mb-8"
+          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
+          data-testid="rule-form-criteria-item-conditional-add-button"
+        >
+          <PrimeButton
+            icon="pi pi-plus-circle"
+            label="And"
+            size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            outlined
+            @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
+          />
+          <PrimeButton
+            icon="pi pi-plus-circle"
+            label="Or"
+            size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            outlined
+            @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Divider
+            v-if="isNotLastCriteria(criteriaIndex)"
+            align="left"
+            type="dashed"
+            class="capitalize z-0"
+          >
+            and
+          </Divider>
+          <Divider
+            v-else
+            align="left"
+            type="solid"
+          />
+          <PrimeButton
+            v-if="criteriaIndex !== criteria.length - 1"
+            icon="pi pi-trash"
+            size="small"
+            outlined
+            @click="removeCriteriaDecorator(criteriaIndex)"
+            :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
+          />
+        </div>
       </div>
+
       <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
         <PrimeButton
-          :pt="{
-            root: { class: 'justify-center' },
-            label: { class: 'grow-0' }
-          }"
           icon="pi pi-plus-circle"
           label="Add Criteria"
+          size="small"
           outlined
-          class="w-full"
           :disabled="maximumCriteriaReached"
           @click="addNewCriteria"
           data-testid="rule-form-criteria-add-button"
@@ -785,6 +777,7 @@
         <div class="flex gap-2 mt-6 mb-8">
           <div class="w-1/2">
             <FieldDropdown
+              filter
               :key="behaviorItem.key"
               :name="`behaviors[${behaviorIndex}].name`"
               :options="behaviorsOptions"
@@ -829,6 +822,19 @@
                   </ul>
                 </template>
               </FieldDropdown>
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
+              <FieldDropdownLazyLoader
+                :service="getEdgeConnectors"
+                :loadService="edgeConnectorsService.loadEdgeConnectorsService"
+                :loading="loadingOrigins"
+                :name="`behaviors[${behaviorIndex}].edgeConnectorId`"
+                optionLabel="name"
+                optionValue="id"
+                :key="behaviorItem.key"
+                :value="behaviors[behaviorIndex].value.edgeConnectorId"
+                :data-testid="`edge-application-rule-form__edge-connector-item[${behaviorIndex}]`"
+              />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown

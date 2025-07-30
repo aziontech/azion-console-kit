@@ -26,9 +26,11 @@
       :sortField="props.groupColumn"
       sortMode="single"
       :rowClass="stateClassRules"
+      rowHover
       :pt="{
         bodyrow: (rowData) => ({
-          id: `row-${rowData.context.index}`
+          id: `row-${rowData.context.index}`,
+          class: 'cursor-pointer'
         })
       }"
     >
@@ -117,9 +119,12 @@
         #groupheader="slotProps"
         v-if="props.groupColumn"
       >
-        <span class="vertical-align-middle font-bold line-height-3 absolute left-16 top-4">
+        <div
+          class="vertical-align-middle font-medium line-height-3 absolute left-16 top-4 cursor-pointer"
+          @click="toggleGroup(slotProps.data)"
+        >
           {{ getObjectPath(slotProps.data, props.groupColumn) }}
-        </span>
+        </div>
       </template>
 
       <Column
@@ -346,7 +351,7 @@
   import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from '../dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import InputNumber from 'primevue/inputnumber'
@@ -442,6 +447,10 @@
     expandableRowGroups: {
       type: Boolean,
       default: false
+    },
+    isEdgeApplicationRulesEngine: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -462,6 +471,7 @@
   const menuRef = ref({})
   const valueInputedUser = ref(0)
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
@@ -488,11 +498,19 @@
     return data.value.filter((row) => row.position.altered)
   })
 
-  const updateRowPositions = () => {
+  const updateRowPositions = (phase) => {
     data.value.forEach((row, index) => {
-      row.position.value = index
-      row.position.altered =
-        row.position.altered && row.position.immutableValue !== row.position.value
+      if (!props.isEdgeApplicationRulesEngine) {
+        row.position.value = index
+        row.position.altered =
+          row.position.altered && row.position.immutableValue !== row.position.value
+      } else {
+        if (row.position.phase.toLowerCase() === phase.toLowerCase()) {
+          row.position.value = index
+          row.position.altered =
+            row.position.altered && row.position.immutableValue !== row.position.value
+        }
+      }
     })
   }
 
@@ -513,18 +531,68 @@
     }
   }
 
-  const onPositionChange = (updatedRow, newValue) => {
+  const changePositionOnEdgeApplicationRulesEngine = (updatedRow, position) => {
+    const targetPosition = parseInt(position, 10)
+    if (isNaN(targetPosition)) return
+
+    const ALL_RULES = data.value
+    const currentPhase = updatedRow.phase?.content
+    if (!currentPhase) return
+
+    const rulesInCurrentPhase = ALL_RULES.filter((item) => item.phase?.content === currentPhase)
+    const originalIndex = rulesInCurrentPhase.findIndex((rule) => rule.id === updatedRow.id)
+    if (originalIndex === -1) return
+
+    const maxAllowedPosition = rulesInCurrentPhase.length - 1
+    let newPosition = targetPosition
+
+    if (newPosition > maxAllowedPosition) {
+      newPosition = maxAllowedPosition
+      displayPositionExceededToast()
+    }
+
+    if (originalIndex === newPosition) return
+
+    const firstRule = rulesInCurrentPhase[originalIndex]
+    const secondRule = rulesInCurrentPhase[newPosition]
+
+    firstRule.position.value = targetPosition
+    firstRule.position.altered = targetPosition !== firstRule.position.immutableValue
+
+    secondRule.position.value = originalIndex
+    secondRule.position.altered = originalIndex !== secondRule.position.immutableValue
+
+    const temp = rulesInCurrentPhase[originalIndex]
+    rulesInCurrentPhase[originalIndex] = secondRule
+    rulesInCurrentPhase[targetPosition] = temp
+
+    const rulesInOtherPhases = ALL_RULES.filter((rule) => rule.phase?.content !== currentPhase)
+    data.value = [...rulesInOtherPhases, ...rulesInCurrentPhase]
+  }
+
+  const changePosition = (updatedRow, newValue) => {
     checkPositionExceededMaxResults(updatedRow.position.max)
-    const oldIndex = data.value.findIndex((item) => item.id === updatedRow.id)
+    const oldIndex = data.value.findIndex(
+      (item) => item.id === updatedRow.id && item.phase?.content === updatedRow.phase?.content
+    )
     if (oldIndex === -1) return
 
     const [movedItem] = data.value.splice(oldIndex, 1)
     movedItem.position.altered = true
     data.value.splice(newValue, 0, movedItem)
-    updateRowPositions()
+    updateRowPositions(updatedRow.phase?.content)
+  }
+
+  const onPositionChange = (updatedRow, newValue) => {
+    if (!props.isEdgeApplicationRulesEngine) {
+      changePosition(updatedRow, newValue)
+    } else {
+      changePositionOnEdgeApplicationRulesEngine(updatedRow, newValue)
+    }
+
     setTimeout(() => {
       const table = document.querySelector('.p-datatable')
-      const rowElement = table?.querySelector(`#row-${movedItem.position.value}`)
+      const rowElement = table?.querySelector(`#row-${newValue}`)
 
       if (rowElement) {
         rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -542,13 +610,60 @@
     }
   }
 
-  const onRowReorder = async (event) => {
+  const showInvalidMoveToast = () => {
+    toast.add({
+      severity: 'warn',
+      summary: 'Invalid Action',
+      detail: 'Rules can only be reordered within their own phase (Request or Response).',
+      life: 3000
+    })
+  }
+
+  const handleRuleDropToEdgeApplicationRulesEngine = (event) => {
     const { dragIndex, dropIndex } = event
-    const row = data.value[dragIndex]
-    if (data.value[dropIndex].name === 'Default Rule') return
-    if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
-      onPositionChange(row, dropIndex)
-      emit('on-reorder', { event, data })
+
+    const rules = data.value
+    const draggedRule = rules[dragIndex]
+    const targetRule = rules[dropIndex]
+
+    const isMoveInvalid =
+      !draggedRule || !targetRule || draggedRule.phase?.content !== targetRule.phase?.content
+
+    if (isMoveInvalid) {
+      showInvalidMoveToast()
+      reload()
+      return
+    }
+
+    const [movedRule] = rules.splice(dragIndex, 1)
+    rules.splice(dropIndex, 0, movedRule)
+
+    const affectedPhase = draggedRule.phase.content
+    const rulesInAffectedPhase = rules.filter((rule) => rule.phase?.content === affectedPhase)
+
+    rulesInAffectedPhase.forEach((rule, index) => {
+      const isTheRuleThatMoved = rule.id === movedRule.id
+      const positionHasChanged = rule.position.value !== index
+
+      if (isTheRuleThatMoved || positionHasChanged) {
+        rule.position.value = index
+        rule.position.altered = true
+      }
+    })
+
+    emit('on-reorder', { event, data: rules })
+  }
+
+  const onRowReorder = async (event) => {
+    if (!props.isEdgeApplicationRulesEngine) {
+      const { dragIndex, dropIndex } = event
+      const row = data.value[dragIndex]
+      if (row.position.max >= dropIndex && row.position.min <= dropIndex) {
+        onPositionChange(row, dropIndex)
+        emit('on-reorder', { event, data })
+      }
+    } else {
+      handleRuleDropToEdgeApplicationRulesEngine(event)
     }
   }
 
@@ -567,20 +682,18 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  if (opt.data.updated) {
+                    reload()
+                  }
                 }
-                openDialog(DeleteDialog, bodyDelete)
-              }
+              })
               break
             case 'action':
               action.commandAction(rowData)
@@ -710,6 +823,17 @@
 
   const optionsColumns = ref([])
 
+  const toggleGroup = (groupData) => {
+    const groupValue = getObjectPath(groupData, props.groupColumn)
+    const index = expandedGroups.value.indexOf(groupValue)
+
+    if (index === -1) {
+      expandedGroups.value.push(groupValue)
+    } else {
+      expandedGroups.value.splice(index, 1)
+    }
+  }
+
   onMounted(() => {
     loadData({
       fields: props.apiFields,
@@ -721,6 +845,7 @@
 
   defineExpose({ reload })
 </script>
+
 <style lang="scss">
   .p-datatable {
     .p-datatable-tbody {

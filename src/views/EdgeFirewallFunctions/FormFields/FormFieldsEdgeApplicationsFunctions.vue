@@ -7,39 +7,37 @@
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import { computed, ref, watch } from 'vue'
   import FieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
+  import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer'])
-
-  const props = defineProps({
-    listEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
-    loadEdgeFunctionService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const drawerRef = ref('')
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleDrawerSuccess = (response) => {
-    edgeFunctionID.value = response.functionId
+  const handleDrawerSuccess = (functionId) => {
+    edgeFunctionID.value = functionId
   }
 
   const changeArgs = async (target) => {
-    if (target?.args) {
-      args.value = target.args
+    if (target?.jsonArgs) {
+      args.value = target.jsonArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
-    return props.listEdgeFunctionsService({
-      initiatorType: 'edge_firewall',
+    return edgeFunctionService.listEdgeFunctionsDropdown({
+      executionEnvironment: 'firewall',
+      fields: ['id', 'name', 'args', 'execution_environment'],
       ...queryParams
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = (queryParams) => {
+    return edgeFunctionService.loadEdgeFunction({
+      ...queryParams,
+      fields: ['id', 'name', 'args']
     })
   }
 
@@ -96,13 +94,13 @@
           name="edgeFunctionID"
           required
           :service="listEdgeFunctionsServiceDecorator"
-          :loadService="props.loadEdgeFunctionService"
+          :loadService="loadEdgeFunctionServiceDecorator"
           :value="edgeFunctionID"
-          :moreOptions="['args']"
+          :moreOptions="['jsonArgs']"
           disableEmitFirstRender
           @onSelectOption="changeArgs"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           appendTo="self"
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
         >
@@ -136,7 +134,7 @@
         >
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"

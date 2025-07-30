@@ -1,7 +1,8 @@
 <script setup>
-  import { toRef, useSlots } from 'vue'
+  import { toRef, useSlots, computed, useAttrs } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
+  import LabelBlock from '@/templates/label-block'
 
   const props = defineProps({
     value: {
@@ -39,6 +40,18 @@
   })
 
   const name = toRef(props, 'name')
+  const attrs = useAttrs()
+
+  const customTestId = computed(() => {
+    const id = attrs['data-testid'] || 'field-input-group'
+
+    return {
+      label: `${id}__label`,
+      input: `${id}__input`,
+      description: `${id}__description`,
+      error: `${id}__error-message`
+    }
+  })
 
   const slots = useSlots()
   const hasIconSlot = !!slots.icon
@@ -54,11 +67,13 @@
 </script>
 
 <template>
-  <label
+  <LabelBlock
+    v-if="props.label"
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
-  >
+    :data-testid="customTestId.label"
+    :label="props.label"
+    :isRequired="attrs.required"
+  />
   <div class="p-inputgroup">
     <div
       class="p-inputgroup-addon"
@@ -73,7 +88,7 @@
       :name="name"
       :readonly="readonly"
       :disabled="disabled"
-      :class="inputClass"
+      :class="[{ 'p-invalid': errorMessage }, $attrs.class, inputClass]"
       type="text"
       :placeholder="props.placeholder"
       @input="handleChange"

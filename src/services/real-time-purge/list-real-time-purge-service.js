@@ -48,6 +48,35 @@ const MAPTYPE = {
   url: 'URL'
 }
 
+const parseEscapedJSON = (escapedString) => {
+  let unescapedString = escapedString
+  let parsedData = null
+  let hasChanged
+
+  do {
+    hasChanged = false
+    try {
+      parsedData = JSON.parse(unescapedString)
+
+      if (typeof parsedData === 'string') {
+        unescapedString = parsedData
+        hasChanged = true
+      }
+    } catch (error) {
+      const newUnescapedString = unescapedString.replace(/\\"/g, '"')
+
+      if (newUnescapedString !== unescapedString) {
+        unescapedString = newUnescapedString
+        hasChanged = true
+      } else {
+        return null
+      }
+    }
+  } while (hasChanged)
+
+  return parsedData
+}
+
 const adapt = (httpResponse) => {
   const DEFAULT_VALUE = '-'
 
@@ -57,12 +86,7 @@ const adapt = (httpResponse) => {
 
     const data = (() => {
       if (item?.requestData && item?.requestData !== DEFAULT_VALUE) {
-        try {
-          const unescapedRequestData = item.requestData.replace(/\\"/g, '"')
-          return JSON.parse(unescapedRequestData)
-        } catch (error) {
-          return null
-        }
+        return parseEscapedJSON(item.requestData)
       }
       return null
     })()
@@ -74,7 +98,8 @@ const adapt = (httpResponse) => {
       layer: data?.layer ? MAPLAYER[data.layer] : DEFAULT_VALUE,
       user: item.authorEmail,
       disabled: !data,
-      time: formatExhibitionDate(item.ts, 'full', 'short')
+      time: formatExhibitionDate(item.ts, 'full', 'short'),
+      ts: item.ts
     }
   })
   return {

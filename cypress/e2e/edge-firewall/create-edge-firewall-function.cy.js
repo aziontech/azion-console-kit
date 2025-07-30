@@ -8,7 +8,7 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(functionName, { delay: 0 })
-  cy.intercept('GET', '/api/v4/edge_functions/functions/*').as('getFunctionsSaved')
+  cy.intercept('GET', '/v4/edge_functions/functions/*').as('getFunctionsSaved')
   cy.get(selectors.edgeFirewall.edgeFunctionActionbar).find(selectors.functions.saveButton).click()
   cy.verifyToast('success', 'Your edge function has been created')
   cy.wait('@getFunctionsSaved')
@@ -30,14 +30,14 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.createButton).click()
     cy.get(selectors.edgeFirewall.nameInput).clear()
     cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
-    cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
     cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
     cy.get(selectors.edgeFirewall.saveButton).click()
-    cy.verifyToast('success', 'Your Edge Firewall has been created')
+    cy.verifyToastWithAction('success', 'Your Edge Firewall has been created')
 
     // Act - create Edge Function instance
     cy.get(selectors.edgeFirewall.functionsTab).click()
-    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
+    cy.intercept('POST', '/v4/edge_firewall/firewalls/*/functions').as('createFunction')
+    cy.intercept('GET', '/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeFirewall.createFunctionInstanceButton).click()
     cy.get(selectors.edgeFirewall.functionInstanceName).clear()
     cy.get(selectors.edgeFirewall.functionInstanceName).type(functionInstanceName)
@@ -46,6 +46,7 @@ describe('Edge Firewall spec', { tags: ['@dev5'] }, () => {
     cy.get(selectors.edgeFirewall.createFunctionButton).click()
     createFunctionCase()
     cy.get(selectors.edgeFirewall.functionInstanceSubmit).click()
+    cy.wait('@createFunction')
     cy.verifyToast('success', 'Your Function has been created')
 
     // Assert - Find created function

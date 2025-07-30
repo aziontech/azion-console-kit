@@ -13,8 +13,8 @@ const createWAFCase = () => {
 
   // Act
   cy.get(selectors.wafs.nameInput).type(wafName)
-  cy.intercept('POST', '/api/v4/edge_firewall/wafs*').as('wafRules')
-  cy.intercept('GET', '/api/v4/edge_firewall/wafs/*').as('wafRulesGET')
+  cy.intercept('POST', '/v4/edge_firewall/wafs*').as('wafRules')
+  cy.intercept('GET', '/v4/edge_firewall/wafs/*').as('wafRulesGET')
 
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@wafRules')
@@ -34,11 +34,11 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     cy.wait('@wafRulesGET')
     cy.openProduct('Edge Firewall')
 
-    cy.intercept('GET', 'api/v4/edge_firewall/wafs?ordering=name&page=1&page_size=100&fields=&search=', {
+    cy.intercept('GET', '/v4/edge_firewall/wafs?ordering=name&page=1&page_size=100&fields=&search=', {
       fixture: '/waf-rules/waf-list.json'
     }).as('wafDropdown')
 
-    cy.intercept('GET', 'api/v4/edge_firewall/wafs?ordering=name&page=2&page_size=100&fields=&search=', {
+    cy.intercept('GET', '/v4/edge_firewall/wafs?ordering=name&page=2&page_size=100&fields=&search=', {
       fixture: '/waf-rules/waf-list-second-page.json'
     }).as('wafDropdownSecondPage')
     // Act - create Edge Firewall
@@ -68,8 +68,8 @@ describe('Edge Firewall spec', { tags: ['@dev5', '@xfail'] }, () => {
     // Act - Set WAF Behavior
     cy.get(selectors.edgeFirewall.ruleBehaviorDropdown).click()
     cy.get(selectors.edgeFirewall.behaviorsWafOption).click()
+    cy.wait('@wafDropdown')
     cy.get(selectors.edgeFirewall.rulesWafDropdown).click()
-    cy.wait('@wafDropdown', { timeout: 3000 })
     cy.get(selectors.edgeFirewall.scrollWafDropdown).scrollTo('bottom')
     cy.wait('@wafDropdownSecondPage', { timeout: 3000 });
     // eslint-disable-next-line cypress/unsafe-to-chain-command

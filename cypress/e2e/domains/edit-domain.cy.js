@@ -31,7 +31,7 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
   cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
   cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
-  cy.intercept('GET', '/api/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
+  cy.intercept('GET', '/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
   cy.get(selectors.edgeFirewall.saveButton).click()
   cy.verifyToast('success', 'Your Edge Firewall has been created')
   cy.wait('@retrieveEdgeFirewall')
@@ -56,7 +56,7 @@ const createDigitalCertificate = () => {
   cy.get(selectors.digitalCertificates.emailInput).type(`${digitalCertificateName}@example.com`)
   cy.get(selectors.digitalCertificates.sanTextarea).type(`${digitalCertificateName}.net`)
 
-  cy.intercept('GET', '/api/v4/digital_certificates/certificates/*?fields=*').as(
+  cy.intercept('GET', '/v4/digital_certificates/certificates/*?fields=*').as(
     'getDigitalCertificatesApi'
   )
 
@@ -79,6 +79,9 @@ const createDigitalCertificate = () => {
 
 describe('Domains spec', { tags: ['@dev3'] }, () => {
   beforeEach(() => {
+    cy.intercept('GET', '/api/account/info', {
+        fixture: '/account/info/domain_flags.json'
+    }).as('accountInfo')
     cy.login()
   })
 
@@ -88,7 +91,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     domainName = generateUniqueName('domain')
 
     // Arrange
-    cy.intercept('GET', '/api/v4/edge_firewall/firewalls*').as('getEdgeFirewalls')
+    cy.intercept('GET', '/v4/edge_firewall/firewalls*').as('getEdgeFirewalls')
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
@@ -105,9 +108,10 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
 
     cy.get(selectors.domains.edgeFirewallField).click()
     cy.get(selectors.domains.edgeFirewallDropdownSearch).clear()
+    
     cy.intercept(
       'GET',
-      `/api/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=${firewallName}`
+      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
     cy.get(selectors.domains.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')

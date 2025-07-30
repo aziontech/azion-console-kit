@@ -8,7 +8,7 @@
       scrollable
       removableSort
       :lazy="props.lazy"
-      rowHover
+      :rowHover="!disabledList"
       ref="dataTableRef"
       class="overflow-clip rounded-md"
       dataKey="id"
@@ -59,6 +59,9 @@
                 @keyup.enter="fetchOnSearch"
                 @input="handleSearchValue(false)"
               />
+              <div class="ml-3">
+                <slot name="select-buttons" />
+              </div>
             </span>
 
             <PrimeButton
@@ -79,6 +82,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -110,7 +114,7 @@
         :field="col.field"
         :header="col.header"
         :sortField="col?.sortField"
-        :class="col.disableSort ? '' : 'hover:cursor-pointer'"
+        :class="{ 'hover:cursor-pointer': !col.disableSort || !disabledList }"
         data-testid="data-table-column"
       >
         <template #body="{ data: rowData }">
@@ -238,6 +242,7 @@
     </DataTable>
     <DataTable
       v-else
+      :disabled="disabledList"
       :value="Array(10)"
       :pt="{
         header: { class: '!border-t-0' }
@@ -272,6 +277,7 @@
               <PrimeButton
                 class="max-sm:w-full"
                 @click="navigateToAddPage"
+                :disabled="disabledAddButton"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
                 v-if="addButtonLabel"
@@ -305,9 +311,9 @@
   import PrimeMenu from 'primevue/menu'
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
@@ -331,7 +337,17 @@
       type: Array,
       default: () => [{ field: 'name', header: 'Name' }]
     },
+    hiddenByDefault: {
+      type: Array,
+      default: () => []
+    },
     loadDisabled: {
+      type: Boolean
+    },
+    disabledAddButton: {
+      type: Boolean
+    },
+    disabledList: {
       type: Boolean
     },
     isGraphql: {
@@ -442,6 +458,7 @@
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
@@ -531,20 +548,19 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload() && updateDataTablePagination()
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  if (opt.data.updated) {
+                    reload()
+                    updateDataTablePagination()
+                  }
                 }
-                openDialog(DeleteDialog, bodyDelete)
-              }
+              })
               break
             case 'action':
               action.commandAction(rowData)
@@ -561,31 +577,45 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
-      try {
-        isLoading.value = true
+  const loadData = async ({ page, ...query }, service) => {
+    try {
+      isLoading.value = true
+      if (service) {
+        const { count = 0, body = [] } = props.isGraphql
+          ? await service()
+          : await service({ page, ...query })
+
+        data.value = body
+        totalRecords.value = count
+      } else {
         const { count = 0, body = [] } = props.isGraphql
           ? await props.listService()
           : await props.listService({ page, ...query })
+
         data.value = body
         totalRecords.value = count
-      } catch (error) {
+      }
+    } catch (error) {
+      // Check if error is an ErrorHandler instance (from v2 services)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
         const errorMessage = error.message || error
         toast.add({
           closable: true,
           severity: 'error',
-          summary: 'error',
+          summary: 'Error',
           detail: errorMessage
         })
-      } finally {
-        isLoading.value = false
-        if (firstLoadData.value) {
-          const hasData = data.value?.length > 0
-          emit('on-load-data', !!hasData)
-        }
-        firstLoadData.value = false
       }
+    } finally {
+      isLoading.value = false
+      if (firstLoadData.value) {
+        const hasData = data.value?.length > 0
+        emit('on-load-data', !!hasData)
+      }
+      firstLoadData.value = false
     }
   }
 
@@ -624,7 +654,7 @@
     }
   }
 
-  const reload = async (query = {}) => {
+  const reload = async (query = {}, listService = props.listService) => {
     if (!savedOrdering.value) {
       savedOrdering.value = props.defaultOrderingFieldName
     }
@@ -641,7 +671,7 @@
       commonParams.search = savedSearch.value
     }
 
-    loadData(commonParams)
+    loadData(commonParams, listService)
   }
 
   const extractFieldValue = (rowData, field) => {
@@ -710,8 +740,18 @@
         ordering: props.defaultOrderingFieldName
       })
     }
-    selectedColumns.value = props.columns
+    selectedColumns.value = props.columns.filter(
+      (col) => !props.hiddenByDefault?.includes(col.field)
+    )
   })
+
+  watch(
+    () => props.columns,
+    (newColumns) => {
+      selectedColumns.value = newColumns
+    },
+    { deep: true }
+  )
 
   defineExpose({ reload, handleExportTableDataToCSV })
 </script>

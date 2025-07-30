@@ -5,6 +5,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
+  import { edgeFirewallService } from '@/services/v2'
   import { inject } from 'vue'
 
   defineOptions({ name: 'create-edge-firewall' })
@@ -13,13 +14,6 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    createEdgeFirewallService: {
-      type: Function,
-      required: true
-    }
-  })
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -33,16 +27,30 @@
     name: '',
     isActive: true,
     debugRules: false,
-    edgeFunctionsEnabled: false,
+    edgeFunctionsEnabled: true,
     networkProtectionEnabled: true,
     wafEnabled: false,
     ddosProtectionUnmetered: true
   }
 
-  const handleCreateEdgeFirewall = () => {
+  const handleCreateEdgeFirewall = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Firewall'
     })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Firewall has been created',
+      actions: {
+        link: {
+          label: 'View Edge Firewall',
+          callback: () => response.redirectToUrl(`/edge-firewall/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleFailedCreateEdgeFirewall = (error) => {
@@ -65,11 +73,12 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeFirewallService"
+        :createService="edgeFirewallService.createEdgeFirewallService"
         :schema="validationSchema"
         :initialValues="initialValues"
         @on-response="handleCreateEdgeFirewall"
         @on-response-fail="handleFailedCreateEdgeFirewall"
+        disableToast
       >
         <template #form>
           <FormCreateEdgeFirewall />

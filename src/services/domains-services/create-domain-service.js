@@ -25,6 +25,10 @@ const adapt = (payload) => {
     environment: payload.environment
   }
 
+  if (!payload.mtlsTrustedCertificate) {
+    delete dataRequest.mtls_trusted_ca_certificate_id
+  }
+
   if (payload.edgeFirewall) {
     dataRequest.edge_firewall_id = payload.edgeFirewall
   }

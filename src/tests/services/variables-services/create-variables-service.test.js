@@ -40,20 +40,6 @@ describe('VariablesServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        uuid: 1
-      }
-    })
-    const { sut } = makeSut()
-
-    const data = await sut(fixtures.variableMock)
-
-    expect(data.feedback).toBe('Your variable has been created')
-  })
-
   it.each([
     {
       scenario: 'already used variable key',

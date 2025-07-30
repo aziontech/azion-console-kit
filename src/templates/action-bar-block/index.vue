@@ -1,6 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import PrimeButton from 'primevue/button'
+
   defineOptions({ name: 'action-bar-block' })
 
   const emit = defineEmits(['onSubmit', 'onCancel'])

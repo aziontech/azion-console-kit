@@ -25,7 +25,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -54,7 +53,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -84,7 +82,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -110,7 +107,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -120,7 +116,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     //Edit Flow
     //Arrange
-    cy.intercept('GET', '/api/v4/workspace/network_lists/*').as('networkListsApi')
+    cy.intercept('GET', '/v4/workspace/network_lists/*').as('networkListsApi')
     cy.get(selectors.networkLists.nameRow).click()
     cy.wait('@networkListsApi')
 
@@ -129,7 +125,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.asnTextarea).type('{enter}123{enter}')
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your Network List has been updated')
+    cy.verifyToast('success', 'Your Network List has been updated.')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -159,7 +155,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -168,7 +163,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.typeRow).should('have.text', 'Countries')
     //Edit Flow
     //Arrange
-    cy.intercept('GET', '/api/v4/workspace/network_lists/*').as('networkListsApi')
+    cy.intercept('GET', '/v4/workspace/network_lists/*').as('networkListsApi')
     cy.get(selectors.networkLists.nameRow).click()
     cy.wait('@networkListsApi')
 
@@ -178,7 +173,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.countriesListOption(3)).click()
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your Network List has been updated')
+    cy.verifyToast('success', 'Your Network List has been updated.')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -209,7 +204,6 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
 
     cy.get(selectors.networkLists.saveButton).click()
     cy.verifyToast('success', 'Your network list has been created')
-    cy.get(selectors.networkLists.cancelButton).click()
 
     // Assert
     cy.get(selectors.networkLists.searchInput).clear()
@@ -218,7 +212,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.typeRow).should('have.text', 'IP/CIDR')
     //Edit Flow
     //Arrange
-    cy.intercept('GET', '/api/v4/workspace/network_lists/*').as('networkListsApi')
+    cy.intercept('GET', '/v4/workspace/network_lists/*').as('networkListsApi')
     cy.get(selectors.networkLists.nameRow).click()
     cy.wait('@networkListsApi')
 
@@ -227,7 +221,7 @@ describe('Network Lists spec', { tags: ['@dev6'] }, () => {
     cy.get(selectors.networkLists.ipcidrTextarea).type('{enter}192.148.3.4')
 
     cy.get(selectors.networkLists.saveButton).click()
-    cy.verifyToast('success', 'Your Network List has been updated')
+    cy.verifyToast('success', 'Your Network List has been updated.')
 
     //Assert
     cy.get(selectors.networkLists.searchInput).clear()

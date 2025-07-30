@@ -36,10 +36,6 @@
     editDeviceGroupService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -65,9 +61,10 @@
     emit('onSuccess')
   }
 
-  const handleSuccessCreate = () => {
+  const handleSuccessCreate = (response) => {
+    const createItemId = response.id
     handleTrackCreation()
-    emit('onSuccess')
+    emit('onSuccess', createItemId)
   }
 
   const closeDrawer = () => {
@@ -76,18 +73,12 @@
   }
 
   const loadService = async (payload) => {
-    const deviceGroup = await props.loadDeviceGroupService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    const deviceGroup = await props.loadDeviceGroupService(props.edgeApplicationId, payload.id)
     return deviceGroup
   }
 
   const editService = async (payload) => {
-    return await props.editDeviceGroupService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
-    })
+    return await props.editDeviceGroupService(props.edgeApplicationId, payload)
   }
 
   const openDrawerCreate = () => {
@@ -97,10 +88,6 @@
   const openDrawerEdit = (id) => {
     selectedDeviceGroupToEdit.value = id.toString()
     showEditDrawer.value = true
-  }
-
-  const closeDrawerEdit = () => {
-    showEditDrawer.value = false
   }
 
   const handleTrackSuccessEdit = () => {
@@ -145,8 +132,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   defineExpose({

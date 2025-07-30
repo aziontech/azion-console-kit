@@ -10,6 +10,7 @@
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
   import orderDialog from '@/views/EdgeApplicationsRulesEngine/Dialog/order-dialog.vue'
+  import { networkListsService, edgeFirewallRulesEngineService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -33,23 +34,12 @@
       type: Function,
       required: true
     },
-    listEdgeFirewallRulesEngineService: {
-      type: Function,
-      required: true
-    },
-    deleteEdgeFirewallRulesEngineService: {
-      type: Function,
-      required: true
-    },
+
     loadEdgeFirewallRulesEngineService: {
       type: Function,
       required: true
     },
     listFunctionsService: {
-      type: Function,
-      required: true
-    },
-    listWafRulesService: {
       type: Function,
       required: true
     },
@@ -61,19 +51,7 @@
       type: Object,
       required: true
     },
-    listNetworkListService: {
-      type: Function,
-      required: true
-    },
-    loadNetworkListService: {
-      type: Function,
-      required: true
-    },
     reorderRulesEngine: {
-      type: Function,
-      required: true
-    },
-    loadWafRulesService: {
       type: Function,
       required: true
     }
@@ -94,16 +72,16 @@
   ]
 
   const listEdgeFirewallRulesEngineServiceWithDecorator = async (query) => {
-    return await props.listEdgeFirewallRulesEngineService({
+    return await edgeFirewallRulesEngineService.listEdgeFirewallRulesEngineService({
       id: props.edgeFirewallId,
       ...query
     })
   }
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
-    return await props.deleteEdgeFirewallRulesEngineService({
-      edgeFirewallId: props.edgeFirewallId,
+    return await edgeFirewallRulesEngineService.deleteEdgeFirewallRulesEngineService(
+      props.edgeFirewallId,
       ruleEngineId
-    })
+    )
   }
 
   const handleTrackEditEvent = () => {
@@ -142,7 +120,10 @@
   const reorderDecoratorService = async (data, reload) => {
     isLoadingButtonOrder.value = true
     try {
-      await props.reorderRulesEngine(data, props.edgeFirewallId)
+      await edgeFirewallRulesEngineService.reorderEdgeFirewallRulesEngineService(
+        data,
+        props.edgeFirewallId
+      )
       toast.add({
         closable: true,
         severity: 'success',
@@ -150,12 +131,16 @@
         detail: 'Reorder saved'
       })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'error',
+          detail: error
+        })
+      }
     } finally {
       isLoadingButtonOrder.value = false
       reload()
@@ -166,6 +151,25 @@
     {
       field: 'name',
       header: 'Name',
+      disableSort: true
+    },
+    {
+      field: 'description',
+      header: 'Description',
+      filterPath: 'description.value',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' }),
+      disableSort: true
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      disableSort: true
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
       disableSort: true
     },
     {
@@ -181,25 +185,6 @@
         })
       },
       disableSort: true
-    },
-    {
-      field: 'description',
-      header: 'Description',
-      filterPath: 'description.value',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disableSort: true
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified',
-      disableSort: true
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor',
-      disableSort: true
     }
   ])
 
@@ -211,8 +196,6 @@
       service: deleteEdgeFirewallRulesEngineServiceWithDecorator
     }
   ]
-
-  const disabledOrdering = ref(true)
 
   const isLoadingButtonOrder = ref(false)
   const updateRulesOrder = async (rows, alteredRows, reload) => {
@@ -251,12 +234,10 @@
     :edgeFirewallModules="edgeFirewallModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
-    :listWafRulesService="listWafRulesService"
     :loadService="loadEdgeFirewallRulesEngineService"
     :editService="editEdgeFirewallRulesEngineService"
-    :listNetworkListService="listNetworkListService"
-    :loadNetworkListService="loadNetworkListService"
-    :loadWafRulesService="loadWafRulesService"
+    :listNetworkListService="networkListsService.listNetworkLists"
+    :loadNetworkListService="networkListsService.loadNetworkList"
     @onSuccess="reloadList"
   />
 
@@ -299,14 +280,11 @@
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
-              class="bg-secondary"
               outlined
-              label="Cancel"
+              label="Discard Changes"
               @click="reload"
-              :disabled="isLoadingButtonOrder"
-              data-testid="rules-engine-cancel-order-button"
+              data-testid="review-changes-dialog-footer-cancel-button"
             />
-
             <PrimeButton
               label="Review Changes"
               class="bg-surface"
@@ -340,15 +318,6 @@
         label="Rules Engine"
         data-testid="create_Rules Engine_button"
         @click="openCreateDrawer"
-      />
-      <PrimeButton
-        icon="pi pi-save"
-        :disabled="disabledOrdering"
-        label="Save order"
-        :loading="isLoadingButtonOrder"
-        data-testid="rules-engine-save-order-button"
-        @click="updateRulesOrder(data, reload)"
-        v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
       />
     </template>
   </EmptyResultsBlock>

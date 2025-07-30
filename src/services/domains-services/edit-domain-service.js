@@ -26,6 +26,10 @@ const adapt = (payload) => {
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
 
+  if (!payload.mtlsTrustedCertificate) {
+    delete basePayload.mtls_trusted_ca_certificate_id
+  }
+
   return basePayload
 }
 /**

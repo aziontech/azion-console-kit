@@ -10,7 +10,7 @@ const createFunctionCase = () => {
   // Act
   cy.get(selectors.functions.nameInput).clear()
   cy.get(selectors.functions.nameInput).type(fixtures.functionName, { delay: 0 })
-  cy.intercept('GET', 'api/v4/edge_functions/functions/*').as('getFunctions')
+  cy.intercept('GET', '/v4/edge_functions/functions/*').as('getFunctions')
   cy.get(selectors.edgeApplication.functionsInstance.edgeFunctionActionbar)
     .find(selectors.functions.saveButton)
     .click()
@@ -25,11 +25,11 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
+
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
@@ -37,7 +37,6 @@ const createEdgeApplicationCase = () => {
     'have.text',
     fixtures.edgeApplicationName
   )
-
   // Act - Navigate to the created edge application
   cy.get(selectors.list.filteredRow.column('name')).click()
 }
@@ -45,6 +44,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -65,11 +67,11 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     createEdgeApplicationCase()
 
     // Act - create a function instance
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()
-    cy.intercept('GET', '/api/v4/edge_functions/functions*').as('getFunctions')
+    cy.intercept('GET', '/v4/edge_functions/functions*').as('getFunctions')
     cy.get(selectors.edgeApplication.functionsInstance.createButton).click()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).clear()
     cy.get(selectors.edgeApplication.functionsInstance.nameInput).type(

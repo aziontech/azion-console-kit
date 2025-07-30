@@ -25,11 +25,11 @@ const createEdgeApplicationCase = () => {
   // Act
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).clear()
-  cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
+  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
+  cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
+
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)
@@ -45,6 +45,9 @@ const createEdgeApplicationCase = () => {
 describe('Edge Application', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     fixtures.edgeApplicationName = generateUniqueName('EdgeApp')
+    cy.intercept('GET', '/api/account/info', {
+      fixture: '/account/info/without_flags.json'
+    }).as('accountInfo')
     // Login
     cy.login()
 
@@ -65,11 +68,11 @@ describe('Edge Application', { tags: ['@dev4'] }, () => {
     createEdgeApplicationCase()
     cy.intercept(
       'GET',
-      'api/v4/edge_functions/functions?ordering=name&page=1&page_size=100&fields=&search=*'
+      '/v4/edge_functions/functions?*'
     ).as('getEdgeFunctions')
 
     // Act - create a function instance
-    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctions')).click()
+    cy.get(selectors.edgeApplication.mainSettings.modulesSwitch('edgeFunctionsEnabled')).click()
     cy.get(selectors.form.actionsSubmitButton).click()
     cy.verifyToast('success', 'Your edge application has been updated')
     cy.get(selectors.edgeApplication.tabs('Functions Instances')).click()

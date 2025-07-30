@@ -1,10 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock
-        :pageTitle="domainName"
-        :tag="tagLocked"
-      ></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="domainName"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -17,21 +14,12 @@
         @on-edit-fail="handleTrackFailEditEvent"
       >
         <template #form>
-          <InlineMessage
-            severity="warn"
-            v-if="isLocked"
-          >
-            <b>Warning</b>
-            {{ INFORMATION_TEXTS.LOCKED_MESSAGE }}
-          </InlineMessage>
           <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :listEdgeApplicationsService="listEdgeApplicationsService"
             :loadEdgeApplicationsService="loadEdgeApplicationsService"
-            :listEdgeFirewallService="listEdgeFirewallService"
-            :loadEdgeFirewallService="loadEdgeFirewallService"
-            :listDigitalCertificatesService="listDigitalCertificatesService"
-            :loadDigitalCertificatesService="loadDigitalCertificatesService"
+            :listEdgeFirewallService="edgeFirewallService.listEdgeFirewallService"
+            :loadEdgeFirewallService="edgeFirewallService.loadEdgeFirewallService"
             hasDomainName
             @copyDomainName="copyDomainName"
           />
@@ -49,33 +37,22 @@
 </template>
 
 <script setup>
-  import { ref, inject, onMounted, computed } from 'vue'
+  import { ref, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import InlineMessage from 'primevue/inlinemessage'
-  import { INFORMATION_TEXTS } from '@/helpers'
   import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { useRoute } from 'vue-router'
+  import { edgeFirewallService } from '@/services/v2'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
     editDomainService: {
-      type: Function,
-      required: true
-    },
-    listDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
       type: Function,
       required: true
     },
@@ -99,10 +76,6 @@
       type: Function,
       required: true
     },
-    checkWorkloadLockedService: {
-      type: Function,
-      required: true
-    },
     updatedRedirect: {
       type: String,
       required: true
@@ -123,19 +96,6 @@
     })
   }
 
-  const tagProps = {
-    value: 'Locked',
-    severity: 'warning',
-    tooltip: INFORMATION_TEXTS.LOCKED_MESSAGE_TOOLTIP
-  }
-
-  const tagLocked = computed(() => {
-    if (isLocked.value) {
-      return tagProps
-    }
-    return null
-  })
-
   const handleTrackFailEditEvent = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -149,33 +109,14 @@
   }
 
   const digitalCertificates = ref([])
-  const toast = useToast()
   const domainName = ref()
-  const isLocked = ref(false)
-  const route = useRoute()
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
-  }
 
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
   }
 
   const setDomainName = async (domain) => {
     domainName.value = domain.name
-  }
-
-  const checkLockedWorkload = async () => {
-    const workloadId = route.params.id
-    isLocked.value = await props.checkWorkloadLockedService({
-      id: workloadId
-    })
   }
 
   const validationSchema = yup.object({
@@ -218,9 +159,5 @@
       .label('Trusted CA Certificate'),
     active: yup.boolean(),
     environment: yup.string()
-  })
-
-  onMounted(() => {
-    checkLockedWorkload()
   })
 </script>

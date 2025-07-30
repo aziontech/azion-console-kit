@@ -5,7 +5,6 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
-      - UXE-6333-real-time-event-improvement-fork
   push:
     branches:
       - dev
@@ -29,6 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn ci
-        
+
       - name: Run security-linter
         run: yarn security-check

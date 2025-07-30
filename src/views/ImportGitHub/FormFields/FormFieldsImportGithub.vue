@@ -12,23 +12,12 @@
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
   import LabelBlock from '@/templates/label-block'
+  import { vcsService } from '@/services/v2'
 
   const toast = useToast()
   const router = useRouter()
 
   const props = defineProps({
-    listPlatformsService: {
-      type: Function
-    },
-    postCallbackUrlService: {
-      type: Function
-    },
-    listIntegrationsService: {
-      type: Function
-    },
-    listRepositoriesService: {
-      type: Function
-    },
     listVulcanPresetsService: {
       type: Function
     },
@@ -70,15 +59,13 @@
   const saveIntegration = async (integration) => {
     try {
       isGithubConnectLoading.value = true
-      await props.postCallbackUrlService(callbackUrl.value, integration.data)
-      await listIntegrations()
+      await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
+      await loadListIntegrations()
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Save failed',
-        detail: error
-      })
+      error.showWithOptions(toast, (error) => ({
+        summary: `Save failed ${error.detail}`,
+        severity: 'error'
+      }))
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -93,19 +80,13 @@
   }
 
   const integrationsList = ref([])
-  const listIntegrations = async () => {
+  const loadListIntegrations = async () => {
     try {
       isGithubConnectLoading.value = true
-      const data = await props.listIntegrationsService()
-
+      const data = await vcsService.listIntegrations()
       integrationsList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Listing failed',
-        detail: error
-      })
+      error.showWithOptions(toast, { summary: 'Listing failed' })
     } finally {
       isGithubConnectLoading.value = false
     }
@@ -122,15 +103,10 @@
     try {
       repositoriesList.value = []
       loadingRepositories.value = true
-      const data = await props.listRepositoriesService(gitScope.value)
+      const data = await vcsService.listRepositories(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Loading failed',
-        detail: error
-      })
+      error.showWithOptions(toast, { summary: 'Loading failed' })
     } finally {
       loadingRepositories.value = false
     }
@@ -138,7 +114,10 @@
 
   const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
-      const framework = await props.frameworkDetectorService({ accountName, repositoryName })
+      const framework = await props.frameworkDetectorService({
+        accountName,
+        repositoryName
+      })
       preset.value = framework
     } catch (error) {
       toast.add({
@@ -184,7 +163,7 @@
   }
 
   onMounted(async () => {
-    await listIntegrations()
+    await loadListIntegrations()
     listenerOnMessage()
     presetsList.value = await props.listVulcanPresetsService()
   })
@@ -211,7 +190,6 @@
       <div v-show="!hasIntegrations">
         <OAuthGithub
           ref="oauthGithubRef"
-          :listPlatformsService="listPlatformsService"
           @onCallbackUrl="
             (uri) => {
               setCallbackUrl(uri.value)
