@@ -4,7 +4,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsEdgeStorage from './FormFields/FormFieldsEdgeStorage.vue'
-  import { useEdgeStorageBuckets } from '@/composables/useEdgeStorageBuckets'
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
@@ -15,7 +14,6 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const toast = useToast()
-  const { addBucket } = useEdgeStorageBuckets()
 
   defineProps({
     createEdgeStorageBucketService: {
@@ -34,9 +32,6 @@
   })
 
   const handleResponse = (response) => {
-    // Add bucket to shared state
-    const newBucket = addBucket(response)
-
     tracker.product.productCreated({
       productName: 'Edge Storage Bucket'
     })
@@ -45,7 +40,7 @@
     toast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Bucket "${newBucket.name}" has been created successfully`,
+      detail: `Bucket "${response.name}" has been created successfully`,
       life: 5000
     })
 
