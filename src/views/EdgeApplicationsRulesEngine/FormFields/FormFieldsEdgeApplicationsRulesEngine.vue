@@ -237,7 +237,9 @@
       filter_request_header: 'header-name',
       redirect_to_301: 'location',
       redirect_to_302: 'location',
-      rewrite_request: 'URL-path'
+      rewrite_request: 'URL-path',
+      set_cookie: 'cookie-name=value',
+      add_response_header: 'header-name: value'
     }
 
     return placeholders[behavior] || ''
@@ -327,7 +329,6 @@
       requires: !props.hideApplicationAcceleratorInDescription
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
-    { label: 'Finish Request Phase', value: 'finish_request_phase', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
