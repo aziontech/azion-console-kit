@@ -35,10 +35,6 @@
         then: (schema) => schema.required('IP/CIDR is a required field')
       })
       .when('networkListType', {
-        is: 'countries',
-        then: (schema) => schema.notRequired().nonNullable()
-      })
-      .when('networkListType', {
         is: (networkListType) => networkListType !== 'countries',
         then: (schema) =>
           schema.test(
