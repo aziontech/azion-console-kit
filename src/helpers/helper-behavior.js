@@ -37,7 +37,11 @@ const adaptBehavior = (behaviors) => {
       'filter_request_header',
       'filter_request_cookie',
       'add_request_header',
-      'add_request_cookie'
+      'add_request_cookie',
+      'filter_response_header',
+      'filter_response_cookie',
+      'add_response_header',
+      'add_response_cookie'
     ]
     if (behaviorString.includes(behavior.name)) {
       return {
