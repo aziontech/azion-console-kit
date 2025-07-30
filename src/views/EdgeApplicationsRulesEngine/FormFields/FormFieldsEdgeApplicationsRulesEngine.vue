@@ -88,8 +88,7 @@
     'run_function',
     'set_origin',
     'set_cache_policy',
-    'capture_match_groups',
-    'finish_request_phase'
+    'capture_match_groups'
   ]
 
   const VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS = ['${server_addr}', '${server_port}']
