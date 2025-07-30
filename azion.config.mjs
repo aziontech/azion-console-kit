@@ -85,9 +85,7 @@ const cookieRewriteRules = [
 
 const config = {
   build: {
-    preset: {
-      name: 'vue'
-    }
+    preset: 'vue'
   },
   origin: [
     ...addStagePrefix([
