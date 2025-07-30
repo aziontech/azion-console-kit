@@ -498,19 +498,10 @@
     return data.value.filter((row) => row.position.altered)
   })
 
-  const updateRowPositions = (phase) => {
-    data.value.forEach((row, index) => {
-      if (!props.isEdgeApplicationRulesEngine) {
-        row.position.value = index
-        row.position.altered =
-          row.position.altered && row.position.immutableValue !== row.position.value
-      } else {
-        if (row.position.phase.toLowerCase() === phase.toLowerCase()) {
-          row.position.value = index
-          row.position.altered =
-            row.position.altered && row.position.immutableValue !== row.position.value
-        }
-      }
+  const updateRowPositions = (table) => {
+    table.forEach((row, index) => {
+      row.position.value = index
+      row.position.altered = row.position.immutableValue !== row.position.value
     })
   }
 
@@ -538,8 +529,10 @@
     const ALL_RULES = data.value
     const currentPhase = updatedRow.phase?.content
     if (!currentPhase) return
+    const response = ALL_RULES.filter((item) => item.phase?.content === 'Response')
+    const request = ALL_RULES.filter((item) => item.phase?.content === 'Request')
 
-    const rulesInCurrentPhase = ALL_RULES.filter((item) => item.phase?.content === currentPhase)
+    const rulesInCurrentPhase = currentPhase === 'Response' ? response : request
     const originalIndex = rulesInCurrentPhase.findIndex((rule) => rule.id === updatedRow.id)
     if (originalIndex === -1) return
 
@@ -553,21 +546,15 @@
 
     if (originalIndex === newPosition) return
 
-    const firstRule = rulesInCurrentPhase[originalIndex]
-    const secondRule = rulesInCurrentPhase[newPosition]
+    const firstRule = rulesInCurrentPhase.splice(originalIndex, 1)[0]
 
     firstRule.position.value = targetPosition
-    firstRule.position.altered = targetPosition !== firstRule.position.immutableValue
+    firstRule.position.altered = newPosition !== firstRule.position.immutableValue
 
-    secondRule.position.value = originalIndex
-    secondRule.position.altered = originalIndex !== secondRule.position.immutableValue
+    rulesInCurrentPhase.splice(newPosition, 0, firstRule)
 
-    const temp = rulesInCurrentPhase[originalIndex]
-    rulesInCurrentPhase[originalIndex] = secondRule
-    rulesInCurrentPhase[targetPosition] = temp
-
-    const rulesInOtherPhases = ALL_RULES.filter((rule) => rule.phase?.content !== currentPhase)
-    data.value = [...rulesInOtherPhases, ...rulesInCurrentPhase]
+    updateRowPositions(rulesInCurrentPhase)
+    data.value = [...request, ...response]
   }
 
   const changePosition = (updatedRow, newValue) => {
@@ -580,7 +567,7 @@
     const [movedItem] = data.value.splice(oldIndex, 1)
     movedItem.position.altered = true
     data.value.splice(newValue, 0, movedItem)
-    updateRowPositions(updatedRow.phase?.content)
+    updateRowPositions(data.value)
   }
 
   const onPositionChange = (updatedRow, newValue) => {
@@ -651,6 +638,7 @@
       }
     })
 
+    updateRowPositions(rulesInAffectedPhase)
     emit('on-reorder', { event, data: rules })
   }
 
