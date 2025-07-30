@@ -170,7 +170,7 @@
 
     try {
       loadingFunctionsInstance.value = true
-      const params = { fields: ['id', 'name'] }
+      const params = { fields: ['id', 'name'], pageSize: 200 }
       const responseFunctions = await edgeApplicationFunctionService.listFunctions(
         props.edgeApplicationId,
         params
@@ -407,6 +407,8 @@
         :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
         @refreshFunctions="handleRefreshFunctions"
+        @refreshOrigins="handleRefreshOrigins"
+        @refreshCacheSettings="handleRefreshCacheSettings"
         :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :functionsInstanceOptions="functionsInstanceOptions"

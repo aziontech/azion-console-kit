@@ -624,7 +624,7 @@
             icon="pi pi-trash"
             size="small"
             outlined
-            @click="handleDeleteCriteria(criteriaIndex, null)"
+            @click="handleDeleteCriteria(criteriaIndex + 1, null)"
           />
         </div>
       </div>
