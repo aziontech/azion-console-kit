@@ -20,6 +20,26 @@ export const edgeStorageRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'edge-storage-create',
+      component: () => import('@views/EdgeStorage/CreateView.vue'),
+      props: {
+        createEdgeStorageBucketService: EdgeStorageServices.createEdgeStorageBucket
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Storage',
+            to: '/edge-storage'
+          },
+          {
+            label: 'Create Bucket',
+            to: '/edge-storage/create'
+          }
+        ]
+      }
     }
   ]
 }
