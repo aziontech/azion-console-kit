@@ -177,7 +177,7 @@
             label="Private Key"
             name="privateKey"
             :value="privateKey"
-            placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new private key in this field to update it."
           />
         </div>
       </template>
