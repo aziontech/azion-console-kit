@@ -53,7 +53,7 @@
             :options="edgeAccessOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select the appropriate access level for your bucket based on your application's requirements."
+            placeholder="Select a Edge Access level."
             description="Select the appropriate access level for your bucket based on your application's requirements."
             data-testid="edge-storage-form__edge-access-field"
           />

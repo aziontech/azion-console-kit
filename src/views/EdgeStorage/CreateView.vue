@@ -23,12 +23,8 @@
   })
 
   const validationSchema = yup.object({
-    name: yup
-      .string()
-      .required('Name is required')
-      .min(3, 'Name must be at least 3 characters')
-      .max(63, 'Name must not exceed 63 characters'),
-    edgeAccess: yup.string().required('Edge Access is required').default('read_write')
+    name: yup.string().label('Name').required().min(3).max(63),
+    edgeAccess: yup.string().label('Edge Access').required().default('read_write')
   })
 
   const handleResponse = (response) => {
@@ -36,7 +32,6 @@
       productName: 'Edge Storage Bucket'
     })
 
-    // Show success toast
     toast.add({
       severity: 'success',
       summary: 'Success',
@@ -44,10 +39,7 @@
       life: 5000
     })
 
-    // Redirect to list view
-    setTimeout(() => {
-      router.push('/edge-storage')
-    }, 1000)
+    router.push('/edge-storage')
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -62,16 +54,7 @@
       .track()
   }
 
-  // Mock service function
   const mockCreateService = async (data) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Mock validation
-    if (!data.name) {
-      throw new Error('Name is required')
-    }
-
     return {
       ...data,
       id: Date.now(),
