@@ -325,7 +325,7 @@
     fields: behaviors
   } = useFieldArray('behaviors')
 
-  const behaviorsOptions = computed(({ name }) => {
+  const behaviorsOptions = ({ name }) => {
     const edgeFirewallModules = enabledModules.value
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
@@ -359,7 +359,7 @@
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
-  })
+  }
 
   const handleDeleteBehavior = (behaviorItemIndex) => {
     removeBehavior(behaviorItemIndex)
