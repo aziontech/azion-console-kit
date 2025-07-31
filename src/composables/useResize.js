@@ -29,6 +29,7 @@ export function useResize() {
   const isGreaterThanMD = computed(() => windowWidth.value > BREAKPOINTS.MD)
   const isGreaterThanLG = computed(() => windowWidth.value > BREAKPOINTS.LG)
   const isGreaterThanXL = computed(() => windowWidth.value > BREAKPOINTS.XL)
+
   const isMobile = computed(() => windowWidth.value <= BREAKPOINTS.MD)
   const isTablet = computed(
     () => windowWidth.value > BREAKPOINTS.MD && windowWidth.value <= BREAKPOINTS.XL
