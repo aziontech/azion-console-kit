@@ -19,6 +19,7 @@
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
+        :firstLoadData="firstLoadData"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">
@@ -84,7 +85,9 @@
     CERTIFICATE_TYPES,
     handleClickToCreate,
     listService,
-    deleteService
+    deleteService,
+    firstLoadData,
+    setFirstLoadData
   } = useDigitalCertificate()
 
   const hasContentToList = ref(true)
@@ -135,6 +138,7 @@
   ])
 
   const handleLoadData = (event) => {
+    setFirstLoadData(false)
     hasContentToList.value = event
   }
 

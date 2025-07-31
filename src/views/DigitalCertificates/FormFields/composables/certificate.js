@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, readonly } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   digitalCertificatesService,
@@ -22,6 +22,7 @@ export const PRIVATE_KEY_TYPES = {
 
 const sharedCertificateType = ref(CERTIFICATE_TYPES.EDGE_CERTIFICATE)
 const sharedCertificateTypeList = ref('Certificates')
+const isFirstLoadData = ref(true)
 
 export function useDigitalCertificate(initialType = null) {
   const route = useRoute()
@@ -114,6 +115,10 @@ export function useDigitalCertificate(initialType = null) {
     return 'Create Server Certificate'
   })
 
+  const setFirstLoadData = (value) => {
+    isFirstLoadData.value = value
+  }
+
   return {
     certificateType,
     createService,
@@ -127,6 +132,8 @@ export function useDigitalCertificate(initialType = null) {
     certificateTypeList,
     pageTitleByCertificateType,
     handleClickToCreate,
-    deleteService
+    deleteService,
+    firstLoadData: readonly(isFirstLoadData),
+    setFirstLoadData
   }
 }
