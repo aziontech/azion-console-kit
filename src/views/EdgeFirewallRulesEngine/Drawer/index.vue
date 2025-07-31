@@ -4,13 +4,9 @@
   import FormFieldsEdgeFirewallRulesEngine from '../FormFields/FormFieldsEdgeFirewallRulesEngine.vue'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { onMounted, ref, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import {
-    edgeFirewallRulesEngineService,
-    edgeFirewallFunctionService,
-    wafService
-  } from '@/services/v2'
+  import { edgeFirewallRulesEngineService, wafService } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -31,10 +27,6 @@
       required: true
     },
     loadService: {
-      type: Function,
-      required: true
-    },
-    listFunctionsService: {
       type: Function,
       required: true
     },
@@ -60,7 +52,6 @@
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
-  const edgeFirewallFunctionsOptions = ref([])
 
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
@@ -197,23 +188,6 @@
       .track()
   }
 
-  const listFunctionsServiceWithDecorator = async () => {
-    return await edgeFirewallFunctionService.listFunctionsService(props.edgeFirewallId, {
-      pageSize: 100,
-      fields: 'id,name',
-      ordering: 'active'
-    })
-  }
-
-  const listEdgeFirewallFunctionsOptions = async () => {
-    try {
-      const result = await listFunctionsServiceWithDecorator()
-      edgeFirewallFunctionsOptions.value = result.body
-    } catch {
-      hasEdgeFunctionsProductAccess.value = false
-    }
-  }
-
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
     return await edgeFirewallRulesEngineService.createEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
@@ -233,9 +207,6 @@
       payload
     )
   }
-  onMounted(async () => {
-    await Promise.all([listEdgeFirewallFunctionsOptions()])
-  })
 
   defineExpose({
     openCreateDrawer,
@@ -258,7 +229,6 @@
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
-        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
@@ -282,7 +252,6 @@
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
-        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"

@@ -167,10 +167,6 @@
   ])
 
   const props = defineProps({
-    functionsInstanceOptions: {
-      type: Array,
-      required: true
-    },
     cacheSettingsOptions: {
       type: Array,
       required: true
@@ -213,10 +209,6 @@
       required: true
     },
     loadingOrigins: {
-      type: Boolean,
-      default: false
-    },
-    loadingFunctionsInstance: {
       type: Boolean,
       default: false
     }

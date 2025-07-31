@@ -18,10 +18,6 @@
   })
 
   const props = defineProps({
-    edgeFirewallFunctionsOptions: {
-      type: Array,
-      required: true
-    },
     listWafRulesService: {
       type: Function,
       required: true
@@ -58,8 +54,8 @@
     })
   }
 
-  const loadEdgeFunctionServiceDecorator = async (functionId) => {
-    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, functionId)
+  const loadEdgeFunctionServiceDecorator = async ({ id }) => {
+    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, id)
   }
 
   const YEAR_IN_SECONDS = 31536000
