@@ -1,6 +1,5 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-// Screen breakpoints (following Tailwind CSS conventions)
 const BREAKPOINTS = {
   SM: 640,
   MD: 768,
@@ -8,7 +7,6 @@ const BREAKPOINTS = {
   XL: 1280
 }
 
-// Global reactive window width
 const windowWidth = ref(window.innerWidth)
 
 const updateWidth = () => {
@@ -27,20 +25,16 @@ export function useResize() {
     window.removeEventListener('resize', updateWidth)
   })
 
-  // Computed properties for different breakpoints
   const isGreaterThanSM = computed(() => windowWidth.value > BREAKPOINTS.SM)
   const isGreaterThanMD = computed(() => windowWidth.value > BREAKPOINTS.MD)
   const isGreaterThanLG = computed(() => windowWidth.value > BREAKPOINTS.LG)
   const isGreaterThanXL = computed(() => windowWidth.value > BREAKPOINTS.XL)
-
-  // Computed properties for specific breakpoint ranges
   const isMobile = computed(() => windowWidth.value <= BREAKPOINTS.MD)
   const isTablet = computed(
     () => windowWidth.value > BREAKPOINTS.MD && windowWidth.value <= BREAKPOINTS.XL
   )
   const isDesktop = computed(() => windowWidth.value > BREAKPOINTS.XL)
 
-  // Helper function to check custom breakpoints
   const isGreaterThan = (breakpoint) => {
     return computed(() => windowWidth.value > breakpoint)
   }

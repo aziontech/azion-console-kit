@@ -5,14 +5,15 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsEdgeStorage from './FormFields/FormFieldsEdgeStorage.vue'
   import * as yup from 'yup'
-  import { inject } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { inject, computed } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
+  const route = useRoute()
   const toast = useToast()
 
   defineProps({
@@ -21,6 +22,8 @@
       required: true
     }
   })
+
+  const isCreatePage = computed(() => route.name === 'edge-storage-create')
 
   const validationSchema = yup.object({
     name: yup.string().label('Name').required().min(3).max(63),
@@ -70,7 +73,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Bucket" />
+      <PageHeadingBlock :pageTitle="isCreatePage ? 'Create Bucket' : 'Edit Bucket'" />
     </template>
     <template #content>
       <CreateFormBlock
@@ -81,7 +84,7 @@
         disableToast
       >
         <template #form>
-          <FormFieldsEdgeStorage />
+          <FormFieldsEdgeStorage :showDangerZone="!isCreatePage" />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
