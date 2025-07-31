@@ -439,11 +439,18 @@
       id: route.params.id
     })
 
+    const {
+      wafEnabled: webApplicationFirewall,
+      debugRules,
+      networkProtectionEnabled: networkProtectionLayer,
+      edgeFunctionsEnabled: edgeFunctions
+    } = edgeFirewall
+
     enabledModules.value = {
-      webApplicationFirewall: edgeFirewall.wafEnabled,
-      debugRules: edgeFirewall.debugRules,
-      networkProtectionLayer: edgeFirewall.networkProtectionEnabled,
-      edgeFunctions: edgeFirewall.edgeFunctionsEnabled
+      webApplicationFirewall,
+      debugRules,
+      networkProtectionLayer,
+      edgeFunctions
     }
   }
 
