@@ -144,22 +144,22 @@ export const WafAdapter = {
       ? {
           query_string: 'specific_query_string',
           request_body: 'specific_body_form_field',
-          request_header: 'specific_request_header',
+          request_header: 'specific_http_header',
           body: 'specific_body_form_field',
           file_name: 'file_extension',
           raw_body: 'raw_body',
           path: 'any_url',
-          cookie: 'specific_request_header'
+          cookie: 'specific_http_header'
         }
       : {
           query_string: 'any_query_string',
           request_body: 'body_form_field',
-          request_header: 'any_request_header',
+          request_header: 'any_http_header',
           body: 'body_form_field',
           file_name: 'file_extension',
           raw_body: 'raw_body',
           path: 'any_url',
-          cookie: 'any_request_header'
+          cookie: 'any_http_header'
         }
 
     if (attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY) {
@@ -169,7 +169,7 @@ export const WafAdapter = {
       }
     }
 
-    const match = MAP_ZONES[attack.matchZone] || 'specific_request_header'
+    const match = MAP_ZONES[attack.matchZone] || 'specific_http_header'
     const suffix = hasMatchValue ? `_${attack.matchesOn}` : ''
 
     return {
