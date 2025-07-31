@@ -26,6 +26,13 @@ export const EdgeFirewallFunctionAdapter = {
       }) || []
     )
   },
+
+  transformListFunctionsDropdown(data) {
+    return data.map((item) => ({
+      name: item.name,
+      id: item.id
+    }))
+  },
   transformLoadEdgeFirewallFunction(data) {
     return {
       id: data.id,

@@ -30,6 +30,19 @@ export class EdgeFirewallFunctionService {
     }
   }
 
+  listFunctionsDropdownService = async (edgeFirewallId, params = { pageSize: 10 }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#getUrl(edgeFirewallId),
+      params
+    })
+
+    return {
+      count: data.count,
+      body: this.#getTransformed('transformListFunctionsDropdown', data.results)
+    }
+  }
+
   listEdgeFirewallFunctionsService = async (edgeFirewallId, query = { pageSize: 10 }) => {
     const { body: functionInstances, count } = await this.listFunctionsService(
       edgeFirewallId,

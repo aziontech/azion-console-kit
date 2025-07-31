@@ -20,7 +20,7 @@
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService, edgeApplicationFunctionService } from '@/services/v2'
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
@@ -34,6 +34,20 @@
     return await edgeConnectorsService.listEdgeConnectorsService({
       fields: 'id,name',
       ...query
+    })
+  }
+
+  const getFunctionsInstanceOptions = async (query) => {
+    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
+      fields: 'id,name',
+      ...query
+    })
+  }
+
+  const loadFunctionsInstance = async ({ id }) => {
+    return await edgeApplicationFunctionService.loadEdgeApplicationFunction({
+      edgeApplicationID: props.edgeApplicationId,
+      functionID: id
     })
   }
 
@@ -791,11 +805,11 @@
 
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
-              <FieldDropdown
-                filter
+              <FieldDropdownLazyLoader
+                :service="getFunctionsInstanceOptions"
+                :loadService="loadFunctionsInstance"
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
-                :options="functionsInstanceOptions"
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
@@ -821,7 +835,7 @@
                     </li>
                   </ul>
                 </template>
-              </FieldDropdown>
+              </FieldDropdownLazyLoader>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
               <FieldDropdownLazyLoader

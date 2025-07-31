@@ -10,6 +10,8 @@
   import Divider from 'primevue/divider'
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted } from 'vue'
+  import { edgeFirewallFunctionService } from '@/services/v2'
+  import { useRoute } from 'vue-router'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
@@ -45,6 +47,20 @@
       required: true
     }
   })
+  const route = useRoute()
+  const edgeFirewallId = route.params.id
+
+  const listEdgeFunctionsServiceDecorator = async (query) => {
+    return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
+      ...query,
+      fields: 'name,id',
+      active: true
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = async (functionId) => {
+    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, functionId)
+  }
 
   const YEAR_IN_SECONDS = 31536000
   const DEFAULT_CRITERIA_OPTION = {
@@ -696,11 +712,12 @@
           </div>
           <div class="w-1/2 max-sm:w-full">
             <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
+                :service="listEdgeFunctionsServiceDecorator"
+                :loadService="loadEdgeFunctionServiceDecorator"
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
-                :options="props.edgeFirewallFunctionsOptions"
                 placeholder="Select an function"
                 optionLabel="name"
                 optionValue="id"

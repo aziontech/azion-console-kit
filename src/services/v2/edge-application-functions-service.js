@@ -28,6 +28,22 @@ export class EdgeApplicationFunctionService {
     }
   }
 
+  listFunctionsDropdown = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#getUrl(edgeApplicationId),
+      params
+    })
+
+    const { results, count } = data
+    const body = this.adapter?.transformListFunctionsDropdown?.(results) ?? results
+
+    return {
+      body,
+      count
+    }
+  }
+
   listEdgeApplicationFunctions = async (
     edgeApplicationId,
     params = { pageSize: 10, fields: [] }
