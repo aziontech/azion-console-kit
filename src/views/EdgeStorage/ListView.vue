@@ -58,16 +58,6 @@
                   <div class="flex items-center justify-between">
                     <div class="flex-1">
                       <div class="font-medium text-color-primary">{{ bucket.name }}</div>
-                      <div class="text-sm text-color-secondary mt-1">
-                        {{ formatDate(bucket.lastModified) }}
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <Tag
-                        :value="bucket.active?.value || 'Active'"
-                        :severity="bucket.active?.severity || 'success'"
-                        size="small"
-                      />
                     </div>
                   </div>
                 </div>
@@ -221,20 +211,5 @@
       productName: 'Edge Storage'
     })
     router.push('/edge-storage/create')
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch {
-      return dateString
-    }
   }
 </script>
