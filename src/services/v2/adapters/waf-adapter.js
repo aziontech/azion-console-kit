@@ -127,59 +127,48 @@ export const WafAdapter = {
     return payloadReturn
   },
   adaptCreateWafRuleAllowedTuningPayload(attack, name, path) {
-    const payloadReturn = {
+    const hasMatchValue = !!attack.matchValue
+    const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
+    const valueField = attack.matchValue === '-' ? null : attack.matchValue
+
+    const MAP_ZONES = {
+      query_string: hasMatchValue ? 'specific_query_string' : 'any_query_string',
+      request_body: hasMatchValue ? 'specific_body_form_field' : 'body_form_field',
+      request_header: hasMatchValue ? 'specific_http_header' : 'any_http_header',
+      body: hasMatchValue ? 'specific_body_form_field' : 'body_form_field',
+      file_name: 'file_extension',
+      raw_body: 'raw_body',
+      path: 'any_url',
+      cookie: hasMatchValue ? 'specific_http_header' : 'any_http_header'
+    }
+
+    const skipSuffix = ['any_url', 'raw_body', 'file_extension']
+
+    const match =
+      attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY
+        ? 'body_form_field'
+        : MAP_ZONES[attack.matchZone] || 'specific_http_header'
+
+    const hasSpecificMatch = match.startsWith('specific_')
+    const suffix = skipSuffix.includes(match) ? '' : `_${attack.matchesOn}`
+
+    const matchFormat = `${match}${suffix}`
+
+    return {
       rule_id: attack.ruleId,
       ...(path && { path }),
       name: name
         .split('\n')
         .filter((line) => line.trim() !== '')
         .join(' ')
-        .trim()
-    }
-
-    const hasMatchValue = !!attack.matchValue
-    const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
-    const valueField = attack.matchValue === '-' ? null : attack.matchValue
-    const MAP_ZONES = hasMatchValue
-      ? {
-          query_string: 'specific_query_string',
-          request_body: 'specific_body_form_field',
-          request_header: 'specific_http_header',
-          body: 'specific_body_form_field',
-          file_name: 'file_extension',
-          raw_body: 'raw_body',
-          path: 'any_url',
-          cookie: 'specific_http_header'
-        }
-      : {
-          query_string: 'any_query_string',
-          request_body: 'body_form_field',
-          request_header: 'any_http_header',
-          body: 'body_form_field',
-          file_name: 'file_extension',
-          raw_body: 'raw_body',
-          path: 'any_url',
-          cookie: 'any_http_header'
-        }
-
-    if (attack.ruleId === RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY) {
-      return {
-        ...payloadReturn,
-        conditions: [{ match: 'body_form_field' }]
-      }
-    }
-
-    const match = MAP_ZONES[attack.matchZone] || 'specific_http_header'
-    const suffix = hasMatchValue ? `_${attack.matchesOn}` : ''
-
-    return {
-      ...payloadReturn,
+        .trim(),
       conditions: [
         {
-          match: `${match}${suffix}`,
-          ...(hasMatchValue && {
-            [attack.matchesOn]: attack.matchZone === 'cookie' ? attack.matchZone : valueField
-          })
+          match: matchFormat,
+          ...(hasSpecificMatch &&
+            hasMatchValue && {
+              [attack.matchesOn]: attack.matchZone === 'cookie' ? attack.matchZone : valueField
+            })
         }
       ]
     }
