@@ -20,7 +20,7 @@
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService, edgeApplicationFunctionService } from '@/services/v2'
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
@@ -34,6 +34,20 @@
     return await edgeConnectorsService.listEdgeConnectorsService({
       fields: 'id,name',
       ...query
+    })
+  }
+
+  const getFunctionsInstanceOptions = async (query) => {
+    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
+      fields: 'id,name',
+      ...query
+    })
+  }
+
+  const loadFunctionsInstance = async ({ id }) => {
+    return await edgeApplicationFunctionService.loadEdgeApplicationFunction({
+      edgeApplicationID: props.edgeApplicationId,
+      functionID: id
     })
   }
 
@@ -153,10 +167,6 @@
   ])
 
   const props = defineProps({
-    functionsInstanceOptions: {
-      type: Array,
-      required: true
-    },
     cacheSettingsOptions: {
       type: Array,
       required: true
@@ -201,10 +211,6 @@
     loadingOrigins: {
       type: Boolean,
       default: false
-    },
-    loadingFunctionsInstance: {
-      type: Boolean,
-      default: false
     }
   })
 
@@ -212,6 +218,7 @@
   const drawerOriginRef = ref('')
   const drawerFunctionRef = ref('')
   const activeAccordions = ref([0])
+  const behaviorIndexSelect = ref(null)
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
@@ -372,7 +379,8 @@
     drawerOriginRef.value.openDrawerCreate()
   }
 
-  const openDrawerFunction = () => {
+  const openDrawerFunction = (index) => {
+    behaviorIndexSelect.value = index
     drawerFunctionRef.value.openDrawerCreate()
   }
 
@@ -518,8 +526,10 @@
     emit('refreshOrigins')
   }
 
-  const handleSuccessFunction = () => {
-    emit('refreshFunctions')
+  const handleSuccessFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
   }
 </script>
 
@@ -791,11 +801,11 @@
 
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
-              <FieldDropdown
-                filter
+              <FieldDropdownLazyLoader
+                :service="getFunctionsInstanceOptions"
+                :loadService="loadFunctionsInstance"
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
-                :options="functionsInstanceOptions"
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
@@ -809,7 +819,7 @@
                         class="w-full whitespace-nowrap flex"
                         data-testid="edge-applications-rules-engine-form__create-function-instance-button"
                         text
-                        @click="openDrawerFunction"
+                        @click="openDrawerFunction(behaviorIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
                         :pt="{
@@ -821,7 +831,7 @@
                     </li>
                   </ul>
                 </template>
-              </FieldDropdown>
+              </FieldDropdownLazyLoader>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
               <FieldDropdownLazyLoader

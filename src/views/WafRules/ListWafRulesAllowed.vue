@@ -33,11 +33,16 @@
     }
   })
 
+  const schemaConditions = yup.object().shape({
+    field: yup.string().required('field is required'),
+    match: yup.string().required()
+  })
+
   const validationSchemaAllowed = yup.object({
-    ruleId: yup.string().required().label('rule id'),
+    ruleId: yup.string().required().label('Rule Id'),
     name: yup.string().required(),
     path: yup.string(),
-    conditions: yup.array(),
+    conditions: yup.array().of(schemaConditions),
     status: yup.boolean(),
     operator: yup.boolean()
   })
