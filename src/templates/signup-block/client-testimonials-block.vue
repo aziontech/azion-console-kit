@@ -30,16 +30,16 @@
 
 <script setup>
   import Carousel from 'primevue/carousel'
-  import Vtex from '@/assets/svg/vtex-logo.vue'
+  import Axur from '@/assets/svg/axur-logo.vue'
   import { h, ref } from 'vue'
   const timeToNextSlideInMs = 10000
 
   const listTestimonials = ref([
     {
-      name: 'Gustavo Franco',
-      position: 'Senior Director of Engineering',
-      testimonial: `VTEX builds ultra-low latency, serverless applications with Azion, enabling thousands of clients to boost their online sales.`,
-      logo: h(Vtex)
+      name: 'Fabio Ramos',
+      position: 'CEO of Axur',
+      testimonial: `With Azion, we can scale our proprietary AI models without worrying about infrastructure. Inspecting millions of websites daily, performing the fastest takedown in the market.`,
+      logo: h(Axur)
     }
   ])
 </script>
