@@ -60,7 +60,6 @@ function createSecureItems() {
       to: '/edge-connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
-      tag: 'Preview',
       visible: !hasFlagBlockApiV4()
     },
     {
@@ -143,7 +142,6 @@ function createEdgeLibrariesItems() {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'ai ai-custom-pages',
-      tag: 'Preview',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
     },
