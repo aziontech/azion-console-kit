@@ -23,7 +23,7 @@ function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   const menuOption = {
     label: handleTextDomainWorkload.pluralTitle,
-    icon: 'ai ai-workloads',
+    icon: hasFlagBlockApiV4() ? 'pi pi-globe' : 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
     id: 'domains',
     tag: 'Preview'
