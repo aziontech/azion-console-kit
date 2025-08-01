@@ -25,12 +25,7 @@ function createDomainsItem() {
     label: handleTextDomainWorkload.pluralTitle,
     icon: hasFlagBlockApiV4() ? 'pi pi-globe' : 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
-    id: 'domains',
-    tag: 'Preview'
-  }
-
-  if (hasFlagBlockApiV4()) {
-    delete menuOption.tag
+    id: 'domains'
   }
 
   return menuOption
