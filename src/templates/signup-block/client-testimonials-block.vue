@@ -37,7 +37,7 @@
   const listTestimonials = ref([
     {
       name: 'Fabio Ramos',
-      position: 'CEO da Axur',
+      position: 'CEO of Axur',
       testimonial: `With Azion, we can scale our proprietary AI models without worrying about infrastructure. Inspecting millions of websites daily, performing the fastest takedown in the market.`,
       logo: h(Axur)
     }
