@@ -10,6 +10,8 @@
   import Divider from 'primevue/divider'
   import { useFieldArray } from 'vee-validate'
   import { computed, nextTick, ref, onMounted } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { edgeFirewallService } from '@/services/v2'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
@@ -28,10 +30,6 @@
       type: Function,
       required: true
     },
-    enabledModules: {
-      type: Object,
-      required: true
-    },
     hasEdgeFunctionsProductAccess: {
       type: Boolean,
       default: true
@@ -47,6 +45,8 @@
   })
 
   const YEAR_IN_SECONDS = 31536000
+  const enabledModules = ref({})
+  const route = useRoute()
   const DEFAULT_CRITERIA_OPTION = {
     variable: '',
     operator: '',
@@ -64,6 +64,7 @@
   const hasWafAccess = ref(true)
   onMounted(async () => {
     await Promise.all([listNetworkList()])
+    loaderEdgeFirewall()
   })
 
   const listWafRulesServiceOptions = async (query) => {
@@ -190,7 +191,7 @@
   }
 
   const generateCriteriaVariableOptions = () => {
-    const edgeFirewallModules = props.enabledModules
+    const edgeFirewallModules = enabledModules.value
     const hasNetworkProtectionLayerModuleEnabled = edgeFirewallModules.networkProtectionLayer
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
 
@@ -325,7 +326,7 @@
   } = useFieldArray('behaviors')
 
   const behaviorsOptions = ({ name }) => {
-    const edgeFirewallModules = props.enabledModules
+    const edgeFirewallModules = enabledModules.value
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
@@ -433,6 +434,26 @@
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
+
+  const loaderEdgeFirewall = async () => {
+    const edgeFirewall = await edgeFirewallService.loadEdgeFirewallService({
+      id: route.params.id
+    })
+
+    const {
+      wafEnabled: webApplicationFirewall,
+      debugRules,
+      networkProtectionEnabled: networkProtectionLayer,
+      edgeFunctionsEnabled: edgeFunctions
+    } = edgeFirewall
+
+    enabledModules.value = {
+      webApplicationFirewall,
+      debugRules,
+      networkProtectionLayer,
+      edgeFunctions
+    }
+  }
 
   const clearCriteriaArgument = ({
     selectedCriteriaVariable,
