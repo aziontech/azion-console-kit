@@ -28,6 +28,22 @@ export class EdgeApplicationFunctionService {
     }
   }
 
+  listFunctionsDropdown = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#getUrl(edgeApplicationId),
+      params
+    })
+
+    const { results, count } = data
+    const body = this.adapter?.transformListFunctionsDropdown?.(results) ?? results
+
+    return {
+      body,
+      count
+    }
+  }
+
   listEdgeApplicationFunctions = async (
     edgeApplicationId,
     params = { pageSize: 10, fields: [] }
@@ -76,14 +92,15 @@ export class EdgeApplicationFunctionService {
     const edgeApplicationId = payload.id
     const body = this.adapter?.transformPayload(payload)
 
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'POST',
       url: this.#getUrl(edgeApplicationId),
       body
     })
 
     return {
-      feedback: 'Your Function has been created'
+      feedback: 'Your Function has been created',
+      id: data.data.id
     }
   }
 

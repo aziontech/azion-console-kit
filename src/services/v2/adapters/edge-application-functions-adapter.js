@@ -30,6 +30,13 @@ export const EdgeApplicationFunctionsAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
 
+  transformListFunctionsDropdown(data) {
+    return data.map((item) => ({
+      name: item.name,
+      id: item.id
+    }))
+  },
+
   transformLoadEdgeApplicationFunction(functionData) {
     const { data } = functionData
     return {
