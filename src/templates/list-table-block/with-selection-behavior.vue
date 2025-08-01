@@ -12,7 +12,7 @@
       scrollable
       removableSort
       :value="data"
-      :paginator="true"
+      :paginator="paginator"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="minimumOfItemsPerPage"
       v-model:selection="selectedItems"
@@ -346,6 +346,10 @@
     pt: {
       type: Object,
       default: () => ({})
+    },
+    paginator: {
+      type: Boolean,
+      default: true
     }
   })
 

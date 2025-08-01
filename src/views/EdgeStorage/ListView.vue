@@ -44,21 +44,17 @@
                   {{ searchTerm ? 'No buckets found' : 'No buckets created yet' }}
                 </div>
               </div>
-              <div
-                v-else
-                class="space-y-2"
-              >
+              <div v-else>
                 <div
                   v-for="bucket in filteredBuckets"
                   :key="bucket.id"
-                  class="p-3 border surface-border rounded cursor-pointer hover:bg-surface-hover transition-colors"
-                  :class="{ 'bg-primary-50 border-primary-200': selectedBucket?.id === bucket.id }"
+                  class="p-3 rounded cursor-pointer hover:bg-[#1C1C1C] transition-colors"
+                  :class="{ 'bg-[#1C1C1C]': selectedBucket?.id === bucket.id }"
                   @click="selectBucket(bucket)"
                 >
                   <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                      <div class="font-medium text-color-primary">{{ bucket.name }}</div>
-                    </div>
+                    <span class="text-sm font-medium text-color-primary">{{ bucket.name }}</span>
+                    <span class="text-xs text-color-secondary">{{ bucket.size }}</span>
                   </div>
                 </div>
               </div>
@@ -112,25 +108,16 @@
                   <div
                     v-for="bucket in filteredBuckets"
                     :key="bucket.id"
-                    class="p-3 border surface-border rounded cursor-pointer hover:bg-surface-hover transition-colors"
+                    class="p-3 cursor-pointer hover:bg-[#1C1C1C] transition-colors"
                     :class="{
-                      'bg-primary-50 border-primary-200': selectedBucket?.id === bucket.id
+                      'bg-[#1C1C1C]': selectedBucket?.id === bucket.id
                     }"
                     @click="selectBucket(bucket)"
                   >
                     <div class="flex items-center justify-between">
                       <div class="flex-1">
                         <div class="font-medium text-color-primary">{{ bucket.name }}</div>
-                        <div class="text-sm text-color-secondary mt-1">
-                          {{ formatDate(bucket.lastModified) }}
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <Tag
-                          :value="bucket.active?.value || 'Active'"
-                          :severity="bucket.active?.severity || 'success'"
-                          size="small"
-                        />
+                        <div class="font-medium text-color-primary">{{ bucket.size }}</div>
                       </div>
                     </div>
                   </div>
@@ -138,8 +125,67 @@
               </div>
             </div>
           </template>
+          <div
+            v-if="selectedBucket"
+            class="flex flex-col h-full"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-color-primary">{{ selectedBucket.name }}</h2>
+              <div class="flex items-center gap-3">
+                <div class="p-input-icon-left">
+                  <i class="pi pi-search" />
+                  <InputText
+                    v-model="fileSearchTerm"
+                    placeholder="Search in folder"
+                    class="w-64"
+                    @input="handleFileSearch"
+                  />
+                </div>
+                <PrimeButton
+                  icon="pi pi-refresh"
+                  size="small"
+                  outlined
+                  label="Refresh"
+                  class="px-4 py-1 flex items-center justify-center"
+                />
+                <PrimeButton
+                  icon="pi pi-cog"
+                  size="small"
+                  @click="handleSettingsTrackEvent"
+                  label="Settings"
+                  outlined
+                  class="px-4 py-1 flex items-center justify-center"
+                />
+                <PrimeButton
+                  size="small"
+                  @click="openFileSelector"
+                  label="Add to files"
+                  iconPos="right"
+                  icon="pi pi-chevron-down"
+                  primary
+                  class="px-4 py-1 cursor-pointer flex items-center justify-center"
+                />
+              </div>
+            </div>
+            <ListTableBlock
+              v-if="selectedBucket.files.length > 0"
+              pageTitleDelete="Files"
+              :listService="getFiles"
+              ref="listServiceFilesRef"
+              :columns="getColumns"
+              v-model:selectedItensData="selectedFiles"
+              :showSelectionMode="true"
+              hiddenHeader
+              :paginator="false"
+            />
+
+            <DragAndDrop
+              v-else
+              :selectedBucket="selectedBucket"
+            />
+          </div>
           <EmptyResultsBlock
-            v-if="!selectedBucket"
+            v-else
             title="No buckets created"
             description="Create your first bucket here."
             createButtonLabel="Bucket"
@@ -161,17 +207,19 @@
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ListTableBlock from '@/templates/list-table-block/with-selection-behavior.vue'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
-  import Tag from 'primevue/tag'
+  import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
+  import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-
+  const { buckets, handleFileSelect } = useEdgeStorage()
   defineProps({
     documentationService: {
       required: true,
@@ -179,10 +227,13 @@
     }
   })
 
-  const buckets = ref([])
-  const selectedBucket = ref(null)
+  const selectedBucket = ref(buckets.value[0])
+  const selectedFiles = ref([])
   const searchTerm = ref('')
+  const fileSearchTerm = ref('')
   const isLoading = ref(false)
+
+  const listServiceFilesRef = ref(null)
 
   const { isGreaterThanMD } = useResize()
 
@@ -194,6 +245,7 @@
   })
 
   const selectBucket = (bucket) => {
+    listServiceFilesRef.value?.reload()
     selectedBucket.value = bucket
   }
 
@@ -212,4 +264,60 @@
     })
     router.push('/edge-storage/create')
   }
+
+  const handleSettingsTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge Storage'
+    })
+    router.push('/edge-storage/settings')
+  }
+
+  const getFiles = () => {
+    if (!selectedBucket.value?.files) return []
+
+    if (!fileSearchTerm.value.trim()) {
+      return selectedBucket.value.files
+    }
+
+    const searchLower = fileSearchTerm.value.toLowerCase().trim()
+    return selectedBucket.value.files.filter((file) =>
+      file.name.toLowerCase().includes(searchLower)
+    )
+  }
+
+  const handleFileSearch = () => {
+    // Trigger table refresh when search term changes
+    listServiceFilesRef.value?.reload()
+  }
+
+  const openFileSelector = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.multiple = true
+    input.style.display = 'none'
+
+    input.onchange = (event) => {
+      const files = event.target.files
+      if (files.length > 0 && selectedBucket.value) {
+        handleFileSelect(event, selectedBucket.value.id)
+      }
+      document.body.removeChild(input)
+    }
+
+    document.body.appendChild(input)
+    input.click()
+  }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'size',
+        header: 'Size'
+      }
+    ]
+  })
 </script>

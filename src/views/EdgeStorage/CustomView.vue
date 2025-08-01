@@ -9,12 +9,14 @@
   import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
+  const { addBucket } = useEdgeStorage()
 
   defineProps({
     createEdgeStorageBucketService: {
@@ -57,16 +59,18 @@
       .track()
   }
 
-  const mockCreateService = async (data) => {
-    return {
-      ...data,
+  const mockCreateService = (data) => {
+    const newBucket = {
       id: Date.now(),
-      active: true,
-      storageSpace: 0,
-      lastModified: new Date().toISOString(),
-      lastEditor: 'Current User',
-      productVersion: '1.0'
+      name: data.name,
+      region: 'us-east-1',
+      createdAt: new Date(),
+      size: '0 B',
+      objectCount: 0,
+      data: data.edgeAccess
     }
+    addBucket(newBucket)
+    return newBucket
   }
 </script>
 
