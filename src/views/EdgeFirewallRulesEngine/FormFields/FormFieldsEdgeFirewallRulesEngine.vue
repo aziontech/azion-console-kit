@@ -8,15 +8,17 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
+  import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
+
   import { useFieldArray } from 'vee-validate'
-  import { computed, nextTick, ref, onMounted } from 'vue'
+  import { computed, nextTick, ref, onMounted, watch } from 'vue'
   import { edgeFirewallFunctionService } from '@/services/v2'
   import { useRoute } from 'vue-router'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
   })
-
+  const emit = defineEmits(['isOverlapped'])
   const props = defineProps({
     listWafRulesService: {
       type: Function,
@@ -45,7 +47,8 @@
   })
   const route = useRoute()
   const edgeFirewallId = route.params.id
-
+  const drawerFunctionRef = ref('')
+  const behaviorIndexSelect = ref(null)
   const listEdgeFunctionsServiceDecorator = async (query) => {
     return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
       ...query,
@@ -456,6 +459,24 @@
       criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
     })
   }
+
+  const openDrawerFunction = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
+  const successFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
+  }
+
+  watch(
+    () => drawerFunctionRef.value.showCreateFunctionDrawer,
+    () => {
+      emit('isOverlapped', drawerFunctionRef.value.showCreateFunctionDrawer)
+    }
+  )
 </script>
 <template>
   <FormHorizontal
@@ -661,6 +682,11 @@
     :isDrawer="true"
   >
     <template #inputs>
+      <DrawerFunction
+        ref="drawerFunctionRef"
+        @onSuccess="successFunction"
+        :edgeFirewallID="edgeFirewallId"
+      />
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorItemIndex) in behaviors"
@@ -719,7 +745,27 @@
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-function-instance-button"
+                        text
+                        @click="openDrawerFunction(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Function Instance"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
             </template>
 
             <template v-if="isTagEvent(behaviorItemIndex)">

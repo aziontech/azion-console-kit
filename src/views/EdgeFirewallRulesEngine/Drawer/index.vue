@@ -52,7 +52,7 @@
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
-
+  const isOverlapped = ref(false)
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
 
@@ -208,6 +208,10 @@
     )
   }
 
+  const handleIsOverlapped = (value) => {
+    isOverlapped.value = value
+  }
+
   defineExpose({
     openCreateDrawer,
     openEditDrawer
@@ -221,6 +225,7 @@
     :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
+    :isOverlapped="isOverlapped"
     @onSuccess="handleCreateWithSuccess"
     @onError="handleFailedToCreate"
     title="Create Rule"
@@ -233,6 +238,7 @@
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        @isOverlapped="handleIsOverlapped"
       />
     </template>
   </CreateDrawerBlock>
@@ -244,6 +250,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
+    :isOverlapped="isOverlapped"
     @onError="handleFailedEditEdgeFirewallRules"
     @onSuccess="handleEditWithSuccess"
     title="Edit Rule"
@@ -256,6 +263,7 @@
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        @isOverlapped="handleIsOverlapped"
       />
     </template>
   </EditDrawerBlock>

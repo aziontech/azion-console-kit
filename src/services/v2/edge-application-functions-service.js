@@ -92,14 +92,15 @@ export class EdgeApplicationFunctionService {
     const edgeApplicationId = payload.id
     const body = this.adapter?.transformPayload(payload)
 
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'POST',
       url: this.#getUrl(edgeApplicationId),
       body
     })
 
     return {
-      feedback: 'Your Function has been created'
+      feedback: 'Your Function has been created',
+      id: data.data.id
     }
   }
 

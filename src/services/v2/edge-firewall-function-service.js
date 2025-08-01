@@ -80,13 +80,13 @@ export class EdgeFirewallFunctionService {
   createEdgeFirewallService = async (payload) => {
     const body = this.#getTransformed('transformPayloadFunction', [payload, 'POST'])
 
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'POST',
       url: this.#getUrl(payload.id),
       body
     })
 
-    return { feedback: 'Your Function has been created' }
+    return { feedback: 'Your Function has been created', id: data.data.id }
   }
 
   editEdgeFirewallFunctionService = async (payload) => {

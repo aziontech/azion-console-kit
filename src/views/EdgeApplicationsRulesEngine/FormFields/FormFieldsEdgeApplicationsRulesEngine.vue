@@ -218,6 +218,7 @@
   const drawerOriginRef = ref('')
   const drawerFunctionRef = ref('')
   const activeAccordions = ref([0])
+  const behaviorIndexSelect = ref(null)
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
@@ -378,7 +379,8 @@
     drawerOriginRef.value.openDrawerCreate()
   }
 
-  const openDrawerFunction = () => {
+  const openDrawerFunction = (index) => {
+    behaviorIndexSelect.value = index
     drawerFunctionRef.value.openDrawerCreate()
   }
 
@@ -524,8 +526,10 @@
     emit('refreshOrigins')
   }
 
-  const handleSuccessFunction = () => {
-    emit('refreshFunctions')
+  const handleSuccessFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
   }
 </script>
 
@@ -815,7 +819,7 @@
                         class="w-full whitespace-nowrap flex"
                         data-testid="edge-applications-rules-engine-form__create-function-instance-button"
                         text
-                        @click="openDrawerFunction"
+                        @click="openDrawerFunction(behaviorIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
                         :pt="{
