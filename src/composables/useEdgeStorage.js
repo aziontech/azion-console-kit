@@ -16,15 +16,40 @@ const buckets = ref([
     files: [
       {
         id: Date.now(),
-        name: 'file.txt',
-        size: '100 KB',
-        lastModified: new Date()
+        name: '[FOLDER] documents',
+        size: null,
+        lastModified: new Date().toLocaleString(),
+        isFolder: true,
+        files: [
+          {
+            id: Date.now() + 1,
+            name: 'file-folder-1.txt',
+            size: '100 KB',
+            lastModified: new Date().toLocaleString(),
+            isFolder: false
+          },
+          {
+            id: Date.now() + 2,
+            name: 'file-folder-2.txt',
+            size: '200 KB',
+            lastModified: new Date().toLocaleString(),
+            isFolder: false
+          }
+        ]
       },
       {
-        id: Date.now(),
+        id: Date.now() + 1,
+        name: 'file.txt',
+        size: '100 KB',
+        lastModified: new Date().toLocaleString(),
+        isFolder: false
+      },
+      {
+        id: Date.now() + 2,
         name: 'file2.txt',
         size: '200 KB',
-        lastModified: new Date()
+        lastModified: new Date().toLocaleString(),
+        isFolder: false
       }
     ]
   },
@@ -32,7 +57,7 @@ const buckets = ref([
     id: 2,
     name: 'my-bucket-2',
     region: 'us-east-1',
-    createdAt: new Date(),
+    createdAt: new Date().toLocaleString(),
     size: '0.2 GB',
     objectCount: 0,
     setting: 'read_write',
@@ -64,7 +89,7 @@ export const useEdgeStorage = () => {
       id: Date.now(),
       name: bucket.name,
       region: bucket.region,
-      createdAt: bucket.createdAt || new Date(),
+      createdAt: bucket.createdAt || new Date().toLocaleString(),
       size: formatSize(bucket.size),
       objectCount: bucket.objectCount || 0,
       setting: bucket.edgeAccess
@@ -146,7 +171,8 @@ export const useEdgeStorage = () => {
           name: file.name,
           size: formatSize(file.size),
           id: Date.now(),
-          lastModified: new Date()
+          lastModified: new Date(),
+          isFolder: false
         })
       })
     }
@@ -185,6 +211,30 @@ export const useEdgeStorage = () => {
     return false
   }
 
+  /**
+   * Creates a new folder in a bucket.
+   * @param {string} folderName - The name of the folder to create.
+   * @param {number|string} bucketId - The ID of the bucket to create the folder in.
+   * @returns {Object|null} The created folder object or null if bucket not found.
+   */
+  const createFolder = (folderName, bucketId) => {
+    const bucket = findBucketById(bucketId)
+
+    if (bucket) {
+      const newFolder = {
+        id: Date.now(),
+        name: folderName,
+        size: null,
+        lastModified: new Date(),
+        isFolder: true
+      }
+      bucket.files.push(newFolder)
+      return newFolder
+    }
+
+    return null
+  }
+
   return {
     buckets,
     files,
@@ -197,6 +247,7 @@ export const useEdgeStorage = () => {
     addFiles,
     getFilesByBucket,
     removeFile,
-    handleFileSelect
+    handleFileSelect,
+    createFolder
   }
 }

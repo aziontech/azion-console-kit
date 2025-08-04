@@ -291,7 +291,8 @@
     'on-load-data',
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
-    'update:selectedItensData'
+    'update:selectedItensData',
+    'on-row-click-edit-folder'
   ])
 
   const props = defineProps({
@@ -350,6 +351,10 @@
     paginator: {
       type: Boolean,
       default: true
+    },
+    enableEditClickFolder: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -494,6 +499,8 @@
       emit('on-row-click-edit-redirect', item)
     } else if (props.enableEditClick) {
       router.push({ path: `${props.editPagePath}/${item.id}` })
+    } else if (props.enableEditClickFolder) {
+      emit('on-row-click-edit-folder', item)
     }
   }
 

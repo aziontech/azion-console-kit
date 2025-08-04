@@ -177,6 +177,8 @@
               :showSelectionMode="true"
               hiddenHeader
               :paginator="false"
+              enableEditClickFolder
+              @on-row-click-edit-folder="handleEditFolder"
             />
 
             <DragAndDrop
@@ -231,6 +233,7 @@
   const selectedFiles = ref([])
   const searchTerm = ref('')
   const fileSearchTerm = ref('')
+  const selectedFolder = ref(null)
   const isLoading = ref(false)
 
   const listServiceFilesRef = ref(null)
@@ -244,9 +247,55 @@
     )
   })
 
+  const files = computed(() => {
+    if (!selectedBucket.value?.files) return []
+
+    const filesToShow = selectedFolder.value
+      ? selectedFolder.value.files
+      : selectedBucket.value.files
+
+    let filteredFiles = filesToShow
+
+    if (fileSearchTerm.value.trim()) {
+      const searchLower = fileSearchTerm.value.toLowerCase().trim()
+      filteredFiles = filesToShow.filter((file) => file.name.toLowerCase().includes(searchLower))
+    }
+
+    if (selectedFolder.value && !fileSearchTerm.value.trim()) {
+      const parentNavItem = {
+        id: 'parent-nav',
+        name: '..',
+        size: null,
+        lastModified: '',
+        isFolder: true,
+        isParentNav: true
+      }
+      return [parentNavItem, ...filteredFiles]
+    }
+
+    return filteredFiles
+  })
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'name',
+        header: 'Name'
+      },
+      {
+        field: 'size',
+        header: 'Size'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
+      }
+    ]
+  })
   const selectBucket = (bucket) => {
     listServiceFilesRef.value?.reload()
     selectedBucket.value = bucket
+    selectedFolder.value = null
   }
 
   const handleSearch = () => {
@@ -273,20 +322,10 @@
   }
 
   const getFiles = () => {
-    if (!selectedBucket.value?.files) return []
-
-    if (!fileSearchTerm.value.trim()) {
-      return selectedBucket.value.files
-    }
-
-    const searchLower = fileSearchTerm.value.toLowerCase().trim()
-    return selectedBucket.value.files.filter((file) =>
-      file.name.toLowerCase().includes(searchLower)
-    )
+    return files.value
   }
 
   const handleFileSearch = () => {
-    // Trigger table refresh when search term changes
     listServiceFilesRef.value?.reload()
   }
 
@@ -308,16 +347,17 @@
     input.click()
   }
 
-  const getColumns = computed(() => {
-    return [
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'size',
-        header: 'Size'
-      }
-    ]
-  })
+  const handleEditFolder = (item) => {
+    if (item.isParentNav) {
+      goBackToBucket()
+    } else if (item.isFolder) {
+      selectedFolder.value = item
+      listServiceFilesRef.value?.reload()
+    }
+  }
+
+  const goBackToBucket = () => {
+    selectedFolder.value = null
+    listServiceFilesRef.value?.reload()
+  }
 </script>
