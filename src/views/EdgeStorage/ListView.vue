@@ -48,8 +48,8 @@
                 <div
                   v-for="bucket in filteredBuckets"
                   :key="bucket.id"
-                  class="p-3 rounded cursor-pointer hover:bg-[#1C1C1C] transition-colors"
-                  :class="{ 'bg-[#1C1C1C]': selectedBucket?.id === bucket.id }"
+                  class="p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
+                  :class="{ 'bg-[--table-bg-color]': selectedBucket?.id === bucket.id }"
                   @click="selectBucket(bucket)"
                 >
                   <div class="flex items-center justify-between">
@@ -108,9 +108,9 @@
                   <div
                     v-for="bucket in filteredBuckets"
                     :key="bucket.id"
-                    class="p-3 cursor-pointer hover:bg-[#1C1C1C] transition-colors"
+                    class="p-3 cursor-pointer hover:bg-[--table-bg-color] transition-colors"
                     :class="{
-                      'bg-[#1C1C1C]': selectedBucket?.id === bucket.id
+                      'bg-[--table-bg-color]': selectedBucket?.id === bucket.id
                     }"
                     @click="selectBucket(bucket)"
                   >
