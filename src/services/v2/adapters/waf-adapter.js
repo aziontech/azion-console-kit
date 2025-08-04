@@ -127,7 +127,9 @@ export const WafAdapter = {
     return payloadReturn
   },
   adaptCreateWafRuleAllowedTuningPayload(attack, name, path) {
-    attack.matchValue = attack.matchValue === '-' ? null : attack.matchValue
+    if (attack.matchValue === '-') {
+      attack.matchValue = null
+    }
     const hasMatchValue = !!attack.matchValue
     const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
 
