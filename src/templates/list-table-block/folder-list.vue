@@ -72,16 +72,48 @@
         headerStyle="width: 3rem"
       />
       <Column
-        :sortable="!col.disableSort"
-        v-for="col of selectedColumns"
+        :sortable="selectedItems.length > 0 ? false : !col.disableSort"
+        v-for="(col, index) of selectedColumns"
         :key="col.field"
         :field="col.field"
-        :header="col.header"
-        :sortField="col?.sortField"
-        headerClass="p-highlight"
+        :header="selectedItems.length === 0 ? col.header : ''"
+        :sortField="selectedItems.length > 0 ? null : col?.sortField"
+        headerClass="p-highlight relative h-16 w-[20rem]"
         :class="{ 'hover:cursor-pointer ': !disabledList }"
         data-testid="data-table-column"
       >
+        <template
+          #header
+          v-if="selectedItems.length > 0 && index === 0"
+        >
+          <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
+            <span class="text-sm">{{ selectedItems.length }} files selected</span>
+            <div class="flex gap-2">
+              <PrimeButton
+                size="small"
+                outlined
+                icon="pi pi-arrow-right-arrow-left"
+                label="Move"
+                class="px-4"
+              />
+              <PrimeButton
+                size="small"
+                outlined
+                icon="pi pi-download"
+                label="Download"
+                class="px-4"
+              />
+              <PrimeButton
+                size="small"
+                icon="pi pi-trash"
+                label="Delete"
+                severity="danger"
+                class="px-4"
+                @click="emit('delete-selected-items')"
+              />
+            </div>
+          </div>
+        </template>
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
             <div
@@ -292,7 +324,8 @@
     'on-before-go-to-add-page',
     'on-before-go-to-edit',
     'update:selectedItensData',
-    'on-row-click-edit-folder'
+    'on-row-click-edit-folder',
+    'delete-selected-items'
   ])
 
   const props = defineProps({
