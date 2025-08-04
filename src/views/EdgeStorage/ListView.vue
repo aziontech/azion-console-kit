@@ -174,7 +174,6 @@
               ref="listServiceFilesRef"
               :columns="getColumns"
               v-model:selectedItensData="selectedFiles"
-              :showSelectionMode="true"
               hiddenHeader
               :paginator="false"
               enableEditClickFolder
@@ -209,7 +208,7 @@
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import ListTableBlock from '@/templates/list-table-block/with-selection-behavior.vue'
+  import ListTableBlock from '@/templates/list-table-block/folder-list.vue'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import DragAndDrop from './components/DragAndDrop.vue'
