@@ -127,9 +127,11 @@ export const WafAdapter = {
     return payloadReturn
   },
   adaptCreateWafRuleAllowedTuningPayload(attack, name, path) {
+    if (attack.matchValue === '-') {
+      attack.matchValue = null
+    }
     const hasMatchValue = !!attack.matchValue
     const RULE_ID_MISSING_CONTENT_TYPE_IN_POST_BODY = 11
-    const valueField = attack.matchValue === '-' ? null : attack.matchValue
 
     const MAP_ZONES = {
       query_string: hasMatchValue ? 'specific_query_string' : 'any_query_string',
@@ -167,7 +169,8 @@ export const WafAdapter = {
           match: matchFormat,
           ...(hasSpecificMatch &&
             hasMatchValue && {
-              [attack.matchesOn]: attack.matchZone === 'cookie' ? attack.matchZone : valueField
+              [attack.matchesOn]:
+                attack.matchZone === 'cookie' ? attack.matchZone : attack.matchValue
             })
         }
       ]
