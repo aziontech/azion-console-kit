@@ -816,7 +816,7 @@
 
 <script setup>
   import { MIN_PAYLOAD_SIZE_IN_BYTES, MAX_PAYLOAD_SIZE_IN_BYTES } from '@/utils/constants'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
@@ -943,4 +943,14 @@
     const text = '"\\n"'
     return `Character that'll be used at the end of each log line. The ${text} escape sequence breaks values into different lines in NDJSON format.`
   })
+
+  watch(
+    () => headers.value,
+    () => {
+      if (!headers.value) {
+        headers.value = []
+        addHeader()
+      }
+    }
+  )
 </script>

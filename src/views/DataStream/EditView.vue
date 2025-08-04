@@ -10,7 +10,7 @@
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useAccountStore } from '@/stores/account'
   import { dataStreamService } from '@/services/v2'
-  import { validationSchema } from './FormFields/composables/validation'
+  import { validationSchema, initialValues } from './FormFields/composables/validation'
 
   const props = defineProps({
     updatedRedirect: {
@@ -21,13 +21,17 @@
 
   const store = useAccountStore()
   const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
-  const hasAccessToSampling = computed(() => store.hasSamplingFlag)
 
   const displaySamplingDialog = ref(false)
-  const formSubmit = (onSubmit) => {
-    if (!hasAccessToSampling.value) {
+  const formSubmit = (onSubmit, values, formValid) => {
+    if (!values.hasSampling) {
       onSubmit()
     } else {
+      if (!formValid) {
+        onSubmit()
+        return
+      }
+
       displaySamplingDialog.value = true
     }
   }
@@ -44,16 +48,17 @@
         :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
+        :initialValues="initialValues"
       >
         <template #form>
           <FormFieldsDataStream />
         </template>
         <template
           v-if="hasNoPermissionToEditDataStream"
-          #action-bar="{ onSubmit, onCancel, loading, values }"
+          #action-bar="{ onSubmit, onCancel, loading, values, formValid }"
         >
           <ActionBarBlockWithTeleport
-            @onSubmit="formSubmit(onSubmit, values)"
+            @onSubmit="formSubmit(onSubmit, values, formValid)"
             @onCancel="onCancel"
             :loading="loading"
           />

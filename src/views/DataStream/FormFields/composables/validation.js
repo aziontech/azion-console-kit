@@ -191,4 +191,13 @@ const validationSchema = yup.object({
   })
 })
 
-export { validationSchema }
+const initialValues = {
+  endpoint: 'standard',
+  endpointUrl: '',
+  headers: [],
+  lineSeparator: '',
+  payloadFormat: '',
+  maxSize: 1000000
+}
+
+export { validationSchema, initialValues }

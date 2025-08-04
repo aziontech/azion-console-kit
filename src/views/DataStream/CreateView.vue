@@ -12,7 +12,7 @@
   import { validationSchema } from './FormFields/composables/validation'
 
   const displaySamplingDialog = ref(false)
-  const formSubmit = async (onSubmit, values, errors, formValid) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
     if (!values.hasSampling) {
       onSubmit()
     } else {
