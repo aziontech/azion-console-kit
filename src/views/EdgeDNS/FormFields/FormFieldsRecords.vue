@@ -262,7 +262,6 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
           label="Description"
-          required
           :value="description"
           name="description"
           placeholder="add the description"
