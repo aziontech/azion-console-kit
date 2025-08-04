@@ -135,7 +135,7 @@
         is: 'weighted',
         then: (schema) => schema.min(0).max(255).required()
       }),
-    description: yup.string().required().label('Description'),
+    description: yup.string().label('Description'),
     edgeDNSID: yup.number()
   })
 
