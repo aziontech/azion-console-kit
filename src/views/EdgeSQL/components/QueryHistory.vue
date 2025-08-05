@@ -7,6 +7,7 @@
   import Button from 'primevue/button'
   import Tag from 'primevue/tag'
   import Textarea from 'primevue/textarea'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
 
   defineOptions({ name: 'edge-sql-query-history' })
 
@@ -65,6 +66,10 @@
     document.body.removeChild(downloadLink)
     URL.revokeObjectURL(url)
   }
+  
+  const documentationService = () => {
+    window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
+  }
 
 
 </script>
@@ -98,11 +103,17 @@
       </div>
     </div>
 
-    <div v-if="queryHistory.length === 0" class="flex flex-col items-center justify-center p-8 text-center">
-      <i class="pi pi-history text-6xl text-primary mb-4 opacity-50"></i>
-      <h4 class="text-lg font-medium text-color mb-2">No queries executed yet</h4>
-      <p class="text-color-secondary">Execute queries to see them here</p>
-    </div>
+    <EmptyResultsBlock
+      v-if="queryHistory.length === 0"
+      title="No queries executed yet"
+      description="Execute queries to see them appear in your history"
+      :documentationService="documentationService"
+      :inTabs="true"
+    >
+      <template #illustration>
+        <i class="pi pi-history text-6xl text-primary mb-4 opacity-50"></i>
+      </template>
+    </EmptyResultsBlock>
 
     <DataTable
       v-else

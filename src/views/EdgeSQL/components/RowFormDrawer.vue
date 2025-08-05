@@ -453,45 +453,30 @@
               <!-- Campo BLOB/Special Type - Readonly -->
               <div v-if="isFieldBlobType(column)" class="field">
                 <label class="text-sm font-medium text-color mb-2 block">
-                  {{ getEnhancedLabel(column) }}
+                  {{ column }}
                 </label>
                 <InputText
                   :value="formatSpecialTypeValue(initialData[column])"
                   disabled
                   class="w-full font-mono text-sm"
+                  placeholder="Read-only field"
                 />
-                <small class="text-color-secondary mt-2 block">
-                  {{ getFieldDescription(column) }}
-                </small>
-                <div class="flex gap-1 flex-wrap mt-2">
-                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
-                </div>
+
               </div>
 
               <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
-                  :label="getEnhancedLabel(column)"
+                  :label="column"
                   :name="column"
                   :placeholder="`Enter ${column} value`"
                   :disabled="disabledFields"
-                  :description="getFieldDescription(column)"
                   :data-testid="`row-form__field-${index}`"
                   :data-field="column"
                 />
               </template>
               
-              <!-- Column Constraints -->
-              <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
-                <Tag 
-                  v-for="constraint in getColumnConstraints(column)"
-                  :key="constraint.value"
-                  :value="constraint.value" 
-                  :severity="constraint.severity" 
-                  class="text-xs" 
-                  style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" 
-                />
-              </div>
+
               
             </div>
           </div>
@@ -531,45 +516,30 @@
               <!-- Campo BLOB/Special Type - Readonly (mesmo em modo Create, se há dados iniciais) -->
               <div v-if="isFieldBlobType(column)" class="field">
                 <label class="text-sm font-medium text-color mb-2 block">
-                  {{ getEnhancedLabel(column) }}
+                  {{ column }}
                 </label>
                 <InputText
                   :value="formatSpecialTypeValue(initialData[column])"
                   disabled
                   class="w-full font-mono text-sm"
+                  placeholder="Read-only field"
                 />
-                <small class="text-color-secondary mt-2 block">
-                  {{ getFieldDescription(column) }}
-                </small>
-                <div class="flex gap-1 flex-wrap mt-2">
-                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
-                </div>
+
               </div>
 
               <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
-                  :label="getEnhancedLabel(column)"
+                  :label="column"
                   :name="column"
                   :placeholder="`Enter ${column} value`"
                   :disabled="disabledFields"
-                  :description="getFieldDescription(column)"
                   :data-testid="`row-form__field-${index}`"
                   :data-field="column"
                 />
               </template>
               
-              <!-- Column Constraints -->
-              <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
-                <Tag 
-                  v-for="constraint in getColumnConstraints(column)"
-                  :key="constraint.value"
-                  :value="constraint.value" 
-                  :severity="constraint.severity" 
-                  class="text-xs" 
-                  style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" 
-                />
-              </div>
+
               
             </div>
           </div>

@@ -8,12 +8,13 @@
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
-            label="Database Name *"
+            label="Database Name"
             name="name"
             placeholder="my-database"
             :value="name"
             description="Use only letters, numbers, underscore (_) and hyphen (-)"
             data-testid="database-name-field"
+            required
           />
         </div>
       </template>

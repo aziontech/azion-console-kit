@@ -12,7 +12,7 @@
   import { useToast } from 'primevue/usetoast'
   import * as EdgeSQLService from '@/services/edge-sql-services'
   import { useEdgeSQLStore } from '@/stores/edge-sql'
-  import { useEdgeSQLStatusManager } from '@/composables/useEdgeSQLStatusManager'
+  import { useEdgeSQLStatusManager } from '@/composables/use-edge-sql-status-manager'
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
 
   defineOptions({ name: 'list-edge-sql-databases' })
@@ -239,6 +239,14 @@
         }
       },
       {
+        field: 'created_at',
+        header: 'Created At'
+      },
+      {
+        field: 'last_modified',
+        header: 'Last Modified'
+      },
+      {
         field: 'status',
         header: 'Status',
         type: 'component',
@@ -277,15 +285,6 @@
             columnAppearance: 'tag'
           })
         }
-      },
-      {
-        field: 'createdAt',
-        header: 'Created At'
-      },
-      {
-        field: 'lastModify',
-        sortField: 'updatedAt',
-        header: 'Last Modified'
       }
     ]
   })
@@ -295,7 +294,7 @@
     'name',
     'status', 
     'created_at',
-    'updated_at'
+    'last_modified'
   ]
 </script>
 

@@ -14,6 +14,8 @@
   import TabPanel from 'primevue/tabpanel'
   import Skeleton from 'primevue/skeleton'
   import Menu from 'primevue/menu'
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
 
   import { useDialog } from 'primevue/usedialog'
 
@@ -24,6 +26,7 @@
   import RowFormDrawer from './components/RowFormDrawer.vue'
   import InfoDrawerBlock from '@templates/info-drawer-block'
   import InfoSection from '@templates/info-drawer-block/info-section'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { QUICK_TEMPLATES, SQLITE_QUERIES } from './constants/queries'
   import { TableActionManager } from './utils/table-actions'
   import { useAccountStore } from '@/stores/account'
@@ -38,6 +41,10 @@
   const dialog = useDialog()
   const sqlStore = useEdgeSQLStore()
   const accountStore = useAccountStore()
+
+  const documentationService = () => {
+    window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
+  }
 
   const databaseId = computed(() => route.params.id)
   const databaseName = computed(() => {
@@ -346,9 +353,7 @@
     await executeQuery(false) // false = não mostrar toast
   }
 
-  const toggleEditor = () => {
-    isEditorCollapsed.value = !isEditorCollapsed.value
-  }
+
 
   const toggleTemplates = () => {
     isTemplatesCollapsed.value = !isTemplatesCollapsed.value
@@ -1160,13 +1165,19 @@
                   </div>
               </div>
               
-                <div v-else-if="tablesTree.length === 0" class="flex flex-col items-center justify-center p-4 text-center flex-grow-1">
-                  <i class="pi pi-database text-2xl text-primary mb-2"></i>
-                  <p class="text-xs text-color-secondary mb-2">No tables found</p>
-                <small class="text-xs text-color-secondary opacity-75">
-                    Use CREATE TABLE statements
-                </small>
-              </div>
+                <div v-else-if="tablesTree.length === 0" class="flex-grow-1">
+                  <EmptyResultsBlock
+                    title="No tables found"
+                    description="Use CREATE TABLE statements to create your first table"
+                    :documentationService="documentationService"
+                    :inTabs="true"
+                    :noBorder="true"
+                  >
+                    <template #illustration>
+                      <i class="pi pi-database text-4xl text-primary opacity-50"></i>
+                    </template>
+                  </EmptyResultsBlock>
+                </div>
 
                 <div v-else class="flex-grow-1 overflow-y-auto pr-1">
                   <div 
@@ -1233,22 +1244,17 @@
           <div class="flex-1 min-w-0">
             <div class="h-full flex flex-column gap-2 overflow-hidden">
               <!-- SQL Editor -->
-              <div class="flex-shrink-0 bg-surface-0 border-round-lg border-1 surface-border" :class="{ 'editor-collapsed': isEditorCollapsed }">
-                <div 
-                  class="flex items-center justify-between p-3 border-bottom-1 surface-border cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
-                  @click="toggleEditor"
-                >
-                  <div class="flex items-center gap-2">
-                    <i class="pi pi-code text-primary"></i>
-                    <span class="font-semibold text-color">Query Editor</span>
-                  </div>
-                  <i 
-                    :class="isEditorCollapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
-                    class="text-color-secondary hover:text-primary text-sm"
-                  />
-                </div>
-                
-                <div v-show="!isEditorCollapsed" class="p-3 editor-content">
+              <div class="flex-shrink-0">
+                <Accordion :activeIndex="isEditorCollapsed ? null : 0">
+                  <AccordionTab>
+                    <template #header>
+                      <div class="flex items-center gap-2">
+                        <i class="pi pi-code text-primary"></i>
+                        <span class="font-semibold text-color">Query Editor</span>
+                      </div>
+                    </template>
+                    
+                    <div class="p-3 editor-content">
                   <div class="sql-editor-container mb-3 border-1 surface-border overflow-hidden" style="height: 180px;">
                     <vue-monaco-editor
                       v-model:value="sqlQuery"
@@ -1273,7 +1279,7 @@
                       />
                       <Button
                         label="Clear"
-                        icon="pi pi-refresh"
+                        icon="pi pi-delete-left"
                         severity="secondary"
                         outlined
                         @click="sqlQuery = ''"
@@ -1303,8 +1309,10 @@
                         <span>{{ getQueryStats(queryResults).rowsWritten }} written</span>
                       </div>
                     </div>
-                  </div>
-                </div>
+                    </div>
+                    </div>
+                  </AccordionTab>
+                </Accordion>
               </div>
 
               <!-- Results and History -->
@@ -1380,7 +1388,6 @@
                               severity="primary"
                               class="p-button-sm font-medium"
                               @click="openInsertRowDrawer"
-                              v-tooltip.top="'Insert new row'"
                             />
                             <Button
                               icon="pi pi-file-export"
@@ -1460,16 +1467,9 @@
                                 :frozen="colIndex === 0 && isPrimaryKey(column.field)"
                                 :alignFrozen="colIndex === 0 && isPrimaryKey(column.field) ? 'left' : undefined"
                               >
-                                <!-- Header customizado com ícone de chave para Primary Keys -->
+                                <!-- Header padrão sem ícone de chave -->
                                 <template #header>
-                                  <div class="flex items-center gap-2">
-                                    <span>{{ column.header }}</span>
-                                    <i 
-                                      v-if="isPrimaryKey(column.field)"
-                                      class="pi pi-key text-yellow-500 text-sm"
-                                      v-tooltip.top="'Primary Key'"
-                                    ></i>
-                                  </div>
+                                  <span>{{ column.header }}</span>
                                 </template>
                                 
                                 <template #body="{ data, field, index }">
@@ -1495,7 +1495,7 @@
                           <!-- Mensagem quando não há dados, mas mantém a tabela visível -->
                           <div v-if="!result.rows?.length" class="text-center p-4 text-color-secondary bg-surface-50 dark:bg-surface-800">
                             <i class="pi pi-info-circle mr-2"></i>
-                            No data found - table is empty
+                            No results found
                           </div>
                         </div>
                       </div>
