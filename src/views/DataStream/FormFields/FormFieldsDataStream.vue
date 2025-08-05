@@ -13,7 +13,10 @@
   <InputSection :disabled="hasNoPermissionToEditDataStream" />
   <TransformSection :disabled="hasNoPermissionToEditDataStream" />
   <RenderTemplateSection :disabled="hasNoPermissionToEditDataStream" />
-  <OutputSection :disabled="hasNoPermissionToEditDataStream" />
+  <OutputSection
+    :disabled="hasNoPermissionToEditDataStream"
+    :isEdit="isEdit"
+  />
   <StatusSection :disabled="hasNoPermissionToEditDataStream" />
 </template>
 
@@ -37,6 +40,9 @@
     resetForm: {
       type: Function,
       required: false
+    },
+    isEdit: {
+      type: Boolean
     }
   })
 
