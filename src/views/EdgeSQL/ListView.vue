@@ -10,7 +10,7 @@
 
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { useToast } from 'primevue/usetoast'
-  import * as EdgeSQLService from '@/services/edge-sql-services'
+  import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQLStore } from '@/stores/edge-sql'
   import { useEdgeSQLStatusManager } from '@/composables/use-edge-sql-status-manager'
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
@@ -62,7 +62,7 @@
       title: 'database',
       icon: 'pi pi-trash',
       service: async (databaseId, databaseData) => {
-        const result = await EdgeSQLService.deleteDatabaseService(databaseId)
+        const result = await edgeSQLService.deleteDatabase(databaseId)
 
         const databaseName = databaseData.name?.text || databaseData.name
         addDeleteOperation(databaseId, databaseName, (status, operation) => {
@@ -323,7 +323,7 @@
         createPagePath="/edge-sql/create"
         editPagePath="/edge-sql/database"
         :enableEditClick="false"
-        :listService="EdgeSQLService.listDatabasesService"
+        :listService="edgeSQLService.listDatabases"
         :columns="getColumns"
         :apiFields="DATABASE_API_FIELDS"
         @on-load-data="handleLoadData"

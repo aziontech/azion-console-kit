@@ -20,7 +20,7 @@
   import { useDialog } from 'primevue/usedialog'
 
   import { useEdgeSQLStore } from '@/stores/edge-sql'
-  import * as EdgeSQLService from '@/services/edge-sql-services'
+  import { edgeSQLService } from '@/services/v2'
   import QueryHistory from './components/QueryHistory.vue'
   import DeleteDialog from '@/templates/list-table-block/dialog/delete-dialog.vue'
   import RowFormDrawer from './components/RowFormDrawer.vue'
@@ -88,7 +88,7 @@
   // Carregar informações do banco de dados
   const loadDatabaseInfo = async () => {
     try {
-      const result = await EdgeSQLService.getDatabaseService(databaseId.value)
+      const result = await edgeSQLService.getDatabase(databaseId.value)
 
       if (result.statusCode === 200) {
         const database = result.body
@@ -138,7 +138,7 @@
 
     isLoadingTables.value = true
     try {
-      const result = await EdgeSQLService.getTablesService(databaseId.value)
+      const result = await edgeSQLService.getTables(databaseId.value)
 
       if (result.statusCode === 200) {
         sqlStore.setCurrentTables(result.body.tables)
@@ -199,12 +199,11 @@
       const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
       const result = isSelectQuery
-        ? await EdgeSQLService.queryDatabaseService({
-            databaseId: databaseId.value,
-            query: sqlQuery.value
+        ? await edgeSQLService.queryDatabase(databaseId.value, {
+            statement: sqlQuery.value,
+            parameters: []
           })
-        : await EdgeSQLService.executeDatabaseService({
-            databaseId: databaseId.value,
+        : await edgeSQLService.executeDatabase(databaseId.value, {
             statements: [sqlQuery.value]
           })
 
@@ -360,9 +359,9 @@
   const loadTableSchema = async (tableName) => {
     isLoadingSchema.value = true
     try {
-      const result = await EdgeSQLService.queryDatabaseService({
-        databaseId: databaseId.value,
-        query: SQLITE_QUERIES.TABLE_INFO(tableName)
+      const result = await edgeSQLService.queryDatabase(databaseId.value, {
+        statement: SQLITE_QUERIES.TABLE_INFO(tableName),
+        parameters: []
       })
 
       if (result.statusCode === 200 && result.body.results?.length > 0) {
@@ -383,9 +382,9 @@
     selectedTableDefinition.value = ''
     try {
       // Obter a definição CREATE TABLE do SQLite
-      const result = await EdgeSQLService.queryDatabaseService({
-        databaseId: databaseId.value,
-        query: SQLITE_QUERIES.TABLE_DEFINITION(tableName)
+      const result = await edgeSQLService.queryDatabase(databaseId.value, {
+        statement: SQLITE_QUERIES.TABLE_DEFINITION(tableName),
+        parameters: []
       })
 
       if (
@@ -517,8 +516,7 @@
   // Serviço para deletar tabela usando SQL DROP TABLE
   const deleteTableService = async (tableName) => {
     try {
-      const result = await EdgeSQLService.executeDatabaseService({
-        databaseId: databaseId.value,
+      const result = await edgeSQLService.executeDatabase(databaseId.value, {
         statements: [`DROP TABLE ${tableName};`]
       })
 
@@ -548,6 +546,7 @@
         selectedID: tableName,
         selectedItemData: { name: tableName },
         deleteService: () => deleteTableService(tableName),
+        deleteConfirmationText: tableName,
         entityDeleteMessage: `The table "${tableName}" will be permanently deleted along with all its data. This action cannot be undone.`,
         onSuccess: () => {
           // Já é tratado no deleteTableService
@@ -780,8 +779,7 @@
       })
 
       // Executar todas as queries DELETE
-      const result = await EdgeSQLService.executeDatabaseService({
-        databaseId: databaseId.value,
+      const result = await edgeSQLService.executeDatabase(databaseId.value, {
         statements: deleteQueries
       })
 
@@ -846,6 +844,7 @@
         selectedID: selectedCount,
         selectedItemData: selectedRowsData,
         deleteService: deleteRowsService,
+        deleteConfirmationText: 'DELETE',
         entityDeleteMessage: `The selected ${selectedCount} row${
           selectedCount > 1 ? 's' : ''
         } will be permanently deleted from the table. This action cannot be undone.`,

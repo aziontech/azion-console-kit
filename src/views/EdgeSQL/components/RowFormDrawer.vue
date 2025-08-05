@@ -9,7 +9,7 @@
   import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
 
-  import * as EdgeSQLService from '@/services/edge-sql-services'
+  import { edgeSQLService } from '@/services/v2'
   import { useRoute } from 'vue-router'
 
   defineOptions({
@@ -205,8 +205,7 @@
 
       const query = buildInsertQuery(props.tableName, props.columns, cleanFormData)
 
-      const result = await EdgeSQLService.executeDatabaseService({
-        databaseId: databaseId.value,
+      const result = await edgeSQLService.executeDatabase(databaseId.value, {
         statements: [query]
       })
 
@@ -255,8 +254,7 @@
 
       const query = buildUpdateQuery(props.tableName, changedData, whereCondition)
 
-      const result = await EdgeSQLService.executeDatabaseService({
-        databaseId: databaseId.value,
+      const result = await edgeSQLService.executeDatabase(databaseId.value, {
         statements: [query]
       })
 

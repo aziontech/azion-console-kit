@@ -1,5 +1,5 @@
 import { ref, computed, onUnmounted } from 'vue'
-import * as EdgeSQLService from '@/services/edge-sql-services'
+import { edgeSQLService } from '@/services/v2'
 
 const globalEventBus = ref(new Map())
 
@@ -131,7 +131,7 @@ export function useEdgeSQLStatusManager() {
           }
         }
 
-        const result = await EdgeSQLService.checkDatabaseStatusService(
+        const result = await edgeSQLService.checkDatabaseStatus(
           operation.id,
           'id,name,status,is_active'
         )
@@ -307,7 +307,7 @@ export function useEdgeSQLStatusManager() {
     }
 
     try {
-      const result = await EdgeSQLService.checkDatabaseStatusService(
+      const result = await edgeSQLService.checkDatabaseStatus(
         databaseId,
         'id,name,status,is_active'
       )

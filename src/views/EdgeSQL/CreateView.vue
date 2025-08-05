@@ -42,7 +42,7 @@
   import { inject, ref } from 'vue'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import * as EdgeSQLService from '@/services/edge-sql-services'
+  import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQLStatusManager } from '@/composables/use-edge-sql-status-manager'
   import { useToast } from 'primevue/usetoast'
 
@@ -66,7 +66,7 @@
     name: ''
   })
   const createDatabaseServiceWithMonitoring = async (payload) => {
-    const result = await EdgeSQLService.createDatabaseService(payload)
+          const result = await edgeSQLService.createDatabase(payload)
 
     if (result.shouldMonitor && result.databaseId) {
       if (result.feedback) {

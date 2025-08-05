@@ -109,6 +109,10 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+// Edge SQL
+import { EdgeSQLService } from './edge-sql-service'
+import { EdgeSQLAdapter } from './adapters/edge-sql-adapter'
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -167,6 +171,7 @@ const workloadService = new WorkloadService(
   digitalCertificatesService,
   DigitalCertificatesAdapter
 )
+const edgeSQLService = new EdgeSQLService(httpService, EdgeSQLAdapter)
 
 export {
   vcsService,
@@ -196,5 +201,6 @@ export {
   billingGqlService,
   workloadService,
   workloadDeploymentService,
-  edgeStorageService
+  edgeStorageService,
+  edgeSQLService
 }
