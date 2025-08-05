@@ -67,8 +67,8 @@ const buckets = ref([
 const selectedBucket = ref(buckets.value[0])
 
 const formatSize = (size) => {
+  if (size == 0) return '0 Bytes'
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  if (size == 0) return 'n/a'
   const aux = Math.floor(Math.log(size) / Math.log(1024))
   return (size / Math.pow(1024, aux)).toFixed(2) + ' ' + sizes[aux]
 }

@@ -487,13 +487,11 @@
     return actions
   }
 
-  const loadData = async ({ page, ...query }) => {
+  const loadData = async () => {
     if (props.listService) {
       try {
         isLoading.value = true
-        const response = props.isGraphql
-          ? await props.listService()
-          : await props.listService({ page, ...query })
+        const response = await props.listService()
         data.value = response
       } catch (error) {
         data.value = []
@@ -528,10 +526,6 @@
 
     if (props.editInDrawer) {
       props.editInDrawer(item)
-    } else if (props.enableEditCustomRedirect) {
-      emit('on-row-click-edit-redirect', item)
-    } else if (props.enableEditClick) {
-      router.push({ path: `${props.editPagePath}/${item.id}` })
     } else if (props.enableEditClickFolder) {
       emit('on-row-click-edit-folder', item)
     }
