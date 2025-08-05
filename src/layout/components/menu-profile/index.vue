@@ -310,7 +310,7 @@
   const setTheme = useAccountStore().setTheme
 
   const hasAccessToActivityHistory = computed(() => {
-    return user.kind === 'reseller' || user.kind === 'group' || user.kind === 'brand'
+    return user.kind === 'client'
   })
 
   onBeforeMount(() => {
@@ -354,7 +354,7 @@
     {
       label: 'Activity History',
       to: '/activity-history',
-      visible: !hasAccessToActivityHistory.value
+      visible: hasAccessToActivityHistory.value
     },
     {
       label: 'Teams Permissions',
