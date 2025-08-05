@@ -149,8 +149,33 @@
 
   const getColumns = computed(() => [
     {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
       field: 'name',
       header: 'Name',
+      disableSort: true
+    },
+    {
+      field: 'description',
+      header: 'Description',
+      filterPath: 'description.value',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' }),
+      disableSort: true
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified',
+      disableSort: true
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor',
       disableSort: true
     },
     {
@@ -166,25 +191,6 @@
         })
       },
       disableSort: true
-    },
-    {
-      field: 'description',
-      header: 'Description',
-      filterPath: 'description.value',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' }),
-      disableSort: true
-    },
-    {
-      field: 'lastModified',
-      header: 'Last Modified',
-      disableSort: true
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor',
-      disableSort: true
     }
   ])
 
@@ -196,8 +202,6 @@
       service: deleteEdgeFirewallRulesEngineServiceWithDecorator
     }
   ]
-
-  const disabledOrdering = ref(true)
 
   const isLoadingButtonOrder = ref(false)
   const updateRulesOrder = async (rows, alteredRows, reload) => {
@@ -282,14 +286,11 @@
             class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
           >
             <PrimeButton
-              class="bg-secondary"
               outlined
-              label="Cancel"
+              label="Discard Changes"
               @click="reload"
-              :disabled="isLoadingButtonOrder"
-              data-testid="rules-engine-cancel-order-button"
+              data-testid="review-changes-dialog-footer-cancel-button"
             />
-
             <PrimeButton
               label="Review Changes"
               class="bg-surface"
@@ -323,15 +324,6 @@
         label="Rules Engine"
         data-testid="create_Rules Engine_button"
         @click="openCreateDrawer"
-      />
-      <PrimeButton
-        icon="pi pi-save"
-        :disabled="disabledOrdering"
-        label="Save order"
-        :loading="isLoadingButtonOrder"
-        data-testid="rules-engine-save-order-button"
-        @click="updateRulesOrder(data, reload)"
-        v-tooltip.bottom="{ value: 'Saves the new order of rules.', showDelay: 200 }"
       />
     </template>
   </EmptyResultsBlock>

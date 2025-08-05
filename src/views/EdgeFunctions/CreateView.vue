@@ -19,12 +19,13 @@
 
   const ARGS_INITIAL_STATE = '{}'
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Functions',
       from: route.query.origin,
       createdFrom: 'singleEntity'
     })
+    handleToast(response)
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -59,19 +60,32 @@
       }
       return isValidJson
     }),
-    initiatorType: yup.string().required().label('Initiator Type'),
+    executionEnvironment: yup.string().required().label('Initiator Type'),
     active: yup.boolean(),
-    language: yup.string()
+    runtime: yup.string()
   })
   const updateObject = ref({})
 
   const initialValues = {
     name: '',
     active: true,
-    language: 'javascript',
+    runtime: 'javascript',
     code: HelloWorldSample,
     args: ARGS_INITIAL_STATE,
-    initiatorType: 'edge_application'
+    executionEnvironment: 'application'
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge function has been created',
+      actions: {
+        link: {
+          label: 'View Edge Function',
+          callback: () => response.redirectToUrl(`/edge-functions/edit/${response.functionId}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 </script>
 
@@ -89,6 +103,7 @@
         @on-response="handleTrackCreation"
         @on-response-fail="handleTrackFailedCreation"
         :initialValues="initialValues"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeFunctions v-model:preview-data="updateObject" />

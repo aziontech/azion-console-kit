@@ -14,6 +14,7 @@
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import { digitalCertificatesService } from '@/services/v2'
+  import CopyBlock from '@/templates/copy-block/copy-block.vue'
 
   const props = defineProps({
     digitalCertificates: {
@@ -237,16 +238,7 @@
               disabled
             />
           </span>
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            data-testid="edit-domains-form__domain-field__copy-button"
-            type="button"
-            aria-label="Copy to Clipboard"
-            label="Copy to Clipboard"
-            :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: domainName })"
-          />
+          <copyBlock :value="domainName" />
         </div>
       </div>
     </template>

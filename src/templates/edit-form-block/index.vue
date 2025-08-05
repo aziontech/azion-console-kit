@@ -42,7 +42,8 @@
     'on-edit-success',
     'on-edit-fail',
     'on-load-fail',
-    'loaded-service-object'
+    'loaded-service-object',
+    'onError'
   ])
 
   const { scrollToError } = useScrollToError()

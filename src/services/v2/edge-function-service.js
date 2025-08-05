@@ -43,7 +43,7 @@ export class EdgeFunctionService {
   }
 
   listEdgeFunctionsDropdown = async (params = { pageSize: 10, fields: [] }) => {
-    if (!params.initiatorType) return []
+    if (!params.executionEnvironment) return []
 
     const { data } = await this.http.request({
       method: 'GET',
@@ -52,7 +52,9 @@ export class EdgeFunctionService {
     })
 
     const { results, count } = data
-    const dataFiltered = results?.filter((values) => values.initiator_type === params.initiatorType)
+    const dataFiltered = results?.filter(
+      (values) => values.execution_environment === params.executionEnvironment
+    )
 
     const transformed =
       this.adapter?.transformEdgeFunctionsDropdown?.(dataFiltered, params.fields) ?? results
@@ -64,7 +66,7 @@ export class EdgeFunctionService {
   }
 
   listEdgeFunctions = async (params = { pageSize: 100, fields: [] }) => {
-    if (!params.initiatorType) return []
+    if (!params.executionEnvironment) return []
 
     const { data } = await this.http.request({
       method: 'GET',
@@ -73,7 +75,9 @@ export class EdgeFunctionService {
     })
 
     const { results, count } = data
-    const dataFiltered = results?.filter((values) => values.initiator_type === params.initiatorType)
+    const dataFiltered = results?.filter(
+      (values) => values.execution_environment === params.executionEnvironment
+    )
 
     const transformed =
       this.adapter?.transformEdgeFunctions?.(dataFiltered, params.fields) ?? results

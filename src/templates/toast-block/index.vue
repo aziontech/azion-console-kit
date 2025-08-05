@@ -20,10 +20,25 @@
         </header>
         <p
           class="text-sm text-color-secondary font-normal mt-3"
+          v-if="message.component"
+        >
+          <component
+            :is="message.component"
+            :v-bind="message.props"
+          />
+        </p>
+        <p
+          class="text-sm text-color-secondary font-normal mt-3"
           v-if="message.detail"
           :data-testid="handleDataTestIdInItem(message, 'detail')"
         >
           {{ parseText(message.detail, CHAR_LIMITS.DETAIL) }}
+        </p>
+        <p
+          class="text-sm text-color-secondary font-normal mt-3"
+          v-if="message.additionalDetails"
+        >
+          {{ message.additionalDetails }}
         </p>
         <div
           class="flex flex-row gap-2 align-self-end mt-5"
@@ -42,12 +57,14 @@
             :data-testid="handleDataTestIdInItem(message, 'secondary')"
             outlined
             size="small"
-            :label="message.action.secondary.label"
+            :icon="getButtonIcon(message.action.secondary)"
+            :label="getButtonLabel(message.action.secondary)"
             @click="handleClick(message, 'secondary')"
+            :disabled="isButtonAnimating(message.action.secondary)"
           />
           <PrimeButton
-            severity="secondary"
             v-if="message.action.primary"
+            severity="secondary"
             :data-testid="handleDataTestIdInItem(message, 'primary')"
             size="small"
             :label="message.action.primary.label"
@@ -63,6 +80,7 @@
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
+  import { reactive } from 'vue'
 
   defineOptions({ name: 'ToastBlock' })
 
@@ -71,6 +89,8 @@
     SUMMARY: 100,
     DETAIL: 125
   }
+
+  const animatingButtons = reactive(new Map())
 
   const toastOptions = {
     root: {
@@ -91,7 +111,15 @@
 
   const parseText = (text, charLimit) => {
     const existsAndIsString = text && isString(text)
-    return existsAndIsString && text.substring(0, charLimit)
+    if (existsAndIsString) {
+      return text.substring(0, charLimit)
+    }
+    if (!text) {
+      return ''
+    }
+    // eslint-disable-next-line no-console
+    console.error('An unexpected error occurred', text)
+    return 'An unexpected error occurred'
   }
 
   const showActions = (message) => {
@@ -203,7 +231,57 @@
     return parser[severity] || 'pi pi-check text-xs'
   }
 
+  const getButtonKey = (action) => {
+    return `${action.label}-${action.animation?.time || 'default'}`
+  }
+
+  const isButtonAnimating = (action) => {
+    if (!action.animation) return false
+    return animatingButtons.has(getButtonKey(action))
+  }
+
+  const getButtonIcon = (action) => {
+    if (!action.animation) return action.icon || null
+
+    const buttonKey = getButtonKey(action)
+    const isAnimating = animatingButtons.has(buttonKey)
+
+    if (isAnimating) {
+      return action.animation.icon
+    }
+
+    return action.icon || null
+  }
+
+  const getButtonLabel = (action) => {
+    if (!action.animation) return action.label
+
+    const buttonKey = getButtonKey(action)
+    const isAnimating = animatingButtons.has(buttonKey)
+
+    if (isAnimating) {
+      return action.animation.label
+    }
+
+    return action.label
+  }
+
+  const startButtonAnimation = (action) => {
+    if (!action.animation) return
+
+    const buttonKey = getButtonKey(action)
+    animatingButtons.set(buttonKey, true)
+
+    setTimeout(() => {
+      animatingButtons.delete(buttonKey)
+    }, action.animation.time)
+  }
+
   const handleClick = (message, action) => {
-    message.action[action].callback()
+    const actionData = message.action[action]
+    if (actionData.animation) {
+      startButtonAnimation(actionData)
+    }
+    actionData.callback()
   }
 </script>

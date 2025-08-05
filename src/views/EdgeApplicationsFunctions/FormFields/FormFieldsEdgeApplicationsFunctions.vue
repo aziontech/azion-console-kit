@@ -17,20 +17,20 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleDrawerSuccess = (response) => {
-    edgeFunctionID.value = response.functionId
+  const handleDrawerSuccess = (functionId) => {
+    edgeFunctionID.value = functionId
   }
 
   const changeArgs = (target) => {
-    if (target?.jsonArgs) {
-      args.value = target?.jsonArgs
+    if (target?.defaultArgs) {
+      args.value = target?.defaultArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
-      initiatorType: 'edge_application',
-      fields: ['id', 'name', 'json_args', 'initiator_type'],
+      executionEnvironment: 'application',
+      fields: ['id', 'name', 'default_args', 'execution_environment'],
       ...queryParams
     })
   }
@@ -38,7 +38,7 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'json_args']
+      fields: ['id', 'name', 'default_args']
     })
   }
 
@@ -97,10 +97,10 @@
           name="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionServiceDecorator"
-          :moreOptions="['jsonArgs']"
+          :moreOptions="['defaultArgs']"
           disableEmitFirstRender
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           :value="edgeFunctionID"
           inputId="edgeFunctionID"
           @onSelectOption="changeArgs"
@@ -130,7 +130,7 @@
       <div class="flex flex-col gap-2 w-full">
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"

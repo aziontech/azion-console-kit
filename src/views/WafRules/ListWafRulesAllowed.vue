@@ -12,6 +12,7 @@
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2'
+  import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -22,15 +23,6 @@
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
-  const ALLOWED_RULES_API_FIELDS = [
-    'id',
-    'last_modified',
-    'rule_id',
-    'name',
-    'path',
-    'match_zones',
-    'active'
-  ]
 
   const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
@@ -38,30 +30,34 @@
     documentationServiceAllowed: {
       required: true,
       type: Function
-    },
-    optionsRuleIds: {
-      required: true,
-      type: Array,
-      default: () => []
     }
   })
 
+  const schemaConditions = yup.object().shape({
+    field: yup.string().when('match', {
+      is: (match) => match.startsWith('specific_'),
+      then: (schema) => schema.required('field is required'),
+      otherwise: (schema) => schema.nullable()
+    }),
+    match: yup.string().required()
+  })
+
   const validationSchemaAllowed = yup.object({
-    ruleId: yup.string().required().label('rule id'),
+    ruleId: yup.string().required().label('Rule Id'),
     name: yup.string().required(),
-    path: yup.string(),
-    matchZones: yup.array(),
+    path: yup.string().nullable(),
+    conditions: yup.array().of(schemaConditions),
     status: yup.boolean(),
-    useRegex: yup.boolean()
+    operator: yup.boolean()
   })
 
   const initialValues = {
-    matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
+    conditions: [itemDefaultCondition],
     path: '',
     name: '',
     ruleId: 0,
     status: true,
-    useRegex: false
+    operator: false
   }
 
   const wafRuleId = ref(route.params.id)
@@ -111,26 +107,23 @@
   const wafRulesAllowedColumns = ref([
     {
       field: 'ruleId',
-      header: 'Rule ID',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+      header: 'Rule ID'
     },
     {
       field: 'name',
-      header: 'Name',
+      header: 'Description',
       type: 'component',
       component: (columnData) =>
-        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
     },
 
     {
       field: 'path',
-      header: 'URI'
+      header: 'Path'
     },
     {
-      field: 'matchZones',
-      header: 'Match Zones',
+      field: 'conditions',
+      header: 'Conditions',
       type: 'component',
       disableSort: true,
       component: (columnData) =>
@@ -245,7 +238,6 @@
     emptyListMessage="No allowed rules found."
     isTabs
     :actions="actions"
-    :apiFields="ALLOWED_RULES_API_FIELDS"
   >
     <template #addButton>
       <PrimeButton
@@ -262,7 +254,7 @@
     title="No allowed rule has been created."
     description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
     createButtonLabel="Allowed Rule"
-    :documentationService="documentationServiceAllowed"
+    :documentationService="props.documentationServiceAllowed"
     :inTabs="true"
   >
     <template #default>
@@ -298,7 +290,7 @@
     title="Create Allowed Rule"
   >
     <template #formFields>
-      <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
+      <FormFieldsAllowed :optionsRuleIds="optionsRuleIds"></FormFieldsAllowed>
     </template>
   </CreateDrawerBlock>
 
@@ -316,7 +308,7 @@
     <template #formFields>
       <FormFieldsAllowed
         :disabledRuleId="true"
-        :optionsRuleIds="props.optionsRuleIds"
+        :optionsRuleIds="optionsRuleIds"
       />
     </template>
   </EditDrawerBlock>

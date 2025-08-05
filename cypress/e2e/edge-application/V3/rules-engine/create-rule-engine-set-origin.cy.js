@@ -16,7 +16,6 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.edgeApplication.mainSettings.addressInput).type('httpbingo.org')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)

@@ -36,10 +36,6 @@
     editDeviceGroupService: {
       required: true,
       type: Function
-    },
-    documentationService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -65,9 +61,10 @@
     emit('onSuccess')
   }
 
-  const handleSuccessCreate = () => {
+  const handleSuccessCreate = (response) => {
+    const createItemId = response.id
     handleTrackCreation()
-    emit('onSuccess')
+    emit('onSuccess', createItemId)
   }
 
   const closeDrawer = () => {
@@ -91,10 +88,6 @@
   const openDrawerEdit = (id) => {
     selectedDeviceGroupToEdit.value = id.toString()
     showEditDrawer.value = true
-  }
-
-  const closeDrawerEdit = () => {
-    showEditDrawer.value = false
   }
 
   const handleTrackSuccessEdit = () => {
@@ -139,8 +132,6 @@
         errorType: 'api'
       })
       .track()
-
-    closeDrawerEdit()
   }
 
   defineExpose({

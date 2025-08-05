@@ -30,6 +30,19 @@ export class EdgeFirewallFunctionService {
     }
   }
 
+  listFunctionsDropdownService = async (edgeFirewallId, params = { pageSize: 10 }) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#getUrl(edgeFirewallId),
+      params
+    })
+
+    return {
+      count: data.count,
+      body: this.#getTransformed('transformListFunctionsDropdown', data.results)
+    }
+  }
+
   listEdgeFirewallFunctionsService = async (edgeFirewallId, query = { pageSize: 10 }) => {
     const { body: functionInstances, count } = await this.listFunctionsService(
       edgeFirewallId,
@@ -37,16 +50,16 @@ export class EdgeFirewallFunctionService {
     )
     this.countFunctions = count
 
-    const enrichedFunctions = await enrichByMatchingReference(
-      functionInstances,
-      this.#listFunctionNames,
-      (item) => item.edgeFunctionId,
-      (item, matchedRef) => ({
+    const enrichedFunctions = await enrichByMatchingReference({
+      items: functionInstances,
+      fetchReferencePage: this.#listFunctionNames,
+      getReferenceId: (item) => item.edgeFunctionId,
+      merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
       }),
-      { pageSize: 100 }
-    )
+      pageSize: 100
+    })
 
     return {
       body: this.#getTransformed('transformFunction', enrichedFunctions),
@@ -67,13 +80,13 @@ export class EdgeFirewallFunctionService {
   createEdgeFirewallService = async (payload) => {
     const body = this.#getTransformed('transformPayloadFunction', [payload, 'POST'])
 
-    await this.http.request({
+    const { data } = await this.http.request({
       method: 'POST',
       url: this.#getUrl(payload.id),
       body
     })
 
-    return { feedback: 'Your Function has been created' }
+    return { feedback: 'Your Function has been created', id: data.data.id }
   }
 
   editEdgeFirewallFunctionService = async (payload) => {

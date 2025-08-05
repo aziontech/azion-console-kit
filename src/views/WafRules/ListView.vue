@@ -61,10 +61,14 @@
     hasContentToList.value = event
   }
 
-  const WAF_API_FIELDS = ['id', 'name', 'threats_configuration', 'active']
-
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name'
@@ -112,7 +116,6 @@
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
         :actions="actions"
-        :apiFields="WAF_API_FIELDS"
         :defaultOrderingFieldName="'name'"
       />
       <EmptyResultsBlock

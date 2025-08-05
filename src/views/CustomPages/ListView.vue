@@ -50,31 +50,14 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Name'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        sortField: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'default',
-        header: 'Default',
-        sortField: 'default',
-        filterPath: 'default',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        },
-        disableSort: false
       },
       {
         field: 'active',
@@ -89,6 +72,15 @@
           })
         },
         disableSort: false
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModify',
+        sortField: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })
@@ -98,8 +90,8 @@
     'name',
     'last_editor',
     'last_modified',
-    'default',
-    'active'
+    'active',
+    'last_modify'
   ]
 </script>
 
@@ -127,7 +119,7 @@
         emptyListMessage="No Custom Pages found."
         data-testid="custom-pages-list-table-block"
         :actions="actions"
-        :defaultOrderingFieldName="'name'"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

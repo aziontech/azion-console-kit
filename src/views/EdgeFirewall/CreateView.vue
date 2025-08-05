@@ -27,16 +27,30 @@
     name: '',
     isActive: true,
     debugRules: false,
-    edgeFunctionsEnabled: false,
+    edgeFunctionsEnabled: true,
     networkProtectionEnabled: true,
     wafEnabled: false,
     ddosProtectionUnmetered: true
   }
 
-  const handleCreateEdgeFirewall = () => {
+  const handleCreateEdgeFirewall = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Firewall'
     })
+    handleToast(response)
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Firewall has been created',
+      actions: {
+        link: {
+          label: 'View Edge Firewall',
+          callback: () => response.redirectToUrl(`/edge-firewall/edit/${response.data.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 
   const handleFailedCreateEdgeFirewall = (error) => {
@@ -64,6 +78,7 @@
         :initialValues="initialValues"
         @on-response="handleCreateEdgeFirewall"
         @on-response-fail="handleFailedCreateEdgeFirewall"
+        disableToast
       >
         <template #form>
           <FormCreateEdgeFirewall />

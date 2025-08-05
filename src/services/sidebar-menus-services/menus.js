@@ -21,14 +21,14 @@ function createMarketplaceItem() {
 
 function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
-
-  return {
+  const menuOption = {
     label: handleTextDomainWorkload.pluralTitle,
-    icon: 'ai ai-workloads',
+    icon: hasFlagBlockApiV4() ? 'pi pi-globe' : 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
-    id: 'domains',
-    tag: 'Preview'
+    id: 'domains'
   }
+
+  return menuOption
 }
 
 function createBuildItems() {
@@ -55,7 +55,6 @@ function createSecureItems() {
       to: '/edge-connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
-      tag: 'Preview',
       visible: !hasFlagBlockApiV4()
     },
     {
@@ -138,7 +137,6 @@ function createEdgeLibrariesItems() {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'ai ai-custom-pages',
-      tag: 'Preview',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
     },
@@ -198,7 +196,7 @@ function createMarketplaceProductsItems() {
     },
     {
       label: 'SIEM',
-      to: 'https://f0semqqgv4.map.azionedge.net/login',
+      to: 'https://caixa-siem.azion.com/login',
       icon: 'pi pi-chart-bar',
       id: 'siem',
       external: true

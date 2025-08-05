@@ -27,7 +27,13 @@
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    isActive: true,
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false
   })
 
   const handleBlocks = ['general']
@@ -60,9 +66,16 @@
   }
   const handleCreateWithSuccess = (response) => {
     handleTrackCreation()
+    handleToast(response)
     emit('onSuccess')
-    emit('onEdgeApplicationCreated', response.applicationId)
+    emit('onEdgeApplicationCreated', response.data.id)
     closeCreateDrawer()
+  }
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your edge application has been created'
+    }
+    response.showToastWithActions(toast)
   }
   defineExpose({
     showCreateDrawer,
@@ -81,10 +94,12 @@
     @onSuccess="handleCreateWithSuccess"
     @onResponseFail="handleTrackFailedCreation"
     title="Create Edge Application"
+    disableToast
   >
     <template #formFields>
       <FormFieldsCreateEdgeApplications
         :handleBlock="handleBlocks"
+        isDrawer
         data-testid="create-edge-application-form-fields"
       />
     </template>

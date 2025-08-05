@@ -1,7 +1,7 @@
 <template>
   <vue-monaco-editor
     v-model:value="code"
-    :language="language"
+    :language="runtime"
     :theme="theme"
     class="!w-[99%] h-full surface-border border-r"
     :class="{
@@ -28,7 +28,7 @@
     readOnly: {
       type: Boolean
     },
-    language: {
+    runtime: {
       type: String,
       default: 'javascript',
       validator: (value) => {

@@ -8,12 +8,13 @@
     </template>
     <template #content>
       <CreateFormBlock
-        @on-response="handleTrackCreation"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :createService="edgeAppService.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
         data-testid="create-edge-application-form-block"
+        disableToast
       >
         <template #form>
           <FormFieldsCreateEdgeApplications
@@ -57,10 +58,35 @@
   })
 
   const initialValues = ref({
-    name: ''
+    name: '',
+    applicationAcceleratorEnabled: false,
+    edgeCacheEnabled: true,
+    edgeFunctionsEnabled: true,
+    imageProcessorEnabled: false,
+    tieredCacheEnabled: false,
+    isActive: true
   })
 
   const handleBlocks = ['general']
+
+  const handleResponse = (response) => {
+    handleTrackCreation()
+    handleToast(response)
+  }
+
+  const handleToast = ({ data, showToastWithActions, redirectToUrl }) => {
+    const toast = {
+      feedback: 'Your edge application has been created',
+      actions: {
+        link: {
+          label: 'View Edge Application',
+          callback: () => redirectToUrl(`/edge-applications/edit/${data.id}`)
+        }
+      }
+    }
+
+    showToastWithActions(toast)
+  }
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({

@@ -62,7 +62,10 @@
       await vcsService.postCallbackUrl(callbackUrl.value, integration.data)
       await loadListIntegrations()
     } catch (error) {
-      error.showWithOptions(toast, { summary: 'Save failed' })
+      error.showWithOptions(toast, (error) => ({
+        summary: `Save failed ${error.detail}`,
+        severity: 'error'
+      }))
     } finally {
       isGithubConnectLoading.value = false
     }

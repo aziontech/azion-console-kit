@@ -4,8 +4,17 @@
       <PageHeadingBlock pageTitle="Invoice Details" />
     </template>
     <template #content>
+      <div class="mb-4">
+        <slot
+          name="notification"
+          :redirectLink="redirectPayment"
+        />
+      </div>
       <div class="w-full flex flex-col-reverse sm:flex-row gap-6">
-        <TableServicesProducts :listProduct="listServiceProducts" />
+        <TableServicesProducts
+          :listProduct="listServiceProducts"
+          :isLoading="isServiceProductsLoading"
+        />
         <div class="w-full sm:w-1/2 flex flex-col h-max border surface-border rounded-md">
           <div class="p-3 md:p-6 flex flex-col gap-4">
             <div class="flex justify-between">
@@ -154,7 +163,7 @@
 
 <script setup>
   import { onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -166,6 +175,24 @@
   import TableServicesProducts from './components/table-services-products'
   import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'
   import { windowOpen } from '@/helpers/window-open'
+
+  const DEFAULT_PRODUCTS_LIST = [
+    {
+      region: 'Global',
+      service: 'No services found',
+      value: '0.00',
+      descriptions: [
+        {
+          service: 'Details',
+          data: [
+            {
+              country: 'No usage data available'
+            }
+          ]
+        }
+      ]
+    }
+  ]
 
   const props = defineProps({
     loadInvoiceDataService: {
@@ -180,6 +207,10 @@
       type: Function,
       required: true
     },
+    loadCurrentInvoiceService: {
+      type: Function,
+      required: true
+    },
     clipboardWrite: {
       type: Function,
       required: true
@@ -187,6 +218,7 @@
   })
 
   const route = useRoute()
+  const router = useRouter()
   const toast = useToast()
   const accountStore = useAccountStore()
 
@@ -197,6 +229,7 @@
   const isInvoiceDataLoaded = ref(true)
   const isCardDefaultLoaded = ref(true)
   const listServiceProducts = ref([])
+  const isServiceProductsLoading = ref(true)
 
   onMounted(() => {
     listServiceAndProductsChanges()
@@ -216,12 +249,17 @@
   }
 
   const listServiceAndProductsChanges = async () => {
+    isServiceProductsLoading.value = true
     try {
-      listServiceProducts.value = accountIsNotRegular.value
+      const products = accountIsNotRegular.value
         ? await props.listServiceAndProductsChangesService(route.params.billId)
         : await listServiceAndProductsChangesAccountingService(route.params.billId)
-    } catch {
-      listServiceProducts.value = []
+
+      listServiceProducts.value = products?.length ? products : DEFAULT_PRODUCTS_LIST
+    } catch (error) {
+      listServiceProducts.value = DEFAULT_PRODUCTS_LIST
+    } finally {
+      isServiceProductsLoading.value = false
     }
   }
 
@@ -241,11 +279,23 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Successfully copied!'
+      summary: 'Success',
+      detail: 'Successfully copied!'
     })
   }
 
   const invoiceDownload = () => {
     windowOpen(invoiceData.value.invoiceDownloadURL, '_blank')
+  }
+
+  const redirectPayment = () => {
+    const routerPayment = {
+      name: 'billing-tabs',
+      params: {
+        tab: 'payment'
+      }
+    }
+
+    router.push(routerPayment)
   }
 </script>

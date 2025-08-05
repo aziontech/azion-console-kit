@@ -14,15 +14,31 @@ export class DigitalCertificatesService {
       body
     })
 
-    const {
-      data: { id }
-    } = data
+    return data
+  }
 
-    return {
-      feedback: 'Your digital certificate has been created!',
-      urlToEditView: `/digital-certificates/edit/${id}`,
-      domainId: id
+  createDigitalCertificateLetEncrypt = async (payload, sourceCertificate) => {
+    const body = this.adapter?.transformCreateDigitalCertificateLetEncrypt?.(
+      payload,
+      sourceCertificate
+    )
+
+    const { data: response } = await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/request`,
+      body,
+      processError: false
+    })
+
+    if (response?.meta?.certificate) {
+      return { id: response.meta.certificate }
     }
+
+    if (response?.meta) {
+      throw response.error()
+    }
+
+    return response.data
   }
 
   editDigitalCertificate = async (payload) => {
@@ -55,12 +71,24 @@ export class DigitalCertificatesService {
   }
 
   listDigitalCertificatesDropdown = async (params) => {
-    const data = await this.listDigitalCertificates(params)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params: {
+        search: '',
+        fields: '',
+        ordering: 'name',
+        page: 1,
+        pageSize: 10,
+        ...params
+      }
+    })
+
     return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'csr', 'managed']
+    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate']
 
     const { data } = await this.http.request({
       method: 'GET',
@@ -73,7 +101,7 @@ export class DigitalCertificatesService {
     return this.adapter?.transformLoadDigitalCertificate?.(data)
   }
 
-  deleteDigitalCertificate = async ({ id }) => {
+  deleteDigitalCertificate = async (id) => {
     await this.http.request({
       method: 'DELETE',
       url: `${this.baseURL}/${id}`

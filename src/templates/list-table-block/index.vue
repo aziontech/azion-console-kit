@@ -28,6 +28,8 @@
       :exportFunction="exportFunctionMapper"
       :loading="isLoading"
       data-testid="data-table"
+      :first="firstItemIndex"
+      :rowClass="stateClass"
     >
       <template
         #header
@@ -70,7 +72,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
-                :disabled="disabledList"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :data-testid="`create_${addButtonLabel}_button`"
@@ -112,6 +114,7 @@
               :data-testid="`list-table-block__column__${col.field}__row`"
             />
           </template>
+
           <template v-else>
             <component
               :is="col.component(extractFieldValue(rowData, col.field))"
@@ -120,7 +123,6 @@
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -178,6 +180,7 @@
               size="small"
               outlined
               v-bind="optionsOneAction(rowData)"
+              v-tooltip.top="getTooltipConfig(rowData)"
               @click="executeCommand(rowData)"
               class="cursor-pointer table-button"
               data-testid="data-table-actions-column-body-action-button"
@@ -265,7 +268,7 @@
             >
               <PrimeButton
                 class="max-sm:w-full"
-                :disabled="disabledList"
+                :disabled="disabledAddButton"
                 @click="navigateToAddPage"
                 icon="pi pi-plus"
                 :label="addButtonLabel"
@@ -303,7 +306,7 @@
   import Skeleton from 'primevue/skeleton'
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import DeleteDialog from './dialog/delete-dialog.vue'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { getCsvCellContentFromRowData } from '@/helpers'
@@ -321,6 +324,9 @@
 
   const props = defineProps({
     disabledList: {
+      type: Boolean
+    },
+    disabledAddButton: {
       type: Boolean
     },
     hiddenHeader: {
@@ -411,7 +417,7 @@
       default: () => ({})
     }
   })
-
+  const firstItemIndex = ref(0)
   const tableDefinitions = useTableDefinitionsStore()
 
   const minimumOfItemsPerPage = ref(tableDefinitions.getNumberOfLinesPerPage)
@@ -429,6 +435,7 @@
   const menuRef = ref({})
   const hasExportToCsvMapper = ref(!!props.csvMapper)
 
+  const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
@@ -448,6 +455,12 @@
     }
     selectedColumns.value = props.columns
   })
+
+  const stateClass = (data) => {
+    if (data?.focus) {
+      return 'transition-colors duration-1000 animate-highlight-fade'
+    }
+  }
 
   const formatSummaryToCSV = (summary) => {
     const summaryValue = summary
@@ -515,20 +528,16 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
-              {
-                const bodyDelete = {
-                  data: {
-                    title: action.title,
-                    selectedID: rowData.id,
-                    selectedItemData: rowData,
-                    deleteDialogVisible: true,
-                    deleteService: action.service,
-                    rerender: Math.random()
-                  },
-                  onClose: (opt) => opt.data.updated && reload()
+              openDeleteDialog({
+                title: action.title,
+                id: rowData.id,
+                data: rowData,
+                deleteService: action.service,
+                deleteConfirmationText: undefined,
+                closeCallback: (opt) => {
+                  opt.data.updated && reload()
                 }
-                openDialog(DeleteDialog, bodyDelete)
-              }
+              })
               break
             case 'action':
               action.commandAction(rowData)
@@ -554,13 +563,17 @@
           : await props.listService({ page, ...query })
         data.value = response
       } catch (error) {
-        const errorMessage = error.message || error
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'error',
-          detail: errorMessage
-        })
+        if (error && typeof error.showErrors === 'function') {
+          error.showErrors(toast)
+        } else {
+          const errorMessage = error.message || error
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: 'error',
+            detail: errorMessage
+          })
+        }
       } finally {
         isLoading.value = false
       }
@@ -598,18 +611,40 @@
   }
 
   const optionsOneAction = (rowData) => {
-    const [firstAction] = actionOptions(rowData)
-    return {
-      icon: firstAction?.icon,
-      disabled: firstAction?.disabled
+    const [firstAction] = actionOptions(rowData) || []
+
+    if (!firstAction) {
+      return {
+        icon: '',
+        tooltip: '',
+        disabled: true
+      }
     }
+
+    const { icon, tooltip, disabled } = firstAction
+
+    return {
+      icon,
+      tooltip,
+      disabled
+    }
+  }
+
+  const getTooltipConfig = (rowData) => {
+    const actionOptions = optionsOneAction(rowData)
+    return actionOptions.tooltip ? { value: actionOptions.tooltip, showDelay: 200 } : null
   }
 
   const reload = (query = {}) => {
     loadData({ page: 1, ...query })
   }
 
-  defineExpose({ reload, handleExportTableDataToCSV, data })
+  const updateDataTablePagination = () => {
+    const FIRST_NUMBER_PAGE = 0
+    firstItemIndex.value = FIRST_NUMBER_PAGE
+  }
+
+  defineExpose({ reload, handleExportTableDataToCSV, data, updateDataTablePagination })
 
   const extractFieldValue = (rowData, field) => {
     return rowData[field]
@@ -627,6 +662,7 @@
     const numberOfLinesPerPage = event.rows
     tableDefinitions.setNumberOfLinesPerPage(numberOfLinesPerPage)
     minimumOfItemsPerPage.value = numberOfLinesPerPage
+    firstItemIndex.value = event.first
   }
 
   const filterBy = computed(() => {

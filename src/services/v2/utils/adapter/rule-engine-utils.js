@@ -18,39 +18,46 @@ export const parseCriteria = (criteria) => {
 export const parseBehaviors = (behaviors) => {
   const parsedBehaviors = behaviors.map((behavior) => {
     switch (behavior.name) {
+      case 'tag_event':
+        return {
+          type: behavior.name,
+          attributes: {
+            value: behavior.tag_event
+          }
+        }
       case 'run_function':
         return {
-          name: behavior.name,
-          argument: behavior.functionId
+          type: behavior.name,
+          attributes: { value: behavior.functionId }
         }
-      case 'set_waf_ruleset':
+      case 'set_waf':
         return {
-          name: behavior.name,
-          argument: {
-            mode: behavior.mode,
-            id: behavior.id
+          type: behavior.name,
+          attributes: {
+            waf_id: Number(behavior.id),
+            mode: behavior.mode
           }
         }
       case 'set_rate_limit':
         const typeToEnableBurstSize = 'second'
-        const argument = {
+        const attributes = {
           type: behavior.type,
           limit_by: behavior.limit_by,
           average_rate_limit: Number(behavior.average_rate_limit)
         }
 
         if (behavior.type === typeToEnableBurstSize) {
-          argument.maximum_burst_size = Number(behavior.maximum_burst_size)
+          attributes.maximum_burst_size = Number(behavior.maximum_burst_size)
         }
 
         return {
-          name: behavior.name,
-          argument
+          type: behavior.name,
+          attributes
         }
       case 'set_custom_response':
         return {
-          name: behavior.name,
-          argument: {
+          type: behavior.name,
+          attributes: {
             status_code: behavior.status_code,
             content_type: behavior.content_type,
             content_body: behavior.content_body
@@ -58,7 +65,7 @@ export const parseBehaviors = (behaviors) => {
         }
       default:
         return {
-          name: behavior.name
+          type: behavior.name
         }
     }
   })
@@ -96,37 +103,43 @@ export const parseCriteriaLoad = (criteria) => {
  */
 export const parseBehaviorsLoad = (behaviors) => {
   const parsedBehaviors = behaviors.map((behavior) => {
-    switch (behavior.name) {
+    switch (behavior.type) {
       case 'run_function':
         return {
-          name: behavior.name,
-          functionId: parseInt(behavior.argument)
+          name: behavior.type,
+          functionId: parseInt(behavior.attributes.value)
         }
 
-      case 'set_waf_ruleset':
+      case 'tag_event':
         return {
-          name: behavior.name,
-          mode: behavior.argument.mode,
-          id: Number(behavior.argument.id)
+          name: behavior.type,
+          tag_event: behavior.attributes.value
+        }
+
+      case 'set_waf':
+        return {
+          name: behavior.type,
+          mode: behavior.attributes.mode,
+          id: Number(behavior.attributes.waf_id)
         }
       case 'set_rate_limit':
         return {
-          name: behavior.name,
-          type: behavior.argument.type,
-          limit_by: behavior.argument.limit_by,
-          average_rate_limit: behavior.argument.average_rate_limit,
-          maximum_burst_size: behavior.argument.maximum_burst_size
+          name: behavior.type,
+          type: behavior.attributes.type,
+          limit_by: behavior.attributes.limit_by,
+          average_rate_limit: behavior.attributes.average_rate_limit,
+          maximum_burst_size: behavior.attributes.maximum_burst_size
         }
       case 'set_custom_response':
         return {
-          name: behavior.name,
-          status_code: behavior.argument.status_code,
-          content_type: behavior.argument.content_type,
-          content_body: behavior.argument.content_body
+          name: behavior.type,
+          status_code: behavior.attributes.status_code,
+          content_type: behavior.attributes.content_type,
+          content_body: behavior.attributes.content_body
         }
       default:
         return {
-          name: behavior.name
+          name: behavior.type
         }
     }
   })

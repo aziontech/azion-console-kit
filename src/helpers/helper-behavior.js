@@ -7,42 +7,79 @@ const MAP_BEHAVIOR = {
 
 const adaptBehavior = (behaviors) => {
   return behaviors.map((behavior) => {
-    let behaviorTargetValue = { argument: behavior[MAP_BEHAVIOR[behavior.name] || 'target'] }
     if (behavior.name === 'capture_match_groups') {
-      behaviorTargetValue = {
-        argument: {
-          captured_array: behavior.captured_array,
+      return {
+        type: behavior.name,
+        attributes: {
           subject: behavior.subject,
-          regex: behavior.regex
+          regex: behavior.regex,
+          captured_array: behavior.captured_array_name || behavior.captured_array
         }
       }
     }
 
+    const behaviorInt = ['run_function', 'set_edge_connector', 'set_cache_policy', 'set_origin']
+    if (behaviorInt.includes(behavior.name)) {
+      return {
+        type: behavior.name,
+        attributes: {
+          value: parseInt(behavior[MAP_BEHAVIOR[behavior.name]])
+        }
+      }
+    }
+
+    const behaviorString = [
+      'redirect_to_301',
+      'redirect_to_302',
+      'set_header',
+      'set_cookie',
+      'rewrite_request',
+      'filter_request_header',
+      'filter_request_cookie',
+      'add_request_header',
+      'add_request_cookie',
+      'filter_response_header',
+      'filter_response_cookie',
+      'add_response_header',
+      'add_response_cookie'
+    ]
+    if (behaviorString.includes(behavior.name)) {
+      return {
+        type: behavior.name,
+        attributes: {
+          value: behavior[MAP_BEHAVIOR[behavior.name] || 'target']
+        }
+      }
+    }
+
+    // BehaviorNoArg (deny, deliver, no-content, etc)
     return {
-      name: behavior.name,
-      ...behaviorTargetValue
+      type: behavior.name
     }
   })
 }
 
 const parsedBehavior = (behaviors) => {
   return behaviors.map((behavior) => {
-    let behaviorItem = { [MAP_BEHAVIOR[behavior.name] || 'target']: behavior.argument }
-    if (behavior.name === 'capture_match_groups') {
-      behaviorItem = { ...behavior.argument }
+    let behaviorItem = { [MAP_BEHAVIOR[behavior.type] || 'target']: behavior.attributes?.value }
+    if (behavior.type === 'capture_match_groups') {
+      behaviorItem = { ...behavior.attributes }
     }
-    if (behavior.name === 'set_cache_policy' && typeof behavior.argument === 'number') {
-      behaviorItem = { cacheId: behavior.argument.toString() }
+    if (behavior.type === 'set_cache_policy' && typeof behavior.attributes?.value === 'number') {
+      behaviorItem = { cacheId: behavior.attributes.value.toString() }
     }
-    if (behavior.name === 'set_origin' && typeof behavior.argument === 'number') {
-      behaviorItem = { originId: behavior.argument.toString() }
+    if (behavior.type === 'set_origin' && typeof behavior.attributes?.value === 'number') {
+      behaviorItem = { originId: behavior.attributes.value.toString() }
     }
-    if (behavior.name === 'set_edge_connector' && typeof behavior.argument === 'number') {
-      behaviorItem = { edgeConnectorId: parseInt(behavior.argument) }
+    if (behavior.type === 'set_edge_connector' && typeof behavior.attributes?.value === 'number') {
+      behaviorItem = { edgeConnectorId: parseInt(behavior.attributes.value) }
+    }
+    if (behavior.type === 'run_function') {
+      behaviorItem = { functionId: parseInt(behavior.attributes?.value) }
     }
 
     return {
-      name: behavior.name,
+      name: behavior.type,
       ...behaviorItem
     }
   })

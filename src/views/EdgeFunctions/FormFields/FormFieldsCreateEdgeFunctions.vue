@@ -63,16 +63,16 @@
     return previewValues
   })
 
-  const initiatorTypeOptions = [
+  const executionEnvironmentOptions = [
     {
       title: 'Edge Application',
       subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
-      inputValue: 'edge_application'
+      inputValue: 'application'
     },
     {
       title: 'Edge Firewall',
       subtitle: 'Functions are executed by a firewall to apply security policies.',
-      inputValue: 'edge_firewall'
+      inputValue: 'firewall'
     }
   ]
 </script>
@@ -102,19 +102,19 @@
 
       <FormHorizontal
         class="mt-8"
-        title="Language"
+        title="Runtime"
         :isDrawer="isDrawer"
-        description="The language the edge function is written in."
+        description="The execution runtime used to run your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
             <FieldTextIcon
-              label="Language"
+              label="Runtime"
               name="LANGUAGE_LABEL"
               icon="pi pi-lock"
+              disabled
               :value="LANGUAGE_LABEL"
               description="Currently, only JavaScript is supported."
-              readonly
             />
           </div>
         </template>
@@ -123,16 +123,16 @@
       <FormHorizontal
         v-if="!isDrawer"
         class="mt-8"
-        title="Initiator Type"
-        description="Define the source or trigger that executes the edge function."
+        title="Execution Environment"
+        description="Specify the execution environment for your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
             <FieldGroupRadio
               required
-              nameField="initiatorType"
+              nameField="executionEnvironment"
               isCard
-              :options="initiatorTypeOptions"
+              :options="executionEnvironmentOptions"
             />
           </div>
         </template>
@@ -171,7 +171,7 @@
           <CodeEditor
             v-model="code"
             :initialValue="HelloWorldSample"
-            language="javascript"
+            runtime="javascript"
             :errors="hasCodeError"
           />
           <small
@@ -194,7 +194,7 @@
         <CodeEditor
           v-model="code"
           :initialValue="HelloWorldSample"
-          language="javascript"
+          runtime="javascript"
           :errors="hasCodeError"
         />
         <small
@@ -218,7 +218,7 @@
           <CodeEditor
             v-model="defaultArgs"
             :initialValue="ARGS_INITIAL_STATE"
-            language="json"
+            runtime="json"
             :errors="hasArgsError"
           />
         </SplitterPanel>
@@ -234,7 +234,7 @@
         <CodeEditor
           v-model="defaultArgs"
           :initialValue="ARGS_INITIAL_STATE"
-          language="json"
+          runtime="json"
           :errors="hasArgsError"
         />
       </div>

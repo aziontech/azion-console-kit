@@ -20,7 +20,7 @@ const transformMap = {
   id: (value) => value.id.toString(),
   edgeFunction: (value) => value.edge_function,
   name: (value) => parseName(value),
-  jsonArgs: (value) => JSON.stringify(value.json_args, null, '\t'),
+  jsonArgs: (value) => JSON.stringify(value.args, null, '\t'),
   lastEditor: (value) => value.last_editor,
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified)
 }
@@ -30,13 +30,20 @@ export const EdgeApplicationFunctionsAdapter = {
     return adaptServiceDataResponse(data, fields, transformMap)
   },
 
+  transformListFunctionsDropdown(data) {
+    return data.map((item) => ({
+      name: item.name,
+      id: item.id
+    }))
+  },
+
   transformLoadEdgeApplicationFunction(functionData) {
     const { data } = functionData
     return {
       id: data.id,
       edgeFunctionID: data.edge_function,
       name: data.name,
-      args: JSON.stringify(data.json_args, null, '\t')
+      args: JSON.stringify(data.args, null, '\t')
     }
   },
 
@@ -44,7 +51,7 @@ export const EdgeApplicationFunctionsAdapter = {
     return {
       name: payload.name,
       edge_function: payload.edgeFunctionID,
-      json_args: JSON.parse(payload.args),
+      args: JSON.parse(payload.args),
       active: true
     }
   },
@@ -53,7 +60,7 @@ export const EdgeApplicationFunctionsAdapter = {
     return {
       name: payload.name,
       edge_function: payload.edgeFunctionID,
-      json_args: JSON.parse(payload.args)
+      args: JSON.parse(payload.args)
     }
   }
 }

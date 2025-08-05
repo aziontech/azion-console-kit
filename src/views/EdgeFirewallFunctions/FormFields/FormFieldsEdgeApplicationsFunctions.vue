@@ -16,20 +16,20 @@
     drawerRef.value.openCreateDrawer()
   }
 
-  const handleDrawerSuccess = (response) => {
-    edgeFunctionID.value = response.functionId
+  const handleDrawerSuccess = (functionId) => {
+    edgeFunctionID.value = functionId
   }
 
   const changeArgs = async (target) => {
-    if (target?.jsonArgs) {
-      args.value = target.jsonArgs
+    if (target?.defaultArgs) {
+      args.value = target.defaultArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
-      initiatorType: 'edge_firewall',
-      fields: ['id', 'name', 'json_args', 'initiator_type'],
+      executionEnvironment: 'firewall',
+      fields: ['id', 'name', 'default_args', 'execution_environment'],
       ...queryParams
     })
   }
@@ -37,7 +37,7 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'json_args']
+      fields: ['id', 'name', 'default_args']
     })
   }
 
@@ -96,11 +96,11 @@
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionServiceDecorator"
           :value="edgeFunctionID"
-          :moreOptions="['jsonArgs']"
+          :moreOptions="['defaultArgs']"
           disableEmitFirstRender
           @onSelectOption="changeArgs"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="id"
           appendTo="self"
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
         >
@@ -134,7 +134,7 @@
         >
         <CodeEditor
           v-model="args"
-          language="json"
+          runtime="json"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
           :errors="hasArgsError"
           :minimap="false"

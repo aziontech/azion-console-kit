@@ -71,7 +71,7 @@
     'id',
     'name',
     'edge_function',
-    'json_args',
+    'args',
     'last_modified',
     'last_editor'
   ]
@@ -92,6 +92,12 @@
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name',

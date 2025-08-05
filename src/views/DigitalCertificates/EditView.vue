@@ -5,8 +5,8 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="digitalCertificatesService.editDigitalCertificate"
-        :loadService="digitalCertificatesService.loadDigitalCertificate"
+        :editService="editServiceRender"
+        :loadService="loadServiceRender"
         :schema="validationSchema"
         updatedRedirect="list-digital-certificates"
         @on-edit-success="handleTrackSuccessEdit"
@@ -38,9 +38,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEditDigitalCertificates from './FormFields/FormFieldsEditDigitalCertificates.vue'
   import * as yup from 'yup'
-  import { inject } from 'vue'
+  import { inject, computed } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { digitalCertificatesService } from '@/services/v2'
+  import { digitalCertificatesService, digitalCertificatesCRLService } from '@/services/v2'
+  import { useDigitalCertificate } from './FormFields/composables/certificate'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -56,12 +57,14 @@
     }
   })
 
+  const { certificateTypeList } = useDigitalCertificate()
+
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field.'),
     type: yup.string(),
     csr: yup.string(),
-    certificate: yup.string(),
-    privateKey: yup.string(),
+    certificate: yup.string().nullable(),
+    privateKey: yup.string().nullable(),
     managed: yup
       .boolean()
       .isFalse(
@@ -88,4 +91,16 @@
       })
       .track()
   }
+
+  const editServiceRender = computed(() => {
+    return certificateTypeList.value === 'Certificates'
+      ? digitalCertificatesService.editDigitalCertificate
+      : digitalCertificatesCRLService.editDigitalCertificateCRL
+  })
+
+  const loadServiceRender = computed(() => {
+    return certificateTypeList.value === 'Certificates'
+      ? digitalCertificatesService.loadDigitalCertificate
+      : digitalCertificatesCRLService.loadDigitalCertificateCRL
+  })
 </script>

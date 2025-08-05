@@ -40,12 +40,16 @@
     try {
       return await wafService.loadWafRule({ id: wafRuleId.value })
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Processing failed',
-        detail: error
-      })
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Processing failed',
+          detail: error.message || error
+        })
+      }
     }
   }
 
@@ -166,7 +170,6 @@
           <ListWafRulesAllowed
             v-if="activeTab === mapTabs.allowed"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
-            :optionsRuleIds="props.wafRulesAllowed.optionsRuleIds"
             @handle-go-to-tuning="changeRouteByClickingOnTab"
           />
         </TabPanel>

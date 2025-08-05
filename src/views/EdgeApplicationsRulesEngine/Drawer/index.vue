@@ -1,8 +1,7 @@
 <script setup>
-  import { ref, inject, onMounted } from 'vue'
+  import { ref, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
@@ -49,6 +48,11 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    currentPhase: {
+      type: String,
+      required: false,
+      default: 'request'
     }
   })
 
@@ -64,15 +68,15 @@
   )
   const loadEditRulesEngineDrawer = refDebounced(showEditRulesEngineDrawer, debouncedDrawerAnimate)
   const selectedRulesEngineToEdit = ref({})
-  const functionsInstanceOptions = ref([])
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
+  const initialPhase = ref(props.currentPhase)
 
   const initialValues = ref({
     id: props.edgeApplicationId,
     name: '',
     description: '',
-    phase: 'request',
+    phase: initialPhase.value,
     criteria: [
       [
         {
@@ -119,7 +123,20 @@
     ),
     behaviors: yup.array().of(
       yup.object().shape({
-        name: yup.string().required().label('behavior')
+        name: yup.string().required().label('behavior'),
+        captured_array: yup.string().when('name', {
+          is: (name) => name === 'capture_match_groups',
+          then: (schema) =>
+            schema
+              .matches(
+                /^[a-zA-Z][a-zA-Z_ ]{0,9}$/,
+                'Captured array name must start with a letter and contain only letters or underscores (maximum 10 characters).'
+              )
+              .min(1, 'Captured array name must have at least 1 character.')
+              .max(10, 'Captured array name must have at most 10 characters.')
+              .required(),
+          otherwise: (schema) => schema.notRequired()
+        })
       })
     )
   })
@@ -136,41 +153,14 @@
   }
 
   const editService = async (payload) => {
+    const payloadEdit = { phase: props.currentPhase, ...payload }
     return await rulesEngineService.editRulesEngine({
-      payload,
+      payload: payloadEdit,
       edgeApplicationId: props.edgeApplicationId
     })
   }
 
   const loadingOrigins = ref(false)
-  const loadingFunctionsInstance = ref(false)
-
-  const listFunctionsInstanceOptions = async () => {
-    if (!props.isEdgeFunctionEnabled) return
-
-    try {
-      loadingFunctionsInstance.value = true
-      const params = { fields: ['id', 'name'] }
-      const responseFunctions = await edgeApplicationFunctionService.listFunctions(
-        props.edgeApplicationId,
-        params
-      )
-      functionsInstanceOptions.value = responseFunctions.map((el) => {
-        return {
-          id: el.id,
-          name: el.name.text
-        }
-      })
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      loadingFunctionsInstance.value = false
-    }
-  }
 
   const listCacheSettingsOptions = async () => {
     isLoadingRequests.value = true
@@ -206,11 +196,11 @@
   const loadService = async () => {
     return await rulesEngineService.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
-      edgeApplicationId: props.edgeApplicationId
+      edgeApplicationId: props.edgeApplicationId,
+      phase: initialPhase.value
     })
   }
 
-  const initialPhase = ref('request')
   const openDrawerCreate = (selectedPhase = 'request') => {
     initialValues.value.phase = selectedPhase
     initialPhase.value = selectedPhase
@@ -299,10 +289,6 @@
     await listOriginsOptions()
   }
 
-  const handleRefreshFunctions = async () => {
-    await listFunctionsInstanceOptions()
-  }
-
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -310,12 +296,15 @@
   })
 
   onMounted(async () => {
-    await Promise.all([
-      listFunctionsInstanceOptions(),
-      listCacheSettingsOptions(),
-      listOriginsOptions()
-    ])
+    await Promise.all([listCacheSettingsOptions(), listOriginsOptions()])
   })
+
+  watch(
+    () => props.currentPhase,
+    (newPhase) => {
+      initialPhase.value = newPhase
+    }
+  )
 </script>
 
 <template>
@@ -336,18 +325,15 @@
       <FormFieldsDrawerRulesEngine
         :isLoadingRequests="isLoadingRequests"
         :loadingOrigins="loadingOrigins"
-        :loadingFunctionsInstance="loadingFunctionsInstance"
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :clipboardWrite="clipboardWrite"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
         @refreshOrigins="handleRefreshOrigins"
-        @refreshFunctions="handleRefreshFunctions"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -356,6 +342,7 @@
       />
     </template>
   </CreateDrawerBlock>
+
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
     :isOverlapped="isOverlapped"
@@ -376,12 +363,11 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isLoadingRequests="isLoadingRequests"
         :loadingOrigins="loadingOrigins"
-        :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
-        @refreshFunctions="handleRefreshFunctions"
+        @refreshOrigins="handleRefreshOrigins"
+        @refreshCacheSettings="handleRefreshCacheSettings"
         :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"

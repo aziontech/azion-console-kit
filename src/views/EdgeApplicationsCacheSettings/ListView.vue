@@ -31,7 +31,9 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
-  const CACHE_SETTING_API_FIELDS = ['id', 'name', 'browser_cache', 'edge_cache']
+
+  //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
+  const CACHE_SETTING_API_FIELDS = []
 
   const listCacheSettingsServiceWithDecorator = async (query) => {
     return await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
@@ -76,6 +78,12 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Origin Name'
       },
@@ -110,6 +118,7 @@
 <template>
   <Drawer
     ref="drawerRef"
+    :isOverlapped="true"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
     :createService="cacheSettingsService.createCacheSettingsService"

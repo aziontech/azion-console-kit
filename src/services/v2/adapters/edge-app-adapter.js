@@ -1,4 +1,6 @@
 import { formatExhibitionDate } from '@/helpers/convert-date'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
 const LOCKED_VALUE = 'custom'
 
@@ -17,51 +19,58 @@ const parseName = (edgeApplication) => {
   return nameProps
 }
 
+const transformMap = {
+  id: (value) => value.id,
+  active: (value) => parseStatusData(value.active),
+  name: (value) => parseName(value),
+  lastEditor: (value) => value.last_editor,
+  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModified: (value) => value.last_modified,
+  disableEditClick: (value) => value.product_version === LOCKED_VALUE,
+  isLocked: (value) => value.product_version === LOCKED_VALUE
+}
+
 export const EdgeAppAdapter = {
-  transformListEdgeApp(data, isDropdown) {
-    return (
-      data?.map((edgeApplication) => {
-        return {
-          id: edgeApplication.id,
-          name: isDropdown ? edgeApplication.name : parseName(edgeApplication),
-          disableEditClick: edgeApplication.product_version === LOCKED_VALUE,
-          lastEditor: edgeApplication.last_editor,
-          lastModify: formatExhibitionDate(edgeApplication.last_modified, 'full'),
-          lastModified: edgeApplication.last_modified,
-          active: edgeApplication.active,
-          isLocked: edgeApplication.product_version === LOCKED_VALUE
-        }
-      }) || []
-    )
+  transformListEdgeApp(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
+  transformListDropdownEdgeApp(data) {
+    return data.map((edgeApplication) => ({
+      id: edgeApplication.id,
+      name: edgeApplication.name
+    }))
+  },
+
   transformLoadEdgeApp({ data }) {
     return {
       id: data?.id,
       name: data?.name,
-      edgeCacheEnabled: data?.modules?.edge_cache_enabled,
-      edgeFunctionsEnabled: data?.modules?.edge_functions_enabled,
-      applicationAcceleratorEnabled: data?.modules?.application_accelerator_enabled,
-      imageProcessorEnabled: data?.modules?.image_processor_enabled,
-      tieredCacheEnabled: data?.modules?.tiered_cache_enabled,
+      edgeCacheEnabled: data?.modules?.edge_cache.enabled,
+      edgeFunctionsEnabled: data?.modules?.edge_functions.enabled,
+      applicationAcceleratorEnabled: data?.modules?.application_accelerator.enabled,
+      imageProcessorEnabled: data?.modules?.image_processor.enabled,
+      tieredCacheEnabled: data?.modules?.tiered_cache.enabled,
       isActive: data?.active,
       debug: data?.debug,
       productVersion: data?.product_version
     }
   },
-  transformPayloadEdit(payload) {
+
+  transformPayload(payload) {
     return {
       name: payload.name,
       modules: {
-        edge_cache_enabled: payload.edgeCacheEnabled,
-        edge_functions_enabled: payload.edgeFunctionsEnabled,
-        application_accelerator_enabled: payload.applicationAcceleratorEnabled,
-        image_processor_enabled: payload.imageProcessorEnabled,
-        tiered_cache_enabled: payload.tieredCacheEnabled
+        edge_cache: { enabled: payload.edgeCacheEnabled },
+        edge_functions: { enabled: payload.edgeFunctionsEnabled },
+        application_accelerator: { enabled: payload.applicationAcceleratorEnabled },
+        image_processor: { enabled: payload.imageProcessorEnabled },
+        tiered_cache: { enabled: payload.tieredCacheEnabled }
       },
       active: payload.isActive,
       debug: payload.debug
     }
   },
+
   transformPayloadClone(payload) {
     return {
       id: payload.id,

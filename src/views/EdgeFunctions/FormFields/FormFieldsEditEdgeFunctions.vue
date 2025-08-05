@@ -1,7 +1,7 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -13,8 +13,8 @@
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
-  defineProps(['previewData', 'lang'])
-  const emit = defineEmits(['update:previewData', 'update:lang', 'update:name'])
+  defineProps(['previewData', 'run'])
+  const emit = defineEmits(['update:previewData', 'update:run', 'update:name'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -24,38 +24,32 @@
   const ARGS_INITIAL_STATE = '{}'
 
   const previewState = ref(true)
-  const showPreview = computed(() => {
-    return previewState.value && language.value !== 'lua'
-  })
 
   const { value: name } = useField('name')
 
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs')
   const { value: code, errorMessage: codeError } = useField('code')
-  const { value: language } = useField('language')
+  const { value: runtime } = useField('runtime')
+  const { value: runtimeFormat } = useField('runtimeFormat')
+
+  const showPreview = computed(() => {
+    return previewState.value && runtime.value !== 'azion_lua'
+  })
 
   let initialCodeValue = ''
   let initialJsonArgsValue = ARGS_INITIAL_STATE
+
   const unwatch = watch(name, () => {
     initialCodeValue = code.value
     initialJsonArgsValue = defaultArgs.value
 
     emit('update:name', name.value)
+    emit('update:run', runtime.value)
 
     if (initialCodeValue) {
       unwatch()
     }
-  })
-
-  const languageLabel = computed(() => {
-    const languageLabels = {
-      javascript: 'JavaScript',
-      lua: 'Lua'
-    }
-
-    emit('update:lang', language.value)
-    return languageLabels[language.value]
   })
 
   const hasCodeError = computed(() => {
@@ -72,19 +66,20 @@
       args: defaultArgs.value
     }
     emit('update:previewData', previewValues)
+    emit('update:run', runtime.value)
     return previewValues
   })
 
-  const initiatorTypeOptions = [
+  const executionEnvironmentOptions = [
     {
       title: 'Edge Application',
       subtitle: 'Functions are executed at the edge to reduce latency and enhance performance.',
-      inputValue: 'edge_application'
+      inputValue: 'application'
     },
     {
       title: 'Edge Firewall',
       subtitle: 'Functions are executed by a firewall to apply security policies.',
-      inputValue: 'edge_firewall'
+      inputValue: 'firewall'
     }
   ]
 </script>
@@ -113,45 +108,34 @@
 
       <FormHorizontal
         class="mt-8"
-        title="Language"
-        description="The language the edge function is written in."
+        title="Runtime"
+        description="The execution runtime used to run your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
-            <label
-              for="language"
-              class="text-color text-base font-medium"
-              >Language</label
-            >
-            <span class="p-input-icon-right">
-              <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-              <InputText
-                v-model="languageLabel"
-                id="language"
-                type="text"
-                class="w-full text-[var(--text-color-secondary)]"
-                readonly
-              />
-            </span>
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Language isn't an editable field.</small
-            >
+            <FieldTextIcon
+              label="Runtime"
+              name="runtimeFormat.content"
+              icon="pi pi-lock"
+              disabled
+              description="Runtime isn't an editable field."
+            />
           </div>
         </template>
       </FormHorizontal>
 
       <FormHorizontal
         class="mt-8"
-        title="Initiator Type"
-        description="Define the source or trigger that executes the edge function."
+        title="Execution Environment"
+        description="Specify the execution environment for your edge function"
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
             <FieldGroupRadio
               required
-              nameField="initiatorType"
+              nameField="executionEnvironment"
+              :options="executionEnvironmentOptions"
               isCard
-              :options="initiatorTypeOptions"
             />
           </div>
         </template>
@@ -190,7 +174,7 @@
           <CodeEditor
             v-model="code"
             :initialValue="initialCodeValue"
-            :language="language"
+            :runtime="runtimeFormat.format"
             :errors="hasCodeError"
             :readOnly="isProprietaryCode"
           />
@@ -214,7 +198,7 @@
         <CodeEditor
           v-model="code"
           :initialValue="initialCodeValue"
-          :language="language"
+          :runtime="runtimeFormat.format"
           :errors="hasCodeError"
         />
         <small
@@ -238,7 +222,7 @@
           <CodeEditor
             v-model="defaultArgs"
             :initialValue="initialJsonArgsValue"
-            language="json"
+            runtime="json"
             :errors="hasArgsError"
           />
         </SplitterPanel>
@@ -254,7 +238,7 @@
         <CodeEditor
           v-model="defaultArgs"
           :initialValue="initialJsonArgsValue"
-          language="json"
+          runtime="json"
           :errors="hasArgsError"
         />
       </div>

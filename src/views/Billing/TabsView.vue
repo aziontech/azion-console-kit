@@ -6,11 +6,9 @@
   import Tag from 'primevue/tag'
   import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
-  import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod'
   import SkeletonBlock from '@/templates/skeleton-block'
 
-  import { ref, computed, provide, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
 
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
@@ -19,37 +17,32 @@
   const route = useRoute()
   const router = useRouter()
   const accountStore = useAccountStore()
+  const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
 
-  const { paymentReviewPending, accountIsNotRegular } = storeToRefs(accountStore)
+  const { accountIsNotRegular } = storeToRefs(accountStore)
 
   const activeTab = ref(0)
-  const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
-  const listPaymentMethodsRef = ref(null)
-  const viewBillsRef = ref(null)
-  const accountBlocked = paymentReviewPending
 
-  provide('drawersMethods', {
-    openDrawerPaymentMethod: () => {
-      drawerPaymentMethodRef.value.openDrawer()
-    },
-    openDrawerAddCredit: () => {
-      if (cardDefault.value.cardData) drawerAddCreditRef.value.openDrawer()
-    }
-  })
+  const viewBillsRef = ref(null)
+  const paymentListViewRef = ref(null)
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
-    addCreditService: { type: Function, required: true },
-    createPaymentMethodService: { type: Function, required: true },
-    paymentServices: { type: Object, required: true },
-    billsServices: { type: Object, required: true },
-    getStripeClientService: { type: Function, required: true }
+    getStripeClientService: { type: Function, required: true },
+    loadCurrentInvoiceService: { type: Function, required: true },
+    loadInvoiceDataService: { type: Function, required: true },
+    listServiceAndProductsChangesService: { type: Function, required: true },
+    clipboardWrite: { type: Function, required: true },
+    documentPaymentMethodService: { type: Function, required: true },
+    listPaymentHistoryService: { type: Function, required: true },
+    documentPaymentHistoryService: { type: Function, required: true },
+    loadYourServicePlanService: { type: Function, required: true },
+    openPlans: { type: Function, required: true },
+    loadContractServicePlan: { type: Function, required: true },
+    loadInvoiceLastUpdatedService: { type: Function, required: true },
+    cardDefault: { type: Object, required: true }
   })
 
-  const cardDefault = ref({
-    loader: false
-  })
   const invoiceLastUpdated = ref('')
   const loadingLastUpdated = ref(false)
 
@@ -94,44 +87,49 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
-  const loadListPaymentMethods = () => {
-    if (isActiveTab.value.payment) {
-      listPaymentMethodsRef.value?.reloadList()
-    }
-
-    loadCardDefault()
-  }
-
-  const loadCardDefault = async () => {
-    cardDefault.value.isLoader = false
-    try {
-      cardDefault.value = await props.loadPaymentMethodDefaultService()
-    } finally {
-      cardDefault.value = {
-        ...cardDefault.value,
-        loader: true
-      }
-    }
-  }
-
   const loadInvoiceLastUpdated = async () => {
     try {
       loadingLastUpdated.value = true
       invoiceLastUpdated.value = accountIsNotRegular.value
-        ? await props.billsServices.loadInvoiceLastUpdatedService()
+        ? await props.loadInvoiceLastUpdatedService()
         : ''
     } finally {
       loadingLastUpdated.value = false
     }
   }
 
-  const successAddCredit = async () => {
-    await viewBillsRef.value?.reloadList()
+  const callBackDrawer = async () => {
+    if (paymentListViewRef.value) {
+      await paymentListViewRef.value.reloadList()
+    }
+    if (viewBillsRef.value) {
+      await viewBillsRef.value.reloadList()
+    }
   }
+
+  const redirectPaymentMethod = () => {
+    changeTab(TABS_MAP.payment)
+  }
+
+  const propsNotification = () => ({
+    redirectLink: redirectPaymentMethod,
+    linkText: {
+      hidden: isActiveTab.value.payment
+    },
+    buttonCredit: {
+      hidden: isActiveTab.value.payment
+    },
+    buttonPaymentMethod: {
+      hidden: isActiveTab.value.payment
+    }
+  })
+
+  defineExpose({
+    callBackDrawer
+  })
 
   onMounted(() => {
     renderTabCurrentRouter()
-    loadCardDefault()
     loadInvoiceLastUpdated()
   })
 </script>
@@ -158,19 +156,12 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <DrawerAddCredit
-        ref="drawerAddCreditRef"
-        v-if="cardDefault.cardData"
-        :cardDefault="cardDefault"
-        :createService="props.addCreditService"
-        @onSuccess="successAddCredit"
-      />
-      <DrawerPaymentMethod
-        ref="drawerPaymentMethodRef"
-        :createPaymentMethodService="props.createPaymentMethodService"
-        :getStripeClientService="props.getStripeClientService"
-        @onSuccess="loadListPaymentMethods"
-      />
+      <div class="mb-4">
+        <slot
+          name="notification"
+          v-bind="propsNotification()"
+        />
+      </div>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -178,7 +169,6 @@
       >
         <TabPanel
           header="Bills"
-          :disabled="accountBlocked"
           :pt="{
             headerAction: {
               'data-testid': 'billing__bills-tab__button'
@@ -188,8 +178,7 @@
           <BillsView
             v-if="isActiveTab.bills"
             ref="viewBillsRef"
-            v-bind="props.billsServices"
-            :cardDefault="cardDefault"
+            v-bind="props"
             @changeTab="changeTab"
           />
         </TabPanel>
@@ -203,10 +192,12 @@
           }"
         >
           <PaymentListView
+            ref="paymentListViewRef"
             v-if="isActiveTab.payment"
-            ref="listPaymentMethodsRef"
-            @update-credit-event="loadCardDefault"
-            v-bind="props.paymentServices"
+            @update-credit-event="emit('loadCard')"
+            @openDrawerAddCredit="emit('openDrawerAddCredit')"
+            @openDrawerAddPaymentMethod="emit('openDrawerAddPaymentMethod')"
+            v-bind="props"
           />
         </TabPanel>
       </TabView>

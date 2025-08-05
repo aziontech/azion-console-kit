@@ -27,8 +27,6 @@ describe('Variables spec', { tags: ['@dev7'] }, () => {
     // Assert
     cy.verifyToast('success', 'Your variable has been created')
 
-    cy.get(selectors.form.actionsCancelButton).click()
-
     cy.get(selectors.list.searchInput).type(`${variableKey}{enter}`)
     cy.get(selectors.variables.listRow('key')).should('have.text', variableKey)
 

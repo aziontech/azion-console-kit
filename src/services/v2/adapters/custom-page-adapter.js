@@ -1,75 +1,82 @@
-import { capitalizeFirstLetter } from '@/helpers'
-import { parseStatusData, parseDefaultData } from '../utils/adapter/parse-status-utils'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
+import { formatExhibitionDate } from '@/helpers/convert-date'
+import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
-const nullable = (value) => {
-  return value ? value : null
+const nullable = (value) => ([null, undefined, '-', ''].includes(value) ? null : value)
+
+const getPage = (page) => {
+  const typeAttributes = {
+    page_connector: {
+      connector: nullable(page.connector),
+      ttl: nullable(page.ttl),
+      uri: nullable(page.uri),
+      custom_status_code: nullable(page.customStatusCode)
+    },
+    page_default: {
+      content_type: nullable(page.contentType),
+      response: nullable(page.response)
+    }
+  }
+
+  return {
+    type: page.type,
+    attributes: {
+      ...(typeAttributes[page.type] || {}),
+      custom_status_code: nullable(page.customStatusCode)
+    }
+  }
 }
 
-const convertDate = (date) => {
-  let convertedDate
-  try {
-    convertedDate = new Date(date)
-    if (isNaN(convertedDate)) throw new Error('Invalid Date')
-  } catch (error) {
-    convertedDate = null
-  }
-  return convertedDate
+const transformMap = {
+  id: (value) => value.id,
+  name: (value) => value.name,
+  lastEditor: (value) => value.last_editor,
+  lastModify: (value) => formatExhibitionDate(value.last_modified, 'full', undefined),
+  lastModified: (value) => value.last_modified,
+  active: (value) => parseStatusData(value.active)
 }
 
 export const CustomPageAdapter = {
-  transformListCustomPage(data) {
-    return (
-      data?.map((customPage) => {
-        return {
-          id: customPage?.id,
-          name: customPage?.name,
-          lastEditor: customPage?.last_editor,
-          lastModified: convertDate(customPage?.last_modified),
-          active: parseStatusData(customPage?.active),
-          default: parseDefaultData(customPage?.default)
-        }
-      }) || []
-    )
+  transformListCustomPage(data, fields) {
+    return adaptServiceDataResponse(data, fields, transformMap)
   },
-  transformPayloadCustomPage(payload) {
-    const pages = payload.pages.map((page) => {
-      return {
-        code: page.code.toLowerCase(),
-        ttl: page.ttl,
-        uri: nullable(page.uri),
-        custom_status_code: nullable(page.customStatusCode)
-      }
-    })
+  transformPayloadCreateCustomPage(payload) {
+    const pages = payload.pages.filter((page) => page.type !== 'page_default')
+
     return {
       name: payload.name,
-      active: payload.isActive,
-      default: payload.isDefault,
-      connector_custom_pages: {
-        edge_connector: nullable(payload.edgeConnectorId),
-        pages
-      }
+      active: payload.active,
+      pages: [
+        ...pages.map((page) => {
+          return {
+            code: page.code.value?.toLowerCase(),
+            page: getPage(page)
+          }
+        })
+      ]
     }
   },
   transformLoadCustomPage({ data }) {
-    const pages = data.connector_custom_pages.pages.map((page) => {
-      return {
-        code: capitalizeFirstLetter(page.code),
-        ttl: page.ttl,
-        uri: page.uri,
-        customStatusCode: page.custom_status_code
-      }
-    })
-
-    return {
+    const response = {
       id: data.id,
       name: data.name,
-      lastEditor: data.last_editor,
-      lastModified: data.last_modified,
-      isActive: data.active,
-      isDefault: data.default,
-      productVersion: data.product_version,
-      edgeConnectorId: data.connector_custom_pages.edge_connector,
-      pages
+      last_editor: data.last_editor,
+      last_modified: data.last_modified,
+      active: data.active,
+      product_version: data.product_version,
+      pages: data.pages.map((item) => ({
+        id: item.code === 'default' ? 0 : item.code,
+        code: { value: nullable(item.code) },
+        type: nullable(item.page.type),
+        customStatusCode: nullable(item.page.attributes.custom_status_code),
+        connector: nullable(item.page.attributes.connector),
+        ttl: nullable(item.page.attributes.ttl),
+        uri: nullable(item.page.attributes.uri),
+        contentType: nullable(item.page.attributes.content_type),
+        response: nullable(item.page.attributes.response)
+      }))
     }
+
+    return response
   }
 }

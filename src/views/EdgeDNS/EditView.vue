@@ -50,6 +50,10 @@
   const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
+      field: 'id',
+      header: 'ID'
+    },
+    {
       field: 'name',
       header: 'Name'
     },
@@ -92,6 +96,7 @@
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
   const visibleOnSaved = ref(false)
+  const edgeDNSName = ref('')
 
   const defaultTabs = {
     mainSettings: 0,
@@ -134,10 +139,7 @@
         is: 'weighted',
         then: (schema) => schema.min(0).max(255).required()
       }),
-    description: yup.string().when('selectedPolicy', {
-      is: 'weighted',
-      then: (schema) => schema.required().label('Description')
-    }),
+    description: yup.string().label('Description'),
     edgeDNSID: yup.number()
   })
 
@@ -368,12 +370,18 @@
       })
       .track()
   }
+
+  const loadEdgeDNS = async (id) => {
+    const edgeDNS = await edgeDNSService.loadEdgeDNSService(id)
+    edgeDNSName.value = edgeDNS.name
+    return edgeDNS
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Zone" />
+      <PageHeadingBlock :pageTitle="edgeDNSName" />
     </template>
     <template #content>
       <TabView
@@ -391,7 +399,7 @@
         >
           <EditFormBlock
             :editService="edgeDNSService.editEdgeDNSService"
-            :loadService="edgeDNSService.loadEdgeDNSService"
+            :loadService="loadEdgeDNS"
             :schema="validationSchemaEditEDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"

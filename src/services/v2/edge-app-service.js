@@ -5,7 +5,12 @@ export class EdgeAppService {
     this.baseURL = 'v4/edge_application/applications'
   }
 
-  listEdgeApplicationsService = async (params = { pageSize: 10 }) => {
+  listEdgeApplicationsService = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name', 'active', 'last_editor', 'last_modified', 'product_version']
+    }
+  ) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.baseURL,
@@ -13,7 +18,27 @@ export class EdgeAppService {
     })
     const { count, results } = data
 
-    const body = this.adapter?.transformListEdgeApp?.(results) ?? results
+    const body = this.adapter?.transformListEdgeApp?.(results, params.fields) ?? results
+    return {
+      body,
+      count
+    }
+  }
+
+  listEdgeApplicationsServiceDropdown = async (
+    params = {
+      pageSize: 10,
+      fields: ['id', 'name']
+    }
+  ) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.baseURL,
+      params
+    })
+    const { count, results } = data
+
+    const body = this.adapter?.transformListDropdownEdgeApp?.(results) ?? results
 
     return {
       body,
@@ -32,19 +57,15 @@ export class EdgeAppService {
   }
 
   createEdgeApplicationService = async (payload) => {
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
+
     const { data } = await this.http.request({
       method: 'POST',
       url: this.baseURL,
-      body: {
-        name: payload.name
-      }
+      body
     })
 
-    return {
-      feedback: 'Your edge application has been created',
-      urlToEditView: `/edge-applications/edit/${data.data.id}`,
-      applicationId: data.data.id
-    }
+    return data
   }
 
   cloneEdgeApplicationService = async (payload) => {
@@ -64,7 +85,7 @@ export class EdgeAppService {
   }
 
   editEdgeApplicationService = async (payload) => {
-    const body = this.adapter?.transformPayloadEdit?.(payload) ?? payload
+    const body = this.adapter?.transformPayload?.(payload) ?? payload
 
     await this.http.request({
       method: 'PATCH',

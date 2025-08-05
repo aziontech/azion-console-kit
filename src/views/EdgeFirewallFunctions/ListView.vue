@@ -61,6 +61,7 @@
   import DrawerFunction from './Drawer'
   import FetchListTableBlock from '@/templates/list-table-block/with-fetch-ordering-and-pagination.vue'
   import { edgeFirewallFunctionService } from '@/services/v2'
+
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -115,6 +116,12 @@
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name'

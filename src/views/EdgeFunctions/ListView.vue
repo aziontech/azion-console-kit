@@ -17,6 +17,7 @@
         emptyListMessage="No edge functions found."
         :actions="actions"
         :apiFields="EDGE_FUNCTIONS_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else
@@ -60,8 +61,9 @@
     'id',
     'name',
     'active',
-    'language',
-    'initiator_type',
+    'runtime',
+    'vendor',
+    'execution_environment',
     'reference_count',
     'last_editor'
   ]
@@ -88,6 +90,12 @@
 
   const getColumns = computed(() => [
     {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
       field: 'name',
       header: 'Name',
       filterPath: 'name.text',
@@ -108,9 +116,23 @@
       header: 'Ref. Count'
     },
     {
-      field: 'language',
+      field: 'vendor',
+      header: 'Vendor',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: {
+            text: columnData || '-',
+            ...(columnData && { leftIcon: 'pi pi-shopping-cart text-xl' })
+          },
+          columnAppearance: 'text-with-icon'
+        })
+      }
+    },
+    {
+      field: 'runtime',
       header: 'Language',
-      filterPath: 'language.content',
+      filterPath: 'runtime.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -120,7 +142,7 @@
       }
     },
     {
-      field: 'initiatorType',
+      field: 'executionEnvironment',
       header: 'Initiator Type'
     },
     {

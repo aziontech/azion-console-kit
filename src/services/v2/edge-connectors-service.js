@@ -22,6 +22,15 @@ export class EdgeConnectorsService {
     }
   }
 
+  listEdgeConnectorsDropDownService = async (params, callBackFilter) => {
+    const { body, count } = await this.listEdgeConnectorsService(params)
+    const filterTypes = body.filter(callBackFilter)
+    return {
+      body: filterTypes,
+      count
+    }
+  }
+
   createEdgeConnectorsService = async (payload) => {
     const body = this.adapter?.transformPayloadEdgeConnectors?.(payload) ?? payload
 
@@ -34,8 +43,7 @@ export class EdgeConnectorsService {
     const { id } = data.data
 
     return {
-      feedback: 'Edge Connector successfully created',
-      urlToEditView: '/edge-connectors',
+      ...data,
       id: parseInt(id)
     }
   }

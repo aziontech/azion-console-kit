@@ -15,14 +15,21 @@ const STATUS_AS_TAG = {
 }
 
 const LANGUAGE_WITH_ICON = {
-  javascript: {
+  azion_js: {
     content: 'JavaScript',
+    format: 'javascript',
     icon: 'javascript'
   },
-  lua: {
+  azion_lua: {
     content: 'Lua',
+    format: 'lua',
     icon: 'lua'
   }
+}
+
+const CODE_LANG = {
+  javascript: 'azion_js',
+  lua: 'azion_lua'
 }
 
 const parseLastEditor = (edgeFunctionData) => {
@@ -49,14 +56,15 @@ const parseName = (edgeFunctionData) => {
 const transformMap = {
   id: (value) => value.id,
   active: (value) => value.active,
-  language: (value) => value.language,
-  initiatorType: (value) => value.initiator_type,
+  runtime: (value) => value.runtime,
+  executionEnvironment: (value) => value.execution_environment,
   lastEditor: (value) => value.last_editor,
   referenceCount: (value) => value.reference_count,
   defaultArgs: (value) => JSON.stringify(value.default_args, null, 2),
   name: (value) => value.name,
   code: (value) => value.code,
   version: (value) => value.version || '-',
+  vendor: (value) => value.vendor || '-',
   isProprietaryCode: (value) => value.is_proprietary_code || false
 }
 
@@ -74,7 +82,7 @@ export const EdgeFunctionsAdapter = {
 
   transformLoadEdgeFunction({ data }, fields) {
     const adapt = adaptServiceDataResponseToLoad(data, fields, transformMap)
-
+    adapt.runtimeFormat = LANGUAGE_WITH_ICON[adapt.runtime]
     return adapt
   },
 
@@ -92,11 +100,12 @@ export const EdgeFunctionsAdapter = {
         return {
           status: STATUS_AS_TAG[edgeFunction.active],
           version: edgeFunction.version || '-',
-          language: LANGUAGE_WITH_ICON[edgeFunction.language],
-          initiatorType: edgeFunction.initiator_type,
+          runtime: LANGUAGE_WITH_ICON[edgeFunction.runtime] || {},
+          executionEnvironment: edgeFunction.execution_environment,
           id: edgeFunction.id,
           lastEditor: parseLastEditor(edgeFunction),
           name: parseName(edgeFunction),
+          vendor: edgeFunction.vendor,
           referenceCount: edgeFunction.reference_count
         }
       }) || []
@@ -108,8 +117,8 @@ export const EdgeFunctionsAdapter = {
     return {
       name: payload.name,
       code: payload.code,
-      language: payload.language,
-      initiator_type: payload.initiatorType,
+      runtime: CODE_LANG[payload.runtime],
+      execution_environment: payload.executionEnvironment,
       default_args: parsedArgs,
       active: payload.active
     }

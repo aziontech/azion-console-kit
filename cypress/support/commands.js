@@ -135,6 +135,23 @@ Cypress.Commands.add('verifyToast', (summary, detail = '') => {
     })
 })
 
+Cypress.Commands.add('verifyToastWithAction', (summary, detail = '') => {
+  const messageText = `${summary}${detail}`
+  const customId = `[data-testid="toast-block__content__${messageText}"]`
+  const customIdButton = `[data-testid="toast-block__content__${messageText}__link"]`
+
+  cy.get(customId)
+    .should('be.visible')
+    .and('contain', messageText)
+    .then(($toast) => {
+      $toast.find(customIdButton).trigger('click')
+      $toast.siblings('div').find('.p-toast-icon-close').trigger('click')
+    })
+    .then(() => {
+      cy.get(customId).should('not.be.visible')
+    })
+})
+
 
 /**
  * Verifies the visibility and content of a toast message.
@@ -190,7 +207,8 @@ const sidebarProducts = [
   'Network Lists',
   'WAF Rules',
   'Custom Pages',
-  'Edge Connectors'
+  'Edge Connectors',
+  'Edge SQL'
 ]
 const accountProducts = [
   'Account Settings',

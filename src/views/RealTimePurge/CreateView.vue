@@ -9,15 +9,13 @@
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { purgeService } from '@/services/v2'
+  import { usePurgeStore } from '@/stores/purge'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const purgeStore = usePurgeStore()
 
   defineProps({
-    createRealTimePurgeService: {
-      type: Function,
-      required: true
-    },
     contactSalesRealTimePurgeService: {
       type: Function,
       required: true
@@ -25,6 +23,7 @@
   })
 
   const handleResponse = () => {
+    purgeStore.incrementPurgeCount()
     tracker.product.productCreated({
       productName: 'Purge'
     })
@@ -72,7 +71,8 @@
           <InlineMessage
             class="w-fit"
             severity="info"
-            >After a purge is added, the results may take some time to propagate to all edge nodes.
+          >
+            After a purge is added, the results may take some time to propagate to all edge nodes.
           </InlineMessage>
           <FormFieldsCreateRealTimePurge
             :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService"

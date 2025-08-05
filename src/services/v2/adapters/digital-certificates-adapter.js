@@ -1,26 +1,6 @@
-import { capitalizeFirstLetter, getCurrentTimezone, checkIfFieldExist } from '@/helpers'
-
-const parseStatusData = (status) => {
-  if (!status) {
-    return {
-      content: '-',
-      severity: 'info'
-    }
-  }
-
-  const isActive = status.toUpperCase() === 'ACTIVE'
-  const parsedStatus = isActive
-    ? {
-        content: capitalizeFirstLetter(status),
-        severity: 'success'
-      }
-    : {
-        content: capitalizeFirstLetter(status),
-        severity: 'danger'
-      }
-
-  return parsedStatus
-}
+import { getCurrentTimezone, checkIfFieldExist, getCurrentDateTimeIntl } from '@/helpers'
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-utils'
 
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
@@ -40,25 +20,52 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
+  transformCreateDigitalCertificateLetEncrypt(payload, sourceCertificate) {
+    const payloadRequest = {
+      name: `Let's Encrypt - ${payload.name} - ${getCurrentDateTimeIntl()}`,
+      certificate: null,
+      private_key: null,
+      type: 'edge_certificate',
+      challenge: 'dns',
+      authority: 'lets_encrypt',
+      key_algorithm: 'rsa_2048',
+      active: true,
+      common_name: payload.letEncrypt.commonName,
+      alternative_names: payload.letEncrypt.alternativeNames
+    }
+
+    if (sourceCertificate) {
+      payloadRequest.source_certificate = sourceCertificate
+    }
+
+    return payloadRequest
+  },
+
   transformListDigitalCertificates({ results, count }) {
     const formattedResults = results?.map((item) => {
-      const subjectNames = checkIfFieldExist(
-        item?.subject_name?.map((subject) => subject)?.join(',')
-      )
+      let subjectName = []
       const typeMap = {
         edge_certificate: EDGE_CERTIFICATE,
         trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
+      }
+
+      if (item.subject_name && item.subject_name.length) {
+        if (item.subject_name[0].includes(',')) {
+          subjectName = item.subject_name[0].split(',')
+        } else {
+          subjectName = item.subject_name
+        }
       }
 
       return {
         id: checkIfFieldExist(item?.id, null),
         name: checkIfFieldExist(item?.name),
         issuer: checkIfFieldExist(item?.issuer),
-        subjectName: subjectNames,
+        subjectName,
         type: checkIfFieldExist(typeMap[item?.type]),
         validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
         status: {
-          status: parseStatusData(item.status),
+          status: parseStatusString(item.status),
           statusDetail: item?.status_detail
         }
       }
@@ -70,16 +77,27 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ body, count }, { type, search }) {
-    let parsedDigitalCertificates = body?.map((item) => {
+  transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
+    let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
-        name: item.name
+        name: item.name,
+        authority: item?.authority,
+        status: item?.status,
+        group: 'My certificates'
       }
     })
 
     if (type === 'edge_certificate') {
-      const DEFAULT_CERTIFICATES = [{ id: 0, name: 'Azion (SAN)' }]
+      const DEFAULT_CERTIFICATES = [
+        { id: 0, name: 'Azion (SAN)', status: 'active', group: 'Certificates presets' },
+        {
+          id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
+          name: "Let's Encrypt",
+          status: 'active',
+          group: 'Certificates presets'
+        }
+      ]
       const searchLowercase = search?.toLowerCase()
       const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
 
@@ -109,7 +127,9 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificate_type,
-      certificate_content
+      certificate_content,
+      certificate,
+      authority
     } = data
 
     return {
@@ -123,7 +143,9 @@ export const DigitalCertificatesAdapter = {
       validity,
       status,
       certificateType: certificate_type,
-      certificateContent: certificate_content
+      certificateContent: certificate_content,
+      certificate,
+      authority
     }
   },
 

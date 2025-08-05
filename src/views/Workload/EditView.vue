@@ -1,75 +1,54 @@
 <template>
-  <EditFormBlock
-    :editService="editDomainService"
-    :loadService="loadDomainService"
-    :schema="validationSchema"
-    :updatedRedirect="updatedRedirect"
-    @loaded-service-object="setDomainName"
-    @on-edit-success="handleTrackEditEvent"
-    @on-edit-fail="handleTrackFailEditEvent"
-    isTabs
-  >
-    <template #form>
-      <FormFieldsEditDomains
-        :digitalCertificates="digitalCertificates"
-        :loadDigitalCertificatesService="loadDigitalCertificatesService"
-        hasDomainName
-        @copyDomainName="copyDomainName"
-      />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock :pageTitle="workloadName" />
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading }">
-      <ActionBarTemplate
-        @onSubmit="onSubmit"
-        @onCancel="onCancel"
-        :loading="loading"
-      />
+    <template #content>
+      <EditFormBlock
+        :editService="workloadService.editWorkload"
+        :loadService="workloadService.loadWorkload"
+        :schema="validationSchema"
+        :updatedRedirect="updatedRedirect"
+        @loaded-service-object="setWorkloadName"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
+      >
+        <template #form>
+          <FormFieldsWorkload isEdit />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
     </template>
-  </EditFormBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
   import { ref, inject } from 'vue'
-
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import * as yup from 'yup'
-  import { useToast } from 'primevue/usetoast'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { workloadService } from '@/services/v2'
+  import { validationSchema } from './Config/validation'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const props = defineProps({
-    editDomainService: {
-      type: Function,
-      required: true
-    },
-    loadDigitalCertificatesService: {
-      type: Function,
-      required: true
-    },
-    updatedRedirect: {
-      type: String,
-      required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
-    },
-    updateDigitalCertificates: {
-      type: Function,
-      required: true
-    },
-    domain: {
-      type: Object,
-      required: true
-    }
+  defineProps({
+    updatedRedirect: { type: String, required: true }
   })
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
-      productName: 'Domain'
+      productName: 'Workload'
     })
   }
 
@@ -77,7 +56,7 @@
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
-        productName: 'Domain',
+        productName: 'Workload',
         errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
@@ -85,80 +64,9 @@
       .track()
   }
 
-  const digitalCertificates = ref([])
-  const toast = useToast()
-  const domainName = ref()
+  const workloadName = ref()
 
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity,
-      summary
-    })
+  const setWorkloadName = async (workload) => {
+    workloadName.value = workload.name
   }
-
-  const copyDomainName = ({ name }) => {
-    props.clipboardWrite(name)
-    showToast('success', 'Successfully copied!')
-  }
-
-  const setDomainName = async (domain) => {
-    domainName.value = domain.name
-  }
-
-  const loadDomainService = () => {
-    return props.domain
-  }
-
-  const validationSchema = yup.object({
-    id: yup.string().required(),
-    name: yup
-      .string()
-      .required()
-      .test(
-        'only-ascii',
-        'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
-        function (value) {
-          const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
-          return nameRegex.test(value)
-        }
-      ),
-    domainName: yup.string().required(),
-    httpsPort: yup.array().when('useHttps', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    httpPort: yup.array().min(1).required(),
-    quicPort: yup.array().when('useHtpp3', {
-      is: true,
-      then: (schema) => schema.min(1, 'At least one port is required'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    cnames: yup
-      .string()
-      .label('CNAME')
-      .when('cnameAccessOnly', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .test({
-        name: 'no-whitespace',
-        message: `Space characters aren't allowed.`,
-        test: (value) => value?.includes(' ') === false
-      }),
-    cnameAccessOnly: yup.boolean(),
-    edgeCertificate: yup.string().optional(),
-    mtlsIsEnabled: yup.boolean(),
-    mtlsVerification: yup.string(),
-    mtlsTrustedCertificate: yup
-      .string()
-      .when('mtlsIsEnabled', {
-        is: true,
-        then: (schema) => schema.required()
-      })
-      .label('Trusted CA Certificate'),
-    active: yup.boolean(),
-    environment: yup.string()
-  })
 </script>

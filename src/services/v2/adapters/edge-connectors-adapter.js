@@ -1,18 +1,21 @@
 import { getCurrentTimezone } from '@/helpers'
 import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
-const extractAddressesPostRequest = (addresses) => {
+const extractAddressesPostRequest = (addresses, loaderBalancerIsEnabled) => {
   return addresses.map((address) => {
     return {
-      address: address.address,
-      plain_port: address.plainPort,
-      tls_port: address.tlsPort,
-      server_role: address.serverRole,
-      weight: address.weight,
-      active: address.active,
-      max_conns: address.maxConns,
-      max_fails: address.maxFails,
-      fail_timeout: address.failTimeout
+      active: address?.active,
+      address: address?.address,
+      http_port: address?.httpPort,
+      https_port: address?.httpsPort,
+      modules: loaderBalancerIsEnabled
+        ? {
+            load_balancer: {
+              server_role: address?.serverRole,
+              weight: address?.weight
+            }
+          }
+        : null
     }
   })
 }
@@ -20,95 +23,164 @@ const extractAddressesPostRequest = (addresses) => {
 const extractAddressesLoadRequest = (addresses) => {
   return addresses.map((address) => {
     return {
-      address: address.address,
-      plainPort: address.plain_port,
-      tlsPort: address.tls_port,
-      serverRole: address.server_role,
-      weight: address.weight,
       active: address.active,
-      maxConns: address.max_conns,
-      maxFails: address.max_fails,
-      failTimeout: address.fail_timeout
+      address: address.address,
+      httpPort: address.http_port,
+      httpsPort: address.https_port,
+      serverRole: address.modules?.load_balancer?.server_role,
+      weight: address.modules?.load_balancer?.weight
     }
   })
 }
 
 const typeBuilders = {
   live_ingest: (payload) => ({
-    type_properties: {
-      endpoint: payload.liveIngestEndpoint
-    }
-  }),
-
-  s3: (payload) => ({
-    addresses: extractAddressesPostRequest(payload.addresses),
-    type_properties: {
-      host: payload.s3.host,
-      bucket: payload.s3.bucket,
-      path: payload.s3.path,
-      region: payload.s3.region,
-      access_key: payload.s3.accessKey,
-      secret_key: payload.s3.secretKey
-    }
+    region: payload.connectionOptions.region
   }),
 
   edge_storage: (payload) => ({
-    type_properties: {
-      bucket: payload.edgeStorage.bucket,
-      prefix: payload.edgeStorage.prefix
-    }
+    bucket: payload.connectionOptions.bucket,
+    prefix: payload.connectionOptions.prefix
   }),
 
-  http: (payload) => ({
-    addresses: extractAddressesPostRequest(payload.addresses),
-    type_properties: {
-      versions: payload.http.versions,
-      host: payload.http.host,
-      path: payload.http.path,
-      following_redirect: payload.http.followingRedirect,
-      real_ip_header: payload.http.realIpHeader,
-      real_port_header: payload.http.realPortHeader
+  http: (payload) => {
+    const modules = {
+      origin_shield: {
+        enabled: payload.modules.originShield.enabled,
+        config: payload.modules.originShield.enabled
+          ? {
+              origin_ip_acl: {
+                enabled: payload.modules.originShield.config.originIpAcl.enabled
+              },
+              hmac: {
+                enabled: payload.modules.originShield.config.hmac.enabled,
+                config: {
+                  type: payload.modules.originShield.config.hmac.config.type,
+                  attributes: {
+                    region: payload.modules.originShield.config.hmac.config.attributes.region,
+                    service: payload.modules.originShield.config.hmac.config.attributes.service,
+                    access_key:
+                      payload.modules.originShield.config.hmac.config.attributes.accessKey,
+                    secret_key: payload.modules.originShield.config.hmac.config.attributes.secretKey
+                  }
+                }
+              }
+            }
+          : null
+      },
+      load_balancer: {
+        enabled: payload.modules.loadBalancer.enabled,
+        config: payload.modules.loadBalancer.enabled
+          ? {
+              method: payload.modules.loadBalancer.config.method,
+              max_retries: payload.modules.loadBalancer.config.maxRetries,
+              connection_timeout: payload.modules.loadBalancer.config.connectionTimeout,
+              read_write_timeout: payload.modules.loadBalancer.config.readWriteTimeout
+            }
+          : null
+      }
     }
-  })
+
+    if (!payload.modules.originShield.config.hmac.enabled) {
+      delete modules.origin_shield.config.hmac
+    }
+
+    const shouldSendModules =
+      payload.modules.originShield.enabled || payload.modules.loadBalancer.enabled
+
+    const result = {
+      addresses: extractAddressesPostRequest(
+        payload.addresses,
+        payload.modules.loadBalancer.enabled
+      ),
+      connection_options: {
+        dns_resolution: payload.connectionOptions.dnsResolution,
+        transport_policy: payload.connectionOptions.transportPolicy,
+        host: payload.connectionOptions.host,
+        path_prefix: payload.connectionOptions.path,
+        following_redirect: payload.connectionOptions.followingRedirect,
+        real_ip_header: payload.connectionOptions.realIpHeader,
+        real_port_header: payload.connectionOptions.realPortHeader
+      }
+    }
+
+    if (shouldSendModules) {
+      result.modules = modules
+    }
+
+    return result
+  }
 }
 
 const typeBuildersLoadRequest = {
   live_ingest: (data) => ({
-    liveIngestEndpoint: data.type_properties.endpoint
-  }),
-  s3: (data) => ({
-    addresses: extractAddressesLoadRequest(data.addresses),
-    s3: {
-      host: data.type_properties.host,
-      bucket: data.type_properties.bucket,
-      path: data.type_properties.path,
-      region: data.type_properties.region,
-      accessKey: data.type_properties.access_key,
-      secretKey: data.type_properties.secret_key
+    connectionOptions: {
+      region: data.attributes.region
     }
   }),
+
   edge_storage: (data) => ({
-    edgeStorage: {
-      bucket: data.type_properties.bucket,
-      prefix: data.type_properties.prefix
+    connectionOptions: {
+      bucket: data.attributes.bucket,
+      prefix: data.attributes.prefix
     }
   }),
+
   http: (data) => ({
-    addresses: extractAddressesLoadRequest(data.addresses),
-    http: {
-      versions: data.type_properties.versions,
-      host: data.type_properties.host,
-      path: data.type_properties.path,
-      followingRedirect: data.type_properties.following_redirect,
-      realIpHeader: data.type_properties.real_ip_header,
-      realPortHeader: data.type_properties.real_port_header
-    }
+    connectionOptions: {
+      dnsResolution: data.attributes.connection_options.dns_resolution,
+      transportPolicy: data.attributes.connection_options.transport_policy,
+      host: data.attributes.connection_options.host,
+      path: data.attributes.connection_options.path_prefix,
+      realIpHeader: data.attributes.connection_options.real_ip_header,
+      realPortHeader: data.attributes.connection_options.real_port_header,
+      followingRedirect: data.attributes.connection_options.following_redirect
+    },
+    modules: {
+      loadBalancer: {
+        enabled: data.attributes.modules?.load_balancer?.enabled,
+        config: {
+          method: data.attributes.modules?.load_balancer?.config?.method,
+          maxRetries: data.attributes.modules?.load_balancer?.config?.max_retries,
+          connectionTimeout: data.attributes.modules?.load_balancer?.config?.connection_timeout,
+          readWriteTimeout: data.attributes.modules?.load_balancer?.config?.read_write_timeout
+        }
+      },
+      originShield: {
+        enabled: data.attributes.modules?.origin_shield?.enabled,
+        config: {
+          originIpAcl: {
+            enabled: data.attributes.modules?.origin_shield?.config?.origin_ip_acl?.enabled
+          },
+          hmac: {
+            enabled: data.attributes.modules?.origin_shield?.config?.hmac?.enabled,
+            config: {
+              type: data.attributes.modules?.origin_shield?.config?.hmac?.config?.type,
+              attributes: {
+                region:
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes?.region,
+                service:
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes?.service,
+                accessKey:
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes
+                    ?.access_key,
+                secretKey:
+                  data.attributes.modules?.origin_shield?.config?.hmac?.config?.attributes
+                    ?.secret_key
+              }
+            }
+          }
+        }
+      }
+    },
+    addresses: extractAddressesLoadRequest(data.attributes.addresses)
   })
 }
 
-const buildTypePayload = (type, payload, action) => {
-  const builder = action === 'POST' ? typeBuilders[type] : typeBuildersLoadRequest[type]
-  return builder(payload)
+const edgeConnectorsTypes = {
+  http: 'HTTP',
+  edge_storage: 'Edge Storage',
+  live_ingest: 'Live Ingest'
 }
 
 export const EdgeConnectorsAdapter = {
@@ -118,18 +190,16 @@ export const EdgeConnectorsAdapter = {
         return {
           id: edgeConnectors.id,
           name: edgeConnectors.name,
-          type: edgeConnectors?.type,
-          header: edgeConnectors?.type_properties?.real_port_header,
-          address: edgeConnectors?.addresses
-            ? edgeConnectors?.addresses
+          type: edgeConnectorsTypes[edgeConnectors?.type],
+          header: edgeConnectors?.attributes?.connection_options?.host || '-',
+          address: edgeConnectors?.attributes?.addresses
+            ? edgeConnectors?.attributes?.addresses
                 .map((el) => {
                   return el.address
                 })
-                .join(',')
-            : [],
-          active: edgeConnectors?.active
-            ? parseStatusData(edgeConnectors.active)
-            : edgeConnectors?.active,
+                .join(', ')
+            : '-',
+          active: parseStatusData(edgeConnectors.active),
           lastEditor: edgeConnectors?.last_editor,
           lastModified: edgeConnectors?.last_modified
             ? getCurrentTimezone(edgeConnectors.last_modified)
@@ -138,45 +208,29 @@ export const EdgeConnectorsAdapter = {
       }) || []
     )
   },
+
   transformPayloadEdgeConnectors(payload) {
-    const builder = buildTypePayload(payload.type, payload, 'POST')
+    const builder = typeBuilders[payload.type]
+    const attributes = builder(payload)
 
     return {
       name: payload.name,
       type: payload.type,
-      modules: {
-        origin_shield_enabled: payload.originShieldEnabled,
-        load_balancer_enabled: payload.loadBalancerEnabled
-      },
-      active: payload.status,
-      tls: {
-        policy: payload.tlsPolicy
-      },
-      load_balance_method: payload.loadBalanceMethod,
-      connection_preference: payload.connectionPreference,
-      connection_timeout: payload.connectionTimeout,
-      read_write_timeout: payload.readWriteTimeout,
-      max_retries: payload.maxRetries,
-      ...builder
+      active: payload.active,
+      attributes
     }
   },
+
   transformLoadEdgeConnectors({ data }) {
-    const builder = buildTypePayload(data.type, data, 'GET')
+    const builder = typeBuildersLoadRequest[data.type]
+    const attributes = builder(data)
 
     return {
       id: data.id,
-      type: data.type,
       name: data.name,
-      loadBalancerEnabled: data.modules.load_balancer_enabled,
-      originShieldEnabled: data.modules.origin_shield_enabled,
-      tlsPolicy: data.tls.policy,
-      loadBalanceMethod: data.load_balance_method,
-      connectionPreference: data.connection_preference,
-      connectionTimeout: data.connection_timeout,
-      readWriteTimeout: data.read_write_timeout,
-      maxRetries: data.max_retries,
-      status: data.active,
-      ...builder
+      type: data.type,
+      active: data.active,
+      ...attributes
     }
   }
 }

@@ -38,10 +38,11 @@
     active: true
   }
 
-  const handleTrackSuccessCreated = () => {
+  const handleTrackSuccessCreated = (response) => {
     tracker.product.productCreated({
       productName: 'Edge Service'
     })
+    handleToast(response)
   }
 
   const handleTrackFailCreated = (error) => {
@@ -54,6 +55,19 @@
         errorMessage: message
       })
       .track()
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: 'Your Edge Service has been created',
+      actions: {
+        link: {
+          label: 'View Edge Service',
+          callback: () => response.redirectToUrl(`/edge-services/edit/${response.id}`)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
   }
 </script>
 
@@ -69,6 +83,7 @@
         :initialValues="initialValues"
         @on-response="handleTrackSuccessCreated"
         @on-response-fail="handleTrackFailCreated"
+        disableToast
       >
         <template #form>
           <FormFieldsEdgeService />

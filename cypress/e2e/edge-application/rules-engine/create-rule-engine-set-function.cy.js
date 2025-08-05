@@ -15,7 +15,6 @@ const createEdgeApplicationCase = () => {
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
-  cy.get(selectors.form.actionsCancelButton).click()
 
   // Assert - Verify the edge application was created
   cy.get(selectors.list.searchInput).type(`${fixtures.edgeApplicationName}{enter}`)

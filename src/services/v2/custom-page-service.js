@@ -13,8 +13,7 @@ export class CustomPageService {
     })
 
     const { count, results } = data
-    const body = this.adapter?.transformListCustomPage?.(results) ?? results
-
+    const body = this.adapter?.transformListCustomPage?.(results, params.fields) ?? results
     return {
       body,
       count
@@ -22,7 +21,7 @@ export class CustomPageService {
   }
 
   createCustomPagesService = async (payload) => {
-    const body = this.adapter?.transformPayloadCustomPage?.(payload) ?? payload
+    const body = this.adapter?.transformPayloadCreateCustomPage?.(payload) ?? payload
 
     const { data } = await this.http.request({
       method: 'POST',
@@ -30,15 +29,11 @@ export class CustomPageService {
       body
     })
 
-    return {
-      feedback: 'Custom Page successfully created',
-      urlToEditView: `/custom-pages/edit/${data.data.id}`,
-      id: data.data.id
-    }
+    return data
   }
 
   editCustomPagesService = async (payload) => {
-    const body = this.adapter?.transformPayloadCustomPage?.(payload) ?? payload
+    const body = this.adapter?.transformPayloadCreateCustomPage?.(payload) ?? payload
 
     await this.http.request({
       method: 'PATCH',

@@ -25,6 +25,7 @@
         <div class="w-full">
           <FetchListTableBlock
             :disabledList="hasNoPermissionToCreateDataStream || disabledList"
+            :disabledAddButton="hasNoPermissionToCreateDataStream || disabledList"
             v-if="hasContentToList"
             addButtonLabel="Stream"
             createPagePath="/data-stream/create"
@@ -35,7 +36,7 @@
             emptyListMessage="No streams found."
             :apiFields="DATA_STREAM_API_FIELDS"
             :actions="actions"
-            :defaultOrderingFieldName="'name'"
+            :defaultOrderingFieldName="'-last_modified'"
           ></FetchListTableBlock>
           <EmptyResultsBlock
             v-else
@@ -81,7 +82,16 @@
 
   const store = useAccountStore()
   const hasNoPermissionToCreateDataStream = computed(() => !store.hasPermissionToEditDataStream)
-  const DATA_STREAM_API_FIELDS = ['id', 'name', 'data_source', 'active', 'data_set_id', 'endpoint']
+  const DATA_STREAM_API_FIELDS = [
+    'id',
+    'name',
+    'active',
+    'outputs',
+    'transform',
+    'inputs',
+    'last_editor',
+    'last_modified'
+  ]
   const domainsCount = ref(0)
   const domainsLoading = ref(true)
   const toast = useToast()
@@ -144,6 +154,12 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Name'
       },
@@ -171,6 +187,14 @@
             data: columnData,
             columnAppearance: 'tag'
           })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor'
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified'
       }
     ]
   })

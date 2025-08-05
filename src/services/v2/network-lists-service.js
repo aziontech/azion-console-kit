@@ -38,10 +38,7 @@ export class NetworkListsService {
       body: bodyRequest
     })
 
-    return {
-      feedback: 'Your network list has been created',
-      urlToEditView: `/network-lists/edit/${response.data.id}`
-    }
+    return response.data
   }
 
   loadNetworkList = async ({ id }, isDropdown = false) => {

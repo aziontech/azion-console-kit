@@ -1,15 +1,11 @@
-// Queries úteis para operações em tabelas SQLite
 export const TABLE_QUERIES = {
-  // Informações básicas
   COUNT_RECORDS: (tableName) => `SELECT COUNT(*) as total_rows FROM ${tableName};`,
   TABLE_INFO: (tableName) => `PRAGMA table_info(${tableName});`,
   TABLE_DEFINITION: (tableName) =>
     `SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
 
-  // Índices e performance
   TABLE_INDEXES: (tableName) => `PRAGMA index_list(${tableName});`,
 
-  // Estrutura e relacionamentos
   FOREIGN_KEYS: (tableName) => `PRAGMA foreign_key_list(${tableName});`,
   TABLE_SIZE: (tableName) => `SELECT 
     name,
@@ -17,12 +13,10 @@ export const TABLE_QUERIES = {
   FROM ${tableName}, sqlite_master 
   WHERE sqlite_master.name = '${tableName}';`,
 
-  // Queries de limpeza
   VACUUM_ANALYZE: () => `VACUUM; ANALYZE;`,
   DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
   TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
 
-  // Tamanho do banco de dados
   DATABASE_SIZE: () => `SELECT 
     (page_count * page_size) AS size_bytes,
     ROUND((page_count * page_size) / 1024.0, 2) AS size_kb,
@@ -31,7 +25,6 @@ export const TABLE_QUERIES = {
     pragma_page_count(), pragma_page_size();`
 }
 
-// Ações disponíveis para o menu contextual da tabela
 export const TABLE_MENU_ACTIONS = [
   {
     label: 'Table Info',
@@ -98,7 +91,6 @@ export const TABLE_MENU_ACTIONS = [
   }
 ]
 
-// Classe para gerenciar ações de tabela
 export class TableActionManager {
   constructor(
     executeQueryFn,
@@ -127,39 +119,32 @@ export class TableActionManager {
   }
 
   async executeQueryAction(action, tableName) {
-    // Gerar a query
     const query = typeof action.query === 'function' ? action.query(tableName) : action.query
 
-    // Configurar o editor
     this.sqlQuery.value = query
 
-    // Expandir editor se estiver colapsado
     if (this.isEditorCollapsed.value) {
       this.isEditorCollapsed.value = false
     }
 
-    // Mudar para aba Results
     this.activeTabIndex.value = 0
 
-    // Executar a query automaticamente
     await this.executeQuery()
   }
 
   executeDrawerAction(action, tableName) {
-    // Delegar para a função de drawer específica
     if (this.showDrawer[action.action]) {
       this.showDrawer[action.action](tableName)
     }
   }
 
   executeDeleteAction(action, tableName) {
-    // Abrir dialog de confirmação de delete
     if (this.openDeleteDialog) {
       this.openDeleteDialog(tableName)
     }
   }
 
-  // Gerar itens do menu dinamicamente
+
   generateMenuItems(tableName) {
     return TABLE_MENU_ACTIONS.map((action) => {
       if (action.separator) {
@@ -170,7 +155,6 @@ export class TableActionManager {
         label: action.label,
         icon: action.icon,
         command: async () => {
-          // Confirmar ação se necessário
           if (action.confirmMessage) {
             if (!confirm(action.confirmMessage)) {
               return

@@ -278,11 +278,11 @@
     listServiceWafTunningRef.value?.handleExportTableDataToCSV()
   }
 
-  const showToast = (summary, severity) => {
+  const showToast = (detail, summary, severity) => {
     return toast.add({
       severity,
-      summary: severity,
-      detail: summary,
+      summary,
+      detail,
       closable: true
     })
   }
@@ -328,10 +328,10 @@
       })
 
       if (status === 'rejected') {
-        throw new Error(reason)
+        throw new Error(reason.message || reason)
       }
 
-      showToast(value, 'success')
+      showToast(value.feedback, 'Success', 'success')
       filterSearch()
       closeDialog()
       selectedEvents.value = []
@@ -339,10 +339,13 @@
       showDetailsOfAttack.value = false
       handleTrackAllowRule()
     } catch (error) {
-      let errorMessage = error?.message || error
-
-      handleTrackFailedToAllowRules(errorMessage)
-      showToast(errorMessage, 'error')
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error?.message || error
+        showToast(errorMessage, 'Error', 'error')
+        handleTrackFailedToAllowRules(errorMessage)
+      }
     } finally {
       isLoadingAllowed.value = false
     }
@@ -397,7 +400,12 @@
       const response = await networkListsService.listNetworkLists({ fields: '', isDropdown: true })
       netWorkListOptions.value.options = response
     } catch (error) {
-      showToast(error, 'error')
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+      } else {
+        const errorMessage = error?.message || error
+        showToast(errorMessage, 'error', 'error')
+      }
     } finally {
       netWorkListOptions.value.done = false
     }

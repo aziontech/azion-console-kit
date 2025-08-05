@@ -8,19 +8,18 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import PrimeMenu from 'primevue/menu'
+  import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
+
   import { useFieldArray } from 'vee-validate'
-  import { computed, nextTick, ref, onMounted } from 'vue'
+  import { computed, nextTick, ref, onMounted, watch } from 'vue'
+  import { edgeFirewallFunctionService } from '@/services/v2'
+  import { useRoute } from 'vue-router'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
   })
-
+  const emit = defineEmits(['isOverlapped'])
   const props = defineProps({
-    edgeFirewallFunctionsOptions: {
-      type: Array,
-      required: true
-    },
     listWafRulesService: {
       type: Function,
       required: true
@@ -46,6 +45,21 @@
       required: true
     }
   })
+  const route = useRoute()
+  const edgeFirewallId = route.params.id
+  const drawerFunctionRef = ref('')
+  const behaviorIndexSelect = ref(null)
+  const listEdgeFunctionsServiceDecorator = async (query) => {
+    return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
+      ...query,
+      fields: 'name,id',
+      active: true
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = async ({ id }) => {
+    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, id)
+  }
 
   const YEAR_IN_SECONDS = 31536000
   const DEFAULT_CRITERIA_OPTION = {
@@ -60,8 +74,6 @@
     { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
   ]
 
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const networkList = ref([])
   const hasWafAccess = ref(true)
@@ -70,7 +82,7 @@
   })
 
   const listWafRulesServiceOptions = async (query) => {
-    return await props.listWafRulesService({ ...query, fields: 'name,id' })
+    return await props.listWafRulesService({ ...query, fields: 'name,id', active: true })
   }
 
   const listNetworkList = async () => {
@@ -294,63 +306,16 @@
     return criteriaVariableOptions
   }
 
-  /**
-   * Checks if a criteria can be deleted.
-   * @param {number} index - The index of the criteria.
-   * @returns {boolean}
-   */
-  const isNotFirstCriteria = (index) => {
-    return criteria.value.length > 1 && index < criteria.value.length - 1
-  }
-
-  /**
-   * Checks if is the last criteria divider.
-   * @param {number} criteriaIndex
-   * @returns {boolean}
-   */
   const isLastCriteriaSectionDivider = (criteriaIndex) => {
     return criteriaIndex !== criteria.value.length - 1
   }
 
-  /**
-   * Toggle the visibility of the conditional menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   * @param {number} conditionalIndex - The index of the conditional inside a criteria.
-   */
-  const toggleConditionalMenu = (event, index, conditionalIndex) => {
-    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
-  }
-
-  /**
-   * Toggle the visibility of the criteria menu.
-   * @param {Event} event
-   * @param {number} criteriaIndex
-   */
-  const toggleCriteriaMenu = ({ event, criteriaIndex }) => {
-    criteriaMenuRef.value[criteriaIndex].toggle(event)
-  }
-
-  /**
-   * @param {number} criteriaIndex
-   * @param {number} [criteriaInnerRowIndex]
-   * @returns {Array} options for the criteria menu available commands.
-   */
-  const criteriaMenuOptions = (criteriaIndex, criteriaInnerRowIndex = null) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          if (criteriaInnerRowIndex === null) {
-            removeCriteria(criteriaIndex)
-          } else {
-            removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
-          }
-        }
-      }
-    ]
+  const handleDeleteCriteria = (criteriaIndex, criteriaInnerRowIndex) => {
+    if (criteriaInnerRowIndex === null) {
+      removeCriteria(criteriaIndex)
+    } else {
+      removeCriteriaInnerRow(criteriaIndex, criteriaInnerRowIndex)
+    }
   }
 
   const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
@@ -373,61 +338,45 @@
     remove: removeBehavior,
     fields: behaviors
   } = useFieldArray('behaviors')
-  const behaviorsMenuRef = ref({})
 
-  const behaviorsOptions = computed(() => {
+  const behaviorsOptions = ({ name }) => {
     const edgeFirewallModules = props.enabledModules
     const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
     const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
-    const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
+    const wafBehaviorIsAlreadySelected = name !== 'set_waf' && currentBehaviors.includes('set_waf')
+    const runFunctionBehaviorIsAlreadySelected =
+      name !== 'run_function' && currentBehaviors.includes('run_function')
 
+    const disableWafBehavior =
+      wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled || !hasWafAccess.value
+    const disableRunFunctionBehavior =
+      runFunctionBehaviorIsAlreadySelected ||
+      !hasEdgeFunctionsModuleEnabled ||
+      !props.hasEdgeFunctionsProductAccess
     return [
-      { value: 'deny', label: 'Deny (403 Forbidden)', disabled: false },
-      { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
-      { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
+      { value: 'deny', label: 'Deny (403 Forbidden)' },
+      { value: 'tag_event', label: 'Tag Event' },
+      { value: 'drop', label: 'Drop (Close Without Response)' },
+      { value: 'set_rate_limit', label: 'Set Rate Limit' },
       {
-        value: 'set_waf_ruleset',
-        label: `${
-          hasWebApplicationFirewallModuleEnabled
-            ? 'Set WAF Rule Set'
-            : 'Set WAF Rule Set - requires WAF'
-        }`,
-        disabled:
-          wafBehaviorIsAlreadySelected ||
-          !hasWebApplicationFirewallModuleEnabled ||
-          !hasWafAccess.value
+        value: 'set_waf',
+        label: `${hasWebApplicationFirewallModuleEnabled ? 'Set WAF' : 'Set WAF - requires WAF'}`,
+        disabled: disableWafBehavior
       },
       {
         value: 'run_function',
         label: `${
           hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
         }`,
-        disabled:
-          runFunctionBehaviorIsAlreadySelected ||
-          !hasEdgeFunctionsModuleEnabled ||
-          !props.hasEdgeFunctionsProductAccess
+        disabled: disableRunFunctionBehavior
       },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
-  })
-
-  const toggleBehaviorMenu = (event, behaviorItemIndex) => {
-    behaviorsMenuRef.value[behaviorItemIndex].toggle(event)
   }
 
-  const behaviorMenuOptions = (behaviorItemIndex) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          removeBehavior(behaviorItemIndex)
-        }
-      }
-    ]
+  const handleDeleteBehavior = (behaviorItemIndex) => {
+    removeBehavior(behaviorItemIndex)
   }
 
   const generateBehaviorLabelSection = (behaviorItem) => {
@@ -464,8 +413,13 @@
   }
 
   const isWafBehavior = (behaviorItemIndex) => {
-    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset'
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf'
   }
+
+  const isTagEvent = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'tag_event'
+  }
+
   const isRateLimitBehavior = (behaviorItemIndex) => {
     return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
   }
@@ -490,7 +444,7 @@
     if (!lastBehavior.value.name) {
       return true
     }
-    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset']
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf']
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
@@ -505,6 +459,24 @@
       criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
     })
   }
+
+  const openDrawerFunction = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
+  const successFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
+  }
+
+  watch(
+    () => drawerFunctionRef.value.showCreateFunctionDrawer,
+    () => {
+      emit('isOverlapped', drawerFunctionRef.value.showCreateFunctionDrawer)
+    }
+  )
 </script>
 <template>
   <FormHorizontal
@@ -555,23 +527,17 @@
             <Divider
               align="left"
               type="dashed"
-              class="capitalize"
+              class="capitalize z-0"
             >
               {{ criteriaRow.conditional }}
             </Divider>
 
             <PrimeButton
               v-if="criteriaInnerRowIndex !== 0"
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-trash"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, criteriaIndex, criteriaInnerRowIndex)"
-            />
-            <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${criteriaInnerRowIndex}`] = el)"
-              id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(criteriaIndex, criteriaInnerRowIndex)"
-              :popup="true"
+              @click="handleDeleteCriteria(criteriaIndex, criteriaInnerRowIndex)"
             />
           </div>
 
@@ -687,19 +653,12 @@
             align="left"
             type="solid"
           />
-
           <PrimeButton
-            v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-ellipsis-h"
+            v-if="criteriaIndex !== criteria.length - 1"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu({ event, criteriaIndex: criteriaIndex + 1 })"
-          />
-          <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
-            id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(criteriaIndex + 1)"
-            :popup="true"
+            @click="handleDeleteCriteria(criteriaIndex + 1, null)"
           />
         </div>
       </div>
@@ -723,6 +682,11 @@
     :isDrawer="true"
   >
     <template #inputs>
+      <DrawerFunction
+        ref="drawerFunctionRef"
+        @onSuccess="successFunction"
+        :edgeFirewallID="edgeFirewallId"
+      />
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorItemIndex) in behaviors"
@@ -732,23 +696,16 @@
           <Divider
             align="left"
             type="dashed"
+            class="z-0"
           >
             {{ generateBehaviorLabelSection(behaviorItem) }}
           </Divider>
-
           <PrimeButton
             v-if="behaviorItemIndex !== 0"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, behaviorItemIndex)"
-          />
-
-          <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[behaviorItemIndex] = el)"
-            id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(behaviorItemIndex)"
-            :popup="true"
+            @click="handleDeleteBehavior(behaviorItemIndex)"
           />
         </div>
 
@@ -759,7 +716,8 @@
               :enableWorkaroundLabelToDisabledOptions="true"
               :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
-              :options="behaviorsOptions"
+              :options="behaviorsOptions(behaviors[behaviorItemIndex].value)"
+              filter
               placeholder="Select a behavior"
               optionLabel="label"
               optionValue="value"
@@ -776,16 +734,48 @@
           </div>
           <div class="w-1/2 max-sm:w-full">
             <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
+                :service="listEdgeFunctionsServiceDecorator"
+                :loadService="loadEdgeFunctionServiceDecorator"
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
-                :options="props.edgeFirewallFunctionsOptions"
                 placeholder="Select an function"
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-function-instance-button"
+                        text
+                        @click="openDrawerFunction(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Function Instance"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
+            </template>
+
+            <template v-if="isTagEvent(behaviorItemIndex)">
+              <FieldText
+                class="w-full"
+                id="`behaviors[${behaviorItemIndex}].tag_event`"
+                :key="`${behaviorItem.key}-tag_event`"
+                placeholder="Tag Event"
+                :value="behaviors[behaviorItemIndex].value.tag_event"
+                :name="`behaviors[${behaviorItemIndex}].tag_event`"
               />
             </template>
 
@@ -809,8 +799,8 @@
                 :name="`behaviors[${behaviorItemIndex}].mode`"
                 :options="[
                   {
-                    label: 'Learning',
-                    value: 'learning'
+                    label: 'Logging',
+                    value: 'logging'
                   },
                   {
                     label: 'Blocking',

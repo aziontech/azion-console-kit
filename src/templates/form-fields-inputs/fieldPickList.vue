@@ -29,39 +29,47 @@
       }"
     >
       <template #sourceheader>
-        <div class="flex flex-col gap-2">
-          <span>Available {{ title }}</span>
-          <InputText
-            class="h-8 w-full md:min-w-[20rem]"
-            v-model.trim="searchSource"
-            data-testid="search-input-source"
-            placeholder="Search"
-          />
+        <div class="flex flex-col w-full">
+          <span class="mb-4">Available {{ title }}</span>
+
+          <Divider class="ml-[-16px] w-[calc(100%+32px)]" />
+
+          <span class="p-input-icon-right w-full mt-4">
+            <i class="pi pi-search text-[var(--text-color-secondary)]" />
+            <InputText
+              class="h-8 w-full"
+              v-model.trim="searchSource"
+              data-testid="search-input-source"
+              placeholder="Search"
+            />
+          </span>
         </div>
       </template>
       <template #targetheader>
-        <div class="flex flex-col gap-2">
-          <span>Chosen {{ title }}</span>
-          <InputText
-            class="h-8 w-full md:min-w-[20rem]"
-            v-model.trim="searchTarget"
-            data-testid="search-input-target"
-            placeholder="Search"
-          />
+        <div class="flex flex-col w-full">
+          <span class="mb-4">Chosen {{ title }}</span>
+
+          <Divider class="ml-[-16px] w-[calc(100%+32px)]" />
+
+          <span class="p-input-icon-right w-full mt-4">
+            <i class="pi pi-search text-[var(--text-color-secondary)]" />
+            <InputText
+              class="h-8 w-full"
+              v-model.trim="searchTarget"
+              data-testid="search-input-target"
+              placeholder="Search"
+            />
+          </span>
         </div>
       </template>
 
       <template #item="slotProps">
-        <div class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs">
+        <div class="flex flex-wrap pl-3 align-items-center gap-3 py-2">
           <div
             class="flex-1 flex flex-column gap-2"
             v-if="!slotProps.item?.loading"
           >
-            <span
-              class="font-normal"
-              data-testid="picklist_name-item"
-              >{{ slotProps.item.name }}
-            </span>
+            <span data-testid="picklist_name-item">{{ slotProps.item.name }} </span>
           </div>
           <div
             class="flex-1 flex flex-column gap-2"
@@ -74,12 +82,16 @@
     </PickList>
   </div>
 </template>
+
 <script setup>
   import PickList from 'primevue/picklist'
   import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
   import ProgressSpinner from 'primevue/progressspinner'
   import InputText from 'primevue/inputtext'
   import { watchDebounced } from '@vueuse/core'
+  import Divider from 'primevue/divider'
+  import { useToast } from 'primevue/usetoast'
+
   const props = defineProps({
     disabled: {
       type: Boolean
@@ -111,9 +123,12 @@
   const searchSource = ref('')
   const searchTarget = ref('')
   const originalSource = ref([])
-  const originalTargert = ref([])
+  const originalTarget = ref([])
   const data = ref(props.dataPick)
   const loading = ref(false)
+
+  const toast = useToast()
+
   const addUniqueItems = (targetArray, itemsToAdd) => {
     const existingIds = new Set(targetArray.map((item) => item.id))
     itemsToAdd.forEach((item) => {
@@ -142,7 +157,7 @@
     return data.value[0]
   })
   const filteredTarget = computed(() => {
-    return data.value[1].filter((item) =>
+    return data.value[1]?.filter((item) =>
       item.name.toLowerCase().includes(searchTarget.value.toLowerCase())
     )
   })
@@ -151,12 +166,12 @@
     data.value[0] = originalSource.value.filter((item) => !idsParaRemover.has(item.id))
     originalSource.value = data.value[0]
   }
-  const setOrigionalTarget = (target) => {
-    originalTargert.value = target
+  const setOriginalTarget = (target) => {
+    originalTarget.value = target
   }
   const handleSelectItemWithSearchTarget = (targets) => {
     const map = new Map()
-    originalTargert.value.forEach((item) => {
+    originalTarget.value.forEach((item) => {
       map.set(item.id, item)
     })
     targets.forEach((item) => {
@@ -175,7 +190,7 @@
     if (searchTarget.value) {
       handleSelectItemWithSearchTarget(newTarget)
     } else {
-      setOrigionalTarget(newTarget)
+      setOriginalTarget(newTarget)
     }
   }
   const searchFilter = () => {
@@ -211,6 +226,13 @@
     } catch (error) {
       notRequest.value = true
       removeLoadingPickList()
+
+      toast.add({
+        severity: 'info',
+        summary: 'Info',
+        detail: 'No more items to load',
+        life: 5000
+      })
     } finally {
       loading.value = false
     }
@@ -261,3 +283,10 @@
     }
   })
 </script>
+
+<style>
+  .p-picklist-source-wrapper .p-picklist-list li,
+  .p-picklist-target-wrapper .p-picklist-list li {
+    padding: 0 !important;
+  }
+</style>

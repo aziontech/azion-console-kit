@@ -18,8 +18,8 @@
     'name',
     'debug_rules',
     'last_editor',
-    'modules',
     'last_modified',
+    'last_modify',
     'active'
   ]
 
@@ -54,11 +54,26 @@
 
   const getColumns = computed(() => [
     {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
       field: 'name',
       header: 'Name'
     },
     {
-      field: 'status',
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'last_modified',
+      header: 'Last Modified'
+    },
+    {
+      field: 'active',
       header: 'Status',
       sortField: 'active',
       filterPath: 'active',
@@ -69,15 +84,6 @@
           columnAppearance: 'tag'
         })
       }
-    },
-    {
-      field: 'lastEditor',
-      header: 'Last Editor'
-    },
-    {
-      field: 'lastModify',
-      sortField: 'last_modified',
-      header: 'Last Modified'
     }
   ])
 
@@ -117,6 +123,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         :actions="actions"
         :apiFields="EDGE_FIREWALL_API_FIELDS"
+        :defaultOrderingFieldName="'-last_modified'"
       />
       <EmptyResultsBlock
         v-else

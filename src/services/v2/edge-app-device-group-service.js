@@ -40,13 +40,14 @@ export class DeviceGroupService {
 
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
-    await this.http.request({
+    const result = await this.http.request({
       method: 'POST',
       url: this.getUrl(edgeApplicationId),
       body
     })
 
     return {
+      id: result.data.data.id,
       feedback: 'Device Group successfully created'
     }
   }
@@ -54,13 +55,13 @@ export class DeviceGroupService {
   editDeviceGroupService = async (edgeApplicationId, payload) => {
     const body = this.adapter?.transformPayload?.(payload) ?? payload
 
-    const { data } = await this.http.request({
+    await this.http.request({
       method: 'PUT',
       url: this.getUrl(edgeApplicationId, `/${payload.id}`),
       body
     })
 
-    return data.results
+    return 'Device Group successfully updated'
   }
 
   deleteDeviceGroupService = async (edgeApplicationId, deviceGroupId) => {

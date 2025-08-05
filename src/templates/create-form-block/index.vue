@@ -37,6 +37,10 @@
     unSaved: {
       type: Boolean,
       default: true
+    },
+    disableToast: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -78,6 +82,19 @@
     toast.add(options)
   }
 
+  const showToastWithActions = (toastData) => {
+    const options = {
+      closable: true,
+      severity: 'success',
+      summary: 'success',
+      detail: toastData.feedback,
+      additionalDetails: toastData?.additionalFeedback,
+      action: toastData?.actions
+    }
+
+    toast.add(options)
+  }
+
   const showFeedback = (feedback = 'created successfully') => {
     const feedbackMessage = feedback
     if (props.disableAfterCreateToastFeedback) {
@@ -86,15 +103,19 @@
     showToast('success', feedbackMessage)
   }
 
-  const redirectToUrl = (path) => {
-    router.push({ path })
+  const redirectToUrl = (path, params = {}) => {
+    router.push({ path, params, query: params })
   }
 
   const handleSuccess = (response) => {
-    emit('on-response', response)
+    emit('on-response', { ...response, showToastWithActions, redirectToUrl })
+    if (props.disableToast) {
+      router.go(-1)
+      return
+    }
     showFeedback(response?.feedback)
     if (props.disabledCallback) return
-    redirectToUrl(response?.urlToEditView)
+    redirectToUrl(response?.urlToEditView, response?.params)
   }
 
   const onSubmit = handleSubmit(
@@ -106,7 +127,7 @@
       } catch (error) {
         if (error && typeof error.showErrors === 'function') {
           error.showErrors(toast)
-          emit('onError', error.message[0])
+          emit('on-response-fail', error.message[0] || error)
         } else {
           // Fallback for legacy errors or non-ErrorHandler errors
           const errorMessage = error?.message || error
@@ -122,7 +143,10 @@
 
   defineExpose({
     resetForm,
-    values
+    values,
+    showToastWithActions,
+    showFeedback,
+    redirectToUrl
   })
 </script>
 
