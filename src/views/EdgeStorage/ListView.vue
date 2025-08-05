@@ -178,6 +178,7 @@
               :paginator="false"
               enableEditClickFolder
               @on-row-click-edit-folder="handleEditFolder"
+              @delete-selected-items="handleDeleteSelectedItems"
             />
 
             <DragAndDrop
@@ -216,11 +217,15 @@
   import { useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
+  import { useDeleteDialog } from '@/composables/useDeleteDialog'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, handleFileSelect } = useEdgeStorage()
+  const { buckets, selectedBucket, handleFileSelect, removeFiles } = useEdgeStorage()
+  const { isGreaterThanMD } = useResize()
+  const { openDeleteDialog } = useDeleteDialog()
+
   defineProps({
     documentationService: {
       required: true,
@@ -228,7 +233,6 @@
     }
   })
 
-  const selectedBucket = ref(buckets.value[0])
   const selectedFiles = ref([])
   const searchTerm = ref('')
   const fileSearchTerm = ref('')
@@ -236,8 +240,6 @@
   const isLoading = ref(false)
 
   const listServiceFilesRef = ref(null)
-
-  const { isGreaterThanMD } = useResize()
 
   const filteredBuckets = computed(() => {
     if (!searchTerm.value) return buckets.value
@@ -358,5 +360,26 @@
   const goBackToBucket = () => {
     selectedFolder.value = null
     listServiceFilesRef.value?.reload()
+  }
+
+  const handleDeleteSelectedItems = () => {
+    openDeleteDialog({
+      title: `${selectedFiles.value.length} selected items`,
+      message: 'Are you sure you want to delete the selected items?',
+      data: {
+        deleteConfirmationText:
+          selectedFiles.value.length === 1
+            ? selectedFiles.value[0].name
+            : `${selectedFiles.value.length} selected items`
+      },
+      deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
+      successCallback: () => {
+        listServiceFilesRef.value?.reload()
+      },
+      closeCallback: () => {
+        selectedFiles.value = []
+        listServiceFilesRef.value?.reload()
+      }
+    })
   }
 </script>

@@ -64,10 +64,11 @@ const buckets = ref([
     files: []
   }
 ])
+const selectedBucket = ref(buckets.value[0])
 
 const formatSize = (size) => {
+  if (size == 0) return '0 Bytes'
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  if (size == 0) return 'n/a'
   const aux = Math.floor(Math.log(size) / Math.log(1024))
   return (size / Math.pow(1024, aux)).toFixed(2) + ' ' + sizes[aux]
 }
@@ -235,8 +236,16 @@ export const useEdgeStorage = () => {
     return null
   }
 
+  const removeFiles = (fileIds) => {
+    const bucket = findBucketById(selectedBucket.value.id)
+    if (bucket) {
+      bucket.files = bucket.files.filter((file) => !fileIds.includes(file.id))
+    }
+  }
+
   return {
     buckets,
+    selectedBucket,
     files,
     addBucket,
     deleteBucket,
@@ -247,6 +256,7 @@ export const useEdgeStorage = () => {
     addFiles,
     getFilesByBucket,
     removeFile,
+    removeFiles,
     handleFileSelect,
     createFolder
   }
