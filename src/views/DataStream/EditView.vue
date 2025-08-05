@@ -19,6 +19,8 @@
     }
   })
 
+  const validation = validationSchema(true)
+
   const store = useAccountStore()
   const hasNoPermissionToEditDataStream = computed(() => store.hasPermissionToEditDataStream)
 
@@ -47,11 +49,11 @@
         :editService="dataStreamService.editDataStreamService"
         :loadService="dataStreamService.loadDataStreamService"
         :updatedRedirect="props.updatedRedirect"
-        :schema="validationSchema"
+        :schema="validation"
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsDataStream />
+          <FormFieldsDataStream isEdit />
         </template>
         <template
           v-if="hasNoPermissionToEditDataStream"

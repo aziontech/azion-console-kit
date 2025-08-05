@@ -268,7 +268,7 @@
             for="secretKey"
             label="Secret Key"
             data-testid="data-stream-form__destination__secret-key-field__label"
-            isRequired
+            :isRequired="!isEdit"
           />
           <PrimePassword
             id="secretKey"
@@ -346,34 +346,14 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <LabelBlock
+          <FieldGroupRadio
             label="Content Type"
+            nameField="contentType"
             isRequired
-            data-testid="data-stream-form__destination__content-type-field__label"
+            :options="listContentType"
+            :isCard="false"
+            data-testid="data-stream-form__destination__content-type-field"
           />
-          <div class="flex flex-col gap-3">
-            <div
-              class="flex no-wrap gap-2 items-center"
-              v-for="contentTypeItem of listContentType"
-              :key="contentTypeItem.value"
-            >
-              <RadioButton
-                :disabled="hasNoPermissionToEditDataStream"
-                :class="{ 'p-invalid': contentTypeError }"
-                v-model="contentType"
-                inputId="contentType"
-                :name="contentTypeItem.value"
-                :value="contentTypeItem.value"
-                data-testid="data-stream-form__destination__content-type-field__radio"
-              />
-              <label
-                class="text-color text-sm font-normal leading-tight"
-                data-testid="data-stream-form__destination__content-type-field__label"
-              >
-                {{ contentTypeItem.label }}
-              </label>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -826,16 +806,22 @@
   import ButtonPrimer from 'primevue/button'
   import PrimePassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
-  import RadioButton from 'primevue/radiobutton'
   import LabelBlock from '@/templates/label-block'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio.vue'
 
   const store = useAccountStore()
 
   const { value: endpoint } = useField('endpoint')
   const { value: endpointUrl } = useField('endpointUrl')
   const { value: headers } = useField('headers')
+
+  defineProps({
+    isEdit: {
+      type: Boolean
+    }
+  })
 
   // Standard
   const { value: host } = useField('host')
@@ -844,7 +830,6 @@
   const { value: accessKey, errorMessage: accessKeyError } = useField('accessKey')
   const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
   const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
-  const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
   const { value: payloadFormat } = useField('payloadFormat')
   const { value: lineSeparator } = useField('lineSeparator')
   const { value: maxSize } = useField('maxSize')
@@ -923,8 +908,8 @@
   })
 
   const listContentType = ref([
-    { label: 'plain/text', value: 'plain/text' },
-    { label: 'application/gzip', value: 'application/gzip' }
+    { title: 'plain/text', inputValue: 'plain/text' },
+    { title: 'application/gzip', inputValue: 'application/gzip' }
   ])
 
   const theme = computed(() => {
