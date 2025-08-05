@@ -41,7 +41,7 @@ export class EdgeSQLService {
     })
 
     const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
-    
+
     return {
       feedback: `Database "${name}" created successfully`,
       urlToEditView: `/edge-sql/databases/${adaptedData.id}`,
@@ -131,7 +131,9 @@ export class EdgeSQLService {
       url: `/v4/edge_sql/databases/${databaseId}/query`,
       method: 'POST',
       body: {
-        statements: ["SELECT name, type, sql FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name;"]
+        statements: [
+          "SELECT name, type, sql FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name;"
+        ]
       }
     })
 
@@ -142,7 +144,7 @@ export class EdgeSQLService {
     if (!databaseId) {
       throw new Error('Database ID is required')
     }
-    
+
     if (!statement) {
       throw new Error('SQL statement is required')
     }
@@ -162,7 +164,7 @@ export class EdgeSQLService {
     if (!databaseId) {
       throw new Error('Database ID is required')
     }
-    
+
     if (!statements || !Array.isArray(statements) || statements.length === 0) {
       throw new Error('At least one SQL statement is required')
     }

@@ -36,9 +36,8 @@ export function useEdgeSQLStatusManager() {
     listeners.forEach((listener) => {
       try {
         listener(data)
-      // eslint-disable-next-line no-empty
-      } catch (error) {
-      } 
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     })
   }
 
@@ -197,7 +196,6 @@ export function useEdgeSQLStatusManager() {
     return updatedOperations
   }
 
-
   function updateOperationStatus(operationId, newStatus) {
     const operation = pendingOperations.value.get(operationId)
     if (operation) {
@@ -206,11 +204,10 @@ export function useEdgeSQLStatusManager() {
     }
   }
 
-
   function completeOperation(operationId, finalStatus, error = null) {
     const operation = pendingOperations.value.get(operationId)
 
-        if (operation) {
+    if (operation) {
       const callback = operationCallbacks.value.get(operationId)
       if (callback) {
         callback(finalStatus, { ...operation, error })
@@ -221,7 +218,6 @@ export function useEdgeSQLStatusManager() {
 
     emitGlobalEvent('operationCompleted', { id: operationId, status: finalStatus, error })
   }
-
 
   function startPolling() {
     if (intervalRef.value || !hasPendingOperations.value) {
@@ -238,9 +234,8 @@ export function useEdgeSQLStatusManager() {
 
       try {
         await checkAllPendingOperations()
-      // eslint-disable-next-line no-empty
-      } catch (error) {
-      }
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     }, POLLING_INTERVAL)
   }
 
@@ -256,9 +251,8 @@ export function useEdgeSQLStatusManager() {
     try {
       const operations = Array.from(pendingOperations.value.entries()).map(([id, op]) => [id, op])
       localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(operations))
-    // eslint-disable-next-line no-empty
-    } catch (error) {
-    }
+      // eslint-disable-next-line no-empty
+    } catch (error) {}
   }
 
   function loadFromLocalStorage() {
@@ -267,7 +261,6 @@ export function useEdgeSQLStatusManager() {
       if (stored) {
         const operations = JSON.parse(stored)
         pendingOperations.value = new Map(operations)
-
 
         const now = Date.now()
         const oneHour = 60 * 60 * 1000

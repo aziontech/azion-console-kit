@@ -110,7 +110,7 @@ export class EdgeSQLAdapter {
 
   static adaptTablesFromQuery(httpResponse) {
     const data = httpResponse.data || httpResponse.body
-    
+
     if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
       return {
         statusCode: 200,
@@ -132,9 +132,9 @@ export class EdgeSQLAdapter {
 
     // SQLite master table returns: name, type, sql
     const tables = firstResult.results.rows.map((row) => ({
-      name: row[0],        // name column
-      type: row[1] || 'table',  // type column  
-      sql: row[2] || ''    // sql column
+      name: row[0], // name column
+      type: row[1] || 'table', // type column
+      sql: row[2] || '' // sql column
     }))
 
     return {
@@ -148,7 +148,7 @@ export class EdgeSQLAdapter {
   static adaptTablesFromExecute(httpResponse) {
     const data = httpResponse.data || httpResponse.body
     const results = data.data || data
-    
+
     // Execute returns array of results, get first one
     if (!Array.isArray(results) || results.length === 0) {
       return {
@@ -171,9 +171,9 @@ export class EdgeSQLAdapter {
 
     // SQLite master table returns: name, type, sql
     const tables = result.rows.map((row) => ({
-      name: row[0],        // name column
-      type: row[1] || 'table',  // type column  
-      sql: row[2] || ''    // sql column
+      name: row[0], // name column
+      type: row[1] || 'table', // type column
+      sql: row[2] || '' // sql column
     }))
 
     return {
@@ -188,39 +188,41 @@ export class EdgeSQLAdapter {
     const data = httpResponse.data || httpResponse.body
 
     // A API retorna data como array de objetos com results ou error
-    const results = data?.data?.map((item) => {
-      // Se há erro no item, retornar estrutura de erro
-      if (item.error) {
-        return {
-          error: item.error,
-          columns: [],
-          rows: [],
-          statement: null,
-          query_duration_ms: null,
-          rows_read: null,
-          rows_written: null
+    const results =
+      data?.data?.map((item) => {
+        // Se há erro no item, retornar estrutura de erro
+        if (item.error) {
+          return {
+            error: item.error,
+            columns: [],
+            rows: [],
+            statement: null,
+            query_duration_ms: null,
+            rows_read: null,
+            rows_written: null
+          }
         }
-      }
 
-      // Se há results, processar normalmente
-      return {
-        columns: item.results?.columns || [],
-        rows: item.results?.rows || [],
-        statement: item.results?.statement,
-        query_duration_ms: item.results?.query_duration_ms,
-        rows_read: item.results?.rows_read,
-        rows_written: item.results?.rows_written
-      }
-    }) || []
+        // Se há results, processar normalmente
+        return {
+          columns: item.results?.columns || [],
+          rows: item.results?.rows || [],
+          statement: item.results?.statement,
+          query_duration_ms: item.results?.query_duration_ms,
+          rows_read: item.results?.rows_read,
+          rows_written: item.results?.rows_written
+        }
+      }) || []
 
     return {
       statusCode: 200,
       body: {
         state: data?.state || 'executed',
         results,
-        affectedRows: results.reduce((total, result) => {
-          return total + (result.rows?.length || 0)
-        }, 0) || 0
+        affectedRows:
+          results.reduce((total, result) => {
+            return total + (result.rows?.length || 0)
+          }, 0) || 0
       }
     }
   }
@@ -228,19 +230,21 @@ export class EdgeSQLAdapter {
   static adaptQueryFromExecute(httpResponse) {
     const data = httpResponse.data || httpResponse.body
     const results = data.data || data
-    
+
     // Execute returns array of results, get first one
     if (!Array.isArray(results) || results.length === 0) {
       return {
         statusCode: 200,
         body: {
-          results: [{
-            rows: [],
-            columns: [],
-            rowsAffected: 0,
-            executionTime: 0,
-            success: true
-          }]
+          results: [
+            {
+              rows: [],
+              columns: [],
+              rowsAffected: 0,
+              executionTime: 0,
+              success: true
+            }
+          ]
         }
       }
     }
@@ -249,13 +253,15 @@ export class EdgeSQLAdapter {
     return {
       statusCode: 200,
       body: {
-        results: [{
-          rows: result.rows || [],
-          columns: result.columns || [],
-          rowsAffected: result.rowsAffected || result.rows_affected || 0,
-          executionTime: result.executionTime || result.execution_time || 0,
-          success: true
-        }]
+        results: [
+          {
+            rows: result.rows || [],
+            columns: result.columns || [],
+            rowsAffected: result.rowsAffected || result.rows_affected || 0,
+            executionTime: result.executionTime || result.execution_time || 0,
+            success: true
+          }
+        ]
       }
     }
   }
@@ -264,39 +270,41 @@ export class EdgeSQLAdapter {
     const data = httpResponse.data || httpResponse.body
 
     // A API retorna data como array de objetos com results ou error
-    const results = data?.data?.map((item) => {
-      // Se há erro no item, retornar estrutura de erro
-      if (item.error) {
-        return {
-          error: item.error,
-          columns: [],
-          rows: [],
-          statement: null,
-          query_duration_ms: null,
-          rows_read: null,
-          rows_written: null
+    const results =
+      data?.data?.map((item) => {
+        // Se há erro no item, retornar estrutura de erro
+        if (item.error) {
+          return {
+            error: item.error,
+            columns: [],
+            rows: [],
+            statement: null,
+            query_duration_ms: null,
+            rows_read: null,
+            rows_written: null
+          }
         }
-      }
 
-      // Se há results, processar normalmente
-      return {
-        columns: item.results?.columns || [],
-        rows: item.results?.rows || [],
-        statement: item.results?.statement,
-        query_duration_ms: item.results?.query_duration_ms,
-        rows_read: item.results?.rows_read,
-        rows_written: item.results?.rows_written
-      }
-    }) || []
+        // Se há results, processar normalmente
+        return {
+          columns: item.results?.columns || [],
+          rows: item.results?.rows || [],
+          statement: item.results?.statement,
+          query_duration_ms: item.results?.query_duration_ms,
+          rows_read: item.results?.rows_read,
+          rows_written: item.results?.rows_written
+        }
+      }) || []
 
     return {
       statusCode: 200,
       body: {
         state: data?.state || 'executed',
         results,
-        affectedRows: results.reduce((total, result) => {
-          return total + (result.rows?.length || 0)
-        }, 0) || 0
+        affectedRows:
+          results.reduce((total, result) => {
+            return total + (result.rows?.length || 0)
+          }, 0) || 0
       }
     }
   }

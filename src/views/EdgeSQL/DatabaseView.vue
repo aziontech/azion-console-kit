@@ -59,7 +59,6 @@
   const executionTime = ref(0)
   const affectedRows = ref(0)
 
-  // Dados das tabelas para o Tree
   const tablesTree = ref([])
   const selectedTableSchema = ref(null)
   const selectedTableDefinition = ref('')
@@ -67,25 +66,19 @@
   const isLoadingDefinition = ref(false)
   const isEditorCollapsed = ref(true)
   const isTemplatesCollapsed = ref(true)
-  const selectedTableName = ref(null) // Tabela atualmente selecionada/ativa
+  const selectedTableName = ref(null)
 
-  // Estado da interface
   const activeTabIndex = ref(1)
   const tableMenuRef = ref()
   const selectedTable = ref(null)
   const selectedRows = ref([])
 
-  // Paginação dos resultados
   const rowsPerPage = ref(20)
   const currentPage = ref(0)
-
-  // Função para lidar com mudanças de paginação
   const onPageChange = (event) => {
     currentPage.value = event.page
     rowsPerPage.value = event.rows
   }
-
-  // Carregar informações do banco de dados
   const loadDatabaseInfo = async () => {
     try {
       const result = await edgeSQLService.getDatabase(databaseId.value)
@@ -93,7 +86,6 @@
       if (result.statusCode === 200) {
         const database = result.body
 
-        // Verificar se o database está pronto para uso
         if (database.status === 'creating') {
           toast.add({
             severity: 'warn',
@@ -132,7 +124,6 @@
     }
   }
 
-  // Carregar tabelas do banco
   const loadTables = async () => {
     if (!databaseId.value) return
 
@@ -143,7 +134,6 @@
       if (result.statusCode === 200) {
         sqlStore.setCurrentTables(result.body.tables)
 
-        // Formatar para o componente Tree
         tablesTree.value = result.body.tables.map((table) => ({
           key: table.name,
           label: table.name,
@@ -165,7 +155,6 @@
     }
   }
 
-  // Executar query
   const executeQuery = async (showToast = true) => {
     if (!sqlQuery.value.trim()) {
       if (showToast) {
@@ -195,7 +184,6 @@
     const startTime = Date.now()
 
     try {
-      // Detectar se é uma query SELECT ou um comando
       const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
       const result = isSelectQuery
@@ -213,17 +201,14 @@
         queryResults.value = result.body.results || []
         affectedRows.value = result.body.affectedRows || 0
 
-        // Limpar estados de edição e seleção
         selectedRows.value = []
         rowFormDrawerVisible.value = false
         isEditingRow.value = false
         editingRowData.value = {}
         editingRowIndex.value = -1
 
-        // Resetar paginação para primeira página
         currentPage.value = 0
 
-        // Adicionar ao histórico
         sqlStore.addQueryResult({
           query: sqlQuery.value,
           results: result.body.results,
@@ -232,9 +217,8 @@
           type: isSelectQuery ? 'query' : 'execute'
         })
 
-        activeTabIndex.value = 0 // Mudar para aba de resultados
+        activeTabIndex.value = 0
 
-        // Mostrar toast apenas se solicitado (execução manual)
         if (showToast) {
           const stats = getQueryStats(queryResults.value)
           const apiDuration = stats?.duration || executionTime.value
@@ -247,7 +231,6 @@
           })
         }
 
-        // Recarregar tabelas se foi um comando DDL
         if (
           !isSelectQuery &&
           (sqlQuery.value.toLowerCase().includes('create table') ||
@@ -256,13 +239,10 @@
         ) {
           await loadTables()
         }
-
-        // As estatísticas já são mostradas automaticamente na interface
       } else {
         throw new Error(result.error || 'Error executing query')
       }
     } catch (error) {
-      // Sempre mostrar erros
       toast.add({
         severity: 'error',
         summary: 'Error',
@@ -274,7 +254,6 @@
     }
   }
 
-  // Quick query templates - importado do arquivo de constants
   const quickTemplates = computed(() => {
     return QUICK_TEMPLATES.map((template) => ({
       ...template,
@@ -305,10 +284,10 @@
   const useTemplate = (template) => {
     sqlQuery.value = template.query
     activeTabIndex.value = 0
-    // Desselecionar tabela ativa
+
     selectedTableName.value = null
     sqlStore.setSelectedTable(null)
-    // Expandir editor automaticamente para mostrar a query
+
     if (isEditorCollapsed.value) {
       isEditorCollapsed.value = false
     }
@@ -317,16 +296,15 @@
   const rerunQuery = async (query) => {
     sqlQuery.value = query
     activeTabIndex.value = 0
-    // Expandir o editor se estiver colapsado para mostrar a query
+
     if (isEditorCollapsed.value) {
       isEditorCollapsed.value = false
     }
-    // Executar a query automaticamente
+
     await executeQuery()
   }
 
   const clearHistory = () => {
-    // Visual feedback when history is cleared
     toast.add({
       severity: 'info',
       summary: 'History Cleared',
@@ -337,19 +315,16 @@
 
   const selectTable = async (node) => {
     const tableName = node.key || node.name
-    selectedTableName.value = tableName // Marcar tabela como selecionada/ativa
+    selectedTableName.value = tableName
     sqlStore.setSelectedTable({ name: tableName })
     sqlQuery.value = SQLITE_QUERIES.SELECT_ALL(tableName)
 
-    // Ativar skeleton imediatamente
     isLoadingSchema.value = true
 
-    // Carregar schema da tabela
     await loadTableSchema(tableName)
 
-    // Executar automaticamente a query e mostrar na aba Results (sem toast)
-    activeTabIndex.value = 0 // Mudar para aba Results
-    await executeQuery(false) // false = não mostrar toast
+    activeTabIndex.value = 0
+    await executeQuery(false)
   }
 
   const toggleTemplates = () => {
@@ -370,8 +345,8 @@
           columns: result.body.results[0].rows || []
         }
       }
+      // eslint-disable-next-line no-empty
     } catch (error) {
-      // Silently handle schema loading errors
     } finally {
       isLoadingSchema.value = false
     }
@@ -381,7 +356,6 @@
     isLoadingDefinition.value = true
     selectedTableDefinition.value = ''
     try {
-      // Obter a definição CREATE TABLE do SQLite
       const result = await edgeSQLService.queryDatabase(databaseId.value, {
         statement: SQLITE_QUERIES.TABLE_DEFINITION(tableName),
         parameters: []
@@ -417,7 +391,6 @@
     })
   }
 
-  // Monaco Editor theme configuration para SQL
   const monacoTheme = computed(() => {
     return accountStore.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
@@ -458,28 +431,23 @@
     }
   }
 
-  // Menu actions for tables
   const showTableMenu = (event, table) => {
-    // Se é a mesma tabela, apenas alternar o menu
     if (selectedTable.value?.key === table.key) {
       tableMenuRef.value.toggle(event)
       return
     }
 
-    // Fechar menu anterior se estiver aberto
     if (tableMenuRef.value) {
       tableMenuRef.value.hide()
     }
 
     selectedTable.value = table
 
-    // Usar nextTick para garantir que o estado foi atualizado
     nextTick(() => {
       tableMenuRef.value.show(event)
     })
   }
 
-  // Estado dos drawers
   const drawerVisible = ref(false)
   const definitionDrawerVisible = ref(false)
   const rowFormDrawerVisible = ref(false)
@@ -491,7 +459,6 @@
     if (!selectedTableDefinition.value) return
 
     try {
-      // Carregar definição se ainda não foi carregada
       if (!selectedTableDefinition.value) {
         await loadTableDefinition(selectedTableSchema.value.name)
       }
@@ -513,7 +480,6 @@
     }
   }
 
-  // Serviço para deletar tabela usando SQL DROP TABLE
   const deleteTableService = async (tableName) => {
     try {
       const result = await edgeSQLService.executeDatabase(databaseId.value, {
@@ -521,9 +487,8 @@
       })
 
       if (result.statusCode === 200) {
-        // Recarregar lista de tabelas
         await loadTables()
-        // Limpar seleção se a tabela deletada estava selecionada
+
         if (selectedTableName.value === tableName) {
           selectedTableName.value = null
           sqlStore.setSelectedTable(null)
@@ -538,7 +503,6 @@
     }
   }
 
-  // Função para abrir dialog de confirmação de delete de tabela
   const openDeleteTableDialog = (tableName) => {
     dialog.open(DeleteDialog, {
       data: {
@@ -548,14 +512,11 @@
         deleteService: () => deleteTableService(tableName),
         deleteConfirmationText: tableName,
         entityDeleteMessage: `The table "${tableName}" will be permanently deleted along with all its data. This action cannot be undone.`,
-        onSuccess: () => {
-          // Já é tratado no deleteTableService
-        }
+        onSuccess: () => {}
       }
     })
   }
 
-  // Inicializar o gerenciador de ações de tabela
   const tableActionManager = new TableActionManager(
     executeQuery,
     {
@@ -581,7 +542,6 @@
     return tableActionManager.generateMenuItems(selectedTable.value.key)
   })
 
-  // Formatação de resultados
   const formatResultColumns = (result) => {
     return (
       result.columns?.map((col) => ({
@@ -591,34 +551,30 @@
     )
   }
 
-  // Verificar se uma coluna é Primary Key
   const isPrimaryKey = (columnName) => {
     if (!selectedTableSchema.value?.columns) return false
     const columnInfo = selectedTableSchema.value.columns.find((col) => col[1] === columnName)
-    return columnInfo ? columnInfo[5] === 1 : false // col[5] é o campo pk
+    return columnInfo ? columnInfo[5] === 1 : false
   }
 
   const formatResultData = (result) => {
     if (!result.rows || !result.columns) return []
 
     return result.rows.map((row, rowIndex) => {
-      const obj = { _rowId: rowIndex, _originalRow: row } // Manter dados originais
+      const obj = { _rowId: rowIndex, _originalRow: row }
       result.columns.forEach((col, index) => {
         const value = row[index]
-        obj[col] = value // Sempre manter o valor original para edição
+        obj[col] = value
       })
       return obj
     })
   }
 
-  // Função para detectar se há erro no resultado
   const hasResultError = (result) => {
-    // Estrutura padrão: result.errors (array)
     if (result?.errors && Array.isArray(result.errors) && result.errors.length > 0) {
       return true
     }
 
-    // Estrutura do serviço corrigido: result.error (string)
     if (result?.error && typeof result.error === 'string') {
       return true
     }
@@ -626,17 +582,14 @@
     return false
   }
 
-  // Função para extrair mensagem de erro do resultado
   const getResultError = (result) => {
     if (!hasResultError(result)) return null
 
-    // Estrutura padrão: result.errors (array)
     if (result?.errors && Array.isArray(result.errors) && result.errors.length > 0) {
       const error = result.errors[0]
       return error.detail || error.title || 'Unknown error occurred'
     }
 
-    // Estrutura do serviço corrigido: result.error (string)
     if (result?.error && typeof result.error === 'string') {
       return result.error
     }
@@ -644,11 +597,9 @@
     return 'Unknown error occurred'
   }
 
-  // Função para extrair estatísticas dos resultados
   const getQueryStats = (results) => {
     if (!Array.isArray(results) || results.length === 0) return null
 
-    // Somar estatísticas de todos os resultados
     const stats = results.reduce(
       (acc, result) => {
         return {
@@ -664,19 +615,15 @@
     return stats
   }
 
-  // Função para formatar valores de células para visualização
   const formatCellValue = (value) => {
     if (value === null) return 'NULL'
     if (value === undefined) return 'UNDEFINED'
     if (value === '') return '(empty)'
 
-    // Para objetos complexos, mostrar conteúdo real quando possível
     if (value !== null && value !== undefined && typeof value === 'object') {
-      // Se tem propriedades específicas de BLOB/Vector
       if (value.type && value.data) {
         return `${value.type}(${value.data.length || 'unknown size'})`
       } else if (Array.isArray(value)) {
-        // Para arrays pequenos, mostrar conteúdo; para grandes, mostrar resumo
         if (value.length <= 5) {
           return `[${value.join(', ')}]`
         } else {
@@ -685,13 +632,11 @@
       } else if (value.constructor === Uint8Array || value.constructor === ArrayBuffer) {
         return `BLOB(${value.byteLength || value.length} bytes)`
       } else {
-        // Para objetos simples, mostrar conteúdo real
         const keys = Object.keys(value)
         if (keys.length === 1) {
           const firstKey = keys[0]
           const firstValue = value[firstKey]
 
-          // Se é um valor simples, mostrar ele
           if (typeof firstValue === 'string' || typeof firstValue === 'number') {
             if (typeof firstValue === 'string' && firstValue.length > 50) {
               return `"${firstValue.substring(0, 47)}..."`
@@ -701,7 +646,6 @@
           }
         }
 
-        // Fallback para objetos complexos
         try {
           const jsonStr = JSON.stringify(value)
           if (jsonStr.length <= 100) {
@@ -718,7 +662,6 @@
     return value
   }
 
-  // Serviço para deletar linhas usando SQL DELETE
   const deleteRowsService = async (selectedID, selectedItemData) => {
     try {
       if (!selectedTableName.value || !selectedTableSchema.value?.columns) {
@@ -728,18 +671,13 @@
       const tableName = selectedTableName.value
       const columnInfo = selectedTableSchema.value.columns
 
-      // selectedItemData pode ser um único objeto ou array
       const rowsToDelete = Array.isArray(selectedItemData) ? selectedItemData : [selectedItemData]
 
-      // Construir queries DELETE para cada linha selecionada
       const deleteQueries = rowsToDelete.map((rowData) => {
-        // Construir condição WHERE usando todas as colunas da linha
         const whereConditions = []
 
-        // Tentar usar chave primária primeiro
-        const primaryKeys = columnInfo.filter((col) => col[5] === 1) // col[5] é o campo pk
+        const primaryKeys = columnInfo.filter((col) => col[5] === 1)
 
-        // Verificar se temos chaves primárias com valores não-nulos
         let usePrimaryKeys = false
         if (primaryKeys.length > 0) {
           primaryKeys.forEach((col) => {
@@ -755,9 +693,7 @@
           })
         }
 
-        // Se não temos PKs válidas, usar todas as colunas não-nulas
         if (!usePrimaryKeys) {
-          // Se não há chave primária, usar todas as colunas não-nulas
           Object.keys(rowData).forEach((columnName) => {
             if (columnName !== '_rowId') {
               const value = rowData[columnName]
@@ -778,7 +714,6 @@
         return `DELETE FROM ${tableName} WHERE ${whereConditions.join(' AND ')};`
       })
 
-      // Executar todas as queries DELETE
       const result = await edgeSQLService.executeDatabase(databaseId.value, {
         statements: deleteQueries
       })
@@ -794,7 +729,6 @@
     }
   }
 
-  // Função utilitária para escapar valores SQL (reutilizada)
   const escapeValue = (value, columnType) => {
     if (value === null || value === undefined || value === '') {
       return 'NULL'
@@ -802,24 +736,20 @@
 
     const strValue = value.toString().trim()
 
-    // Para tipos numéricos, não colocar aspas se for um número válido
     if (
       columnType &&
       (columnType.toUpperCase().includes('INTEGER') ||
         columnType.toUpperCase().includes('REAL') ||
         columnType.toUpperCase().includes('NUMERIC'))
     ) {
-      // Verificar se é um número válido
       if (!isNaN(strValue) && strValue !== '') {
         return strValue
       }
     }
 
-    // Para outros tipos, escapar aspas simples e colocar entre aspas
     return `'${strValue.replace(/'/g, "''")}'`
   }
 
-  // Função utilitária para obter tipo da coluna
   const getColumnTypeFromInfo = (columnName, columnInfo) => {
     const info = columnInfo.find((col) => col[1] === columnName)
     return info ? info[2] : 'TEXT'
@@ -830,14 +760,12 @@
 
     const selectedCount = selectedRows.value.length
 
-    // Preparar dados das linhas selecionadas (sem _rowId)
     const selectedRowsData = selectedRows.value.map((row) => {
       const cleanRow = { ...row }
       delete cleanRow._rowId
       return cleanRow
     })
 
-    // Abrir dialog de confirmação seguindo o padrão do projeto
     dialog.open(DeleteDialog, {
       data: {
         title: `row${selectedCount > 1 ? 's' : ''}`,
@@ -849,7 +777,6 @@
           selectedCount > 1 ? 's' : ''
         } will be permanently deleted from the table. This action cannot be undone.`,
         onSuccess: async () => {
-          // Limpar seleção e recarregar dados
           selectedRows.value = []
           if (selectedTableName.value && sqlQuery.value) {
             await executeQuery(false)
@@ -937,19 +864,15 @@
     const result = queryResults.value[0]
     if (!result.columns) return
 
-    // Limpar estado anterior primeiro
     clearRowFormState()
 
-    // Preparar dados para edição usando diretamente rowData
     isEditingRow.value = true
     editingRowData.value = {}
 
-    // rowData já contém os dados formatados da linha
     result.columns.forEach((col) => {
       editingRowData.value[col] = rowData[col] || ''
     })
 
-    // Definir qual campo deve receber o foco
     focusedField.value = fieldToFocus
 
     editingRowIndex.value = rowIndex
@@ -957,7 +880,6 @@
   }
 
   const handleRowFormSuccess = async () => {
-    // Limpar todos os estados primeiro
     selectedRows.value = []
     editingRowData.value = {}
     editingRowIndex.value = -1
@@ -965,22 +887,15 @@
     focusedField.value = ''
     rowFormDrawerVisible.value = false
 
-    // Recarregar os dados da tabela executando a query novamente
     if (selectedTableName.value && sqlQuery.value) {
-      await executeQuery(false) // false = não mostrar toast da query
+      await executeQuery(false)
     }
-
-    // Não mostrar toast aqui - deixar o template base mostrar
-    // para evitar notificações duplicadas
   }
 
-  // Estado para controlar clique vs double-click
   const clickTimeout = ref(null)
 
-  // Função para copiar valor da célula (só no clique simples)
   const copyToClipboard = async (rowData, fieldName) => {
     try {
-      // Usar o valor original da linha em vez do valor formatado
       const originalRow = rowData._originalRow
       const result = queryResults.value[0]
 
@@ -988,7 +903,6 @@
         const fieldIndex = result.columns.indexOf(fieldName)
         const originalValue = fieldIndex >= 0 ? originalRow[fieldIndex] : rowData[fieldName]
 
-        // Para objetos complexos, tentar JSON.stringify
         let textToCopy = ''
         if (originalValue === null || originalValue === undefined) {
           textToCopy = 'NULL'
@@ -1023,29 +937,23 @@
     }
   }
 
-  // Gerenciar clique simples vs double-click
   const handleCellClick = (rowData, fieldName) => {
-    // Cancelar timeout anterior se existir
     if (clickTimeout.value) {
       clearTimeout(clickTimeout.value)
     }
 
-    // Definir timeout para clique simples
     clickTimeout.value = setTimeout(() => {
       copyToClipboard(rowData, fieldName)
       clickTimeout.value = null
-    }, 250) // 250ms para detectar double-click
+    }, 250)
   }
 
-  // Gerenciar double-click (cancelar cópia e abrir drawer)
   const handleCellDoubleClick = (data, index, field) => {
-    // Cancelar timeout do clique simples
     if (clickTimeout.value) {
       clearTimeout(clickTimeout.value)
       clickTimeout.value = null
     }
 
-    // Abrir drawer
     openEditRowDrawer(data, index, field)
   }
 
@@ -1066,9 +974,7 @@
     padding: { top: 10, bottom: 10 }
   }
 
-  // Função para lidar com atalhos de teclado
   const handleKeyDown = (event) => {
-    // Ctrl+Enter para executar query
     if (event.ctrlKey && event.key === 'Enter') {
       event.preventDefault()
       if (!isExecutingQuery.value && sqlQuery.value.trim()) {
@@ -1081,12 +987,10 @@
     await loadDatabaseInfo()
     await loadTables()
 
-    // Adicionar listener para atalhos de teclado
     document.addEventListener('keydown', handleKeyDown)
   })
 
   onBeforeUnmount(() => {
-    // Remover listener quando componente for desmontado
     document.removeEventListener('keydown', handleKeyDown)
   })
 
@@ -1103,10 +1007,8 @@
     }
   })
 
-  // Limpar estado quando o drawer fechar
   watch(rowFormDrawerVisible, (newVisible) => {
     if (!newVisible) {
-      // Delay para permitir animações antes de limpar
       setTimeout(() => {
         clearRowFormState()
       }, 300)
@@ -1137,13 +1039,11 @@
       <template #content>
         <div class="sql-interface h-full overflow-hidden">
           <div class="flex h-full gap-3 p-3">
-            <!-- Database structure sidebar - Fixed width -->
             <div
               class="database-sidebar flex-shrink-0 bg-surface-0 border-round-lg border-1 surface-border"
               style="width: 320px"
             >
               <div class="h-full flex flex-column overflow-hidden">
-                <!-- Tables Section - Takes available space -->
                 <div class="p-4 flex-grow-1 overflow-hidden flex flex-column">
                   <h3
                     class="text-sm font-semibold mb-3 text-color flex items-center gap-2 flex-shrink-0"
@@ -1222,7 +1122,6 @@
                   </div>
                 </div>
 
-                <!-- Quick Templates Section - Fixed at bottom -->
                 <div
                   class="flex-shrink-0 border-top-1 surface-border templates-section"
                   :class="{ 'p-4': !isTemplatesCollapsed, 'px-4 py-3': isTemplatesCollapsed }"
@@ -1264,10 +1163,8 @@
               </div>
             </div>
 
-            <!-- Main SQL interface -->
             <div class="flex-1 min-w-0">
               <div class="h-full flex flex-column gap-2 overflow-hidden">
-                <!-- SQL Editor -->
                 <div class="flex-shrink-0">
                   <Accordion :activeIndex="isEditorCollapsed ? null : 0">
                     <AccordionTab>
@@ -1318,7 +1215,6 @@
                             v-if="queryResults.length > 0"
                             class="flex align-items-center gap-3 text-sm text-color-secondary px-3 py-1 bg-surface-100 dark:bg-surface-700 border-round"
                           >
-                            <!-- Tempo de execução real da API -->
                             <div
                               v-if="getQueryStats(queryResults)?.duration"
                               class="flex align-items-center gap-1"
@@ -1326,7 +1222,7 @@
                               <i class="pi pi-clock text-xs"></i>
                               <span>{{ getQueryStats(queryResults).duration }}ms</span>
                             </div>
-                            <!-- Fallback para tempo calculado -->
+
                             <div
                               v-else-if="executionTime > 0"
                               class="flex align-items-center gap-1"
@@ -1335,7 +1231,6 @@
                               <span>{{ executionTime }}ms</span>
                             </div>
 
-                            <!-- Estatísticas de leitura e escrita -->
                             <div
                               v-if="getQueryStats(queryResults)?.rowsRead !== undefined"
                               class="flex align-items-center gap-1"
@@ -1357,7 +1252,6 @@
                   </Accordion>
                 </div>
 
-                <!-- Results and History -->
                 <div
                   class="flex-grow-1 bg-surface-0 border-round-lg border-1 surface-border overflow-hidden"
                 >
@@ -1373,7 +1267,6 @@
                         </div>
                       </template>
 
-                      <!-- Loading skeleton durante execução de query -->
                       <div
                         v-if="isExecutingQuery"
                         class="results-container overflow-y-auto pr-2"
@@ -1418,7 +1311,6 @@
                         </div>
                       </div>
 
-                      <!-- Estado vazio quando não há resultados -->
                       <div
                         v-else-if="queryResults.length === 0"
                         class="flex flex-col items-center justify-center h-full text-center p-8"
@@ -1428,7 +1320,6 @@
                         <p class="text-color-secondary">Execute a query to see the results here</p>
                       </div>
 
-                      <!-- Resultados -->
                       <div
                         v-else
                         class="results-container overflow-y-auto pr-2"
@@ -1461,7 +1352,6 @@
                               />
                             </h4>
 
-                            <!-- Toolbar das Ações -->
                             <div class="flex items-center gap-2">
                               <Button
                                 v-if="result.columns?.length > 0"
@@ -1498,7 +1388,6 @@
                             </div>
                           </div>
 
-                          <!-- Mostrar erro quando há erro na query -->
                           <div
                             v-if="hasResultError(result)"
                             class="text-center p-6 bg-surface-50 dark:bg-surface-800 border-round-lg border-1 surface-border"
@@ -1512,7 +1401,6 @@
                             </p>
                           </div>
 
-                          <!-- Mostrar tabela quando há colunas (com ou sem dados) -->
                           <div
                             v-else-if="result.columns?.length > 0"
                             class="border-round-lg shadow-sm border-1 surface-border overflow-hidden"
@@ -1542,7 +1430,6 @@
                                 }
                               }"
                             >
-                              <!-- Coluna de seleção fixa -->
                               <Column
                                 selectionMode="multiple"
                                 headerStyle="width: 2rem"
@@ -1552,7 +1439,6 @@
                                 alignFrozen="left"
                               ></Column>
 
-                              <!-- Colunas de dados -->
                               <Column
                                 v-for="(column, colIndex) in formatResultColumns(result)"
                                 :key="column.field"
@@ -1563,7 +1449,6 @@
                                   colIndex === 0 && isPrimaryKey(column.field) ? 'left' : undefined
                                 "
                               >
-                                <!-- Header padrão sem ícone de chave -->
                                 <template #header>
                                   <span>{{ column.header }}</span>
                                 </template>
@@ -1576,7 +1461,7 @@
                                       $event.stopPropagation();
                                     "
                                     @dblclick="
-                                      handleCellDoubleClick(data, index, field);
+                                      handleCellDoubleClick(data, index, field)
                                       $event.stopPropagation();
                                     "
                                     :title="`Click to copy • Double-click to edit`"
@@ -1595,7 +1480,6 @@
                               </Column>
                             </DataTable>
 
-                            <!-- Mensagem quando não há dados, mas mantém a tabela visível -->
                             <div
                               v-if="!result.rows?.length"
                               class="text-center p-4 text-color-secondary bg-surface-50 dark:bg-surface-800"
@@ -1630,19 +1514,16 @@
       </template>
     </ContentBlock>
 
-    <!-- Table Info Drawer -->
     <InfoDrawerBlock
       v-model:visible="drawerVisible"
       :title="selectedTableSchema ? `Table Info: ${selectedTableSchema.name}` : 'Table Information'"
     >
       <template #body>
         <div class="w-full flex flex-col gap-8 max-md:gap-6">
-          <!-- Skeleton Loading State -->
           <div
             v-if="isLoadingSchema"
             class="w-full"
           >
-            <!-- Header Section Skeleton -->
             <div class="flex flex-col gap-8 max-md:gap-6">
               <div
                 class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
@@ -1657,7 +1538,6 @@
                 </div>
               </div>
 
-              <!-- Columns Section Skeleton -->
               <div
                 class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
               >
@@ -1685,12 +1565,10 @@
             </div>
           </div>
 
-          <!-- Loaded Content -->
           <div
             v-else-if="selectedTableSchema"
             class="w-full"
           >
-            <!-- Header Section with Table Info -->
             <InfoSection
               :title="selectedTableSchema.name"
               :loading="false"
@@ -1717,7 +1595,6 @@
               </template>
             </InfoSection>
 
-            <!-- Columns Section -->
             <InfoSection
               title="Columns"
               :loading="false"
@@ -1730,13 +1607,11 @@
                     class="p-4 border-round-md surface-border border-1 hover:surface-100 dark:hover:surface-700 transition-colors"
                   >
                     <div class="flex flex-column gap-3">
-                      <!-- Column Name and Type -->
                       <div class="flex align-items-center gap-2">
                         <i class="pi pi-bookmark text-primary text-sm"></i>
                         <span class="font-semibold text-color">{{ column[1] }}</span>
                       </div>
 
-                      <!-- Data Type -->
                       <div class="text-xs text-color-secondary">
                         <span
                           class="font-mono bg-surface-100 dark:bg-surface-700 px-2 py-1 border-round"
@@ -1745,7 +1620,6 @@
                         </span>
                       </div>
 
-                      <!-- Constraints -->
                       <div class="flex gap-1 flex-wrap">
                         <Tag
                           v-if="column[3]"
@@ -1777,7 +1651,6 @@
             </InfoSection>
           </div>
 
-          <!-- Empty State -->
           <div
             v-else
             class="flex flex-col items-center justify-center p-8 text-center"
@@ -1792,19 +1665,16 @@
       </template>
     </InfoDrawerBlock>
 
-    <!-- SQL Definition Drawer -->
     <InfoDrawerBlock
       v-model:visible="definitionDrawerVisible"
       :title="selectedTable?.key ? `SQL Definition: ${selectedTable.key}` : 'SQL Definition'"
     >
       <template #body>
         <div class="w-full flex flex-col gap-8 max-md:gap-6">
-          <!-- Skeleton Loading State -->
           <div
             v-if="isLoadingDefinition"
             class="w-full"
           >
-            <!-- Header Section Skeleton -->
             <div class="flex flex-col gap-8 max-md:gap-6">
               <div
                 class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
@@ -1818,7 +1688,6 @@
                 </div>
               </div>
 
-              <!-- SQL Statement Section Skeleton -->
               <div
                 class="max-w-screen-3xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
               >
@@ -1838,12 +1707,10 @@
             </div>
           </div>
 
-          <!-- Loaded Content -->
           <div
             v-else-if="selectedTableDefinition"
             class="w-full"
           >
-            <!-- Header Section with Table Info -->
             <InfoSection
               :title="selectedTable?.key || 'Table'"
               :loading="false"
@@ -1870,7 +1737,6 @@
               </template>
             </InfoSection>
 
-            <!-- CREATE TABLE Statement Section -->
             <InfoSection
               title="CREATE TABLE Statement"
               :loading="false"
@@ -1916,7 +1782,6 @@
             </InfoSection>
           </div>
 
-          <!-- Empty State -->
           <div
             v-else
             class="flex flex-col items-center justify-center p-8 text-center"
@@ -1932,7 +1797,6 @@
       </template>
     </InfoDrawerBlock>
 
-    <!-- Row Form Drawer -->
     <RowFormDrawer
       v-model:visible="rowFormDrawerVisible"
       :columns="queryResults[0]?.columns || []"
@@ -1944,7 +1808,6 @@
       @onSuccess="handleRowFormSuccess"
     />
 
-    <!-- Table Menu -->
     <Menu
       ref="tableMenuRef"
       id="table_menu"

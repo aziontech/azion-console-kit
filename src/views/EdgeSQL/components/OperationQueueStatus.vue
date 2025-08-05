@@ -54,7 +54,6 @@
     v-if="!isEmpty || isProcessing"
     class="flex items-center gap-2 px-3 py-2 bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg"
   >
-    <!-- Ícone de status -->
     <i
       :class="[
         statusIcon,
@@ -67,14 +66,12 @@
       ]"
     ></i>
 
-    <!-- Status principal -->
     <Tag
       :value="queueSummary.text"
       :severity="statusColor"
       class="text-xs"
     />
 
-    <!-- Contadores detalhados -->
     <div
       v-if="stats.creating > 0 || stats.deleting > 0"
       class="flex items-center gap-1"

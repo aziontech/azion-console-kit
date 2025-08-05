@@ -48,11 +48,9 @@
 
   defineOptions({ name: 'create-edge-sql-database' })
 
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const toast = useToast()
 
-  // Sistema de status manager para monitoramento
   const { addCreateOperation } = useEdgeSQLStatusManager()
 
   const validationSchema = yup.object({
@@ -66,7 +64,7 @@
     name: ''
   })
   const createDatabaseServiceWithMonitoring = async (payload) => {
-          const result = await edgeSQLService.createDatabase(payload)
+    const result = await edgeSQLService.createDatabase(payload)
 
     if (result.shouldMonitor && result.databaseId) {
       if (result.feedback) {

@@ -54,11 +54,9 @@
   const route = useRoute()
   const databaseId = computed(() => route.params.id)
 
-  // Criar schema de validação dinâmico baseado nas colunas (excluindo campos BLOB)
   const validationSchema = computed(() => {
     const schema = {}
     props.columns.forEach((column) => {
-      // Campos BLOB não precisam de validação
       if (!isFieldBlobType(column)) {
         schema[column] = yup.string().label(column)
       }
@@ -66,13 +64,10 @@
     return yup.object(schema)
   })
 
-  // Valores iniciais baseados nas colunas (excluindo campos BLOB)
   const initialValues = computed(() => {
     const values = {}
     props.columns.forEach((column) => {
-      // Campos BLOB não participam da validação/formulário
       if (!isFieldBlobType(column)) {
-        // Usar cópia do valor para evitar referências compartilhadas
         const value = props.initialData[column]
         values[column] = value !== undefined && value !== null ? String(value) : ''
       }
@@ -84,14 +79,12 @@
     return props.isEditing ? 'Edit Row' : 'Insert New Row'
   })
 
-  // Key única para EditDrawerBlock para forçar re-render com dados novos
   const editDrawerKey = computed(() => {
     if (!props.isEditing) return 'edit'
     const dataString = JSON.stringify(props.initialData)
     return `edit-${dataString.substring(0, 20)}-${Date.now().toString().slice(-6)}`
   })
 
-  // Utilitárieas para construir queries SQL
   const escapeValue = (value, columnType) => {
     if (value === null || value === undefined || value === '') {
       return 'NULL'
@@ -99,25 +92,21 @@
 
     const strValue = value.toString().trim()
 
-    // Para tipos numéricos, não colocar aspas se for um número válido
     if (
       columnType &&
       (columnType.toUpperCase().includes('INTEGER') ||
         columnType.toUpperCase().includes('REAL') ||
         columnType.toUpperCase().includes('NUMERIC'))
     ) {
-      // Verificar se é um número válido
       if (!isNaN(strValue) && strValue !== '') {
         return strValue
       }
     }
 
-    // Para outros tipos, escapar aspas simples e colocar entre aspas
     return `'${strValue.replace(/'/g, "''")}'`
   }
 
   const buildInsertQuery = (tableName, columns, formData) => {
-    // Filtrar apenas colunas que têm valores
     const columnsWithValues = columns.filter(
       (col) => formData[col] !== undefined && formData[col] !== null && formData[col] !== ''
     )
@@ -134,7 +123,6 @@
   }
 
   const buildUpdateQuery = (tableName, changedData, whereCondition) => {
-    // Incluir apenas os campos que realmente mudaram
     const setClause = Object.keys(changedData)
       .map((col) => `${col} = ${escapeValue(changedData[col], getColumnType(col))}`)
       .join(', ')
@@ -144,10 +132,8 @@
   const buildWhereCondition = (formData, columnInfo) => {
     const whereConditions = []
 
-    // Encontrar colunas de chave primária
-    const primaryKeys = columnInfo.filter((col) => col[5] === 1) // col[5] é o campo pk
+    const primaryKeys = columnInfo.filter((col) => col[5] === 1)
 
-    // Verificar se temos chaves primárias com valores não-nulos
     let usePrimaryKeys = false
     if (primaryKeys.length > 0) {
       primaryKeys.forEach((col) => {
@@ -163,7 +149,6 @@
       })
     }
 
-    // Se não temos PKs válidas, usar todas as colunas não-nulas
     if (!usePrimaryKeys) {
       Object.keys(formData).forEach((columnName) => {
         const value = formData[columnName]
@@ -182,17 +167,14 @@
     return whereConditions.join(' AND ')
   }
 
-  // Serviços reais que executam SQL
   const realCreateService = async (formData) => {
     try {
       if (!props.tableName) {
         throw new Error('Table name is required')
       }
 
-      // Filtrar campos vazios e campos BLOB (não editáveis)
       const cleanFormData = {}
       Object.keys(formData).forEach((key) => {
-        // Não incluir campos BLOB no INSERT
         if (
           !isFieldBlobType(key) &&
           formData[key] !== undefined &&
@@ -228,26 +210,21 @@
         throw new Error('Table name is required')
       }
 
-      // Usar dados originais para WHERE condition
       const originalData = props.initialData
       const whereCondition = buildWhereCondition(originalData, props.columnInfo)
 
-      // Identificar apenas os campos que mudaram (excluindo campos BLOB)
       const changedData = {}
       props.columns.forEach((column) => {
-        // Não incluir campos BLOB no UPDATE
         if (!isFieldBlobType(column)) {
           const originalValue = originalData[column] || ''
           const newValue = formData[column] || ''
 
-          // Só incluir no UPDATE se o valor realmente mudou
           if (originalValue !== newValue) {
             changedData[column] = newValue
           }
         }
       })
 
-      // Se nenhum campo mudou, não fazer update
       if (Object.keys(changedData).length === 0) {
         return 'No changes detected'
       }
@@ -268,12 +245,9 @@
     }
   }
 
-  // Load service para EditDrawerBlock - retorna os dados iniciais
   const realLoadService = async () => {
-    // Simular delay da API
     await new Promise((resolve) => setTimeout(resolve, 200))
 
-    // Retornar uma cópia limpa dos dados iniciais
     const loadedData = {}
     props.columns.forEach((column) => {
       const value = props.initialData[column]
@@ -283,12 +257,9 @@
     return loadedData
   }
 
-  // Handlers para sucesso e erro
   const handleSuccess = (response) => {
-    // Emitir sucesso para o componente pai
     emit('onSuccess', response)
 
-    // Fechar o drawer após sucesso
     emit('update:visible', false)
   }
 
@@ -301,7 +272,6 @@
     })
   }
 
-  // Funções utilitárias para obter informações das colunas
   const getColumnInfo = (columnName) => {
     return props.columnInfo.find((col) => col[1] === columnName) || []
   }
@@ -337,7 +307,6 @@
     return description
   }
 
-  // Funções para detectar e tratar tipos especiais (BLOB, etc.)
   const isSpecialType = (value) => {
     if (value !== null && value !== undefined && typeof value === 'object') {
       return true
@@ -351,7 +320,6 @@
     if (value === '') return '(empty)'
 
     if (value !== null && value !== undefined && typeof value === 'object') {
-      // Se tem propriedades específicas de BLOB/Vector
       if (value.type && value.data) {
         return `${value.type}(${value.data.length || 'unknown size'})`
       } else if (Array.isArray(value)) {
@@ -359,12 +327,11 @@
       } else if (value.constructor === Uint8Array || value.constructor === ArrayBuffer) {
         return `BLOB(${value.byteLength || value.length} bytes)`
       } else {
-        // Para outros objetos
         const keys = Object.keys(value)
         const firstKey = keys[0]
         if (keys.length === 1 && typeof value[firstKey] === 'string') {
           const data = value[firstKey]
-          // Se parece com base64 ou dados binários
+
           if (data.length > 16 && /^[A-Za-z0-9+/=]+$/.test(data.substring(0, 20))) {
             return `BLOB(${Math.round(data.length * 0.75)} bytes, base64)`
           } else {
@@ -384,17 +351,15 @@
     return isSpecialType(value)
   }
 
-  // Focus no campo específico ou primeiro campo quando o drawer abrir
   watch(
     () => [props.visible, props.focusField],
     async ([newVisible, focusField]) => {
       if (newVisible && props.columns.length > 0) {
         await nextTick()
-        // Aguardar um pouco mais para garantir que o drawer está totalmente renderizado
+
         setTimeout(() => {
           let targetField = null
 
-          // Se um campo específico foi solicitado, tentar focá-lo
           if (focusField) {
             const fieldIndex = props.columns.indexOf(focusField)
             if (fieldIndex >= 0) {
@@ -404,36 +369,30 @@
             }
           }
 
-          // Se não encontrou o campo específico, focar no primeiro
           if (!targetField) {
             targetField = document.querySelector(`[data-testid="row-form__field-0"] input`)
           }
 
           if (targetField) {
             targetField.focus()
-            // Se for um input de texto, selecionar todo o conteúdo
+
             if (targetField.tagName === 'INPUT' && targetField.type === 'text') {
               targetField.select()
             }
           }
-        }, 500) // Aumentei o timeout para EditDrawerBlock que pode demorar mais para carregar
+        }, 500)
       }
     }
   )
 
-  // Watch para acompanhar mudanças nos dados iniciais
   watch(
     () => props.initialData,
-    () => {
-      // Os dados são automaticamente atualizados via computed initialValues
-      // Não precisamos fazer nada manual aqui
-    },
+    () => {},
     { deep: true, immediate: true }
   )
 </script>
 
 <template>
-  <!-- Create Mode -->
   <CreateDrawerBlock
     v-if="!isEditing"
     ref="createDrawerRef"
@@ -459,7 +418,6 @@
               :key="column"
               class="flex flex-col gap-2"
             >
-              <!-- Campo BLOB/Special Type - Readonly -->
               <div
                 v-if="isFieldBlobType(column)"
                 class="field"
@@ -485,7 +443,6 @@
                 </div>
               </div>
 
-              <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
                   :label="getEnhancedLabel(column)"
@@ -498,7 +455,6 @@
                 />
               </template>
 
-              <!-- Column Constraints -->
               <div
                 v-if="getColumnConstraints(column).length > 0"
                 class="flex gap-1 flex-wrap mt-1"
@@ -519,7 +475,6 @@
     </template>
   </CreateDrawerBlock>
 
-  <!-- Edit Mode -->
   <EditDrawerBlock
     v-else
     :key="editDrawerKey"
@@ -547,7 +502,6 @@
               :key="column"
               class="flex flex-col gap-2"
             >
-              <!-- Campo BLOB/Special Type - Readonly (mesmo em modo Create, se há dados iniciais) -->
               <div
                 v-if="isFieldBlobType(column)"
                 class="field"
@@ -573,7 +527,6 @@
                 </div>
               </div>
 
-              <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
                   :label="getEnhancedLabel(column)"
@@ -586,7 +539,6 @@
                 />
               </template>
 
-              <!-- Column Constraints -->
               <div
                 v-if="getColumnConstraints(column).length > 0"
                 class="flex gap-1 flex-wrap mt-1"

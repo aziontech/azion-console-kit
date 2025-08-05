@@ -144,7 +144,6 @@ export class TableActionManager {
     }
   }
 
-
   generateMenuItems(tableName) {
     return TABLE_MENU_ACTIONS.map((action) => {
       if (action.separator) {

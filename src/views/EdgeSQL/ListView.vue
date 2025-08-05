@@ -17,7 +17,6 @@
 
   defineOptions({ name: 'list-edge-sql-databases' })
 
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
@@ -304,7 +303,6 @@
       >
         <template #actions>
           <div class="flex items-center gap-3">
-            <!-- Status da fila de operações -->
             <OperationQueueStatus
               :stats="stats"
               :isProcessing="isProcessing"
