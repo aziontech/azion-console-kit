@@ -10,19 +10,19 @@ const STORAGE_KEYS = {
 const saveToStorage = (key, data) => {
   try {
     localStorage.setItem(key, JSON.stringify(data))
-      } catch (error) {
-      // Silently handle localStorage save errors
-    }
+  } catch (error) {
+    // Silently handle localStorage save errors
+  }
 }
 
 const loadFromStorage = (key, defaultValue = null) => {
   try {
     const item = localStorage.getItem(key)
     return item ? JSON.parse(item) : defaultValue
-      } catch (error) {
-      // Silently handle localStorage load errors
-      return defaultValue
-    }
+  } catch (error) {
+    // Silently handle localStorage load errors
+    return defaultValue
+  }
 }
 
 export const useEdgeSQLStore = defineStore('edgeSQL', () => {
@@ -51,7 +51,7 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   }
 
   const removeDatabase = (databaseId) => {
-    databases.value = databases.value.filter(db => db.id !== databaseId)
+    databases.value = databases.value.filter((db) => db.id !== databaseId)
     if (currentDatabase.value?.id === databaseId) {
       currentDatabase.value = null
       currentTables.value = []
@@ -63,7 +63,7 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     currentDatabase.value = database
     currentTables.value = []
     selectedTable.value = null
-    
+
     // Salvar database atual no localStorage
     if (database) {
       saveToStorage(STORAGE_KEYS.CURRENT_DATABASE, database)
@@ -90,14 +90,14 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
       databaseId: currentDatabase.value?.id,
       databaseName: currentDatabase.value?.name
     }
-    
+
     queryResults.value.unshift(enrichedResult)
-    
+
     // Limitar histórico a 100 queries para não sobrecarregar localStorage
     if (queryResults.value.length > 100) {
       queryResults.value = queryResults.value.slice(0, 100)
     }
-    
+
     // Salvar no localStorage
     saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
   }
@@ -120,12 +120,12 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   }
 
   const removeQueryFromHistory = (queryId) => {
-    queryResults.value = queryResults.value.filter(query => query.id !== queryId)
+    queryResults.value = queryResults.value.filter((query) => query.id !== queryId)
     saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
   }
 
   const getQueryHistoryForDatabase = (databaseId) => {
-    return queryResults.value.filter(query => query.databaseId === databaseId)
+    return queryResults.value.filter((query) => query.databaseId === databaseId)
   }
 
   const exportHistory = () => {
@@ -153,7 +153,7 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     selectedTable.value = null
     isLoading.value = false
     error.value = null
-    
+
     // Limpar localStorage
     localStorage.removeItem(STORAGE_KEYS.QUERY_HISTORY)
     localStorage.removeItem(STORAGE_KEYS.CURRENT_DATABASE)
@@ -194,4 +194,4 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     clearError,
     reset
   }
-}) 
+})

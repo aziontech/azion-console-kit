@@ -16,14 +16,13 @@
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
 
   defineOptions({ name: 'list-edge-sql-databases' })
-  
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
   const sqlStore = useEdgeSQLStore()
-  
 
   const {
     isProcessing,
@@ -45,7 +44,7 @@
 
   const hasContentToList = ref(true)
   const fetchListRef = ref(null)
-  
+
   const reloadList = () => {
     if (fetchListRef.value?.reload) {
       fetchListRef.value.reload()
@@ -64,7 +63,7 @@
       icon: 'pi pi-trash',
       service: async (databaseId, databaseData) => {
         const result = await EdgeSQLService.deleteDatabaseService(databaseId)
-        
+
         const databaseName = databaseData.name?.text || databaseData.name
         addDeleteOperation(databaseId, databaseName, (status, operation) => {
           if (status === 'failed') {
@@ -85,22 +84,22 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
-    
+
     if (event && fetchListRef.value?.data?.value && Array.isArray(fetchListRef.value.data.value)) {
       processLoadedData(fetchListRef.value.data.value)
     }
   }
-  
+
   const processLoadedData = (databases) => {
     if (!Array.isArray(databases)) return
-    
-    databases.forEach(db => {
+
+    databases.forEach((db) => {
       const statusContent = db.status?.content || db.status
       const databaseName = db.name?.text || db.name
-      
+
       const isPendingStatus = PENDING_STATUSES.includes(statusContent)
       const isAlreadyMonitored = isDatabasePending(db.id)
-      
+
       if (isPendingStatus && !isAlreadyMonitored) {
         if (statusContent === 'creating') {
           addCreateOperation(db.id, databaseName, (status, operation) => {
@@ -141,9 +140,9 @@
     tracker.product?.clickToEdit({
       productName: 'Database'
     })
-    
+
     const statusContent = database.status?.content || database.status
-    
+
     if (statusContent === 'creating') {
       toast.add({
         severity: 'warn',
@@ -153,7 +152,7 @@
       })
       return
     }
-    
+
     if (statusContent !== 'created' && statusContent !== 'ready') {
       toast.add({
         severity: 'error',
@@ -163,16 +162,20 @@
       })
       return
     }
-    
+
     sqlStore.setCurrentDatabase(database)
     router.push(`/edge-sql/database/${database.id}`)
   }
 
-  watch(() => route.path, (newPath, oldPath) => {
-    if (oldPath?.includes('/edge-sql/create') && newPath === '/edge-sql') {
-      setTimeout(reloadList, 500)
-    }
-  }, { immediate: true })
+  watch(
+    () => route.path,
+    (newPath, oldPath) => {
+      if (oldPath?.includes('/edge-sql/create') && newPath === '/edge-sql') {
+        setTimeout(reloadList, 500)
+      }
+    },
+    { immediate: true }
+  )
 
   watch(
     () => fetchListRef.value?.data?.value,
@@ -253,7 +256,7 @@
         component: (columnData) => {
           const statusContent = columnData?.content || columnData
           let tagData = columnData
-          
+
           if (statusContent === 'creating') {
             tagData = {
               content: 'Creating',
@@ -279,7 +282,7 @@
               icon: 'pi pi-exclamation-triangle'
             }
           }
-          
+
           return columnBuilder({
             data: tagData,
             columnAppearance: 'tag'
@@ -289,13 +292,7 @@
     ]
   })
 
-  const DATABASE_API_FIELDS = [
-    'id',
-    'name',
-    'status', 
-    'created_at',
-    'last_modified'
-  ]
+  const DATABASE_API_FIELDS = ['id', 'name', 'status', 'created_at', 'last_modified']
 </script>
 
 <template>
@@ -352,4 +349,4 @@
       </EmptyResultsBlock>
     </template>
   </ContentBlock>
-</template> 
+</template>

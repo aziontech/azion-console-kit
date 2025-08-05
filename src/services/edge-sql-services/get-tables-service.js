@@ -2,15 +2,15 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 
 export const getTablesService = async (databaseId) => {
   if (!databaseId) {
-          return {
-        body: {
-          tables: [],
-          count: 0,
-          error: 'Database ID is required'
-        },
-        statusCode: 400,
+    return {
+      body: {
+        tables: [],
+        count: 0,
         error: 'Database ID is required'
-      }
+      },
+      statusCode: 400,
+      error: 'Database ID is required'
+    }
   }
 
   try {
@@ -47,14 +47,15 @@ const adapt = (httpResponse) => {
 
   // A API retorna data como array de objetos com results
   // Extrair nomes das tabelas dos resultados
-  const tables = data?.data?.[0]?.results?.rows?.map(row => ({
-    name: row[0], // Nome da tabela
-    type: 'table',
-    schema: 'main'
-  })) || []
+  const tables =
+    data?.data?.[0]?.results?.rows?.map((row) => ({
+      name: row[0], // Nome da tabela
+      type: 'table',
+      schema: 'main'
+    })) || []
 
   return {
     tables,
     count: tables.length
   }
-} 
+}

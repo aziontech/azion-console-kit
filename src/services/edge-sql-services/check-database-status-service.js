@@ -14,7 +14,7 @@ export const checkDatabaseStatusService = async (id, fields = null) => {
   }
 
   try {
-    const url = fields 
+    const url = fields
       ? `/v4/edge_sql/databases/${id}?fields=${fields}`
       : `/v4/edge_sql/databases/${id}`
 
@@ -76,4 +76,4 @@ const adapt = (httpResponse) => {
     deletedAt: database.deleted_at,
     isActive: database.is_active
   }
-} 
+}

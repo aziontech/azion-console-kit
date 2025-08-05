@@ -59,10 +59,7 @@
     name: yup
       .string()
       .required('Database name is required')
-      .matches(
-        /^[a-zA-Z0-9_-]+$/,
-        'Use only letters, numbers, underscore (_) and hyphen (-)'
-      )
+      .matches(/^[a-zA-Z0-9_-]+$/, 'Use only letters, numbers, underscore (_) and hyphen (-)')
   })
 
   const initialValues = ref({
@@ -70,29 +67,31 @@
   })
   const createDatabaseServiceWithMonitoring = async (payload) => {
     const result = await EdgeSQLService.createDatabaseService(payload)
-    
+
     if (result.shouldMonitor && result.databaseId) {
-        if (result.feedback) {
+      if (result.feedback) {
+        toast.add({
+          severity: 'success',
+          summary: 'Creating Database',
+          detail: result.feedback,
+          life: 3000
+        })
+      }
+
+      addCreateOperation(result.databaseId, result.databaseName, (status, operation) => {
+        if (status === 'failed') {
           toast.add({
-            severity: 'success',
-            summary: 'Creating Database',
-            detail: result.feedback,
-            life: 3000
+            severity: 'error',
+            summary: 'Creation Failed',
+            detail: `Failed to create database "${result.databaseName}". ${
+              operation.error || 'Please try again.'
+            }`,
+            life: 6000
           })
         }
-        
-        addCreateOperation(result.databaseId, result.databaseName, (status, operation) => {
-          if (status === 'failed') {
-            toast.add({
-              severity: 'error',
-              summary: 'Creation Failed',
-              detail: `Failed to create database "${result.databaseName}". ${operation.error || 'Please try again.'}`,
-              life: 6000
-            })
-          }
-        })
+      })
     }
-    
+
     return result
   }
 
@@ -115,4 +114,4 @@
       })
       ?.track()
   }
-</script> 
+</script>

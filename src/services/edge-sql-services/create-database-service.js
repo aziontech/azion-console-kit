@@ -21,14 +21,17 @@ export const createDatabaseService = async ({ name }) => {
       throw new Error(apiError.detail || apiError.title || 'Error creating database')
     }
 
-    const isSuccess = (httpResponse.statusCode === 201 || httpResponse.statusCode === 200) ||
-                     (httpResponse.body?.state === 'pending' || httpResponse.body?.state === 'created')
-    
+    const isSuccess =
+      httpResponse.statusCode === 201 ||
+      httpResponse.statusCode === 200 ||
+      httpResponse.body?.state === 'pending' ||
+      httpResponse.body?.state === 'created'
+
     if (isSuccess) {
       const adaptedData = adapt(httpResponse)
-      
+
       const urlToEditView = '/edge-sql'
-      
+
       return {
         feedback: `Database "${adaptedData.name}" is being created...`,
         urlToEditView,
@@ -57,4 +60,4 @@ const adapt = (httpResponse) => {
     updatedAt: database.updated_at,
     isActive: database.is_active
   }
-} 
+}

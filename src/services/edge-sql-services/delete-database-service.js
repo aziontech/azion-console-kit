@@ -30,4 +30,4 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Error('Error deleting database')
   }
-} 
+}

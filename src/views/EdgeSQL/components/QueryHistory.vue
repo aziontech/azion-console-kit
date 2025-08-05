@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useEdgeSQLStore } from '@/stores/edge-sql'
-  
+
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import Button from 'primevue/button'
@@ -12,9 +12,9 @@
   defineOptions({ name: 'edge-sql-query-history' })
 
   const emit = defineEmits(['rerun-query', 'clear-history'])
-  
+
   const sqlStore = useEdgeSQLStore()
-  
+
   const queryHistory = computed(() => sqlStore.queryResults)
 
   const formatExecutionTime = (time) => {
@@ -66,23 +66,28 @@
     document.body.removeChild(downloadLink)
     URL.revokeObjectURL(url)
   }
-  
+
   const documentationService = () => {
     window.open('https://www.azion.com/en/documentation/products/edge-sql/', '_blank')
   }
-
-
 </script>
 
 <template>
   <div class="h-full">
-    <div class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg">
+    <div
+      class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
+    >
       <h4 class="text-base font-semibold text-color flex items-center gap-2">
         <i class="pi pi-history text-primary"></i>
         Query History
-        <Tag v-if="queryHistory.length > 0" :value="`${queryHistory.length} quer${queryHistory.length !== 1 ? 'ies' : 'y'}`" severity="info" class="text-xs" />
+        <Tag
+          v-if="queryHistory.length > 0"
+          :value="`${queryHistory.length} quer${queryHistory.length !== 1 ? 'ies' : 'y'}`"
+          severity="info"
+          class="text-xs"
+        />
       </h4>
-      
+
       <div class="flex items-center gap-2">
         <Button
           v-if="queryHistory.length > 0"
@@ -127,7 +132,10 @@
         table: { class: 'text-sm' }
       }"
     >
-      <Column header="Type" style="width: 90px">
+      <Column
+        header="Type"
+        style="width: 90px"
+      >
         <template #body="{ data }">
           <Tag
             :value="getQueryTypeLabel(data.type)"
@@ -137,7 +145,10 @@
         </template>
       </Column>
 
-      <Column header="Query" style="min-width: 300px">
+      <Column
+        header="Query"
+        style="min-width: 300px"
+      >
         <template #body="{ data }">
           <div class="query-preview">
             <code class="text-xs text-color-secondary font-mono flex-1">
@@ -154,7 +165,10 @@
         </template>
       </Column>
 
-      <Column header="Time" style="width: 100px">
+      <Column
+        header="Time"
+        style="width: 100px"
+      >
         <template #body="{ data }">
           <span class="text-sm text-color-secondary flex items-center gap-1">
             <i class="pi pi-clock text-xs"></i>
@@ -163,7 +177,10 @@
         </template>
       </Column>
 
-      <Column header="Executed At" style="width: 160px">
+      <Column
+        header="Executed At"
+        style="width: 160px"
+      >
         <template #body="{ data }">
           <span class="text-xs text-color-secondary">
             {{ formatTimestamp(data.timestamp) }}
@@ -184,14 +201,18 @@
             class="w-full font-mono text-sm border-round-md"
             rows="3"
           />
-          
-          <div v-if="data.results?.length > 0" class="mt-4">
+
+          <div
+            v-if="data.results?.length > 0"
+            class="mt-4"
+          >
             <h5 class="mb-2 text-color flex items-center gap-2">
               <i class="pi pi-list text-primary"></i>
               Results:
             </h5>
             <p class="text-sm text-color-secondary">
-              {{ data.results.reduce((total, result) => total + (result.rows?.length || 0), 0) }} row(s) returned
+              {{ data.results.reduce((total, result) => total + (result.rows?.length || 0), 0) }}
+              row(s) returned
             </p>
           </div>
         </div>
@@ -201,26 +222,26 @@
 </template>
 
 <style scoped>
-.query-preview {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  max-width: 100%;
-}
+  .query-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 100%;
+  }
 
-.query-preview code {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background: transparent;
-  padding: 0;
-}
+  .query-preview code {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: transparent;
+    padding: 0;
+  }
 
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  padding: 0.5rem;
-}
+  :deep(.p-datatable .p-datatable-tbody > tr > td) {
+    padding: 0.5rem;
+  }
 
-:deep(.p-panel .p-panel-content) {
-  padding: 1rem;
-}
-</style> 
+  :deep(.p-panel .p-panel-content) {
+    padding: 1rem;
+  }
+</style>

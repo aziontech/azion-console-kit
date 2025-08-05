@@ -45,4 +45,4 @@ const adapt = (httpResponse) => {
     updatedAt: database.updated_at,
     deletedAt: database.deleted_at
   }
-} 
+}

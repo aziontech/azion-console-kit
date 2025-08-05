@@ -3,13 +3,12 @@ export const TABLE_QUERIES = {
   // Informações básicas
   COUNT_RECORDS: (tableName) => `SELECT COUNT(*) as total_rows FROM ${tableName};`,
   TABLE_INFO: (tableName) => `PRAGMA table_info(${tableName});`,
-  TABLE_DEFINITION: (tableName) => `SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
-  
+  TABLE_DEFINITION: (tableName) =>
+    `SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
 
-  
   // Índices e performance
   TABLE_INDEXES: (tableName) => `PRAGMA index_list(${tableName});`,
-  
+
   // Estrutura e relacionamentos
   FOREIGN_KEYS: (tableName) => `PRAGMA foreign_key_list(${tableName});`,
   TABLE_SIZE: (tableName) => `SELECT 
@@ -17,12 +16,12 @@ export const TABLE_QUERIES = {
     COUNT(*) as row_count
   FROM ${tableName}, sqlite_master 
   WHERE sqlite_master.name = '${tableName}';`,
-  
+
   // Queries de limpeza
   VACUUM_ANALYZE: () => `VACUUM; ANALYZE;`,
   DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
   TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
-  
+
   // Tamanho do banco de dados
   DATABASE_SIZE: () => `SELECT 
     (page_count * page_size) AS size_bytes,
@@ -42,7 +41,7 @@ export const TABLE_MENU_ACTIONS = [
   },
   {
     label: 'View Definition',
-    icon: 'pi pi-code', 
+    icon: 'pi pi-code',
     type: 'drawer',
     action: 'showDefinition'
   },
@@ -97,12 +96,18 @@ export const TABLE_MENU_ACTIONS = [
     type: 'delete',
     description: 'Permanently delete this table'
   }
-
 ]
 
 // Classe para gerenciar ações de tabela
 export class TableActionManager {
-  constructor(executeQueryFn, showDrawerFn, activeTabIndexRef, isEditorCollapsedRef, sqlQueryRef, deleteDialogFn) {
+  constructor(
+    executeQueryFn,
+    showDrawerFn,
+    activeTabIndexRef,
+    isEditorCollapsedRef,
+    sqlQueryRef,
+    deleteDialogFn
+  ) {
     this.executeQuery = executeQueryFn
     this.showDrawer = showDrawerFn
     this.activeTabIndex = activeTabIndexRef
@@ -123,21 +128,19 @@ export class TableActionManager {
 
   async executeQueryAction(action, tableName) {
     // Gerar a query
-    const query = typeof action.query === 'function' 
-      ? action.query(tableName) 
-      : action.query
+    const query = typeof action.query === 'function' ? action.query(tableName) : action.query
 
     // Configurar o editor
     this.sqlQuery.value = query
-    
+
     // Expandir editor se estiver colapsado
     if (this.isEditorCollapsed.value) {
       this.isEditorCollapsed.value = false
     }
-    
+
     // Mudar para aba Results
     this.activeTabIndex.value = 0
-    
+
     // Executar a query automaticamente
     await this.executeQuery()
   }
@@ -158,7 +161,7 @@ export class TableActionManager {
 
   // Gerar itens do menu dinamicamente
   generateMenuItems(tableName) {
-    return TABLE_MENU_ACTIONS.map(action => {
+    return TABLE_MENU_ACTIONS.map((action) => {
       if (action.separator) {
         return { separator: true }
       }
@@ -173,10 +176,10 @@ export class TableActionManager {
               return
             }
           }
-          
+
           await this.executeTableAction(action, tableName)
         }
       }
     })
   }
-} 
+}

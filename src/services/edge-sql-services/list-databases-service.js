@@ -47,28 +47,30 @@ const adapt = (httpResponse) => {
     }
   }
 
-  const parsedDatabases = httpResponse.body.results.map((database) => {
-    if (!database || typeof database !== 'object') {
-      return null
-    }
+  const parsedDatabases = httpResponse.body.results
+    .map((database) => {
+      if (!database || typeof database !== 'object') {
+        return null
+      }
 
-    return {
-      id: String(database.id || ''),
-      name: {
-        text: database.name || '',
-        tagProps: {}
-      },
-      clientId: database.client_id,
-      status: {
-        content: String(database.status || 'unknown'),
-        severity: getStatusSeverity(database.status)
-      },
-      createdAt: new Date(database.created_at).toLocaleString(),
-      updatedAt: formatDate(database.updated_at),
-      lastModify: new Date(database.updated_at).toLocaleString(),
-      lastModifyDate: String(database.updated_at || '')
-    }
-  }).filter(Boolean) // Remove entradas null
+      return {
+        id: String(database.id || ''),
+        name: {
+          text: database.name || '',
+          tagProps: {}
+        },
+        clientId: database.client_id,
+        status: {
+          content: String(database.status || 'unknown'),
+          severity: getStatusSeverity(database.status)
+        },
+        createdAt: new Date(database.created_at).toLocaleString(),
+        updatedAt: formatDate(database.updated_at),
+        lastModify: new Date(database.updated_at).toLocaleString(),
+        lastModifyDate: String(database.updated_at || '')
+      }
+    })
+    .filter(Boolean) // Remove entradas null
 
   // Retorna no formato que o FetchListTableBlock espera
   return {
@@ -98,8 +100,8 @@ const getStatusSeverity = (status) => {
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
-  return new Intl.DateTimeFormat('en-US', { 
+  return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
     timeStyle: 'short'
   }).format(new Date(dateString))
-} 
+}

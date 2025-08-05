@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "columns": ["id", "name", "email", "created_at"],
+      "rows": [
+        [1, "John Doe", "john@example.com", "2024-01-01T10:00:00Z"],
+        [2, "Jane Smith", "jane@example.com", "2024-01-02T11:30:00Z"],
+        [3, "Bob Wilson", "bob@example.com", "2024-01-03T14:15:00Z"]
+      ],
+      "query_duration_ms": 15,
+      "rows_read": 3,
+      "rows_written": 0
+    }
+  ]
+}

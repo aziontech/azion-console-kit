@@ -30,4 +30,4 @@
   defineOptions({ name: 'form-fields-create-database' })
 
   const { value: name } = useField('name')
-</script> 
+</script>
