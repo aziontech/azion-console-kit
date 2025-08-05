@@ -218,6 +218,7 @@
   import { useResize } from '@/composables/useResize'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
+=======
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -226,12 +227,14 @@
   const { isGreaterThanMD } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
+  const { buckets, handleFileSelect } = useEdgeStorage()
   defineProps({
     documentationService: {
       required: true,
       type: Function
     }
   })
+
 
   const selectedFiles = ref([])
   const searchTerm = ref('')
