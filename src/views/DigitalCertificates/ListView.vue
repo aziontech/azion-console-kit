@@ -158,6 +158,12 @@
     if (certificateTypeList.value === 'CRL') {
       return [
         {
+          field: 'id',
+          header: 'ID',
+          sortField: 'id',
+          filterPath: 'id'
+        },
+        {
           field: 'name',
           header: 'Name',
           type: 'component',
@@ -184,6 +190,12 @@
       ]
     }
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name',
