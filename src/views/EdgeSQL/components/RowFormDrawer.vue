@@ -6,6 +6,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
 
   import * as EdgeSQLService from '@/services/edge-sql-services'
@@ -304,8 +305,33 @@
     return info[2] || null
   }
 
+  const getColumnConstraints = (columnName) => {
+    const info = getColumnInfo(columnName)
+    const constraints = []
+    
+    if (info[3]) constraints.push({ value: 'NOT NULL', severity: 'warning' })
+    if (info[5]) constraints.push({ value: 'PRIMARY KEY', severity: 'info' })
+    if (info[4]) constraints.push({ value: 'DEFAULT', severity: 'secondary' })
+    
+    return constraints
+  }
 
+  const getEnhancedLabel = (columnName) => {
+    const type = getColumnType(columnName)
+    return type ? `${columnName} (${type})` : columnName
+  }
 
+  const getFieldDescription = (columnName) => {
+    const info = getColumnInfo(columnName)
+    if (!info.length) return `Enter ${columnName} value`
+    
+    let description = `Column: ${columnName}`
+    if (info[4]) description += ` - Default: ${info[4]}`
+    
+    return description
+  }
+
+  // Funções para detectar e tratar tipos especiais (BLOB, etc.)
   const isSpecialType = (value) => {
     if (value !== null && value !== undefined && typeof value === 'object') {
       return true
@@ -427,28 +453,45 @@
               <!-- Campo BLOB/Special Type - Readonly -->
               <div v-if="isFieldBlobType(column)" class="field">
                 <label class="text-sm font-medium text-color mb-2 block">
-                  {{ column }}
+                  {{ getEnhancedLabel(column) }}
                 </label>
                 <InputText
                   :value="formatSpecialTypeValue(initialData[column])"
                   disabled
                   class="w-full font-mono text-sm"
-                  placeholder="Read-only field"
                 />
-
+                <small class="text-color-secondary mt-2 block">
+                  {{ getFieldDescription(column) }}
+                </small>
+                <div class="flex gap-1 flex-wrap mt-2">
+                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
+                </div>
               </div>
 
               <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
-                  :label="column"
+                  :label="getEnhancedLabel(column)"
                   :name="column"
                   :placeholder="`Enter ${column} value`"
                   :disabled="disabledFields"
+                  :description="getFieldDescription(column)"
                   :data-testid="`row-form__field-${index}`"
                   :data-field="column"
                 />
               </template>
+              
+              <!-- Column Constraints -->
+              <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
+                <Tag 
+                  v-for="constraint in getColumnConstraints(column)"
+                  :key="constraint.value"
+                  :value="constraint.value" 
+                  :severity="constraint.severity" 
+                  class="text-xs" 
+                  style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" 
+                />
+              </div>
               
 
               
@@ -490,30 +533,46 @@
               <!-- Campo BLOB/Special Type - Readonly (mesmo em modo Create, se há dados iniciais) -->
               <div v-if="isFieldBlobType(column)" class="field">
                 <label class="text-sm font-medium text-color mb-2 block">
-                  {{ column }}
+                  {{ getEnhancedLabel(column) }}
                 </label>
                 <InputText
                   :value="formatSpecialTypeValue(initialData[column])"
                   disabled
                   class="w-full font-mono text-sm"
-                  placeholder="Read-only field"
                 />
-
+                <small class="text-color-secondary mt-2 block">
+                  {{ getFieldDescription(column) }}
+                </small>
+                <div class="flex gap-1 flex-wrap mt-2">
+                  <Tag value="READONLY" severity="warning" class="text-xs" style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" />
+                </div>
               </div>
 
               <!-- Campo Normal - Editável -->
               <template v-else>
                 <FieldText
-                  :label="column"
+                  :label="getEnhancedLabel(column)"
                   :name="column"
                   :placeholder="`Enter ${column} value`"
                   :disabled="disabledFields"
+                  :description="getFieldDescription(column)"
                   :data-testid="`row-form__field-${index}`"
                   :data-field="column"
                 />
               </template>
               
-
+              <!-- Column Constraints -->
+              <div v-if="getColumnConstraints(column).length > 0" class="flex gap-1 flex-wrap mt-1">
+                <Tag 
+                  v-for="constraint in getColumnConstraints(column)"
+                  :key="constraint.value"
+                  :value="constraint.value" 
+                  :severity="constraint.severity" 
+                  class="text-xs" 
+                  style="font-size: 0.65rem; padding: 0.125rem 0.25rem;" 
+                />
+              </div>
+              
               
             </div>
           </div>
