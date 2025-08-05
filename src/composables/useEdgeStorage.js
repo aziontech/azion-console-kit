@@ -13,6 +13,17 @@ const buckets = ref([
     size: '0.2 GB',
     objectCount: 0,
     setting: 'read_write',
+    credentials: [
+      {
+        id: 1,
+        name: 'teste',
+        accessKey: 'AKIAIOSFODNN7EXAMPLE',
+        secretKey: '•••••••••••••••',
+        createdAt: new Date().toLocaleString(),
+        expiresAt: new Date().toLocaleString(),
+        capacities: 'Content'
+      }
+    ],
     files: [
       {
         id: Date.now(),
@@ -61,6 +72,7 @@ const buckets = ref([
     size: '0.2 GB',
     objectCount: 0,
     setting: 'read_write',
+    credentials: [],
     files: []
   }
 ])
@@ -122,24 +134,19 @@ export const useEdgeStorage = () => {
    * @returns {Object|undefined} The bucket object if found, undefined otherwise.
    */
   const findBucketById = (id) => {
-    return buckets.value.find((bucket) => bucket.id === id)
+    return buckets.value.find((bucket) => bucket.id === parseInt(id))
   }
 
   /**
    * Updates a bucket's properties.
    * @param {number|string} id - The ID of the bucket to update.
    * @param {Object} updates - Object containing the properties to update.
-   * @returns {Object|null} The updated bucket object or null if not found.
    */
   const updateBucket = (id, updates) => {
     const bucket = findBucketById(id)
-
     if (bucket) {
       Object.assign(bucket, updates)
-      return bucket
     }
-
-    return null
   }
 
   /**
@@ -243,6 +250,36 @@ export const useEdgeStorage = () => {
     }
   }
 
+  const removeCredential = (credentialId) => {
+    const bucket = findBucketById(selectedBucket.value.id)
+    if (bucket) {
+      bucket.credentials = bucket.credentials.filter((credential) => credential.id !== credentialId)
+    }
+  }
+
+  const addCredential = (credentialData) => {
+    const bucket = findBucketById(selectedBucket.value.id)
+    if (bucket) {
+      const accessKey = 'AKIA' + Math.random().toString(36).substring(2, 15).toUpperCase()
+      const secretKey =
+        Math.random().toString(36).substring(2, 40) + Math.random().toString(36).substring(2, 40)
+
+      const newCredential = {
+        id: Date.now(),
+        name: credentialData.name,
+        accessKey,
+        secretKey,
+        createdAt: new Date().toLocaleString(),
+        expiresAt: credentialData.expirationDate.toLocaleString(),
+        capacities: 'Content'
+      }
+
+      bucket.credentials.push(newCredential)
+      return newCredential
+    }
+    return null
+  }
+
   return {
     buckets,
     selectedBucket,
@@ -258,6 +295,8 @@ export const useEdgeStorage = () => {
     removeFile,
     removeFiles,
     handleFileSelect,
-    createFolder
+    createFolder,
+    removeCredential,
+    addCredential
   }
 }

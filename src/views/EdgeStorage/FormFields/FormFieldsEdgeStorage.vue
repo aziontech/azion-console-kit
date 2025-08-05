@@ -6,7 +6,6 @@
   import { useField } from 'vee-validate'
 
   defineOptions({ name: 'form-fields-edge-storage' })
-
   defineProps({
     showDangerZone: {
       type: Boolean,
@@ -27,7 +26,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-8">
+  <div class="flex flex-col gap-8 py-8">
     <FormHorizontal
       title="General"
       description="Check the details of the Edge Storage Bucket."
