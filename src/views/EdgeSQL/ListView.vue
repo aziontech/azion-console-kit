@@ -24,7 +24,7 @@
   const toast = useToast()
   const sqlStore = useEdgeSQLStore()
   
-  // Novo sistema de gerenciamento de status otimizado
+
   const {
     isProcessing,
     isEmpty,

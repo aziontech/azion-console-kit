@@ -6,7 +6,6 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
 
   import * as EdgeSQLService from '@/services/edge-sql-services'
@@ -305,33 +304,8 @@
     return info[2] || null
   }
 
-  const getColumnConstraints = (columnName) => {
-    const info = getColumnInfo(columnName)
-    const constraints = []
-    
-    if (info[3]) constraints.push({ value: 'NOT NULL', severity: 'warning' })
-    if (info[5]) constraints.push({ value: 'PRIMARY KEY', severity: 'info' })
-    if (info[4]) constraints.push({ value: 'DEFAULT', severity: 'secondary' })
-    
-    return constraints
-  }
 
-  const getEnhancedLabel = (columnName) => {
-    const type = getColumnType(columnName)
-    return type ? `${columnName} (${type})` : columnName
-  }
 
-  const getFieldDescription = (columnName) => {
-    const info = getColumnInfo(columnName)
-    if (!info.length) return `Enter ${columnName} value`
-    
-    let description = `Column: ${columnName}`
-    if (info[4]) description += ` - Default: ${info[4]}`
-    
-    return description
-  }
-
-  // Funções para detectar e tratar tipos especiais (BLOB, etc.)
   const isSpecialType = (value) => {
     if (value !== null && value !== undefined && typeof value === 'object') {
       return true
