@@ -4,13 +4,9 @@
   import FormFieldsEdgeFirewallRulesEngine from '../FormFields/FormFieldsEdgeFirewallRulesEngine.vue'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { onMounted, ref, inject } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import {
-    edgeFirewallRulesEngineService,
-    edgeFirewallFunctionService,
-    wafService
-  } from '@/services/v2'
+  import { edgeFirewallRulesEngineService, wafService } from '@/services/v2'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -34,10 +30,6 @@
       type: Function,
       required: true
     },
-    listFunctionsService: {
-      type: Function,
-      required: true
-    },
     editService: {
       type: Function,
       required: true
@@ -56,8 +48,7 @@
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
-  const edgeFirewallFunctionsOptions = ref([])
-
+  const isOverlapped = ref(false)
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
 
@@ -193,23 +184,6 @@
       .track()
   }
 
-  const listFunctionsServiceWithDecorator = async () => {
-    return await edgeFirewallFunctionService.listFunctionsService(props.edgeFirewallId, {
-      pageSize: 100,
-      fields: 'id,name',
-      ordering: 'active'
-    })
-  }
-
-  const listEdgeFirewallFunctionsOptions = async () => {
-    try {
-      const result = await listFunctionsServiceWithDecorator()
-      edgeFirewallFunctionsOptions.value = result.body
-    } catch {
-      hasEdgeFunctionsProductAccess.value = false
-    }
-  }
-
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
     return await edgeFirewallRulesEngineService.createEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
@@ -229,9 +203,10 @@
       payload
     )
   }
-  onMounted(async () => {
-    await Promise.all([listEdgeFirewallFunctionsOptions()])
-  })
+
+  const handleIsOverlapped = (value) => {
+    isOverlapped.value = value
+  }
 
   defineExpose({
     openCreateDrawer,
@@ -246,6 +221,7 @@
     :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
+    :isOverlapped="isOverlapped"
     @onSuccess="handleCreateWithSuccess"
     @onError="handleFailedToCreate"
     title="Create Rule"
@@ -253,11 +229,11 @@
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
-        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        @isOverlapped="handleIsOverlapped"
       />
     </template>
   </CreateDrawerBlock>
@@ -269,6 +245,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
+    :isOverlapped="isOverlapped"
     @onError="handleFailedEditEdgeFirewallRules"
     @onSuccess="handleEditWithSuccess"
     title="Edit Rule"
@@ -277,11 +254,11 @@
       <FormFieldsEdgeFirewallRulesEngine
         :enabledModules="edgeFirewallModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
-        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        @isOverlapped="handleIsOverlapped"
       />
     </template>
   </EditDrawerBlock>

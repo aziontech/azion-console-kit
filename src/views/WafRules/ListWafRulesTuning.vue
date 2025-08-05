@@ -328,7 +328,7 @@
       })
 
       if (status === 'rejected') {
-        throw new Error(reason)
+        throw new Error(reason.message || reason)
       }
 
       showToast(value.feedback, 'Success', 'success')

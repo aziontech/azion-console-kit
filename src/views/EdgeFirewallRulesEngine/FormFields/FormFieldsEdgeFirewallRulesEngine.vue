@@ -8,20 +8,18 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
+  import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
+
   import { useFieldArray } from 'vee-validate'
-  import { computed, nextTick, ref, onMounted } from 'vue'
+  import { computed, nextTick, ref, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
-  import { edgeFirewallService } from '@/services/v2'
+  import { edgeFirewallService, edgeFirewallFunctionService } from '@/services/v2'
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
   })
-
+  const emit = defineEmits(['isOverlapped'])
   const props = defineProps({
-    edgeFirewallFunctionsOptions: {
-      type: Array,
-      required: true
-    },
     listWafRulesService: {
       type: Function,
       required: true
@@ -43,10 +41,24 @@
       required: true
     }
   })
+  const route = useRoute()
+  const edgeFirewallId = route.params.id
+  const drawerFunctionRef = ref('')
+  const behaviorIndexSelect = ref(null)
+  const listEdgeFunctionsServiceDecorator = async (query) => {
+    return await edgeFirewallFunctionService.listFunctionsDropdownService(edgeFirewallId, {
+      ...query,
+      fields: 'name,id',
+      active: true
+    })
+  }
+
+  const loadEdgeFunctionServiceDecorator = async ({ id }) => {
+    return await edgeFirewallFunctionService.loadFunctionsService(edgeFirewallId, id)
+  }
 
   const YEAR_IN_SECONDS = 31536000
   const enabledModules = ref({})
-  const route = useRoute()
   const DEFAULT_CRITERIA_OPTION = {
     variable: '',
     operator: '',
@@ -465,6 +477,24 @@
       criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
     })
   }
+
+  const openDrawerFunction = (behaviorItemIndex) => {
+    behaviorIndexSelect.value = behaviorItemIndex
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
+  const successFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
+  }
+
+  watch(
+    () => drawerFunctionRef.value.showCreateFunctionDrawer,
+    () => {
+      emit('isOverlapped', drawerFunctionRef.value.showCreateFunctionDrawer)
+    }
+  )
 </script>
 <template>
   <FormHorizontal
@@ -670,6 +700,11 @@
     :isDrawer="true"
   >
     <template #inputs>
+      <DrawerFunction
+        ref="drawerFunctionRef"
+        @onSuccess="successFunction"
+        :edgeFirewallID="edgeFirewallId"
+      />
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, behaviorItemIndex) in behaviors"
@@ -717,17 +752,38 @@
           </div>
           <div class="w-1/2 max-sm:w-full">
             <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
-              <FieldDropdown
+              <FieldDropdownLazyLoader
+                :service="listEdgeFunctionsServiceDecorator"
+                :loadService="loadEdgeFunctionServiceDecorator"
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
-                :options="props.edgeFirewallFunctionsOptions"
                 placeholder="Select an function"
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
                 class="w-full mb-3"
-              />
+              >
+                <template #footer>
+                  <ul class="p-2">
+                    <li>
+                      <PrimeButton
+                        class="w-full whitespace-nowrap flex"
+                        data-testid="edge-firewall-rules-form__create-function-instance-button"
+                        text
+                        @click="openDrawerFunction(behaviorItemIndex)"
+                        size="small"
+                        icon="pi pi-plus-circle"
+                        :pt="{
+                          label: { class: 'w-full text-left' },
+                          root: { class: 'p-2' }
+                        }"
+                        label="Create Function Instance"
+                      />
+                    </li>
+                  </ul>
+                </template>
+              </FieldDropdownLazyLoader>
             </template>
 
             <template v-if="isTagEvent(behaviorItemIndex)">

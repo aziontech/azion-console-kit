@@ -76,9 +76,9 @@
     emit('onSuccess')
   }
 
-  const handleSuccessCreate = () => {
+  const handleSuccessCreate = (response) => {
     handleTrackCreation()
-    emit('onSuccess')
+    emit('onSuccess', response.id)
     closeDrawerCreate()
   }
 

@@ -22,15 +22,15 @@
   }
 
   const changeArgs = (target) => {
-    if (target?.jsonArgs) {
-      args.value = target?.jsonArgs
+    if (target?.defaultArgs) {
+      args.value = target?.defaultArgs
     }
   }
 
   const listEdgeFunctionsServiceDecorator = (queryParams) => {
     return edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
-      fields: ['id', 'name', 'args', 'execution_environment'],
+      fields: ['id', 'name', 'default_args', 'execution_environment'],
       ...queryParams
     })
   }
@@ -38,7 +38,7 @@
   const loadEdgeFunctionServiceDecorator = (queryParams) => {
     return edgeFunctionService.loadEdgeFunction({
       ...queryParams,
-      fields: ['id', 'name', 'args']
+      fields: ['id', 'name', 'default_args']
     })
   }
 
@@ -97,7 +97,7 @@
           name="edgeFunctionID"
           :service="listEdgeFunctionsServiceDecorator"
           :loadService="loadEdgeFunctionServiceDecorator"
-          :moreOptions="['jsonArgs']"
+          :moreOptions="['defaultArgs']"
           disableEmitFirstRender
           optionLabel="name"
           optionValue="id"
