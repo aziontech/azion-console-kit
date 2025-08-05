@@ -7,7 +7,7 @@
 
 **Azion Console Kit** is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) interface.
 
-This project was developed by Azion, an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
+This project was developed by Azion, an Edge Computing Platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
 
 ## Getting Started 🔛
 
@@ -15,13 +15,13 @@ This project was developed by Azion, an edge computing platform that allows you 
 
 Before you begin, ensure that you have the following:
 
-- [Node.js](https://nodejs.org/) version 18 or later
+- [Node.js](https://nodejs.org/) version 20.11.0 or later
 - [Yarn](https://yarnpkg.com/) package manager
 
 If you are not a JS developer and don't want to install yarn and node, you can use Docker:
 
 ```bash
-alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
+alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:20.11.0 yarn"
 ```
 
 ### Setup
