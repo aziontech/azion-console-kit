@@ -19,7 +19,7 @@ export const edgeStorageRoutes = {
     {
       path: 'create',
       name: 'edge-storage-create',
-      component: () => import('@/views/EdgeStorage/CustomView.vue'),
+      component: () => import('@/views/EdgeStorage/View.vue'),
       meta: {
         breadCrumbs: [
           {
@@ -29,6 +29,26 @@ export const edgeStorageRoutes = {
           {
             label: 'Create Bucket',
             to: '/edge-storage/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edge-storage-bucket-settings',
+      component: () => import('@/views/EdgeStorage/View.vue'),
+      props: {
+        mode: 'edit',
+        updatedRedirect: 'edge-storage-list'
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Storage',
+            to: '/edge-storage'
+          },
+          {
+            label: 'Bucket Settings'
           }
         ]
       }

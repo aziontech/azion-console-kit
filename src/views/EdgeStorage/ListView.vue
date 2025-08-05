@@ -316,10 +316,7 @@
   }
 
   const handleSettingsTrackEvent = () => {
-    tracker.product.clickToCreate({
-      productName: 'Edge Storage'
-    })
-    router.push('/edge-storage/settings')
+    router.push(`/edge-storage/edit/${selectedBucket.value.id}`)
   }
 
   const getFiles = () => {
