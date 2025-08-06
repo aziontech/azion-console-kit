@@ -35,6 +35,10 @@
     disableAfterCreateToastFeedback: {
       type: Boolean,
       default: false
+    },
+    initialValues: {
+      type: Object,
+      default: () => ({})
     }
   })
 
@@ -53,7 +57,8 @@
   const blockViewRedirection = ref(true)
 
   const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
-    validationSchema: props.schema
+    validationSchema: props.schema,
+    initialValues: props.initialValues
   })
 
   let formHasUpdated, visibleOnSaved

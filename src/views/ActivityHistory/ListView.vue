@@ -6,8 +6,7 @@
     <template #content>
       <div v-if="hasContentToList">
         <ActivityHistoryBlock
-          :listActivityHistoryEventsService="listActivityHistoryEventsService"
-          :getActivityHistoryTotalRecords="getActivityHistoryTotalRecords"
+          :listEventsService="listEventsService"
           @on-load-data="handleLoadData"
         />
       </div>
@@ -56,15 +55,11 @@
       hasContentToList: true
     }),
     props: {
-      listActivityHistoryEventsService: {
+      listEventsService: {
         type: Function,
         required: true
       },
       documentationService: {
-        type: Function,
-        required: true
-      },
-      getActivityHistoryTotalRecords: {
         type: Function,
         required: true
       }

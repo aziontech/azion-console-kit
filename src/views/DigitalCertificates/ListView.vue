@@ -19,7 +19,6 @@
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
-        :firstLoadData="firstLoadData"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">
@@ -138,8 +137,10 @@
   ])
 
   const handleLoadData = (event) => {
+    if (firstLoadData.value) {
+      hasContentToList.value = event
+    }
     setFirstLoadData(false)
-    hasContentToList.value = event
   }
 
   const handleTrackEventGoToCreate = () => {
