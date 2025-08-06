@@ -957,6 +957,17 @@
     openEditRowDrawer(data, index, field)
   }
 
+  // Wrapper functions para resolver conflito com o formatter
+  const handleCellClickWithStopPropagation = (data, field, event) => {
+    handleCellClick(data, field)
+    event.stopPropagation()
+  }
+
+  const handleCellDoubleClickWithStopPropagation = (data, index, field, event) => {
+    handleCellDoubleClick(data, index, field)
+    event.stopPropagation()
+  }
+
   const monacoOptions = {
     minimap: { enabled: false },
     tabSize: 2,
@@ -1456,13 +1467,14 @@
                                 <template #body="{ data, field, index }">
                                   <div
                                     class="table-cell-content cursor-pointer"
-                                    @click="
-                                      handleCellClick(data, field);
-                                      $event.stopPropagation();
-                                    "
+                                    @click="handleCellClickWithStopPropagation(data, field, $event)"
                                     @dblclick="
-                                      handleCellDoubleClick(data, index, field)
-                                      $event.stopPropagation();
+                                      handleCellDoubleClickWithStopPropagation(
+                                        data,
+                                        index,
+                                        field,
+                                        $event
+                                      )
                                     "
                                     :title="`Click to copy • Double-click to edit`"
                                   >
