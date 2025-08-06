@@ -77,6 +77,10 @@ const buckets = ref([
   }
 ])
 const selectedBucket = ref(buckets.value[0])
+const isUploading = ref(false)
+const fileToUpload = ref([])
+const uploadProgress = ref(0)
+const uploadCount = ref(1)
 
 const formatSize = (size) => {
   if (size == 0) return '0 Bytes'
@@ -85,8 +89,6 @@ const formatSize = (size) => {
   return (size / Math.pow(1024, aux)).toFixed(2) + ' ' + sizes[aux]
 }
 
-// Array to store uploaded files
-const files = ref([])
 export const useEdgeStorage = () => {
   /**
    * Adds a new bucket to the buckets array.
@@ -169,21 +171,58 @@ export const useEdgeStorage = () => {
    * @param {FileList|File[]} fileList - The files to add (from drag/drop or file input).
    * @param {number|string} bucketId - The ID of the bucket to upload files to.
    */
-  const addFiles = (fileList, bucketId) => {
+  const addFiles = async (fileList, bucketId) => {
     const bucket = findBucketById(bucketId)
 
     if (bucket) {
+      isUploading.value = true
+
       const filesArray = Array.from(fileList)
-      filesArray.forEach((file) => {
-        bucket.files.push({
-          name: file.name,
-          size: formatSize(file.size),
-          id: Date.now(),
-          lastModified: new Date(),
-          isFolder: false
+      fileToUpload.value = filesArray
+      uploadCount.value = 1
+
+      try {
+        await uploadFiles()
+        filesArray.forEach((file) => {
+          bucket.files.push({
+            name: file.name,
+            size: formatSize(file.size),
+            id: Date.now(),
+            lastModified: new Date().toLocaleString(),
+            isFolder: false
+          })
         })
-      })
+        isUploading.value = false
+      } catch (error) {
+        isUploading.value = false
+      }
     }
+  }
+
+  const uploadFiles = () => {
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (isUploading.value === false) {
+          clearInterval(interval)
+          reject()
+          return
+        }
+        if (uploadCount.value === fileToUpload.value.length && uploadProgress.value >= 100) {
+          clearInterval(interval)
+          isUploading.value = false
+          fileToUpload.value = []
+          uploadCount.value = 1
+          uploadProgress.value = 0
+          resolve()
+          return
+        } else if (uploadProgress.value >= 100) {
+          uploadProgress.value = 0
+          uploadCount.value++
+        } else {
+          uploadProgress.value += Math.floor(Math.random() * 30) + 1
+        }
+      }, 1500)
+    })
   }
 
   const handleFileSelect = (event, bucketId) => {
@@ -204,22 +243,6 @@ export const useEdgeStorage = () => {
   }
 
   /**
-   * Removes a file from the files array.
-   * @param {number|string} fileId - The ID of the file to remove.
-   * @returns {boolean} True if file was found and removed, false otherwise.
-   */
-  const removeFile = (fileId) => {
-    const index = buckets.value.findIndex((bucket) => bucket.id === fileId)
-
-    if (index !== -1) {
-      buckets.value.splice(index, 1)
-      return true
-    }
-
-    return false
-  }
-
-  /**
    * Creates a new folder in a bucket.
    * @param {string} folderName - The name of the folder to create.
    * @param {number|string} bucketId - The ID of the bucket to create the folder in.
@@ -233,7 +256,7 @@ export const useEdgeStorage = () => {
         id: Date.now(),
         name: folderName,
         size: null,
-        lastModified: new Date(),
+        lastModified: new Date().toLocaleString(),
         isFolder: true
       }
       bucket.files.push(newFolder)
@@ -283,7 +306,10 @@ export const useEdgeStorage = () => {
   return {
     buckets,
     selectedBucket,
-    files,
+    isUploading,
+    fileToUpload,
+    uploadCount,
+    uploadProgress,
     addBucket,
     deleteBucket,
     findBucketById,
@@ -292,7 +318,6 @@ export const useEdgeStorage = () => {
     clearAllBuckets,
     addFiles,
     getFilesByBucket,
-    removeFile,
     removeFiles,
     handleFileSelect,
     createFolder,
