@@ -91,6 +91,12 @@ export const TABLE_MENU_ACTIONS = [
   }
 ]
 
+const ACTION_HANDLERS = {
+  query: 'executeQueryAction',
+  drawer: 'executeDrawerAction',
+  delete: 'executeDeleteAction'
+}
+
 export class TableActionManager {
   constructor(
     executeQueryFn,
@@ -109,12 +115,9 @@ export class TableActionManager {
   }
 
   async executeTableAction(action, tableName) {
-    if (action.type === 'query') {
-      return this.executeQueryAction(action, tableName)
-    } else if (action.type === 'drawer') {
-      return this.executeDrawerAction(action, tableName)
-    } else if (action.type === 'delete') {
-      return this.executeDeleteAction(action, tableName)
+    const handlerName = ACTION_HANDLERS[action.type]
+    if (handlerName && this[handlerName]) {
+      return this[handlerName](action, tableName)
     }
   }
 

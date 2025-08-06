@@ -152,17 +152,23 @@ export function useEdgeSQLStatusManager() {
     const updatedOperations = []
 
     for (const { operationId, result, error, errorObject, operation } of results) {
-              if (error) {
-          const errorStr = Array.isArray(error) ? error.join(' ') : (typeof error === 'string' ? error : JSON.stringify(error))
-          
-          const is404Error = operation.type === 'delete' && (
-            errorStr.includes('404') || 
+      if (error) {
+        const errorStr = Array.isArray(error)
+          ? error.join(' ')
+          : typeof error === 'string'
+          ? error
+          : JSON.stringify(error)
+
+        const is404Error =
+          operation.type === 'delete' &&
+          (errorStr.includes('404') ||
             errorStr.toLowerCase().includes('not found') ||
             errorObject?.status === 404 ||
             errorObject?.response?.status === 404 ||
-            (errorObject?.message && (errorObject.message.includes('404') || errorObject.message.toLowerCase().includes('not found')))
-          )
-        
+            (errorObject?.message &&
+              (errorObject.message.includes('404') ||
+                errorObject.message.toLowerCase().includes('not found'))))
+
         if (is404Error) {
           completeOperation(operationId, 'deleted')
           updatedOperations.push({ id: operationId, status: 'deleted' })
@@ -243,7 +249,7 @@ export function useEdgeSQLStatusManager() {
 
       try {
         await checkAllPendingOperations()
-      // eslint-disable-next-line no-empty
+        // eslint-disable-next-line no-empty
       } catch (error) {}
     }, POLLING_INTERVAL)
   }
@@ -260,7 +266,7 @@ export function useEdgeSQLStatusManager() {
     try {
       const operations = Array.from(pendingOperations.value.entries()).map(([id, op]) => [id, op])
       localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(operations))
-    // eslint-disable-next-line no-empty
+      // eslint-disable-next-line no-empty
     } catch (error) {}
   }
 
@@ -334,13 +340,13 @@ export function useEdgeSQLStatusManager() {
       }
     } catch (error) {
       const errorMsg = Array.isArray(error.message) ? error.message.join(' ') : error.message
-      
-      const is404Error = operation.type === 'delete' && (
-        (errorMsg && (errorMsg.includes('404') || errorMsg.toLowerCase().includes('not found'))) ||
-        error.status === 404 ||
-        error.response?.status === 404
-      )
-      
+
+      const is404Error =
+        operation.type === 'delete' &&
+        ((errorMsg && (errorMsg.includes('404') || errorMsg.toLowerCase().includes('not found'))) ||
+          error.status === 404 ||
+          error.response?.status === 404)
+
       if (is404Error) {
         completeOperation(databaseId, 'deleted')
         saveToLocalStorage()

@@ -85,7 +85,7 @@
         }
       })
     }
-    
+
     // Sempre redireciona para listagem
     result.urlToEditView = '/edge-sql'
 
@@ -100,32 +100,47 @@
     })
   }
 
-  const handleTrackFailedCreation = (error) => {
-    let fieldName = 'no field'
-    let message = 'Unknown error'
+  const parseApiError = (error) => {
+    const apiError = error.response?.data?.errors?.[0]
+    if (!apiError) return null
 
-    // Handle structured API errors
+    return {
+      fieldName: apiError.source?.pointer || 'api',
+      message: `${apiError.title}: ${apiError.detail}`
+    }
+  }
+
+  const parseStringError = (error) => {
+    const trackerResult = handleTrackerError(error)
+    return {
+      fieldName: trackerResult.fieldName,
+      message: trackerResult.message
+    }
+  }
+
+  const parseGenericError = (error) => {
+    return {
+      fieldName: 'no field',
+      message: error.message || error.toString() || 'Failed to create database'
+    }
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    let errorInfo
+
     if (error.response?.data?.errors?.[0]) {
-      const apiError = error.response.data.errors[0]
-      fieldName = apiError.source?.pointer || 'api'
-      message = `${apiError.title}: ${apiError.detail}`
+      errorInfo = parseApiError(error)
     } else if (typeof error === 'string') {
-      // Handle string errors with the original tracker
-      const trackerResult = handleTrackerError(error)
-      fieldName = trackerResult.fieldName
-      message = trackerResult.message
+      errorInfo = parseStringError(error)
     } else {
-      // Handle other error types
-      message = error.message || error.toString() || 'Failed to create database'
+      errorInfo = parseGenericError(error)
     }
 
-    tracker.product
-      ?.failedToCreate({
-        productName: 'Edge SQL Database',
-        errorType: 'api',
-        fieldName: fieldName.trim(),
-        errorMessage: message
-      })
-      ?.track()
+    tracker.product?.failedToCreate({
+      productName: 'Edge SQL Database',
+      errorType: 'api',
+      fieldName: errorInfo.fieldName.trim(),
+      errorMessage: errorInfo.message
+    })?.track()
   }
 </script>

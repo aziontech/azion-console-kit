@@ -13,6 +13,7 @@
   import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQLStore } from '@/stores/edge-sql'
   import { useEdgeSQLStatusManager } from '@/composables/use-edge-sql-status-manager'
+  import { getStatusContent, getDatabaseName, isPendingStatus } from './utils/database-status'
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
 
   defineOptions({ name: 'list-edge-sql-databases' })
@@ -30,9 +31,10 @@
     addCreateOperation,
     addDeleteOperation,
     isDatabasePending,
-    PENDING_STATUSES,
     onGlobalEvent
   } = useEdgeSQLStatusManager()
+
+
 
   const props = defineProps({
     documentationService: {
@@ -66,7 +68,7 @@
         const databaseName = databaseData.name?.text || databaseData.name
 
         const isAsyncOperation = typeof result === 'string' && result.includes('initiated')
-        
+
         if (isAsyncOperation) {
           addDeleteOperation(databaseId, databaseName, (status, operation) => {
             if (status === 'failed') {
@@ -102,42 +104,54 @@
     }
   }
 
+  const shouldMonitorDatabase = (db) => {
+    const statusContent = getStatusContent(db)
+    const isPending = isPendingStatus(statusContent)
+    const isAlreadyMonitored = isDatabasePending(db.id)
+    return isPending && !isAlreadyMonitored
+  }
+
+  const createOperationCallback = (databaseName) => (status, operation) => {
+    if (status === 'failed') {
+      toast.add({
+        severity: 'error',
+        summary: 'Creation Failed',
+        detail: `Failed to create database "${databaseName}". ${operation.error || ''}`,
+        life: 5000
+      })
+      reloadList()
+    }
+  }
+
+  const deleteOperationCallback = (databaseName) => (status, operation) => {
+    if (status === 'failed') {
+      toast.add({
+        severity: 'error',
+        summary: 'Delete Failed',
+        detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
+        life: 5000
+      })
+      reloadList()
+    }
+  }
+
+  const addDatabaseOperation = (db) => {
+    const statusContent = getStatusContent(db)
+    const databaseName = getDatabaseName(db)
+
+    if (statusContent === 'creating') {
+      addCreateOperation(db.id, databaseName, createOperationCallback(databaseName))
+    } else if (statusContent === 'deleting') {
+      addDeleteOperation(db.id, databaseName, deleteOperationCallback(databaseName))
+    }
+  }
+
   const processLoadedData = (databases) => {
     if (!Array.isArray(databases)) return
 
     databases.forEach((db) => {
-      const statusContent = db.status?.content || db.status
-      const databaseName = db.name?.text || db.name
-
-      const isPendingStatus = PENDING_STATUSES.includes(statusContent)
-      const isAlreadyMonitored = isDatabasePending(db.id)
-
-      if (isPendingStatus && !isAlreadyMonitored) {
-        if (statusContent === 'creating') {
-          addCreateOperation(db.id, databaseName, (status, operation) => {
-            if (status === 'failed') {
-              toast.add({
-                severity: 'error',
-                summary: 'Creation Failed',
-                detail: `Failed to create database "${databaseName}". ${operation.error || ''}`,
-                life: 5000
-              })
-              reloadList()
-            }
-          })
-        } else if (statusContent === 'deleting') {
-          addDeleteOperation(db.id, databaseName, (status, operation) => {
-            if (status === 'failed') {
-              toast.add({
-                severity: 'error',
-                summary: 'Delete Failed',
-                detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
-                life: 5000
-              })
-              reloadList()
-            }
-          })
-        }
+      if (shouldMonitorDatabase(db)) {
+        addDatabaseOperation(db)
       }
     })
   }

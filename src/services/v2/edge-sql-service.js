@@ -4,8 +4,6 @@ export class EdgeSQLService {
     this.EdgeSQLAdapter = EdgeSQLAdapter
   }
 
-
-
   /**
    * Standardized success response formatting
    * @private
@@ -59,7 +57,7 @@ export class EdgeSQLService {
 
     // Só monitora se status não for final (created/ready)
     const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
-    
+
     return this._formatSuccessResponse(adaptedData, `Database "${name}" created successfully`, {
       shouldMonitor,
       databaseId: adaptedData.id,
