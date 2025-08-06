@@ -129,11 +129,10 @@ export class EdgeSQLAdapter {
       }
     }
 
-    // SQLite master table returns: name, type, sql
     const tables = firstResult.results.rows.map((row) => ({
-      name: row[0], // name column
-      type: row[1] || 'table', // type column
-      sql: row[2] || '' // sql column
+      name: row[0],
+      type: row[1] || 'table',
+      sql: row[2] || ''
     }))
 
     return {
@@ -148,7 +147,6 @@ export class EdgeSQLAdapter {
     const data = httpResponse.data || httpResponse.body
     const results = data.data || data
 
-    // Execute returns array of results, get first one
     if (!Array.isArray(results) || results.length === 0) {
       return {
         statusCode: 200,
@@ -168,11 +166,10 @@ export class EdgeSQLAdapter {
       }
     }
 
-    // SQLite master table returns: name, type, sql
     const tables = result.rows.map((row) => ({
-      name: row[0], // name column
-      type: row[1] || 'table', // type column
-      sql: row[2] || '' // sql column
+      name: row[0],
+      type: row[1] || 'table',
+      sql: row[2] || ''
     }))
 
     return {
@@ -186,10 +183,8 @@ export class EdgeSQLAdapter {
   static adaptQueryResult(httpResponse) {
     const data = httpResponse.data || httpResponse.body
 
-    // A API retorna data como array de objetos com results ou error
     const results =
       data?.data?.map((item) => {
-        // Se há erro no item, retornar estrutura de erro
         if (item.error) {
           return {
             error: item.error,
@@ -202,7 +197,6 @@ export class EdgeSQLAdapter {
           }
         }
 
-        // Se há results, processar normalmente
         return {
           columns: item.results?.columns || [],
           rows: item.results?.rows || [],
@@ -230,7 +224,6 @@ export class EdgeSQLAdapter {
     const data = httpResponse.data || httpResponse.body
     const results = data.data || data
 
-    // Execute returns array of results, get first one
     if (!Array.isArray(results) || results.length === 0) {
       return {
         statusCode: 200,
@@ -268,10 +261,8 @@ export class EdgeSQLAdapter {
   static adaptExecuteResult(httpResponse) {
     const data = httpResponse.data || httpResponse.body
 
-    // A API retorna data como array de objetos com results ou error
     const results =
       data?.data?.map((item) => {
-        // Se há erro no item, retornar estrutura de erro
         if (item.error) {
           return {
             error: item.error,
@@ -284,7 +275,6 @@ export class EdgeSQLAdapter {
           }
         }
 
-        // Se há results, processar normalmente
         return {
           columns: item.results?.columns || [],
           rows: item.results?.rows || [],

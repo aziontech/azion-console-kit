@@ -65,9 +65,9 @@
 
         const databaseName = databaseData.name?.text || databaseData.name
 
-        // Se é operação assíncrona, monitora via polling
-        if (result._isAsyncOperation) {
-          console.log(`[ListView] Starting async delete monitoring for database ${databaseId}`)
+        const isAsyncOperation = typeof result === 'string' && result.includes('initiated')
+        
+        if (isAsyncOperation) {
           addDeleteOperation(databaseId, databaseName, (status, operation) => {
             if (status === 'failed') {
               toast.add({
@@ -88,7 +88,6 @@
             }
           })
         }
-        // Para operações síncronas, DeleteDialog mostra toast automático com a string
 
         return result
       }

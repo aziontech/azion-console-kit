@@ -132,7 +132,6 @@
     loading.value = true
     try {
       const feedback = await data.deleteService(data.selectedID, data.selectedItemData)
-      console.log('[DeleteDialog] feedback received:', feedback, typeof feedback)
       showToast('success', 'Success', feedback ?? 'Deleted successfully!')
       emit('successfullyDeleted')
       resetForm()
@@ -152,14 +151,11 @@
   }
 
   const showToast = (severity, summary, detail = '') => {
-    console.log('[DeleteDialog] showToast called with:', { severity, summary, detail, detailType: typeof detail })
-    const finalDetail = detail || 'An error occurred while trying to delete the item. Please try again.'
-    console.log('[DeleteDialog] final detail:', finalDetail)
     toast.add({
       closable: true,
       severity,
       summary,
-      detail: finalDetail
+      detail: detail || 'An error occurred while trying to delete the item. Please try again.'
     })
   }
 

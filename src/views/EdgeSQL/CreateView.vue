@@ -57,7 +57,9 @@
     name: yup
       .string()
       .required('Database name is required')
-      .matches(/^[a-zA-Z0-9_-]+$/, 'Use only letters, numbers, underscore (_) and hyphen (-)')
+      .min(6, 'Database name must be at least 6 characters')
+      .max(50, 'Database name must be at most 50 characters')
+      .matches(/^[a-zA-Z0-9-]+$/, 'Use only letters, numbers and hyphen (-)')
   })
 
   const initialValues = ref({
@@ -66,16 +68,10 @@
   const createDatabaseServiceWithMonitoring = async (payload) => {
     const result = await edgeSQLService.createDatabase(payload)
 
+    // Só monitora se realmente for assíncrono (retorna status creating/pending)
     if (result.shouldMonitor && result.databaseId) {
-      if (result.feedback) {
-        toast.add({
-          severity: 'success',
-          summary: 'Creating Database',
-          detail: result.feedback,
-          life: 3000
-        })
-      }
-
+      // Para databases que retornam "created" direto, não precisa polling
+      // Para databases que retornam "creating", precisa polling
       addCreateOperation(result.databaseId, result.databaseName, (status, operation) => {
         if (status === 'failed') {
           toast.add({
@@ -89,6 +85,9 @@
         }
       })
     }
+    
+    // Sempre redireciona para listagem
+    result.urlToEditView = '/edge-sql'
 
     return result
   }
@@ -102,7 +101,24 @@
   }
 
   const handleTrackFailedCreation = (error) => {
-    const { fieldName, message } = handleTrackerError(error)
+    let fieldName = 'no field'
+    let message = 'Unknown error'
+
+    // Handle structured API errors
+    if (error.response?.data?.errors?.[0]) {
+      const apiError = error.response.data.errors[0]
+      fieldName = apiError.source?.pointer || 'api'
+      message = `${apiError.title}: ${apiError.detail}`
+    } else if (typeof error === 'string') {
+      // Handle string errors with the original tracker
+      const trackerResult = handleTrackerError(error)
+      fieldName = trackerResult.fieldName
+      message = trackerResult.message
+    } else {
+      // Handle other error types
+      message = error.message || error.toString() || 'Failed to create database'
+    }
+
     tracker.product
       ?.failedToCreate({
         productName: 'Edge SQL Database',

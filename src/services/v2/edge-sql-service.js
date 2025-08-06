@@ -57,9 +57,11 @@ export class EdgeSQLService {
 
     const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
 
+    // Só monitora se status não for final (created/ready)
+    const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
+    
     return this._formatSuccessResponse(adaptedData, `Database "${name}" created successfully`, {
-      urlToEditView: `/edge-sql/databases/${adaptedData.id}`,
-      shouldMonitor: true,
+      shouldMonitor,
       databaseId: adaptedData.id,
       databaseName: adaptedData.name,
       statusCode: httpResponse.statusCode || 201
@@ -77,9 +79,6 @@ export class EdgeSQLService {
     })
 
     const feedback = this.EdgeSQLAdapter.adaptDatabaseDelete(httpResponse)
-    console.log('[EdgeSQLService] deleteDatabase feedback:', feedback, typeof feedback)
-    
-    // Sempre retorna string (padrão v2)
     return feedback
   }
 
@@ -112,7 +111,7 @@ export class EdgeSQLService {
 
     const adaptedData = this.EdgeSQLAdapter.adaptDatabaseStatus(httpResponse)
     return this._formatSuccessResponse(adaptedData, null, {
-      statusCode: httpResponse.statusCode
+      statusCode: httpResponse.statusCode || 200
     })
   }
 
