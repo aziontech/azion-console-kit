@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@services/axios/errors'
-import { listActivityHistoryEventsService } from '@/services/activity-history-services'
+import { listEventsService } from '@/services/activity-history-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '../../../services/axios/makeEventsApi'
 
@@ -17,7 +17,7 @@ const records = [
 ]
 
 const makeSut = () => {
-  const sut = listActivityHistoryEventsService
+  const sut = listEventsService
 
   return { sut }
 }
@@ -43,7 +43,7 @@ describe('ListActivityHistoryService', () => {
     const { sut } = makeSut()
     const token = 'token'
     const apiClient = graphQLApi(token)
-    await sut({ apiClient })
+    await sut(apiClient)
     const offSetEnd = new Date()
     const offSetStart = new Date(
       Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
