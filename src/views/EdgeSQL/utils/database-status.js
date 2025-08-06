@@ -43,7 +43,9 @@ export const isPendingStatus = (status) => {
 }
 
 export const isCompletedStatus = (status) => {
-  return [DATABASE_STATUSES.CREATED, DATABASE_STATUSES.READY, DATABASE_STATUSES.DELETED].includes(status)
+  return [DATABASE_STATUSES.CREATED, DATABASE_STATUSES.READY, DATABASE_STATUSES.DELETED].includes(
+    status
+  )
 }
 
 export const isFailedStatus = (status) => {
@@ -68,4 +70,4 @@ export const getStatusContent = (database) => {
 
 export const getDatabaseName = (database) => {
   return database.name?.text || database.name
-} 
+}

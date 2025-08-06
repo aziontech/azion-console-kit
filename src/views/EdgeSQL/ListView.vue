@@ -34,8 +34,6 @@
     onGlobalEvent
   } = useEdgeSQLStatusManager()
 
-
-
   const props = defineProps({
     documentationService: {
       required: true,
@@ -56,43 +54,43 @@
     setTimeout(reloadList, 200)
   })
 
+  const deleteDatabaseService = async (databaseId, databaseData) => {
+    const result = await edgeSQLService.deleteDatabase(databaseId)
+    const databaseName = databaseData.name?.text || databaseData.name
+    const isAsyncOperation = typeof result === 'string' && result.includes('initiated')
+
+    if (isAsyncOperation) {
+      addDeleteOperation(databaseId, databaseName, (status, operation) => {
+        if (status === 'failed') {
+          toast.add({
+            severity: 'error',
+            summary: 'Delete Failed',
+            detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
+            life: 5000
+          })
+          reloadList()
+        } else if (status === 'deleted') {
+          toast.add({
+            severity: 'success',
+            summary: 'Delete Completed',
+            detail: `Database "${databaseName}" has been successfully deleted.`,
+            life: 4000
+          })
+          reloadList()
+        }
+      })
+    }
+
+    return result
+  }
+
   const actions = [
     {
       type: 'delete',
       label: 'Delete',
       title: 'database',
       icon: 'pi pi-trash',
-      service: async (databaseId, databaseData) => {
-        const result = await edgeSQLService.deleteDatabase(databaseId)
-
-        const databaseName = databaseData.name?.text || databaseData.name
-
-        const isAsyncOperation = typeof result === 'string' && result.includes('initiated')
-
-        if (isAsyncOperation) {
-          addDeleteOperation(databaseId, databaseName, (status, operation) => {
-            if (status === 'failed') {
-              toast.add({
-                severity: 'error',
-                summary: 'Delete Failed',
-                detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
-                life: 5000
-              })
-              reloadList()
-            } else if (status === 'deleted') {
-              toast.add({
-                severity: 'success',
-                summary: 'Delete Completed',
-                detail: `Database "${databaseName}" has been successfully deleted.`,
-                life: 4000
-              })
-              reloadList()
-            }
-          })
-        }
-
-        return result
-      }
+      service: deleteDatabaseService
     }
   ]
 
@@ -158,13 +156,13 @@
 
   const handleTrackEvent = () => {
     tracker.product?.clickToCreate({
-      productName: 'Database'
+      productName: 'Edge SQL Database'
     })
   }
 
   const handleTrackEditEvent = (database) => {
     tracker.product?.clickToEdit({
-      productName: 'Database'
+      productName: 'Edge SQL Database'
     })
 
     const statusContent = database.status?.content || database.status
@@ -318,7 +316,7 @@
     ]
   })
 
-  const DATABASE_API_FIELDS = ['id', 'name', 'status', 'created_at', 'last_modified']
+  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'created_at', 'last_modified']
 </script>
 
 <template>
@@ -350,7 +348,7 @@
         :enableEditClick="false"
         :listService="edgeSQLService.listDatabases"
         :columns="getColumns"
-        :apiFields="DATABASE_API_FIELDS"
+        :apiFields="EDGE_SQL_API_FIELDS"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"

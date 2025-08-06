@@ -21,7 +21,10 @@
       </div>
     </div>
 
-    <div v-if="queryResults.length === 0" class="text-center py-8 text-surface-500">
+    <div
+      v-if="queryResults.length === 0"
+      class="text-center py-8 text-surface-500"
+    >
       No results to display
     </div>
 
@@ -48,7 +51,10 @@
         class="min-w-[150px]"
       >
         <template #body="{ data, field }">
-          <div class="table-cell-content cursor-pointer" @click="handleCellClick(data, field)">
+          <div
+            class="table-cell-content cursor-pointer"
+            @click="handleCellClick(data, field)"
+          >
             {{ formatCellValue(data[field]) }}
           </div>
         </template>
@@ -58,64 +64,64 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
+  import { computed } from 'vue'
+  import DataTable from 'primevue/datatable'
+  import Column from 'primevue/column'
+  import Button from 'primevue/button'
 
-const props = defineProps({
-  queryResults: {
-    type: Array,
-    default: () => []
-  },
-  rowsPerPage: {
-    type: Number,
-    default: 20
-  },
-  currentPage: {
-    type: Number,
-    default: 0
+  const props = defineProps({
+    queryResults: {
+      type: Array,
+      default: () => []
+    },
+    rowsPerPage: {
+      type: Number,
+      default: 20
+    },
+    currentPage: {
+      type: Number,
+      default: 0
+    }
+  })
+
+  const emit = defineEmits(['page-change', 'cell-click', 'refresh', 'export'])
+
+  const tableColumns = computed(() => {
+    if (!props.queryResults.length) return []
+
+    const firstRow = props.queryResults[0]
+    return Object.keys(firstRow).map((key) => ({
+      field: key,
+      header: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')
+    }))
+  })
+
+  const onPageChange = (event) => {
+    emit('page-change', event)
   }
-})
 
-const emit = defineEmits(['page-change', 'cell-click', 'refresh', 'export'])
+  const handleCellClick = (data, field) => {
+    emit('cell-click', { data, field })
+  }
 
-const tableColumns = computed(() => {
-  if (!props.queryResults.length) return []
-  
-  const firstRow = props.queryResults[0]
-  return Object.keys(firstRow).map(key => ({
-    field: key,
-    header: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')
-  }))
-})
+  const formatCellValue = (value) => {
+    if (value === null || value === undefined) return 'NULL'
+    if (typeof value === 'boolean') return value ? 'true' : 'false'
+    if (typeof value === 'object') return JSON.stringify(value)
+    return String(value)
+  }
 
-const onPageChange = (event) => {
-  emit('page-change', event)
-}
-
-const handleCellClick = (data, field) => {
-  emit('cell-click', { data, field })
-}
-
-const formatCellValue = (value) => {
-  if (value === null || value === undefined) return 'NULL'
-  if (typeof value === 'boolean') return value ? 'true' : 'false'
-  if (typeof value === 'object') return JSON.stringify(value)
-  return String(value)
-}
-
-const exportResults = () => {
-  emit('export')
-}
+  const exportResults = () => {
+    emit('export')
+  }
 </script>
 
 <style scoped>
-.table-cell-content {
-  padding: 0.5rem;
-  word-break: break-word;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style> 
+  .table-cell-content {
+    padding: 0.5rem;
+    word-break: break-word;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

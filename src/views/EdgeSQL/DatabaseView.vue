@@ -243,11 +243,12 @@
         throw new Error(result.error || 'Error executing query')
       }
     } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred'
       toast.add({
         severity: 'error',
-        summary: 'Error',
-        detail: error.message,
-        life: 5000
+        summary: 'Query Error',
+        detail: errorMessage,
+        life: 6000
       })
     } finally {
       isExecutingQuery.value = false

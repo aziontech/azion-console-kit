@@ -58,7 +58,7 @@ export class EdgeSQLService {
     // Só monitora se status não for final (created/ready)
     const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
 
-    return this._formatSuccessResponse(adaptedData, `Database "${name}" created successfully`, {
+    return this._formatSuccessResponse(adaptedData, null, {
       shouldMonitor,
       databaseId: adaptedData.id,
       databaseName: adaptedData.name,
@@ -144,7 +144,8 @@ export class EdgeSQLService {
       method: 'POST',
       body: {
         statements: [statement]
-      }
+      },
+      processError: false
     })
 
     return this.EdgeSQLAdapter.adaptQueryResult(httpResponse)
@@ -162,7 +163,8 @@ export class EdgeSQLService {
     const httpResponse = await this.httpService.request({
       url: `/v4/edge_sql/databases/${databaseId}/query`,
       method: 'POST',
-      body: { statements }
+      body: { statements },
+      processError: false
     })
 
     return this.EdgeSQLAdapter.adaptExecuteResult(httpResponse)

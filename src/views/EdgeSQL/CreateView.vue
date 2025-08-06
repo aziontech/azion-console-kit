@@ -8,12 +8,12 @@
     </template>
     <template #content>
       <CreateFormBlock
-        @on-response="handleTrackCreation"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :createService="createDatabaseServiceWithMonitoring"
         :schema="validationSchema"
         :initialValues="initialValues"
-        :disableAfterCreateToastFeedback="true"
+        disableToast
         data-testid="create-edge-sql-database-form-block"
       >
         <template #form>
@@ -40,6 +40,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateDatabase from './FormFields/FormFieldsCreateDatabase.vue'
   import { inject, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeSQLService } from '@/services/v2'
@@ -50,6 +51,7 @@
 
   const tracker = inject('tracker')
   const toast = useToast()
+  const route = useRoute()
 
   const { addCreateOperation } = useEdgeSQLStatusManager()
 
@@ -68,10 +70,7 @@
   const createDatabaseServiceWithMonitoring = async (payload) => {
     const result = await edgeSQLService.createDatabase(payload)
 
-    // Só monitora se realmente for assíncrono (retorna status creating/pending)
     if (result.shouldMonitor && result.databaseId) {
-      // Para databases que retornam "created" direto, não precisa polling
-      // Para databases que retornam "creating", precisa polling
       addCreateOperation(result.databaseId, result.databaseName, (status, operation) => {
         if (status === 'failed') {
           toast.add({
@@ -86,16 +85,27 @@
       })
     }
 
-    // Sempre redireciona para listagem
-    result.urlToEditView = '/edge-sql'
-
     return result
+  }
+
+  const handleResponse = (response) => {
+    handleTrackCreation()
+    
+    if (response?.data?.id) {
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Your Edge SQL database has been created',
+        life: 4000,
+        closable: true
+      })
+    }
   }
 
   const handleTrackCreation = () => {
     tracker.product?.productCreated({
       productName: 'Edge SQL Database',
-      from: 'list',
+      from: route.query.origin || 'list',
       createdFrom: 'singleEntity'
     })
   }
@@ -136,11 +146,13 @@
       errorInfo = parseGenericError(error)
     }
 
-    tracker.product?.failedToCreate({
-      productName: 'Edge SQL Database',
-      errorType: 'api',
-      fieldName: errorInfo.fieldName.trim(),
-      errorMessage: errorInfo.message
-    })?.track()
+    tracker.product
+      ?.failedToCreate({
+        productName: 'Edge SQL Database',
+        errorType: 'api',
+        fieldName: errorInfo.fieldName.trim(),
+        errorMessage: errorInfo.message
+      })
+      ?.track()
   }
 </script>

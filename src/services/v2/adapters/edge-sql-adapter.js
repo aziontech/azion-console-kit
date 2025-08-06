@@ -183,6 +183,11 @@ export class EdgeSQLAdapter {
   static adaptQueryResult(httpResponse) {
     const data = httpResponse.data || httpResponse.body
 
+    if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+      const firstError = data.errors[0]
+      throw new Error(`${firstError.title}: ${firstError.detail}`)
+    }
+
     const results =
       data?.data?.map((item) => {
         if (item.error) {
@@ -260,6 +265,11 @@ export class EdgeSQLAdapter {
 
   static adaptExecuteResult(httpResponse) {
     const data = httpResponse.data || httpResponse.body
+
+    if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+      const firstError = data.errors[0]
+      throw new Error(`${firstError.title}: ${firstError.detail}`)
+    }
 
     const results =
       data?.data?.map((item) => {
