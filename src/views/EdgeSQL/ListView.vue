@@ -64,17 +64,31 @@
         const result = await edgeSQLService.deleteDatabase(databaseId)
 
         const databaseName = databaseData.name?.text || databaseData.name
-        addDeleteOperation(databaseId, databaseName, (status, operation) => {
-          if (status === 'failed') {
-            toast.add({
-              severity: 'error',
-              summary: 'Delete Failed',
-              detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
-              life: 5000
-            })
-            reloadList()
-          }
-        })
+
+        // Se é operação assíncrona, monitora via polling
+        if (result._isAsyncOperation) {
+          console.log(`[ListView] Starting async delete monitoring for database ${databaseId}`)
+          addDeleteOperation(databaseId, databaseName, (status, operation) => {
+            if (status === 'failed') {
+              toast.add({
+                severity: 'error',
+                summary: 'Delete Failed',
+                detail: `Failed to delete database "${databaseName}". ${operation.error || ''}`,
+                life: 5000
+              })
+              reloadList()
+            } else if (status === 'deleted') {
+              toast.add({
+                severity: 'success',
+                summary: 'Delete Completed',
+                detail: `Database "${databaseName}" has been successfully deleted.`,
+                life: 4000
+              })
+              reloadList()
+            }
+          })
+        }
+        // Para operações síncronas, DeleteDialog mostra toast automático com a string
 
         return result
       }

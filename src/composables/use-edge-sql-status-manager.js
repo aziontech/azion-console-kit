@@ -113,7 +113,10 @@ export function useEdgeSQLStatusManager() {
       PENDING_STATUSES.includes(op.status)
     )
 
+    console.log(`[StatusManager] Checking ${operations.length} pending operations:`, operations.map(op => `${op.id}(${op.status})`))
+
     if (operations.length === 0) {
+      console.log('[StatusManager] No pending operations, stopping polling')
       stopPolling()
       return []
     }
@@ -143,7 +146,8 @@ export function useEdgeSQLStatusManager() {
       } catch (error) {
         return {
           operationId: operation.id,
-          error: error.message,
+          error: error.message || error,
+          errorObject: error,  // Mantém erro original para análise
           operation
         }
       }
@@ -152,12 +156,26 @@ export function useEdgeSQLStatusManager() {
     const results = await Promise.all(statusChecks)
     const updatedOperations = []
 
-    for (const { operationId, result, error, operation } of results) {
+    for (const { operationId, result, error, errorObject, operation } of results) {
       if (error) {
-        if (operation.type === 'delete' && (error.includes('404') || error.includes('not found'))) {
+        // Converte error para string se for array ou objeto
+        const errorStr = Array.isArray(error) ? error.join(' ') : (typeof error === 'string' ? error : JSON.stringify(error))
+        
+        // Melhor detecção de 404 para operações de delete
+        const is404Error = operation.type === 'delete' && (
+          errorStr.includes('404') || 
+          errorStr.toLowerCase().includes('not found') ||
+          errorObject?.status === 404 ||
+          errorObject?.response?.status === 404 ||
+          (errorObject?.message && (errorObject.message.includes('404') || errorObject.message.toLowerCase().includes('not found')))
+        )
+        
+        if (is404Error) {
+          console.log(`[StatusManager] Database ${operationId} deleted (404 detected)`, errorStr)
           completeOperation(operationId, 'deleted')
           updatedOperations.push({ id: operationId, status: 'deleted' })
         } else {
+          console.log(`[StatusManager] Operation ${operationId} failed:`, errorStr)
           completeOperation(operationId, 'failed', error)
           updatedOperations.push({ id: operationId, status: 'failed', error })
         }
@@ -208,12 +226,16 @@ export function useEdgeSQLStatusManager() {
     const operation = pendingOperations.value.get(operationId)
 
     if (operation) {
+      console.log(`[StatusManager] Completing operation ${operationId} with status: ${finalStatus}`)
       const callback = operationCallbacks.value.get(operationId)
       if (callback) {
         callback(finalStatus, { ...operation, error })
         operationCallbacks.value.delete(operationId)
       }
       pendingOperations.value.delete(operationId)
+      console.log(`[StatusManager] Removed operation ${operationId} from pending operations. Remaining: ${pendingOperations.value.size}`)
+    } else {
+      console.log(`[StatusManager] Operation ${operationId} not found in pending operations`)
     }
 
     emitGlobalEvent('operationCompleted', { id: operationId, status: finalStatus, error })
@@ -224,10 +246,12 @@ export function useEdgeSQLStatusManager() {
       return
     }
 
+    console.log('[StatusManager] Starting polling for pending operations')
     isProcessing.value = true
 
     intervalRef.value = setInterval(async () => {
       if (!hasPendingOperations.value) {
+        console.log('[StatusManager] No pending operations, stopping polling from interval')
         stopPolling()
         return
       }
@@ -235,12 +259,15 @@ export function useEdgeSQLStatusManager() {
       try {
         await checkAllPendingOperations()
         // eslint-disable-next-line no-empty
-      } catch (error) {}
+      } catch (error) {
+        console.log('[StatusManager] Error during polling:', error)
+      }
     }, POLLING_INTERVAL)
   }
 
   function stopPolling() {
     if (intervalRef.value) {
+      console.log('[StatusManager] Stopping polling')
       clearInterval(intervalRef.value)
       intervalRef.value = null
       isProcessing.value = false
@@ -324,14 +351,24 @@ export function useEdgeSQLStatusManager() {
         return { id: databaseId, status: finalStatus }
       }
     } catch (error) {
-      if (
-        operation.type === 'delete' &&
-        (error.message.includes('404') || error.message.includes('not found'))
-      ) {
+      // Converte error.message para string se for array
+      const errorMsg = Array.isArray(error.message) ? error.message.join(' ') : error.message
+      
+      // Melhor detecção de 404 para operações de delete
+      const is404Error = operation.type === 'delete' && (
+        (errorMsg && (errorMsg.includes('404') || errorMsg.toLowerCase().includes('not found'))) ||
+        error.status === 404 ||
+        error.response?.status === 404
+      )
+      
+      if (is404Error) {
+        console.log(`[StatusManager] Database ${databaseId} deleted (404 detected in checkDatabaseStatus)`, errorMsg)
         completeOperation(databaseId, 'deleted')
         saveToLocalStorage()
         return { id: databaseId, status: 'deleted' }
       }
+      
+      console.log(`[StatusManager] Error checking database ${databaseId}:`, errorMsg || error)
     }
 
     return null

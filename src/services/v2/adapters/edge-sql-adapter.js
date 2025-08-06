@@ -44,9 +44,8 @@ export class EdgeSQLAdapter {
             content: String(database.status || 'unknown'),
             severity: EdgeSQLAdapter.getStatusSeverity(database.status)
           },
-          createdAt: new Date(database.created_at || database.last_modified).toLocaleString(),
-          updatedAt: EdgeSQLAdapter.formatDate(database.last_modified),
-          lastModify: new Date(database.last_modified).toLocaleString(),
+          created_at: EdgeSQLAdapter.formatDate(database.created_at || database.last_modified),
+          last_modified: EdgeSQLAdapter.formatDate(database.last_modified),
           lastModifyDate: String(database.last_modified || '')
         }
       })
@@ -326,6 +325,16 @@ export class EdgeSQLAdapter {
       default:
         return 'info'
     }
+  }
+
+  static adaptDatabaseDelete(httpResponse) {
+    const data = httpResponse.data || httpResponse.body
+
+    if (data?.state === 'pending') {
+      return 'Database deletion initiated. This may take a few moments.'
+    }
+
+    return 'Database successfully deleted'
   }
 
   static formatDate(dateString) {
