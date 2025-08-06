@@ -21,4 +21,31 @@ export class EdgeStorageService {
 
     return this.adapter?.transformListEdgeStorageBuckets?.(data, params)
   }
+
+  createEdgeStorageBucket = async (bucket = {}) => {
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: this.baseURL,
+      body: bucket
+    })
+
+    return this.adapter?.transformCreateEdgeStorageBucket?.(data)
+  }
+
+  listEdgeStorageBucketFiles = async (params = {}) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `${this.baseURL}/${params.bucketName}/objects`,
+      params: {
+        search: '',
+        fields: '',
+        ordering: 'name',
+        page: 1,
+        pageSize: 100,
+        ...params
+      }
+    })
+
+    return this.adapter?.transformListEdgeStorageBucketFiles?.(data, params)
+  }
 }

@@ -16,7 +16,7 @@
   defineEmits(['delete-bucket'])
 
   const { value: name } = useField('name')
-  const { value: edgeAccess } = useField('edgeAccess')
+  const { value: edge_access } = useField('edge_access')
 
   const edgeAccessOptions = [
     { label: 'Read & Write', value: 'read_write' },
@@ -54,8 +54,8 @@
           <FieldDropdown
             label="Edge Access"
             required
-            name="edgeAccess"
-            :value="edgeAccess"
+            name="edge_access"
+            :value="edge_access"
             :options="edgeAccessOptions"
             optionLabel="label"
             optionValue="value"
