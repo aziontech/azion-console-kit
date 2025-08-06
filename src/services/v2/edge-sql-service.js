@@ -4,6 +4,34 @@ export class EdgeSQLService {
     this.EdgeSQLAdapter = EdgeSQLAdapter
   }
 
+  /**
+   * Standardized error handling for EdgeSQL operations
+   * @private
+   */
+  _handleError(error, operation = 'operation') {
+    const statusCode = error.response?.status || error.statusCode || 500
+    const errorMessage = error.response?.data?.error || error.message || `Failed to execute ${operation}`
+    
+    return {
+      statusCode,
+      error: errorMessage,
+      body: null
+    }
+  }
+
+  /**
+   * Standardized success response formatting
+   * @private
+   */
+  _formatSuccessResponse(data, feedback = null, additionalData = {}) {
+    return {
+      statusCode: 200,
+      body: data,
+      feedback,
+      ...additionalData
+    }
+  }
+
   listDatabases = async ({
     orderBy = 'name',
     sort = 'asc',
@@ -11,44 +39,52 @@ export class EdgeSQLService {
     pageSize = 20,
     search = ''
   } = {}) => {
-    const searchParams = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ordering: sort === 'desc' ? `-${orderBy}` : orderBy
-    })
+    try {
+      const searchParams = new URLSearchParams({
+        page: page.toString(),
+        page_size: pageSize.toString(),
+        ordering: sort === 'desc' ? `-${orderBy}` : orderBy
+      })
 
-    if (search) {
-      searchParams.set('search', search)
+      if (search) {
+        searchParams.set('search', search)
+      }
+
+      const httpResponse = await this.httpService.request({
+        url: `/v4/edge_sql/databases?${searchParams.toString()}`,
+        method: 'GET'
+      })
+
+      const adaptedData = this.EdgeSQLAdapter.adaptDatabaseList(httpResponse)
+      return this._formatSuccessResponse(adaptedData)
+    } catch (error) {
+      return this._handleError(error, 'list databases')
     }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases?${searchParams.toString()}`,
-      method: 'GET'
-    })
-
-    return this.EdgeSQLAdapter.adaptDatabaseList(httpResponse)
   }
 
   createDatabase = async ({ name }) => {
-    if (!name) {
-      throw new Error('Database name is required')
-    }
+    try {
+      if (!name?.trim()) {
+        return this._handleError({ message: 'Database name is required' }, 'create database')
+      }
 
-    const httpResponse = await this.httpService.request({
-      url: '/v4/edge_sql/databases',
-      method: 'POST',
-      body: { name }
-    })
+      const httpResponse = await this.httpService.request({
+        url: '/v4/edge_sql/databases',
+        method: 'POST',
+        body: { name: name.trim() }
+      })
 
-    const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
+      const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
 
-    return {
-      feedback: `Database "${name}" created successfully`,
-      urlToEditView: `/edge-sql/databases/${adaptedData.id}`,
-      data: adaptedData,
-      statusCode: httpResponse.statusCode || 200,
-      shouldMonitor: true,
-      databaseName: adaptedData.name
+      return this._formatSuccessResponse(adaptedData, `Database "${name}" created successfully`, {
+        urlToEditView: `/edge-sql/databases/${adaptedData.id}`,
+        shouldMonitor: true,
+        databaseId: adaptedData.id,
+        databaseName: adaptedData.name,
+        statusCode: httpResponse.statusCode || 201
+      })
+    } catch (error) {
+      return this._handleError(error, 'create database')
     }
   }
 
@@ -82,15 +118,11 @@ export class EdgeSQLService {
   }
 
   checkDatabaseStatus = async (id, fields = null) => {
-    if (!id) {
-      return {
-        body: null,
-        statusCode: 400,
-        error: 'Database ID is required'
-      }
-    }
-
     try {
+      if (!id) {
+        return this._handleError({ message: 'Database ID is required' }, 'check database status')
+      }
+
       const url = fields
         ? `/v4/edge_sql/databases/${id}?fields=${fields}`
         : `/v4/edge_sql/databases/${id}`
@@ -100,24 +132,15 @@ export class EdgeSQLService {
         method: 'GET'
       })
 
-      return {
-        body: this.EdgeSQLAdapter.adaptDatabaseStatus(httpResponse),
+      const adaptedData = this.EdgeSQLAdapter.adaptDatabaseStatus(httpResponse)
+      return this._formatSuccessResponse(adaptedData, null, {
         statusCode: httpResponse.statusCode
-      }
+      })
     } catch (error) {
       if (error.response?.status === 404 || error.message?.includes('404')) {
-        return {
-          body: null,
-          statusCode: 404,
-          error: 'Database not found'
-        }
+        return this._handleError({ message: 'Database not found' }, 'check database status')
       }
-
-      return {
-        body: null,
-        statusCode: 500,
-        error: error.message || 'Error checking database status'
-      }
+      return this._handleError(error, 'check database status')
     }
   }
 
