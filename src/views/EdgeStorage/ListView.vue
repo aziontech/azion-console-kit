@@ -127,7 +127,7 @@
           </template>
           <div
             v-if="selectedBucket"
-            class="flex flex-col h-full"
+            class="flex flex-col h-full gap-3"
           >
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold text-color-primary">{{ selectedBucket.name }}</h2>
@@ -167,6 +167,7 @@
                 />
               </div>
             </div>
+            <UploadCard />
             <ListTableBlock
               v-if="!!selectedBucket"
               pageTitleDelete="Files"
@@ -219,6 +220,7 @@
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2'
+  import UploadCard from './components/UploadCard.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -301,7 +303,7 @@
     input.multiple = true
     input.style.display = 'none'
 
-    input.onchange = (event) => {
+    input.onchange = async (event) => {
       const files = event.target.files
       if (files.length > 0 && selectedBucket.value) {
         handleFileSelect(event, selectedBucket.value.id)
