@@ -37,6 +37,7 @@ const adapt = (filter, dataset) => {
 const adaptResponse = (httpResponse, dataset) => {
   const { body } = httpResponse
   const totalRecords = body.data[dataset][0].count
+  const formattedBR = new Intl.NumberFormat('pt-BR').format(totalRecords)
 
-  return totalRecords
+  return formattedBR
 }
