@@ -27,8 +27,8 @@
   import InfoDrawerBlock from '@templates/info-drawer-block'
   import InfoSection from '@templates/info-drawer-block/info-section'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import { QUICK_TEMPLATES, SQLITE_QUERIES } from './constants/queries'
-  import { TableActionManager } from './utils/table-actions'
+  import { QUICK_TEMPLATES, SQLITE_QUERIES } from './constants'
+  import { TableActionManager } from './utils'
   import { useAccountStore } from '@/stores/account'
 
   defineOptions({ name: 'edge-sql-database-view' })

@@ -6,7 +6,6 @@ const STORAGE_KEYS = {
   CURRENT_DATABASE: 'edge_sql_current_database'
 }
 
-// Funções utilitárias para localStorage
 const saveToStorage = (key, data) => {
   try {
     localStorage.setItem(key, JSON.stringify(data))
@@ -26,7 +25,6 @@ const loadFromStorage = (key, defaultValue = null) => {
 }
 
 export const useEdgeSQLStore = defineStore('edgeSQL', () => {
-  // State
   const databases = ref([])
   const currentDatabase = ref(null)
   const currentTables = ref([])
@@ -35,13 +33,12 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   const error = ref(null)
   const selectedTable = ref(null)
 
-  // Getters
   const databasesCount = computed(() => databases.value.length)
   const hasCurrentDatabase = computed(() => !!currentDatabase.value)
   const currentDatabaseName = computed(() => currentDatabase.value?.name || '')
   const tablesCount = computed(() => currentTables.value.length)
 
-  // Actions
+
   const setDatabases = (newDatabases) => {
     databases.value = newDatabases
   }
@@ -64,7 +61,6 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     currentTables.value = []
     selectedTable.value = null
 
-    // Salvar database atual no localStorage
     if (database) {
       saveToStorage(STORAGE_KEYS.CURRENT_DATABASE, database)
     }
@@ -83,22 +79,22 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   }
 
   const addQueryResult = (result) => {
-    // Adicionar timestamp único e database info
+
     const enrichedResult = {
       ...result,
-      id: Date.now() + Math.random(), // ID único
+      id: Date.now() + Math.random(), 
       databaseId: currentDatabase.value?.id,
       databaseName: currentDatabase.value?.name
     }
 
     queryResults.value.unshift(enrichedResult)
 
-    // Limitar histórico a 100 queries para não sobrecarregar localStorage
+  
     if (queryResults.value.length > 100) {
       queryResults.value = queryResults.value.slice(0, 100)
     }
 
-    // Salvar no localStorage
+  
     saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
   }
 
@@ -154,13 +150,12 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     isLoading.value = false
     error.value = null
 
-    // Limpar localStorage
+  
     localStorage.removeItem(STORAGE_KEYS.QUERY_HISTORY)
     localStorage.removeItem(STORAGE_KEYS.CURRENT_DATABASE)
   }
 
   return {
-    // State
     databases,
     currentDatabase,
     currentTables,
@@ -168,14 +163,10 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     isLoading,
     error,
     selectedTable,
-
-    // Getters
     databasesCount,
     hasCurrentDatabase,
     currentDatabaseName,
     tablesCount,
-
-    // Actions
     setDatabases,
     addDatabase,
     removeDatabase,

@@ -12,8 +12,8 @@
   import { useToast } from 'primevue/usetoast'
   import { edgeSQLService } from '@/services/v2'
   import { useEdgeSQLStore } from '@/stores/edge-sql'
-  import { useEdgeSQLStatusManager } from './hooks/use-edge-sql-status-manager'
-  import { getStatusContent, getDatabaseName, isPendingStatus } from './utils/database-status'
+  import { useEdgeSQLStatusManager } from './hooks'
+  import { getStatusContent, getDatabaseName, isPendingStatus } from './utils'
   import OperationQueueStatus from './components/OperationQueueStatus.vue'
 
   defineOptions({ name: 'list-edge-sql-databases' })

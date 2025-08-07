@@ -44,7 +44,7 @@
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeSQLService } from '@/services/v2'
-  import { useEdgeSQLStatusManager } from './hooks/use-edge-sql-status-manager'
+  import { useEdgeSQLStatusManager } from './hooks'
   import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'create-edge-sql-database' })

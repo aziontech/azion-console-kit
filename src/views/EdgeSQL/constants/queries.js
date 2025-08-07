@@ -79,7 +79,28 @@ export const SQLITE_QUERIES = {
 
   DATABASE_INFO: () => `PRAGMA database_list;`,
 
-  TABLE_INDEXES: (tableName) => `PRAGMA index_list(${tableName});`
+  TABLE_INDEXES: (tableName) => `PRAGMA index_list(${tableName});`,
+
+  FOREIGN_KEYS: (tableName) => `PRAGMA foreign_key_list(${tableName});`,
+
+  TABLE_SIZE: (tableName) => `SELECT 
+    name,
+    COUNT(*) as row_count
+  FROM ${tableName}, sqlite_master 
+  WHERE sqlite_master.name = '${tableName}';`,
+
+  VACUUM_ANALYZE: () => `VACUUM; ANALYZE;`,
+
+  DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
+
+  TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
+
+  DATABASE_SIZE: () => `SELECT 
+    (page_count * page_size) AS size_bytes,
+    ROUND((page_count * page_size) / 1024.0, 2) AS size_kb,
+    ROUND((page_count * page_size) / 1048576.0, 2) AS size_mb
+  FROM 
+    pragma_page_count(), pragma_page_size();`
 }
 
 export const QUICK_ACTIONS = {

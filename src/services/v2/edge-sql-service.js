@@ -55,7 +55,6 @@ export class EdgeSQLService {
 
     const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
 
-    // Só monitora se status não for final (created/ready)
     const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
 
     return this._formatSuccessResponse(adaptedData, null, {

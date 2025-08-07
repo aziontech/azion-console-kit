@@ -1,29 +1,6 @@
-export const TABLE_QUERIES = {
-  COUNT_RECORDS: (tableName) => `SELECT COUNT(*) as total_rows FROM ${tableName};`,
-  TABLE_INFO: (tableName) => `PRAGMA table_info(${tableName});`,
-  TABLE_DEFINITION: (tableName) =>
-    `SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}';`,
+import { SQLITE_QUERIES } from '../constants/queries'
 
-  TABLE_INDEXES: (tableName) => `PRAGMA index_list(${tableName});`,
-
-  FOREIGN_KEYS: (tableName) => `PRAGMA foreign_key_list(${tableName});`,
-  TABLE_SIZE: (tableName) => `SELECT 
-    name,
-    COUNT(*) as row_count
-  FROM ${tableName}, sqlite_master 
-  WHERE sqlite_master.name = '${tableName}';`,
-
-  VACUUM_ANALYZE: () => `VACUUM; ANALYZE;`,
-  DELETE_ALL: (tableName) => `DELETE FROM ${tableName};`,
-  TRUNCATE_SIMULATION: (tableName) => `DELETE FROM ${tableName}; VACUUM;`,
-
-  DATABASE_SIZE: () => `SELECT 
-    (page_count * page_size) AS size_bytes,
-    ROUND((page_count * page_size) / 1024.0, 2) AS size_kb,
-    ROUND((page_count * page_size) / 1048576.0, 2) AS size_mb
-  FROM 
-    pragma_page_count(), pragma_page_size();`
-}
+export const TABLE_QUERIES = SQLITE_QUERIES
 
 export const TABLE_MENU_ACTIONS = [
   {
