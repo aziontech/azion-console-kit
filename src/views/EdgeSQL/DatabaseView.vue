@@ -65,7 +65,7 @@
   const isLoadingSchema = ref(false)
   const isLoadingDefinition = ref(false)
   const isEditorCollapsed = ref(true)
-  const isTemplatesCollapsed = ref(false)
+  const isTemplatesCollapsed = ref(true)
   const selectedTableName = ref(null)
 
   const activeTabIndex = ref(1)
