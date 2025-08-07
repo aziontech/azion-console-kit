@@ -75,22 +75,19 @@
 <template>
   <div class="h-full">
     <div
+      v-if="queryHistory.length > 0"
       class="flex justify-content-between align-items-center mb-3 p-3 bg-surface-50 dark:bg-surface-800 border-round-lg"
     >
-      <h4 class="text-base font-semibold text-color flex items-center gap-2">
-        <i class="pi pi-history text-primary"></i>
-        Query History
+      <div class="flex items-center gap-2">
         <Tag
-          v-if="queryHistory.length > 0"
           :value="`${queryHistory.length} quer${queryHistory.length !== 1 ? 'ies' : 'y'}`"
           severity="info"
           class="text-xs"
         />
-      </h4>
+      </div>
 
       <div class="flex items-center gap-2">
         <Button
-          v-if="queryHistory.length > 0"
           icon="pi pi-download"
           severity="secondary"
           class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
@@ -98,7 +95,6 @@
           v-tooltip.top="'Export history'"
         />
         <Button
-          v-if="queryHistory.length > 0"
           icon="pi pi-trash"
           severity="danger"
           class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
@@ -114,9 +110,10 @@
       description="Execute queries to see them appear in your history"
       :documentationService="documentationService"
       :inTabs="true"
+      :noBorder="true"
     >
       <template #illustration>
-        <i class="pi pi-history text-6xl text-primary mb-4 opacity-50"></i>
+        <i class="pi pi-history text-6xl text-primary opacity-50"></i>
       </template>
     </EmptyResultsBlock>
 

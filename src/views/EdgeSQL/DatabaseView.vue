@@ -1318,7 +1318,7 @@
 
                       <div
                         v-else-if="queryResults.length === 0"
-                        class="flex flex-col items-center justify-center text-center p-8"
+                        class="flex flex-col items-center justify-center text-center p-8 min-h-[300px]"
                       >
                         <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
                         <h3 class="text-xl font-medium text-color mb-2">Ready to execute</h3>
@@ -1825,7 +1825,6 @@
 <style scoped>
   .sql-interface {
     height: calc(100vh);
-
   }
 
   .database-sidebar {
@@ -1853,7 +1852,6 @@
     overflow: hidden;
   }
 
-  
   .table-cell-content {
     max-width: 280px;
     overflow: hidden;
@@ -1910,7 +1908,6 @@
   :deep(.p-tree .p-treenode-label) {
     text-align: left !important;
   }
-
 
   :deep(.results-tabs .p-tabview-nav) {
     background: transparent;

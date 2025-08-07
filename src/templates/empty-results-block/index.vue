@@ -37,7 +37,7 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
+      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3 min-h-[300px]"
       :class="{ 'border surface-border': !noBorder, 'rounded-t-none': noShowBorderTop }"
     >
       <slot name="illustration">
