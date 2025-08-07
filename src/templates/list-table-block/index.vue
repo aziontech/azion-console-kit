@@ -528,6 +528,9 @@
               openDialog(action.dialog.component, action.dialog.body(rowData, reload))
               break
             case 'delete':
+              if (action.tryExecuteCommand && !action.tryExecuteCommand(rowData)) {
+                return
+              }
               openDeleteDialog({
                 title: action.title,
                 id: rowData.id,

@@ -62,10 +62,6 @@
     edgeFirewallID: {
       type: String,
       required: true
-    },
-    createFunctionService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -102,15 +98,15 @@
     })
   })
 
-  const handleCreateFunction = () => {
+  const handleCreateFunction = (response) => {
     closeDrawerCreate()
     handleTrackSuccessCreate()
-    emit('onSuccess')
+    emit('onSuccess', response.id)
   }
 
-  const handleSuccessEdit = () => {
+  const handleSuccessEdit = (response) => {
     showEditFunctionDrawer.value = false
-    emit('onSuccess')
+    emit('onSuccess', response.id)
     handleTrackSuccessEdit()
   }
 
@@ -199,6 +195,7 @@
   }
 
   defineExpose({
+    showCreateFunctionDrawer,
     openDrawerCreate,
     openDrawerEdit
   })

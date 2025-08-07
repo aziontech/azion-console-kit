@@ -64,7 +64,7 @@ const parseByEndpointType = (payload) => {
           url: payload.endpointUrl,
           payload_format: payload.payloadFormat,
           log_line_separator: payload.lineSeparator,
-          max_size: payload.maxSize,
+          max_size: payload.maxSize || 1000000,
           headers: getHeadersPostRequest(payload.headers)
         }
       }

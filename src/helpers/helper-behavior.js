@@ -75,7 +75,7 @@ const parsedBehavior = (behaviors) => {
       behaviorItem = { edgeConnectorId: parseInt(behavior.attributes.value) }
     }
     if (behavior.type === 'run_function') {
-      behaviorItem = { functionId: behavior.attributes?.value.toString() }
+      behaviorItem = { functionId: parseInt(behavior.attributes?.value) }
     }
 
     return {
