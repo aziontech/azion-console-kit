@@ -104,7 +104,7 @@ export const validationSchema = yup.object({
     )
     .when(['workloadHostnameAllowAccess', 'useCustomDomain'], {
       is: (workloadHostnameAllowAccess, useCustomDomain) =>
-        workloadHostnameAllowAccess === false && useCustomDomain === false,
+        !workloadHostnameAllowAccess && !useCustomDomain,
       then: (schema) =>
         schema.test(
           'has-filled-domain',
