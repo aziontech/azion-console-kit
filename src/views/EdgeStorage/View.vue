@@ -25,8 +25,7 @@
   })
   const route = useRoute()
   const toast = useToast()
-  const { updateBucket, findBucketById, selectedBucket, deleteBucket, removeCredential } =
-    useEdgeStorage()
+  const { findBucketById, selectedBucket, removeCredential } = useEdgeStorage()
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
@@ -84,12 +83,13 @@
       edit: {
         component: EditFormBlock,
         props: {
-          editService: mockEditService,
-          loadService: mockLoadService,
+          editService: edgeStorageService.updateEdgeStorageBucket,
+          loadService: loadService,
           schema: validationSchema,
           title: title,
           updatedRedirect: 'edge-storage-list',
-          disableAfterCreateToastFeedback: true
+          disableAfterCreateToastFeedback: true,
+          disableNameEdit: true
         }
       }
     }[props.mode]
@@ -111,15 +111,7 @@
     })
   }
 
-  const mockEditService = (bucket) => {
-    const bucketUpdates = {
-      name: bucket.name,
-      setting: bucket.edgeAccess
-    }
-    updateBucket(route.params.id, bucketUpdates)
-  }
-
-  const mockLoadService = ({ id }) => {
+  const loadService = ({ id }) => {
     const bucket = findBucketById(id)
     if (!bucket) {
       throw new Error('Bucket not found')
@@ -127,7 +119,7 @@
 
     return {
       name: bucket.name,
-      edgeAccess: bucket.setting
+      edge_access: bucket.edgeAccess
     }
   }
 
@@ -141,7 +133,7 @@
       data: {
         deleteConfirmationText: selectedBucket.value.name
       },
-      deleteService: () => deleteBucket(selectedBucket.value.id),
+      deleteService: () => edgeStorageService.deleteEdgeStorageBucket(selectedBucket.value.name),
       successCallback: () => {
         toast.add({
           severity: 'success',
@@ -198,7 +190,10 @@
           v-bind="componentForm.props"
         >
           <template #form>
-            <FormFieldsEdgeStorage :showDangerZone="!isCreatePage" />
+            <FormFieldsEdgeStorage
+              :show-danger-zone="!isCreatePage"
+              :disable-name-edit="!isCreatePage"
+            />
           </template>
           <template #action-bar="{ onSubmit, onCancel, loading }">
             <ActionBarTemplate
@@ -222,8 +217,9 @@
           >
             <template #form>
               <FormFieldsEdgeStorage
-                :showDangerZone="!isCreatePage"
+                :show-danger-zone="!isCreatePage"
                 @delete-bucket="handleDeleteBucket"
+                :disable-name-edit="!isCreatePage"
               />
             </template>
             <template #action-bar="{ onSubmit, onCancel, loading }">

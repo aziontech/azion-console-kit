@@ -10,6 +10,10 @@
     showDangerZone: {
       type: Boolean,
       default: true
+    },
+    disableNameEdit: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -30,6 +34,7 @@
     <FormHorizontal
       title="General"
       description="Check the details of the Edge Storage Bucket."
+      :disabled="disableNameEdit"
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">

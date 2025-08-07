@@ -44,40 +44,12 @@ export const useEdgeStorage = () => {
   }
 
   /**
-   * Deletes a bucket from the buckets array based on its ID.
-   * @param {number|string} id - The ID of the bucket to delete.
-   * @returns {boolean} True if bucket was found and deleted, false otherwise.
-   */
-  const deleteBucket = (id) => {
-    const index = buckets.value.findIndex((bucket) => bucket.id === id)
-
-    if (index !== -1) {
-      buckets.value.splice(index, 1)
-      return true
-    }
-
-    return false
-  }
-
-  /**
    * Finds a bucket by its ID.
    * @param {number|string} id - The ID of the bucket to find.
    * @returns {Object|undefined} The bucket object if found, undefined otherwise.
    */
   const findBucketById = (id) => {
-    return buckets.value.find((bucket) => bucket.id === parseInt(id))
-  }
-
-  /**
-   * Updates a bucket's properties.
-   * @param {number|string} id - The ID of the bucket to update.
-   * @param {Object} updates - Object containing the properties to update.
-   */
-  const updateBucket = (id, updates) => {
-    const bucket = findBucketById(id)
-    if (bucket) {
-      Object.assign(bucket, updates)
-    }
+    return buckets.value.find((bucket) => bucket.id === id)
   }
 
   /**
@@ -240,9 +212,7 @@ export const useEdgeStorage = () => {
     uploadCount,
     uploadProgress,
     addBucket,
-    deleteBucket,
     findBucketById,
-    updateBucket,
     getBucketCount,
     clearAllBuckets,
     addFiles,
