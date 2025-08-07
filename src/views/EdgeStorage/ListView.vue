@@ -171,9 +171,10 @@
             <ListTableBlock
               v-if="!!selectedBucket"
               pageTitleDelete="Files"
-              :listService="listEdgeStorageBucketFiles"
+              :listService="edgeStorageService.listEdgeStorageBucketFiles"
               ref="listServiceFilesRef"
               :columns="getColumns"
+              :selected-bucket="selectedBucket"
               v-model:selectedItensData="selectedFiles"
               hiddenHeader
               :paginator="false"
