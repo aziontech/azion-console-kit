@@ -90,7 +90,7 @@
 
   const handleResponse = (response) => {
     handleTrackCreation()
-    
+
     if (response?.data?.id) {
       toast.add({
         severity: 'success',

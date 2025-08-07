@@ -1264,12 +1264,10 @@
                   </Accordion>
                 </div>
 
-                <div
-                  class="flex-grow-1 bg-surface-0 border-round-lg border-1 surface-border overflow-hidden"
-                >
+                <div class="flex-grow-1 bg-surface-0 border-round-lg border-1 surface-border">
                   <TabView
                     v-model:activeIndex="activeTabIndex"
-                    class="h-full results-tabs"
+                    class="results-tabs"
                   >
                     <TabPanel>
                       <template #header>
@@ -1281,12 +1279,7 @@
 
                       <div
                         v-if="isExecutingQuery"
-                        class="results-container overflow-y-auto pr-2"
-                        :style="{
-                          'max-height': isEditorCollapsed
-                            ? 'calc(100vh - 300px)'
-                            : 'calc(100vh - 450px)'
-                        }"
+                        class="results-container"
                       >
                         <div class="mb-6">
                           <div
@@ -1325,7 +1318,7 @@
 
                       <div
                         v-else-if="queryResults.length === 0"
-                        class="flex flex-col items-center justify-center h-full text-center p-8"
+                        class="flex flex-col items-center justify-center text-center p-8"
                       >
                         <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
                         <h3 class="text-xl font-medium text-color mb-2">Ready to execute</h3>
@@ -1334,12 +1327,7 @@
 
                       <div
                         v-else
-                        class="results-container overflow-y-auto pr-2"
-                        :style="{
-                          'max-height': isEditorCollapsed
-                            ? 'calc(100vh - 300px)'
-                            : 'calc(100vh - 450px)'
-                        }"
+                        class="results-container"
                       >
                         <div
                           v-for="(result, index) in queryResults"
@@ -1421,14 +1409,10 @@
                               :value="formatResultData(result)"
                               v-model:selection="selectedRows"
                               dataKey="_rowId"
-                              scrollable
-                              :scrollHeight="
-                                formatResultData(result).length > 20 ? '400px' : '300px'
-                              "
                               class="w-full"
                               selectionMode="checkbox"
                               :metaKeySelection="false"
-                              :paginator="formatResultData(result).length > 20"
+                              :paginator="true"
                               :rows="rowsPerPage"
                               :rowsPerPageOptions="[10, 20, 50, 100]"
                               @page="onPageChange"
@@ -1970,26 +1954,6 @@
     background: transparent;
     border: none;
     padding: 1rem;
-  }
-
-  /* Scroll elegante para os resultados e sidebar */
-  .results-container::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .results-container::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-  }
-
-  .results-container::-webkit-scrollbar-thumb {
-    background: var(--surface-300);
-    border-radius: 10px;
-    transition: background 0.2s ease;
-  }
-
-  .results-container::-webkit-scrollbar-thumb:hover {
-    background: var(--surface-400);
   }
 
   /* Animação para colapsar/expandir o SQL Editor */
