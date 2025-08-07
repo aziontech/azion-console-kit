@@ -38,7 +38,6 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   const currentDatabaseName = computed(() => currentDatabase.value?.name || '')
   const tablesCount = computed(() => currentTables.value.length)
 
-
   const setDatabases = (newDatabases) => {
     databases.value = newDatabases
   }
@@ -79,22 +78,19 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
   }
 
   const addQueryResult = (result) => {
-
     const enrichedResult = {
       ...result,
-      id: Date.now() + Math.random(), 
+      id: Date.now() + Math.random(),
       databaseId: currentDatabase.value?.id,
       databaseName: currentDatabase.value?.name
     }
 
     queryResults.value.unshift(enrichedResult)
 
-  
     if (queryResults.value.length > 100) {
       queryResults.value = queryResults.value.slice(0, 100)
     }
 
-  
     saveToStorage(STORAGE_KEYS.QUERY_HISTORY, queryResults.value)
   }
 
@@ -150,7 +146,6 @@ export const useEdgeSQLStore = defineStore('edgeSQL', () => {
     isLoading.value = false
     error.value = null
 
-  
     localStorage.removeItem(STORAGE_KEYS.QUERY_HISTORY)
     localStorage.removeItem(STORAGE_KEYS.CURRENT_DATABASE)
   }

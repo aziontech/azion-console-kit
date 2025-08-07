@@ -40,20 +40,22 @@ export const createEdgeSQLErrorHandler = (tracker, toast) => {
   return {
     handleCreationError: (error, productName = 'Edge SQL Database') => {
       const errorInfo = parseError(error)
-      
-      tracker?.product?.failedToCreate?.({
-        productName,
-        errorType: 'api',
-        fieldName: errorInfo.fieldName.trim(),
-        errorMessage: errorInfo.message
-      })?.track()
+
+      tracker?.product
+        ?.failedToCreate?.({
+          productName,
+          errorType: 'api',
+          fieldName: errorInfo.fieldName.trim(),
+          errorMessage: errorInfo.message
+        })
+        ?.track()
 
       return errorInfo
     },
 
     handleQueryError: (error) => {
       const errorInfo = parseError(error)
-      
+
       toast?.add({
         severity: 'error',
         summary: 'Query Error',
@@ -66,7 +68,7 @@ export const createEdgeSQLErrorHandler = (tracker, toast) => {
 
     handleDeleteError: (error, entityName) => {
       const errorInfo = parseError(error)
-      
+
       toast?.add({
         severity: 'error',
         summary: 'Delete Failed',
@@ -80,7 +82,7 @@ export const createEdgeSQLErrorHandler = (tracker, toast) => {
     // eslint-disable-next-line no-unused-vars
     handleGeneralError: (error, context = 'operation') => {
       const errorInfo = parseError(error)
-      
+
       toast?.add({
         severity: 'error',
         summary: 'Error',
@@ -91,4 +93,4 @@ export const createEdgeSQLErrorHandler = (tracker, toast) => {
       return errorInfo
     }
   }
-} 
+}

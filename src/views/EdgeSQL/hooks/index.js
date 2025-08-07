@@ -1,1 +1,1 @@
-export * from './use-edge-sql-status-manager' 
+export * from './use-edge-sql-status-manager'
