@@ -65,7 +65,7 @@
   const isLoadingSchema = ref(false)
   const isLoadingDefinition = ref(false)
   const isEditorCollapsed = ref(true)
-  const isTemplatesCollapsed = ref(true)
+  const isTemplatesCollapsed = ref(false)
   const selectedTableName = ref(null)
 
   const activeTabIndex = ref(1)
@@ -73,7 +73,7 @@
   const selectedTable = ref(null)
   const selectedRows = ref([])
 
-  const rowsPerPage = ref(20)
+  const rowsPerPage = ref(6)
   const currentPage = ref(0)
   const onPageChange = (event) => {
     currentPage.value = event.page
@@ -1069,7 +1069,7 @@
                     class="flex-grow-1 overflow-y-auto pr-1"
                   >
                     <div
-                      v-for="i in 3"
+                      v-for="i in 6"
                       :key="`skeleton-${i}`"
                       class="flex items-center justify-between px-3 py-2 border-round min-h-10"
                     >
@@ -1824,11 +1824,10 @@
 
 <style scoped>
   .sql-interface {
-    height: calc(100vh - 180px);
-    max-height: calc(100vh - 180px);
+    height: calc(100vh);
+
   }
 
-  /* Layout fixo sem splitter */
   .database-sidebar {
     min-width: 320px;
     max-width: 320px;
@@ -1839,13 +1838,10 @@
     font-size: 14px;
     line-height: 1.4;
   }
-
-  /* Melhorar alinhamento dos botões */
   :deep(.p-button.justify-content-start) {
     text-align: left;
   }
 
-  /* Limitações de largura das células */
   :deep(.p-datatable .p-datatable-thead > tr > th) {
     max-width: 300px;
     min-width: 120px;
@@ -1857,7 +1853,7 @@
     overflow: hidden;
   }
 
-  /* Estilos para células com conteúdo truncado */
+  
   .table-cell-content {
     max-width: 280px;
     overflow: hidden;
@@ -1876,7 +1872,6 @@
     width: 100%;
   }
 
-  /* Destacar linhas selecionadas */
   :deep(.p-datatable .p-datatable-tbody > tr.p-highlight) {
     background-color: var(--primary-50) !important;
   }
@@ -1885,7 +1880,6 @@
     background-color: var(--primary-50) !important;
   }
 
-  /* Scroll horizontal melhorado */
   :deep(.p-datatable-wrapper) {
     overflow-x: auto !important;
     max-width: 100%;
@@ -1909,7 +1903,6 @@
     background: var(--surface-400);
   }
 
-  /* Estilos para o Tree no panel esquerdo */
   :deep(.p-tree .p-treenode-content) {
     text-align: left !important;
   }
@@ -1918,7 +1911,7 @@
     text-align: left !important;
   }
 
-  /* Estilos para as tabs Results/History */
+
   :deep(.results-tabs .p-tabview-nav) {
     background: transparent;
     border: none;
@@ -1956,13 +1949,11 @@
     padding: 1rem;
   }
 
-  /* Animação para colapsar/expandir o SQL Editor */
   .editor-collapsed {
     max-height: 56px !important;
     overflow: hidden;
   }
 
-  /* SQL Definition Display */
   .sql-definition-display {
     font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   }
