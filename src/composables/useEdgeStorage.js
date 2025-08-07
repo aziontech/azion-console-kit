@@ -4,79 +4,8 @@ import { ref } from 'vue'
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
  */
-const buckets = ref([
-  {
-    id: 1,
-    name: 'my-bucket',
-    region: 'us-east-1',
-    createdAt: new Date(),
-    size: '0.2 GB',
-    objectCount: 0,
-    setting: 'read_write',
-    credentials: [
-      {
-        id: 1,
-        name: 'teste',
-        accessKey: 'AKIAIOSFODNN7EXAMPLE',
-        secretKey: '•••••••••••••••',
-        createdAt: new Date().toLocaleString(),
-        expiresAt: new Date().toLocaleString(),
-        capacities: 'Content'
-      }
-    ],
-    files: [
-      {
-        id: Date.now(),
-        name: '[FOLDER] documents',
-        size: null,
-        lastModified: new Date().toLocaleString(),
-        isFolder: true,
-        files: [
-          {
-            id: Date.now() + 1,
-            name: 'file-folder-1.txt',
-            size: '100 KB',
-            lastModified: new Date().toLocaleString(),
-            isFolder: false
-          },
-          {
-            id: Date.now() + 2,
-            name: 'file-folder-2.txt',
-            size: '200 KB',
-            lastModified: new Date().toLocaleString(),
-            isFolder: false
-          }
-        ]
-      },
-      {
-        id: Date.now() + 1,
-        name: 'file.txt',
-        size: '100 KB',
-        lastModified: new Date().toLocaleString(),
-        isFolder: false
-      },
-      {
-        id: Date.now() + 2,
-        name: 'file2.txt',
-        size: '200 KB',
-        lastModified: new Date().toLocaleString(),
-        isFolder: false
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'my-bucket-2',
-    region: 'us-east-1',
-    createdAt: new Date().toLocaleString(),
-    size: '0.2 GB',
-    objectCount: 0,
-    setting: 'read_write',
-    credentials: [],
-    files: []
-  }
-])
-const selectedBucket = ref(buckets.value[0])
+const buckets = ref([])
+const selectedBucket = ref()
 const isUploading = ref(false)
 const fileToUpload = ref([])
 const uploadProgress = ref(0)

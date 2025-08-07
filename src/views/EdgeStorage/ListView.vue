@@ -169,9 +169,9 @@
             </div>
             <UploadCard />
             <ListTableBlock
-              v-if="selectedBucket.files.length > 0"
+              v-if="!!selectedBucket"
               pageTitleDelete="Files"
-              :listService="getFiles"
+              :listService="listEdgeStorageBucketFiles"
               ref="listServiceFilesRef"
               :columns="getColumns"
               v-model:selectedItensData="selectedFiles"
@@ -214,11 +214,12 @@
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import DragAndDrop from './components/DragAndDrop.vue'
-  import { ref, computed, inject } from 'vue'
+  import { ref, computed, inject, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useResize } from '@/composables/useResize'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import { edgeStorageService } from '@/services/v2'
   import UploadCard from './components/UploadCard.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -248,35 +249,6 @@
     return buckets.value.filter((bucket) =>
       bucket.name.toLowerCase().includes(searchTerm.value.toLowerCase())
     )
-  })
-
-  const files = computed(() => {
-    if (!selectedBucket.value?.files) return []
-
-    const filesToShow = selectedFolder.value
-      ? selectedFolder.value.files
-      : selectedBucket.value.files
-
-    let filteredFiles = filesToShow
-
-    if (fileSearchTerm.value.trim()) {
-      const searchLower = fileSearchTerm.value.toLowerCase().trim()
-      filteredFiles = filesToShow.filter((file) => file.name.toLowerCase().includes(searchLower))
-    }
-
-    if (selectedFolder.value && !fileSearchTerm.value.trim()) {
-      const parentNavItem = {
-        id: 'parent-nav',
-        name: '..',
-        size: null,
-        lastModified: '',
-        isFolder: true,
-        isParentNav: true
-      }
-      return [parentNavItem, ...filteredFiles]
-    }
-
-    return filteredFiles
   })
 
   const getColumns = computed(() => {
@@ -319,10 +291,6 @@
 
   const handleSettingsTrackEvent = () => {
     router.push(`/edge-storage/edit/${selectedBucket.value.id}`)
-  }
-
-  const getFiles = () => {
-    return files.value
   }
 
   const handleFileSearch = () => {
@@ -381,4 +349,16 @@
       }
     })
   }
+
+  onMounted(async () => {
+    try {
+      isLoading.value = true
+      const response = await edgeStorageService.listEdgeStorageBuckets()
+      buckets.value = response.body
+    } catch (error) {
+      isLoading.value = false
+    } finally {
+      isLoading.value = false
+    }
+  })
 </script>

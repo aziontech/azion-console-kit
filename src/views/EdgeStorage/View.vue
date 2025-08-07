@@ -18,19 +18,15 @@
   import PrimeButton from 'primevue/button'
   import { useDialog } from 'primevue/usedialog'
   import CredentialCreatedDialog from './Dialog/CredentialCreatedDialog.vue'
+  import { edgeStorageService } from '@/services/v2'
+
   defineOptions({
     name: 'edge-storage-view'
   })
   const route = useRoute()
   const toast = useToast()
-  const {
-    addBucket,
-    updateBucket,
-    findBucketById,
-    selectedBucket,
-    deleteBucket,
-    removeCredential
-  } = useEdgeStorage()
+  const { updateBucket, findBucketById, selectedBucket, deleteBucket, removeCredential } =
+    useEdgeStorage()
   const { openDeleteDialog } = useDeleteDialog()
   const dialog = useDialog()
   const router = useRouter()
@@ -80,7 +76,7 @@
       create: {
         component: CreateFormBlock,
         props: {
-          createService: mockCreateService,
+          createService: edgeStorageService.createEdgeStorageBucket,
           schema: validationSchema,
           disableToast: true
         }
@@ -113,20 +109,6 @@
       } successfully`,
       life: 5000
     })
-  }
-
-  const mockCreateService = (data) => {
-    const newBucket = {
-      id: Date.now(),
-      name: data.name,
-      region: 'us-east-1',
-      createdAt: new Date(),
-      size: 100,
-      objectCount: 0,
-      data: data.edgeAccess
-    }
-    addBucket(newBucket)
-    return newBucket
   }
 
   const mockEditService = (bucket) => {
