@@ -18,28 +18,31 @@
             {{ parseText(message.summary, CHAR_LIMITS.SUMMARY) }}
           </h5>
         </header>
-        <p
-          class="text-sm text-color-secondary font-normal mt-3"
-          v-if="message.component"
-        >
-          <component
-            :is="message.component"
-            :v-bind="message.props"
-          />
-        </p>
-        <p
-          class="text-sm text-color-secondary font-normal mt-3"
-          v-if="message.detail"
-          :data-testid="handleDataTestIdInItem(message, 'detail')"
-        >
-          {{ parseText(message.detail, CHAR_LIMITS.DETAIL) }}
-        </p>
-        <p
-          class="text-sm text-color-secondary font-normal mt-3"
-          v-if="message.additionalDetails"
-        >
-          {{ message.additionalDetails }}
-        </p>
+        <div :class="{ 'max-h-32 overflow-y-auto': message.additionalDetails }">
+          <p
+            class="text-sm text-color-secondary font-normal mt-3"
+            v-if="message.component"
+          >
+            <component
+              :is="message.component"
+              :v-bind="message.props"
+            />
+          </p>
+          <p
+            class="text-sm text-color-secondary font-normal mt-3"
+            :class="{ 'max-h-32 overflow-y-auto': !message.additionalDetails }"
+            v-if="message.detail"
+            :data-testid="handleDataTestIdInItem(message, 'detail')"
+          >
+            {{ parseText(message.detail, CHAR_LIMITS.DETAIL, false) }}
+          </p>
+          <p
+            class="text-sm text-color-secondary font-normal mt-3"
+            v-if="message.additionalDetails"
+          >
+            {{ message.additionalDetails }}
+          </p>
+        </div>
         <div
           class="flex flex-row gap-2 align-self-end mt-5"
           v-if="showActions(message)"
@@ -109,10 +112,16 @@
 
   const isString = (str) => typeof str === 'string'
 
-  const parseText = (text, charLimit) => {
+  const parseText = (text, charLimit, isSummary = true) => {
     const existsAndIsString = text && isString(text)
-    if (existsAndIsString) {
+    const isSummaryAndExists = existsAndIsString && isSummary
+    const isDetailAndExists = existsAndIsString && !isSummary
+
+    if (isSummaryAndExists) {
       return text.substring(0, charLimit)
+    }
+    if (isDetailAndExists) {
+      return text
     }
     if (!text) {
       return ''
