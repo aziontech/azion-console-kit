@@ -201,6 +201,7 @@
   const search = ref('')
   const focusSearch = ref(null)
   const disableEmitInit = ref(props.disableEmitFirstRender)
+  const alreadyLoadedData = ref(false)
 
   onMounted(async () => {
     await fetchData()
@@ -386,7 +387,12 @@
         }
       }
 
-      if (currentPage === INITIAL_PAGE && props.value && search.value === '') {
+      if (
+        currentPage === INITIAL_PAGE &&
+        props.value &&
+        search.value === '' &&
+        !alreadyLoadedData.value
+      ) {
         await checkValueInList(props.value)
       }
     } catch (error) {
@@ -546,6 +552,7 @@
 
     if (!existitemInList) {
       loadSelectedValue(value)
+      alreadyLoadedData.value = true
     }
   }
 
