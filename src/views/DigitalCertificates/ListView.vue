@@ -19,6 +19,7 @@
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
+        :firstLoadData="firstLoadData"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">
@@ -84,7 +85,9 @@
     CERTIFICATE_TYPES,
     handleClickToCreate,
     listService,
-    deleteService
+    deleteService,
+    firstLoadData,
+    setFirstLoadData
   } = useDigitalCertificate()
 
   const hasContentToList = ref(true)
@@ -135,6 +138,7 @@
   ])
 
   const handleLoadData = (event) => {
+    setFirstLoadData(false)
     hasContentToList.value = event
   }
 
@@ -153,6 +157,12 @@
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
+        {
+          field: 'id',
+          header: 'ID',
+          sortField: 'id',
+          filterPath: 'id'
+        },
         {
           field: 'name',
           header: 'Name',
@@ -180,6 +190,12 @@
       ]
     }
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name',

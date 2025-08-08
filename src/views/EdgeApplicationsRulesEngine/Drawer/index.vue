@@ -2,7 +2,6 @@
   import { ref, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-  import { edgeApplicationFunctionService } from '@/services/v2'
 
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
@@ -69,7 +68,6 @@
   )
   const loadEditRulesEngineDrawer = refDebounced(showEditRulesEngineDrawer, debouncedDrawerAnimate)
   const selectedRulesEngineToEdit = ref({})
-  const functionsInstanceOptions = ref([])
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
   const initialPhase = ref(props.currentPhase)
@@ -163,34 +161,6 @@
   }
 
   const loadingOrigins = ref(false)
-  const loadingFunctionsInstance = ref(false)
-
-  const listFunctionsInstanceOptions = async () => {
-    if (!props.isEdgeFunctionEnabled) return
-
-    try {
-      loadingFunctionsInstance.value = true
-      const params = { fields: ['id', 'name'] }
-      const responseFunctions = await edgeApplicationFunctionService.listFunctions(
-        props.edgeApplicationId,
-        params
-      )
-      functionsInstanceOptions.value = responseFunctions?.body?.map((el) => {
-        return {
-          id: el.id,
-          name: el.name.text
-        }
-      })
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
-    } finally {
-      loadingFunctionsInstance.value = false
-    }
-  }
 
   const listCacheSettingsOptions = async () => {
     isLoadingRequests.value = true
@@ -319,10 +289,6 @@
     await listOriginsOptions()
   }
 
-  const handleRefreshFunctions = async () => {
-    await listFunctionsInstanceOptions()
-  }
-
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -330,11 +296,7 @@
   })
 
   onMounted(async () => {
-    await Promise.all([
-      listFunctionsInstanceOptions(),
-      listCacheSettingsOptions(),
-      listOriginsOptions()
-    ])
+    await Promise.all([listCacheSettingsOptions(), listOriginsOptions()])
   })
 
   watch(
@@ -363,18 +325,15 @@
       <FormFieldsDrawerRulesEngine
         :isLoadingRequests="isLoadingRequests"
         :loadingOrigins="loadingOrigins"
-        :loadingFunctionsInstance="loadingFunctionsInstance"
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :clipboardWrite="clipboardWrite"
         :cacheSettingsOptions="cacheSettingsOptions"
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
         @refreshOrigins="handleRefreshOrigins"
-        @refreshFunctions="handleRefreshFunctions"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -404,12 +363,11 @@
         :edgeApplicationId="props.edgeApplicationId"
         :isLoadingRequests="isLoadingRequests"
         :loadingOrigins="loadingOrigins"
-        :loadingFunctionsInstance="loadingFunctionsInstance"
         @toggleDrawer="handleToggleDrawer"
-        @refreshFunctions="handleRefreshFunctions"
+        @refreshOrigins="handleRefreshOrigins"
+        @refreshCacheSettings="handleRefreshCacheSettings"
         :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
-        :functionsInstanceOptions="functionsInstanceOptions"
         :originsOptions="originsOptions"
         :cacheSettingsOptions="cacheSettingsOptions"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"

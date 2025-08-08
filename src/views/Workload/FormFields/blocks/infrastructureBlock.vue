@@ -38,7 +38,7 @@
     {
       title: 'Production Infrastructure (All Edge Locations)',
       subtitle:
-        'Deploy to the Staging Network for testing with limited propagation to Edge Locations.',
+        'Deploy to the Production Network for global availability across all Edge Locations.',
       inputValue: '1',
       disabled: props.isEdit,
       tag: tagInfrastructureProduct.value

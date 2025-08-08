@@ -20,7 +20,7 @@
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeButton from 'primevue/button'
-  import { edgeConnectorsService } from '@/services/v2'
+  import { edgeConnectorsService, edgeApplicationFunctionService } from '@/services/v2'
 
   const getBehaviorsOriginOrEdgeConnectors = () => {
     if (!hasFlagBlockApiV4()) {
@@ -34,6 +34,20 @@
     return await edgeConnectorsService.listEdgeConnectorsService({
       fields: 'id,name',
       ...query
+    })
+  }
+
+  const getFunctionsInstanceOptions = async (query) => {
+    return await edgeApplicationFunctionService.listFunctionsDropdown(props.edgeApplicationId, {
+      fields: 'id,name',
+      ...query
+    })
+  }
+
+  const loadFunctionsInstance = async ({ id }) => {
+    return await edgeApplicationFunctionService.loadEdgeApplicationFunction({
+      edgeApplicationID: props.edgeApplicationId,
+      functionID: id
     })
   }
 
@@ -88,8 +102,7 @@
     'run_function',
     'set_origin',
     'set_cache_policy',
-    'capture_match_groups',
-    'finish_request_phase'
+    'capture_match_groups'
   ]
 
   const VARIABLE_AUTOCOMPLETE_REQUEST_OPTIONS = ['${server_addr}', '${server_port}']
@@ -154,10 +167,6 @@
   ])
 
   const props = defineProps({
-    functionsInstanceOptions: {
-      type: Array,
-      required: true
-    },
     cacheSettingsOptions: {
       type: Array,
       required: true
@@ -202,10 +211,6 @@
     loadingOrigins: {
       type: Boolean,
       default: false
-    },
-    loadingFunctionsInstance: {
-      type: Boolean,
-      default: false
     }
   })
 
@@ -213,6 +218,7 @@
   const drawerOriginRef = ref('')
   const drawerFunctionRef = ref('')
   const activeAccordions = ref([0])
+  const behaviorIndexSelect = ref(null)
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
@@ -237,7 +243,9 @@
       filter_request_header: 'header-name',
       redirect_to_301: 'location',
       redirect_to_302: 'location',
-      rewrite_request: 'URL-path'
+      rewrite_request: 'URL-path',
+      set_cookie: 'cookie-name=value',
+      add_response_header: 'header-name: value'
     }
 
     return placeholders[behavior] || ''
@@ -327,7 +335,6 @@
       requires: !props.hideApplicationAcceleratorInDescription
     },
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
-    { label: 'Finish Request Phase', value: 'finish_request_phase', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
@@ -372,7 +379,8 @@
     drawerOriginRef.value.openDrawerCreate()
   }
 
-  const openDrawerFunction = () => {
+  const openDrawerFunction = (index) => {
+    behaviorIndexSelect.value = index
     drawerFunctionRef.value.openDrawerCreate()
   }
 
@@ -518,8 +526,10 @@
     emit('refreshOrigins')
   }
 
-  const handleSuccessFunction = () => {
-    emit('refreshFunctions')
+  const handleSuccessFunction = (functionId) => {
+    if (behaviorIndexSelect.value === null) return
+    behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
+    behaviorIndexSelect.value = null
   }
 </script>
 
@@ -723,7 +733,7 @@
             icon="pi pi-trash"
             size="small"
             outlined
-            @click="removeCriteriaDecorator(criteriaIndex)"
+            @click="removeCriteriaDecorator(criteriaIndex + 1)"
             :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
           />
         </div>
@@ -791,11 +801,11 @@
 
           <div class="w-1/2">
             <template v-if="behaviorItem.value.name === 'run_function'">
-              <FieldDropdown
-                filter
+              <FieldDropdownLazyLoader
+                :service="getFunctionsInstanceOptions"
+                :loadService="loadFunctionsInstance"
                 :loading="loadingFunctionsInstance"
                 :name="`behaviors[${behaviorIndex}].functionId`"
-                :options="functionsInstanceOptions"
                 optionLabel="name"
                 optionValue="id"
                 :key="behaviorItem.key"
@@ -809,7 +819,7 @@
                         class="w-full whitespace-nowrap flex"
                         data-testid="edge-applications-rules-engine-form__create-function-instance-button"
                         text
-                        @click="openDrawerFunction"
+                        @click="openDrawerFunction(behaviorIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
                         :pt="{
@@ -821,7 +831,7 @@
                     </li>
                   </ul>
                 </template>
-              </FieldDropdown>
+              </FieldDropdownLazyLoader>
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_edge_connector'">
               <FieldDropdownLazyLoader
