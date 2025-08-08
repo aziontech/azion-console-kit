@@ -48,4 +48,23 @@ export class EdgeStorageService {
 
     return this.adapter?.transformListEdgeStorageBucketFiles?.(data, params)
   }
+
+  updateEdgeStorageBucket = async (bucket = {}) => {
+    await this.http.request({
+      method: 'PATCH',
+      url: `${this.baseURL}/${bucket.name}`,
+      body: { edge_access: bucket.edge_access }
+    })
+
+    return `Bucket "${bucket.name}" has been updated successfully`
+  }
+
+  deleteEdgeStorageBucket = async (bucketName = '') => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/${bucketName}`
+    })
+
+    return `Bucket "${bucketName}" has been deleted successfully`
+  }
 }
