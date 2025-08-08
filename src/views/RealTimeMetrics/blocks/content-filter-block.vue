@@ -9,7 +9,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const emit = defineEmits(['clearHash'])
+  const emit = defineEmits(['clearHash', 'applyFilter'])
   const props = defineProps({
     playgroundOpener: {
       type: Function,
@@ -212,6 +212,7 @@
     })
 
     await loadCurrentReports(props.userUTC)
+    emit('applyFilter')
   }
 
   watch(
