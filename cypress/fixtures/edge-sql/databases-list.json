@@ -1,0 +1,37 @@
+{
+  "results": [
+    {
+      "id": 1206,
+      "name": "harmoniq-my-db",
+      "status": "created",
+      "active": true,
+      "created_at": "2025-06-09T16:59:09.341870Z",
+      "updated_at": "2025-06-09T16:59:09.341870Z",
+      "product_version": "1.0"
+    },
+    {
+      "id": 1290,
+      "name": "test-database-demo",
+      "status": "created",
+      "active": true,
+      "created_at": "2025-06-10T17:30:16.356206Z",
+      "updated_at": "2025-06-10T17:30:16.356206Z",
+      "product_version": "1.0"
+    },
+    {
+      "id": 1300,
+      "name": "production-analytics-db",
+      "status": "created",
+      "active": true,
+      "created_at": "2025-07-16T17:37:40.663678Z",
+      "updated_at": "2025-07-16T17:37:40.663678Z",
+      "product_version": "1.0"
+    }
+  ],
+  "count": 3,
+  "total_pages": 1,
+  "links": {
+    "previous": null,
+    "next": null
+  }
+}
