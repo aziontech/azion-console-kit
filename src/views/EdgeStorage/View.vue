@@ -19,6 +19,7 @@
   const route = useRoute()
   const toast = useToast()
   const { findBucketById, selectedBucket } = useEdgeStorage()
+
   const { openDeleteDialog } = useDeleteDialog()
   const router = useRouter()
 
@@ -56,16 +57,31 @@
     }[props.mode]
   })
 
+  const nameRegex = /^[A-Za-z0-9_-]+$/
+  const edgeAccess = ['read_write', 'read_only', 'restricted']
+
   const validationSchema = yup.object({
-    name: yup.string().label('Name').required().min(3).max(63),
-    edgeAccess: yup.string().label('Edge Access').required().default('read_write')
+    name: yup
+      .string()
+      .label('Name')
+      .required()
+      .min(6)
+      .max(63)
+      .test('name', 'Invalid name format', (value) => nameRegex.test(value)),
+    edge_access: yup
+      .string()
+      .label('Edge Access')
+      .required()
+      .default('read_write')
+      .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
   })
 
-  const handleResponse = () => {
+  const handleResponse = (response) => {
+    createdBucket.value = response.data.name
     toast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Bucket "${selectedBucket.value.name}" has been ${
+      detail: `Bucket "${response.data.name}" has been ${
         isCreatePage.value ? 'created' : 'updated'
       } successfully`,
       life: 5000
