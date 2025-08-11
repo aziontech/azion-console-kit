@@ -133,7 +133,6 @@
           />
         </template>
       </component>
-
     </template>
   </ContentBlock>
 </template>
