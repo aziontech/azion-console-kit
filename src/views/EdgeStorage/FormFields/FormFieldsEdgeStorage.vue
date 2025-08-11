@@ -25,7 +25,7 @@
   const edgeAccessOptions = [
     { label: 'Read & Write', value: 'read_write' },
     { label: 'Read Only', value: 'read_only' },
-    { label: 'Write Only', value: 'write_only' }
+    { label: 'Restricted', value: 'restricted' }
   ]
 </script>
 

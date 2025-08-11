@@ -16,6 +16,7 @@ const failedFiles = ref([])
 const currentFileProgress = ref(0)
 const totalBytesUploaded = ref(0)
 const totalBytesToUpload = ref(0)
+const createdBucket = ref('')
 
 const formatSize = (size) => {
   if (size == 0) return '0 Bytes'
@@ -251,6 +252,7 @@ export const useEdgeStorage = () => {
     createFolder,
     removeFiles,
     removeCredential,
-    addCredential
+    addCredential,
+    createdBucket
   }
 }
