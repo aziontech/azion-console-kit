@@ -54,6 +54,7 @@
         name="enableLargeFileCache"
         auto
         :isCard="false"
+        @onSwitchChange="checkLargeFileCache"
         title="Large file optimization"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
         description="Optimize caching for large files by splitting them into smaller fragments for efficient delivery."
@@ -147,8 +148,11 @@
     return !!enableLargeFileCache.value
   })
 
-  watch(enableLargeFileCache, (value) => {
+  const checkLargeFileCache = (value) => {
     cdnCacheSettings.value = value ? 'override' : 'honor'
+  }
+
+  watch(enableLargeFileCache, (value) => {
     emit('enableSliceConfiguration', value)
   })
 
