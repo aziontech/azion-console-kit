@@ -29,7 +29,7 @@ export class EdgeStorageService {
       body: bucket
     })
 
-    return this.adapter?.transformCreateEdgeStorageBucket?.(data)
+    return data
   }
 
   listEdgeStorageBucketFiles = async (params = {}) => {
