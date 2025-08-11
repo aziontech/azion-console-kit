@@ -87,8 +87,8 @@ export class DigitalCertificatesService {
     return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
   }
 
-  loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate']
+  loadDigitalCertificate = async ({ id, isDropdown = false }) => {
+    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate', 'status']
 
     const { data } = await this.http.request({
       method: 'GET',
@@ -98,7 +98,7 @@ export class DigitalCertificatesService {
       }
     })
 
-    return this.adapter?.transformLoadDigitalCertificate?.(data)
+    return this.adapter?.transformLoadDigitalCertificate?.(data, isDropdown)
   }
 
   deleteDigitalCertificate = async (id) => {

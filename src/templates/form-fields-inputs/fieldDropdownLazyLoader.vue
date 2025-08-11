@@ -47,16 +47,27 @@
       v-if="enableCustomLabel"
       #value="slotProps"
     >
-      <span :data-testid="customTestId.value">
+      <span
+        class="flex align-items-center gap-2"
+        :data-testid="customTestId.value"
+      >
+        <i
+          v-if="showIcon"
+          :class="`pi ${iconSelected} ${iconColor}`"
+        ></i>
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
     <template #option="slotProps">
-      <div class="flex align-items-center">
+      <div class="flex align-items-center gap-2">
         <i
           v-if="slotProps.option.icon"
-          :class="`pi ${slotProps.option.icon}`"
+          :class="`pi ${slotProps.option.icon} ${iconColor}`"
         ></i>
+        <span
+          v-else-if="!slotProps.option.icon && showIcon"
+          class="w-4"
+        ></span>
         <div>{{ slotProps.option.name }}</div>
       </div>
     </template>
@@ -177,6 +188,18 @@
     optionGroupChildren: {
       type: String,
       default: ''
+    },
+    defaultPosition: {
+      type: Number,
+      default: 0
+    },
+    showIcon: {
+      type: Boolean,
+      default: false
+    },
+    iconColor: {
+      type: String,
+      default: ''
     }
   })
 
@@ -191,7 +214,7 @@
   const NUMBER_OF_CHARACTERS_TO_RESET_SEARCH = 0
   const PERMISSION_DENIED = 'You do not have permission'
   const hasNoPermission = ref(false)
-
+  const iconSelected = ref('')
   const name = toRef(props, 'name')
   const slots = useSlots()
   const data = ref([])
@@ -276,8 +299,43 @@
    * @returns {string | null} The selected value if it corresponds to a disabled option, or null otherwise.
    */
   const getLabelBySelectedValue = (selectedValue) => {
-    const result = props.options.find((option) => option.value === selectedValue)
-    return result?.label
+    // Don't proceed if there's no selected value
+    if (!selectedValue) return null
+
+    // Find the selected option
+    let selectedOption = null
+
+    if (props.options) {
+      selectedOption = props.options.find((option) => option.value === selectedValue)
+      return selectedOption?.label
+    }
+
+    if (data.value?.length) {
+      const isGroupedData = data.value.some(
+        (item) => item[props.optionGroupLabel] && item[props.optionGroupChildren]
+      )
+
+      if (isGroupedData) {
+        for (const group of data.value) {
+          const groupItems = group[props.optionGroupChildren] || []
+          selectedOption = groupItems.find((option) => option[props.optionValue] === selectedValue)
+          if (selectedOption) break
+        }
+      } else {
+        selectedOption = data.value.find((option) => option[props.optionValue] === selectedValue)
+      }
+    }
+
+    // Set the icon in a separate effect to prevent recursive updates
+    if (selectedOption) {
+      // Use nextTick to avoid the reactive update during render
+      Promise.resolve().then(() => {
+        iconSelected.value = selectedOption.icon
+      })
+      return selectedOption[props.optionLabel] || selectedOption.name
+    }
+
+    return null
   }
 
   const fetchData = async (currentPage = 1) => {
@@ -413,7 +471,6 @@
       loading.value = true
       const results = await props.loadService({ id })
       if (!results) return
-
       const newOption = {
         [props.optionLabel]: results.name,
         [props.optionValue]: results.id,
@@ -444,9 +501,9 @@
         if (!optionExists) {
           // Add to first group or create a new group
           if (data.value.length > 0) {
-            data.value[0][props.optionGroupChildren] = [
+            data.value[props.defaultPosition][props.optionGroupChildren] = [
               newOption,
-              ...data.value[0][props.optionGroupChildren]
+              ...data.value[props.defaultPosition][props.optionGroupChildren]
             ]
           } else {
             // Create a default group if no groups exist
