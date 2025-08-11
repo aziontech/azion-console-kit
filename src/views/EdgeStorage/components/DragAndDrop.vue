@@ -4,7 +4,7 @@
       class="flex flex-col items-center gap-8 justify-center w-full mx-auto text-center py-16 border border-solid surface-border rounded-lg transition-colors"
       @dragover.prevent
       @dragenter.prevent
-      @drop.prevent="handleDrop"
+      @drop.prevent="handleFileChange"
     >
       <div
         class="rounded-full border surface-border flex items-center justify-center w-[90px] h-[90px]"
@@ -33,7 +33,7 @@
       type="file"
       multiple
       class="hidden"
-      @change="(event) => handleFileSelect(event, selectedBucket.id)"
+      @change="handleFileChange"
     />
   </div>
 </template>
@@ -42,20 +42,14 @@
   import { ref } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const props = defineProps({
-    selectedBucket: {
-      type: Object,
-      required: true
-    }
-  })
-
-  const { addFiles, handleFileSelect } = useEdgeStorage()
+  const { uploadFiles } = useEdgeStorage()
   const fileInput = ref(null)
 
-  const handleDrop = (event) => {
+  const handleFileChange = async (event) => {
     const files = event.dataTransfer.files
-    if (files.length > 0 && props.selectedBucket) {
-      addFiles(files, props.selectedBucket.id)
+    if (files.length > 0) {
+      await uploadFiles(files)
+      event.target.value = ''
     }
   }
 

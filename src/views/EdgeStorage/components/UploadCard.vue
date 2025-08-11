@@ -6,7 +6,7 @@
     <div class="flex justify-between items-center gap-3.5">
       <div class="flex items-center gap-1.5">
         <i class="pi pi-file"></i>
-        <span>{{ fileToUpload[uploadCount - 1]?.name }}</span>
+        <span>{{ uploadStatus.current.name }}</span>
       </div>
       <PrimeButton
         icon="pi pi-times-circle"
@@ -16,12 +16,16 @@
         @click="isUploading = false"
       />
     </div>
-    <span class="text-sm text-color-secondary"
-      >Uploading {{ uploadCount }} of {{ fileToUpload.length }}</span
-    >
+
+    <div class="flex justify-between items-center text-sm">
+      <span class="text-color-secondary">
+        Uploading {{ uploadStatus.uploaded }} of {{ uploadStatus?.total }} files
+      </span>
+      <span class="font-medium">{{ uploadStatus.progress }}%</span>
+    </div>
     <ProgressBar
-      :value="uploadProgress"
-      style="height: 6px"
+      :value="uploadStatus.progress"
+      style="height: 8px"
       :showValue="false"
       :pt="{
         value: { style: 'background-color: var(--primary-color) !important' }
@@ -35,5 +39,5 @@
 
   import PrimeButton from 'primevue/button'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
-  const { isUploading, uploadCount, uploadProgress, fileToUpload } = useEdgeStorage()
+  const { isUploading, uploadStatus } = useEdgeStorage()
 </script>
