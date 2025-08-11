@@ -34,6 +34,7 @@ import REAL_TIME_EVENTS_SELECTORS from './selectors/product-selectors/real-time-
 import WORKLOAD_SELECTORS from './selectors/product-selectors/workload.js'
 import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.js'
 import EDGE_CONNECTOR_SELECTORS from './selectors/product-selectors/edge-connectors.js'
+import EDGE_SQL_SELECTORS from './selectors/product-selectors/edge-sql.js'
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
@@ -65,7 +66,8 @@ const selectors = {
   realTimeEvents: REAL_TIME_EVENTS_SELECTORS,
   workload: WORKLOAD_SELECTORS,
   customPages: CUSTOM_PAGES_SELECTORS,
-  edgeConnector: EDGE_CONNECTOR_SELECTORS
+  edgeConnector: EDGE_CONNECTOR_SELECTORS,
+  edgeSQL: EDGE_SQL_SELECTORS
 }
 
 export default selectors
