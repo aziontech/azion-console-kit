@@ -25,7 +25,7 @@
     </div>
     <ProgressBar
       :value="uploadStatus.progress"
-      style="height: 8px"
+      style="height: 0.5em"
       :showValue="false"
       :pt="{
         value: { style: 'background-color: var(--primary-color) !important' }

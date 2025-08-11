@@ -25,7 +25,7 @@ const formatSize = (size) => {
 }
 
 const uploadProgress = computed(() => {
-  if (totalBytesToUpload.value === 0) return 0
+  if (!totalBytesToUpload.value) return 0
   const completedFilesBytes = uploadedFiles.value.reduce((sum, file) => sum + file.size, 0)
   const currentFileBytes =
     currentFileProgress.value > 0 && currentUploadingFile.value
@@ -83,7 +83,7 @@ export const useEdgeStorage = () => {
 
         const validFiles = filesArray.filter((file) => file.size <= maxFileSize)
 
-        if (validFiles.length === 0) {
+        if (!validFiles.length) {
           return
         }
 
@@ -135,7 +135,7 @@ export const useEdgeStorage = () => {
         const successCount = uploadedFiles.value.length
         const failureCount = failedFiles.value.length
 
-        if (successCount > 0) {
+        if (successCount) {
           toast.add({
             severity: failureCount > 0 ? 'warn' : 'success',
             summary: failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
@@ -149,7 +149,7 @@ export const useEdgeStorage = () => {
           })
         }
 
-        if (failureCount > 0 && successCount === 0) {
+        if (failureCount && !successCount) {
           toast.add({
             severity: 'error',
             summary: 'Upload Failed',
