@@ -156,14 +156,13 @@
                   outlined
                   class="px-4 py-1 flex items-center justify-center"
                 />
-                <PrimeButton
+                <SplitButton
                   size="small"
-                  @click="openFileSelector"
                   label="Add to files"
-                  iconPos="right"
-                  icon="pi pi-chevron-down"
+                  @click="openFileSelector"
+                  :model="uploadMenuItems"
                   primary
-                  class="px-4 py-1 cursor-pointer flex items-center justify-center"
+                  class="whitespace-nowrap"
                 />
               </div>
             </div>
@@ -212,6 +211,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ListTableBlock from '@/templates/list-table-block/folder-list.vue'
   import PrimeButton from 'primevue/button'
+  import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, inject, onMounted } from 'vue'
@@ -226,7 +226,7 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, selectedBucket, handleFileSelect, removeFiles, createdBucket } = useEdgeStorage()
+  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles } = useEdgeStorage()
   const { isGreaterThanMD } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -244,6 +244,18 @@
   const isLoading = ref(false)
 
   const listServiceFilesRef = ref(null)
+  const uploadMenuItems = [
+    {
+      label: 'Create folder',
+      icon: 'pi pi-folder',
+      command: () => openFileSelector('folder')
+    },
+    {
+      label: 'Upload files',
+      icon: 'pi pi-upload',
+      command: () => openFileSelector('files')
+    }
+  ]
 
   const filteredBuckets = computed(() => {
     if (!searchTerm.value) return buckets.value
@@ -298,16 +310,23 @@
     listServiceFilesRef.value?.reload()
   }
 
-  const openFileSelector = () => {
+  const openFileSelector = (type = 'files') => {
     const input = document.createElement('input')
     input.type = 'file'
-    input.multiple = true
     input.style.display = 'none'
+
+    if (type === 'folder') {
+      input.webkitdirectory = true
+      input.multiple = false
+    } else {
+      input.multiple = true
+      input.webkitdirectory = false
+    }
 
     input.onchange = async (event) => {
       const files = event.target.files
-      if (files.length > 0 && selectedBucket.value) {
-        handleFileSelect(event, selectedBucket.value.id)
+      if (files.length > 0) {
+        await uploadFiles(files)
       }
       document.body.removeChild(input)
     }
@@ -369,3 +388,13 @@
     }
   })
 </script>
+
+<style scoped lang="scss">
+  ::v-deep(.p-splitbutton) {
+    height: 2rem !important;
+    .p-button + .p-button {
+      border-radius: 0 0.375rem 0.375rem 0;
+      height: unset !important;
+    }
+  }
+</style>

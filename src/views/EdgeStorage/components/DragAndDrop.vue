@@ -42,16 +42,8 @@
   import { ref } from 'vue'
   import { useEdgeStorage } from '@/composables/useEdgeStorage'
 
-  const { uploadFiles } = useEdgeStorage()
+  const { handleFileChange } = useEdgeStorage()
   const fileInput = ref(null)
-
-  const handleFileChange = async (event) => {
-    const files = event.dataTransfer.files
-    if (files.length > 0) {
-      await uploadFiles(files)
-      event.target.value = ''
-    }
-  }
 
   const openFileSelector = () => {
     fileInput.value?.click()

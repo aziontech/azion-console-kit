@@ -114,7 +114,6 @@ export const useEdgeStorage = () => {
           const onProgress = (progress) => {
             currentFileProgress.value = progress.percentage
           }
-
           try {
             await edgeStorageService.addEdgeStorageBucketFiles(
               file,
@@ -231,7 +230,13 @@ export const useEdgeStorage = () => {
     }
     return null
   }
-
+  const handleFileChange = async (event) => {
+    const files = event.dataTransfer.files
+    if (files.length > 0) {
+      await uploadFiles(files)
+      event.target.value = ''
+    }
+  }
   return {
     buckets,
     selectedBucket,
@@ -253,6 +258,7 @@ export const useEdgeStorage = () => {
     removeFiles,
     removeCredential,
     addCredential,
-    createdBucket
+    createdBucket,
+    handleFileChange
   }
 }
