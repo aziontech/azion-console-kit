@@ -38,6 +38,7 @@
           :groupData="groupData"
           :userUTC="userUTC"
           :filterHash="filterHash"
+          @applyFilter="applyFilter"
           @clearHash="clearFilterHash"
         />
       </div>
@@ -202,6 +203,18 @@
       updateRouter()
     }, 100)
   })
+
+  const applyFilter = () => {
+    // - pegar o dataset atual e usuario
+    // - pegar o hash do filtros sem o time range
+    // - e salvar para o usuario no localStorage
+    // const filterUserDatasetHash = {
+    //   dataset:
+    //   user:
+    //   filterHash:
+    //   expirationDate
+    // }
+  }
 
   onUnmounted(() => {
     groupObservable.unsubscribe(updateGroupData)
