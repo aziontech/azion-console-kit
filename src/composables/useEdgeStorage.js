@@ -1,5 +1,6 @@
-import { ref } from 'vue'
-
+import { ref, computed } from 'vue'
+import { edgeStorageService } from '@/services/v2'
+import { useToast } from 'primevue/usetoast'
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
@@ -8,8 +9,13 @@ const buckets = ref([])
 const selectedBucket = ref()
 const isUploading = ref(false)
 const fileToUpload = ref([])
-const uploadProgress = ref(0)
 const uploadCount = ref(1)
+const currentUploadingFile = ref(null)
+const uploadedFiles = ref([])
+const failedFiles = ref([])
+const currentFileProgress = ref(0)
+const totalBytesUploaded = ref(0)
+const totalBytesToUpload = ref(0)
 const createdBucket = ref('')
 
 const formatSize = (size) => {
@@ -19,31 +25,33 @@ const formatSize = (size) => {
   return (size / Math.pow(1024, aux)).toFixed(2) + ' ' + sizes[aux]
 }
 
-export const useEdgeStorage = () => {
-  /**
-   * Adds a new bucket to the buckets array.
-   * @param {Object} bucket - The bucket object to add.
-   * @param {string} bucket.name - Bucket name.
-   * @param {string} bucket.region - Bucket region.
-   * @param {Date} [bucket.createdAt] - Creation date (defaults to now).
-   * @param {string} [bucket.size] - Bucket size (defaults to '0 GB').
-   * @param {number} [bucket.objectCount] - Number of objects (defaults to 0).
-   */
-  const addBucket = (bucket) => {
-    const newBucket = {
-      id: Date.now(),
-      name: bucket.name,
-      region: bucket.region,
-      createdAt: bucket.createdAt || new Date().toLocaleString(),
-      size: formatSize(bucket.size),
-      objectCount: bucket.objectCount || 0,
-      setting: bucket.edgeAccess
-    }
+const uploadProgress = computed(() => {
+  if (!totalBytesToUpload.value) return 0
+  const completedFilesBytes = uploadedFiles.value.reduce((sum, file) => sum + file.size, 0)
+  const currentFileBytes =
+    currentFileProgress.value > 0 && currentUploadingFile.value
+      ? (currentUploadingFile.value.sizeBytes * currentFileProgress.value) / 100
+      : 0
+  const totalProgress = ((completedFilesBytes + currentFileBytes) / totalBytesToUpload.value) * 100
+  return Math.round(Math.min(totalProgress, 100))
+})
 
-    buckets.value.push(newBucket)
-    return newBucket
+const uploadStatus = computed(() => {
+  return {
+    total: fileToUpload.value.length,
+    uploaded: uploadCount.value,
+    failed: failedFiles.value.length,
+    current: currentUploadingFile.value,
+    progress: uploadProgress.value,
+    currentFileProgress: currentFileProgress.value,
+    totalBytesUploaded: totalBytesUploaded.value,
+    totalBytesToUpload: totalBytesToUpload.value,
+    bytesRemaining: totalBytesToUpload.value - totalBytesUploaded.value
   }
+})
 
+export const useEdgeStorage = () => {
+  const toast = useToast()
   /**
    * Finds a bucket by its ID.
    * @param {number|string} id - The ID of the bucket to find.
@@ -52,98 +60,117 @@ export const useEdgeStorage = () => {
   const findBucketById = (id) => {
     return buckets.value.find((bucket) => bucket.id === id)
   }
-
-  /**
-   * Gets the total count of buckets.
-   * @returns {number} Total number of buckets.
-   */
-  const getBucketCount = () => {
-    return buckets.value.length
-  }
-
-  /**
-   * Clears all buckets (useful for testing or reset functionality).
-   */
-  const clearAllBuckets = () => {
-    buckets.value.splice(0, buckets.value.length)
-  }
-
   /**
    * Adds files to the files array with name and size information.
    * @param {FileList|File[]} fileList - The files to add (from drag/drop or file input).
    * @param {number|string} bucketId - The ID of the bucket to upload files to.
    */
-  const addFiles = async (fileList, bucketId) => {
-    const bucket = findBucketById(bucketId)
-
-    if (bucket) {
-      isUploading.value = true
-
+  const uploadFiles = async (fileList) => {
+    if (selectedBucket.value) {
       const filesArray = Array.from(fileList)
-      fileToUpload.value = filesArray
+      const maxFileSize = 300 * 1024 * 1024 // 300MB in bytes
+
+      const oversizedFiles = filesArray.filter((file) => file.size > maxFileSize)
+
+      if (oversizedFiles.length > 0) {
+        toast.add({
+          severity: 'warn',
+          summary: 'File Size Limit Exceeded',
+          detail: `${oversizedFiles.length} file${
+            oversizedFiles.length > 1 ? 's' : ''
+          } exceed the 300MB limit and cannot be uploaded.`,
+          life: 5000
+        })
+
+        const validFiles = filesArray.filter((file) => file.size <= maxFileSize)
+
+        if (!validFiles.length) {
+          return
+        }
+
+        fileToUpload.value = validFiles
+      } else {
+        fileToUpload.value = filesArray
+      }
+
+      isUploading.value = true
       uploadCount.value = 1
+      uploadedFiles.value = []
+      failedFiles.value = []
+      currentUploadingFile.value = null
+      currentFileProgress.value = 0
+      totalBytesUploaded.value = 0
+      totalBytesToUpload.value = fileToUpload.value.reduce((sum, file) => sum + file.size, 0)
 
       try {
-        await uploadFiles()
-        filesArray.forEach((file) => {
-          bucket.files.push({
+        for (const file of fileToUpload.value) {
+          currentUploadingFile.value = {
             name: file.name,
             size: formatSize(file.size),
-            id: Date.now(),
-            lastModified: new Date().toLocaleString(),
-            isFolder: false
+            sizeBytes: file.size
+          }
+          currentFileProgress.value = 0
+
+          const onProgress = (progress) => {
+            currentFileProgress.value = progress.percentage
+          }
+
+          try {
+            await edgeStorageService.addEdgeStorageBucketFiles(
+              file,
+              selectedBucket.value.name,
+              onProgress
+            )
+            uploadedFiles.value.push(file)
+            totalBytesUploaded.value += file.size
+            currentFileProgress.value = 100
+            uploadCount.value++
+          } catch (fileError) {
+            failedFiles.value.push({ file, error: fileError })
+          }
+        }
+
+        currentUploadingFile.value = null
+        isUploading.value = false
+
+        const successCount = uploadedFiles.value.length
+        const failureCount = failedFiles.value.length
+
+        if (successCount) {
+          toast.add({
+            severity: failureCount > 0 ? 'warn' : 'success',
+            summary: failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
+            detail:
+              failureCount > 0
+                ? `${successCount} file${
+                    successCount > 1 ? 's' : ''
+                  } uploaded successfully, ${failureCount} failed`
+                : `${successCount} file${successCount > 1 ? 's' : ''} uploaded successfully`,
+            life: 5000
           })
-        })
-        isUploading.value = false
+        }
+
+        if (failureCount && !successCount) {
+          toast.add({
+            severity: 'error',
+            summary: 'Upload Failed',
+            detail: `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`,
+            life: 5000
+          })
+        }
       } catch (error) {
+        currentUploadingFile.value = null
         isUploading.value = false
+
+        toast.add({
+          severity: 'error',
+          summary: 'Upload Failed',
+          detail: 'An unexpected error occurred during upload. Please try again.',
+          life: 5000
+        })
       }
     }
   }
-
-  const uploadFiles = () => {
-    return new Promise((resolve, reject) => {
-      const interval = setInterval(() => {
-        if (isUploading.value === false) {
-          clearInterval(interval)
-          reject()
-          return
-        }
-        if (uploadCount.value === fileToUpload.value.length && uploadProgress.value >= 100) {
-          clearInterval(interval)
-          isUploading.value = false
-          fileToUpload.value = []
-          uploadCount.value = 1
-          uploadProgress.value = 0
-          resolve()
-          return
-        } else if (uploadProgress.value >= 100) {
-          uploadProgress.value = 0
-          uploadCount.value++
-        } else {
-          uploadProgress.value += Math.floor(Math.random() * 30) + 1
-        }
-      }, 1500)
-    })
-  }
-
-  const handleFileSelect = (event, bucketId) => {
-    const files = event.target.files
-    if (files.length > 0) {
-      addFiles(files, bucketId)
-      event.target.value = ''
-    }
-  }
-
-  /**
-   * Gets files for a specific bucket.
-   * @param {number|string} bucketId - The ID of the bucket.
-   * @returns {Array} Array of files for the specified bucket.
-   */
-  const getFilesByBucket = (bucketId) => {
-    return buckets.value.find((bucket) => bucket.id === bucketId)?.files || []
-  }
-
   /**
    * Creates a new folder in a bucket.
    * @param {string} folderName - The name of the folder to create.
@@ -212,15 +239,18 @@ export const useEdgeStorage = () => {
     fileToUpload,
     uploadCount,
     uploadProgress,
-    addBucket,
+    uploadStatus,
+    currentUploadingFile,
+    uploadedFiles,
+    failedFiles,
+    currentFileProgress,
+    totalBytesUploaded,
+    totalBytesToUpload,
+    formatSize,
     findBucketById,
-    getBucketCount,
-    clearAllBuckets,
-    addFiles,
-    getFilesByBucket,
-    removeFiles,
-    handleFileSelect,
+    uploadFiles,
     createFolder,
+    removeFiles,
     removeCredential,
     addCredential,
     createdBucket

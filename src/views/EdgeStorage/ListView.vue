@@ -169,7 +169,7 @@
             </div>
             <UploadCard />
             <ListTableBlock
-              v-if="!!selectedBucket"
+              v-if="!!selectedBucket?.files?.length"
               pageTitleDelete="Files"
               :listService="listEdgeStorageBucketFiles"
               ref="listServiceFilesRef"
