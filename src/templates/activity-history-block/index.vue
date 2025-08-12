@@ -114,10 +114,17 @@
             </template>
           </Timeline>
         </div>
+        <Paginator
+          :rows="10"
+          :totalRecords="totalRecords"
+          :rowsPerPageOptions="[10, 25, 50]"
+          @page="handlePageChange"
+        />
       </template>
     </Card>
   </div>
 </template>
+
 <script setup>
   defineOptions({ name: 'activity-history-block' })
   import Timeline from 'primevue/timeline'
@@ -126,6 +133,7 @@
   import InputText from 'primevue/inputtext'
   import { ref, computed, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import Paginator from 'primevue/paginator'
 
   const emit = defineEmits(['on-load-data'])
 
@@ -133,6 +141,9 @@
   const search = ref('')
   const isLoading = ref(false)
   const events = ref([])
+  const totalRecords = ref(0)
+  const rowsPerPage = ref(10)
+  const offset = ref(0)
 
   const iconsMap = ref({
     created: 'pi pi-plus-circle text-xs',
@@ -148,7 +159,11 @@
   })
 
   const props = defineProps({
-    listEventsService: {
+    listActivityHistoryEventsService: {
+      type: Function,
+      required: true
+    },
+    getActivityHistoryTotalRecords: {
       type: Function,
       required: true
     }
@@ -165,7 +180,12 @@
   async function loadData() {
     try {
       isLoading.value = true
-      const data = await props.listEventsService()
+      const data = await props.listActivityHistoryEventsService({
+        limit: rowsPerPage.value,
+        offset: offset.value
+      })
+      totalRecords.value = await props.getActivityHistoryTotalRecords()
+
       events.value = data.map((historyEvent) => ({
         date: historyEvent.ts,
         icon: iconsMap.value[historyEvent.type],
@@ -182,6 +202,15 @@
     } finally {
       isLoading.value = false
     }
+  }
+
+  const handlePageChange = async (event) => {
+    const page = event.page
+    const rows = event.rows
+
+    rowsPerPage.value = rows
+    offset.value = page * rows
+    await loadData()
   }
 
   onMounted(async () => {
