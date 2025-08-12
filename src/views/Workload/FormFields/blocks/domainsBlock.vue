@@ -163,7 +163,10 @@
               <LabelBlock label="Subdomain" />
             </div>
             <div class="flex w-1/2">
-              <LabelBlock label="Domain" />
+              <LabelBlock
+                label="Domain"
+                name="domains"
+              />
             </div>
           </div>
           <div
