@@ -18,7 +18,7 @@
   })
   const route = useRoute()
   const toast = useToast()
-  const { findBucketById, selectedBucket } = useEdgeStorage()
+  const { findBucketById, selectedBucket, createdBucket } = useEdgeStorage()
 
   const { openDeleteDialog } = useDeleteDialog()
   const router = useRouter()
