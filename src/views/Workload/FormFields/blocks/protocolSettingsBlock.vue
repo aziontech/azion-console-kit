@@ -80,9 +80,15 @@
 
   const warningDigitalCertificateMessage = computed(() => {
     if (statusDigitalCertificate.value === 'pending') {
-      return 'This certificate is pending validation and may not work until it’s validated'
+      return {
+        text: 'This certificate is pending validation and may not work until it’s validated',
+        color: 'text-[var(--p-tag-warning-color)]'
+      }
     } else if (statusDigitalCertificate.value === 'failed') {
-      return 'This digital certificate failed and cannot be used until the issue is resolved.'
+      return {
+        text: 'This digital certificate failed and cannot be used until the issue is resolved.',
+        color: 'text-[var(--error-color)]'
+      }
     }
 
     return ''
@@ -93,6 +99,11 @@
   const selectCertificate = ({ status, authority }) => {
     statusDigitalCertificate.value = status
     authorityCertificate.value = authority
+  }
+
+  const iconColor = {
+    'pi-times-circle': 'text-[var(--error-color)]',
+    'pi-exclamation-triangle': 'text-[var(--p-tag-warning-color)]'
   }
 </script>
 <template>
@@ -179,7 +190,7 @@
             keyToFilter="status"
             :moreOptions="moreOptions"
             @onSelectOption="selectCertificate"
-            iconColor="text-[var(--error-color)]"
+            :iconColor="iconColor"
             showIcon
             enableWorkaroundLabelToDisabledOptions
           >
@@ -205,10 +216,11 @@
           </fieldDropdownLazyLoader>
           <small
             v-if="warningDigitalCertificateMessage"
-            class="text-[var(--p-tag-warning-color)] text-xs font-normal"
+            :class="warningDigitalCertificateMessage.color"
+            class="text-xs font-normal"
             data-testid="form-horizontal-delivery-settings-digital-certificate-warning"
           >
-            {{ warningDigitalCertificateMessage }}
+            {{ warningDigitalCertificateMessage.text }}
           </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">

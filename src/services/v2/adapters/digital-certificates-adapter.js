@@ -5,7 +5,7 @@ import { parseStatusString } from '@/services/v2/utils/adapter/parse-status-util
 const EDGE_CERTIFICATE = 'TLS Certificate'
 const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
-const checkStatus = (status) => {
+const getIconByStatus = (status) => {
   if (status === 'pending') {
     return 'pi-exclamation-triangle'
   } else if (status === 'failed') {
@@ -94,7 +94,7 @@ export const DigitalCertificatesAdapter = {
         name: item.name,
         authority: item?.authority,
         status: item?.status,
-        icon: checkStatus(item?.status)
+        icon: getIconByStatus(item?.status)
       }
     })
     let bodyParser = []
@@ -131,7 +131,7 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformLoadDigitalCertificate({ data }, isDropdown = false) {
+  transformLoadDigitalCertificate({ data }) {
     const {
       id,
       name,
@@ -162,7 +162,7 @@ export const DigitalCertificatesAdapter = {
       certificateContent: certificate_content,
       certificate,
       authority,
-      icon: isDropdown ? checkStatus(status) : undefined
+      icon: getIconByStatus(status)
     }
   },
 

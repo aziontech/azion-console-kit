@@ -53,7 +53,7 @@
       >
         <i
           v-if="showIcon"
-          :class="`pi ${iconSelected} ${iconColor}`"
+          :class="`pi ${iconSelected} ${applyIconColor(iconSelected)}`"
         ></i>
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
@@ -62,7 +62,7 @@
       <div class="flex align-items-center gap-2">
         <i
           v-if="slotProps.option.icon"
-          :class="`pi ${slotProps.option.icon} ${iconColor}`"
+          :class="`pi ${slotProps.option.icon} ${applyIconColor(slotProps.option.icon)}`"
         ></i>
         <span
           v-else-if="!slotProps.option.icon && showIcon"
@@ -198,8 +198,8 @@
       default: false
     },
     iconColor: {
-      type: String,
-      default: ''
+      type: Object,
+      default: () => ({})
     }
   })
 
@@ -290,6 +290,10 @@
     ]
   }
 
+  const applyIconColor = (icon) => {
+    return props.iconColor[icon]
+  }
+
   /**
    * Workaround to resolve the issue described in https://github.com/primefaces/primevue/issues/4431
    * This should be remove from this field component as soon as the
@@ -299,10 +303,8 @@
    * @returns {string | null} The selected value if it corresponds to a disabled option, or null otherwise.
    */
   const getLabelBySelectedValue = (selectedValue) => {
-    // Don't proceed if there's no selected value
     if (!selectedValue) return null
 
-    // Find the selected option
     let selectedOption = null
 
     if (props.options) {
@@ -326,9 +328,7 @@
       }
     }
 
-    // Set the icon in a separate effect to prevent recursive updates
     if (selectedOption) {
-      // Use nextTick to avoid the reactive update during render
       Promise.resolve().then(() => {
         iconSelected.value = selectedOption.icon
       })
