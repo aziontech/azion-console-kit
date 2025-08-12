@@ -163,6 +163,10 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
+                  :menuButtonProps="{ class: 'rounded-l-none' }"
+                  :pt="{
+                    root: { class: 'h-[2rem]' }
+                  }"
                 />
               </div>
             </div>
@@ -388,13 +392,3 @@
     }
   })
 </script>
-
-<style scoped lang="scss">
-  ::v-deep(.p-splitbutton) {
-    height: 2rem !important;
-    .p-button + .p-button {
-      border-radius: 0 0.375rem 0.375rem 0;
-      height: unset !important;
-    }
-  }
-</style>
