@@ -18,6 +18,7 @@
               placeholder="Search by event"
               v-model="search"
               data-testid="events-search-input"
+              @keyup.enter="loadData()"
             />
           </span>
           <span
@@ -63,7 +64,7 @@
           >
           <Timeline
             v-else
-            :value="filteredEvents"
+            :value="events"
             align="left"
             class="customized-timeline"
             :pt="{
@@ -168,13 +169,8 @@
       required: true
     }
   })
-  const filteredEvents = computed(() => {
-    return events.value.filter((element) =>
-      element.event.toLowerCase().includes(search.value.toLowerCase())
-    )
-  })
   const noEventsFound = computed(() => {
-    return filteredEvents.value.length === 0
+    return events.value.length === 0
   })
 
   async function loadData() {
@@ -182,9 +178,10 @@
       isLoading.value = true
       const data = await props.listActivityHistoryEventsService({
         limit: rowsPerPage.value,
-        offset: offset.value
+        offset: offset.value,
+        search: search.value
       })
-      totalRecords.value = await props.getActivityHistoryTotalRecords()
+      totalRecords.value = await props.getActivityHistoryTotalRecords(search.value)
 
       events.value = data.map((historyEvent) => ({
         date: historyEvent.ts,

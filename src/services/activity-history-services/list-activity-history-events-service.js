@@ -5,7 +5,8 @@ import { makeEventsListBaseUrl } from './make-events-list-base-url'
 export const listActivityHistoryEventsService = async ({
   apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN),
   offset = 0,
-  limit = 1000
+  limit = 1000,
+  search = ''
 } = {}) => {
   const offSetEnd = new Date()
   const offSetStart = new Date(
@@ -13,7 +14,11 @@ export const listActivityHistoryEventsService = async ({
   )
   const payload = {
     operatioName: 'ActivityHistory',
-    query: `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+    query: `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+  }
+
+  if (search) {
+    payload.query = `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } titleLike: "%${search}%" }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
   }
   let httpResponse = await AxiosHttpClientAdapter.request(
     {

@@ -50,7 +50,7 @@ describe('ListActivityHistoryService', () => {
     )
     const payload = {
       operatioName: 'ActivityHistory',
-      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
     }
     expect(requestSpy).toHaveBeenCalledWith(
       {
