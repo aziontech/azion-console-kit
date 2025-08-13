@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { edgeStorageService } from '@/services/v2'
 import { useToast } from 'primevue/usetoast'
+import * as yup from 'yup'
+
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
  * @returns {Object} Object containing buckets array and management functions.
@@ -48,6 +50,24 @@ const uploadStatus = computed(() => {
     totalBytesToUpload: totalBytesToUpload.value,
     bytesRemaining: totalBytesToUpload.value - totalBytesUploaded.value
   }
+})
+const nameRegex = /^[A-Za-z0-9_-]+$/
+const edgeAccess = ['read_write', 'read_only', 'restricted']
+
+const validationSchema = yup.object({
+  name: yup
+    .string()
+    .label('Name')
+    .required()
+    .min(6)
+    .max(63)
+    .test('name', 'Invalid name format', (value) => nameRegex.test(value)),
+  edge_access: yup
+    .string()
+    .label('Edge Access')
+    .required()
+    .default('read_write')
+    .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
 })
 
 export const useEdgeStorage = () => {
@@ -259,6 +279,7 @@ export const useEdgeStorage = () => {
     removeCredential,
     addCredential,
     createdBucket,
+    validationSchema,
     handleFileChange
   }
 }

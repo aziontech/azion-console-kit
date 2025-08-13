@@ -5,7 +5,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsEdgeStorage from './FormFields/FormFieldsEdgeStorage.vue'
-  import * as yup from 'yup'
   import { computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
@@ -18,7 +17,7 @@
   })
   const route = useRoute()
   const toast = useToast()
-  const { findBucketById, selectedBucket, createdBucket } = useEdgeStorage()
+  const { findBucketById, selectedBucket, createdBucket, validationSchema } = useEdgeStorage()
 
   const { openDeleteDialog } = useDeleteDialog()
   const router = useRouter()
@@ -55,25 +54,6 @@
         }
       }
     }[props.mode]
-  })
-
-  const nameRegex = /^[A-Za-z0-9_-]+$/
-  const edgeAccess = ['read_write', 'read_only', 'restricted']
-
-  const validationSchema = yup.object({
-    name: yup
-      .string()
-      .label('Name')
-      .required()
-      .min(6)
-      .max(63)
-      .test('name', 'Invalid name format', (value) => nameRegex.test(value)),
-    edge_access: yup
-      .string()
-      .label('Edge Access')
-      .required()
-      .default('read_write')
-      .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
   })
 
   const handleResponse = (response) => {
