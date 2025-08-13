@@ -80,7 +80,9 @@ export class EdgeStorageService {
 
     await this.http.request({
       method: 'POST',
-      url: `${this.baseURL}/${bucketName}/objects/${file.name}`,
+      url: `${this.baseURL}/${bucketName}/objects/${
+        file.webkitRelativePath ? file.webkitRelativePath : file.name
+      }`,
       body: file,
       config
     })
