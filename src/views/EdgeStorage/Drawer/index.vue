@@ -60,7 +60,7 @@
     @onSuccess="handleCreateEdgeStorage"
     createButtonLabel="Create"
     title="Create Bucket"
-    :showBarGoBack="true"
+    showBarGoBack
     disableToast
   >
     <template #formFields>
