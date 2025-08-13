@@ -329,7 +329,7 @@
 
     input.onchange = async (event) => {
       const files = event.target.files
-      if (files.length > 0) {
+      if (files.length) {
         await uploadFiles(files)
       }
       document.body.removeChild(input)
@@ -382,7 +382,7 @@
       if (createdBucket.value) {
         selectedBucket.value = buckets.value.find((bucket) => bucket.name === createdBucket.value)
         createdBucket.value = ''
-      } else if (buckets.value.length > 0) {
+      } else if (buckets.value.length) {
         selectedBucket.value = buckets.value[0]
       }
     } catch (error) {

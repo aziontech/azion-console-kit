@@ -72,7 +72,7 @@ export const useEdgeStorage = () => {
 
       const oversizedFiles = filesArray.filter((file) => file.size > maxFileSize)
 
-      if (oversizedFiles.length > 0) {
+      if (oversizedFiles.length) {
         toast.add({
           severity: 'warn',
           summary: 'File Size Limit Exceeded',
@@ -232,7 +232,7 @@ export const useEdgeStorage = () => {
   }
   const handleFileChange = async (event) => {
     const files = event.dataTransfer.files
-    if (files.length > 0) {
+    if (files.length) {
       await uploadFiles(files)
       event.target.value = ''
     }
