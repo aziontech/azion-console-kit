@@ -14,7 +14,7 @@ export const getActivityHistoryTotalRecords = async ({ search = '' }) => {
   }
 
   if (search) {
-    payload.query = `query ActivityHistory { activityHistoryEvents (aggregate: { count: rows }, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } or: [{ titleLike: "%${search}%" }, { commentLike: "%${search}%" }], }) { count } } `
+    payload.query = `query ActivityHistory { activityHistoryEvents (aggregate: { count: rows }, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } or: [{ titleIlike: "%${search}%" }, { commentIlike: "%${search}%" }], }) { count } } `
   }
 
   let httpResponse = await AxiosHttpClientAdapter.request(
