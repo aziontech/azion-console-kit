@@ -1,21 +1,21 @@
-import { convertGQLTotalRecords } from '@/helpers/convert-gql'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
 import graphQLApi from '../axios/makeEventsApi'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 
-export const getActivityHistoryTotalRecords = async (search = '') => {
-  const dataset = 'activityHistoryEvents'
-  const filter = {
-    tsRange: {
-      tsRangeBegin: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString(),
-      tsRangeEnd: new Date().toISOString()
-    }
-  }
-  if (search) {
-    filter.titleLike = `%${search}%`
-  }
-  const payload = adapt(filter, dataset)
+export const getActivityHistoryTotalRecords = async ({ search = '' }) => {
   const apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+  const offSetEnd = new Date()
+  const offSetStart = new Date(
+    Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
+  )
+  const payload = {
+    operatioName: 'ActivityHistory',
+    query: `query ActivityHistory { activityHistoryEvents(aggregate: { count: rows }, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } }) { count } } `
+  }
+
+  if (search) {
+    payload.query = `query ActivityHistory { activityHistoryEvents (aggregate: { count: rows }, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } or: [{ titleLike: "%${search}%" }, { commentLike: "%${search}%" }], }) { count } } `
+  }
 
   let httpResponse = await AxiosHttpClientAdapter.request(
     {
@@ -25,21 +25,12 @@ export const getActivityHistoryTotalRecords = async (search = '') => {
     },
     apiClient
   )
-  return adaptResponse(httpResponse, dataset)
+  return adaptResponse(httpResponse)
 }
 
-const adapt = (filter, dataset) => {
-  const table = {
-    dataset: dataset,
-    limit: 10000,
-    fields: ['count']
-  }
-  return convertGQLTotalRecords(filter, table)
-}
-
-const adaptResponse = (httpResponse, dataset) => {
+const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
-  const totalRecords = body.data[dataset][0].count
+  const totalRecords = body.data.activityHistoryEvents[0].count
 
   return totalRecords
 }

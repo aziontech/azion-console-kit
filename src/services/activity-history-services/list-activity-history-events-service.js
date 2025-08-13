@@ -18,7 +18,7 @@ export const listActivityHistoryEventsService = async ({
   }
 
   if (search) {
-    payload.query = `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } titleLike: "%${search}%" }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+    payload.query = `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } or: [{ titleLike: "%${search}%" }, { commentLike: "%${search}%" }], }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
   }
   let httpResponse = await AxiosHttpClientAdapter.request(
     {
