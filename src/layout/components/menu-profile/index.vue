@@ -132,7 +132,7 @@
             </template>
           </Dropdown>
         </div>
-        <Divider class="surface-border p-1 m-0" />
+        <Divider class="surface-border p-1 m-0 mb-2" />
         <PrimeButton
           data-testid="profile-block__sidebar__logout-btn"
           class="w-full rounded-md flex content-start text-left"
@@ -145,6 +145,7 @@
             }
           }"
           label="Logout"
+          size="small"
           icon="pi pi-sign-out"
           text
           @click="logout"
@@ -282,6 +283,7 @@
           }
         }"
         label="Logout"
+        size="small"
         icon="pi pi-sign-out"
         text
         @click="logout"
