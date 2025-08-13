@@ -32,12 +32,20 @@
             <div class="flex-1 overflow-y-auto">
               <div
                 v-if="isLoading"
-                class="text-center py-4"
+                class="flex flex-col gap-3"
               >
-                <i class="pi pi-spin pi-spinner text-2xl text-color-secondary"></i>
+                <div
+                  v-for="index in 3"
+                  :key="index"
+                  class="py-2 rounded"
+                >
+                  <div class="flex items-center justify-between">
+                    <Skeleton class="h-4 w-32" />
+                  </div>
+                </div>
               </div>
               <div
-                v-else-if="filteredBuckets.length === 0"
+                v-else-if="!filteredBuckets.length"
                 class="text-left py-2"
               >
                 <div class="text-color-secondary text-sm">
@@ -48,12 +56,14 @@
                 <div
                   v-for="bucket in filteredBuckets"
                   :key="bucket.id"
-                  class="p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
+                  class="p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors overflow-x-hidden"
                   :class="{ 'bg-[--table-bg-color]': selectedBucket?.id === bucket.id }"
                   @click="selectBucket(bucket)"
                 >
                   <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-color-primary">{{ bucket.name }}</span>
+                    <span class="text-sm font-medium text-color-primary truncate">{{
+                      bucket.name
+                    }}</span>
                     <span class="text-xs text-color-secondary">{{ bucket.size }}</span>
                   </div>
                 </div>
@@ -61,7 +71,7 @@
             </div>
           </div>
         </template>
-        <div class="flex w-full flex-col gap-8">
+        <div class="flex w-full flex-col gap-8 overflow-auto">
           <template v-if="!isGreaterThanMD">
             <div class="flex flex-col gap-4">
               <div class="flex justify-between items-center">
@@ -89,12 +99,20 @@
               <div class="flex-1 overflow-y-auto">
                 <div
                   v-if="isLoading"
-                  class="text-center py-4"
+                  class="flex flex-col gap-3"
                 >
-                  <i class="pi pi-spin pi-spinner text-2xl text-color-secondary"></i>
+                  <div
+                    v-for="n in 3"
+                    :key="n"
+                    class="p-3 rounded"
+                  >
+                    <div class="flex items-center justify-between">
+                      <Skeleton class="h-4 w-32" />
+                    </div>
+                  </div>
                 </div>
                 <div
-                  v-else-if="filteredBuckets.length === 0"
+                  v-else-if="!filteredBuckets.length"
                   class="text-left py-2"
                 >
                   <div class="text-color-secondary text-sm">
@@ -130,14 +148,16 @@
             class="flex flex-col h-full gap-3"
           >
             <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-semibold text-color-primary">{{ selectedBucket.name }}</h2>
+              <h2 class="text-xl font-semibold text-color-primary truncate">
+                {{ selectedBucket.name }}
+              </h2>
               <div class="flex items-center gap-3">
                 <div class="p-input-icon-left">
                   <i class="pi pi-search" />
                   <InputText
                     v-model="fileSearchTerm"
                     placeholder="Search in folder"
-                    class="w-64"
+                    class="w-48 lg:w-64"
                     @input="handleFileSearch"
                   />
                 </div>
@@ -145,14 +165,14 @@
                   icon="pi pi-refresh"
                   size="small"
                   outlined
-                  label="Refresh"
+                  :label="isGreaterThanXL ? 'Refresh' : ''"
                   class="px-4 py-1 flex items-center justify-center"
                 />
                 <PrimeButton
                   icon="pi pi-cog"
                   size="small"
                   @click="handleSettingsTrackEvent"
-                  label="Settings"
+                  :label="isGreaterThanXL ? 'Settings' : ''"
                   outlined
                   class="px-4 py-1 flex items-center justify-center"
                 />
@@ -217,6 +237,7 @@
   import PrimeButton from 'primevue/button'
   import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
+  import Skeleton from 'primevue/skeleton'
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, inject, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
@@ -231,7 +252,7 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles } = useEdgeStorage()
-  const { isGreaterThanMD } = useResize()
+  const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
   defineProps({
@@ -246,7 +267,6 @@
   const fileSearchTerm = ref('')
   const selectedFolder = ref(null)
   const isLoading = ref(false)
-
   const listServiceFilesRef = ref(null)
   const uploadMenuItems = [
     {
