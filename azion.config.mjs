@@ -5,7 +5,7 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 
-const addStagePrefix = (origin) => {
+const addStagePrefix = (origin) => {  
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
       const isCitiesDomain = hostHeader === 'cities.azion.com'
@@ -85,9 +85,7 @@ const cookieRewriteRules = [
 
 const config = {
   build: {
-    preset: {
-      name: 'vue'
-    }
+    preset: 'vue'
   },
   origin: [
     ...addStagePrefix([
