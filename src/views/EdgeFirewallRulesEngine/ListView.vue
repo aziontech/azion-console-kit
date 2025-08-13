@@ -47,10 +47,6 @@
       type: String || Number,
       required: true
     },
-    edgeFirewallModules: {
-      type: Object,
-      required: true
-    },
     reorderRulesEngine: {
       type: Function,
       required: true
@@ -149,6 +145,12 @@
 
   const getColumns = computed(() => [
     {
+      field: 'id',
+      header: 'ID',
+      sortField: 'id',
+      filterPath: 'id'
+    },
+    {
       field: 'name',
       header: 'Name',
       disableSort: true
@@ -231,7 +233,6 @@
   <Drawer
     ref="drawerRef"
     :edgeFirewallId="edgeFirewallId"
-    :edgeFirewallModules="edgeFirewallModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
     :loadService="loadEdgeFirewallRulesEngineService"

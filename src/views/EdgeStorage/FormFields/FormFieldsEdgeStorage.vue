@@ -10,6 +10,10 @@
     showDangerZone: {
       type: Boolean,
       default: true
+    },
+    disableNameEdit: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -21,15 +25,16 @@
   const edgeAccessOptions = [
     { label: 'Read & Write', value: 'read_write' },
     { label: 'Read Only', value: 'read_only' },
-    { label: 'Write Only', value: 'write_only' }
+    { label: 'Restricted', value: 'restricted' }
   ]
 </script>
 
 <template>
-  <div class="flex flex-col gap-8 py-8">
+  <div class="flex flex-col gap-8">
     <FormHorizontal
       title="General"
       description="Check the details of the Edge Storage Bucket."
+      :disabled="disableNameEdit"
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">

@@ -29,7 +29,7 @@ export class EdgeStorageService {
       body: bucket
     })
 
-    return this.adapter?.transformCreateEdgeStorageBucket?.(data)
+    return data
   }
 
   listEdgeStorageBucketFiles = async (bucketName = '') => {
@@ -37,6 +37,53 @@ export class EdgeStorageService {
       method: 'GET',
       url: `${this.baseURL}/${bucketName}/objects`
     })
-    return this.adapter?.transformListEdgeStorageBucketFiles?.(data) ?? data.results
+
+    return data.results
+  }
+
+  updateEdgeStorageBucket = async (bucket = {}) => {
+    await this.http.request({
+      method: 'PATCH',
+      url: `${this.baseURL}/${bucket.name}`,
+      body: { edge_access: bucket.edge_access }
+    })
+
+    return `Bucket "${bucket.name}" has been updated successfully`
+  }
+
+  deleteEdgeStorageBucket = async (bucketName = '') => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/${bucketName}`
+    })
+
+    return `Bucket "${bucketName}" has been deleted successfully`
+  }
+
+  addEdgeStorageBucketFiles = async (file = {}, bucketName = '', onProgress = null) => {
+    const config = {}
+
+    if (onProgress && typeof onProgress === 'function') {
+      config.onUploadProgress = (progressEvent) => {
+        const progress = {
+          loaded: progressEvent.loaded,
+          total: progressEvent.total,
+          percentage: progressEvent.total
+            ? Math.round((progressEvent.loaded / progressEvent.total) * 100)
+            : 0,
+          fileName: file.name,
+          fileSize: file.size
+        }
+        onProgress(progress)
+      }
+    }
+
+    await this.http.request({
+      method: 'POST',
+      url: `${this.baseURL}/${bucketName}/objects/${file.name}`,
+      body: file,
+      config
+    })
+    return 'File added successfully'
   }
 }

@@ -430,10 +430,6 @@
     lazy: {
       type: Boolean,
       default: true
-    },
-    firstLoadData: {
-      type: Boolean,
-      default: true
     }
   })
 
@@ -466,6 +462,7 @@
   const dialog = useDialog()
   const router = useRouter()
   const toast = useToast()
+  const firstLoadData = ref(true)
 
   const sortFieldValue = ref(null)
   const sortOrderValue = ref(null)
@@ -613,10 +610,11 @@
       }
     } finally {
       isLoading.value = false
-      if (props.firstLoadData) {
+      if (firstLoadData.value) {
         const hasData = data.value?.length > 0
         emit('on-load-data', !!hasData)
       }
+      firstLoadData.value = false
     }
   }
 

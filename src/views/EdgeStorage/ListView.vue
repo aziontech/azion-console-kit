@@ -171,7 +171,9 @@
             <ListTableBlock
               v-if="!!selectedBucket"
               pageTitleDelete="Files"
-              :listService="edgeStorageService.listEdgeStorageBucketFiles"
+              :listService="
+                () => edgeStorageService.listEdgeStorageBucketFiles(selectedBucket.name)
+              "
               ref="listServiceFilesRef"
               :columns="getColumns"
               :selected-bucket="selectedBucket"
@@ -194,7 +196,7 @@
             description="Create your first bucket here."
             createButtonLabel="Bucket"
             @click-to-create="handleCreateTrackEvent"
-            :documentationService="documentationService"
+            :documentationService="documentationGuideProducts.edgeStorage"
           >
             <template #illustration>
               <Illustration />
@@ -222,11 +224,12 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import { edgeStorageService } from '@/services/v2'
   import UploadCard from './components/UploadCard.vue'
+  import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, selectedBucket, handleFileSelect, removeFiles } = useEdgeStorage()
+  const { buckets, selectedBucket, handleFileSelect, removeFiles, createdBucket } = useEdgeStorage()
   const { isGreaterThanMD } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -356,6 +359,12 @@
       isLoading.value = true
       const response = await edgeStorageService.listEdgeStorageBuckets()
       buckets.value = response.body
+      if (createdBucket.value) {
+        selectedBucket.value = buckets.value.find((bucket) => bucket.name === createdBucket.value)
+        createdBucket.value = ''
+      } else if (buckets.value.length > 0) {
+        selectedBucket.value = buckets.value[0]
+      }
     } catch (error) {
       isLoading.value = false
     } finally {

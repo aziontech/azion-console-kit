@@ -93,6 +93,12 @@
   const getColumns = computed(() => {
     return [
       {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
+      {
         field: 'name',
         header: 'Name',
         type: 'component',

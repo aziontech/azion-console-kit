@@ -11,8 +11,10 @@
   import { dataStreamService } from '@/services/v2'
   import { validationSchema } from './FormFields/composables/validation'
 
+  const validation = validationSchema(false)
+
   const displaySamplingDialog = ref(false)
-  const formSubmit = async (onSubmit, values, errors, formValid) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
     if (!values.hasSampling) {
       onSubmit()
     } else {
@@ -47,7 +49,7 @@
     <template #content>
       <CreateFormBlock
         :createService="dataStreamService.createDataStreamService"
-        :schema="validationSchema"
+        :schema="validation"
         @on-response="handleToast"
         @on-response-fail="(error) => console.log(error)"
         disableToast

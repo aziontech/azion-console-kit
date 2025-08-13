@@ -23,14 +23,9 @@ function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   const menuOption = {
     label: handleTextDomainWorkload.pluralTitle,
-    icon: 'ai ai-workloads',
+    icon: hasFlagBlockApiV4() ? 'pi pi-globe' : 'ai ai-workloads',
     to: `/${handleTextDomainWorkload.pluralLabel}`,
-    id: 'domains',
-    tag: 'Preview'
-  }
-
-  if (hasFlagBlockApiV4()) {
-    delete menuOption.tag
+    id: 'domains'
   }
 
   return menuOption
@@ -60,7 +55,6 @@ function createSecureItems() {
       to: '/edge-connectors',
       icon: 'ai ai-edge-connectors',
       id: 'edge-connectors',
-      tag: 'Preview',
       visible: !hasFlagBlockApiV4()
     },
     {
@@ -143,7 +137,6 @@ function createEdgeLibrariesItems() {
       label: 'Custom Pages',
       to: '/custom-pages',
       icon: 'ai ai-custom-pages',
-      tag: 'Preview',
       id: 'custom-pages',
       visible: !hasFlagBlockApiV4()
     },

@@ -138,8 +138,10 @@
   ])
 
   const handleLoadData = (event) => {
+    if (firstLoadData.value) {
+      hasContentToList.value = event
+    }
     setFirstLoadData(false)
-    hasContentToList.value = event
   }
 
   const handleTrackEventGoToCreate = () => {
@@ -157,6 +159,12 @@
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
+        {
+          field: 'id',
+          header: 'ID',
+          sortField: 'id',
+          filterPath: 'id'
+        },
         {
           field: 'name',
           header: 'Name',
@@ -184,6 +192,12 @@
       ]
     }
     return [
+      {
+        field: 'id',
+        header: 'ID',
+        sortField: 'id',
+        filterPath: 'id'
+      },
       {
         field: 'name',
         header: 'Name',
