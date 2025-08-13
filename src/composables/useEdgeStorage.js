@@ -279,7 +279,7 @@ export const useEdgeStorage = () => {
     removeCredential,
     addCredential,
     createdBucket,
-    validationSchema
+    validationSchema,
     handleFileChange
   }
 }
