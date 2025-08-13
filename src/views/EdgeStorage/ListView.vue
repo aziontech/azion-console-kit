@@ -35,8 +35,8 @@
                 class="flex flex-col gap-3"
               >
                 <div
-                  v-for="n in 3"
-                  :key="n"
+                  v-for="index in 3"
+                  :key="index"
                   class="py-2 rounded"
                 >
                   <div class="flex items-center justify-between">
