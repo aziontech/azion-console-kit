@@ -16,54 +16,45 @@ export class ActivityHistoryService {
 
   listActivityHistoryEvents = async ({ offset = 0, limit = 1000, search = '' }) => {
     const { offSetEnd, offSetStart } = this.#getOffsetDate()
+    const baseQuery = `
+      query ActivityHistory(
+        $offset: Int, 
+        $limit: Int, 
+        $begin: DateTime!, 
+        $end: DateTime!
+        ${search ? ', $search: String' : ''}
+      ) {
+        activityHistoryEvents(
+          offset: $offset, 
+          limit: $limit, 
+          filter: { 
+            tsRange: { begin: $begin, end: $end }
+            ${search ? 'or: [{ titleIlike: $search }, { commentIlike: $search }],' : ''}
+          }, 
+          orderBy: [ts_DESC]
+        ) { 
+          ts
+          title
+          comment
+          type
+          authorName
+          authorEmail
+          accountId
+        }
+      }`
 
     const payload = {
-      operatioName: 'ActivityHistory',
-      query: `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!) { 
-        activityHistoryEvents( offset: $offset limit: $limit, 
-          filter: { 
-            tsRange: {
-              begin: $begin, 
-              end: $end 
-            } 
-          }, orderBy: [ts_DESC] ) { 
-          ts 
-          title 
-          comment
-          type 
-          authorName 
-          authorEmail 
-          accountId 
-        } } `,
+      operationName: 'ActivityHistory',
+      query: baseQuery,
       variables: {
         offset,
         limit,
         begin: offSetStart.toISOString(),
-        end: offSetEnd.toISOString()
+        end: offSetEnd.toISOString(),
+        ...(search ? { search: `%${search}%` } : {})
       }
     }
 
-    if (search) {
-      payload.query = `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!, $search: String) { 
-      activityHistoryEvents( offset: $offset limit: $limit, 
-        filter: { 
-          tsRange: {
-            begin: $begin, 
-            end: $end 
-          } 
-          or: [{ titleIlike: $search }, { commentIlike: $search }], 
-        }, orderBy: [ts_DESC] ) 
-        { 
-          ts 
-          title 
-          comment 
-          type 
-          authorName 
-          authorEmail 
-          accountId 
-        } } `
-      payload.variables.search = `%${search}%`
-    }
     let httpResponse = await this.http.request(
       {
         url: `${this.baseURL}`,
@@ -84,35 +75,31 @@ export class ActivityHistoryService {
   getTotalRecords = async ({ search = '' }) => {
     const { offSetEnd, offSetStart } = this.#getOffsetDate()
 
+    const query = `
+      query ActivityHistory(
+        $begin: DateTime!, 
+        $end: DateTime!
+        ${search ? ', $search: String' : ''}
+      ) {
+        activityHistoryEvents(
+          aggregate: { count: rows },
+          filter: { 
+            tsRange: { begin: $begin, end: $end }
+            ${search ? 'or: [{ titleIlike: $search }, { commentIlike: $search }],' : ''}
+          }
+        ) { 
+          count 
+        }
+      }`
+
     const payload = {
-      operatioName: 'ActivityHistory',
-      query: `query ActivityHistory ($begin: DateTime!, $end: DateTime!) { 
-          activityHistoryEvents(
-            aggregate: { count: rows }, 
-            filter: { 
-              tsRange: {
-                begin: $begin, 
-                end: $end 
-              } 
-            }) { count } } `,
+      operationName: 'ActivityHistory',
+      query,
       variables: {
         begin: offSetStart.toISOString(),
-        end: offSetEnd.toISOString()
+        end: offSetEnd.toISOString(),
+        ...(search ? { search: `%${search}%` } : {})
       }
-    }
-
-    if (search) {
-      payload.query = `query ActivityHistory ($begin: DateTime!, $end: DateTime!, $search: String) { 
-        activityHistoryEvents (
-          aggregate: { count: rows }, 
-          filter: { 
-          tsRange: {
-            begin: $begin, 
-            end: $end 
-          } 
-          or: [{ titleIlike: $search }, { commentIlike: $search }], 
-        }) { count } } `
-      payload.variables.search = `%${search}%`
     }
 
     let { data: httpResponse } = await this.http.request(
