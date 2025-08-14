@@ -310,15 +310,6 @@
     selectedFolder.value = null
   }
 
-  const handleSearch = () => {
-    if (
-      selectedBucket.value &&
-      !filteredBuckets.value.find((bucket) => bucket.id === selectedBucket.value.id)
-    ) {
-      selectedBucket.value = filteredBuckets.value[0] || null
-    }
-  }
-
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
       productName: 'Edge Storage'
