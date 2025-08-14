@@ -23,8 +23,9 @@
   watch(
     () => route,
     (to) => {
+      const hasId = to.params.id
       const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
-      document.title = pageTitle
+      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
     },
     { immediate: true, deep: true }
   )
