@@ -17,6 +17,17 @@
         :groupData="groupData"
         :userUTC="userUTC"
       />
+      <!-- Sistema de Filtros Avançados -->
+      <div class="mb-6">
+        <AdvancedFilterSystem
+          v-model="advancedFilterState"
+          @search="handleAdvancedSearch"
+          @dateChange="handleAdvancedDateChange"
+          @filterChange="handleAdvancedFilterChange"
+          @update="handleAdvancedUpdate"
+        />
+      </div>
+
       <div
         class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-6 md:gap-4"
       >
@@ -66,6 +77,7 @@
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
+  import AdvancedFilterSystem from '@/templates/advanced-filter-system/index.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -121,6 +133,16 @@
   const filterData = ref(null)
   const reportData = ref(null)
 
+  /* Advanced Filter System state */
+  const advancedFilterState = ref({
+    searchQuery: '',
+    dateRange: {
+      startDate: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 horas atrás
+      endDate: new Date()
+    },
+    filters: []
+  })
+
   const updateGroupData = (data) => {
     groupData.value = { ...data }
   }
@@ -153,6 +175,31 @@
 
   const load = async () => {
     await loadCurrentReports(userUTC)
+  }
+
+  /* Advanced Filter System methods */
+  const handleAdvancedSearch = (query) => {
+    console.log('Advanced search query:', query)
+    // Aqui você pode integrar com o sistema de filtros existente
+    // Por exemplo, aplicar a busca nos filtros do módulo de métricas
+  }
+
+  const handleAdvancedDateChange = (range) => {
+    console.log('Advanced date range changed:', range)
+    // Aqui você pode integrar com o sistema de datas existente
+    // Por exemplo, aplicar o range de datas nos filtros do módulo
+  }
+
+  const handleAdvancedFilterChange = (filters) => {
+    console.log('Advanced filters changed:', filters)
+    // Aqui você pode integrar com o sistema de filtros existente
+    // Por exemplo, converter os filtros avançados para o formato do módulo
+  }
+
+  const handleAdvancedUpdate = (state) => {
+    console.log('Advanced filter state updated:', state)
+    // Aqui você pode aplicar todas as mudanças do sistema avançado
+    // Por exemplo, recarregar os relatórios com os novos filtros
   }
 
   const setCurrentPageAndDashboard = () => {
@@ -202,6 +249,18 @@
       updateRouter()
     }, 100)
   })
+
+  // Watcher para sincronizar filtros avançados com o sistema existente
+  watch(
+    advancedFilterState,
+    (newState) => {
+      console.log('Advanced filter state changed:', newState)
+      // Aqui você pode implementar a lógica de sincronização
+      // Por exemplo, converter os filtros avançados para o formato do módulo
+      // e aplicar nos filtros existentes
+    },
+    { deep: true }
+  )
 
   onUnmounted(() => {
     groupObservable.unsubscribe(updateGroupData)
