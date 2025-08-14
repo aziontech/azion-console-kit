@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build",
     "ci": "yarn install --frozen-lockfile",
     "test:unit": "TZ=UTC vitest --ui",
     "test:unit:headless": "TZ=UTC vitest",
@@ -38,6 +40,9 @@
     "@stripe/stripe-js": "^4.1.0",
     "@vee-validate/yup": "^4.11.1",
     "@vueuse/core": "^10.7.0",
+    "@jsonforms/core": "3.6.0",
+    "@jsonforms/vue-vanilla": "3.6.0",
+    "@jsonforms/vue": "3.6.0",
     "analytics": "^0.8.11",
     "axios": "^1.7.4",
     "azion": "^1.15.0",
@@ -65,6 +70,15 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.0",
+    "@storybook/addon-docs": "^9.0.5",
+    "@storybook/addon-links": "^9.0.5",
+    "@storybook/addon-themes": "^9.0.5",
+    "@storybook/vue3-vite": "^9.0.5",
+    "@whitespace/storybook-addon-html": "^7.0.0",
+    "eslint-plugin-storybook": "^9.0.5",
+    "storybook": "^9.0.5",
+
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@cypress/code-coverage": "^3.12.39",
@@ -100,5 +114,6 @@
     "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^0.33.0",
     "vitest-sonar-reporter": "^1.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

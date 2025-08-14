@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./buttonDelete.d.ts",
+  "browser": {
+    "./sfc": "./buttonDelete.vue"
+  }
+}
