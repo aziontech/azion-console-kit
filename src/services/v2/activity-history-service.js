@@ -6,11 +6,17 @@ export class ActivityHistoryService {
     this.apiClient = apiClient
   }
 
-  listActivityHistoryEvents = async ({ offset = 0, limit = 1000, search = '' }) => {
+  #getOffsetDate = () => {
     const offSetEnd = new Date()
     const offSetStart = new Date(
       Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
     )
+    return { offSetEnd, offSetStart }
+  }
+
+  listActivityHistoryEvents = async ({ offset = 0, limit = 1000, search = '' }) => {
+    const { offSetEnd, offSetStart } = this.#getOffsetDate()
+
     const payload = {
       operatioName: 'ActivityHistory',
       query: `query ActivityHistory { activityHistoryEvents( offset: ${offset} limit: ${limit}, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}", } }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
@@ -37,10 +43,8 @@ export class ActivityHistoryService {
   }
 
   getTotalRecords = async ({ search = '' }) => {
-    const offSetEnd = new Date()
-    const offSetStart = new Date(
-      Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
-    )
+    const { offSetEnd, offSetStart } = this.#getOffsetDate()
+
     const payload = {
       operatioName: 'ActivityHistory',
       query: `query ActivityHistory { activityHistoryEvents(aggregate: { count: rows }, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}" } }) { count } } `
