@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
-  
+
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
 
@@ -16,13 +16,11 @@
   import { edgeFunctionService } from '@/services/v2'
 
   const emit = defineEmits(['toggleDrawer'])
-  const renderers = Object.freeze([
-    ...vanillaRenderers
-  ]);
+  const renderers = Object.freeze([...vanillaRenderers])
 
   const onChangeAzionForm = (event) => {
-    azionFormData.value = event.data;
-  };
+    azionFormData.value = event.data
+  }
 
   const drawerRef = ref('')
   const openDrawer = () => {
@@ -74,7 +72,7 @@
       return JSON.parse(args)
     } catch (error) {
       console.error(`parseStringArgs error: `, error) // eslint-disable-line
-      
+
       return {
         azion_form: {}
       }
@@ -84,7 +82,7 @@
   const getAzionFormData = (azionFormData) => {
     return parseStringArgs(azionFormData).azion_form
   }
-  
+
   watch(args, (args) => {
     setAzionFormSchema(getAzionFormData(args))
   })
@@ -169,7 +167,10 @@
       <div class="flex flex-col gap-2 w-full">
         <TabView>
           <TabPanel header="Azion form">
-            <div id="azionform" class="mt-4">
+            <div
+              id="azionform"
+              class="mt-4"
+            >
               <div v-if="schemaAzionForm">
                 <JsonForms
                   :renderers="renderers"
@@ -190,7 +191,7 @@
                 :minimap="false"
               />
             </div>
-            <small  
+            <small
               v-if="argsError"
               class="p-error text-xs font-normal leading-tight"
             >
