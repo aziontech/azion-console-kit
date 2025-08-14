@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import LabelBlock from '@/templates/label-block'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import fieldDropdownLazyLoaderWithFilter from '@/templates/form-fields-inputs/fieldDropdownLazyLoaderWithFilter.vue'
+  import fieldDropdownLazyLoader from '@/templates/form-fields-inputs/fieldDropdownLazyLoader.vue'
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
@@ -21,6 +21,7 @@
   } from '@/helpers'
 
   const digitalCertificateDrawerRef = ref('')
+  const statusDigitalCertificate = ref('')
 
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
@@ -73,10 +74,36 @@
     })
   }
 
-  const moreOptions = ['authority']
+  const loadDigitalCertificateDecorator = async ({ id }) => {
+    return await digitalCertificatesService.loadDigitalCertificate({ id, isDropdown: true })
+  }
 
-  const selectCertificate = (value) => {
-    authorityCertificate.value = value.authority
+  const warningDigitalCertificateMessage = computed(() => {
+    if (statusDigitalCertificate.value === 'pending') {
+      return {
+        text: 'This certificate is pending validation and may not work until it’s validated',
+        color: 'text-[var(--p-tag-warning-color)]'
+      }
+    } else if (statusDigitalCertificate.value === 'failed') {
+      return {
+        text: 'This digital certificate failed and cannot be used until the issue is resolved.',
+        color: 'text-[var(--error-color)]'
+      }
+    }
+
+    return ''
+  })
+
+  const moreOptions = ['authority', 'icon', 'status']
+
+  const selectCertificate = ({ status, authority }) => {
+    statusDigitalCertificate.value = status
+    authorityCertificate.value = authority
+  }
+
+  const iconColor = {
+    'pi-times-circle': 'text-[var(--error-color)]',
+    'pi-exclamation-triangle': 'text-[var(--p-tag-warning-color)]'
   }
 </script>
 <template>
@@ -142,7 +169,7 @@
         v-if="protocols.http.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <fieldDropdownLazyLoaderWithFilter
+          <fieldDropdownLazyLoader
             ref="dropdownCertificate"
             data-testid="domains-form__edge-certificate-field"
             label="Digital Certificate"
@@ -151,8 +178,9 @@
             optionGroupLabel="group"
             optionGroupChildren="items"
             defaultGroup="My certificates"
+            :defaultPosition="1"
             :service="listDigitalCertificatesByEdgeCertificateTypeDecorator"
-            :loadService="digitalCertificatesService.loadDigitalCertificate"
+            :loadService="loadDigitalCertificateDecorator"
             optionLabel="name"
             optionValue="value"
             :value="tls.certificate"
@@ -161,8 +189,10 @@
             enableCustomLabel
             keyToFilter="status"
             :moreOptions="moreOptions"
-            :valuesToFilter="['active', 'challenge_verification']"
             @onSelectOption="selectCertificate"
+            :iconColor="iconColor"
+            showIcon
+            enableWorkaroundLabelToDisabledOptions
           >
             <template #footer>
               <ul class="p-2">
@@ -183,7 +213,15 @@
                 </li>
               </ul>
             </template>
-          </fieldDropdownLazyLoaderWithFilter>
+          </fieldDropdownLazyLoader>
+          <small
+            v-if="warningDigitalCertificateMessage"
+            :class="warningDigitalCertificateMessage.color"
+            class="text-xs font-normal"
+            data-testid="form-horizontal-delivery-settings-digital-certificate-warning"
+          >
+            {{ warningDigitalCertificateMessage.text }}
+          </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
