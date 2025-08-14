@@ -42,6 +42,7 @@ export const realTimeEventsRoutes = {
     getTotalRecords: RealTimeEventsService.getTotalRecords
   },
   meta: {
+    title: 'Real-Time Events',
     breadCrumbs: [
       {
         label: 'Real-Time Events',

@@ -7,6 +7,9 @@ export const errorRoutes = [
     component: () => import('@views/Error/ForbiddenView.vue'),
     props: {
       documentationService: Helpers.documentationCatalog.resources
+    },
+    meta: {
+      title: '403 Forbidden'
     }
   },
   {
@@ -15,6 +18,9 @@ export const errorRoutes = [
     component: () => import('@views/Error/NotFoundView.vue'),
     props: {
       documentationService: Helpers.documentationCatalog.resources
+    },
+    meta: {
+      title: '404 Not Found'
     }
   }
 ]

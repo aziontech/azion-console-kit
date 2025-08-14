@@ -15,6 +15,7 @@ export const activityHistoryRoutes = {
         documentationService: Helpers.documentationCatalog.activityHistory
       },
       meta: {
+        title: 'Activity History',
         breadCrumbs: [
           {
             label: 'Activity History',

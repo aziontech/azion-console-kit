@@ -12,6 +12,7 @@ export const mfaManagementRoutes = {
         documentationService: Helpers.documentationCatalog.mfaManagement
       },
       meta: {
+        title: 'MFA Management',
         breadCrumbs: [
           {
             label: 'MFA Management',

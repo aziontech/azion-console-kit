@@ -17,6 +17,7 @@ export const wafRulesRoutes = {
         documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
+        title: 'WAF Rules',
         breadCrumbs: [
           {
             label: 'WAF Rules',
@@ -30,6 +31,7 @@ export const wafRulesRoutes = {
       name: 'create-waf-rules',
       component: () => import('@views/WafRules/CreateView.vue'),
       meta: {
+        title: 'Create WAF Rule',
         breadCrumbs: [
           {
             label: 'WAF Rules',
@@ -64,6 +66,7 @@ export const wafRulesRoutes = {
         }
       },
       meta: {
+        title: 'Edit WAF Rule',
         breadCrumbs: [
           {
             label: 'WAF Rules',
