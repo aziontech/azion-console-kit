@@ -19,7 +19,22 @@ export class ActivityHistoryService {
 
     const payload = {
       operatioName: 'ActivityHistory',
-      query: `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!) { activityHistoryEvents( offset: $offset limit: $limit, filter: { tsRange: {begin: $begin, end: $end, } }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `,
+      query: `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!) { 
+        activityHistoryEvents( offset: $offset limit: $limit, 
+          filter: { 
+            tsRange: {
+              begin: $begin, 
+              end: $end 
+            } 
+          }, orderBy: [ts_DESC] ) { 
+          ts 
+          title 
+          comment
+          type 
+          authorName 
+          authorEmail 
+          accountId 
+        } } `,
       variables: {
         offset,
         limit,
@@ -29,7 +44,24 @@ export class ActivityHistoryService {
     }
 
     if (search) {
-      payload.query = `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!, $search: String) { activityHistoryEvents( offset: $offset limit: $limit, filter: { tsRange: {begin: $begin, end: $end, } or: [{ titleIlike: $search }, { commentIlike: $search }], }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+      payload.query = `query ActivityHistory ($offset: Int, $limit: Int, $begin: DateTime!, $end: DateTime!, $search: String) { 
+      activityHistoryEvents( offset: $offset limit: $limit, 
+        filter: { 
+          tsRange: {
+            begin: $begin, 
+            end: $end 
+          } 
+          or: [{ titleIlike: $search }, { commentIlike: $search }], 
+        }, orderBy: [ts_DESC] ) 
+        { 
+          ts 
+          title 
+          comment 
+          type 
+          authorName 
+          authorEmail 
+          accountId 
+        } } `
       payload.variables.search = `%${search}%`
     }
     let httpResponse = await this.http.request(
@@ -54,7 +86,15 @@ export class ActivityHistoryService {
 
     const payload = {
       operatioName: 'ActivityHistory',
-      query: `query ActivityHistory ($begin: DateTime!, $end: DateTime!) { activityHistoryEvents(aggregate: { count: rows }, filter: { tsRange: {begin: $begin, end: $end } }) { count } } `,
+      query: `query ActivityHistory ($begin: DateTime!, $end: DateTime!) { 
+          activityHistoryEvents(
+            aggregate: { count: rows }, 
+            filter: { 
+              tsRange: {
+                begin: $begin, 
+                end: $end 
+              } 
+            }) { count } } `,
       variables: {
         begin: offSetStart.toISOString(),
         end: offSetEnd.toISOString()
@@ -62,7 +102,16 @@ export class ActivityHistoryService {
     }
 
     if (search) {
-      payload.query = `query ActivityHistory ($begin: DateTime!, $end: DateTime!, $search: String) { activityHistoryEvents (aggregate: { count: rows }, filter: { tsRange: {begin: $begin, end: $end } or: [{ titleIlike: $search }, { commentIlike: $search }], }) { count } } `
+      payload.query = `query ActivityHistory ($begin: DateTime!, $end: DateTime!, $search: String) { 
+        activityHistoryEvents (
+          aggregate: { count: rows }, 
+          filter: { 
+          tsRange: {
+            begin: $begin, 
+            end: $end 
+          } 
+          or: [{ titleIlike: $search }, { commentIlike: $search }], 
+        }) { count } } `
       payload.variables.search = `%${search}%`
     }
 
