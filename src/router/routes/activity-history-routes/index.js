@@ -1,4 +1,3 @@
-import * as ActivityHistoryService from '@/services/activity-history-services'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,8 +10,6 @@ export const activityHistoryRoutes = {
       name: 'list-activity-history',
       component: () => import('@views/ActivityHistory/ListView.vue'),
       props: {
-        listActivityHistoryEventsService: ActivityHistoryService.listActivityHistoryEventsService,
-        getActivityHistoryTotalRecords: ActivityHistoryService.getActivityHistoryTotalRecords,
         documentationService: Helpers.documentationCatalog.activityHistory
       },
       meta: {

@@ -187,7 +187,7 @@
       const data = await props.listActivityHistoryEventsService(query)
       totalRecords.value = await props.getActivityHistoryTotalRecords({ search: search.value })
 
-      events.value = data.map((historyEvent) => ({
+      events.value = data.body.map((historyEvent) => ({
         date: historyEvent.ts,
         icon: iconsMap.value[historyEvent.type],
         event: historyEvent.title,
