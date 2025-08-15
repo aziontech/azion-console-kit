@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./selectPanel.d.ts",
+  "browser": {
+    "./sfc": "./selectPanel.vue"
+  }
+}

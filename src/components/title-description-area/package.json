@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./titleDescriptionArea.d.ts",
+  "browser": {
+    "./sfc": "./titleDescriptionArea.vue"
+  }
+}

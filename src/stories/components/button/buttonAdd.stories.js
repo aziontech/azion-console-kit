@@ -1,7 +1,7 @@
 import ButtonAdd from '../../../components/button-add'
 
 export default {
-  title: 'Components/ButtonAdd',
+  title: 'Components/buttons/ButtonAdd',
   component: ButtonAdd,
   tags: ['autodocs'],
   argTypes: {
