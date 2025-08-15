@@ -11,6 +11,7 @@ export const groupsManagementRoutes = {
       name: 'list-groups-management',
       component: () => import('@views/GroupsManagement/ListView.vue'),
       meta: {
+        title: 'Groups Management',
         breadCrumbs: [
           {
             label: 'Groups Management',
@@ -31,6 +32,7 @@ export const groupsManagementRoutes = {
         createAccountByTypeService: AccountManagementServices.createAccountByTypeService
       },
       meta: {
+        title: 'Create Group',
         breadCrumbs: [
           {
             label: 'Groups Management',
@@ -56,6 +58,7 @@ export const groupsManagementRoutes = {
         editAccountService: AccountManagementServices.editAccountService
       },
       meta: {
+        title: 'Edit Group',
         breadCrumbs: [
           {
             label: 'Groups Management',
