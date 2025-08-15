@@ -38,7 +38,7 @@ export class EdgeStorageService {
       url: `${this.baseURL}/${bucketName}/objects`
     })
 
-    return data.results
+    return this.adapter?.transformListEdgeStorageFiles?.(data)
   }
 
   updateEdgeStorageBucket = async (bucket = {}) => {

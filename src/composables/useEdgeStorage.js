@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { edgeStorageService } from '@/services/v2'
 import { useToast } from 'primevue/usetoast'
 import * as yup from 'yup'
+import { formatBytes } from '@/helpers/format-bytes'
 
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
@@ -20,13 +21,6 @@ const totalBytesUploaded = ref(0)
 const totalBytesToUpload = ref(0)
 const createdBucket = ref('')
 const needRefresh = ref(false)
-
-const formatSize = (size) => {
-  if (size == 0) return '0 Bytes'
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  const aux = Math.floor(Math.log(size) / Math.log(1024))
-  return (size / Math.pow(1024, aux)).toFixed(2) + ' ' + sizes[aux]
-}
 
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
@@ -128,7 +122,7 @@ export const useEdgeStorage = () => {
         for (const file of fileToUpload.value) {
           currentUploadingFile.value = {
             name: file.name,
-            size: formatSize(file.size),
+            size: formatBytes(file.size),
             sizeBytes: file.size
           }
           currentFileProgress.value = 0
@@ -273,7 +267,6 @@ export const useEdgeStorage = () => {
     currentFileProgress,
     totalBytesUploaded,
     totalBytesToUpload,
-    formatSize,
     findBucketById,
     uploadFiles,
     createFolder,

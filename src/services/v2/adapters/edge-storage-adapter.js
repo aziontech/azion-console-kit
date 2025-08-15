@@ -1,5 +1,7 @@
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 import { parseStatusData } from '@/services/v2/utils/adapter/parse-status-utils'
+import { formatExhibitionDate } from '@/helpers/convert-date'
+import { formatBytes } from '@/helpers/format-bytes'
 
 const transformMap = {
   id: (value) => value.name,
@@ -20,5 +22,13 @@ export const EdgeStorageAdapter = {
       count,
       body: adapt
     }
+  },
+
+  transformListEdgeStorageFiles(data) {
+    return data.results.map((file) => ({
+      key: file.key,
+      last_modified: formatExhibitionDate(file.last_modified, 'full', undefined),
+      size: formatBytes(file.size)
+    }))
   }
 }

@@ -167,12 +167,7 @@
                   outlined
                   :label="isGreaterThanXL ? 'Refresh' : ''"
                   class="px-4 py-1 flex items-center justify-center"
-                  @click="
-                    () => {
-                      needRefresh = true
-                      listServiceFilesRef?.reload()
-                    }
-                  "
+                  @click="handleRefresh"
                 />
                 <PrimeButton
                   icon="pi pi-cog"
@@ -226,16 +221,8 @@
                 enableEditClickFolder
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
-                @dragover.prevent="
-                  () => {
-                    isDragOver = true
-                  }
-                "
-                @dragleave="
-                  () => {
-                    isDragOver = false
-                  }
-                "
+                @dragover.prevent="handleDrag(true)"
+                @dragleave="handleDrag(false)"
                 @drop.prevent="handleDragDropUpload"
                 class="w-full"
               />
@@ -294,15 +281,8 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const {
-    buckets,
-    selectedBucket,
-    removeFiles,
-    createdBucket,
-    uploadFiles,
-    formatSize,
-    needRefresh
-  } = useEdgeStorage()
+  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles, needRefresh } =
+    useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -443,19 +423,17 @@
 
   const listEdgeStorageBucketFiles = async () => {
     if (!selectedBucket.value.files || needRefresh.value) {
-      const response = await edgeStorageService.listEdgeStorageBucketFiles(
+      selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
         selectedBucket.value.name
       )
-
-      selectedBucket.value.files = response.map((file) => ({
-        key: file.key,
-        last_modified: new Date(file.last_modified).toLocaleString(),
-        size: formatSize(file.size)
-      }))
       needRefresh.value = false
     }
     showDragAndDrop.value = !selectedBucket.value.files?.length
     return selectedBucket.value.files
+  }
+
+  const handleDrag = (value) => {
+    isDragOver.value = value
   }
 
   const handleDragDropUpload = async (event) => {
@@ -465,6 +443,11 @@
       await uploadFiles(files)
       listServiceFilesRef.value?.reload()
     }
+  }
+
+  const handleRefresh = () => {
+    needRefresh.value = true
+    listServiceFilesRef.value?.reload()
   }
 
   onMounted(async () => {
