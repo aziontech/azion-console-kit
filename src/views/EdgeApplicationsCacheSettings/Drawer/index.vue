@@ -119,7 +119,7 @@
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    cdnCacheSettings: yup.string().required().label('Edge cache settings'),
+    cdnCacheSettings: yup.string().required().label('Edge cache Behavior'),
     cdnCacheSettingsMaximumTtl: yup
       .number()
       .label('Edge Maximum TTL')
