@@ -1,7 +1,7 @@
 import ButtonDelete from '../../../components/button-delete'
 
 export default {
-  title: 'Components/ButtonDelete',
+  title: 'Components/buttons/ButtonDelete',
   component: ButtonDelete,
   tags: ['autodocs'],
   argTypes: {

@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./descriptionSmallArea.d.ts",
+  "browser": {
+    "./sfc": "./descriptionSmallArea.vue"
+  }
+}

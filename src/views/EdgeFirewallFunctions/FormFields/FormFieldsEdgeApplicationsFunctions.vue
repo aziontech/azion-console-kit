@@ -7,8 +7,10 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
-  import TabPanel from 'primevue/tabpanel'
-  import TabView from 'primevue/tabview'
+
+  import SelectPanel from '@/components/select-panel'
+  import DescriptionSmallArea from '@/components/description-small-area'
+  
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   import { useField } from 'vee-validate'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
@@ -58,33 +60,46 @@
 
   const schemaAzionForm = ref(null)
   const azionFormData = ref({})
+  const argsValue = ref({})
+  const selectPanelOptions = ['Form', 'JSON']
+  const selectPanelValue = ref(selectPanelOptions[0])
 
-  const hasArgsError = computed(() => {
-    return !!argsError.value
-  })
+  
+  const selectPanelUpdateModelValue = (value) => {
+    selectPanelValue.value = value
+  }
 
   const setAzionFormSchema = (dataSchema) => {
     schemaAzionForm.value = dataSchema
   }
 
-  const parseStringArgs = (args) => {
+  const setFuntionArgs = (argments) => {
+    argsValue.value = argments
+  }
+
+  const argsJsonParser = (args) => {
     try {
       return JSON.parse(args)
     } catch (error) {
-      console.error(`parseStringArgs error: `, error) // eslint-disable-line
+      console.error(`argsJsonParser error: `, error) // eslint-disable-line
 
-      return {
-        azion_form: {}
-      }
+      return {}
     }
   }
 
   const getAzionFormData = (azionFormData) => {
-    return parseStringArgs(azionFormData).azion_form
+    return argsJsonParser(azionFormData).azion_form
   }
+
+  const hasArgsError = computed(() => {
+    return !!argsError.value
+  })
 
   watch(args, (args) => {
     setAzionFormSchema(getAzionFormData(args))
+    setFuntionArgs(argsJsonParser(args))
+
+    // console.log('argsValue.value: ', argsValue.value.azion_form)
   })
 
   watch(
@@ -165,67 +180,48 @@
       </div>
 
       <div class="flex flex-col gap-2 w-full">
-        <TabView>
-          <TabPanel header="Azion form">
-            <div
-              id="azionform"
-              class="mt-4"
-            >
-              <div v-if="schemaAzionForm">
-                <JsonForms
-                  :renderers="renderers"
-                  :data="azionFormData"
-                  :schema="schemaAzionForm"
-                  @change="onChangeAzionForm"
-                />
+        <SelectPanel
+          :options="selectPanelOptions"
+          :value="selectPanelOptions[0]"
+          :title="`Arguments`"
+          :description="`Configure the function arguments to customize its behavior.`"
+          @update:modelValue="selectPanelUpdateModelValue"
+        > 
+          <template #content>
+            <div v-show="selectPanelValue === 'Form'">
+              <div id="azionform">
+                <div v-if="schemaAzionForm">
+                  <JsonForms
+                    :renderers="renderers"
+                    :data="azionFormData"
+                    :schema="schemaAzionForm"
+                    @change="onChangeAzionForm"
+                  />
+                </div>
               </div>
             </div>
-          </TabPanel>
-          <TabPanel header="Args">
-            <div class="resize-y overflow-y-auto mt-4">
-              <CodeEditor
-                v-model="args"
-                runtime="json"
-                class="overflow-clip surface-border border rounded-md"
-                :errors="hasArgsError"
-                :minimap="false"
+            <div v-show="selectPanelValue === 'JSON'">
+              <div class="resize-y overflow-y-auto">
+                <CodeEditor
+                  v-model="args"
+                  runtime="json"
+                  class="overflow-clip surface-border border rounded-md"
+                  :errors="hasArgsError"
+                  :minimap="false"
+                />
+              </div>
+              <small
+                v-if="argsError"
+                class="p-error text-xs font-normal leading-tight"
+              >
+                {{ argsError }}
+              </small>
+              <DescriptionSmallArea
+                description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
               />
             </div>
-            <small
-              v-if="argsError"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ argsError }}
-            </small>
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Customize the arguments in JSON format. Once set, they can be called in code using
-              <code>event.args("arg_name")</code>.
-            </small>
-          </TabPanel>
-        </TabView>
-
-        <!-- <label
-          for="arguments"
-          class="text-color text-sm font-medium leading-5"
-          >Arguments</label
-        >
-        <CodeEditor
-          v-model="args"
-          runtime="json"
-          class="min-h-[200px] overflow-clip surface-border border rounded-md"
-          :errors="hasArgsError"
-          :minimap="false"
-        />
-        <small
-          v-if="argsError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ argsError }}
-        </small>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Customize the arguments in JSON format. Once set, they can be called in code using
-          <code>event.args("arg_name")</code>.
-        </small> -->
+          </template>
+        </SelectPanel>
       </div>
     </template>
   </FormHorizontal>
