@@ -494,12 +494,7 @@
     if (props.listService) {
       try {
         isLoading.value = true
-        const response = await props.listService(props.selectedBucket.name)
-        data.value = response.map((item) => ({
-          name: item.key,
-          size: item.size,
-          lastModified: item.last_modified
-        }))
+        data.value = await props.listService()
       } catch (error) {
         data.value = []
         const errorMessage = error.message || error

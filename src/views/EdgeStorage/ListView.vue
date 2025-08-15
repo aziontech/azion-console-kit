@@ -333,7 +333,7 @@
         header: 'Size'
       },
       {
-        field: 'lastModified',
+        field: 'last_modified',
         header: 'Last Modified'
       }
     ]
