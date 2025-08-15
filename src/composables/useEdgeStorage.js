@@ -253,7 +253,7 @@ export const useEdgeStorage = () => {
     return null
   }
   const handleFileChange = async (event) => {
-    const files = event.dataTransfer.files
+    const files = event.dataTransfer?.files || event.target?.files
     if (files.length) {
       await uploadFiles(files)
       event.target.value = ''
