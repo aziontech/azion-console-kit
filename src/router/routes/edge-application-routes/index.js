@@ -17,6 +17,7 @@ export const edgeApplicationRoutes = {
         documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
+        title: 'Edge Applications',
         breadCrumbs: [
           {
             label: 'Edge Applications',
@@ -40,6 +41,7 @@ export const edgeApplicationRoutes = {
         }
       },
       meta: {
+        title: 'Create Edge Application',
         breadCrumbs: [
           {
             label: 'Edge Applications',
@@ -100,6 +102,7 @@ export const edgeApplicationRoutes = {
         }
       },
       meta: {
+        title: 'Edit Edge Application',
         breadCrumbs: [
           {
             label: 'Edge Applications',

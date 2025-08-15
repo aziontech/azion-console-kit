@@ -9,6 +9,8 @@
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
 
+  const DEFAULT_TITLE = 'Azion Console'
+
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -17,6 +19,16 @@
   const { currentTheme, hasActiveUserId, account } = storeToRefs(accountStore)
 
   const route = useRoute()
+
+  watch(
+    () => route,
+    (to) => {
+      const hasId = to.params.id
+      const pageTitle = to.meta?.title ? `${DEFAULT_TITLE} - ${to.meta.title}` : DEFAULT_TITLE
+      document.title = hasId ? `${pageTitle} - ${to.params.id}` : pageTitle
+    },
+    { immediate: true, deep: true }
+  )
 
   const updateTrackingTraits = () => {
     const {
