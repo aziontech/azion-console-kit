@@ -5,6 +5,14 @@
     isDrawer
   >
     <template #inputs>
+      <FieldSwitchBlock
+        nameField="tieredCache"
+        name="tieredCache"
+        auto
+        :isCard="false"
+        title="Enable Tiered Cache"
+        data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
+      />
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <FieldDropdown
           label="Tiered Cache Region"
@@ -13,6 +21,7 @@
           optionLabel="label"
           optionValue="value"
           :value="tieredCacheRegion"
+          :disabled="!tieredCache"
           inputId="tieredCacheRegion"
           placeholder="Select an Tiered Cache Region"
           description="Choose an Tiered Cache Region suitable for your application."
@@ -27,6 +36,7 @@
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   const TIERED_CACHE_REGION = [
     {
@@ -44,4 +54,5 @@
   ]
 
   const { value: tieredCacheRegion } = useField('tieredCacheRegion')
+  const { value: tieredCache } = useField('tieredCache')
 </script>
