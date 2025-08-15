@@ -2,37 +2,36 @@
   <div
     class="flex flex-col sm:flex-row items-center gap-4 p-6 bg-surface-card border border-surface-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
   >
-    <!-- Botões de Filtro e Ação -->
+    
     <div class="flex items-center gap-2">
-      <Button
+      <PrimeButton
         icon="pi pi-filter"
-        class="p-button-outlined p-button-sm border-surface-border hover:border-primary hover:bg-primary/5 transition-all duration-200 rounded-lg font-medium"
         @click="toggleFilterPanel"
+        size="small"
+        outlined
       />
-      <Button
+      <PrimeButton
         icon="pi pi-plus"
-        class="p-button-outlined p-button-sm border-surface-border hover:border-primary hover:bg-primary/5 transition-all duration-200 rounded-lg font-medium"
+        size="small"
+        outlined
         @click="addNewFilter"
       />
     </div>
 
-    <!-- Campo de Busca -->
     <AdvancedInput
       v-model="searchQuery"
-      placeholder="Search alerts (e.g. kibana.alert.evaluation.threshold > 75)"
       icon="pi pi-search"
       class="w-full sm:flex-1"
       @search="handleSearch"
     />
 
-    <!-- Seletor de Data -->
     <AdvancedCalendar
       v-model="dateRange"
       @change="handleDateChange"
     />
 
     <!-- Botão Update -->
-    <Button
+    <PrimeButton
       label="Update"
       icon="pi pi-refresh"
       class="p-button-success p-button-sm shadow-sm hover:shadow-md transition-all duration-200 rounded-lg font-medium"
@@ -57,7 +56,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
-  import Button from 'primevue/button'
+  import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import AdvancedCalendar from './components/AdvancedCalendar.vue'
   import AdvancedFilter from './components/AdvancedFilter.vue'

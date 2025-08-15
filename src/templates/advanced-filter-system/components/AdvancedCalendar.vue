@@ -1,8 +1,8 @@
 <template>
   <div class="relative">
-    <!-- Header com os campos de data -->
-    <div class="flex flex-col sm:flex-row items-center gap-3">
-      <!-- Botão de abreviações -->
+    <div
+      class="flex flex-col sm:flex-row items-center gap-1 bg-[var(--surface-300)] rounded-lg p-1 px-2.5"
+    >
       <PrimeButton
         icon="pi pi-calendar"
         outlined
@@ -10,15 +10,11 @@
         @click="toggleAbbreviations"
       />
 
-      <div class="flex flex-col sm:flex-row items-center gap-3">
+      <div class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg">
         <div class="relative w-full sm:w-auto">
           <InputText
             :value="startDateInput"
             readonly
-            :class="[
-              'w-full sm:min-w-[200px] cursor-pointer bg-surface-card border border-surface-border rounded-lg px-4 py-3 text-sm text-color transition-all duration-200 hover:border-primary/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm',
-              { 'border-primary ring-2 ring-primary/20': editingField === 'start' }
-            ]"
             @click="selectStartDate"
           />
         </div>
@@ -29,35 +25,20 @@
           <InputText
             :value="endDateInput"
             readonly
-            :class="[
-              'w-full sm:min-w-[200px] cursor-pointer bg-surface-card border border-surface-border rounded-lg px-4 py-3 text-sm text-color transition-all duration-200 hover:border-primary/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm',
-              { 'border-primary ring-2 ring-primary/20': editingField === 'end' }
-            ]"
             @click="selectEndDate"
           />
         </div>
       </div>
-
-      <PrimeButton
-        v-if="hasChanges"
-        label="Update"
-        icon="pi pi-refresh"
-        class="p-button-success p-button-sm shadow-sm hover:shadow-md transition-all duration-200"
-        @click="updateRange"
-      />
     </div>
 
-    <!-- Overlay Panel do Sistema de Abreviações -->
     <OverlayPanel
       ref="abbreviationsPanel"
       :showCloseIcon="false"
-      class="max-w-[600px]"
+      class="max-w-[500px]"
     >
-      <!-- class="min-w-[500px] max-w-[600px] bg-surface-card border border-surface-border shadow-lg rounded-lg" -->
       <div>
-        <!-- Quick Select -->
         <div class="mb-6">
-          <div class="text-sm font-medium leading-5 text-color mb-3">Quick select</div>
+          <div class="text-sm font-medium leading-5 mb-3">Quick select</div>
 
           <div class="flex items-center gap-3">
             <Dropdown
@@ -81,7 +62,7 @@
             />
             <PrimeButton
               label="Apply"
-              class="p-button-primary p-button-sm shadow-sm hover:shadow-md transition-all duration-200"
+              size="small"
               @click="applyQuickSelect"
             />
           </div>
@@ -108,189 +89,158 @@
     <!-- Overlay Panel com o seletor de data -->
     <OverlayPanel
       ref="overlayPanel"
-      class="min-w-[600px] max-w-[700px] bg-surface-card border border-surface-border shadow-lg rounded-lg"
+      class="min-w-[400px] max-w-[400px] bg-surface-card border border-surface-border shadow-lg rounded-lg"
       :showCloseIcon="false"
     >
-      <div class="p-4">
-        <!-- Tabs -->
-        <div class="flex border-b border-surface-border mb-4">
-          <button
-            v-for="tab in TABS"
-            :key="tab.key"
-            :class="[
-              'px-4 py-2 bg-transparent border-none border-b-2 border-transparent cursor-pointer text-sm text-color-secondary transition-all duration-200 hover:text-color',
-              { 'text-primary border-b-primary': activeTab === tab.key }
-            ]"
-            @click="activeTab = tab.key"
-          >
-            {{ tab.label }}
-          </button>
+      <!-- Tabs -->
+      <div class="flex border-b border-surface-border mb-2">
+        <div
+          v-for="tab in TABS"
+          :key="tab.key"
+          @click="activeTab = tab.key"
+        >
+          {{ tab.label }}
         </div>
-
-        <!-- Conteúdo das tabs -->
-        <div class="min-h-[300px]">
-          <!-- Tab Absolute -->
-          <div
-            v-if="activeTab === 'absolute'"
-            class="space-y-6"
-          >
-            <!-- Header com navegação -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <Button
-                  icon="pi pi-chevron-left"
-                  class="p-button-text p-button-sm text-color-secondary hover:text-color"
-                  @click="previousMonth"
-                />
-                <div class="flex items-center gap-2">
-                  <Dropdown
-                    v-model="selectedMonth"
-                    :options="MONTHS"
-                    optionLabel="label"
-                    optionValue="value"
-                    class="min-w-[120px]"
-                    @change="onMonthChange"
-                  />
-                  <Dropdown
-                    v-model="selectedYear"
-                    :options="years"
-                    class="min-w-[100px]"
-                    @change="onYearChange"
-                  />
-                </div>
-                <Button
-                  icon="pi pi-chevron-right"
-                  class="p-button-text p-button-sm text-color-secondary hover:text-color"
-                  @click="nextMonth"
-                />
-              </div>
-
-              <!-- Seletor de hora -->
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-color-secondary">Time:</span>
-                <Dropdown
-                  v-model="selectedTime"
-                  :options="TIME_SLOTS"
-                  class="min-w-[80px]"
-                  placeholder="Select time"
-                />
-              </div>
-            </div>
-
-            <!-- Calendário -->
-            <div class="border border-surface-border rounded-lg p-4 bg-surface-section">
-              <Calendar
-                v-model="selectedDate"
-                :inline="true"
-                :showIcon="false"
-                :showButtonBar="false"
-                :showWeek="false"
-                :dateFormat="'dd/mm/yy'"
-                class="w-full"
-                @date-select="onDateSelect"
-                :pt="{
-                  header: { class: 'hidden' },
-                  table: { class: 'w-full' },
-                  day: {
-                    class:
-                      'p-2 text-center cursor-pointer hover:bg-surface-hover rounded transition-colors duration-200',
-                    style: { minWidth: '40px', height: '40px' }
-                  },
-                  dayLabel: { class: 'text-xs font-medium text-color-secondary' },
-                  month: { class: 'text-sm font-medium text-color' },
-                  year: { class: 'text-sm font-medium text-color' }
-                }"
+      </div>
+      
+      <!-- Absolute -->
+      <div
+        v-if="activeTab === 'absolute'"
+        class="space-y-3"
+      >
+        <div class="flex justify-center">
+          <div class="flex items-center gap-3">
+            <PrimeButton
+              icon="pi pi-chevron-left"
+              size="small"
+              outlined
+              @click="previousMonth"
+            />
+            <div class="flex items-center gap-2">
+              <Dropdown
+                v-model="selectedMonth"
+                :options="MONTHS"
+                optionLabel="label"
+                optionValue="value"
+                class="min-w-[120px]"
+                @change="onMonthChange"
+              />
+              <Dropdown
+                v-model="selectedYear"
+                :options="years"
+                class="min-w-[100px]"
+                @change="onYearChange"
               />
             </div>
-
-            <!-- Preview da data selecionada -->
-            <div class="bg-surface-card border border-surface-border rounded-lg p-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h4 class="text-sm font-medium text-color mb-1">Selected Date & Time</h4>
-                  <p class="text-lg font-semibold text-color">
-                    {{
-                      formatDateSimple(
-                        new Date(
-                          selectedDate.getFullYear(),
-                          selectedDate.getMonth(),
-                          selectedDate.getDate(),
-                          parseInt(selectedTime.split(':')[0]),
-                          parseInt(selectedTime.split(':')[1])
-                        )
-                      )
-                    }}
-                  </p>
-                </div>
-                <Button
-                  label="Apply"
-                  icon="pi pi-check"
-                  class="p-button-primary p-button-sm"
-                  @click="applySelectedDateTime"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab Relative -->
-          <div
-            v-if="activeTab === 'relative'"
-            class="py-4"
-          >
-            <div class="flex flex-col gap-4">
-              <div class="flex gap-2 items-center">
-                <InputNumber
-                  v-model="relativeValue"
-                  :min="1"
-                />
-                <Dropdown
-                  v-model="relativeUnit"
-                  :options="RELATIVE_UNITS"
-                  optionLabel="label"
-                  optionValue="value"
-                />
-                <Dropdown
-                  v-model="relativeDirection"
-                  :options="RELATIVE_DIRECTIONS"
-                  optionLabel="label"
-                  optionValue="value"
-                />
-              </div>
-              <div
-                class="p-3 surface-100 border border-surface-border rounded-md text-sm text-color"
-              >
-                {{ relativePreview }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab Now -->
-          <div
-            v-if="activeTab === 'now'"
-            class="py-4 text-center"
-          >
-            <div class="flex flex-col gap-4 items-center">
-              <p>Use current time as end date</p>
-              <Button
-                label="Set to Now"
-                icon="pi pi-clock"
-                @click="setToNow"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Campo de entrada de data/hora -->
-        <div class="mt-4 pt-4 border-t border-surface-border">
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-color">
-              {{ editingField === 'start' ? 'Start date' : 'End date' }}
-            </label>
-            <InputText
-              :value="editingField === 'start' ? startDateInput : endDateInput"
-              class="w-full"
+            <PrimeButton
+              icon="pi pi-chevron-right"
+              size="small"
+              outlined
+              @click="nextMonth"
             />
           </div>
+        </div>
+
+        <div class="flex gap-3">
+          <!-- diminuir o tamanho do calendario -->
+           <!-- .azion .p-datepicker table td > span tirar a margem forcadamente pt e daylabel-->
+          <Calendar
+            v-model="selectedDate"
+            :inline="true"
+            :showIcon="false"
+            :showButtonBar="false"
+            :showWeek="false"
+            :dateFormat="'dd/mm/yy'"
+            class="w-full"
+            @date-select="onDateSelect"
+            :pt="{
+              header: { class: 'hidden' },
+              table: { class: 'w-full' },
+              daylabel: { class: '!m-0 !p-0 !text-sm' }
+            }"
+          />
+
+          <!-- Seletor de horários -->
+          <div class="w-48 border border-surface-border rounded-lg p-4 bg-surface-section">
+            <div class="max-h-64 overflow-y-auto space-y-1">
+              <button
+                v-for="timeSlot in TIME_SLOTS"
+                :key="timeSlot"
+                :class="[
+                  'w-full text-left px-3 py-2 text-sm rounded transition-colors duration-200',
+                  selectedTime === timeSlot
+                    ? 'bg-primary text-white'
+                    : 'text-color hover:bg-surface-hover'
+                ]"
+                @click="
+                  () => {
+                    selectedTime = timeSlot
+                    updateSelectedDateTime()
+                  }
+                "
+              >
+                {{ timeSlot }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Relative -->
+      <div
+        v-if="activeTab === 'relative'"
+        class="py-4"
+      >
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-2 items-center">
+            <InputNumber
+              v-model="relativeValue"
+              :min="1"
+            />
+            <Dropdown
+              v-model="relativeUnit"
+              :options="RELATIVE_UNITS"
+              optionLabel="label"
+              optionValue="value"
+            />
+            <Dropdown
+              v-model="relativeDirection"
+              :options="RELATIVE_DIRECTIONS"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </div>
+          <div class="p-3 surface-100 border border-surface-border rounded-md text-sm text-color">
+            {{ relativePreview }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Now -->
+      <div
+        v-if="activeTab === 'now'"
+        class="py-4 text-center"
+      >
+        <div class="flex flex-col gap-4 items-center">
+          <p>Use current time as end date</p>
+          <PrimeButton
+            label="Set to Now"
+            icon="pi pi-clock"
+            @click="setToNow"
+          />
+        </div>
+      </div>
+
+      <!-- Campo de entrada de data/hora -->
+      <div class="mt-4 pt-4 border-t border-surface-border">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-medium text-color">
+            {{ editingField === 'start' ? 'Start date' : 'End date' }}
+          </label>
+          <InputText
+            :value="editingField === 'start' ? startDateInput : endDateInput"
+            class="w-full"
+          />
         </div>
       </div>
     </OverlayPanel>
@@ -352,29 +302,53 @@
 
   const TIME_SLOTS = [
     '00:00',
+    '00:30',
     '01:00',
+    '01:30',
     '02:00',
+    '02:30',
     '03:00',
+    '03:30',
     '04:00',
+    '04:30',
     '05:00',
+    '05:30',
     '06:00',
+    '06:30',
     '07:00',
+    '07:30',
     '08:00',
+    '08:30',
     '09:00',
+    '09:30',
     '10:00',
+    '10:30',
     '11:00',
+    '11:30',
     '12:00',
+    '12:30',
     '13:00',
+    '13:30',
     '14:00',
+    '14:30',
     '15:00',
+    '15:30',
     '16:00',
+    '16:30',
     '17:00',
+    '17:30',
     '18:00',
+    '18:30',
     '19:00',
+    '19:30',
     '20:00',
+    '20:30',
     '21:00',
+    '21:30',
     '22:00',
-    '23:00'
+    '22:30',
+    '23:00',
+    '23:30'
   ]
 
   const RELATIVE_UNITS = [
@@ -701,6 +675,31 @@
       }
     }
     hasChanges.value = true
+  }
+
+  const applySelectedDateTime = () => {
+    if (selectedDate.value && selectedTime.value) {
+      const [hours, minutes] = selectedTime.value.split(':')
+      const newDate = new Date(selectedDate.value)
+      newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+      if (editingField.value === 'start') {
+        startDate.value = newDate
+        if (endDate.value && newDate > endDate.value) {
+          endDate.value = newDate
+        }
+      } else {
+        endDate.value = newDate
+        if (startDate.value && newDate < startDate.value) {
+          startDate.value = newDate
+        }
+      }
+
+      hasChanges.value = true
+
+      // Fecha o overlay após aplicar
+      overlayPanel.value.hide()
+    }
   }
 
   const updateRange = () => {

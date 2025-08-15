@@ -139,20 +139,27 @@ export const formatDateTime = (date, short = false, options = {}) => {
 }
 
 /**
- * Formata uma data para exibição simples (DD/MM/YYYY HH:mm)
+ * Formata uma data para exibição no formato "Aug 15, 2025 @ 15:07:13.854"
  * @param {Date} date - Data a ser formatada
- * @returns {string} Data formatada no formato DD/MM/YYYY HH:mm
+ * @returns {string} Data formatada no formato "Aug 15, 2025 @ 15:07:13.854"
  */
 export const formatDateSimple = (date) => {
   if (!isValidDate(date)) return ''
   
-  const day = date.getDate().toString().padStart(2, '0')
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ]
+  
+  const month = months[date.getMonth()]
+  const day = date.getDate()
   const year = date.getFullYear()
   const hours = date.getHours().toString().padStart(2, '0')
   const minutes = date.getMinutes().toString().padStart(2, '0')
+  const seconds = date.getSeconds().toString().padStart(2, '0')
+  const milliseconds = date.getMilliseconds().toString().padStart(3, '0')
   
-  return `${day}/${month}/${year} ${hours}:${minutes}`
+  return `${month} ${day}, ${year} @ ${hours}:${minutes}:${seconds}.${milliseconds}`
 }
 
 /**
