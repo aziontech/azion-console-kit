@@ -81,12 +81,12 @@
   const warningDigitalCertificateMessage = computed(() => {
     if (statusDigitalCertificate.value === 'pending') {
       return {
-        text: 'This certificate is pending validation and may not work until it’s validated',
+        text: 'This certificate is pending validation and HTTPS may not work until it’s validated',
         color: 'text-[var(--p-tag-warning-color)]'
       }
     } else if (statusDigitalCertificate.value === 'failed') {
       return {
-        text: 'This digital certificate failed and cannot be used until the issue is resolved.',
+        text: 'This digital certificate failed and HTTPS cannot be used until the issue is resolved',
         color: 'text-[var(--error-color)]'
       }
     }
