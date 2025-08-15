@@ -204,8 +204,13 @@
               style="display: none"
               @change="handleDragDropUpload"
             />
+
+            <DragAndDrop
+              v-if="showDragAndDrop"
+              :selectedBucket="selectedBucket"
+            />
             <div
-              v-if="!!selectedBucket"
+              v-else
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
               :class="{ 'border-dashed border-[#f3652b]': isDragOver }"
             >
@@ -247,10 +252,6 @@
                 </p>
               </div>
             </div>
-            <DragAndDrop
-              v-else
-              :selectedBucket="selectedBucket"
-            />
           </div>
           <EmptyResultsBlock
             v-else
@@ -319,6 +320,7 @@
   const isLoading = ref(false)
   const listServiceFilesRef = ref(null)
   const isDragOver = ref(false)
+  const showDragAndDrop = ref(false)
 
   const uploadMenuItems = [
     {
@@ -357,6 +359,7 @@
     ]
   })
   const selectBucket = (bucket) => {
+    showDragAndDrop.value = false
     selectedBucket.value = bucket
     selectedFolder.value = null
     listServiceFilesRef.value?.reload()
@@ -451,6 +454,7 @@
       }))
       needRefresh.value = false
     }
+    showDragAndDrop.value = !selectedBucket.value.files?.length
     return selectedBucket.value.files
   }
 
