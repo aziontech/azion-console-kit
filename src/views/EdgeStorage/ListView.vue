@@ -167,6 +167,7 @@
                   outlined
                   :label="isGreaterThanXL ? 'Refresh' : ''"
                   class="px-4 py-1 flex items-center justify-center"
+                  @click="handleRefresh"
                 />
                 <PrimeButton
                   icon="pi pi-cog"
@@ -191,24 +192,53 @@
               </div>
             </div>
             <UploadCard />
-            <ListTableBlock
-              v-if="!!selectedBucket?.files?.length"
-              pageTitleDelete="Files"
-              :listService="listEdgeStorageBucketFiles"
-              ref="listServiceFilesRef"
-              :columns="getColumns"
-              v-model:selectedItensData="selectedFiles"
-              hiddenHeader
-              :paginator="false"
-              enableEditClickFolder
-              @on-row-click-edit-folder="handleEditFolder"
-              @delete-selected-items="handleDeleteSelectedItems"
+            <input
+              ref="dragDropFileInput"
+              type="file"
+              multiple
+              style="display: none"
+              @change="handleDragDropUpload"
             />
 
             <DragAndDrop
-              v-else
+              v-if="showDragAndDrop"
               :selectedBucket="selectedBucket"
             />
+            <div
+              v-else
+              class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
+              :class="{ 'border-dashed border-[#f3652b]': isDragOver }"
+            >
+              <ListTableBlock
+                pageTitleDelete="Files"
+                :listService="listEdgeStorageBucketFiles"
+                ref="listServiceFilesRef"
+                :columns="getColumns"
+                :selected-bucket="selectedBucket"
+                v-model:selectedItensData="selectedFiles"
+                hiddenHeader
+                :paginator="false"
+                enableEditClickFolder
+                @on-row-click-edit-folder="handleEditFolder"
+                @delete-selected-items="handleDeleteSelectedItems"
+                @dragover.prevent="handleDrag(true)"
+                @dragleave="handleDrag(false)"
+                @drop.prevent="handleDragDropUpload"
+                class="w-full"
+              />
+
+              <div class="flex items-center gap-3 text-center">
+                <i class="pi pi-cloud-upload text-xl text-color-secondary"></i>
+                <p class="text-sm text-color-secondary">
+                  Drag files here to add them to your bucket or
+                  <span
+                    class="cursor-pointer text-[var(--text-color-link)] transition-colors"
+                    @click="openFileSelector"
+                    >choose your files</span
+                  >
+                </p>
+              </div>
+            </div>
           </div>
           <EmptyResultsBlock
             v-else
@@ -251,7 +281,8 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles } = useEdgeStorage()
+  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles, needRefresh } =
+    useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -268,6 +299,9 @@
   const selectedFolder = ref(null)
   const isLoading = ref(false)
   const listServiceFilesRef = ref(null)
+  const isDragOver = ref(false)
+  const showDragAndDrop = ref(false)
+
   const uploadMenuItems = [
     {
       label: 'Create folder',
@@ -299,15 +333,16 @@
         header: 'Size'
       },
       {
-        field: 'lastModified',
+        field: 'last_modified',
         header: 'Last Modified'
       }
     ]
   })
   const selectBucket = (bucket) => {
-    listServiceFilesRef.value?.reload()
+    showDragAndDrop.value = false
     selectedBucket.value = bucket
     selectedFolder.value = null
+    listServiceFilesRef.value?.reload()
   }
 
   const handleCreateTrackEvent = () => {
@@ -342,6 +377,7 @@
       const files = event.target.files
       if (files.length) {
         await uploadFiles(files)
+        listServiceFilesRef.value?.reload()
       }
       document.body.removeChild(input)
     }
@@ -383,6 +419,35 @@
         listServiceFilesRef.value?.reload()
       }
     })
+  }
+
+  const listEdgeStorageBucketFiles = async () => {
+    if (!selectedBucket.value.files || needRefresh.value) {
+      selectedBucket.value.files = await edgeStorageService.listEdgeStorageBucketFiles(
+        selectedBucket.value.name
+      )
+      needRefresh.value = false
+    }
+    showDragAndDrop.value = !selectedBucket.value.files?.length
+    return selectedBucket.value.files
+  }
+
+  const handleDrag = (value) => {
+    isDragOver.value = value
+  }
+
+  const handleDragDropUpload = async (event) => {
+    isDragOver.value = false
+    const files = event.target.files || event.dataTransfer.files
+    if (files.length) {
+      await uploadFiles(files)
+      listServiceFilesRef.value?.reload()
+    }
+  }
+
+  const handleRefresh = () => {
+    needRefresh.value = true
+    listServiceFilesRef.value?.reload()
   }
 
   onMounted(async () => {

@@ -316,7 +316,6 @@
   import { useDialog } from 'primevue/usedialog'
   import { useToast } from 'primevue/usetoast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
-
   defineOptions({ name: 'list-table-block-new' })
 
   const emit = defineEmits([
@@ -388,6 +387,10 @@
     enableEditClickFolder: {
       type: Boolean,
       default: false
+    },
+    selectedBucket: {
+      type: Object,
+      default: () => ({})
     }
   })
 
@@ -491,8 +494,7 @@
     if (props.listService) {
       try {
         isLoading.value = true
-        const response = await props.listService()
-        data.value = response
+        data.value = await props.listService()
       } catch (error) {
         data.value = []
         const errorMessage = error.message || error
