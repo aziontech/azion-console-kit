@@ -19,6 +19,7 @@ const currentFileProgress = ref(0)
 const totalBytesUploaded = ref(0)
 const totalBytesToUpload = ref(0)
 const createdBucket = ref('')
+const needRefresh = ref(false)
 
 const formatSize = (size) => {
   if (size == 0) return '0 Bytes'
@@ -87,6 +88,7 @@ export const useEdgeStorage = () => {
    */
   const uploadFiles = async (fileList) => {
     if (selectedBucket.value) {
+      needRefresh.value = true
       const filesArray = Array.from(fileList)
       const maxFileSize = 300 * 1024 * 1024 // 300MB in bytes
 
@@ -280,6 +282,7 @@ export const useEdgeStorage = () => {
     addCredential,
     createdBucket,
     validationSchema,
-    handleFileChange
+    handleFileChange,
+    needRefresh
   }
 }
