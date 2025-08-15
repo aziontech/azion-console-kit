@@ -151,7 +151,7 @@
       .string()
       .label('Query string fields')
       .when('cacheByQueryString', {
-        is: (value) => ['whitelist', 'blacklist'].includes(value),
+        is: (value) => ['allowlist', 'denylist'].includes(value),
         then: (schema) => schema.required()
       }),
     enableQueryStringSort: yup.boolean(),
@@ -163,7 +163,7 @@
       .string()
       .label('Cookie Names')
       .when('cacheByCookies', {
-        is: (value) => ['whitelist', 'blacklist'].includes(value),
+        is: (value) => ['allowlist', 'denylist'].includes(value),
         then: (schema) => schema.required()
       }),
     adaptiveDeliveryAction: yup.string().label('Adaptive Delivery Action'),
