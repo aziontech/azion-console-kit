@@ -14,6 +14,7 @@ export const edgeConnectorsRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Edge Connectors',
         breadCrumbs: [
           {
             label: 'Edge Connectors',
@@ -28,6 +29,7 @@ export const edgeConnectorsRoutes = {
       name: 'create-edge-connectors',
       component: () => import('@views/EdgeConnectors/CreateView.vue'),
       meta: {
+        title: 'Create Edge Connector',
         breadCrumbs: [
           {
             label: 'Edge Connectors',
@@ -46,6 +48,7 @@ export const edgeConnectorsRoutes = {
       name: 'edit-edge-connectors',
       component: () => import('@views/EdgeConnectors/EditView.vue'),
       meta: {
+        title: 'Edit Edge Connector',
         breadCrumbs: [
           {
             label: 'Edge Connectors',

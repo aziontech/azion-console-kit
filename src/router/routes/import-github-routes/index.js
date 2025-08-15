@@ -21,6 +21,7 @@ export const importGithubRoutes = {
         loadSolutionService: MarketplaceService.loadSolutionService
       },
       meta: {
+        title: 'Import from GitHub',
         breadCrumbs: [
           {
             label: 'Import from GitHub',

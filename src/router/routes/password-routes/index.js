@@ -14,6 +14,7 @@ export const passwordRoutes = {
         passwordSettingService: AuthServices.passwordSettingService
       },
       meta: {
+        title: 'New Password',
         isPublic: true,
         hideNavigation: true
       }

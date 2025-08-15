@@ -14,6 +14,7 @@ export const teamsPermissionRoutes = {
         documentationService: Helpers.documentationCatalog.teamPermissions
       },
       meta: {
+        title: 'Teams Permissions',
         breadCrumbs: [
           {
             label: 'Teams Permissions',
@@ -31,6 +32,7 @@ export const teamsPermissionRoutes = {
         listPermissionService: TeamPermissionService.listPermissionService
       },
       meta: {
+        title: 'Create Team Permission',
         breadCrumbs: [
           {
             label: 'Teams Permissions',
@@ -54,6 +56,7 @@ export const teamsPermissionRoutes = {
         updatedRedirect: 'teams-permission'
       },
       meta: {
+        title: 'Edit Team Permission',
         breadCrumbs: [
           {
             label: 'Teams Permissions',

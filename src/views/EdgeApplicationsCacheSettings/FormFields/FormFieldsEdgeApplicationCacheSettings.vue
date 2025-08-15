@@ -55,13 +55,11 @@
 
   const { value: isSliceTieredCache } = useField('isSliceTieredCache')
   const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
-  const { value: tieredCache } = useField('tieredCache')
 
   const enableSliceConfiguration = (isEnabled) => {
     emit('tiered-caching-enabled', isSliceTieredCache.value)
     isSliceEdgeCachingEnabled.value = isEnabled
     isSliceTieredCache.value = isEnabled
-    tieredCache.value = isEnabled
   }
 
   const showTieredCacheForm = computed(() => {

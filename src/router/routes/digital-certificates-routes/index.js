@@ -10,6 +10,7 @@ export const digitalCertificatesRoutes = {
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
       meta: {
+        title: 'Digital Certificates',
         breadCrumbs: [
           {
             label: 'Digital Certificates',
@@ -23,6 +24,7 @@ export const digitalCertificatesRoutes = {
       name: 'create-digital-certificates',
       component: () => import('@views/DigitalCertificates/CreateView.vue'),
       meta: {
+        title: 'Create Digital Certificate',
         breadCrumbs: [
           {
             label: 'Digital Certificates',
@@ -44,6 +46,7 @@ export const digitalCertificatesRoutes = {
         documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
       },
       meta: {
+        title: 'Edit Digital Certificate',
         breadCrumbs: [
           {
             label: 'Digital Certificates',

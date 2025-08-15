@@ -66,18 +66,26 @@ export const CacheSettingsAdapter = {
 
       // Cache vary by querystring
       if (payload.cacheByQueryString && payload.cacheByQueryString !== 'ignore') {
+        let fields = []
+        if (payload.cacheByQueryString !== 'all') {
+          fields = parseTextToArray(payload.queryStringFields)
+        }
         appAccelerator.cache_vary_by_querystring = {
           behavior: payload.cacheByQueryString,
-          fields: parseTextToArray(payload.queryStringFields) || [],
+          fields,
           sort_enabled: payload.enableQueryStringSort !== false
         }
       }
 
       // Cache vary by cookies
       if (payload.cacheByCookies && payload.cacheByCookies !== 'ignore') {
+        let cookieNames = []
+        if (payload.cacheByCookies !== 'all') {
+          cookieNames = parseTextToArray(payload.cookieNames)
+        }
         appAccelerator.cache_vary_by_cookies = {
           behavior: payload.cacheByCookies,
-          cookie_names: parseTextToArray(payload.cookieNames) || []
+          cookie_names: cookieNames
         }
       }
 

@@ -6,7 +6,7 @@
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Edge Cache Settings"
+        label="Edge Cache Behavior"
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="getEdgeCacheRadioOptions()"
@@ -130,7 +130,7 @@
         disabled: !!showSliceConfigurationRange.value
       },
       {
-        title: 'Override cache settings',
+        title: 'Override cache behavior',
         subtitle: `Customize the edge cache behavior by overriding the origin server's cache policies.`,
         inputValue: 'override'
       }

@@ -14,6 +14,7 @@ export const edgeDnsRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Edge DNS',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -30,6 +31,7 @@ export const edgeDnsRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Create Zone',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -51,6 +53,7 @@ export const edgeDnsRoutes = {
         updatedRedirect: 'list-edge-dns'
       },
       meta: {
+        title: 'Edit Zone',
         breadCrumbs: [
           {
             label: 'Edge DNS',
@@ -71,6 +74,7 @@ export const edgeDnsRoutes = {
         documentationService: Helpers.documentationCatalog.records
       },
       meta: {
+        title: 'Edit Record',
         breadCrumbs: [
           {
             label: 'Edge DNS',

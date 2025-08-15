@@ -15,6 +15,7 @@ export const networkListsRoutes = {
         documentationService: Helpers.documentationCatalog.networkLists
       },
       meta: {
+        title: 'Network Lists',
         breadCrumbs: [
           {
             label: 'Network Lists',
@@ -31,6 +32,7 @@ export const networkListsRoutes = {
         listCountriesService: NetworkListsService.listCountriesService
       },
       meta: {
+        title: 'Create Network List',
         breadCrumbs: [
           {
             label: 'Network Lists',
@@ -52,6 +54,7 @@ export const networkListsRoutes = {
         updatedRedirect: 'list-network-list'
       },
       meta: {
+        title: 'Edit Network List',
         breadCrumbs: [
           {
             label: 'Network Lists',

@@ -10,6 +10,7 @@ export const identityProvidersRoutes = {
       name: 'list-identity-providers',
       component: () => import('@views/IdentityProviders/ListView.vue'),
       meta: {
+        title: 'Identity Providers',
         breadCrumbs: [
           {
             label: 'Identity Providers',
@@ -33,6 +34,7 @@ export const identityProvidersRoutes = {
         createSAMLIdentityProviderService: idpService.createSAMLIdentityProviderService
       },
       meta: {
+        title: 'Create Identity Provider',
         breadCrumbs: [
           {
             label: 'Identity Providers',
@@ -57,6 +59,7 @@ export const identityProvidersRoutes = {
         updatedRedirect: 'list-identity-providers'
       },
       meta: {
+        title: 'Edit Identity Provider',
         breadCrumbs: [
           {
             label: 'Identity Providers',

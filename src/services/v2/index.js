@@ -109,6 +109,12 @@ import { WorkloadDeploymentAdapter } from './adapters/workload-deployments-adapt
 import { EdgeStorageAdapter } from './adapters/edge-storage-adapter'
 import { EdgeStorageService } from './edge-storage-service'
 
+// Activity History
+import { ActivityHistoryService } from './activity-history-service'
+import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
+import graphQLApi from '@/services/axios/makeEventsApi'
+const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+
 const httpService = createHttpService()
 
 const vcsService = new VcsService(httpService, VcsAdapter)
@@ -168,6 +174,12 @@ const workloadService = new WorkloadService(
   DigitalCertificatesAdapter
 )
 
+const activityHistoryService = new ActivityHistoryService(
+  httpService,
+  ActivityHistoryAdapter,
+  graphQLApiInstance
+)
+
 export {
   vcsService,
   cacheSettingsService,
@@ -196,5 +208,6 @@ export {
   billingGqlService,
   workloadService,
   workloadDeploymentService,
+  activityHistoryService,
   edgeStorageService
 }

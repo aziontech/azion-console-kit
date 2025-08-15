@@ -18,6 +18,7 @@ export const edgeServicesRoutes = {
         documentationService: Helpers.documentationCatalog.edgeServices
       },
       meta: {
+        title: 'Edge Services',
         breadCrumbs: [
           {
             label: 'Edge Services',
@@ -34,6 +35,7 @@ export const edgeServicesRoutes = {
         createEdgeServiceServices: EdgeServiceServices.createEdgeServiceServices
       },
       meta: {
+        title: 'Create Edge Service',
         breadCrumbs: [
           {
             label: 'Edge Services',
@@ -62,6 +64,7 @@ export const edgeServicesRoutes = {
         updatedRedirect: 'list-edge-services'
       },
       meta: {
+        title: 'Edit Edge Service',
         breadCrumbs: [
           {
             label: 'Edge Services',

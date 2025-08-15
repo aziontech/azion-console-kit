@@ -13,6 +13,7 @@ export const dataStreamRoutes = {
         documentationService: Helpers.documentationCatalog.dataStream
       },
       meta: {
+        title: 'Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',
@@ -26,6 +27,7 @@ export const dataStreamRoutes = {
       name: 'create-data-stream',
       component: () => import('@views/DataStream/CreateView.vue'),
       meta: {
+        title: 'Create Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',
@@ -46,6 +48,7 @@ export const dataStreamRoutes = {
         updatedRedirect: 'list-data-stream'
       },
       meta: {
+        title: 'Edit Data Stream',
         breadCrumbs: [
           {
             label: 'Data Stream',

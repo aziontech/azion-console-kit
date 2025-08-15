@@ -17,6 +17,7 @@ export const variablesRoutes = {
         clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
+        title: 'Variables',
         breadCrumbs: [
           {
             label: 'Variables',
@@ -33,6 +34,7 @@ export const variablesRoutes = {
         createVariablesService: VariablesService.createVariablesService
       },
       meta: {
+        title: 'Create Variable',
         breadCrumbs: [
           {
             label: 'Variables',
@@ -55,6 +57,7 @@ export const variablesRoutes = {
         updatedRedirect: 'list-variables'
       },
       meta: {
+        title: 'Edit Variable',
         breadCrumbs: [
           {
             label: 'Variables',

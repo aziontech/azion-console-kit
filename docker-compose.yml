@@ -1,0 +1,14 @@
+services:
+  azion-console-kit:
+    container_name: azion-console-kit
+    build: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=stage
+      - VITE_ENVIRONMENT=stage
+    stdin_open: true
+    tty: true

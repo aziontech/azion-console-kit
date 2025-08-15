@@ -2,5 +2,8 @@
 export const githubRoutes = {
   path: '/gh-connect',
   name: 'gh-connect',
-  component: () => import('@/views/GitHubConnectionPopup/index.vue')
+  component: () => import('@/views/GitHubConnectionPopup/index.vue'),
+  meta: {
+    title: 'GitHub Connection'
+  }
 }

@@ -10,6 +10,7 @@ export const workloadRoutes = {
       name: `list-workloads`,
       component: () => import('@views/Workload/ListView.vue'),
       meta: {
+        title: 'Workloads',
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {
@@ -27,6 +28,7 @@ export const workloadRoutes = {
         clipboardWrite
       },
       meta: {
+        title: 'Create Workload',
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {
@@ -48,6 +50,7 @@ export const workloadRoutes = {
         updatedRedirect: `list-workloads`
       },
       meta: {
+        title: 'Edit Workload',
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
           {

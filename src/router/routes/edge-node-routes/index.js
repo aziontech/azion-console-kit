@@ -17,6 +17,7 @@ export const edgeNodeRoutes = {
         documentationService: Helpers.documentationCatalog.edgeNodes
       },
       meta: {
+        title: 'Edge Node',
         breadCrumbs: [
           {
             label: 'Edge Node',
@@ -42,6 +43,7 @@ export const edgeNodeRoutes = {
         updatedRedirect: 'list-edge-node'
       },
       meta: {
+        title: 'Edit Edge Node',
         breadCrumbs: [
           {
             label: 'Edge Node',

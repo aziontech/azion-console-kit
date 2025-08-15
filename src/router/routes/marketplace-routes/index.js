@@ -15,6 +15,9 @@ export const marketplaceRoutes = {
       props: {
         listCategoriesService: MarketplaceService.listCategoriesService,
         listSolutionsService: MarketplaceService.listSolutionsService
+      },
+      meta: {
+        title: 'Marketplace'
       }
     },
     {
@@ -35,6 +38,7 @@ export const marketplaceRoutes = {
         checkStatusScriptRunnerService: ScriptRunnerService.checkStatusScriptRunnerService
       },
       meta: {
+        title: 'Marketplace Solution',
         breadCrumbs: [
           {
             label: 'Marketplace',

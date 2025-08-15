@@ -16,6 +16,7 @@ export const settingsRoutes = {
         editUsersService: UsersService.editUsersService
       },
       meta: {
+        title: 'Your Settings',
         breadCrumbs: [
           {
             label: 'Your Settings',

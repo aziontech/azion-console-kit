@@ -15,6 +15,7 @@ export const realTimePurgeRoutes = {
         documentationService: Helpers.documentationCatalog.realTimePurge
       },
       meta: {
+        title: 'Real-Time Purge',
         breadCrumbs: [
           {
             label: 'Real-Time Purge',
@@ -31,6 +32,7 @@ export const realTimePurgeRoutes = {
         contactSalesRealTimePurgeService: RealTimePurgeService.contactSalesRealTimePurgeService
       },
       meta: {
+        title: 'Create Real-Time Purge',
         breadCrumbs: [
           {
             label: 'Real-Time Purge',

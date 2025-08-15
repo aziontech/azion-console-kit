@@ -16,6 +16,7 @@ export const personalTokensRoutes = {
         documentationService: Helpers.documentationCatalog.personalTokens
       },
       meta: {
+        title: 'Personal Tokens',
         breadCrumbs: [
           {
             label: 'Personal Tokens',
@@ -34,6 +35,7 @@ export const personalTokensRoutes = {
         convertDateToLocalTimezone: Helpers.convertDateToLocalTimezone
       },
       meta: {
+        title: 'Create Personal Token',
         breadCrumbs: [
           {
             label: 'Personal Tokens',
