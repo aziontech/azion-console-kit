@@ -278,6 +278,7 @@
   import { edgeStorageService } from '@/services/v2'
   import UploadCard from './components/UploadCard.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
+  import { windowOpen } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -481,13 +482,7 @@
       type: 'application/octet-stream'
     })
     const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = item.name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    windowOpen(url, '_blank')
   }
   onMounted(async () => {
     try {
