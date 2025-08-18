@@ -52,7 +52,6 @@ describe('DomainsServices', () => {
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
         mtls_verification: fixtures.domainMock.mtlsVerification,
         edge_application_id: fixtures.domainMock.edgeApplication,
-        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate,
         environment: fixtures.domainMock.environment
       }
     })

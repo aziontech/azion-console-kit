@@ -89,7 +89,7 @@ export class DigitalCertificatesService {
     if (hasFlagBlockApiV4())
       return this.adapter?.transformListDigitalCertificatesDropdownToDomains?.(data, params)
 
-    return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
+    return this.adapter?.transformListDigitalCertificatesDropdownToWorkloads?.(data, params)
   }
 
   loadDigitalCertificate = async ({ id }) => {
