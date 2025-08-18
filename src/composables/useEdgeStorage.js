@@ -227,27 +227,6 @@ export const useEdgeStorage = () => {
       event.target.value = ''
     }
   }
-  // const handleDownload = async (item) => {
-  //   if (selectedFiles.value.length > 1) {
-  //     const files = selectedFilesselectedFiles.value.map((file) => file.name)
-  //   }else
-  //   const file = await edgeStorageService.downloadEdgeStorageBucketFiles(
-  //     selectedBucket.value.name,
-  //     item.name
-  //   )
-  //   const blob = new Blob([file], {
-  //     type: 'application/octet-stream'
-  //   })
-  //   const url = window.URL.createObjectURL(blob)
-
-  //   const link = document.createElement('a')
-  //   link.href = url
-  //   link.download = item.name
-  //   document.body.appendChild(link)
-  //   link.click()
-  //   document.body.removeChild(link)
-  //   window.URL.revokeObjectURL(url)
-  // }
 
   const handleDownload = async (file) => {
     try {
