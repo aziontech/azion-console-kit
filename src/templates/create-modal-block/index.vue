@@ -56,7 +56,7 @@
       label: 'Edge Connector',
       to: '/edge-connectors/create',
       description:
-        'Create edge connector to transmit logs and event data from Azion to external systems.'
+        'The Edge Connector centralizes connections and provides control with features like load balancing and Origin Shield.'
     },
     {
       label: 'Custom Page',
@@ -142,10 +142,17 @@
     selectedTab.value = 'newResource'
   }
 
+  const filteredResources = computed(() => {
+    const showRosourceOnlyV4 = ['Edge Connector', 'Custom Page']
+    if (!hasFlagBlockApiV4()) return RESOURCES
+
+    return RESOURCES.filter((resource) => !showRosourceOnlyV4.includes(resource.label))
+  })
+
   const templatesData = ref({
     recommended: [],
     templates: [],
-    newResource: RESOURCES,
+    newResource: filteredResources.value,
     githubImport: []
   })
 
