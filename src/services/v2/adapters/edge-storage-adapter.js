@@ -26,6 +26,7 @@ export const EdgeStorageAdapter = {
 
   transformListEdgeStorageFiles(data) {
     return data.results.map((file) => ({
+      id: file.key,
       name: file.key,
       last_modified: formatExhibitionDate(file.last_modified, 'full', undefined),
       size: formatBytes(file.size)

@@ -219,6 +219,7 @@
                 hiddenHeader
                 :paginator="false"
                 enableEditClickFolder
+                :actions="fileActions"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
@@ -312,6 +313,23 @@
       label: 'Upload files',
       icon: 'pi pi-upload',
       command: () => openFileSelector('files')
+    }
+  ]
+
+  const fileActions = [
+    {
+      label: 'Download',
+      icon: 'pi pi-download',
+      type: 'action',
+      commandAction: (item) => {
+        edgeStorageService.downloadEdgeStorageBucketFiles(selectedBucket.value.name, item.id)
+      }
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      type: 'delete',
+      service: (item) => handleDeleteFile(item)
     }
   ]
 
@@ -450,6 +468,10 @@
     listServiceFilesRef.value?.reload()
   }
 
+  const handleDeleteFile = async (item) => {
+    await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, item)
+    listServiceFilesRef.value?.reload()
+  }
   onMounted(async () => {
     try {
       isLoading.value = true
