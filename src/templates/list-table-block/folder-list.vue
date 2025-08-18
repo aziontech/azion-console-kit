@@ -99,9 +99,11 @@
               <PrimeButton
                 size="small"
                 outlined
-                icon="pi pi-download"
+                :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
                 label="Download"
                 class="px-4"
+                :disabled="isDownloading"
+                @click="emit('download-selected-items')"
               />
               <PrimeButton
                 size="small"
@@ -391,6 +393,10 @@
     selectedBucket: {
       type: Object,
       default: () => ({})
+    },
+    isDownloading: {
+      type: Boolean,
+      default: false
     }
   })
 

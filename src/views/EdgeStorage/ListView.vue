@@ -220,11 +220,13 @@
                 :paginator="false"
                 enableEditClickFolder
                 :actions="fileActions"
+                :isDownloading="isDownloading"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @drop.prevent="handleDragDropUpload"
+                @download-selected-items="handleDownload(selectedFiles)"
                 class="w-full"
               />
 
@@ -278,13 +280,21 @@
   import { edgeStorageService } from '@/services/v2'
   import UploadCard from './components/UploadCard.vue'
   import { documentationGuideProducts } from '@/helpers/azion-documentation-catalog'
-  import { windowOpen } from '@/helpers'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles, needRefresh } =
-    useEdgeStorage()
+  const {
+    buckets,
+    selectedBucket,
+    removeFiles,
+    createdBucket,
+    uploadFiles,
+    needRefresh,
+    handleDownload,
+    selectedFiles,
+    isDownloading
+  } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -295,7 +305,6 @@
     }
   })
 
-  const selectedFiles = ref([])
   const searchTerm = ref('')
   const fileSearchTerm = ref('')
   const selectedFolder = ref(null)
@@ -322,7 +331,7 @@
       label: 'Download',
       icon: 'pi pi-download',
       type: 'action',
-      commandAction: (item) => handleDownalod(item)
+      commandAction: (item) => handleDownload(item)
     },
     {
       label: 'Delete',
@@ -473,17 +482,6 @@
     listServiceFilesRef.value?.reload()
   }
 
-  const handleDownalod = async (item) => {
-    const file = await edgeStorageService.downloadEdgeStorageBucketFiles(
-      selectedBucket.value.name,
-      item.name
-    )
-    const blob = new Blob([file], {
-      type: 'application/octet-stream'
-    })
-    const url = window.URL.createObjectURL(blob)
-    windowOpen(url, '_blank')
-  }
   onMounted(async () => {
     try {
       isLoading.value = true
