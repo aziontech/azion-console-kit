@@ -25,7 +25,7 @@ const adapt = (payload) => {
     environment: payload.environment
   }
 
-  if (!payload.mtlsTrustedCertificate) {
+  if (!payload.mtlsTrustedCertificate || !payload.mtlsIsEnabled) {
     delete dataRequest.mtls_trusted_ca_certificate_id
   }
 
