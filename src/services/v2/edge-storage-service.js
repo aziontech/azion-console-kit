@@ -88,4 +88,24 @@ export class EdgeStorageService {
     })
     return 'File added successfully'
   }
+
+  deleteEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.baseURL}/${bucketName}/objects/${fileName}`
+    })
+    return `File "${fileName}" has been deleted successfully`
+  }
+
+  downloadEdgeStorageBucketFiles = async (bucketName = '', fileName = '') => {
+    const response = await this.http.request({
+      method: 'GET',
+      url: `${this.baseURL}/${bucketName}/objects/${fileName}`,
+      config: {
+        responseType: 'blob'
+      }
+    })
+
+    return response.data
+  }
 }

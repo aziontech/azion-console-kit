@@ -3,6 +3,7 @@ import { edgeStorageService } from '@/services/v2'
 import { useToast } from 'primevue/usetoast'
 import * as yup from 'yup'
 import { formatBytes } from '@/helpers/format-bytes'
+import JSZip from 'jszip'
 
 /**
  * Composable for managing EdgeStorage buckets locally (mocked data).
@@ -21,6 +22,8 @@ const totalBytesUploaded = ref(0)
 const totalBytesToUpload = ref(0)
 const createdBucket = ref('')
 const needRefresh = ref(false)
+const selectedFiles = ref([])
+const isDownloading = ref(false)
 
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
@@ -210,42 +213,13 @@ export const useEdgeStorage = () => {
     return null
   }
 
-  const removeFiles = (fileIds) => {
-    const bucket = findBucketById(selectedBucket.value.id)
-    if (bucket) {
-      bucket.files = bucket.files.filter((file) => !fileIds.includes(file.id))
+  const removeFiles = async (fileIds) => {
+    for (const fileId of fileIds) {
+      await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, fileId)
+      needRefresh.value = true
     }
   }
 
-  const removeCredential = (credentialId) => {
-    const bucket = findBucketById(selectedBucket.value.id)
-    if (bucket) {
-      bucket.credentials = bucket.credentials.filter((credential) => credential.id !== credentialId)
-    }
-  }
-
-  const addCredential = (credentialData) => {
-    const bucket = findBucketById(selectedBucket.value.id)
-    if (bucket) {
-      const accessKey = 'AKIA' + Math.random().toString(36).substring(2, 15).toUpperCase()
-      const secretKey =
-        Math.random().toString(36).substring(2, 40) + Math.random().toString(36).substring(2, 40)
-
-      const newCredential = {
-        id: Date.now(),
-        name: credentialData.name,
-        accessKey,
-        secretKey,
-        createdAt: new Date().toLocaleString(),
-        expiresAt: credentialData.expirationDate.toLocaleString(),
-        capacities: 'Content'
-      }
-
-      bucket.credentials.push(newCredential)
-      return newCredential
-    }
-    return null
-  }
   const handleFileChange = async (event) => {
     const files = event.dataTransfer?.files || event.target?.files
     if (files.length) {
@@ -253,6 +227,54 @@ export const useEdgeStorage = () => {
       event.target.value = ''
     }
   }
+
+  const handleDownload = async (file) => {
+    try {
+      isDownloading.value = true
+      const link = document.createElement('a')
+      if (!file?.length) {
+        const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
+          selectedBucket.value.name,
+          file.name
+        )
+        const blob = new Blob([fileData], {
+          type: 'application/octet-stream'
+        })
+        link.href = window.URL.createObjectURL(blob)
+        link.download = file.name
+      } else {
+        const zip = new JSZip()
+
+        for (const file of selectedFiles.value) {
+          const fileData = await edgeStorageService.downloadEdgeStorageBucketFiles(
+            selectedBucket.value.name,
+            file.name
+          )
+          zip.file(file.name, fileData)
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' })
+        link.href = window.URL.createObjectURL(zipBlob)
+
+        const currentDate = new Date().toISOString().split('T')[0]
+        const filename = `${selectedBucket.value.name}_${currentDate}.zip`
+
+        link.download = filename
+        selectedFiles.value = []
+      }
+      link.click()
+    } catch (error) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error downloading files',
+        detail: error.message,
+        life: 5000
+      })
+    } finally {
+      isDownloading.value = false
+    }
+  }
+
   return {
     buckets,
     selectedBucket,
@@ -271,11 +293,12 @@ export const useEdgeStorage = () => {
     uploadFiles,
     createFolder,
     removeFiles,
-    removeCredential,
-    addCredential,
     createdBucket,
     validationSchema,
     handleFileChange,
-    needRefresh
+    needRefresh,
+    handleDownload,
+    selectedFiles,
+    isDownloading
   }
 }

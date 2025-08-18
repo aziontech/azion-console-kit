@@ -219,11 +219,14 @@
                 hiddenHeader
                 :paginator="false"
                 enableEditClickFolder
+                :actions="fileActions"
+                :isDownloading="isDownloading"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"
                 @dragleave="handleDrag(false)"
                 @drop.prevent="handleDragDropUpload"
+                @download-selected-items="handleDownload(selectedFiles)"
                 class="w-full"
               />
 
@@ -281,8 +284,17 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { buckets, selectedBucket, removeFiles, createdBucket, uploadFiles, needRefresh } =
-    useEdgeStorage()
+  const {
+    buckets,
+    selectedBucket,
+    removeFiles,
+    createdBucket,
+    uploadFiles,
+    needRefresh,
+    handleDownload,
+    selectedFiles,
+    isDownloading
+  } = useEdgeStorage()
   const { isGreaterThanMD, isGreaterThanXL } = useResize()
   const { openDeleteDialog } = useDeleteDialog()
 
@@ -293,7 +305,6 @@
     }
   })
 
-  const selectedFiles = ref([])
   const searchTerm = ref('')
   const fileSearchTerm = ref('')
   const selectedFolder = ref(null)
@@ -312,6 +323,21 @@
       label: 'Upload files',
       icon: 'pi pi-upload',
       command: () => openFileSelector('files')
+    }
+  ]
+
+  const fileActions = [
+    {
+      label: 'Download',
+      icon: 'pi pi-download',
+      type: 'action',
+      commandAction: (item) => handleDownload(item)
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      type: 'delete',
+      service: (item) => handleDeleteFile(item)
     }
   ]
 
@@ -446,6 +472,12 @@
   }
 
   const handleRefresh = () => {
+    needRefresh.value = true
+    listServiceFilesRef.value?.reload()
+  }
+
+  const handleDeleteFile = async (item) => {
+    await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, item)
     needRefresh.value = true
     listServiceFilesRef.value?.reload()
   }
