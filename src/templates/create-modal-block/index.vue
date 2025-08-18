@@ -53,6 +53,18 @@
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
+      label: 'Edge Connector',
+      to: '/edge-connectors/create',
+      description:
+        'Create edge connector to transmit logs and event data from Azion to external systems.'
+    },
+    {
+      label: 'Custom Page',
+      to: '/custom-pages/create',
+      description:
+        'Create custom page to display personalized error pages for specific HTTP errors.'
+    },
+    {
       label: 'Edge Nodes',
       to: '/edge-node/create',
       description: 'Create edge infrastructure, installing services and resources in real time.'

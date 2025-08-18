@@ -75,7 +75,7 @@
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
     deviceGroup: [],
-    tieredCache: false,
+    tieredCache: true,
     tieredCacheRegion: 'near-edge',
     isSliceTieredCache: false,
     isSliceEdgeCachingEnabled: false,
@@ -119,7 +119,7 @@
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    cdnCacheSettings: yup.string().required().label('Edge cache settings'),
+    cdnCacheSettings: yup.string().required().label('Edge cache Behavior'),
     cdnCacheSettingsMaximumTtl: yup
       .number()
       .label('Edge Maximum TTL')
@@ -151,7 +151,7 @@
       .string()
       .label('Query string fields')
       .when('cacheByQueryString', {
-        is: (value) => ['whitelist', 'blacklist'].includes(value),
+        is: (value) => ['allowlist', 'denylist'].includes(value),
         then: (schema) => schema.required()
       }),
     enableQueryStringSort: yup.boolean(),
@@ -163,7 +163,7 @@
       .string()
       .label('Cookie Names')
       .when('cacheByCookies', {
-        is: (value) => ['whitelist', 'blacklist'].includes(value),
+        is: (value) => ['allowlist', 'denylist'].includes(value),
         then: (schema) => schema.required()
       }),
     adaptiveDeliveryAction: yup.string().label('Adaptive Delivery Action'),

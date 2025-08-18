@@ -8,6 +8,7 @@ export const edgePulseRoutes = {
       name: 'list-edge-pulse',
       component: () => import('@views/EdgePulse/ListView.vue'),
       meta: {
+        title: 'Edge Pulse',
         breadCrumbs: [
           {
             label: 'Edge Pulse',
