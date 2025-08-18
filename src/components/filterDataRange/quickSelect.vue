@@ -11,7 +11,6 @@
       ref="overlayPanelQuickSelect"
       :showCloseIcon="false"
       class="max-w-[500px]"
-      pt:overlayPanel="bg-surface-card border border-surface-border shadow-lg rounded-lg"
     >
       <div>
         <div class="mb-6">

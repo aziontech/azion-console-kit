@@ -1,7 +1,6 @@
 <template>
   <div class="relative flex-1">
     <div class="relative">
-      <!-- class="w-full pl-12 pr-12 py-3 bg-surface-card border border-surface-border rounded-lg text-sm text-color transition-all duration-200 hover:border-primary/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm" -->
       <InputText
         v-model="inputValue"
         :placeholder="placeholder"
