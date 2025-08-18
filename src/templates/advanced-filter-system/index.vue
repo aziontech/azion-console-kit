@@ -2,66 +2,31 @@
   <div
     class="flex flex-col sm:flex-row items-center gap-4 p-6 bg-surface-card border border-surface-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
   >
-    
-    <div class="flex items-center gap-2">
-      <PrimeButton
-        icon="pi pi-filter"
-        @click="toggleFilterPanel"
-        size="small"
-        outlined
-      />
-      <PrimeButton
-        icon="pi pi-plus"
-        size="small"
-        outlined
-        @click="addNewFilter"
-      />
-    </div>
-
-    <AdvancedInput
-      v-model="searchQuery"
-      icon="pi pi-search"
-      class="w-full sm:flex-1"
-      @search="handleSearch"
-    />
-
-    <AdvancedCalendar
-      v-model="dateRange"
+    <FilterDataRange
+      v-model="dateRangeTest"
       @change="handleDateChange"
     />
-
-    <!-- Botão Update -->
-    <PrimeButton
-      label="Update"
-      icon="pi pi-refresh"
-      class="p-button-success p-button-sm shadow-sm hover:shadow-md transition-all duration-200 rounded-lg font-medium"
-      @click="handleUpdate"
-    />
-
-    <!-- Overlay Panel para Filtros -->
-    <OverlayPanel
-      ref="filterPanel"
-      class="min-w-[600px] max-w-[800px] bg-surface-card border border-surface-border shadow-lg rounded-lg"
-      :showCloseIcon="false"
-    >
-      <AdvancedFilter
-        v-model="filters"
-        @add-filter="handleAddFilter"
-        @remove-filter="handleRemoveFilter"
-        @update-filter="handleUpdateFilter"
-      />
-    </OverlayPanel>
+    <div class="flex flex-col gap-2">
+      <div>
+        <span>Start Date:</span>
+        <span>{{ dateRangeTest.startDate.toLocaleString() }}</span>
+      </div>
+      <div>
+        <span>End Date:</span>
+        <span>{{ dateRangeTest.endDate.toLocaleString() }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, defineModel } from 'vue'
   import PrimeButton from 'primevue/button'
   import OverlayPanel from 'primevue/overlaypanel'
   import AdvancedCalendar from './components/AdvancedCalendar.vue'
   import AdvancedFilter from './components/AdvancedFilter.vue'
   import AdvancedInput from './components/AdvancedInput.vue'
-
+  import FilterDataRange from '@/components/filterDataRange/index.vue'
   // Model
   const model = defineModel({
     type: Object,
@@ -80,6 +45,11 @@
 
   // Component name
   defineOptions({ name: 'AdvancedFilterSystem' })
+
+  const dateRangeTest = ref({
+    startDate: new Date(),
+    endDate: new Date()
+  })
 
   // Refs
   const filterPanel = ref(null)
