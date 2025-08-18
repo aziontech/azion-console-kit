@@ -321,9 +321,7 @@
       label: 'Download',
       icon: 'pi pi-download',
       type: 'action',
-      commandAction: (item) => {
-        edgeStorageService.downloadEdgeStorageBucketFiles(selectedBucket.value.name, item.id)
-      }
+      commandAction: (item) => handleDownalod(item)
     },
     {
       label: 'Delete',
@@ -470,7 +468,26 @@
 
   const handleDeleteFile = async (item) => {
     await edgeStorageService.deleteEdgeStorageBucketFiles(selectedBucket.value.name, item)
+    needRefresh.value = true
     listServiceFilesRef.value?.reload()
+  }
+
+  const handleDownalod = async (item) => {
+    const file = await edgeStorageService.downloadEdgeStorageBucketFiles(
+      selectedBucket.value.name,
+      item.name
+    )
+    const blob = new Blob([file], {
+      type: 'application/octet-stream'
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = item.name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
   }
   onMounted(async () => {
     try {

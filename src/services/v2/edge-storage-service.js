@@ -106,18 +106,6 @@ export class EdgeStorageService {
       }
     })
 
-    const blob = new Blob([response.data], {
-      type: response.headers['content-type'] || 'application/octet-stream'
-    })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-
-    return `File "${fileName}" has been downloaded successfully`
+    return response.data
   }
 }
