@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <TitleArea :title="title"/>
+    <TitleArea :title="title" />
     <DescriptionArea
       v-if="description"
       :description="description"
@@ -22,4 +22,3 @@
     }
   })
 </script>
-  

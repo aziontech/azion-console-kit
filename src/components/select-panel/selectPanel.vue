@@ -5,7 +5,7 @@
         :title="title"
         :description="description"
       />
-      
+
       <div>
         <SelectButton
           v-model="value"
@@ -18,7 +18,7 @@
 
     <div class="mt-6">
       <slot name="content"></slot>
-    </div> 
+    </div>
   </div>
 </template>
 
@@ -45,7 +45,7 @@
     description: {
       type: String,
       default: ''
-    },
+    }
   })
 
   const value = ref(props.value)
