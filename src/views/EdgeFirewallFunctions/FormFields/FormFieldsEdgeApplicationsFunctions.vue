@@ -8,9 +8,10 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
 
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import SelectPanel from '@/components/select-panel'
   import DescriptionSmallArea from '@/components/description-small-area'
-  
+
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
   import { useField } from 'vee-validate'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
@@ -22,6 +23,7 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
+    argsValue.value = JSON.stringify(event.data)
   }
 
   const drawerRef = ref('')
@@ -60,21 +62,29 @@
 
   const schemaAzionForm = ref(null)
   const azionFormData = ref({})
-  const argsValue = ref({})
+  const showFormBuilder = ref(false)
+  const argsValue = ref('{}')
   const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
-  
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = value
   }
 
-  const setAzionFormSchema = (dataSchema) => {
-    schemaAzionForm.value = dataSchema
+  const isToShowFormBuilder = (value) => {
+    showFormBuilder.value = value
   }
 
-  const setFuntionArgs = (argments) => {
-    argsValue.value = argments
+  const setAzionFormSchema = (formSchema) => {
+    schemaAzionForm.value = formSchema
+  }
+
+  const setFuntionArgs = (jsonargs) => {
+    const jsonArgs = argsJsonParser(jsonargs)
+    delete jsonArgs.azion_form
+
+    argsValue.value = JSON.stringify(jsonArgs)
+    azionFormData.value = jsonArgs
   }
 
   const argsJsonParser = (args) => {
@@ -87,8 +97,8 @@
     }
   }
 
-  const getAzionFormData = (azionFormData) => {
-    return argsJsonParser(azionFormData).azion_form
+  const getAzionFormData = (jsonArgs) => {
+    return argsJsonParser(jsonArgs).azion_form
   }
 
   const hasArgsError = computed(() => {
@@ -97,9 +107,7 @@
 
   watch(args, (args) => {
     setAzionFormSchema(getAzionFormData(args))
-    setFuntionArgs(argsJsonParser(args))
-
-    // console.log('argsValue.value: ', argsValue.value.azion_form)
+    setFuntionArgs(args)
   })
 
   watch(
@@ -186,24 +194,54 @@
           :title="`Arguments`"
           :description="`Configure the function arguments to customize its behavior.`"
           @update:modelValue="selectPanelUpdateModelValue"
-        > 
+        >
           <template #content>
             <div v-show="selectPanelValue === 'Form'">
               <div id="azionform">
-                <div v-if="schemaAzionForm">
-                  <JsonForms
-                    :renderers="renderers"
-                    :data="azionFormData"
-                    :schema="schemaAzionForm"
-                    @change="onChangeAzionForm"
+                <div
+                  v-if="schemaAzionForm"
+                  class="flex flex-col gap-4"
+                >
+
+                  <FieldSwitchBlock
+                    title="Form builder"
+                    name="formBuilder"
+                    nameField="formBuilder"
+                    description="Use the enable/disable switch to toggle between form builder and visual editing modes."
+                    @onSwitchChange="(value) => {
+                      isToShowFormBuilder(value)
+                    }"
                   />
+
+                  <div>
+                    <div
+                      v-show="showFormBuilder"
+                      class="resize-y overflow-y-auto"
+                    >
+                      <CodeEditor
+                        v-model="argsValue"
+                        runtime="json"
+                        class="overflow-clip surface-border border rounded-md"
+                        :errors="hasArgsError"
+                        :minimap="false"
+                      />
+                    </div>
+                    <div v-show="!showFormBuilder">
+                      <JsonForms
+                        :renderers="renderers"
+                        :data="azionFormData"
+                        :schema="schemaAzionForm"
+                        @change="onChangeAzionForm"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <div v-show="selectPanelValue === 'JSON'">
               <div class="resize-y overflow-y-auto">
                 <CodeEditor
-                  v-model="args"
+                  v-model="argsValue"
                   runtime="json"
                   class="overflow-clip surface-border border rounded-md"
                   :errors="hasArgsError"
