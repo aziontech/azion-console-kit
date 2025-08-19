@@ -195,7 +195,6 @@
         </FieldDropdownLazyLoader>
       </div>
 
-
       <!-- Edge Functions Dynamic Args -->
       <div class="flex flex-col gap-2 w-full">
         <div v-if="schemaAzionForm">
@@ -224,7 +223,7 @@
                         }
                       "
                     />
-
+                    
                     <div>
                       <div
                         v-show="showFormBuilder"
@@ -278,7 +277,10 @@
             </template>
           </SelectPanel>
         </div>
-        <div v-else class="flex flex-col gap-4">
+        <div
+          v-else
+          class="flex flex-col gap-4"
+        >
           <TitleDescriptionArea
             :title="`Arguments`"
             :description="`Configure the function arguments to customize its behavior.`"
