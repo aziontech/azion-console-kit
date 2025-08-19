@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isUploading"
-    class="flex flex-col gap-3.5 p-5 bg-[--overlay-content-bg] border border-solid border-[--surface-border] rounded"
+    class="flex flex-col gap-3.5 p-5 bg-[--overlay-content-bg] border border-solid border-[--surface-border] rounded mb-2"
   >
     <div class="flex justify-between items-center gap-3.5">
       <div class="flex items-center gap-1.5">

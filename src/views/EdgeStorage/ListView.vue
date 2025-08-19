@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="Edge Storage" />
     </template>
     <template #content>
-      <div class="flex h-full w-full gap-8">
+      <div class="flex w-full gap-8">
         <template v-if="isGreaterThanMD">
           <div class="flex flex-col w-80 gap-4">
             <div class="flex justify-between items-center">
@@ -29,7 +29,7 @@
               />
             </div>
 
-            <div class="flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto max-h-[calc(100svh-40%)]">
               <div
                 v-if="isLoading"
                 class="flex flex-col gap-3"
@@ -49,14 +49,14 @@
                 class="text-left py-2"
               >
                 <div class="text-color-secondary text-sm">
-                  {{ searchTerm ? 'No buckets found' : 'No buckets created yet' }}
+                  {{ searchTerm ? 'No buckets found.' : 'No buckets created yet.' }}
                 </div>
               </div>
               <div v-else>
                 <div
                   v-for="bucket in filteredBuckets"
                   :key="bucket.id"
-                  class="p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors overflow-x-hidden"
+                  class="p-3 rounded cursor-pointer hover:bg-[--table-bg-color] transition-colors"
                   :class="{ 'bg-[--table-bg-color]': selectedBucket?.id === bucket.id }"
                   @click="selectBucket(bucket)"
                 >
@@ -71,9 +71,9 @@
             </div>
           </div>
         </template>
-        <div class="flex w-full flex-col gap-8 overflow-auto">
+        <div class="flex w-full flex-col gap-4 md:gap-8 overflow-auto">
           <template v-if="!isGreaterThanMD">
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
               <div class="flex justify-between items-center">
                 <h3 class="text-lg font-medium text-color-primary">Buckets</h3>
                 <PrimeButton
@@ -86,97 +86,103 @@
                 />
               </div>
 
-              <div class="p-input-icon-left">
-                <i class="pi pi-search" />
-                <InputText
-                  v-model="searchTerm"
-                  placeholder="Search buckets"
+              <div class="flex items-center gap-2">
+                <Dropdown
+                  v-model="selectedBucket"
+                  :options="buckets"
+                  optionLabel="name"
+                  placeholder="Select a bucket"
+                  filter
+                  filterPlaceholder="Search buckets"
+                  :loading="isLoading"
                   class="w-full"
-                  @input="handleSearch"
-                />
-              </div>
-
-              <div class="flex-1 overflow-y-auto">
-                <div
-                  v-if="isLoading"
-                  class="flex flex-col gap-3"
+                  :pt="{
+                    root: { class: 'w-full' },
+                    input: { class: 'w-full' }
+                  }"
+                  @change="handleBucketChange"
                 >
-                  <div
-                    v-for="n in 3"
-                    :key="n"
-                    class="p-3 rounded"
-                  >
-                    <div class="flex items-center justify-between">
-                      <Skeleton class="h-4 w-32" />
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-else-if="!filteredBuckets.length"
-                  class="text-left py-2"
-                >
-                  <div class="text-color-secondary text-sm">
-                    {{ searchTerm ? 'No buckets found' : 'No buckets created yet' }}
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="space-y-2"
-                >
-                  <div
-                    v-for="bucket in filteredBuckets"
-                    :key="bucket.id"
-                    class="p-3 cursor-pointer hover:bg-[--table-bg-color] transition-colors"
-                    :class="{
-                      'bg-[--table-bg-color]': selectedBucket?.id === bucket.id
-                    }"
-                    @click="selectBucket(bucket)"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex-1">
-                        <div class="font-medium text-color-primary">{{ bucket.name }}</div>
-                        <div class="font-medium text-color-primary">{{ bucket.size }}</div>
+                  <template #value="slotProps">
+                    <div
+                      v-if="slotProps.value"
+                      class="flex items-center"
+                    >
+                      <div>
+                        <div class="font-medium">{{ slotProps.value.name }}</div>
+                        <div class="text-sm text-color-secondary">{{ slotProps.value.size }}</div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                    <span v-else>{{ slotProps.placeholder }}</span>
+                  </template>
+                  <template #option="slotProps">
+                    <div class="flex items-center">
+                      <div>
+                        <div class="font-medium">{{ slotProps.option.name }}</div>
+                        <div class="text-sm text-color-secondary">{{ slotProps.option.size }}</div>
+                      </div>
+                    </div>
+                  </template>
+                </Dropdown>
+                <template v-if="!isGreaterThanMD">
+                  <PrimeButton
+                    icon="pi pi-refresh"
+                    size="small"
+                    outlined
+                    :label="isGreaterThanXL ? 'Refresh' : ''"
+                    class="px-4 py-1 flex items-center justify-center"
+                    @click="handleRefresh"
+                  />
+                  <PrimeButton
+                    icon="pi pi-cog"
+                    size="small"
+                    @click="handleSettingsTrackEvent"
+                    :label="isGreaterThanXL ? 'Settings' : ''"
+                    outlined
+                    class="px-4 py-1 flex items-center justify-center"
+                  />
+                </template>
               </div>
             </div>
           </template>
           <div
             v-if="selectedBucket"
-            class="flex flex-col h-full gap-3"
+            class="flex flex-col"
           >
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-semibold text-color-primary truncate">
+            <div class="flex justify-between items-center mb-4 pt-1">
+              <h2
+                v-if="isGreaterThanMD"
+                class="text-xl font-semibold text-color-primary truncate"
+              >
                 {{ selectedBucket.name }}
               </h2>
-              <div class="flex items-center gap-3">
-                <div class="p-input-icon-left">
+              <div class="flex w-full md:w-auto items-center gap-2.5">
+                <div class="p-input-icon-left w-full md:w-64">
                   <i class="pi pi-search" />
                   <InputText
                     v-model="fileSearchTerm"
                     placeholder="Search in folder"
-                    class="w-48 lg:w-64"
+                    class="w-full"
                     @input="handleFileSearch"
                   />
                 </div>
-                <PrimeButton
-                  icon="pi pi-refresh"
-                  size="small"
-                  outlined
-                  :label="isGreaterThanXL ? 'Refresh' : ''"
-                  class="px-4 py-1 flex items-center justify-center"
-                  @click="handleRefresh"
-                />
-                <PrimeButton
-                  icon="pi pi-cog"
-                  size="small"
-                  @click="handleSettingsTrackEvent"
-                  :label="isGreaterThanXL ? 'Settings' : ''"
-                  outlined
-                  class="px-4 py-1 flex items-center justify-center"
-                />
+                <template v-if="isGreaterThanMD">
+                  <PrimeButton
+                    icon="pi pi-refresh"
+                    size="small"
+                    outlined
+                    :label="isGreaterThanXL ? 'Refresh' : ''"
+                    class="px-4 py-1 flex items-center justify-center"
+                    @click="handleRefresh"
+                  />
+                  <PrimeButton
+                    icon="pi pi-cog"
+                    size="small"
+                    @click="handleSettingsTrackEvent"
+                    :label="isGreaterThanXL ? 'Settings' : ''"
+                    outlined
+                    class="px-4 py-1 flex items-center justify-center"
+                  />
+                </template>
                 <SplitButton
                   size="small"
                   label="Add to files"
@@ -184,7 +190,10 @@
                   :model="uploadMenuItems"
                   primary
                   class="whitespace-nowrap"
-                  :menuButtonProps="{ class: 'rounded-l-none' }"
+                  :menuButtonProps="{
+                    class: 'rounded-l-none',
+                    style: { color: 'var(--primary-text-color) !important' }
+                  }"
                   :pt="{
                     root: { class: 'h-[2rem]' }
                   }"
@@ -235,7 +244,7 @@
                 <p class="text-sm text-color-secondary">
                   Drag files here to add them to your bucket or
                   <span
-                    class="cursor-pointer text-[var(--text-color-link)] transition-colors"
+                    class="cursor-pointer text-[var(--text-color-link)] transition-colors hover:underline"
                     @click="openFileSelector"
                     >choose your files</span
                   >
@@ -246,7 +255,7 @@
           <EmptyResultsBlock
             v-else
             title="No buckets created"
-            description="Create your first bucket here."
+            description="Create your first bucket here"
             createButtonLabel="Bucket"
             @click-to-create="handleCreateTrackEvent"
             :documentationService="documentationGuideProducts.edgeStorage"
@@ -271,6 +280,7 @@
   import SplitButton from 'primevue/splitbutton'
   import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
+  import Dropdown from 'primevue/dropdown'
   import DragAndDrop from './components/DragAndDrop.vue'
   import { ref, computed, inject, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
@@ -334,6 +344,7 @@
       commandAction: (item) => handleDownload(item)
     },
     {
+      title: 'File',
       label: 'Delete',
       icon: 'pi pi-trash',
       type: 'delete',
@@ -368,7 +379,12 @@
     showDragAndDrop.value = false
     selectedBucket.value = bucket
     selectedFolder.value = null
+    selectedFiles.value = []
     listServiceFilesRef.value?.reload()
+  }
+
+  const handleBucketChange = (event) => {
+    selectBucket(event.value)
   }
 
   const handleCreateTrackEvent = () => {
@@ -428,14 +444,13 @@
 
   const handleDeleteSelectedItems = () => {
     openDeleteDialog({
-      title: `${selectedFiles.value.length} selected items`,
-      message: 'Are you sure you want to delete the selected items?',
+      title:
+        selectedFiles.value.length > 1 ? `${selectedFiles.value.length} selected files` : 'File',
+      message: 'Are you sure you want to delete the selected files?',
       data: {
-        deleteConfirmationText:
-          selectedFiles.value.length === 1
-            ? selectedFiles.value[0].name
-            : `${selectedFiles.value.length} selected items`
+        deleteConfirmationText: selectedFiles.value[0].name
       },
+      bypassConfirmation: selectedFiles.value.length > 1,
       deleteService: () => removeFiles(selectedFiles.value.map((file) => file.id)),
       successCallback: () => {
         listServiceFilesRef.value?.reload()

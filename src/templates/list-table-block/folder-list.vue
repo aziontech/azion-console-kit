@@ -78,7 +78,7 @@
         :field="col.field"
         :header="selectedItems.length === 0 ? col.header : ''"
         :sortField="selectedItems.length > 0 ? null : col?.sortField"
-        headerClass="p-highlight relative h-16 w-[20rem]"
+        headerClass="relative h-16 w-[20rem]"
         :class="{ 'hover:cursor-pointer ': !disabledList }"
         data-testid="data-table-column"
       >

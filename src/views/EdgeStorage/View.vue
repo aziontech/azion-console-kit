@@ -82,7 +82,7 @@
 
   const handleDeleteBucket = () => {
     openDeleteDialog({
-      title: selectedBucket.value.name,
+      title: 'Bucket',
       data: {
         deleteConfirmationText: selectedBucket.value.name
       },

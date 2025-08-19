@@ -40,7 +40,7 @@
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <FieldText
             label="Name"
-            required
+            :required="!showDangerZone"
             name="name"
             placeholder="Sample Bucket"
             :value="name"
@@ -55,16 +55,16 @@
       description="Define the access level and permissions for your bucket."
     >
       <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col max-w-sm gap-2">
           <FieldDropdown
             label="Edge Access"
-            required
+            :required="!showDangerZone"
             name="edge_access"
             :value="edge_access"
             :options="edgeAccessOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select a Edge Access level."
+            placeholder="Select a Edge Access level"
             description="Select the appropriate access level for your bucket based on your application's requirements."
             data-testid="edge-storage-form__edge-access-field"
           />
