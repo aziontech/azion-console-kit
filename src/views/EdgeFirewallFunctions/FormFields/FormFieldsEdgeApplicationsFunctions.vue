@@ -75,8 +75,8 @@
   const isToShowFormBuilder = (value) => {
     showFormBuilder.value = value
 
-    if(!value) {
-      setAzionFormSchema(JSON.parse(schemaAzionFormString.value))   
+    if (!value) {
+      setAzionFormSchema(JSON.parse(schemaAzionFormString.value))
     }
   }
 
@@ -87,7 +87,7 @@
 
   const setFuntionArgs = (jsonargs) => {
     const jsonArgs = argsJsonParser(jsonargs)
-    
+
     delete jsonArgs.azion_form
 
     argsValue.value = JSON.stringify(jsonArgs)
@@ -214,9 +214,11 @@
                     name="formBuilder"
                     nameField="formBuilder"
                     description="Use the enable/disable switch to toggle between form builder and visual editing modes."
-                    @onSwitchChange="(value) => {
-                      isToShowFormBuilder(value)
-                    }"
+                    @onSwitchChange="
+                      (value) => {
+                        isToShowFormBuilder(value)
+                      }
+                    "
                   />
 
                   <div>
