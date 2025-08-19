@@ -230,19 +230,17 @@
 
                     <div>
                       <div
-                        v-show="showFormBuilder"
+                        v-show="showFormBuilder && schemaAzionFormString"
                         class="resize-y overflow-y-auto"
                       >
-                        <div v-show="schemaAzionFormString">
-                          <CodeEditor
-                            v-model="schemaAzionFormString"
-                            runtime="json"
-                            class="overflow-clip surface-border border rounded-md"
-                            :initialValue="schemaAzionFormString"
-                            :errors="hasArgsError"
-                            :minimap="false"
-                          />
-                        </div>
+                        <CodeEditor
+                          v-model="schemaAzionFormString"
+                          runtime="json"
+                          class="overflow-clip surface-border border rounded-md"
+                          :initialValue="schemaAzionFormString"
+                          :errors="hasArgsError"
+                          :minimap="false"
+                        />
                       </div>
                       <div v-show="!showFormBuilder">
                         <JsonForms
