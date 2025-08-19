@@ -24,7 +24,7 @@
 
   const onChangeAzionForm = (event) => {
     azionFormData.value = event.data
-    argsValue.value = JSON.stringify(event.data)
+    argsValue.value = JSON.stringify(event.data, null, 2)
   }
 
   const drawerRef = ref('')
@@ -69,6 +69,10 @@
   const selectPanelOptions = ['Form', 'JSON']
   const selectPanelValue = ref(selectPanelOptions[0])
 
+  const indentJsonStringify = (json, indentation = 2) => {
+    return JSON.stringify(json, null, indentation)
+  }
+
   const selectPanelUpdateModelValue = (value) => {
     selectPanelValue.value = !value ? selectPanelOptions[0] : value
   }
@@ -83,7 +87,7 @@
 
   const setAzionFormSchema = (formSchema) => {
     schemaAzionForm.value = formSchema
-    schemaAzionFormString.value = JSON.stringify(formSchema)
+    schemaAzionFormString.value = indentJsonStringify(formSchema)
   }
 
   const setFuntionArgs = (jsonargs) => {
@@ -91,7 +95,7 @@
 
     delete jsonArgs.azion_form
 
-    argsValue.value = JSON.stringify(jsonArgs)
+    argsValue.value = indentJsonStringify(jsonArgs)
     azionFormData.value = jsonArgs
   }
 
@@ -223,7 +227,7 @@
                         }
                       "
                     />
-                    
+
                     <div>
                       <div
                         v-show="showFormBuilder"
