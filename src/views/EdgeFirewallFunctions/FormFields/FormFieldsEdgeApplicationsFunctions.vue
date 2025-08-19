@@ -10,7 +10,7 @@
 
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock.vue'
   import SelectPanel from '@/components/select-panel'
-  import DescriptionSmallArea from '@/components/description-small-area'
+  import DescriptionText from '@/components/description-text/descriptionText'
   import TitleDescriptionArea from '@/components/title-description-area'
 
   import Drawer from '@/views/EdgeFunctions/Drawer/index.vue'
@@ -199,7 +199,6 @@
         </FieldDropdownLazyLoader>
       </div>
 
-      <!-- Edge Functions Dynamic Args -->
       <div class="flex flex-col gap-2 w-full">
         <div v-if="schemaAzionForm">
           <SelectPanel
@@ -304,7 +303,9 @@
           >
             {{ argsError }}
           </small>
-          <DescriptionSmallArea
+          <DescriptionText
+            :isHtml="true"
+            size="small"
             description="Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args('arg_name')</code>."
           />
         </div>

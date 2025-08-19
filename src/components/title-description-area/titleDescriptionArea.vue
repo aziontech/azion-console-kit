@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-2">
-    <TitleArea :title="title" />
-    <DescriptionArea
+    <TitleText :title="title" />
+    <DescriptionText
       v-if="description"
       :description="description"
     />
@@ -9,8 +9,8 @@
 </template>
 
 <script setup>
-  import TitleArea from '../title-area/titleArea'
-  import DescriptionArea from '../description-area/descriptionArea'
+  import TitleText from '../title-text/titleText'
+  import DescriptionText from '../description-text/descriptionText'
 
   defineProps({
     title: {

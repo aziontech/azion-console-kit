@@ -1,8 +1,8 @@
-import TitleArea from '../../../components/title-area'
+import TitleText from '../../../components/title-text'
 
 export default {
-  title: 'Components/text/titleArea',
-  component: TitleArea,
+  title: 'Components/text/TitleText',
+  component: TitleText,
   tags: ['autodocs'],
   argTypes: {
     title: {

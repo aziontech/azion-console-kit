@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./titleText.d.ts",
+  "browser": {
+    "./sfc": "./titleText.vue"
+  }
+}
