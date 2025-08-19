@@ -216,7 +216,7 @@
             <div
               v-else
               class="flex flex-col gap-1 items-center border-1 border-transparent justify-center w-full"
-              :class="{ 'border-dashed border-[#f3652b]': isDragOver }"
+              :class="{ 'border-dashed !border-[#f3652b]': isDragOver }"
             >
               <ListTableBlock
                 pageTitleDelete="Files"
@@ -230,6 +230,7 @@
                 enableEditClickFolder
                 :actions="fileActions"
                 :isDownloading="isDownloading"
+                :searchFilter="fileSearchTerm"
                 @on-row-click-edit-folder="handleEditFolder"
                 @delete-selected-items="handleDeleteSelectedItems"
                 @dragover.prevent="handleDrag(true)"

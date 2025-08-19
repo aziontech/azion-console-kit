@@ -11,7 +11,7 @@
       class="overflow-clip rounded-md"
       scrollable
       removableSort
-      :value="data"
+      :value="filterData"
       :paginator="paginator"
       :rowsPerPageOptions="[10, 20, 50, 100]"
       :rows="minimumOfItemsPerPage"
@@ -397,6 +397,10 @@
     isDownloading: {
       type: Boolean,
       default: false
+    },
+    searchFilter: {
+      type: String,
+      default: () => ''
     }
   })
 
@@ -434,6 +438,12 @@
     ...props.pt,
     rowCheckbox: { 'data-testid': 'data-table-row-checkbox' }
   }))
+
+  const filterData = computed(() => {
+    return data.value.filter((item) => {
+      return item.name.toLowerCase().includes(props.searchFilter.toLowerCase())
+    })
+  })
 
   onMounted(() => {
     if (!props.lazyLoad) {
