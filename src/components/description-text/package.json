@@ -1,0 +1,7 @@
+{
+  "main": "./index.js",
+  "types": "./descriptionText.d.ts",
+  "browser": {
+    "./sfc": "./descriptionText.vue"
+  }
+}

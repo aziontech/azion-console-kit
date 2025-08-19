@@ -1,7 +1,0 @@
-{
-  "main": "./index.js",
-  "types": "./titleArea.d.ts",
-  "browser": {
-    "./sfc": "./titleArea.vue"
-  }
-}
