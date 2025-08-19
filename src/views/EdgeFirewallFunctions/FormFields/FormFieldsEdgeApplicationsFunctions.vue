@@ -61,6 +61,7 @@
   const { value: args, errorMessage: argsError } = useField('args')
 
   const schemaAzionForm = ref(null)
+  const schemaAzionFormString = ref('')
   const azionFormData = ref({})
   const showFormBuilder = ref(false)
   const argsValue = ref('{}')
@@ -68,19 +69,25 @@
   const selectPanelValue = ref(selectPanelOptions[0])
 
   const selectPanelUpdateModelValue = (value) => {
-    selectPanelValue.value = value
+    selectPanelValue.value = !value ? selectPanelOptions[0] : value
   }
 
   const isToShowFormBuilder = (value) => {
     showFormBuilder.value = value
+
+    if(!value) {
+      setAzionFormSchema(JSON.parse(schemaAzionFormString.value))   
+    }
   }
 
   const setAzionFormSchema = (formSchema) => {
     schemaAzionForm.value = formSchema
+    schemaAzionFormString.value = JSON.stringify(formSchema)
   }
 
   const setFuntionArgs = (jsonargs) => {
     const jsonArgs = argsJsonParser(jsonargs)
+    
     delete jsonArgs.azion_form
 
     argsValue.value = JSON.stringify(jsonArgs)
@@ -199,10 +206,9 @@
             <div v-show="selectPanelValue === 'Form'">
               <div id="azionform">
                 <div
-                  v-if="schemaAzionForm"
+                  v-if="schemaAzionFormString"
                   class="flex flex-col gap-4"
                 >
-
                   <FieldSwitchBlock
                     title="Form builder"
                     name="formBuilder"
@@ -218,13 +224,16 @@
                       v-show="showFormBuilder"
                       class="resize-y overflow-y-auto"
                     >
-                      <CodeEditor
-                        v-model="argsValue"
-                        runtime="json"
-                        class="overflow-clip surface-border border rounded-md"
-                        :errors="hasArgsError"
-                        :minimap="false"
-                      />
+                      <div v-show="schemaAzionFormString">
+                        <CodeEditor
+                          v-model="schemaAzionFormString"
+                          runtime="json"
+                          class="overflow-clip surface-border border rounded-md"
+                          :initialValue="schemaAzionFormString"
+                          :errors="hasArgsError"
+                          :minimap="false"
+                        />
+                      </div>
                     </div>
                     <div v-show="!showFormBuilder">
                       <JsonForms
@@ -244,6 +253,8 @@
                   v-model="argsValue"
                   runtime="json"
                   class="overflow-clip surface-border border rounded-md"
+                  :initialValue="argsValue"
+                  :readOnly="schemaAzionForm ? true : false"
                   :errors="hasArgsError"
                   :minimap="false"
                 />
