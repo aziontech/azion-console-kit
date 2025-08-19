@@ -131,8 +131,8 @@
     setEdgeCertificate(newEdgeCertificate)
   })
 
-  const onDigitalCertificateSuccess = (domainId) => {
-    edgeCertificate.value = domainId
+  const onDigitalCertificateSuccess = ({ id }) => {
+    edgeCertificate.value = id
   }
 
   const listDigitalCertificatesByType = async (type, queryParams) => {
