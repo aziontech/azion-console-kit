@@ -17,7 +17,7 @@
         :groupData="groupData"
         :userUTC="userUTC"
       />
-      <!-- Sistema de Filtros Avançados -->
+
       <div class="mb-6">
         <AdvancedFilterSystem
           v-model="advancedFilterState"
@@ -3275,11 +3275,7 @@
   const reportData = ref(null)
 
   /* Advanced Filter System state */
-  const advancedFilterState = ref({
-    searchQuery: {},
-    dateRange: null,
-    filters: []
-  })
+  const advancedFilterState = ref({})
 
   const updateGroupData = (data) => {
     groupData.value = { ...data }
@@ -3363,10 +3359,14 @@
     }, 100)
   })
 
-  watch(advancedFilterState, () => {
-    // eslint-disable-next-line no-console
-    console.log('advancedFilterState', advancedFilterState.value)
-  }, { deep: true })
+  watch(
+    advancedFilterState,
+    () => {
+      // eslint-disable-next-line no-console
+      console.log('advancedFilterState', advancedFilterState.value)
+    },
+    { deep: true }
+  )
 
   onUnmounted(() => {
     groupObservable.unsubscribe(updateGroupData)
