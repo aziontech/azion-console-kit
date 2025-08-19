@@ -2,11 +2,11 @@
   <div class="flex items-center gap-4 p-6 border rounded-lg shadow-sm">
     <AdvancedFilter
       v-model="model.filters"
-      :fields="props.fieldsFilter"
+      :filtersOptions="props.fieldsFilter"
       @apply-filter="handleApplyFilter"
     />
 
-    <FilterDataRange v-model="model.dateRange" />
+    <DataTimeRange v-model="model.dateRange" />
     <div class="flex flex-col gap-2 text-xs text-color-secondary">
       <div>
         <span>Active Filters:</span>
@@ -24,8 +24,8 @@
   import { defineModel, onMounted } from 'vue'
 
   defineOptions({ name: 'AdvancedFilterSystem' })
-  import AdvancedFilter from './components/AdvancedFilter.vue'
-  import FilterDataRange from '@/components/filterDataRange/index.vue'
+  import AdvancedFilter from '@/components/base/filterFields'
+  import DataTimeRange from '@/components/base/dataTimeRange'
 
   // Model
   const model = defineModel({
@@ -84,14 +84,14 @@
         filters: []
       }
     }
-    
+
     if (!model.value.dateRange) {
       model.value.dateRange = {
         startDate: new Date(new Date().setDate(new Date().getDate() - 6)),
         endDate: new Date()
       }
     }
-    
+
     if (!model.value.filters) {
       model.value.filters = []
     }
@@ -105,7 +105,7 @@
 
   const formatDateRange = (dateRange) => {
     if (!dateRange?.startDate || !dateRange?.endDate) return 'Not set'
-    
+
     const start = new Date(dateRange.startDate).toLocaleDateString()
     const end = new Date(dateRange.endDate).toLocaleDateString()
     return `${start} - ${end}`

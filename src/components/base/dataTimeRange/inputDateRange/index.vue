@@ -99,7 +99,7 @@
               }"
             />
 
-            <!-- Seletor de horários -->
+            <!-- Time selector -->
             <div class="border surface-border rounded-lg p-1 w-min">
               <div class="max-h-64 overflow-y-auto overflow-x-hidden space-y-1">
                 <PrimeButton
@@ -154,7 +154,6 @@
         </TabPanel>
       </TabView>
 
-      <!-- Campo de entrada de data/hora -->
       <div
         class="mt-4 pt-4 border-t surface-border"
         v-if="activeTab !== 2"
@@ -173,6 +172,8 @@
             <PrimeButton
               v-if="hasChanges"
               icon="pi pi-check"
+              size="small"
+              outlined
               @click="updateRange"
             />
           </div>

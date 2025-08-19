@@ -6,13 +6,18 @@
 </template>
 
 <script setup>
-  import QuickSelect from './quickSelect.vue'
-  import InputDateRange from './inputDateRange.vue'
+  import QuickSelect from './quickSelect/index.vue'
+  import InputDateRange from './inputDateRange/index.vue'
   import { defineModel } from 'vue'
 
-  defineOptions({ name: 'FilterDataRange' })
+  defineOptions({ name: 'DataTimeRange' })
 
   const model = defineModel({
-    type: Object
+    type: Object,
+    required: false,
+    default: () => ({
+      start: new Date(),
+      end: new Date()
+    })
   })
 </script>
