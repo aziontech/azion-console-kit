@@ -223,6 +223,33 @@ function getRemainingDays(dateStr) {
   return Math.floor(days)
 }
 
+const formatDateToIso = (date) => {
+  const pad = (num) => String(num).padStart(2, '0')
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  const seconds = pad(date.getSeconds())
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+}
+
+const getDateRangeByHourRange = (hourRange) => {
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setHours(startDate.getHours() - parseInt(hourRange))
+
+  const formattedStartDate = formatDateToIso(startDate)
+  const formattedEndDate = formatDateToIso(endDate)
+
+  return {
+    startDate: formattedStartDate,
+    endDate: formattedEndDate
+  }
+}
+
 export {
   convertValueToDate,
   convertDateToLocalTimezone,
@@ -235,5 +262,7 @@ export {
   convertValueToDateByUserTimezone,
   formatDateToDayMonthYearHour,
   getRemainingDays,
-  getCurrentDateTimeIntl
+  getCurrentDateTimeIntl,
+  formatDateToIso,
+  getDateRangeByHourRange
 }

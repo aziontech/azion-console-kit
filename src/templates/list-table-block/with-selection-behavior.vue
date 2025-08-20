@@ -446,7 +446,7 @@
   }
 
   const loadData = async ({ page, ...query }) => {
-    if (props.listService) {
+    if (props.listService && !isLoading.value) {
       try {
         isLoading.value = true
         const response = props.isGraphql
