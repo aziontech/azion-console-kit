@@ -238,7 +238,7 @@
     {
       header: 'Origins',
       component: EdgeApplicationsOriginsListView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.origins,
       props: () => ({
         ...props.originsServices,
@@ -260,7 +260,7 @@
     {
       header: 'Error Responses',
       component: EdgeApplicationsErrorResponseEditView,
-      condition: true,
+      condition: hasFlagBlockApiV4(),
       show: showTabs.errorResponses,
       props: () => ({
         ...props.errorResponsesServices,
