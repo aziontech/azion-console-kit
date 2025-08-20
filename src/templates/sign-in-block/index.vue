@@ -162,6 +162,7 @@
 <script setup>
   import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
   import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
+  import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
@@ -304,7 +305,14 @@
       const res = await verifyLoginMethodService(email.value)
       if (res.loginMethod === 'federated') {
         const encodedEmail = encodeURIComponent(email.value)
-        window.location.replace(`${res.loginUrl}?email=${encodedEmail}&console=true`)
+        const redirectUrl = `${res.loginUrl}?email=${encodedEmail}&console=true`
+
+        // Validate OAuth redirect URL before redirecting
+        if (validateOAuthRedirect(redirectUrl)) {
+          window.location.replace(redirectUrl)
+        } else {
+          hasRequestErrorMessage.value = 'Invalid redirect URL detected'
+        }
       } else {
         showPasswordStep()
       }
