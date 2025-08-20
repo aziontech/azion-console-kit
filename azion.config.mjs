@@ -5,7 +5,7 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 
-const addStagePrefix = (origin) => {  
+const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
       const isCitiesDomain = hostHeader === 'cities.azion.com'
@@ -56,7 +56,9 @@ const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConf
         captured: `${cookieName}_arr`,
         subject: `upstream_cookie_${formattedCookieName}`
       },
-      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]};${hasConfigMaxAge ? ' Max-Age=1209600; ' : ' '}Path=/; SameSite=Lax; Secure; Domain=${domain}`,
+      setCookie: `${formattedCookieName}=%{${cookieName}_arr[0]};${
+        hasConfigMaxAge ? ' Max-Age=1209600; ' : ' '
+      }Path=/; SameSite=Lax; Secure; Domain=${domain}`,
       ...(hasConfigMaxAge ? { filterCookie: formattedCookieName } : {})
     }
   }))
@@ -65,19 +67,22 @@ const createCookieRewriteRule = ({ cookieName, description, prefix = '', hasConf
 const cookieRewriteRules = [
   ...createCookieRewriteRule({
     cookieName: 'azrt',
-    description: 'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
+    description:
+      'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
     prefix: '_',
     hasConfigMaxAge: true
   }),
   ...createCookieRewriteRule({
     cookieName: 'azsid',
-    description: 'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
+    description:
+      'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
     prefix: '',
     hasConfigMaxAge: false
   }),
   ...createCookieRewriteRule({
     cookieName: 'azat',
-    description: 'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
+    description:
+      'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
     prefix: '_',
     hasConfigMaxAge: true
   })
@@ -352,7 +357,7 @@ const config = {
             subject: 'request_uri'
           },
           rewrite: `/billing/invoices/%{captured[1]}`,
-          forwardCookies: true,
+          forwardCookies: true
         }
       },
       {
@@ -401,7 +406,24 @@ const config = {
     response: [
       ...cookieRewriteRules,
       {
-        name: 'Secure Headers',
+        name: 'OAuth Security Headers - Login and Signup',
+        description:
+          'Applies strict COOP headers only to authentication-related pages to protect OAuth flows without breaking external links.',
+        match: '^/(login|signup|switch-account|mfa)',
+        behavior: {
+          setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
+        }
+      },
+      {
+        name: 'OAuth Security Headers - GitHub Connection',
+        description: 'Applies strict COOP headers to GitHub connection popup pages.',
+        match: '^/github-connection-popup',
+        behavior: {
+          setHeaders: ['Cross-Origin-Opener-Policy: same-origin']
+        }
+      },
+      {
+        name: 'Secure Headers - General',
         description:
           'Sets various security headers to enhance the security posture of responses, including protections against clickjacking, XSS, and other web vulnerabilities.',
         match: '^\\/',

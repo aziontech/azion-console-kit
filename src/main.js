@@ -24,9 +24,14 @@ import DialogService from 'primevue/dialogservice'
 import { customAiPrompt } from '@modules/azion-ai-chat/directives/custom-ai-prompt'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+import { initOAuthSecurity } from '@/helpers/oauth-security'
 
 import App from './App.vue'
 import router from './router'
+
+// Initialize OAuth security measures early
+// Only applies to authentication pages to avoid breaking external links
+initOAuthSecurity()
 
 const app = createApp(App)
 const pinia = createPinia()
