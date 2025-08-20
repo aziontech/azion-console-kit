@@ -1,33 +1,21 @@
 const OAUTH_SECURITY_CONFIG = {
-  blockedSchemes: [
-    'file:',
-    'data:',
-    'javascript:',
-    'vbscript:',
-    'about:'
-  ],
-  
+  blockedSchemes: ['file:', 'data:', 'javascript:', 'vbscript:', 'about:'],
+
   monitoringInterval: 1000,
-  
+
   maxBlockAttempts: 3
 }
 
-
-
-
-
 const hasDangerousScheme = (url) => {
   const lowerUrl = url.toLowerCase()
-  return OAUTH_SECURITY_CONFIG.blockedSchemes.some(scheme => 
-    lowerUrl.startsWith(scheme)
-  )
+  return OAUTH_SECURITY_CONFIG.blockedSchemes.some((scheme) => lowerUrl.startsWith(scheme))
 }
 
 export const validateOAuthRedirect = (url) => {
   if (!url || typeof url !== 'string') {
     return false
   }
-  
+
   try {
     new URL(url)
     return !hasDangerousScheme(url)
@@ -67,7 +55,7 @@ class OAuthSecurityGuard {
     try {
       const openerOrigin = window.opener.location.origin
       const currentOrigin = window.location.origin
-      
+
       if (openerOrigin !== currentOrigin) {
         this.handleAttack()
         return true
@@ -83,8 +71,8 @@ class OAuthSecurityGuard {
   handleAttack() {
     this.closeMaliciousOpener()
     this.blockNavigation()
-    this.showSecurityAlert()
-    
+    // this.showSecurityAlert() // Security alert hidden
+
     this.blockAttempts++
     if (this.blockAttempts >= OAUTH_SECURITY_CONFIG.maxBlockAttempts) {
       window.location.reload()
@@ -108,7 +96,7 @@ class OAuthSecurityGuard {
       event.returnValue = ''
       return ''
     }
-    
+
     window.addEventListener('beforeunload', blockBeforeUnload, { capture: true })
 
     try {
@@ -160,7 +148,7 @@ class OAuthSecurityGuard {
       This page is now protected from malicious redirects.
     `
     document.body.appendChild(alertDiv)
-    
+
     setTimeout(() => {
       if (alertDiv.parentNode) {
         alertDiv.parentNode.removeChild(alertDiv)
