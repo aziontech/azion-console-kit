@@ -82,12 +82,12 @@ describe('Real-time Purge spec', { tags: ['@dev6'] }, () => {
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
 
     cy.intercept(
       'GET',
-      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
+      `/v4/workspace/firewalls?ordering=name&page=1&page_size=100&fields=&search=`
     ).as('getEdgeFirewallList')
 
     cy.intercept(

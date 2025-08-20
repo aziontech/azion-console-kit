@@ -3,14 +3,14 @@ import selectors from '../../support/selectors'
 describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
   beforeEach(() => {
     cy.login()
-    cy.intercept('GET', '/v4/edge_firewall/wafs*', {
+    cy.intercept('GET', '/v4/workspace/wafs*', {
       fixture: '/waf-rules/waf-list.json'
     }).as('wafListApi')
 
     cy.openProduct('WAF Rules')
 
     cy.wait('@wafListApi', { timeout: 30000 })
-    cy.intercept('GET', '/v4/edge_firewall/wafs/6648', {
+    cy.intercept('GET', '/v4/workspace/wafs/6648', {
       fixture: '/waf-rules/waf-main-settings.json'
     }).as('wafMainSettings')
     cy.get(selectors.list.filteredRow.column('name')).first().click()
@@ -38,7 +38,7 @@ describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
     cy.get(selectors.wafTuning.dataTableRowCheckbox).eq(1).click()
     cy.get(selectors.wafTuning.submitButton).eq(1).click()
     cy.get('textarea').type('teste')
-    cy.intercept('POST', '/v4/edge_firewall/wafs/6648/exceptions', (req) => {
+    cy.intercept('POST', '/v4/workspace/wafs/6648/exceptions', (req) => {
       expect(req.body).to.have.property('match_zones')
       expect(req.body.match_zones).to.be.an('array')
       expect(req.body.match_zones).to.deep.include({
@@ -75,7 +75,7 @@ describe('Waf Rules Tuning', { tags: ['@dev4'] }, () => {
     cy.get(selectors.wafTuning.dataTableRowCheckbox).click()
     cy.get(selectors.wafTuning.submitButton).click()
     cy.get('textarea').type('teste')
-    cy.intercept('POST', '/v4/edge_firewall/wafs/6648/exceptions', (req) => {
+    cy.intercept('POST', '/v4/workspace/wafs/6648/exceptions', (req) => {
       expect(req.body).to.have.property('match_zones')
       expect(req.body.match_zones).to.be.an('array')
       expect(req.body.match_zones).to.deep.include({

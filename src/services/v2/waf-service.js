@@ -2,7 +2,7 @@ export class WafService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_firewall/wafs'
+    this.baseURL = 'v4/workspace/wafs'
   }
 
   listWafRules = async (
@@ -18,9 +18,9 @@ export class WafService {
     const fieldsSplits = Array.isArray(params.fields)
       ? params.fields
       : (params.fields || '')
-          .split(',')
-          .map((field) => field.trim())
-          .filter(Boolean)
+        .split(',')
+        .map((field) => field.trim())
+        .filter(Boolean)
 
     const body = this.adapter?.transformListWafRules?.(results, fieldsSplits) ?? results
 

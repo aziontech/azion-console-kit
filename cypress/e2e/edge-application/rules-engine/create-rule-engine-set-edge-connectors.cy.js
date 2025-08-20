@@ -10,7 +10,7 @@ let fixtures = {}
  */
 const createEdgeApplicationCase = () => {
   // Act
-  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/workspace/applications*').as('createEdgeApp')
 
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(fixtures.edgeApplicationName)
@@ -63,7 +63,7 @@ describe('Edge Application', { tags: ['@dev3'] }, () => {
         body: edgeConnectorsdata
       }
     ).as('listEdgeConnectors')
-    cy.intercept({ method: 'POST', url: '/v4/edge_application/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
+    cy.intercept({ method: 'POST', url: '/v4/workspace/applications/**' }, { body: [], statusCode: 202 }).as('createRulesEngineEdgeConnector')
 
     // Arrange
     cy.openProduct('Edge Application')
