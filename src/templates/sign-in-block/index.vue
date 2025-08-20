@@ -307,7 +307,6 @@
         const encodedEmail = encodeURIComponent(email.value)
         const redirectUrl = `${res.loginUrl}?email=${encodedEmail}&console=true`
 
-        // Validate OAuth redirect URL before redirecting
         if (validateOAuthRedirect(redirectUrl)) {
           window.location.replace(redirectUrl)
         } else {

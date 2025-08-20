@@ -100,7 +100,6 @@
 
     loadingStore.startLoading()
 
-    // Validate OAuth redirect URL before redirecting
     if (validateOAuthRedirect(idp.loginUrl)) {
       accountStore.setSsoSignUpMethod(idp.slug)
       window.location.href = idp.loginUrl
