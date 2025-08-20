@@ -24,6 +24,19 @@ export const validateOAuthRedirect = (url) => {
   }
 }
 
+const logError = (context, error) => {
+  // eslint-disable-next-line no-console
+  console.warn(`Ignored error in ${context}:`, error)
+}
+
+const ignoreError = (fn, context = '') => {
+  try {
+    fn()
+  } catch (error) {
+    logError(context, error)
+  }
+}
+
 class OAuthSecurityGuard {
   constructor() {
     this.isActive = false
@@ -71,7 +84,6 @@ class OAuthSecurityGuard {
   handleAttack() {
     this.closeMaliciousOpener()
     this.blockNavigation()
-    // this.showSecurityAlert() // Security alert hidden
 
     this.blockAttempts++
     if (this.blockAttempts >= OAUTH_SECURITY_CONFIG.maxBlockAttempts) {
@@ -80,13 +92,9 @@ class OAuthSecurityGuard {
   }
 
   closeMaliciousOpener() {
-    try {
-      if (window.opener && window.opener !== window) {
-        window.opener.close()
-        window.opener = null
-      }
-    } catch (error) {
-      // Silent fail
+    if (window.opener && window.opener !== window) {
+      window.opener?.close?.()
+      window.opener = null
     }
   }
 
@@ -99,61 +107,28 @@ class OAuthSecurityGuard {
 
     window.addEventListener('beforeunload', blockBeforeUnload, { capture: true })
 
-    try {
+    this.overrideLocationHref()
+    this.overrideLocationMethods()
+  }
+
+  overrideLocationHref() {
+    ignoreError(() => {
       Object.defineProperty(window.location, 'href', {
-        set: () => {
-          // Do nothing - block the change
-        },
+        set: () => {},
         get: () => this.originalLocation.href,
         configurable: false
       })
-    } catch (error) {
-      // Silent fail
-    }
-
-    try {
-      window.location.replace = () => {
-        return false
-      }
-    } catch (error) {
-      // Silent fail
-    }
-
-    try {
-      window.location.assign = () => {
-        return false
-      }
-    } catch (error) {
-      // Silent fail
-    }
+    }, 'overrideLocationHref')
   }
 
-  showSecurityAlert() {
-    const alertDiv = document.createElement('div')
-    alertDiv.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #dc3545;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-      z-index: 999999;
-      font-family: Arial, sans-serif;
-    `
-    alertDiv.innerHTML = `
-      🚨 SECURITY ALERT: OAuth hijacking attack detected and blocked! 
-      This page is now protected from malicious redirects.
-    `
-    document.body.appendChild(alertDiv)
+  overrideLocationMethods() {
+    ignoreError(() => {
+      window.location.replace = () => false
+    }, 'overrideLocationMethods.replace')
 
-    setTimeout(() => {
-      if (alertDiv.parentNode) {
-        alertDiv.parentNode.removeChild(alertDiv)
-      }
-    }, 10000)
+    ignoreError(() => {
+      window.location.assign = () => false
+    }, 'overrideLocationMethods.assign')
   }
 
   setupProtections() {
