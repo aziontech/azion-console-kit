@@ -10,7 +10,7 @@
  */
 const isAuthPage = () => {
   const authPaths = ['/login', '/signup', '/switch-account', '/mfa', '/github-connection-popup']
-  return authPaths.some(path => window.location.pathname.startsWith(path))
+  return authPaths.some((path) => window.location.pathname.startsWith(path))
 }
 
 /**
@@ -54,7 +54,7 @@ export const preventParentWindowControl = () => {
 export const initOAuthSecurity = () => {
   // Previne o controle da janela pai apenas em páginas de autenticação
   preventParentWindowControl()
-  
+
   // Segurança adicional: define a política de referrer se ainda não estiver definida
   if (!document.querySelector('meta[name="referrer"]')) {
     const metaReferrer = document.createElement('meta')

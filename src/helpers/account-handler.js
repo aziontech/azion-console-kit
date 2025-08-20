@@ -87,7 +87,7 @@ export class AccountHandler {
   async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
     // Apply OAuth security protection first (only on auth pages)
     preventParentWindowControl()
-    
+
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 
