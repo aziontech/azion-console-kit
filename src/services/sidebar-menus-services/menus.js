@@ -173,6 +173,18 @@ function createEdgeLibrariesItems() {
   ]
 }
 
+function createStoreItems() {
+  return [
+    {
+      label: 'Edge SQL',
+      to: '/edge-sql',
+      icon: 'ai ai-edge-sql',
+      tag: 'Preview',
+      id: 'edge-sql'
+    }
+  ]
+}
+
 function createMarketplaceProductsItems() {
   return [
     {
@@ -220,6 +232,10 @@ export function getMenuItens(showMarketplaceProductsItens) {
     {
       label: 'Edge Libraries',
       items: createEdgeLibrariesItems()
+    },
+    {
+      label: 'Store',
+      items: createStoreItems()
     },
     {
       label: 'Marketplace Products',
