@@ -47,10 +47,6 @@
       type: String || Number,
       required: true
     },
-    edgeFirewallModules: {
-      type: Object,
-      required: true
-    },
     reorderRulesEngine: {
       type: Function,
       required: true
@@ -237,7 +233,6 @@
   <Drawer
     ref="drawerRef"
     :edgeFirewallId="edgeFirewallId"
-    :edgeFirewallModules="edgeFirewallModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
     :loadService="loadEdgeFirewallRulesEngineService"

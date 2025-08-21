@@ -14,6 +14,7 @@ export const edgeFirewallRoutes = {
         documentationService: Helpers.documentationCatalog.edgeFirewall
       },
       meta: {
+        title: 'Edge Firewall',
         breadCrumbs: [
           {
             label: 'Edge Firewall',
@@ -30,6 +31,7 @@ export const edgeFirewallRoutes = {
         listDomainsService: DomainServices.listDomainsService
       },
       meta: {
+        title: 'Create Edge Firewall',
         breadCrumbs: [
           {
             label: 'Edge Firewall',
@@ -57,6 +59,7 @@ export const edgeFirewallRoutes = {
         }
       },
       meta: {
+        title: 'Edit Edge Firewall',
         breadCrumbs: [
           {
             label: 'Edge Firewall',

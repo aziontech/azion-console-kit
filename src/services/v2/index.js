@@ -112,6 +112,11 @@ import { EdgeStorageService } from './edge-storage-service'
 // Edge SQL
 import { EdgeSQLService } from './edge-sql-service'
 import { EdgeSQLAdapter } from './adapters/edge-sql-adapter'
+// Activity History
+import { ActivityHistoryService } from './activity-history-service'
+import { ActivityHistoryAdapter } from './adapters/activity-history-adapter'
+import graphQLApi from '@/services/axios/makeEventsApi'
+const graphQLApiInstance = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
 
 const httpService = createHttpService()
 
@@ -173,6 +178,12 @@ const workloadService = new WorkloadService(
 )
 const edgeSQLService = new EdgeSQLService(httpService, EdgeSQLAdapter)
 
+const activityHistoryService = new ActivityHistoryService(
+  httpService,
+  ActivityHistoryAdapter,
+  graphQLApiInstance
+)
+
 export {
   vcsService,
   cacheSettingsService,
@@ -202,5 +213,6 @@ export {
   workloadService,
   workloadDeploymentService,
   edgeStorageService,
-  edgeSQLService
+  edgeSQLService,
+  activityHistoryService
 }

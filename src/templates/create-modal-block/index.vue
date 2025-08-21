@@ -53,6 +53,18 @@
       description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
+      label: 'Edge Connector',
+      to: '/edge-connectors/create',
+      description:
+        'Edge Connector centralizes connections and how to connect to machines and applications.'
+    },
+    {
+      label: 'Custom Page',
+      to: '/custom-pages/create',
+      description:
+        'Create custom page to display personalized error pages for specific HTTP errors.'
+    },
+    {
       label: 'Edge Nodes',
       to: '/edge-node/create',
       description: 'Create edge infrastructure, installing services and resources in real time.'
@@ -130,10 +142,17 @@
     selectedTab.value = 'newResource'
   }
 
+  const filteredResources = computed(() => {
+    const showRosourceOnlyV4 = ['Edge Connector', 'Custom Page']
+    if (!hasFlagBlockApiV4()) return RESOURCES
+
+    return RESOURCES.filter((resource) => !showRosourceOnlyV4.includes(resource.label))
+  })
+
   const templatesData = ref({
     recommended: [],
     templates: [],
-    newResource: RESOURCES,
+    newResource: filteredResources.value,
     githubImport: []
   })
 

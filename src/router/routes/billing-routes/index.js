@@ -29,6 +29,7 @@ export const billingRoutes = {
       name: 'billing-tabs',
       component: () => import('@views/Billing/TabsView.vue'),
       meta: {
+        title: 'Billing',
         breadCrumbs: [
           {
             label: 'Billing',
@@ -42,6 +43,7 @@ export const billingRoutes = {
       name: 'billing-invoice-details',
       component: () => import('@views/Billing/InvoiceDetailsView.vue'),
       meta: {
+        title: 'Invoice Details',
         breadCrumbs: [
           {
             label: 'Billing',

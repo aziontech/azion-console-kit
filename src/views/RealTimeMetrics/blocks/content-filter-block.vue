@@ -216,8 +216,10 @@
 
   watch(
     () => currentDashboard.value,
-    async () => {
-      refAdvancedFilter.value.clearDisplayFilter()
+    async (newVal, oldVal) => {
+      if (newVal.dataset !== oldVal.dataset) {
+        refAdvancedFilter.value.clearDisplayFilter()
+      }
     }
   )
 </script>

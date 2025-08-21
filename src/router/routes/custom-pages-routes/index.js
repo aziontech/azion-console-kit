@@ -13,6 +13,7 @@ export const customPagesRoutes = {
         documentationService: Helpers.documentationGuideProducts.customPages
       },
       meta: {
+        title: 'Custom Pages',
         breadCrumbs: [
           {
             label: 'Custom Pages',
@@ -27,6 +28,7 @@ export const customPagesRoutes = {
       name: 'create-custom-pages',
       component: () => import('@views/CustomPages/View.vue'),
       meta: {
+        title: 'Create Custom Page',
         breadCrumbs: [
           {
             label: 'Custom Pages',
@@ -49,6 +51,7 @@ export const customPagesRoutes = {
         mode: 'edit'
       },
       meta: {
+        title: 'Edit Custom Page',
         breadCrumbs: [
           {
             label: 'Custom Pages',

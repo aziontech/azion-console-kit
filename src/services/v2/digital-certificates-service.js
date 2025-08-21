@@ -1,3 +1,5 @@
+import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+
 export class DigitalCertificatesService {
   constructor(http, adapter) {
     this.http = http
@@ -84,11 +86,14 @@ export class DigitalCertificatesService {
       }
     })
 
-    return this.adapter?.transformListDigitalCertificatesDropdown?.(data, params)
+    if (hasFlagBlockApiV4())
+      return this.adapter?.transformListDigitalCertificatesDropdownToDomains?.(data, params)
+
+    return this.adapter?.transformListDigitalCertificatesDropdownToWorkloads?.(data, params)
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate']
+    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate', 'status']
 
     const { data } = await this.http.request({
       method: 'GET',

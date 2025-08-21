@@ -134,4 +134,13 @@
       }
     }
   )
+
+  watch(
+    () => hasSampling.value,
+    (value) => {
+      if (!value) {
+        samplingPercentage.value = 100
+      }
+    }
+  )
 </script>

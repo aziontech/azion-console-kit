@@ -81,7 +81,7 @@ const typeBuilders = {
       }
     }
 
-    if (!payload.modules.originShield.config.hmac.enabled) {
+    if (!payload.modules.originShield.config.hmac.enabled && modules.origin_shield.config) {
       delete modules.origin_shield.config.hmac
     }
 

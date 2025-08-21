@@ -6,7 +6,7 @@
   >
     <template #inputs>
       <FieldGroupRadio
-        label="Edge Cache Settings"
+        label="Edge Cache Behavior"
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="getEdgeCacheRadioOptions()"
@@ -54,6 +54,7 @@
         name="enableLargeFileCache"
         auto
         :isCard="false"
+        @onSwitchChange="checkLargeFileCache"
         title="Large file optimization"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
         description="Optimize caching for large files by splitting them into smaller fragments for efficient delivery."
@@ -129,7 +130,7 @@
         disabled: !!showSliceConfigurationRange.value
       },
       {
-        title: 'Override cache settings',
+        title: 'Override cache behavior',
         subtitle: `Customize the edge cache behavior by overriding the origin server's cache policies.`,
         inputValue: 'override'
       }
@@ -147,8 +148,11 @@
     return !!enableLargeFileCache.value
   })
 
-  watch(enableLargeFileCache, (value) => {
+  const checkLargeFileCache = (value) => {
     cdnCacheSettings.value = value ? 'override' : 'honor'
+  }
+
+  watch(enableLargeFileCache, (value) => {
     emit('enableSliceConfiguration', value)
   })
 

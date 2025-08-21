@@ -18,6 +18,7 @@
               placeholder="Search by event"
               v-model="search"
               data-testid="events-search-input"
+              @keyup.enter="loadData()"
             />
           </span>
           <span
@@ -63,7 +64,7 @@
           >
           <Timeline
             v-else
-            :value="filteredEvents"
+            :value="events"
             align="left"
             class="customized-timeline"
             :pt="{
@@ -115,9 +116,9 @@
           </Timeline>
         </div>
         <Paginator
-          :rows="10"
+          :rows="rowsPerPage"
           :totalRecords="totalRecords"
-          :rowsPerPageOptions="[10, 25, 50]"
+          :rowsPerPageOptions="[1000, 2500, 5000]"
           @page="handlePageChange"
         />
       </template>
@@ -142,7 +143,7 @@
   const isLoading = ref(false)
   const events = ref([])
   const totalRecords = ref(0)
-  const rowsPerPage = ref(10)
+  const rowsPerPage = ref(1000)
   const offset = ref(0)
 
   const iconsMap = ref({
@@ -168,25 +169,25 @@
       required: true
     }
   })
-  const filteredEvents = computed(() => {
-    return events.value.filter((element) =>
-      element.event.toLowerCase().includes(search.value.toLowerCase())
-    )
-  })
   const noEventsFound = computed(() => {
-    return filteredEvents.value.length === 0
+    if (search.value) {
+      return false
+    }
+    return events.value.length === 0
   })
 
   async function loadData() {
     try {
       isLoading.value = true
-      const data = await props.listActivityHistoryEventsService({
+      const query = {
         limit: rowsPerPage.value,
-        offset: offset.value
-      })
-      totalRecords.value = await props.getActivityHistoryTotalRecords()
+        offset: offset.value,
+        search: search.value
+      }
+      const data = await props.listActivityHistoryEventsService(query)
+      totalRecords.value = await props.getActivityHistoryTotalRecords({ search: search.value })
 
-      events.value = data.map((historyEvent) => ({
+      events.value = data.body.map((historyEvent) => ({
         date: historyEvent.ts,
         icon: iconsMap.value[historyEvent.type],
         event: historyEvent.title,
@@ -218,7 +219,7 @@
   })
 
   watch(events, (currentState) => {
-    const hasData = currentState.length > 0
+    const hasData = currentState.length > 0 || search.value.length > 0
     emit('on-load-data', hasData)
   })
 </script>

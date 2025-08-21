@@ -47,13 +47,8 @@
   const FORMAT_RANGE = 'Range'
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
   const displayFilter = ref([])
-  const lastFilter = ref(true)
 
   const refDialogFilter = ref()
-
-  const disabledSearch = computed(() => {
-    return props.disabled || (lastFilter.value && !displayFilter.value.length)
-  })
 
   const listField = computed(() => {
     return props.fieldsInFilter.map((itemField) => {
@@ -100,7 +95,6 @@
 
   const searchFilter = () => {
     const adaptFilter = adapterApply(displayFilter.value)
-    lastFilter.value = !displayFilter.value.length
 
     emit('applyFilter', adaptFilter)
     emit('update:filterAdvanced', adaptFilter)
