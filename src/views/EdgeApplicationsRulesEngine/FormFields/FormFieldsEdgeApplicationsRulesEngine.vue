@@ -729,7 +729,7 @@
             icon="pi pi-lock"
             class="bg-transparent opacity-50"
           >
-            You can add more criteria enabling
+            Enable
             <button
               type="button"
               class="text-[var(--text-color-link)] hover:underline cursor-pointer"
@@ -737,7 +737,7 @@
             >
               Application Accelerator
             </button>
-            module.
+            module to add more conditions.
           </InlineMessage>
         </div>
 
