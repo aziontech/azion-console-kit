@@ -18,13 +18,13 @@
     Origins has been redesigned as
     <a
       href="#"
-      class="text-blue-300 hover:text-blue-400 transition-colors duration-200"
+      class="text-[var(--text-color-link)] hover:underline"
       @click="navigateToEdgeConnectors"
       >Edge Connectors</a
     >, and Error Responses are now
     <a
       href="#"
-      class="text-blue-300 hover:text-blue-400 transition-colors duration-200"
+      class="text-[var(--text-color-link)] hover:underline"
       @click="navigateToCustomPages"
       >Custom Pages</a
     >. You can access both features through the main menu.
