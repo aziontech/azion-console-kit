@@ -9,10 +9,11 @@
   import { computed, ref } from 'vue'
 
   import * as yup from 'yup'
-  import { FIELDS_MAPPING, OPERATOR_MAPPING } from './component'
+  import { FIELDS_MAPPING, OPERATOR_MAPPING } from '../filterRow/component'
 
   defineOptions({ name: 'dialog-filter' })
   const emit = defineEmits(['applyFilter'])
+  
   const props = defineProps({
     filtersOptions: {
       type: Array,

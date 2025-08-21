@@ -1,7 +1,7 @@
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import { computed, onBeforeMount, onMounted, ref } from 'vue'
-  import ContentFilterBlock from '@/views/RealTimeEvents/Blocks/content-filter-block'
+  import AdvancedFilterSystem from '@/components/base/advanced-filter-system/index.vue'
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
 
@@ -35,7 +35,11 @@
   const recordsFound = ref(0)
 
   const defaultFilter = {
-    tsRange: {},
+    tsRange: {
+      tsRangeBegin: new Date(new Date().setMinutes(new Date().getMinutes() - 5)),
+      tsRangeEnd: new Date(),
+      label: 'Last 5 minutes'
+    },
     fields: [],
     dataset: ''
   }
@@ -115,7 +119,7 @@
       </div>
     </div>
     <div class="border-1 border-bottom-none border-round-top-xl p-3.5 surface-border rounded-md">
-      <ContentFilterBlock
+      <AdvancedFilterSystem
         v-model:filterData="filterData"
         :fieldsInFilter="props.filterFields"
         :downloadCSV="exportTableCSV"

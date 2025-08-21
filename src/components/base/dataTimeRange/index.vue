@@ -1,7 +1,13 @@
 <template>
   <div class="flex gap-1 bg-[var(--surface-100)] rounded-lg p-1">
-    <QuickSelect v-model="model" />
-    <InputDateRange v-model="model" />
+    <QuickSelect
+      v-model="model"
+      @select="emit('select', $event)"
+    />
+    <InputDateRange
+      v-model="model"
+      @select="emit('select', $event)"
+    />
   </div>
 </template>
 
@@ -11,6 +17,8 @@
   import { defineModel } from 'vue'
 
   defineOptions({ name: 'DataTimeRange' })
+
+  const emit = defineEmits(['select'])
 
   const model = defineModel({
     type: Object,

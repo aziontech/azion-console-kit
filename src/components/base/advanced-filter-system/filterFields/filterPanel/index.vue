@@ -12,25 +12,44 @@
     </div>
 
     <!-- Filter Rows -->
-    <div class="px-8 py-6 flex gap-4 flex-col">
-      <FilterRow
+    <div class="px-8 py-6 flex gap-2 flex-col">
+      <div
         v-for="(filterRow, rowIndex) in filterRows"
         :key="rowIndex"
-        v-model="filterRows[rowIndex]"
-        :fields="props.filtersOptions"
-        :row-index="rowIndex"
-        :is-last="rowIndex === filterRows.length - 1"
-        :edit-filter="false"
-        @remove="removeFilterRow"
-        @add-row="addFilterRow"
-      />
+        class="flex flex-col gap-1"
+      >
+        <FilterRow
+          v-model="filterRows[rowIndex]"
+          :fields="props.filtersOptions"
+          :row-index="rowIndex"
+          :is-last="rowIndex === filterRows.length - 1"
+          :edit-filter="false"
+          @remove="removeFilterRow"
+          @add-rule="addFilterRow"
+        />
+
+        <!-- Logical Operator Divider -->
+        <div
+          v-if="rowIndex < filterRows.length - 1"
+          class="flex justify-center items-center"
+        >
+          <Divider
+            align="left"
+            type="solid"
+          >
+            <p class="font-semibold text-color-secondary text-xs">
+              {{ filterRows[rowIndex].logicalOperator || 'OR' }}
+            </p>
+          </Divider>
+        </div>
+      </div>
     </div>
 
     <!-- Preview Section -->
     <div class="px-8 py-4 border-t surface-border">
       <div class="flex items-center gap-2 mb-3">
         <i class="pi pi-search text-color-secondary"></i>
-        <h4 class="text-md font-medium text-color">Preview</h4>
+        Preview
       </div>
 
       <div class="flex flex-wrap gap-2">
@@ -47,6 +66,14 @@
             >OR</span
           >
         </div>
+      </div>
+
+      <!-- JSON Preview -->
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+        <h5 class="text-sm font-medium text-gray-700 mb-2">JSON Structure:</h5>
+        <pre class="text-xs text-gray-600 overflow-auto">{{
+          JSON.stringify(generateFilterStructure(), null, 2)
+        }}</pre>
       </div>
     </div>
 
@@ -94,8 +121,7 @@
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import FilterRow from '../filterRow/index.vue'
-  import { OPERATOR_MAPPING } from '@/templates/advanced-filter/component'
-
+  import Divider from 'primevue/divider'
   defineOptions({ name: 'FilterPanel' })
 
   // Model
@@ -118,7 +144,7 @@
   // Refs
   const customLabel = ref('')
 
-  // Filter rows structure
+  // Filter rows structure - flat structure
   const filterRows = ref([
     {
       id: 1,
@@ -160,19 +186,17 @@
   })
 
   const isFormValid = computed(() => {
-    return filterRows.value.every(
-      (row) => row.field && row.operator && (row.value || row.operator === 'in')
-    )
+    return validationErrors.value.length === 0
   })
 
   // Methods
-  const addFilterRow = () => {
+  const addFilterRow = (logicalOperator = 'OR') => {
     const newRow = {
       id: Date.now(),
       field: null,
       operator: null,
       value: '',
-      logicalOperator: 'OR'
+      logicalOperator: logicalOperator
     }
     filterRows.value.push(newRow)
   }
@@ -183,23 +207,39 @@
     }
   }
 
+  const generateFilterStructure = () => {
+    if (filterRows.value.length === 0) return {}
+
+    if (filterRows.value.length === 1) {
+      return processFilterRow(filterRows.value[0])
+    }
+
+    return {
+      condition: 'AND',
+      rules: filterRows.value.map((row) => processFilterRow(row))
+    }
+  }
+
+  const processFilterRow = (row) => {
+    return {
+      field: row.field,
+      operator: row.operator,
+      value: row.value
+    }
+  }
+
   const addFilter = () => {
     if (!isFormValid.value) return
 
+    const filterStructure = generateFilterStructure()
+
     const filterData = {
-      filters: filterRows.value.map((row) => ({
-        field: row.field,
-        operator: row.operator,
-        value: row.value,
-        logicalOperator: row.logicalOperator
-      })),
+      filters: filterStructure,
       customLabel: customLabel.value
     }
 
-    // Update the model if it's an array
-    if (Array.isArray(model.value)) {
-      model.value = filterData.filters
-    }
+    // Update the model
+    model.value = filterStructure
 
     // Emit the filter data
     emit('apply-filter', filterData)

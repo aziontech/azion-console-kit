@@ -205,6 +205,10 @@
     getCurrentHourAndMinute
   } from '@utils/date.js'
 
+  defineOptions({ name: 'InputDateRange' })
+
+  const emit = defineEmits(['select'])
+
   const model = defineModel({
     type: Object,
     default: () => ({})
@@ -273,6 +277,7 @@
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
+    emit('select', model.value)
   }
 
   const onMonthChange = () => {
@@ -281,6 +286,7 @@
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
+    emit('select', model.value)
   }
 
   const onYearChange = () => {
@@ -289,6 +295,7 @@
     selectedDate.value = newDate
     updateSelectedDateTime()
     hasChanges.value = false
+    emit('select', model.value)
   }
 
   const previousMonth = () => {
@@ -301,6 +308,7 @@
     }
     onMonthChange()
     hasChanges.value = false
+    emit('select', model.value)
   }
 
   const nextMonth = () => {
@@ -312,6 +320,7 @@
       selectedMonth.value++
     }
     onMonthChange()
+    emit('select', model.value)
   }
 
   const selectTime = (time) => {
@@ -319,6 +328,7 @@
     selectedTime.value = time
     updateSelectedDateTime()
     hasChanges.value = false
+    emit('select', model.value)
   }
 
   const updateSelectedDateTime = () => {
@@ -380,6 +390,7 @@
     hasChanges.value = false
     tempInputValue.value = ''
     model.value.label = ''
+    emit('select', model.value)
   }
 
   const updateRange = () => {
@@ -404,6 +415,7 @@
     hasChanges.value = false
     tempInputValue.value = ''
     model.value.label = ''
+    emit('select', model.value)
   }
 
   if (model.value.startDate) {

@@ -81,6 +81,10 @@
     getCurrentMonthLabel
   } from '@utils/date.js'
 
+  const emit = defineEmits(['select'])
+
+  defineOptions({ name: 'QuickSelect' })
+
   const model = defineModel({
     type: Object,
     default: () => ({})
@@ -111,7 +115,7 @@
       startDate: newStartDate,
       endDate: newEndDate
     }
-
+    emit('select', model.value)
     overlayPanelQuickSelect.value.hide()
   }
 
@@ -132,6 +136,14 @@
       case 'last_1_minute':
         ;({ startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
           1,
+          'minutes',
+          getCurrentMonthLabel().toLowerCase(),
+          now
+        ))
+        break
+      case 'last_5_minutes':
+        ;({ startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
+          5,
           'minutes',
           getCurrentMonthLabel().toLowerCase(),
           now
@@ -211,6 +223,7 @@
       label: range.label
     }
 
+    emit('select', model.value)
     overlayPanelQuickSelect.value.hide()
   }
 </script>

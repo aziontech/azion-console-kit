@@ -328,6 +328,7 @@ export const COMMON_DATE_RANGES = {
   today: { label: 'Today', value: 'today' },
   this_week: { label: 'This week', value: 'this_week' },
   last_1_minute: { label: 'Last 1 minute', value: 'last_1_minute' },
+  last_5_minutes: { label: 'Last 5 minutes', value: 'last_5_minutes' },
   last_15_minutes: { label: 'Last 15 minutes', value: 'last_15_minutes' },
   last_30_minutes: { label: 'Last 30 minutes', value: 'last_30_minutes' },
   last_1_hour: { label: 'Last 1 hour', value: 'last_1_hour' },

@@ -1,8 +1,7 @@
 <template>
   <div>
     <PrimeButton
-      icon="pi pi-filter"
-      label="Advanced Filter"
+      icon="pi pi-plus"
       outlined
       size="small"
       @click="toggleOverPanel"

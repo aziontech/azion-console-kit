@@ -67,12 +67,6 @@
 <template>
   <div class="flex flex-col sm:flex-row gap-6 w-full">
     <div class="flex flex-col w-full sm:w-1/2 gap-2">
-      <label
-        for="number_field_begin"
-        class="text-sm font-medium leading-5 text-color"
-      >
-        Begin *
-      </label>
       <InputNumber
         :placeholder="props.placeholder"
         v-model="begin"
@@ -89,12 +83,6 @@
       >
     </div>
     <div class="flex flex-col w-full sm:w-1/2 gap-2">
-      <label
-        for="number_field_end"
-        class="text-sm font-medium leading-5 text-color"
-      >
-        End *
-      </label>
       <InputNumber
         :placeholder="props.placeholder"
         v-model="end"

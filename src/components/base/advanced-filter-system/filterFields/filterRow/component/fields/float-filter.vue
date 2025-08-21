@@ -31,12 +31,6 @@
 <template>
   <div class="w-full sm:w-1/2 sm:pr-6">
     <div class="flex flex-col w-full gap-2">
-      <label
-        for="number_field"
-        class="text-sm font-medium leading-5 text-color"
-      >
-        Value *
-      </label>
       <InputNumber
         :placeholder="props.placeholder"
         v-model="selectedValue"

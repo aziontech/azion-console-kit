@@ -24,12 +24,6 @@
 <template>
   <div class="w-full">
     <div class="flex flex-col w-full gap-2">
-      <label
-        for="in_field_chips"
-        class="text-sm font-medium leading-5 text-color"
-      >
-        Field *
-      </label>
       <div class="card p-fluid">
         <chips
           inputId="in_field_chips"
