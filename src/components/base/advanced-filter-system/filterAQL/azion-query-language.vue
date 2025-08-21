@@ -271,7 +271,7 @@ const handleInitialQuery = () => {
 };
 
 watch(
-  () => props.fieldsInFilter,
+  () => [props.fieldsInFilter, props.filterAdvanced],
   () => {
     handleInitialQuery();
   },

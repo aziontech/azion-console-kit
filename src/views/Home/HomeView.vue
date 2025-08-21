@@ -12,7 +12,6 @@
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import { useLayout } from '@/composables/use-layout'
-  import AdvancedFilterSystem from '@/templates/advanced-filter-system/index.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -47,32 +46,6 @@
   const teams = ref([])
   const showInviteSession = ref(props.inviteSession.show())
   const { isSidebarActive, isVisibleMobileSidebar, OpenSidebarComponent } = useLayout()
-
-  // Advanced Filter System Demo
-  const filterState = ref({
-    searchQuery: '',
-    dateRange: {
-      startDate: new Date(Date.now() - 15 * 60 * 1000),
-      endDate: new Date()
-    },
-    filters: []
-  })
-
-  const handleSearch = (query) => {
-    console.log('Search query:', query)
-  }
-
-  const handleDateChange = (range) => {
-    console.log('Date range changed:', range)
-  }
-
-  const handleFilterChange = (filters) => {
-    console.log('Filters changed:', filters)
-  }
-
-  const handleUpdate = (state) => {
-    console.log('Filter system updated:', state)
-  }
 
   const showSidebar = computed(() => isSidebarActive.value && isVisibleMobileSidebar.value)
   const disclaimer = computed(() => {
@@ -188,40 +161,6 @@
               size="small"
               @click="openModalCreate"
             />
-          </div>
-        </div>
-
-        <!-- Advanced Filter System Demo -->
-        <div class="w-full p-3 sm:p-6 surface-border border rounded-md flex flex-col gap-6">
-          <div class="flex flex-row justify-start gap-3">
-            <div
-              class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
-            >
-              <span class="pi pi-filter"></span>
-            </div>
-            <div class="flex flex-col gap-2">
-              <div class="text-lg sm:text-xl font-medium">Advanced Filter System</div>
-              <div class="text-xs sm:text-sm text-color-secondary">
-                Sistema completo de filtros estilo Elastic Observability com busca, datas e filtros
-                avançados
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col gap-4">
-            <AdvancedFilterSystem
-              v-model="filterState"
-              @search="handleSearch"
-              @dateChange="handleDateChange"
-              @filterChange="handleFilterChange"
-              @update="handleUpdate"
-            />
-            <div class="text-xs text-color-secondary">
-              <strong>Estado atual:</strong><br />
-              Busca: {{ filterState.searchQuery || 'Nenhuma' }}<br />
-              Data: {{ filterState.dateRange.startDate?.toLocaleString() }} →
-              {{ filterState.dateRange.endDate?.toLocaleString() }}<br />
-              Filtros: {{ filterState.filters.length }} ativos
-            </div>
           </div>
         </div>
 
