@@ -29,6 +29,16 @@
   },
   "origin": [
     {
+      "origin-id": 142752,
+      "origin-key": "ef85b806-9eac-4e47-99a6-f9267a5bd9a4",
+      "name": "origin-storage-default"
+    },
+    {
+      "origin-id": 142756,
+      "origin-key": "dcd816a3-8680-4281-96b9-ce1e8cb05e0d",
+      "name": "origin-sso"
+    },
+    {
       "origin-id": 199947,
       "origin-key": "0b7d0aa1-15d0-45c8-8cae-7414007f5798",
       "name": "origin-script-runner"
