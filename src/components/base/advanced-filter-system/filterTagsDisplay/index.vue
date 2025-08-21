@@ -19,27 +19,29 @@
   const processedFilters = computed(() => {
     if (!props.filters?.length) return []
 
-    return props.filters.map((item) => {
-      const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
+    return props.filters
+      .map((item) => {
+        const selectedFields = props.fieldsInFilter.filter(({ value }) => value === item.valueField)
 
-      if (!selectedFields?.length) return null
-      
-      const selectedField = selectedFields.find(({ operator }) => {
-        return operator.find(({ value }) => value === item.operator)
+        if (!selectedFields?.length) return null
+
+        const selectedField = selectedFields.find(({ operator }) => {
+          return operator.find(({ value }) => value === item.operator)
+        })
+
+        if (!selectedField) return null
+
+        const { label, disabled, operator } = selectedField
+        const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
+
+        if (disabled || disabledOp) return null
+
+        return {
+          ...item,
+          field: label
+        }
       })
-
-      if (!selectedField) return null
-
-      const { label, disabled, operator } = selectedField
-      const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
-
-      if (disabled || disabledOp) return null
-
-      return {
-        ...item,
-        field: label
-      }
-    }).filter(Boolean)
+      .filter(Boolean)
   })
 
   const removeFilter = (index) => {
@@ -60,7 +62,7 @@
     <div
       v-for="(filter, index) in processedFilters"
       :key="index"
-      class="inline-flex items-center gap-1 p-1 px-2 rounded-md border text-sm font-medium shadow-sm transition-colors"
+      class="inline-flex items-center gap-1 p-1 px-2 rounded-md border text-sm font-medium surface-border transition-colors"
       @click="handleClickFilter(filter)"
     >
       <span class="text-[--series-three-color]">{{ filter.field }}</span>
