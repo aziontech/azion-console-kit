@@ -56,7 +56,7 @@
       label: 'Edge Connector',
       to: '/edge-connectors/create',
       description:
-        'The Edge Connector centralizes connections and provides control with features like load balancing and Origin Shield.'
+        'Edge Connector centralizes connections and how to connect to machines and applications.'
     },
     {
       label: 'Custom Page',
