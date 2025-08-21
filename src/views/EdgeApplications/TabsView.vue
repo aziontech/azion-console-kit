@@ -303,7 +303,8 @@
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite,
         hideApplicationAcceleratorInDescription:
-          edgeApplication.value[applicationAcceleratorEnabled.value]
+          edgeApplication.value[applicationAcceleratorEnabled.value],
+        navigateToApplicationAccelerator: navigateToApplicationAccelerator
       })
     }
   ])
@@ -313,6 +314,26 @@
   })
 
   renderTabByCurrentRouter()
+
+  const navigateToApplicationAccelerator = () => {
+    changeTab(mapTabs.value['main-settings'])
+    setTimeout(() => {
+      const element = document.querySelector('label[for="applicationAccelerator-switch-0"]')
+      if (element) {
+        const headerHeight = document.querySelector('header')?.offsetHeight || 0
+        const additionalOffset = 100
+        const totalOffset = headerHeight + additionalOffset
+
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        const offsetPosition = elementPosition - totalOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }, 50)
+  }
 
   onMounted(() => {
     checkIsLocked()

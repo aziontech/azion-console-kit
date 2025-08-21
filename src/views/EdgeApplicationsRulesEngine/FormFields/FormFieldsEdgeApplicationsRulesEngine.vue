@@ -163,7 +163,8 @@
     'toggleDrawer',
     'refreshCacheSettings',
     'refreshOrigins',
-    'refreshFunctions'
+    'refreshFunctions',
+    'navigate-to-main-settings'
   ])
 
   const props = defineProps({
@@ -531,6 +532,10 @@
     behaviors.value[behaviorIndexSelect.value].value.functionId = functionId
     behaviorIndexSelect.value = null
   }
+
+  const navigateToMainSettings = () => {
+    emit('navigate-to-main-settings')
+  }
 </script>
 
 <template>
@@ -693,14 +698,17 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase"
+          v-if="!isDefaultPhase"
           data-testid="rule-form-criteria-item-conditional-add-button"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
             label="And"
             size="small"
-            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            :disabled="
+              maximumConditionalsByCriteriaReached(criteriaIndex) ||
+              !isApplicationAcceleratorEnabled
+            "
             outlined
             @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
           />
@@ -708,10 +716,29 @@
             icon="pi pi-plus-circle"
             label="Or"
             size="small"
-            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
+            :disabled="
+              maximumConditionalsByCriteriaReached(criteriaIndex) ||
+              !isApplicationAcceleratorEnabled
+            "
             outlined
             @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
           />
+          <InlineMessage
+            v-if="!isApplicationAcceleratorEnabled"
+            severity="info"
+            icon="pi pi-lock"
+            class="bg-transparent opacity-50"
+          >
+            You can add more criteria enabling
+            <button
+              type="button"
+              class="text-[var(--text-color-link)] hover:underline cursor-pointer"
+              @click="navigateToMainSettings"
+            >
+              Application Accelerator
+            </button>
+            module.
+          </InlineMessage>
         </div>
 
         <div class="flex items-center gap-2">
@@ -739,16 +766,35 @@
         </div>
       </div>
 
-      <div v-if="props.isApplicationAcceleratorEnabled && !isDefaultPhase">
+      <div
+        v-if="!isDefaultPhase"
+        class="flex items-center gap-2"
+      >
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
           size="small"
           outlined
-          :disabled="maximumCriteriaReached"
+          :disabled="maximumCriteriaReached || !isApplicationAcceleratorEnabled"
           @click="addNewCriteria"
           data-testid="rule-form-criteria-add-button"
         />
+        <InlineMessage
+          v-if="!isApplicationAcceleratorEnabled"
+          severity="info"
+          icon="pi pi-lock"
+          class="bg-transparent opacity-50"
+        >
+          You can add more criteria enabling
+          <button
+            type="button"
+            class="text-[var(--text-color-link)] hover:underline cursor-pointer"
+            @click="navigateToMainSettings"
+          >
+            Application Accelerator
+          </button>
+          module.
+        </InlineMessage>
       </div>
     </template>
   </FormHorizontal>
