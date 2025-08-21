@@ -53,7 +53,7 @@ export class EdgeFirewallFunctionService {
     const enrichedFunctions = await enrichByMatchingReference({
       items: functionInstances,
       fetchReferencePage: this.#listFunctionNames,
-      getReferenceId: (item) => item.edgeFunctionId,
+      getReferenceId: (item) => item.functionId,
       merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
