@@ -2,7 +2,7 @@ export class EdgeDNSService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_dns/zones'
+    this.baseURL = 'v4/workspace/dns/zones'
   }
 
   getUrl(suffix = '') {
