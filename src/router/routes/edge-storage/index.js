@@ -2,6 +2,9 @@
 export const edgeStorageRoutes = {
   path: '/edge-storage',
   name: 'edge-storage',
+  meta: {
+    flag: 'checkout_access_without_flag'
+  },
   children: [
     {
       path: '',

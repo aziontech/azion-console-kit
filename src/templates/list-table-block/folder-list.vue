@@ -20,6 +20,7 @@
       :globalFilterFields="filterBy"
       :loading="isLoading"
       data-testid="data-table"
+      rowHover
     >
       <template
         #header
