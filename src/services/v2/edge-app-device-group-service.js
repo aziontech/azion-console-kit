@@ -2,7 +2,7 @@ export class DeviceGroupService {
   constructor(http, adapter) {
     this.http = http
     this.adapter = adapter
-    this.baseURL = 'v4/edge_application/applications'
+    this.baseURL = 'v4/workspace/applications'
   }
 
   getUrl(edgeApplicationId, suffix = '') {

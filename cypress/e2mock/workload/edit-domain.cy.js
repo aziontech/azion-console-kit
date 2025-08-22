@@ -14,7 +14,7 @@ const createEdgeApplicationCase = () => {
   cy.openProduct('Edge Application')
   cy.get(selectors.edgeApplication.mainSettings.createButton).click()
   cy.get(selectors.edgeApplication.mainSettings.nameInput).type(edgeAppName)
-  cy.intercept('POST', '/v4/edge_application/applications*').as('createEdgeApp')
+  cy.intercept('POST', '/v4/workspace/applications*').as('createEdgeApp')
   cy.get(selectors.form.actionsSubmitButton).click()
   cy.wait('@createEdgeApp')
   cy.verifyToast('success', 'Your edge application has been created')
@@ -31,7 +31,7 @@ const createEdgeFirewallCase = () => {
   cy.get(selectors.edgeFirewall.nameInput).type(firewallName)
   cy.get(selectors.edgeFirewall.edgeFunctionSwitch).click()
   cy.get(selectors.edgeFirewall.wafEnabledSwitch).click()
-  cy.intercept('GET', '/v4/edge_firewall/firewalls/*').as('retrieveEdgeFirewall')
+  cy.intercept('GET', '/v4/workspace/firewalls/*').as('retrieveEdgeFirewall')
   cy.get(selectors.edgeFirewall.saveButton).click()
   cy.verifyToast('success', 'Your Edge Firewall has been created')
   cy.wait('@retrieveEdgeFirewall')
@@ -91,15 +91,15 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     domainName = generateUniqueName('domain')
 
     // Arrange
-    cy.intercept('GET', '/api/v4/edge_firewall/firewalls*').as('getEdgeFirewalls')
+    cy.intercept('GET', '/api/v4/workspace/firewalls*').as('getEdgeFirewalls')
     cy.openProduct('Domains')
     cy.intercept(
       'GET',
-      '/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search='
+      '/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search='
     ).as('getEdgeApplicationList')
     cy.intercept(
       'GET',
-      `/api/v4/edge_application/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
+      `/api/v4/workspace/applications?ordering=name&page=1&page_size=100&fields=&search=${edgeAppName}`
     ).as('getEdgeApplicationListFilter')
     cy.get(selectors.workload.createButton).click()
     cy.get(selectors.workload.nameInput).type(domainName)
@@ -126,7 +126,7 @@ describe('Domains spec', { tags: ['@dev3'] }, () => {
     cy.get(selectors.workload.edgeFirewallDropdownSearch).clear()
     cy.intercept(
       'GET',
-      `/v4/edge_firewall/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
+      `/v4/workspace/firewalls?ordering=name&page=1&page_size=100&search=${firewallName}`
     ).as('getCreatedEdgeFirewall')
     cy.get(selectors.workload.edgeFirewallDropdownSearch).type(firewallName)
     cy.wait('@getCreatedEdgeFirewall')
