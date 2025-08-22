@@ -9,27 +9,51 @@ export class WafRulesTuningGqlService {
   }
 
   listWafRulesAllowed = async (params) => {
-    const { pageSize = 100, ...rest } = params
-    let page = 1
-    let allItems = []
+    const { pageSize = 100, concurrency = 3, ...rest } = params
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const data = await wafService.listWafRulesAllowed({
-        page,
-        pageSize,
-        ...rest
-      })
-      const { body, count } = data
+    const firstPage = await wafService.listWafRulesAllowed({
+      page: 1,
+      pageSize,
+      ...rest
+    })
 
-      allItems = [...allItems, ...body]
+    const totalPages = Math.ceil(firstPage.count / pageSize)
+    const allItems = [...firstPage.body]
 
-      if (allItems.length >= count) {
-        break
-      }
-
-      page++
+    if (totalPages <= 1) {
+      return allItems
     }
+
+    const pagePromises = []
+
+    for (let page = 2; page <= totalPages; page++) {
+      pagePromises.push(
+        wafService
+          .listWafRulesAllowed({
+            page,
+            pageSize,
+            ...rest
+          })
+          .then((data) => ({ page, items: data.body }))
+      )
+    }
+
+    const results = []
+
+    // eslint-disable-next-line id-length
+    for (let i = 0; i < pagePromises.length; i += concurrency) {
+      const batch = pagePromises.slice(i, i + concurrency)
+      const batchResults = await Promise.allSettled(batch)
+
+      batchResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          results.push(...result.value.items)
+        }
+      })
+    }
+
+    // eslint-disable-next-line id-length
+    results.sort((a, b) => a.page - b.page).forEach((result) => allItems.push(...result.items))
 
     return allItems
   }
