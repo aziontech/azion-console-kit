@@ -131,7 +131,9 @@ export const WafAdapter = {
       attack.matchValue = null
     }
     const hasSpecificMatch = attack.condition.startsWith('specific_')
+    const suffix = attack.condition.includes('_value') ? 'value' : 'name'
     const hasMatchValue = !!attack.matchValue
+    const hasValue = hasSpecificMatch && hasMatchValue
     return {
       rule_id: attack.ruleId,
       ...(path && { path }),
@@ -143,10 +145,9 @@ export const WafAdapter = {
       conditions: [
         {
           match: attack.condition,
-          ...(hasSpecificMatch &&
-            hasMatchValue && {
-              value: attack.matchValue
-            })
+          ...(hasValue && {
+            [suffix]: attack.matchValue
+          })
         }
       ]
     }

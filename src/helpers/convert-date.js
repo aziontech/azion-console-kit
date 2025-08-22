@@ -1,5 +1,6 @@
 const MINUTE_IN_MILLISECONDS = 60_000
 const HOUR_IN_MILLISECONDS = 3_600_000
+import { useAccountStore } from '@/stores/account'
 
 /**
  * Converts a given value to a date string in a specific format.
@@ -237,8 +238,9 @@ const formatDateToIso = (date) => {
 }
 
 const getDateRangeByHourRange = (hourRange) => {
-  const startDate = new Date()
-  const endDate = new Date()
+  const accountStore = useAccountStore()
+  const startDate = new Date().toUTC(accountStore.account.utc_offset)
+  const endDate = new Date().toUTC(accountStore.account.utc_offset)
   startDate.setHours(startDate.getHours() - parseInt(hourRange))
 
   const formattedStartDate = formatDateToIso(startDate)
