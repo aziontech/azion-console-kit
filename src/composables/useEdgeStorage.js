@@ -25,6 +25,8 @@ const needRefresh = ref(false)
 const selectedFiles = ref([])
 const isDownloading = ref(false)
 
+const toast = useToast()
+
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
   const completedFilesBytes = uploadedFiles.value.reduce((sum, file) => sum + file.size, 0)
@@ -68,8 +70,16 @@ const validationSchema = yup.object({
     .test('edge_access', 'Invalid edge access format', (value) => edgeAccess.includes(value))
 })
 
+const handleToast = (severity, summary, message) => {
+  toast.add({
+    severity: severity,
+    summary: summary,
+    detail: message,
+    life: 5000
+  })
+}
+
 export const useEdgeStorage = () => {
-  const toast = useToast()
   /**
    * Finds a bucket by its ID.
    * @param {number|string} id - The ID of the bucket to find.
@@ -92,14 +102,13 @@ export const useEdgeStorage = () => {
       const oversizedFiles = filesArray.filter((file) => file.size > maxFileSize)
 
       if (oversizedFiles.length) {
-        toast.add({
-          severity: 'warn',
-          summary: 'File Size Limit Exceeded',
-          detail: `${oversizedFiles.length} file${
+        handleToast(
+          'warn',
+          'File Size Limit Exceeded',
+          `${oversizedFiles.length} file${
             oversizedFiles.length > 1 ? 's' : ''
-          } exceed the 300MB limit and cannot be uploaded.`,
-          life: 5000
-        })
+          } exceed the 300MB limit and cannot be uploaded.`
+        )
 
         const validFiles = filesArray.filter((file) => file.size <= maxFileSize)
 
@@ -155,37 +164,33 @@ export const useEdgeStorage = () => {
         const failureCount = failedFiles.value.length
 
         if (successCount) {
-          toast.add({
-            severity: failureCount > 0 ? 'warn' : 'success',
-            summary: failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
-            detail:
-              failureCount > 0
-                ? `${successCount} file${
-                    successCount > 1 ? 's' : ''
-                  } uploaded successfully, ${failureCount} failed`
-                : `${successCount} file${successCount > 1 ? 's' : ''} uploaded successfully`,
-            life: 5000
-          })
+          handleToast(
+            failureCount > 0 ? 'warn' : 'success',
+            failureCount > 0 ? 'Upload Partially Completed' : 'Upload Successful',
+            failureCount > 0
+              ? `${successCount} file${
+                  successCount > 1 ? 's' : ''
+                } uploaded successfully, ${failureCount} failed`
+              : `${successCount} file${successCount > 1 ? 's' : ''} uploaded successfully`
+          )
         }
 
         if (failureCount && !successCount) {
-          toast.add({
-            severity: 'error',
-            summary: 'Upload Failed',
-            detail: `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`,
-            life: 5000
-          })
+          handleToast(
+            'error',
+            'Upload Failed',
+            `All ${failureCount} file${failureCount > 1 ? 's' : ''} failed to upload`
+          )
         }
       } catch (error) {
         currentUploadingFile.value = null
         isUploading.value = false
 
-        toast.add({
-          severity: 'error',
-          summary: 'Upload Failed',
-          detail: 'An unexpected error occurred during upload. Please try again.',
-          life: 5000
-        })
+        handleToast(
+          'error',
+          'Upload Failed',
+          'An unexpected error occurred during upload. Please try again.'
+        )
       }
     }
   }
