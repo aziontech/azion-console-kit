@@ -20,7 +20,6 @@ export class DigitalCertificatesService {
   }
 
   createDigitalCertificateLetEncrypt = async (payload, sourceCertificate) => {
-    // USAR ESSE METODO PARA HTTP-01
     const body = this.adapter?.transformCreateDigitalCertificateLetEncrypt?.(
       payload,
       sourceCertificate
