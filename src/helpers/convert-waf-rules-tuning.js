@@ -126,7 +126,7 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
 
     entry.ruleId.split(',').forEach((ruleStr) => {
       const { ruleId, location, context } = parseRule(ruleStr)
-      const key = `${ruleId}|${location}|${context}`
+      const key = isDescription ? `${ruleId}|${location}|${context}` : `${ruleId}|${location}`
 
       if (!grouped[key]) {
         grouped[key] = {
