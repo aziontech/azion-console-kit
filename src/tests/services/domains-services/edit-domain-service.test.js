@@ -46,8 +46,7 @@ describe('DomainsServices', () => {
         digital_certificate_id: fixtures.domainMock.edgeCertificate,
         is_active: fixtures.domainMock.active,
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
-        mtls_verification: fixtures.domainMock.mtlsVerification,
-        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate
+        mtls_verification: fixtures.domainMock.mtlsVerification
       }
     })
   })

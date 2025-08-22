@@ -87,7 +87,51 @@ export const DigitalCertificatesAdapter = {
     }
   },
 
-  transformListDigitalCertificatesDropdown({ results, count }, { type, search }) {
+  transformListDigitalCertificatesDropdownToWorkloads({ results, count }, { type, search }) {
+    let parsedDigitalCertificates = results.map((item) => {
+      return {
+        id: item.id,
+        name: item.name,
+        authority: item?.authority,
+        status: item?.status,
+        icon: getIconByStatus(item?.status)
+      }
+    })
+    let bodyParser = []
+
+    if (type === 'edge_certificate') {
+      const DEFAULT_CERTIFICATES = [
+        { id: 0, name: 'Azion (SAN)', status: 'active' },
+        {
+          id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
+          name: "Let's Encrypt",
+          status: 'active'
+        }
+      ]
+      const searchLowercase = search?.toLowerCase()
+      const matchesSearch = (cert) => cert.name.toLowerCase().includes(searchLowercase)
+
+      const filteredDefaultCertificates = searchLowercase
+        ? DEFAULT_CERTIFICATES.filter(matchesSearch)
+        : DEFAULT_CERTIFICATES
+
+      bodyParser = [
+        {
+          label: 'Certificates presets',
+          items: filteredDefaultCertificates
+        },
+        { label: 'My certificates', items: parsedDigitalCertificates }
+      ]
+      count += filteredDefaultCertificates.length
+    }
+
+    return {
+      count: count || 0,
+      body: bodyParser || []
+    }
+  },
+
+  transformListDigitalCertificatesDropdownToDomains({ results, count }, { type, search }) {
     let parsedDigitalCertificates = results.map((item) => {
       return {
         id: item.id,
