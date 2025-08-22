@@ -237,8 +237,8 @@ const formatDateToIso = (date) => {
 }
 
 const getDateRangeByHourRange = (hourRange) => {
-  const endDate = new Date()
   const startDate = new Date()
+  const endDate = new Date()
   startDate.setHours(startDate.getHours() - parseInt(hourRange))
 
   const formattedStartDate = formatDateToIso(startDate)

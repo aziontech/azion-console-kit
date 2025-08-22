@@ -105,7 +105,7 @@ const parserWafWatchs = (wafWatchs, isDescription) => {
         : conditionsMap[condition] ?? 'unknown',
       matchesOn
     }
-  })[0]
+  })
 }
 
 const parseRule = (rule) => {
@@ -135,7 +135,7 @@ const parseAndGroupMultipleRules = (logs, isDescription = false) => {
           hitCount: 0,
           ips: new Set(),
           countries: new Set(),
-          condition: parserWafWatchs(ruleStr, isDescription).location,
+          condition: parserWafWatchs(ruleStr, isDescription)?.[0].location,
           matchValue: context,
           paths: new Set()
         }
