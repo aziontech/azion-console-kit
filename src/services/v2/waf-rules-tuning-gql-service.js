@@ -52,7 +52,9 @@ export class WafRulesTuningGqlService {
       })
     }
 
-    results.sort((current, previous) => current.page - previous.page).forEach((result) => allItems.push(...result.items))
+    results
+      .sort((current, previous) => current.page - previous.page)
+      .forEach((result) => allItems.push(...result.items))
 
     return allItems
   }
