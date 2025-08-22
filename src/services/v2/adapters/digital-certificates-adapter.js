@@ -36,7 +36,7 @@ export const DigitalCertificatesAdapter = {
       certificate: null,
       private_key: null,
       type: 'edge_certificate',
-      challenge: 'dns',
+      challenge: payload.tls.certificate === 1 ? 'dns' : 'http',
       authority: 'lets_encrypt',
       key_algorithm: 'rsa_2048',
       active: true,
@@ -104,7 +104,12 @@ export const DigitalCertificatesAdapter = {
         { id: 0, name: 'Azion (SAN)', status: 'active' },
         {
           id: !hasFlagBlockApiV4() ? 1 : 'lets_encrypt',
-          name: "Let's Encrypt",
+          name: "New Let's Encrypt Certificate (DNS-01)",
+          status: 'active'
+        },
+        {
+          id: !hasFlagBlockApiV4() ? 2 : 'lets_encrypt_http',
+          name: "New Let's Encrypt Certificate (HTTP-01)",
           status: 'active'
         }
       ]
