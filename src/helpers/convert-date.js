@@ -229,7 +229,7 @@ const formatDateToIso = (date) => {
   const year = date.getFullYear()
   const month = pad(date.getMonth() + 1)
   const day = pad(date.getDate())
-  const hours = pad(date.getHours())
+  const hours = pad(date.getHours() + 3)
   const minutes = pad(date.getMinutes())
   const seconds = pad(date.getSeconds())
 
