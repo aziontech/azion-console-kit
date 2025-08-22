@@ -2,7 +2,7 @@ const MAP_BEHAVIOR = {
   run_function: 'functionId',
   set_origin: 'originId',
   set_cache_policy: 'cacheId',
-  set_edge_connector: 'edgeConnectorId'
+  set_connector: 'edgeConnectorId'
 }
 
 const adaptBehavior = (behaviors) => {
@@ -18,7 +18,7 @@ const adaptBehavior = (behaviors) => {
       }
     }
 
-    const behaviorInt = ['run_function', 'set_edge_connector', 'set_cache_policy', 'set_origin']
+    const behaviorInt = ['run_function', 'set_connector', 'set_cache_policy', 'set_origin']
     if (behaviorInt.includes(behavior.name)) {
       return {
         type: behavior.name,
@@ -71,7 +71,7 @@ const parsedBehavior = (behaviors) => {
     if (behavior.type === 'set_origin' && typeof behavior.attributes?.value === 'number') {
       behaviorItem = { originId: behavior.attributes.value.toString() }
     }
-    if (behavior.type === 'set_edge_connector' && typeof behavior.attributes?.value === 'number') {
+    if (behavior.type === 'set_connector' && typeof behavior.attributes?.value === 'number') {
       behaviorItem = { edgeConnectorId: parseInt(behavior.attributes.value) }
     }
     if (behavior.type === 'run_function') {

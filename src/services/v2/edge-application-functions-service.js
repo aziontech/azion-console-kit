@@ -48,14 +48,14 @@ export class EdgeApplicationFunctionService {
     edgeApplicationId,
     params = { pageSize: 10, fields: [] }
   ) => {
-    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'edge_function']
+    params.fields = ['id', 'name', 'last_editor', 'last_modified', 'function']
     const { body: functionInstances, count } = await this.listFunctions(edgeApplicationId, params)
     if (!count) return []
 
     const enrichedFunctions = await enrichByMatchingReference({
       items: functionInstances,
       fetchReferencePage: this.#listFunctionNames,
-      getReferenceId: (item) => item.edgeFunction,
+      getReferenceId: (item) => item.function,
       merge: (item, matchedRef) => ({
         ...item,
         functionInstanced: matchedRef.name
