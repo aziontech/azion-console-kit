@@ -38,7 +38,7 @@ const typeBuilders = {
     region: payload.connectionOptions.region
   }),
 
-  edge_storage: (payload) => ({
+  storage: (payload) => ({
     bucket: payload.connectionOptions.bucket,
     prefix: payload.connectionOptions.prefix
   }),
@@ -119,7 +119,7 @@ const typeBuildersLoadRequest = {
     }
   }),
 
-  edge_storage: (data) => ({
+  storage: (data) => ({
     connectionOptions: {
       bucket: data.attributes.bucket,
       prefix: data.attributes.prefix
@@ -179,7 +179,7 @@ const typeBuildersLoadRequest = {
 
 const edgeConnectorsTypes = {
   http: 'HTTP',
-  edge_storage: 'Edge Storage',
+  storage: 'Edge Storage',
   live_ingest: 'Live Ingest'
 }
 
