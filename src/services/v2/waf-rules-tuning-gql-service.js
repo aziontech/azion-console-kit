@@ -52,8 +52,7 @@ export class WafRulesTuningGqlService {
       })
     }
 
-    // eslint-disable-next-line id-length
-    results.sort((a, b) => a.page - b.page).forEach((result) => allItems.push(...result.items))
+    results.sort((current, previous) => current.page - previous.page).forEach((result) => allItems.push(...result.items))
 
     return allItems
   }
