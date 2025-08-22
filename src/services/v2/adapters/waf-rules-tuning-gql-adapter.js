@@ -9,7 +9,7 @@ export const WafRulesTuningGqlAdapter = {
     const {
       data: { logs }
     } = data
-    if (logs.length === 0) return { data: [], recordsFound: 0 }
+    if (!logs.length) return { data: [], recordsFound: 0 }
 
     const results = parseAndGroupMultipleRules(logs)
 
@@ -25,7 +25,7 @@ export const WafRulesTuningGqlAdapter = {
     const {
       data: { logs }
     } = data
-    if (logs.length === 0) return { data: [], recordsFound: 0 }
+    if (!logs.length) return { data: [], recordsFound: 0 }
 
     const results = parseAndGroupMultipleRules(logs, true)
     const grouped = groupByMatchValueAndPath(results)

@@ -44,7 +44,7 @@ export class WafRulesTuningGqlService {
       tsRange_end: date.endDate
     }
 
-    if (query.domains && query.domains.length > 0) {
+    if (query.domains && query.domains.length) {
       queryParams.push('$host: [String]')
       filters.push('hostIn: $host')
       variables.host = query.domains
@@ -56,7 +56,7 @@ export class WafRulesTuningGqlService {
       variables.wafMatchLike = `%:${tuningId}:%`
     }
 
-    if (query.countries && query.countries.length > 0) {
+    if (query.countries && query.countries.length) {
       queryParams.push('$geolocCountryNameIn: [String]')
       filters.push('geolocCountryNameIn: $geolocCountryNameIn')
       variables.geolocCountryNameIn = query.countries
@@ -68,13 +68,13 @@ export class WafRulesTuningGqlService {
       variables.remoteAddress = query.ip
     }
 
-    if (query.ipsList && query.ipsList.length > 0) {
+    if (query.ipsList && query.ipsList.length) {
       queryParams.push('$remoteAddressIn: [String]')
       filters.push('remoteAddressIn: $remoteAddressIn')
       variables.remoteAddressIn = query.ipsList
     }
 
-    if (query.pathsList && query.pathsList.length > 0) {
+    if (query.pathsList && query.pathsList.length) {
       queryParams.push('$requestUriIn: [String]')
       filters.push('requestUriIn: $requestUriIn')
       variables.requestUriIn = query.pathsList
