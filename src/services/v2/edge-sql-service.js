@@ -1,123 +1,95 @@
 export class EdgeSQLService {
-  constructor(httpService, EdgeSQLAdapter) {
+  constructor(httpService, adapter) {
     this.httpService = httpService
-    this.EdgeSQLAdapter = EdgeSQLAdapter
+    this.adapter = adapter
+    this.baseURL = 'v4/edge_sql/databases'
   }
 
-  /**
-   * Standardized success response formatting
-   * @private
-   */
   _formatSuccessResponse(data, feedback = null, additionalData = {}) {
     return {
-      statusCode: 200,
       body: data,
       feedback,
       ...additionalData
     }
   }
 
-  listDatabases = async ({
-    orderBy = 'name',
-    sort = 'asc',
-    page = 1,
-    pageSize = 20,
-    search = ''
-  } = {}) => {
-    const searchParams = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ordering: sort === 'desc' ? `-${orderBy}` : orderBy
-    })
-
-    if (search) {
-      searchParams.set('search', search)
+  listDatabases = async (
+    params = {
+      orderBy: 'name',
+      sort: 'asc',
+      page: 1,
+      pageSize: 10,
+      search: ''
     }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases?${searchParams.toString()}`,
-      method: 'GET'
+  ) => {
+    const { data } = await this.httpService.request({
+      url: this.baseURL,
+      method: 'GET',
+      params
     })
 
-    return this.EdgeSQLAdapter.adaptDatabaseList(httpResponse)
+    const { results, count } = data
+
+    const adaptedData = this.adapter?.adaptDatabaseList?.(results)
+
+    return {
+      count,
+      body: adaptedData
+    }
   }
 
   createDatabase = async ({ name }) => {
-    if (!name?.trim()) {
-      throw new Error('Database name is required')
-    }
-
-    const httpResponse = await this.httpService.request({
-      url: '/v4/edge_sql/databases',
+    const { data } = await this.httpService.request({
+      url: this.baseURL,
       method: 'POST',
-      body: { name: name.trim() }
+      body: { name }
     })
 
-    const adaptedData = this.EdgeSQLAdapter.adaptDatabaseCreate(httpResponse)
+    const adaptedData = this.adapter?.adaptDatabaseCreate?.(data)
 
     const shouldMonitor = adaptedData.status && !['created', 'ready'].includes(adaptedData.status)
 
     return this._formatSuccessResponse(adaptedData, null, {
       shouldMonitor,
       databaseId: adaptedData.id,
-      databaseName: adaptedData.name,
-      statusCode: httpResponse.statusCode || 201
+      databaseName: adaptedData.name
     })
   }
 
   deleteDatabase = async (id) => {
-    if (!id) {
-      throw new Error('Database ID is required')
-    }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases/${id}`,
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${id}`,
       method: 'DELETE'
     })
 
-    const feedback = this.EdgeSQLAdapter.adaptDatabaseDelete(httpResponse)
+    const feedback = this.adapter?.adaptDatabaseDelete?.(data)
     return feedback
   }
 
   getDatabase = async (id) => {
-    if (!id) {
-      throw new Error('Database ID is required')
-    }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases/${id}`,
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${id}`,
       method: 'GET'
     })
 
-    return this.EdgeSQLAdapter.adaptDatabase(httpResponse)
+    return this.adapter?.adaptDatabase?.(data)
   }
 
   checkDatabaseStatus = async (id, fields = null) => {
-    if (!id) {
-      throw new Error('Database ID is required')
-    }
+    const url = fields ? `${this.baseURL}/${id}?fields=${fields}` : `${this.baseURL}/${id}`
 
-    const url = fields
-      ? `/v4/edge_sql/databases/${id}?fields=${fields}`
-      : `/v4/edge_sql/databases/${id}`
-
-    const httpResponse = await this.httpService.request({
+    const { data } = await this.httpService.request({
       url,
       method: 'GET'
     })
 
-    const adaptedData = this.EdgeSQLAdapter.adaptDatabaseStatus(httpResponse)
-    return this._formatSuccessResponse(adaptedData, null, {
-      statusCode: httpResponse.statusCode || 200
-    })
+    const adaptedData = this.adapter?.adaptDatabaseStatus?.(data)
+    return this._formatSuccessResponse(adaptedData, null)
   }
 
   getTables = async (databaseId) => {
-    if (!databaseId) {
-      throw new Error('Database ID is required')
-    }
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases/${databaseId}/query`,
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body: {
         statements: [
@@ -126,20 +98,17 @@ export class EdgeSQLService {
       }
     })
 
-    return this.EdgeSQLAdapter.adaptTablesFromQuery(httpResponse)
+    const adaptedData = this.adapter?.adaptTablesFromQuery?.(data)
+    return {
+      body: {
+        tables: adaptedData
+      }
+    }
   }
 
   queryDatabase = async (databaseId, { statement }) => {
-    if (!databaseId) {
-      throw new Error('Database ID is required')
-    }
-
-    if (!statement) {
-      throw new Error('SQL statement is required')
-    }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases/${databaseId}/query`,
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
       body: {
         statements: [statement]
@@ -147,25 +116,18 @@ export class EdgeSQLService {
       processError: false
     })
 
-    return this.EdgeSQLAdapter.adaptQueryResult(httpResponse)
+    return this.adapter?.adaptQueryResult?.(data)
   }
 
   executeDatabase = async (databaseId, { statements }) => {
-    if (!databaseId) {
-      throw new Error('Database ID is required')
-    }
-
-    if (!statements || !Array.isArray(statements) || statements.length === 0) {
-      throw new Error('At least one SQL statement is required')
-    }
-
-    const httpResponse = await this.httpService.request({
-      url: `/v4/edge_sql/databases/${databaseId}/query`,
+    const body = this.adapter?.adaptSqlCommands?.(statements)
+    const { data } = await this.httpService.request({
+      url: `${this.baseURL}/${databaseId}/query`,
       method: 'POST',
-      body: { statements },
+      body,
       processError: false
     })
 
-    return this.EdgeSQLAdapter.adaptExecuteResult(httpResponse)
+    return this.adapter?.adaptExecuteResult?.(data)
   }
 }

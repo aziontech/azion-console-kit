@@ -255,19 +255,7 @@
     return [
       {
         field: 'name',
-        header: 'Name',
-        filterPath: 'name.text',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-tag'
-          })
-        }
-      },
-      {
-        field: 'created_at',
-        header: 'Created At'
+        header: 'Name'
       },
       {
         field: 'last_modified',
@@ -316,7 +304,7 @@
     ]
   })
 
-  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'created_at', 'last_modified']
+  const EDGE_SQL_API_FIELDS = ['id', 'name', 'status', 'active', 'last_modified']
 </script>
 
 <template>

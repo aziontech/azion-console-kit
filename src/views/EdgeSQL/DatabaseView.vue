@@ -16,6 +16,7 @@
   import Menu from 'primevue/menu'
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
+  import QueryEditorBlock from './FormFields/blocks/QueryEditorBlock.vue'
 
   import { useDialog } from 'primevue/usedialog'
 
@@ -81,38 +82,7 @@
   }
   const loadDatabaseInfo = async () => {
     try {
-      const result = await edgeSQLService.getDatabase(databaseId.value)
-
-      if (result.statusCode === 200) {
-        const database = result.body
-
-        if (database.status === 'creating') {
-          toast.add({
-            severity: 'warn',
-            summary: 'Database Creating',
-            detail:
-              'This database is still being created. You will be redirected to monitor the process.',
-            life: 4000
-          })
-          router.push('/edge-sql')
-          return
-        }
-
-        if (database.status !== 'created' && database.status !== 'ready') {
-          toast.add({
-            severity: 'error',
-            summary: 'Database Unavailable',
-            detail: 'This database is not available for queries at the moment.',
-            life: 5000
-          })
-          router.push('/edge-sql')
-          return
-        }
-
-        sqlStore.setCurrentDatabase(database)
-      } else {
-        throw new Error(result.error || 'Database not found')
-      }
+      await edgeSQLService.getDatabase(databaseId.value)
     } catch (error) {
       toast.add({
         severity: 'error',
@@ -131,18 +101,16 @@
     try {
       const result = await edgeSQLService.getTables(databaseId.value)
 
-      if (result.statusCode === 200) {
-        sqlStore.setCurrentTables(result.body.tables)
+      sqlStore.setCurrentTables(result.body.tables)
 
-        tablesTree.value = result.body.tables.map((table) => ({
-          key: table.name,
-          label: table.name,
-          icon: 'pi pi-table',
-          type: 'table',
-          data: table,
-          children: []
-        }))
-      }
+      tablesTree.value = result.body.tables.map((table) => ({
+        key: table.name,
+        label: table.name,
+        icon: 'pi pi-table',
+        type: 'table',
+        data: table,
+        children: []
+      }))
     } catch (error) {
       toast.add({
         severity: 'warn',
@@ -186,7 +154,7 @@
     try {
       const isSelectQuery = sqlQuery.value.trim().toLowerCase().startsWith('select')
 
-      const result = isSelectQuery
+      const { results, affected } = isSelectQuery
         ? await edgeSQLService.queryDatabase(databaseId.value, {
             statement: sqlQuery.value,
             parameters: []
@@ -197,50 +165,46 @@
 
       executionTime.value = Date.now() - startTime
 
-      if (result.statusCode === 200) {
-        queryResults.value = result.body.results || []
-        affectedRows.value = result.body.affectedRows || 0
+      queryResults.value = results || []
+      affectedRows.value = affected || 0
 
-        selectedRows.value = []
-        rowFormDrawerVisible.value = false
-        isEditingRow.value = false
-        editingRowData.value = {}
-        editingRowIndex.value = -1
+      selectedRows.value = []
+      rowFormDrawerVisible.value = false
+      isEditingRow.value = false
+      editingRowData.value = {}
+      editingRowIndex.value = -1
 
-        currentPage.value = 0
+      currentPage.value = 0
 
-        sqlStore.addQueryResult({
-          query: sqlQuery.value,
-          results: result.body.results,
-          timestamp: new Date(),
-          executionTime: executionTime.value,
-          type: isSelectQuery ? 'query' : 'execute'
+      sqlStore.addQueryResult({
+        query: sqlQuery.value,
+        results,
+        timestamp: new Date(),
+        executionTime: executionTime.value,
+        type: isSelectQuery ? 'query' : 'execute'
+      })
+
+      activeTabIndex.value = 0
+
+      if (showToast) {
+        const stats = getQueryStats(queryResults.value)
+        const apiDuration = stats?.duration || executionTime.value
+
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: `Query executed in ${apiDuration}ms`,
+          life: 3000
         })
+      }
 
-        activeTabIndex.value = 0
-
-        if (showToast) {
-          const stats = getQueryStats(queryResults.value)
-          const apiDuration = stats?.duration || executionTime.value
-
-          toast.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: `Query executed in ${apiDuration}ms`,
-            life: 3000
-          })
-        }
-
-        if (
-          !isSelectQuery &&
-          (sqlQuery.value.toLowerCase().includes('create table') ||
-            sqlQuery.value.toLowerCase().includes('drop table') ||
-            sqlQuery.value.toLowerCase().includes('alter table'))
-        ) {
-          await loadTables()
-        }
-      } else {
-        throw new Error(result.error || 'Error executing query')
+      if (
+        !isSelectQuery &&
+        (sqlQuery.value.toLowerCase().includes('create table') ||
+          sqlQuery.value.toLowerCase().includes('drop table') ||
+          sqlQuery.value.toLowerCase().includes('alter table'))
+      ) {
+        await loadTables()
       }
     } catch (error) {
       const errorMessage = error.message || 'An unexpected error occurred'
@@ -969,23 +933,6 @@
     event.stopPropagation()
   }
 
-  const monacoOptions = {
-    minimap: { enabled: false },
-    tabSize: 2,
-    formatOnPaste: true,
-    wordWrap: 'on',
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    fontSize: 13,
-    lineNumbers: 'on',
-    folding: false,
-    glyphMargin: false,
-    lineDecorationsWidth: 6,
-    lineNumbersMinChars: 3,
-    renderLineHighlight: 'none',
-    padding: { top: 10, bottom: 10 }
-  }
-
   const handleKeyDown = (event) => {
     if (event.ctrlKey && event.key === 'Enter') {
       event.preventDefault()
@@ -993,6 +940,11 @@
         executeQuery()
       }
     }
+  }
+
+  const setSqlQuery = (query) => {
+    sqlQuery.value = query
+    executeQuery()
   }
 
   onMounted(async () => {
@@ -1033,7 +985,7 @@
     <ContentBlock data-testid="edge-sql-database-content-block">
       <template #heading>
         <PageHeadingBlock
-          :pageTitle="databaseName || databaseId"
+          :pageTitle="databaseName"
           data-testid="edge-sql-database-heading"
         >
           <template #actions>
@@ -1050,7 +1002,7 @@
       </template>
       <template #content>
         <div class="sql-interface h-full overflow-hidden">
-          <div class="flex h-full gap-3 p-3">
+          <div class="flex h-full gap-3">
             <div
               class="database-sidebar flex-shrink-0 bg-surface-0 border-round-lg border-1 surface-border"
               style="width: 320px"
@@ -1182,84 +1134,18 @@
                     <AccordionTab>
                       <template #header>
                         <div class="flex items-center gap-2">
-                          <i class="pi pi-code text-primary"></i>
                           <span class="font-semibold text-color">Query Editor</span>
                         </div>
                       </template>
-
-                      <div class="p-3 editor-content">
-                        <div
-                          class="sql-editor-container mb-3 border-1 surface-border overflow-hidden"
-                          style="height: 180px"
-                        >
-                          <vue-monaco-editor
-                            v-model:value="sqlQuery"
-                            language="sql"
-                            :theme="monacoTheme"
-                            :options="{ ...monacoOptions, readOnly: isExecutingQuery }"
-                            class="w-full h-full"
-                          />
-                        </div>
-
-                        <div class="flex justify-content-between align-items-center">
-                          <div class="flex align-items-center gap-3">
-                            <Button
-                              :label="isExecutingQuery ? 'Executing...' : 'Execute Query'"
-                              :icon="isExecutingQuery ? 'pi pi-spin pi-spinner' : 'pi pi-play'"
-                              severity="primary"
-                              :loading="isExecutingQuery"
-                              @click="executeQuery"
-                              :disabled="!sqlQuery.trim() || isExecutingQuery"
-                              class="font-medium"
-                              v-tooltip.top="'Execute Query (Ctrl+Enter)'"
-                            />
-                            <Button
-                              label="Clear"
-                              icon="pi pi-delete-left"
-                              severity="secondary"
-                              outlined
-                              @click="sqlQuery = ''"
-                              :disabled="isExecutingQuery"
-                            />
-                          </div>
-
-                          <div
-                            v-if="queryResults.length > 0"
-                            class="flex align-items-center gap-3 text-sm text-color-secondary px-3 py-1 bg-surface-100 dark:bg-surface-700 border-round"
-                          >
-                            <div
-                              v-if="getQueryStats(queryResults)?.duration"
-                              class="flex align-items-center gap-1"
-                            >
-                              <i class="pi pi-clock text-xs"></i>
-                              <span>{{ getQueryStats(queryResults).duration }}ms</span>
-                            </div>
-
-                            <div
-                              v-else-if="executionTime > 0"
-                              class="flex align-items-center gap-1"
-                            >
-                              <i class="pi pi-clock text-xs"></i>
-                              <span>{{ executionTime }}ms</span>
-                            </div>
-
-                            <div
-                              v-if="getQueryStats(queryResults)?.rowsRead !== undefined"
-                              class="flex align-items-center gap-1"
-                            >
-                              <i class="pi pi-eye text-xs"></i>
-                              <span>{{ getQueryStats(queryResults).rowsRead }} read</span>
-                            </div>
-                            <div
-                              v-if="getQueryStats(queryResults)?.rowsWritten !== undefined"
-                              class="flex align-items-center gap-1"
-                            >
-                              <i class="pi pi-pencil text-xs"></i>
-                              <span>{{ getQueryStats(queryResults).rowsWritten }} written</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      sqlQuery: {{ sqlQuery }}
+                      <QueryEditorBlock
+                        :sqlQuery="sqlQuery"
+                        :queryResults="queryResults"
+                        :executionTime="executionTime"
+                        :isExecutingQuery="isExecutingQuery"
+                        :monacoTheme="monacoTheme"
+                        @execute-query="setSqlQuery"
+                      />
                     </AccordionTab>
                   </Accordion>
                 </div>
@@ -1273,10 +1159,9 @@
                       <template #header>
                         <div class="flex items-center gap-2">
                           <i class="pi pi-table"></i>
-                          <span>Results</span>
+                          Results
                         </div>
                       </template>
-
                       <div
                         v-if="isExecutingQuery"
                         class="results-container"
@@ -1315,9 +1200,8 @@
                           </div>
                         </div>
                       </div>
-
                       <div
-                        v-else-if="queryResults.length === 0"
+                        v-else-if="!queryResults[0]?.rows?.length"
                         class="flex flex-col items-center justify-center text-center p-8 min-h-[300px]"
                       >
                         <i class="pi pi-search text-6xl text-primary mb-4 opacity-50"></i>
@@ -1347,14 +1231,14 @@
                                 :value="`${result.rows.length} row${
                                   result.rows.length !== 1 ? 's' : ''
                                 }`"
-                                severity="success"
+                                severity="info"
                                 class="text-xs"
                               />
                             </h4>
 
                             <div class="flex items-center gap-2">
                               <Button
-                                v-if="result.columns?.length > 0"
+                                v-if="result.columns?.length"
                                 label="Insert"
                                 icon="pi pi-plus"
                                 severity="primary"
@@ -1402,7 +1286,7 @@
                           </div>
 
                           <div
-                            v-else-if="result.columns?.length > 0"
+                            v-else-if="result.columns?.length"
                             class="border-round-lg shadow-sm border-1 surface-border overflow-hidden"
                           >
                             <DataTable

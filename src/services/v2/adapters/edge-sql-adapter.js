@@ -1,8 +1,27 @@
-export class EdgeSQLAdapter {
-  static adaptDatabaseStatus(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    const database = data.data || data
+import { formatExhibitionDate } from '@/helpers/convert-date'
+import { parseStatusData } from '../utils/adapter/parse-status-utils'
 
+const getStatusSeverity = (status) => {
+  switch (status) {
+    case 'created':
+      return 'success'
+    case 'creating':
+      return 'info'
+    case 'deletion_failed':
+      return 'danger'
+    case 'deleting':
+      return 'warning'
+    case 'unknown':
+      return 'warning'
+    case 'pending':
+      return 'info'
+    default:
+      return 'info'
+  }
+}
+
+export const EdgeSQLAdapter = {
+  adaptDatabaseStatus(database) {
     return {
       id: database.id,
       name: database.name,
@@ -16,318 +35,151 @@ export class EdgeSQLAdapter {
       productVersion: database.product_version,
       lastEditor: database.last_editor
     }
-  }
-
-  static adaptDatabaseList(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    if (!data || !Array.isArray(data.results)) {
+  },
+  adaptDatabaseList(data) {
+    const parsedDatabases = data.map((database) => {
       return {
-        count: 0,
-        body: []
+        id: database.id,
+        name: database.name,
+        status: {
+          content: database.status,
+          severity: getStatusSeverity(database.status)
+        },
+        active: parseStatusData(database.active),
+        last_modified: formatExhibitionDate(database.last_modified, 'full', undefined),
+        lastModifyDate: database.last_modified
       }
-    }
+    })
 
-    const parsedDatabases = data.results
-      .map((database) => {
-        if (!database || typeof database !== 'object') {
-          return null
-        }
+    return parsedDatabases
+  },
 
-        return {
-          id: String(database.id || ''),
-          name: {
-            text: database.name || '',
-            tagProps: {}
-          },
-          clientId: database.client_id,
-          status: {
-            content: String(database.status || 'unknown'),
-            severity: EdgeSQLAdapter.getStatusSeverity(database.status)
-          },
-          created_at: EdgeSQLAdapter.formatDate(database.created_at || database.last_modified),
-          last_modified: EdgeSQLAdapter.formatDate(database.last_modified),
-          lastModifyDate: String(database.last_modified || '')
-        }
-      })
-      .filter(Boolean)
-
-    return {
-      count: parseInt(data.count || 0),
-      body: parsedDatabases
-    }
-  }
-
-  static adaptDatabaseCreate(httpResponse) {
+  adaptDatabaseCreate(httpResponse) {
     const data = httpResponse.data || httpResponse.body
     const database = data.data || data
     return {
       id: database.id,
       name: database.name,
-      clientId: database.client_id,
       status: database.status || 'creating',
-      createdAt: database.created_at || database.last_modified,
-      updatedAt: database.updated_at || database.last_modified,
-      lastModified: database.last_modified,
-      isActive: database.active !== undefined ? database.active : database.is_active,
-      productVersion: database.product_version,
-      lastEditor: database.last_editor
+      active: database.active
     }
-  }
+  },
 
-  static adaptDatabase(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    const database = data.data || data
+  adaptDatabase({ data }) {
     return {
-      statusCode: 200,
-      body: {
-        id: database.id,
-        name: database.name,
-        clientId: database.client_id,
-        status: database.status,
-        createdAt: database.created_at || database.last_modified,
-        updatedAt: database.updated_at || database.last_modified,
-        lastModified: database.last_modified,
-        isActive: database.active !== undefined ? database.active : database.is_active,
-        productVersion: database.product_version,
-        lastEditor: database.last_editor
-      }
+      id: data.id,
+      name: data.name,
+      status: data.status,
+      lastModified: data.last_modified,
+      active: data.active
     }
-  }
-
-  static adaptTables(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    if (!data || !Array.isArray(data.results)) {
-      return []
-    }
-
+  },
+  adaptTables(data) {
     return data.results.map((table) => ({
       name: table.name,
       type: table.type || 'table',
       sql: table.sql
     }))
-  }
+  },
 
-  static adaptTablesFromQuery(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-
-    if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
-      return {
-        statusCode: 200,
-        body: {
-          tables: []
-        }
-      }
-    }
-
-    const firstResult = data.data[0]
-    if (firstResult.error || !firstResult.results?.rows) {
-      return {
-        statusCode: 200,
-        body: {
-          tables: []
-        }
-      }
-    }
-
-    const tables = firstResult.results.rows.map((row) => ({
+  adaptTablesFromQuery({ data }) {
+    if (!data[0].results.rows.length) return []
+    return data[0].results.rows.map((row) => ({
       name: row[0],
       type: row[1] || 'table',
       sql: row[2] || ''
     }))
+  },
 
-    return {
-      statusCode: 200,
-      body: {
-        tables: tables
-      }
-    }
-  }
-
-  static adaptTablesFromExecute(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    const results = data.data || data
-
-    if (!Array.isArray(results) || results.length === 0) {
-      return {
-        statusCode: 200,
-        body: {
-          tables: []
-        }
-      }
-    }
-
-    const result = results[0]
-    if (!result.rows || !Array.isArray(result.rows)) {
-      return {
-        statusCode: 200,
-        body: {
-          tables: []
-        }
-      }
-    }
-
-    const tables = result.rows.map((row) => ({
+  adaptTablesFromExecute({ data }) {
+    return data[0].rows.map((row) => ({
       name: row[0],
       type: row[1] || 'table',
       sql: row[2] || ''
     }))
+  },
 
-    return {
-      statusCode: 200,
-      body: {
-        tables: tables
-      }
-    }
-  }
-
-  static adaptQueryResult(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-
-    if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-      const firstError = data.errors[0]
-      throw new Error(`${firstError.title}: ${firstError.detail}`)
-    }
-
-    const results =
-      data?.data?.map((item) => {
-        if (item.error) {
-          return {
-            error: item.error,
-            columns: [],
-            rows: [],
-            statement: null,
-            query_duration_ms: null,
-            rows_read: null,
-            rows_written: null
-          }
-        }
-
-        return {
-          columns: item.results?.columns || [],
-          rows: item.results?.rows || [],
-          statement: item.results?.statement,
-          query_duration_ms: item.results?.query_duration_ms,
-          rows_read: item.results?.rows_read,
-          rows_written: item.results?.rows_written
-        }
-      }) || []
-
-    return {
-      statusCode: 200,
-      body: {
-        state: data?.state || 'executed',
-        results,
-        affectedRows:
-          results.reduce((total, result) => {
-            return total + (result.rows?.length || 0)
-          }, 0) || 0
-      }
-    }
-  }
-
-  static adaptQueryFromExecute(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-    const results = data.data || data
-
-    if (!Array.isArray(results) || results.length === 0) {
+  adaptQueryResult({ data }) {
+    const results = data.map((item) => {
       return {
-        statusCode: 200,
-        body: {
-          results: [
-            {
-              rows: [],
-              columns: [],
-              rowsAffected: 0,
-              executionTime: 0,
-              success: true
-            }
-          ]
-        }
+        columns: item.results?.columns || [],
+        rows: item.results?.rows || [],
+        statement: item.results?.statement,
+        queryDurationMs: item.results?.query_duration_ms,
+        rowsRead: item.results?.rows_read,
+        rowsWritten: item.results?.rows_written
       }
-    }
+    })
 
-    const result = results[0]
     return {
-      statusCode: 200,
-      body: {
-        results: [
-          {
-            rows: result.rows || [],
-            columns: result.columns || [],
-            rowsAffected: result.rowsAffected || result.rows_affected || 0,
-            executionTime: result.executionTime || result.execution_time || 0,
-            success: true
-          }
-        ]
-      }
+      state: data?.state || 'executed',
+      results,
+      affected: EdgeSQLAdapter.affectedRows({ data })
     }
-  }
+  },
 
-  static adaptExecuteResult(httpResponse) {
-    const data = httpResponse.data || httpResponse.body
-
-    if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-      const firstError = data.errors[0]
-      throw new Error(`${firstError.title}: ${firstError.detail}`)
+  adaptSqlCommands(sql) {
+    if (!sql[0] || sql[0].trim() === '') {
+      return []
     }
 
-    const results =
-      data?.data?.map((item) => {
-        if (item.error) {
-          return {
-            error: item.error,
-            columns: [],
-            rows: [],
-            statement: null,
-            query_duration_ms: null,
-            rows_read: null,
-            rows_written: null
-          }
+    const separator = /(?=\b(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b)/i
+
+    const formatSql = sql[0]
+      .split(separator)
+      .map((statement) => statement.trim())
+      .filter((statement) => statement.length > 0)
+
+    return {
+      statements: formatSql
+    }
+  },
+
+  adaptQueryFromExecute({ data }) {
+    const result = data[0]
+    return {
+      state: data?.state || 'executed',
+      results: [
+        {
+          rows: result.rows || [],
+          columns: result.columns || [],
+          rowsAffected: result.rowsAffected || result.rows_affected || 0,
+          executionTime: result.executionTime || result.execution_time || 0,
+          success: true
         }
+      ]
+    }
+  },
 
+  adaptExecuteResult({ data }) {
+    const results =
+      data?.map((item) => {
         return {
           columns: item.results?.columns || [],
           rows: item.results?.rows || [],
           statement: item.results?.statement,
-          query_duration_ms: item.results?.query_duration_ms,
-          rows_read: item.results?.rows_read,
-          rows_written: item.results?.rows_written
+          queryDurationMs: item.results?.query_duration_ms,
+          rowsRead: item.results?.rows_read,
+          rowsWritten: item.results?.rows_written
         }
       }) || []
 
     return {
-      statusCode: 200,
-      body: {
-        state: data?.state || 'executed',
-        results,
-        affectedRows:
-          results.reduce((total, result) => {
-            return total + (result.rows?.length || 0)
-          }, 0) || 0
-      }
+      state: data?.state || 'executed',
+      results,
+      affectedRows: EdgeSQLAdapter.affectedRows({ data })
     }
-  }
+  },
 
-  static getStatusSeverity(status) {
-    switch (status) {
-      case 'created':
-        return 'success'
-      case 'creating':
-        return 'info'
-      case 'deletion_failed':
-        return 'danger'
-      case 'deleting':
-        return 'warning'
-      case 'unknown':
-        return 'warning'
-      case 'pending':
-        return 'info'
-      default:
-        return 'info'
-    }
-  }
+  affectedRows({ data }) {
+    return (
+      data.reduce((total, result) => {
+        return total + (result.rows?.length || 0)
+      }, 0) || 0
+    )
+  },
 
-  static adaptDatabaseDelete(httpResponse) {
+  adaptDatabaseDelete(httpResponse) {
     const data = httpResponse.data || httpResponse.body
 
     if (data?.state === 'pending') {
@@ -335,13 +187,5 @@ export class EdgeSQLAdapter {
     }
 
     return 'Database successfully deleted'
-  }
-
-  static formatDate(dateString) {
-    if (!dateString) return ''
-    return new Intl.DateTimeFormat('en-US', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(new Date(dateString))
   }
 }

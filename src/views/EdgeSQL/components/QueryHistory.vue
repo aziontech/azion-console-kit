@@ -95,7 +95,7 @@
           v-tooltip.top="'Export history'"
         />
         <Button
-          icon="pi pi-trash"
+          icon="pi pi-times-circle"
           severity="danger"
           class="p-button-text p-button-sm !flex !items-center !justify-center w-8 h-8"
           @click="clearHistory"
@@ -154,7 +154,7 @@
             <Button
               icon="pi pi-play"
               severity="primary"
-              class="p-button-sm ml-2 !flex !items-center !justify-center w-6 h-6"
+              outlined
               @click="rerunQuery(data)"
               v-tooltip.top="'Run again'"
             />
