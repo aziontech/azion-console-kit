@@ -25,8 +25,6 @@ const needRefresh = ref(false)
 const selectedFiles = ref([])
 const isDownloading = ref(false)
 
-const toast = useToast()
-
 const uploadProgress = computed(() => {
   if (!totalBytesToUpload.value) return 0
   const completedFilesBytes = uploadedFiles.value.reduce((sum, file) => sum + file.size, 0)
@@ -71,6 +69,7 @@ const validationSchema = yup.object({
 })
 
 const handleToast = (severity, summary, message) => {
+  const toast = useToast()
   toast.add({
     severity: severity,
     summary: summary,
@@ -269,12 +268,7 @@ export const useEdgeStorage = () => {
       }
       link.click()
     } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error downloading files',
-        detail: error.message,
-        life: 5000
-      })
+      handleToast('error', 'Error downloading files', error.message)
     } finally {
       isDownloading.value = false
     }
