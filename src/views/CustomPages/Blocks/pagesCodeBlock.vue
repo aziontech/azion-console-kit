@@ -104,7 +104,6 @@
       header: 'Page Status Code',
       type: 'component',
       filterPath: 'code.value',
-      sortField: 'code.value',
       component: (columnData) => {
         return columnBuilder({
           data: {
