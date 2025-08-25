@@ -14,7 +14,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-  const emit = defineEmits(['onSuccess'])
+  const emit = defineEmits(['onSuccess', 'navigate-to-main-settings'])
 
   const props = defineProps({
     edgeApplicationId: {
@@ -289,6 +289,12 @@
     await listOriginsOptions()
   }
 
+  const handleNavigateToMainSettings = () => {
+    emit('navigate-to-main-settings')
+    closeDrawerEdit()
+    closeDrawerCreate()
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit,
@@ -334,6 +340,7 @@
         @toggleDrawer="handleToggleDrawer"
         @refreshCacheSettings="handleRefreshCacheSettings"
         @refreshOrigins="handleRefreshOrigins"
+        @navigate-to-main-settings="handleNavigateToMainSettings"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
@@ -366,6 +373,7 @@
         @toggleDrawer="handleToggleDrawer"
         @refreshOrigins="handleRefreshOrigins"
         @refreshCacheSettings="handleRefreshCacheSettings"
+        @navigate-to-main-settings="handleNavigateToMainSettings"
         :clipboardWrite="clipboardWrite"
         :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
         :originsOptions="originsOptions"

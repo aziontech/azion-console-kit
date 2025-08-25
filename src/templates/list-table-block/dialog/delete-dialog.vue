@@ -32,7 +32,10 @@
         </p>
       </div>
 
-      <div data-testid="delete-dialog-confirmation">
+      <div
+        data-testid="delete-dialog-confirmation"
+        v-if="!data.bypassConfirmation"
+      >
         <div
           class="flex flex-col w-full gap-2"
           data-testid="delete-dialog-confirmation-input"
@@ -127,7 +130,7 @@
   const { value: confirmation } = useField('confirmation')
 
   const removeItem = async () => {
-    if (!canDelete.value || !meta.value.valid) return
+    if ((!canDelete.value || !meta.value.valid) && !data.bypassConfirmation) return
 
     loading.value = true
     try {
@@ -169,7 +172,7 @@
   })
 
   const isDisabled = computed(() => {
-    return !meta.value.valid || loading.value
+    return (!meta.value.valid && !data.bypassConfirmation) || loading.value
   })
 
   const deleteMessage = computed(() => {
