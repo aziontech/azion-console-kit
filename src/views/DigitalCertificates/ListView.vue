@@ -19,6 +19,7 @@
         @on-before-go-to-edit="handleTrackEventGoToEdit"
         ref="listTableBlock"
         :defaultOrderingFieldName="'-last_modified'"
+        :hiddenByDefault="hiddenColumns"
       >
         <template #select-buttons>
           <div class="flex flex-row gap-2">
@@ -98,7 +99,13 @@
     'status',
     'status_detail',
     'validity',
-    'type'
+    'type',
+    'challenge',
+    'authority',
+    'key_algorithm',
+    'last_editor',
+    'last_modified',
+    'managed'
   ]
   const digitalCertificateTypeSelected = ref('Certificates')
   const optionsSelectButton = ref(['Certificates', 'CRL'])
@@ -155,6 +162,13 @@
     })
   }
 
+  const hiddenColumns = computed(() => {
+    if (certificateTypeList.value === 'CRL') {
+      return []
+    }
+    return ['managed', 'challenge', 'authority', 'keyAlgorithm']
+  })
+
   const getColumns = computed(() => {
     if (certificateTypeList.value === 'CRL') {
       return [
@@ -176,6 +190,22 @@
           field: 'issuer',
           header: 'Issuer',
           sortField: 'issuer'
+        },
+        {
+          field: 'lastEditor',
+          header: 'Last Editor',
+          sortField: 'last_editor',
+          type: 'component',
+          component: (columnData) =>
+            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+        },
+        {
+          field: 'lastModified',
+          header: 'Last Modified',
+          sortField: 'last_modified',
+          type: 'component',
+          component: (columnData) =>
+            columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
         },
         {
           field: 'status',
@@ -226,7 +256,26 @@
       {
         field: 'validity',
         header: 'Expiration Date',
-        sortField: 'validity'
+        sortField: 'validity',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      },
+      {
+        field: 'lastEditor',
+        header: 'Last Editor',
+        sortField: 'last_editor',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
+      },
+      {
+        field: 'lastModified',
+        header: 'Last Modified',
+        sortField: 'last_modified',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: { value: columnData }, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'status',
@@ -238,6 +287,32 @@
             data: { ...columnData.status, tooltipText: columnData.statusDetail },
             columnAppearance: 'tag-with-tooltip'
           })
+      },
+      {
+        field: 'managed',
+        header: 'Managed',
+        sortField: 'managed',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: { content: columnData, severity: columnData ? 'success' : 'danger' },
+            columnAppearance: 'tag'
+          })
+      },
+      {
+        field: 'challenge',
+        header: 'Challenge',
+        sortField: 'challenge'
+      },
+      {
+        field: 'authority',
+        header: 'Authority',
+        sortField: 'authority'
+      },
+      {
+        field: 'keyAlgorithm',
+        header: 'Key Algorithm',
+        sortField: 'key_algorithm'
       }
     ]
   })
