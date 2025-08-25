@@ -71,9 +71,15 @@ export const DigitalCertificatesAdapter = {
         id: checkIfFieldExist(item?.id, null),
         name: checkIfFieldExist(item?.name),
         issuer: checkIfFieldExist(item?.issuer),
-        subjectName,
+        subjectName: subjectName.length ? subjectName : '-',
         type: checkIfFieldExist(typeMap[item?.type]),
         validity: item?.validity ? getCurrentTimezone(item.validity) : '-',
+        challenge: checkIfFieldExist(item?.challenge),
+        authority: checkIfFieldExist(item?.authority),
+        keyAlgorithm: checkIfFieldExist(item?.key_algorithm),
+        lastEditor: checkIfFieldExist(item?.last_editor),
+        lastModified: item?.last_modified ? getCurrentTimezone(item.last_modified) : '-',
+        managed: item?.managed,
         status: {
           status: parseStatusString(item.status),
           statusDetail: item?.status_detail
